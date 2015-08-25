@@ -4,7 +4,9 @@ import com.conveyal.osmlib.OSM;
 import org.joda.time.LocalDate;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
+import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.profile.RaptorWorkerData;
+import org.opentripplanner.streets.LinkedPointSet;
 import org.opentripplanner.streets.StreetLayer;
 import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
@@ -32,9 +34,9 @@ public class TransportNetwork implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransportNetwork.class);
 
-    StreetLayer streetLayer;
+    public StreetLayer streetLayer;
 
-    TransitLayer transitLayer;
+    public TransitLayer transitLayer;
 
     public void write (OutputStream stream) throws IOException {
         LOG.info("Writing transport network...");
@@ -62,6 +64,7 @@ public class TransportNetwork implements Serializable {
         TransportNetwork transportNetwork = TransportNetwork.fromDirectory(new File("."));
 
         // Try out constructing older raptor data format
+        transportNetwork.buildStopTrees(); // optional but needed for RaptorWorkerData
         RaptorWorkerData raptorWorkerData = new RaptorWorkerData(transportNetwork.transitLayer, new LocalDate());
 
         try {
@@ -110,7 +113,6 @@ public class TransportNetwork implements Serializable {
         // Edge lists must be built after all inter-layer linking has occurred.
         streetLayer.buildEdgeLists();
         transitLayer.rebuildTransientIndexes();
-        transitLayer.buildStopTrees(streetLayer);
 
         // Create transfers
         new TransferFinder(transitLayer, streetLayer, 1000).findTransfers();
@@ -195,11 +197,12 @@ public class TransportNetwork implements Serializable {
             // with the stops that were reached.
             int from = random.nextInt(nStreetIntersections);
             int to = random.nextInt(nStreetIntersections);
+            streetRouter.setOrigin(from);
+            streetRouter.route();
+            streetRouter.setOrigin(to);
+            streetRouter.route();
             transitRouter.reset();
-            streetRouter.route(from, StreetRouter.ALL_VERTICES);
-            transitRouter.setOrigins(streetRouter.timesToReachedStops(transitLayer));
-            streetRouter.route(to, StreetRouter.ALL_VERTICES);
-            transitRouter.setTargets(streetRouter.timesToReachedStops(transitLayer).keySet());
+            transitRouter.setOrigins(streetRouter.getReachedStops(), 8 * 60 * 60);
             transitRouter.route();
             if (n != 0 && n % 100 == 0) {
                 LOG.info("    {}/{} searches", n, N);
@@ -207,6 +210,30 @@ public class TransportNetwork implements Serializable {
         }
         double eTime = System.currentTimeMillis() - startTime;
         LOG.info("average response time {} msec", eTime / N);
+    }
+
+
+    /**
+     * Creates some transient (non-serialized) data about which street vertices are close to which transit stops.
+     */
+    public void buildStopTrees() {
+        transitLayer.buildStopTrees(streetLayer);
+    }
+
+    /**
+     * TODO cache this grid.
+     * @return an efficient implicit grid PointSet for this TransportNetwork.
+     */
+    public PointSet getGridPointSet() {
+        return null; // new WebMercatorGridPointSet(this);
+    }
+
+    /**
+     * TODO cache this grid.
+     * @return an efficient implicit grid PointSet for this TransportNetwork, pre-linked to the street layer.
+     */
+    public LinkedPointSet getLinkedGridPointSet() {
+        return getGridPointSet().link(streetLayer);
     }
 
 }

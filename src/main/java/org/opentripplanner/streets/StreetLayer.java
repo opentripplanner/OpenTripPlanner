@@ -63,6 +63,8 @@ public class StreetLayer implements Serializable {
     transient Histogram edgesPerWayHistogram = new Histogram("Number of edges per way per direction");
     transient Histogram pointsPerEdgeHistogram = new Histogram("Number of geometry points per edge");
 
+    public TransitLayer linkedTransitLayer = null;
+
     public void loadFromOsm (OSM osm) {
         LOG.info("Making street edges from OSM ways...");
         this.osm = osm;
@@ -183,10 +185,10 @@ public class StreetLayer implements Serializable {
         Random random = new Random();
         for (int n = 0; n < N; n++) {
             int from = random.nextInt(nVertices);
-            int to = withDestinations ? random.nextInt(nVertices) : StreetRouter.ALL_VERTICES;
             VertexStore.Vertex vertex = vertexStore.getCursor(from);
             // LOG.info("Routing from ({}, {}).", vertex.getLat(), vertex.getLon());
-            router.route(from, to);
+            router.setOrigin(from);
+            router.toVertex = withDestinations ? random.nextInt(nVertices) : StreetRouter.ALL_VERTICES;
             if (n != 0 && n % 100 == 0) {
                 LOG.info("    {}/{} searches", n, N);
             }
@@ -243,8 +245,8 @@ public class StreetLayer implements Serializable {
         EdgeStore.Edge edge = edgeStore.getCursor(split.edge);
 
         // Check for cases where we don't need to create a new vertex (the edge is reached end-wise)
-        if (split.lengthBefore_mm < SNAP_RADIUS_MM || split.lengthAfter_mm < SNAP_RADIUS_MM) {
-            if (split.lengthBefore_mm < split.lengthAfter_mm) {
+        if (split.distance0_mm < SNAP_RADIUS_MM || split.distance1_mm < SNAP_RADIUS_MM) {
+            if (split.distance0_mm < split.distance1_mm) {
                 // Very close to the beginning of the edge.
                 return edge.getFromVertex();
             } else {
@@ -259,13 +261,13 @@ public class StreetLayer implements Serializable {
         // Modify the existing bidirectional edge pair to lead up to the split.
         // Its spatial index entry is still valid, its envelope has only shrunk.
         int oldToVertex = edge.getToVertex();
-        edge.setLengthMm(split.lengthBefore_mm);
+        edge.setLengthMm(split.distance0_mm);
         edge.setToVertex(newVertexIndex);
         edge.setGeometry(Collections.EMPTY_LIST); // Turn it into a straight line for now.
 
         // Make a second, new bidirectional edge pair after the split and add it to the spatial index.
         // New edges will be added to edge lists later (the edge list is a transient index).
-        EdgeStore.Edge newEdge = edgeStore.addStreetPair(newVertexIndex, oldToVertex, split.lengthAfter_mm);
+        EdgeStore.Edge newEdge = edgeStore.addStreetPair(newVertexIndex, oldToVertex, split.distance1_mm);
         spatialIndex.insert(newEdge.getEnvelope(), newEdge.edgeIndex);
         // TODO newEdge.copyFlagsFrom(edge) to match the existing edge...
         return newVertexIndex;
@@ -275,8 +277,8 @@ public class StreetLayer implements Serializable {
     }
 
     /**
-     * Non-destructively find a good split location on an existing street.
-     * @return a Split object representing a point along a sub-segment of a specific edge.
+     * Non-destructively find a location on an existing street near the given point.
+     * @return a Split object representing a point along a sub-segment of a specific edge, or null if there are no streets nearby.
      */
     public Split findSplit (double lat, double lon, double radiusMeters) {
         return Split.find (lat, lon, radiusMeters, this);
@@ -285,6 +287,8 @@ public class StreetLayer implements Serializable {
     /**
      * For every stop in a TransitLayer, find or create a nearby vertex in the street layer and record the connection
      * between the two.
+     * It only makes sense to link one TransitLayer to one StreetLayer, otherwise the bi-mapping between transit stops
+     * and street vertices would be ambiguous.
      */
     public void associateStops (TransitLayer transitLayer, int radiusMeters) {
         for (Stop stop : transitLayer.stopForIndex) {
@@ -292,6 +296,9 @@ public class StreetLayer implements Serializable {
             transitLayer.streetVertexForStop.add(streetVertexIndex); // -1 means no link
             // The inverse stopForStreetVertex map is a transient, derived index and will be built later.
         }
+        // Bidirectional reference between the StreetLayer and the TransitLayer
+        transitLayer.linkedStreetLayer = this;
+        this.linkedTransitLayer = transitLayer;
     }
 
     /**
@@ -310,5 +317,6 @@ public class StreetLayer implements Serializable {
     public int getVertexCount() {
         return vertexStore.nVertices;
     }
+
 
 }

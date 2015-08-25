@@ -6,7 +6,8 @@ import java.io.Serializable;
 
 /**
  * Statistics about running a single task.
- * TODO use two functions: markTime() and finishedX() for each time record. The markTime() function can be reused for every record.
+ * TODO add markField functions: "field = System.currentTimeMillis() - field;"
+ * Every time it's called after the first time will record the elapsed time, assuming fields are initialized to 0.
  */
 public class TaskStatistics implements Serializable{
 

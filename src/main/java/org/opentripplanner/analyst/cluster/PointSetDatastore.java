@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * TODO what does this do? Does it really need to be a subclass?
+ */
 public class PointSetDatastore extends PointSetCache {
 
 	static private File POINT_DIR = new File("cache", "pointsets");

@@ -55,8 +55,9 @@ public class TransferFinder {
                 transfersForStop.add(EMPTY_INT_LIST);
                 continue;
             }
-            streetRouter.route(originStreetVertex, StreetRouter.ALL_VERTICES);
-            TIntIntMap timesToReachedStops = streetRouter.timesToReachedStops(transitLayer);
+            streetRouter.setOrigin(originStreetVertex);
+            streetRouter.route();
+            TIntIntMap timesToReachedStops = streetRouter.getReachedStops();
             // Filter down the list of target stops to only include those stops that are the closest on some pattern.
             TIntIntMap bestStopOnPattern = new TIntIntHashMap(50, 0.5f, -1, -1);
             // For every reached stop,
@@ -88,7 +89,7 @@ public class TransferFinder {
             usefulTargetStops.forEach(targetStopIndex -> {
                 packedTransfers.add(targetStopIndex);
                 packedTransfers.add(timesToReachedStops.get(targetStopIndex));
-                // LOG.info("{} at {}m", transitLayer.stopForIndex.get(targetStopIndex).stop_code, timesToReachedStops.get(targetStopIndex));
+                // LOG.info("{} at {}m", transitLayer.stopForIndex.get(targetStopIndex).stop_code, timegetReachedStops(targetStopIndex));
                 return true;
             });
             // Record this list of transfers as coming out of the stop with index s.

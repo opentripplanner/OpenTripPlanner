@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  *  RAPTOR
+ *  This just searches to the entire network, no goal direction or pruning except a max travel time.
  */
 public class TransitRouter {
 
@@ -37,13 +38,13 @@ public class TransitRouter {
 
     TIntIntMap bestTimeForStop = new TIntIntHashMap(1000, 0.5f, -1, Integer.MAX_VALUE);
 
-    TIntSet targets = new TIntHashSet();
-
-    TIntSet remainingTargets = new TIntHashSet();
-
     BitSet touchedStops = new BitSet();
 
     BitSet touchedPatterns = new BitSet();
+
+    public int maxTravelTimeSeconds = 60 * 60 * 2;
+
+    private int departureTime; // seconds after midnight
 
     public TransitRouter (TransitLayer transitLayer) {
         this.transitLayer = transitLayer;
@@ -51,8 +52,6 @@ public class TransitRouter {
     }
 
     public void reset () {
-        targets.clear();
-        remainingTargets.clear();
         roundData.clear();
         touchedStops.clear();
         touchedPatterns.clear();
@@ -69,21 +68,16 @@ public class TransitRouter {
         roundData.add(currentRound);
     }
 
-    public void setOrigins (TIntIntMap distanceForStopIndex) {
+    // TODO use LocalDateTime
+    // public void setDepartureTime (int secondsAfterMidnight) {
+
+    public void setOrigins (TIntIntMap distanceForStopIndex, int secondsAfterMidnight) {
+        this.departureTime = secondsAfterMidnight;
         distanceForStopIndex.forEachEntry((originStopIndex, distanceMeters) -> {
-            currentRound.put(originStopIndex, distanceMeters);
+            // TODO apply walking speeds properly
+            currentRound.put(originStopIndex, distanceMeters + secondsAfterMidnight);
             return true;
         });
-    }
-
-    public void setTargets (TIntCollection targetStreetVertices) {
-        targetStreetVertices.forEach(targetStreetVertex -> {
-            int targetStopIndex = transitLayer.stopForStreetVertex.get(targetStreetVertex);
-            targets.add(targetStopIndex);
-            return true; // continue iteration
-        });
-        remainingTargets.clear();
-        remainingTargets.addAll(targets);
     }
 
     /**
@@ -117,6 +111,7 @@ public class TransitRouter {
         // Determine which services are active to avoid exploring those that are not running on this day.
         LocalDate searchDate = new LocalDate(2015, 8, 6);
         servicesActive = transitLayer.getActiveServicesForDate(searchDate);
+        final int latestAcceptableTime = departureTime + maxTravelTimeSeconds;
 
         while (true) {
             newRound();
@@ -142,16 +137,18 @@ public class TransitRouter {
                     // Move down the pattern updating arrival times.
                     if (previousRound.containsKey(stop)) {
                         // Attempt re-board at stops that might allow an earlier trip.
-                        // TODO efficient step-backward reboarding (with sorted stoptimes)
+                        // TODO efficient step-backward reboarding (with sorted stoptimes)... THE CURRENT METHOD IS PROBABLY VERY SLOW!
                         int prevRoundTime = previousRound.get(stop);
                         if (prevRoundTime + boardSlackSeconds < currentTrip.arrivals[s]) {
                             currentTrip = tripPattern.findNextDeparture(prevRoundTime + boardSlackSeconds, s);
                         }
                     }
                     int arrivalAtStop = currentTrip.arrivals[s];
-                    if (arrivalAtStop < bestTimeForStop.get(stop)) {
-                        currentRound.put(stop, arrivalAtStop);
-                        bestTimeForStop.put(stop, arrivalAtStop);
+                    if (arrivalAtStop < latestAcceptableTime) {
+                        if (arrivalAtStop < bestTimeForStop.get(stop)) {
+                            currentRound.put(stop, arrivalAtStop);
+                            bestTimeForStop.put(stop, arrivalAtStop);
+                        }
                     }
                 }
             }
@@ -167,7 +164,7 @@ public class TransitRouter {
         }
     }
 
-    // Really, this should create an additional round.
+    // Really, this should create an additional round... if we're trying to reconstruct paths.
     private void doTransfers () {
         // For every stop that was updated,
         currentRound.forEachEntry((stopIndex, arrivalTime) -> {

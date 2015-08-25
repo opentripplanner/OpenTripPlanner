@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents a potential split point along an existing edge, retaining some geometric calculation state so that
  * once the best candidate is found more detailed calculations can continue.
+ * TODO handle initial and final Splits on same edge (use straight-line distance)
  */
 public class Split {
 
@@ -24,9 +25,11 @@ public class Split {
     public double distSquared = Double.POSITIVE_INFINITY;
 
     // The following fields require more calculations and are only set once a best edge is found.
-    public int lengthBefore_mm = 0; // the accumulated distance along the edge geometry up to the split point
-    public int lengthAfter_mm = 0; // the accumulated distance along the edge geometry up to the split point
+    public int distance0_mm = 0; // the accumulated distance along the edge geometry up to the split point
+    public int distance1_mm = 0; // the accumulated distance along the edge geometry after the split point
     public int distance_mm = 0; // the distance from the search point to the split point on the street
+    public int vertex0; // the vertex at the beginning of the chosen edge
+    public int vertex1; // the vertex at the end of the chosen edge
 
     public void setFrom (Split other) {
         edge = other.edge;
@@ -88,12 +91,14 @@ public class Split {
             // No edge found nearby.
             return null;
         }
-        edge.seek(best.edge);
 
         // We found an edge. Iterate over its segments again, accumulating distances along its geometry.
         // The distance calculations involve square roots so are deferred to happen here, only on the selected edge.
         // TODO accumulate before/after geoms. Split point can be passed over since it's not an intermediate.
         // The length is are stored in one-element array to dodge Java's "effectively final" BS.
+        edge.seek(best.edge);
+        best.vertex0 = edge.getFromVertex();
+        best.vertex1 = edge.getToVertex();
         double[] lengthBefore_fixedDeg = new double[1];
         edge.forEachSegment((seg, fLat0, fLon0, fLat1, fLon1) -> {
             // Sum lengths only up to the split point.
@@ -110,19 +115,19 @@ public class Split {
         });
         // Convert the fixed-precision degree measurements into (milli)meters
         double lengthBefore_floatDeg = VertexStore.fixedDegreesToFloating((int)lengthBefore_fixedDeg[0]);
-        best.lengthBefore_mm = (int)(lengthBefore_floatDeg * metersPerDegreeLat * 1000);
+        best.distance0_mm = (int)(lengthBefore_floatDeg * metersPerDegreeLat * 1000);
         // FIXME perhaps we should be using the sphericalDistanceLibrary here, or the other way around.
         // The initial edge lengths are set using that library on OSM node coordinates, and they are slightly different.
         // We are using a single cosLat value at the linking point, instead of a different value at each segment.
-        if (best.lengthBefore_mm < 0) {
-            best.lengthBefore_mm = 0;
+        if (best.distance0_mm < 0) {
+            best.distance0_mm = 0;
             LOG.error("Length of first street segment was not positive.");
         }
-        if (best.lengthBefore_mm > edge.getLengthMm()) {
-            best.lengthBefore_mm = edge.getLengthMm();
+        if (best.distance0_mm > edge.getLengthMm()) {
+            best.distance0_mm = edge.getLengthMm();
             LOG.error("Length of first street segment was greater than the whole edge.");
         }
-        best.lengthAfter_mm = edge.getLengthMm() - best.lengthBefore_mm;
+        best.distance1_mm = edge.getLengthMm() - best.distance0_mm;
         return best;
     }
 }

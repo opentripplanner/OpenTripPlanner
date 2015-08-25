@@ -20,7 +20,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
- *
+ * This routes over the street layer of a TransitNetwork.
+ * It is a throw-away calculator object that retains routing state and after the search is finished.
+ * Additional functions are called to retrieve the routing results from that state.
  */
 public class StreetRouter {
 
@@ -42,15 +44,18 @@ public class StreetRouter {
 
     double targetLat, targetLon; // for goal direction heuristic
 
+    // If you set this to a non-negative number, the search will be directed toward that vertex .
+    public int toVertex = ALL_VERTICES;
+
     /**
-     * @return a map from transit stop indexes to their distances from the origin
+     * @return a map from transit stop indexes to their distances from the origin.
      * Note that the TransitLayer contains all the information about which street vertices are transit stops.
      */
-    public TIntIntMap timesToReachedStops (TransitLayer transitLayer) {
+    public TIntIntMap getReachedStops() {
         TIntIntMap result = new TIntIntHashMap();
         // Convert stop vertex indexes in street layer to transit layer stop indexes.
         bestStates.forEachEntry((vertexIndex, state) -> {
-            int stopIndex = transitLayer.stopForStreetVertex.get(vertexIndex);
+            int stopIndex = streetLayer.linkedTransitLayer.stopForStreetVertex.get(vertexIndex);
             // -1 indicates no value, this street vertex is not a transit stop
             if (stopIndex >= 0) {
                 result.put(stopIndex, state.weight);
@@ -79,17 +84,41 @@ public class StreetRouter {
         this.streetLayer = streetLayer;
     }
 
-    public void route (int fromVertex, int toVertex) {
-        long startTime = System.currentTimeMillis();
+    public void setOrigin (double lat, double lon) {
+        Split split = streetLayer.findSplit(lat, lon, 300);
+        bestStates.clear();
+        queue.reset();
+        State startState0 = new State(split.vertex0, -1, null);
+        State startState1 = new State(split.vertex1, -1, null);
+        // TODO walk speed, assuming 1 m/sec currently.
+        startState0.weight = split.distance0_mm / 1000;
+        startState1.weight = split.distance1_mm / 1000;
+        bestStates.put(split.vertex0, startState0);
+        bestStates.put(split.vertex1, startState1);
+        queue.insert(startState0, startState0.weight);
+        queue.insert(startState1, startState1.weight);
+    }
+
+    public void setOrigin (int fromVertex) {
         bestStates.clear();
         queue.reset();
         State startState = new State(fromVertex, -1, null);
         bestStates.put(fromVertex, startState);
         queue.insert(startState, 0);
+    }
+
+    /**
+     * Call one of the setOrigin functions first.
+     */
+    public void route () {
+
+        if (bestStates.size() == 0 || queue.size() == 0) {
+            throw new IllegalStateException("Routing without first setting an origin.");
+        }
 
         PrintStream printStream; // for debug output
         if (DEBUG_OUTPUT) {
-            File debugFile = new File(String.format("%d-%d.csv", fromVertex, toVertex));
+            File debugFile = new File(String.format("street-router-debug.csv"));
             OutputStream outputStream;
             try {
                 outputStream = new BufferedOutputStream(new FileOutputStream(debugFile));
@@ -100,12 +129,14 @@ public class StreetRouter {
             printStream.println("lat,lon,weight");
         }
 
+        // Set up goal direction if a to vertex was supplied.
         if (toVertex > 0) {
             goalDirection = true;
             VertexStore.Vertex vertex = streetLayer.vertexStore.getCursor(toVertex);
             targetLat = vertex.getLat();
             targetLon = vertex.getLon();
         }
+
         EdgeStore.Edge edge = streetLayer.edgeStore.getCursor();
         while (!queue.empty()) {
             State s0 = queue.extract_min();
@@ -126,7 +157,7 @@ public class StreetRouter {
                 edge.seek(edgeIndex);
                 State s1 = edge.traverse(s0);
                 if (!goalDirection && s1.weight > distanceLimitMeters) {
-                    return true; // iteration should continue
+                    return true; // Iteration over edges should continue.
                 }
                 State existingBest = bestStates.get(s1.vertex);
                 if (existingBest == null || existingBest.weight > s1.weight) {
@@ -134,13 +165,12 @@ public class StreetRouter {
                 }
                 int remainingWeight = goalDirection ? heuristic(s1) : 0;
                 queue.insert(s1, s1.weight + remainingWeight);
-                return true; // iteration should continue
+                return true; // Iteration over edges should continue.
             });
         }
         if (DEBUG_OUTPUT) {
             printStream.close();
         }
-        //LOG.info("Routing produced {} states.", bestStates.size());
     }
 
     /**
@@ -153,12 +183,17 @@ public class StreetRouter {
         return (int)SphericalDistanceLibrary.fastDistance(lat, lon, targetLat, targetLon);
     }
 
+    public int getTravelTimeToVertex (int vertexIndex) {
+        // TODO account for walk speed
+        return bestStates.get(vertexIndex).weight;
+    }
+
     public static class State implements Cloneable {
         public int vertex;
         public int weight;
         public int backEdge;
         public State backState; // previous state in the path chain
-        public State nextState; // for multiple states at the same location
+        public State nextState; // next state at the same location (for turn restrictions and other cases with co-dominant states)
         public State (int atVertex, int viaEdge, State backState) {
             this.vertex = atVertex;
             this.backEdge = viaEdge;

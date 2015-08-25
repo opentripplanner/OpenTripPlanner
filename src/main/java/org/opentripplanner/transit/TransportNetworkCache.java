@@ -17,6 +17,7 @@ import java.util.zip.ZipInputStream;
  * This holds one or more TransportNetworks keyed on unique strings.
  * This is a replacement for ClusterGraphBuilder.
  * TODO this should serialize any networks it builds, attempt to reload from disk, and copy serialized networks to S3.
+ * Because (de)serialization is now about 2 orders of magnitude faster than building from scratch.
  */
 public class TransportNetworkCache {
 
@@ -85,6 +86,7 @@ public class TransportNetworkCache {
         // Now we have a local copy of these graph inputs. Make a graph out of them.
         CommandLineParameters params = new CommandLineParameters();
         currentNetwork = TransportNetwork.fromDirectory(new File(CACHE_DIR, networkId));
+        currentNetwork.buildStopTrees();
         currentNetworkId = networkId;
         return currentNetwork;
 

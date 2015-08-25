@@ -33,7 +33,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.streets.StreetLayer;
-import org.opentripplanner.streets.TempVertexList;
+import org.opentripplanner.streets.LinkedPointSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +102,7 @@ public class PointSet implements Serializable {
      * Null in non-indicator pointsets.
      * TODO remove this if unused, result sets are no longer PointSets.
      */
+    @Deprecated
     public int[][] times;
 
     // The characteristics of the features in this PointSet. This is a column store.
@@ -880,15 +881,24 @@ public class PointSet implements Serializable {
 
     /**
      * Creates an object similar to a SampleSet but for the new TransitNetwork representation.
-     * This is a somewhat slow operation involving a lot of geometry calculations.
-     * The resulting object should be cached.
+     * This is a somewhat slow operation involving a lot of geometry calculations. In some sense the point of making
+     * LinkedPointSets is to cache the relationship between the PointSet and a StreetLayer, so we don't have to
+     * repeatedly do a lot of geometry calculations to temporarily connect the points to the streets.
      */
-    public TempVertexList makeTempVertexList (StreetLayer streetLayer) {
-        TempVertexList tempVertexSet = new TempVertexList(streetLayer);
-        for (int i = 0; i < capacity; i++) {
-            tempVertexSet.addTempVertex(lats[i], lons[i]);
-        }
-        return tempVertexSet;
+    public LinkedPointSet link (StreetLayer streetLayer) {
+        return new LinkedPointSet(this, streetLayer);
+    }
+
+    /**
+     * Using getter methods here to allow generating coordinates and geometries on demand instead of storing them.
+     * This would allow for implicit geometry, as in a regular grid of points.
+     */
+    public double getLat (int i) {
+        return lats[i];
+    }
+
+    public double getLon (int i) {
+        return lons[i];
     }
 
 }

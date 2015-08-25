@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,18 @@ public class TransitLayer implements Serializable {
     // For each transit stop, the distances to nearby streets as packed (vertex, distance) pairs.
     // Making these non-transient triples the serialized file size.
     public List<int[]> stopTrees;
+
+    // The coordinates of a place roughly in the center of the transit network, for centering maps and coordinate systems.
+    public double centerLon;
+    public double centerLat;
+
+    /**
+     * A transitLayer can only be linked to one StreetLayer, otherwise the street indexes for the transit stops would
+     * be ambiguous. It can however be linked to no StreetLayer. So if this field is null there are no known streets,
+     * but if this field is set then this TransitLayer has already been linked to a StreetLayer.
+     * This field is only public because it has to be set from StreetLayer, which is in another package.
+     */
+    public StreetLayer linkedStreetLayer = null;
 
     /**
      * Seems kind of hackish to pass the street layer in.
@@ -152,6 +165,9 @@ public class TransitLayer implements Serializable {
         });
         LOG.info("Done chaining trips together according to blocks.");
 
+        LOG.info("Finding the approximate center of the transport network...");
+        findCenter(gtfs.stops.values());
+
         // Will be useful in naming patterns.
 //        LOG.info("Finding topology of each route/direction...");
 //        Multimap<T2<String, Integer>, TripPattern> patternsForRouteDirection = HashMultimap.create();
@@ -162,6 +178,19 @@ public class TransitLayer implements Serializable {
 
     }
 
+    // The median of all stopTimes would be best but that involves sorting a huge list of numbers.
+    // So we just use the mean of all stops for now.
+    private void findCenter (Collection<Stop> stops) {
+        double lonSum = 0;
+        double latSum = 0;
+        for (Stop stop : stops) {
+            latSum += stop.stop_lat;
+            lonSum += stop.stop_lon;
+        }
+        // Stops is a HashMap so size() is fast. If it ever becomes a MapDB BTree, we may want to do this differently.
+        centerLat = latSum / stops.size();
+        centerLon = lonSum / stops.size();
+    }
 
     /** (Re-)build transient indexes of this TripPattern, connecting stops to patterns etc. */
     public void rebuildTransientIndexes () {
@@ -203,7 +232,7 @@ public class TransitLayer implements Serializable {
 
     /**
      * This transit network must already be linked to streets.
-     * TODO maybe handle this in TransferFinder and serialize the trees.
+     * It is a bad idea to serialize the trees, that makes the serialized graph about 3x bigger.
      * The packed format does not make the serialized size any smaller (the Trove serializers are already smart).
      * However the packed representation uses less live memory: 665 vs 409 MB (including all other data) on Portland.
      */
@@ -221,7 +250,8 @@ public class TransitLayer implements Serializable {
                 stopTrees.add(EMPTY_INT_ARRAY);
                 continue;
             }
-            streetRouter.route(originStreetVertex, StreetRouter.ALL_VERTICES);
+            streetRouter.setOrigin(originStreetVertex);
+            streetRouter.route();
             stopTrees.add(streetRouter.getStopTree());
         }
         LOG.info("Done creating travel distance trees.");
