@@ -183,11 +183,11 @@ public class RepeatedRaptorComparison {
                     switch (which) {
                     case BEST_CASE:
                         histogram = bestCaseHisto;
-                        resultSet = results.worstCase;
+                        resultSet = results.bestCase;
                         break;
                     case WORST_CASE:
                         histogram = worstCaseHisto;
-                        resultSet = results.bestCase;
+                        resultSet = results.worstCase;
                         break;
                     case AVERAGE:
                         histogram = avgCaseHisto;

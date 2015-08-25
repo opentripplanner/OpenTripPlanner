@@ -168,9 +168,10 @@ public class PropagatedTimesStore {
      */
     public ResultEnvelope makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultEnvelope envelope = new ResultEnvelope();
-        envelope.worstCase = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        // max times == worst case accessibility
+        envelope.worstCase = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         envelope.avgCase   = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
-        envelope.bestCase  = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        envelope.bestCase  = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         return envelope;
     }
 
