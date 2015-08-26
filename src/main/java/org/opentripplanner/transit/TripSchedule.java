@@ -52,9 +52,11 @@ public class TripSchedule implements Serializable, Comparable<TripSchedule> {
     public void chainTo (TripSchedule that) {
         // Check that chain is temporally coherent
         if (arrivals[arrivals.length - 1] <= that.departures[0]) {
-            nextInBlock = that;
+            // FIXME need to resolve ambiguity around service dates + block IDs.
+            // nextInBlock = that;
         } else {
-            LOG.error("Trip {} arrives at terminus after the next trip in its block departs.", tripId);
+            // FIXME this error is extremely common in Portland because block IDs are recycled across service days.
+            LOG.debug("Trip {} arrives at terminus after the next trip in its block departs.", tripId);
         }
     }
 
