@@ -83,7 +83,7 @@ public class Job {
             if (now > timeout) {
                 invisibleIterator.remove();
                 tasksAwaitingDelivery.add(tasksById.get(taskId));
-                LOG.warn("Task {} was of job {} was not completed in time, queueing it for re-delivery.", taskId, jobId);
+                LOG.warn("Task {} of job {} was not completed in time, queueing it for re-delivery.", taskId, jobId);
                 nRedelivered += 1;
             }
         }
