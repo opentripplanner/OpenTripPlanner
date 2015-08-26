@@ -84,8 +84,16 @@ public class StreetRouter {
         this.streetLayer = streetLayer;
     }
 
+    /**
+     * @param lat Latitude in floating point (not fixed int) degrees.
+     * @param lon Longitude in flating point (not fixed int) degrees.
+     */
     public void setOrigin (double lat, double lon) {
         Split split = streetLayer.findSplit(lat, lon, 300);
+        if (split == null) {
+            LOG.info("No street was found near the specified origin point of {}, {}.", lat, lon);
+            return;
+        }
         bestStates.clear();
         queue.reset();
         State startState0 = new State(split.vertex0, -1, null);
@@ -113,7 +121,7 @@ public class StreetRouter {
     public void route () {
 
         if (bestStates.size() == 0 || queue.size() == 0) {
-            throw new IllegalStateException("Routing without first setting an origin.");
+            LOG.warn("Routing without first setting an origin, no search will happen.");
         }
 
         PrintStream printStream; // for debug output
@@ -184,8 +192,11 @@ public class StreetRouter {
     }
 
     public int getTravelTimeToVertex (int vertexIndex) {
-        // TODO account for walk speed
-        return bestStates.get(vertexIndex).weight;
+        State state = bestStates.get(vertexIndex);
+        if (state == null) {
+            return Integer.MAX_VALUE; // Unreachable
+        }
+        return state.weight; // TODO true walk speed
     }
 
     public static class State implements Cloneable {
