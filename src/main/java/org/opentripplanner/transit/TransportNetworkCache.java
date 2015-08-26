@@ -25,7 +25,7 @@ public class TransportNetworkCache {
 
     private AmazonS3Client s3 = new AmazonS3Client();
 
-    private static final String CACHE_DIR = "network-cache";
+    private static final File CACHE_DIR = new File("cache", "graphs"); // reuse cached graphs from old analyst worker
 
     private final String sourceBucket;
 
@@ -86,8 +86,9 @@ public class TransportNetworkCache {
         // Now we have a local copy of these graph inputs. Make a graph out of them.
         CommandLineParameters params = new CommandLineParameters();
         currentNetwork = TransportNetwork.fromDirectory(new File(CACHE_DIR, networkId));
-        currentNetwork.buildStopTrees();
         currentNetworkId = networkId;
+        currentNetwork.buildStopTrees();
+        // TODO Save the built graph on S3 for other workers to use.
         return currentNetwork;
 
     }
