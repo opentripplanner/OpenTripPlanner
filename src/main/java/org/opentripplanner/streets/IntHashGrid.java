@@ -161,6 +161,13 @@ public class IntHashGrid {
         long maxXKey = Math.round(max.x / xBinSize);
         long minYKey = Math.round(min.y / yBinSize);
         long maxYKey = Math.round(max.y / yBinSize);
+        // Check sanity before iterating
+        long dx = (maxXKey - minXKey);
+        long dy = (maxYKey - minYKey);
+        if (dx * dy > 1000) {
+            LOG.error("Visiting too many spatial index cells.");
+            return;
+        }
         for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
             for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
                 /*
