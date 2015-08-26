@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.io.FileBackedOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -43,6 +44,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -163,6 +166,9 @@ public class TNAnalystWorker implements Runnable {
     /** TODO what's this number? */
     long lastHighPriorityRequestProcessed = 0;
 
+    /** If true Analyst is running locally, do not use internet connection and hosted servcies. */
+    private boolean workOffline;
+
     /**
      * Queues for high-priority interactive tasks and low-priority batch tasks.
      * Should be plenty long enough to hold all that have come in - we don't need to block on polling the manager.
@@ -173,13 +179,19 @@ public class TNAnalystWorker implements Runnable {
 
         // PARSE THE CONFIGURATION
 
+        // First, check whether we are running Analyst offline.
+        workOffline = Boolean.parseBoolean(config.getProperty("work-offline", "false"));
+        if (workOffline) {
+            LOG.info("Working offline. Avoiding internet connections and hosted services.");
+        }
+
         // Set up the stats store.
         String statsQueue = config.getProperty("statistics-queue");
-        if (statsQueue != null) {
-            this.taskStatisticsStore = new SQSTaskStatisticsStore(statsQueue);
-        } else {
-            // a stats store that does nothing.
+        if (workOffline || statsQueue == null) {
+            // A stats store that does nothing.
             this.taskStatisticsStore = s -> { };
+        } else {
+            this.taskStatisticsStore = new SQSTaskStatisticsStore(statsQueue);
         }
 
         String addr = config.getProperty("broker-address");
@@ -420,7 +432,6 @@ public class TNAnalystWorker implements Runnable {
             ResultEnvelope envelope = new ResultEnvelope();
             try {
                 envelope = router.route();
-                envelope.id = clusterRequest.id;
                 ts.success = true;
             } catch (Exception ex) {
                 // An error occurred. Leave the envelope empty and TODO include error information.
@@ -440,15 +451,32 @@ public class TNAnalystWorker implements Runnable {
                 String s3key = String.join("/", clusterRequest.jobId, clusterRequest.id + ".json.gz");
                 PipedInputStream inPipe = new PipedInputStream();
                 PipedOutputStream outPipe = new PipedOutputStream(inPipe);
-                new Thread(() -> {
-                    s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
-                }).start();
+                Runnable resultSaverRunnable;
+                if (workOffline) {
+                    resultSaverRunnable = () -> {
+                        // No internet connection or hosted services. Save to local file.
+                        try {
+                            File fakeS3 = new File("S3", clusterRequest.outputLocation);
+                            OutputStream fileOut = new FileOutputStream(new File(fakeS3, s3key));
+                        } catch (FileNotFoundException e) {
+                            LOG.error("Could not save results locally.");
+                        }
+                    };
+                } else {
+                    resultSaverRunnable = () -> {
+                        // TODO catch the case where the S3 putObject fails. (call deleteRequest based on PutObjectResult)
+                        // Otherwise the AnalystWorker can freeze piping data to a failed S3 connection.
+                        s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
+                    };
+                };
+                new Thread(resultSaverRunnable).start();
                 OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
                 // We could do the writeValue() in a thread instead, in which case both the DELETE and S3 options
                 // could consume it in the same way.
                 objectMapper.writeValue(gzipOutputStream, envelope);
                 gzipOutputStream.close();
-                // Tell the broker the task has been handled and should not be re-delivered to another worker.
+
+                // Tell the broker the task has been handled and should not be re - delivered to another worker.
                 deleteRequest(clusterRequest);
             } else {
                 // No output location was provided. Instead of saving the result on S3,
@@ -627,7 +655,7 @@ public class TNAnalystWorker implements Runnable {
      * initial-graph-id             The graph ID for this worker to start on
      */
     public static void main(String[] args) {
-        LOG.info("Starting analyst worker");
+        LOG.info("Starting NEW STYLE ANALYST WORKER FOR TRANSPORTNETWORKS");
         LOG.info("OTP commit is {}", MavenVersion.VERSION.commit);
 
         Properties config = new Properties();
