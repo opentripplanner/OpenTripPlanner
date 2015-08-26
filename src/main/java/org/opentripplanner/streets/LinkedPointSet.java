@@ -69,12 +69,14 @@ public class LinkedPointSet {
         distances0_mm = new int[pointSet.capacity];
         distances1_mm = new int[pointSet.capacity];
         for (int i = 0; i < pointSet.capacity; i++) {
-            int fixedLat = VertexStore.floatingDegreesToFixed(pointSet.getLat(i));
-            int fixedLon = VertexStore.floatingDegreesToFixed(pointSet.getLon(i));
-            Split split = streetLayer.findSplit(fixedLat, fixedLon, 300);
-            edges[i] = split.edge;
-            distances0_mm[i] = split.distance0_mm;
-            distances1_mm[i] = split.distance1_mm;
+            Split split = streetLayer.findSplit(pointSet.getLat(i), pointSet.getLon(i), 300);
+            if (split == null) {
+                edges[i] = -1;
+            } else {
+                edges[i] = split.edge;
+                distances0_mm[i] = split.distance0_mm;
+                distances1_mm[i] = split.distance1_mm;
+            }
         }
     }
 
@@ -117,8 +119,12 @@ public class LinkedPointSet {
             int time0 = travelTimeForVertex.getTravelTime(edge.getFromVertex());
             int time1 = travelTimeForVertex.getTravelTime(edge.getToVertex());
             // TODO apply walk speed
-            time0 += distances0_mm[i] / 1000;
-            time1 += distances1_mm[i] / 1000;
+            if (time0 != Integer.MAX_VALUE) {
+                time0 += distances0_mm[i] / 1000;
+            }
+            if (time1 != Integer.MAX_VALUE) {
+                time1 += distances1_mm[i] / 1000;
+            }
             travelTimes[i] = time0 < time1 ? time0 : time1;
         }
         return new PointSetTimes (pointSet, travelTimes);
