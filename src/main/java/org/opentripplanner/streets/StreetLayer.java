@@ -169,7 +169,10 @@ public class StreetLayer implements Serializable {
         EdgeStore.Edge edge = edgeStore.getCursor();
         for (int e = 0; e < edgeStore.nEdges; e += 2) {
             edge.seek(e);
-            spatialIndex.insert(edge.getEnvelope(), e);
+            // FIXME for now we are skipping edges over 1km because they can have huge envelopes. TODO Rasterize them.
+            if (edge.getLengthMm() < 1 * 1000 * 1000) {
+                spatialIndex.insert(edge.getEnvelope(), e);
+            }
         }
         LOG.info("Done indexing streets.");
     }
@@ -278,11 +281,13 @@ public class StreetLayer implements Serializable {
 
     /**
      * Non-destructively find a location on an existing street near the given point.
+     * PARAMETERS ARE FLOATING POINT GEOGRAPHIC (not fixed point ints)
      * @return a Split object representing a point along a sub-segment of a specific edge, or null if there are no streets nearby.
      */
     public Split findSplit (double lat, double lon, double radiusMeters) {
         return Split.find (lat, lon, radiusMeters, this);
     }
+
 
     /**
      * For every stop in a TransitLayer, find or create a nearby vertex in the street layer and record the connection
