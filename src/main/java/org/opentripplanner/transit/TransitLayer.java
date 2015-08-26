@@ -109,7 +109,7 @@ public class TransitLayer implements Serializable {
             int serviceIndex = services.size();
             services.add(service);
             serviceCodeNumber.put(serviceId, serviceIndex);
-            LOG.info("Service {} has ID {}", serviceIndex, serviceId);
+            LOG.debug("Service {} has ID {}", serviceIndex, serviceId);
         });
 
         // Group trips by stop pattern (including pickup/dropoff type) and fill stop times into patterns.
