@@ -104,7 +104,8 @@ public class TNRepeatedRaptorProfileRouter {
         }
 
         if (transit && raptorWorkerData == null) {
-            throw new IllegalArgumentException("Caller must supply RaptorWorkerData if transit is in use.");
+            LOG.error("Caller must supply RaptorWorkerData if transit is in use.");
+            transit = false;
         }
 
         // WHAT WE WANT TO DO HERE:
@@ -123,7 +124,7 @@ public class TNRepeatedRaptorProfileRouter {
         StreetRouter streetRouter = new StreetRouter(network.streetLayer);
         // TODO add time and distance limits to routing, not just weight.
         // TODO apply walk and bike speeds and maxBike time.
-        streetRouter.distanceLimitMeters = transit ? 2000 : 1000_000; // FIXME arbitrary, and account for bike or car access mode
+        streetRouter.distanceLimitMeters = transit ? 2000 : 100_000; // FIXME arbitrary, and account for bike or car access mode
         streetRouter.setOrigin(request.fromLat, request.fromLon);
         streetRouter.route();
         ts.initialStopSearch = (int) (System.currentTimeMillis() - initialStopStartTime);
