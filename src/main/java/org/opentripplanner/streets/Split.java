@@ -45,8 +45,8 @@ public class Split {
      */
     public static Split find (double lat, double lon, double radiusMeters, StreetLayer streetLayer) {
         // NOTE THIS ENTIRE GEOMETRIC CALCULATION IS HAPPENING IN FIXED PRECISION INT DEGREES
-        int fLat = VertexStore.floatingDegreesToFixed(lat);
-        int fLon = VertexStore.floatingDegreesToFixed(lon);
+        int fixLat = VertexStore.floatingDegreesToFixed(lat);
+        int fixLon = VertexStore.floatingDegreesToFixed(lon);
 
         // We won't worry about the perpendicular walks yet.
         // Just insert or find a vertex on the nearest road and return that vertex.
@@ -55,7 +55,7 @@ public class Split {
         double cosLat = FastMath.cos(FastMath.toRadians(lat)); // The projection factor, Earth is a "sphere"
         double radiusFixedLat = VertexStore.floatingDegreesToFixed(radiusMeters / metersPerDegreeLat);
         double radiusFixedLon = radiusFixedLat / cosLat; // Expand the X search space, don't shrink it.
-        Envelope envelope = new Envelope(fLon, fLon, fLat, fLat);
+        Envelope envelope = new Envelope(fixLon, fixLon, fixLat, fixLat);
         envelope.expandBy(radiusFixedLon, radiusFixedLat);
         double squaredRadiusFixedLat = radiusFixedLat * radiusFixedLat; // May overflow, don't use an int
         EdgeStore.Edge edge = streetLayer.edgeStore.getCursor();
@@ -70,14 +70,14 @@ public class Split {
             edge.forEachSegment((seg, fLat0, fLon0, fLat1, fLon1) -> {
                 // Find the fraction along the current segment
                 curr.seg = seg;
-                curr.frac = GeometryUtils.segmentFraction(fLon0, fLat0, fLon1, fLat1, fLon, fLat, cosLat);
+                curr.frac = GeometryUtils.segmentFraction(fLon0, fLat0, fLon1, fLat1, fixLon, fixLat, cosLat);
                 // Project to get the closest point on the segment.
                 // Note: the fraction is scaleless, xScale is accounted for in the segmentFraction function.
                 curr.fLon = fLon0 + curr.frac * (fLon1 - fLon0);
                 curr.fLat = fLat0 + curr.frac * (fLat1 - fLat0);
                 // Find squared distance to edge (avoid taking root)
-                double dx = (curr.fLon - fLon) * cosLat;
-                double dy = (curr.fLat - fLat);
+                double dx = (curr.fLon - fixLon) * cosLat;
+                double dy = (curr.fLat - fixLat);
                 curr.distSquared = dx * dx + dy * dy;
                 // Ignore segments that are too far away (filter false positives).
                 // Replace the best segment if we've found something closer.
