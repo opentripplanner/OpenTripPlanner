@@ -32,7 +32,7 @@ public class StreetRouter {
 
     public static final int ALL_VERTICES = -1;
 
-    private StreetLayer streetLayer;
+    public final StreetLayer streetLayer;
 
     public int distanceLimitMeters = 2_000;
 
@@ -66,7 +66,8 @@ public class StreetRouter {
     }
 
     /**
-     * A packed list of (vertex, distance).
+     * Get a distance table to all street vertices touched by the last search operation on this StreetRouter.
+     * @return A packed list of (vertex, distance) for every reachable street vertex.
      * This is currently returning the weight, which is the distance in meters.
      */
     public int[] getStopTree () {

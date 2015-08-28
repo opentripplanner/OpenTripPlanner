@@ -46,6 +46,7 @@ public class RaptorWorkerTimetable implements Serializable {
 
     int nTrips, nStops;
 
+    /* For each trip on this pattern, an packed array of (arrival, departure) time pairs. */
     public int[][] timesPerTrip;
 
     /* Times for frequency-based trips are stored in parallel arrays (a column store). */

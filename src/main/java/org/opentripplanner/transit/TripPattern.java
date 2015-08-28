@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -95,11 +96,20 @@ public class TripPattern implements Serializable {
                 activeSchedules.add(schedule);
             }
         }
+        // The Raptor worker expects trips to be sorted by departure time.
+        Collections.sort(activeSchedules);
         RaptorWorkerTimetable timetable = new RaptorWorkerTimetable(activeSchedules.size(), stops.length);
-        int i = 0;
+        int trip = 0;
         for (TripSchedule schedule : activeSchedules) {
-            // FIXME we're losing information here. The other Raptor worker does not support different arrival and departure times.
-            timetable.timesPerTrip[i] = schedule.departures;
+            int nStops = schedule.arrivals.length;
+            // The Raptor worker has arrivals and departures packed into a single array.
+            // This is probably not very beneficial.
+            int[] packed = new int[nStops * 2];
+            for (int s = 0, ps = 0; s < nStops; s++) {
+                packed[ps++] = schedule.arrivals[s];
+                packed[ps++] = schedule.departures[s];
+            }
+            timetable.timesPerTrip[trip++] = packed;
         }
 
         timetable.stopIndices = this.stops;

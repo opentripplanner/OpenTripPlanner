@@ -34,7 +34,7 @@ public class JobSimulator {
     public String s3prefix = "S3PREFIX";
     public String pointSetId = "census";
     public String graphId = "c4aa8cc8666788c8d51d4fc99201fa56";
-    public int nOrigins = 20;
+    public int nOrigins = 4;
 
     DefaultHttpClient httpClient = new DefaultHttpClient();
 

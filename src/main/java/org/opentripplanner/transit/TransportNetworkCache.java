@@ -87,7 +87,6 @@ public class TransportNetworkCache {
         CommandLineParameters params = new CommandLineParameters();
         currentNetwork = TransportNetwork.fromDirectory(new File(CACHE_DIR, networkId));
         currentNetworkId = networkId;
-        currentNetwork.buildStopTrees();
         // TODO Save the built graph on S3 for other workers to use.
         return currentNetwork;
 

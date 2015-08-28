@@ -416,7 +416,6 @@ public class TNRaptorWorker {
 
             // perform scheduled search
             stopPositionInPattern = -1;
-
             for (int stopIndex : timetable.stopIndices) {
                 stopPositionInPattern += 1;
                 if (onTrip == -1) {
@@ -516,15 +515,14 @@ public class TNRaptorWorker {
             int baseTimeSeconds = timesAtTransitStops[s];
             if (baseTimeSeconds != UNREACHED) {
                 int[] targets = data.targetsForStop.get(s);
-
-                if (targets == null)
+                if (targets == null) {
                     continue;
-
-                for (int i = 0; i < targets.length; i++) {
-                    int targetIndex = targets[i++]; // increment i after read
-                    // the cache has time in seconds rather than distance, to avoid costly floating-point divides and integer casts here.
-                    int propagated_time = baseTimeSeconds + targets[i];
-
+                }
+                // Targets contains pairs of (targetIndex, time).
+                // The cache has time in seconds rather than distance to avoid costly floating-point divides and integer casts here.
+                for (int i = 0; i < targets.length; ) { // Counter i is incremented in two places below.
+                    int targetIndex = targets[i++]; // Increment i after read
+                    int propagated_time = baseTimeSeconds + targets[i++]; // Increment i after read
                     if (timesAtTargets[targetIndex] > propagated_time) {
                         timesAtTargets[targetIndex] = propagated_time;
                     }

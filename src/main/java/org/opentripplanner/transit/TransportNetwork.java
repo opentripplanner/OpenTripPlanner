@@ -63,10 +63,6 @@ public class TransportNetwork implements Serializable {
         // TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
         TransportNetwork transportNetwork = TransportNetwork.fromDirectory(new File("."));
 
-        // Try out constructing older raptor data format
-        transportNetwork.buildStopTrees(); // optional but needed for RaptorWorkerData
-        RaptorWorkerData raptorWorkerData = new RaptorWorkerData(transportNetwork.transitLayer, new LocalDate());
-
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));
             transportNetwork.write(outputStream);
@@ -212,19 +208,12 @@ public class TransportNetwork implements Serializable {
         LOG.info("average response time {} msec", eTime / N);
     }
 
-
-    /**
-     * Creates some transient (non-serialized) data about which street vertices are close to which transit stops.
-     */
-    public void buildStopTrees() {
-        transitLayer.buildStopTrees(streetLayer);
-    }
-
     /**
      * TODO cache this grid.
      * @return an efficient implicit grid PointSet for this TransportNetwork.
      */
     public PointSet getGridPointSet() {
+        LOG.error("Grid pointset not implemeted yet.");
         return null; // new WebMercatorGridPointSet(this);
     }
 

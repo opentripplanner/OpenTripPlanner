@@ -68,11 +68,11 @@ import java.util.prefs.Preferences;
  */
 public class Graph implements Serializable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
-
-    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;

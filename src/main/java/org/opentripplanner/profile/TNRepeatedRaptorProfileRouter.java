@@ -82,6 +82,9 @@ public class TNRepeatedRaptorProfileRouter {
      */
     public TNRepeatedRaptorProfileRouter(TransportNetwork network, AnalystClusterRequest clusterRequest,
                                          LinkedPointSet targets, TaskStatistics ts) {
+        if (network.streetLayer != targets.streetLayer) {
+            LOG.error("Transit network and target point set are not linked to the same street layer.");
+        }
         this.clusterRequest = clusterRequest;
         this.network = network;
         this.targets = targets;

@@ -5,13 +5,16 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.conveyal.geojson.GeoJsonModule;
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.FileBackedOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,6 +44,7 @@ import org.opentripplanner.transit.TransportNetworkCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -356,7 +360,7 @@ public class TNAnalystWorker implements Runnable {
             // or a job task (where the result is saved to output location on S3).
             boolean isochrone = (clusterRequest.destinationPointsetId == null);
             boolean singlePoint = (clusterRequest.outputLocation == null);
-            boolean transit = (clusterRequest.profileRequest.transitModes != null && !clusterRequest.profileRequest.transitModes.isTransit());
+            boolean transit = (clusterRequest.profileRequest.transitModes != null && clusterRequest.profileRequest.transitModes.isTransit());
 
             if (singlePoint) {
                 lastHighPriorityRequestProcessed = startTime;
@@ -400,10 +404,12 @@ public class TNAnalystWorker implements Runnable {
                 // This is a detailed accessibility request. There is necessarily a destination point set supplied.
                 targets = pointSetDatastore.get(clusterRequest.destinationPointsetId);
             }
-            linkedTargets = targets.link(transportNetwork.streetLayer); // TODO this breaks if transportNetwork has been rebuilt ?
+            // TODO cache these, they are probably slow to make.
+            // TODO this breaks if transportNetwork has been rebuilt ?
+            linkedTargets = targets.link(transportNetwork.streetLayer);
 
             TNRepeatedRaptorProfileRouter router =
-                    new TNRepeatedRaptorProfileRouter(transportNetwork, clusterRequest, linkedTargets, ts);
+                    new TNRepeatedRaptorProfileRouter(transportNetwork, clusterRequest, linkedTargets, ts); // TODO transportNetwork is implied by linkedTargets.
 
             // Produce RAPTOR data tables, going through a cache where relevant.
             // This is only used for multi-point requests. Single-point requests are assumed to be continually
@@ -414,74 +420,43 @@ public class TNAnalystWorker implements Runnable {
             // But then we'd need to pass in both the cache and the key, which is weird.
             long raptorDataStart = System.currentTimeMillis();
             if (transit) {
-                // We only create data tables if transit is in use, otherwise they don't serve any purpose.
+                // We only create stop trees and data tables if transit is in use, otherwise they don't serve any purpose.
                 if (singlePoint) {
                     // Generate a one-time throw-away table if transit is in use but .
                     router.raptorWorkerData =
-                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date); // FIXME repetitive...
+                            new RaptorWorkerData(transportNetwork.transitLayer, linkedTargets, clusterRequest.profileRequest.date); // FIXME repetitive...
                 } else {
                     router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () ->
-                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date));
+                            new RaptorWorkerData(transportNetwork.transitLayer, linkedTargets, clusterRequest.profileRequest.date));
                 }
-                // TODO include TempVertex targets and scenario mods, in RaptorWorkerData
             }
+            // TODO include scenario modifications in RaptorWorkerData.
             ts.raptorData = (int) (System.currentTimeMillis() - raptorDataStart);
 
             // Run the core repeated-raptor analysis.
-            // This result envelope will contain the results of the one-to-many profile or single-departure-time search.
             ResultEnvelope envelope = new ResultEnvelope();
             try {
                 envelope = router.route();
                 ts.success = true;
             } catch (Exception ex) {
-                // An error occurred. Leave the envelope empty and TODO include error information.
+                // An error occurred. Keep the empty envelope empty and TODO include error information.
                 LOG.error("Error occurred in profile request", ex);
                 ts.success = false;
             }
 
             // Send the ResultEnvelope back to the user.
-            // The results are either stored on S3 (for multi-origin jobs) or sent back through the broker (for
-            // immediate interactive display of isochrones).
+            // The results are either stored on S3 (for multi-origin jobs) or sent back through the broker
+            // (for immediate interactive display of isochrones).
             envelope.id = clusterRequest.id;
             envelope.jobId = clusterRequest.jobId;
             envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
-            if (clusterRequest.outputLocation != null) {
-                // Convert the result envelope and its contents to JSON and gzip it in this thread.
-                // Transfer the results to Amazon S3 in another thread, piping between the two.
-                String s3key = String.join("/", clusterRequest.jobId, clusterRequest.id + ".json.gz");
-                PipedInputStream inPipe = new PipedInputStream();
-                PipedOutputStream outPipe = new PipedOutputStream(inPipe);
-                Runnable resultSaverRunnable;
-                if (workOffline) {
-                    resultSaverRunnable = () -> {
-                        // No internet connection or hosted services. Save to local file.
-                        try {
-                            File fakeS3 = new File("S3", clusterRequest.outputLocation);
-                            OutputStream fileOut = new FileOutputStream(new File(fakeS3, s3key));
-                        } catch (FileNotFoundException e) {
-                            LOG.error("Could not save results locally.");
-                        }
-                    };
-                } else {
-                    resultSaverRunnable = () -> {
-                        // TODO catch the case where the S3 putObject fails. (call deleteRequest based on PutObjectResult)
-                        // Otherwise the AnalystWorker can freeze piping data to a failed S3 connection.
-                        s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
-                    };
-                };
-                new Thread(resultSaverRunnable).start();
-                OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
-                // We could do the writeValue() in a thread instead, in which case both the DELETE and S3 options
-                // could consume it in the same way.
-                objectMapper.writeValue(gzipOutputStream, envelope);
-                gzipOutputStream.close();
-
-                // Tell the broker the task has been handled and should not be re - delivered to another worker.
-                deleteRequest(clusterRequest);
-            } else {
+            if (clusterRequest.outputLocation == null) {
                 // No output location was provided. Instead of saving the result on S3,
                 // return the result immediately via a connection held open by the broker and mark the task completed.
                 finishPriorityTask(clusterRequest, envelope);
+            } else {
+                // Save the result on S3 for retrieval by the UI.
+                saveBatchTaskResults(clusterRequest, envelope);
             }
 
             // Record information about the current task so we can analyze usage and efficiency over time.
@@ -544,12 +519,11 @@ public class TNAnalystWorker implements Runnable {
                 EntityUtils.consumeQuietly(entity);
                 return null;
             }
-            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {
-            });
+            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {});
         } catch (JsonProcessingException e) {
             LOG.error("JSON processing exception while getting work", e);
         } catch (SocketTimeoutException stex) {
-            LOG.error("Socket timeout while waiting to receive work.");
+            LOG.info("Socket timeout while waiting to receive work.");
         } catch (HttpHostConnectException ce) {
             LOG.error("Broker refused connection. Sleeping before retry.");
             try {
@@ -561,6 +535,53 @@ public class TNAnalystWorker implements Runnable {
         }
         return null;
 
+    }
+
+    /**
+     * Convert the result envelope and its contents to JSON and gzip it in this thread.
+     * Transfer the results to Amazon S3 in another thread, piping between the two.
+     */
+    private void saveBatchTaskResults (AnalystClusterRequest clusterRequest, ResultEnvelope envelope) {
+        String fileName = clusterRequest.id + ".json.gz";
+        PipedInputStream inPipe = new PipedInputStream();
+        Runnable resultSaverRunnable;
+        if (workOffline) {
+            resultSaverRunnable = () -> {
+                // No internet connection or hosted services. Save to local file.
+                try {
+                    // TODO make a FakeS3 class that can be used by other components.
+                    File fakeS3 = new File("S3", clusterRequest.outputLocation);
+                    File jobDirectory = new File(fakeS3, clusterRequest.jobId);
+                    File outputFile = new File(jobDirectory, fileName);
+                    jobDirectory.mkdirs();
+                    OutputStream fileOut = new BufferedOutputStream(new FileOutputStream(outputFile));
+                    ByteStreams.copy(inPipe, fileOut);
+                } catch (Exception e) {
+                    LOG.error("Could not save results locally: {}", e);
+                }
+            };
+        } else {
+            resultSaverRunnable = () -> {
+                // TODO catch the case where the S3 putObject fails. (call deleteRequest based on PutObjectResult in the runnable)
+                // Otherwise the AnalystWorker can freeze piping data to a failed S3 saver thread.
+                String s3key = "/".join(clusterRequest.jobId, fileName);
+                s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
+            };
+        };
+        new Thread(resultSaverRunnable).start();
+        try {
+            PipedOutputStream outPipe = new PipedOutputStream(inPipe);
+            OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
+            // We could do the writeValue() in a thread instead, in which case both the DELETE and S3 options
+            // could consume it in the same way.
+            objectMapper.writeValue(gzipOutputStream, envelope);
+            gzipOutputStream.close();
+            // Tell the broker the task has been handled and should not be redelivered to another worker.
+            deleteRequest(clusterRequest);
+        } catch (Exception e) {
+            // Do not delete task from broker, it will be retried.
+            LOG.error("Exception while saving routing result to S3: {}", e);
+        }
     }
 
     /**

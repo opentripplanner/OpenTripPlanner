@@ -44,6 +44,8 @@ public class TransitLayer implements Serializable {
 
     public List<TripPattern> tripPatterns = new ArrayList<>();
 
+    // TODO both vertex<->stop indexes are in transitLayer, so the linkage between street and transit layers is really one-to-many, not bidirectional. Use this fact to add multiple GTFS.
+
     // Maybe we need a StopStore that has (streetVertexForStop, transfers, flags, etc.)
     public TIntList streetVertexForStop = new TIntArrayList();
 
@@ -59,10 +61,6 @@ public class TransitLayer implements Serializable {
 
     // TODO there is probably a better way to do this, but for now we need to retain stop object for linking to streets
     public transient List<Stop> stopForIndex = new ArrayList<>();
-
-    // For each transit stop, the distances to nearby streets as packed (vertex, distance) pairs.
-    // Making these non-transient triples the serialized file size.
-    public List<int[]> stopTrees;
 
     // The coordinates of a place roughly in the center of the transit network, for centering maps and coordinate systems.
     public double centerLon;
@@ -228,33 +226,6 @@ public class TransitLayer implements Serializable {
 
     public int getStopCount () {
         return stopIdForIndex.size();
-    }
-
-    /**
-     * This transit network must already be linked to streets.
-     * It is a bad idea to serialize the trees, that makes the serialized graph about 3x bigger.
-     * The packed format does not make the serialized size any smaller (the Trove serializers are already smart).
-     * However the packed representation uses less live memory: 665 vs 409 MB (including all other data) on Portland.
-     */
-    public void buildStopTrees (StreetLayer streetLayer) {
-        LOG.info("Creating travel distance trees from each transit stop...");
-        final int[] EMPTY_INT_ARRAY = new int[0];
-        stopTrees = new ArrayList<>();
-        StreetRouter streetRouter = new StreetRouter(streetLayer);
-        streetRouter.distanceLimitMeters = 2000;
-        for (int s = 0; s < getStopCount(); s++) {
-            int originStreetVertex = streetVertexForStop.get(s);
-            if (originStreetVertex == -1) {
-                LOG.warn("Stop {} is not connected to the street network.", s);
-                // Every iteration must add a map to stopTrees to maintain the right length.
-                stopTrees.add(EMPTY_INT_ARRAY);
-                continue;
-            }
-            streetRouter.setOrigin(originStreetVertex);
-            streetRouter.route();
-            stopTrees.add(streetRouter.getStopTree());
-        }
-        LOG.info("Done creating travel distance trees.");
     }
 
     // Mark all services that are active on the given day. Trips on inactive services will not be used in the search.

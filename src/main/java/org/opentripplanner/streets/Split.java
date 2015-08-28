@@ -124,8 +124,9 @@ public class Split {
             LOG.error("Length of first street segment was not positive.");
         }
         if (best.distance0_mm > edge.getLengthMm()) {
+            LOG.error("Length of first street segment was greater than the whole edge ({} > {}).",
+                    best.distance0_mm, edge.getLengthMm());
             best.distance0_mm = edge.getLengthMm();
-            LOG.error("Length of first street segment was greater than the whole edge.");
         }
         best.distance1_mm = edge.getLengthMm() - best.distance0_mm;
         return best;
