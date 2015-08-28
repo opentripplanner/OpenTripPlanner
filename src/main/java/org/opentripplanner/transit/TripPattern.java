@@ -98,8 +98,15 @@ public class TripPattern implements Serializable {
         RaptorWorkerTimetable timetable = new RaptorWorkerTimetable(activeSchedules.size(), stops.length);
         int i = 0;
         for (TripSchedule schedule : activeSchedules) {
-            // FIXME we're losing information here. The other Raptor worker does not support different arrival and departure times.
-            timetable.timesPerTrip[i] = schedule.departures;
+            // interleave arrivals and departures
+            int[] times = new int[stops.length * 2];
+
+            for (int stop = 0; stop < stops.length; stop++) {
+                times[stop * 2] = schedule.arrivals[stop];
+                times[stop * 2 + 1] = schedule.departures[stop];
+            }
+
+            timetable.timesPerTrip[i++] = times;
         }
 
         timetable.stopIndices = this.stops;

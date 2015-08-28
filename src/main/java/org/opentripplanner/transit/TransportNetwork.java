@@ -1,26 +1,16 @@
 package org.opentripplanner.transit;
 
 import com.conveyal.osmlib.OSM;
-import org.joda.time.LocalDate;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.analyst.PointSet;
-import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.streets.LinkedPointSet;
 import org.opentripplanner.streets.StreetLayer;
 import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -65,7 +55,7 @@ public class TransportNetwork implements Serializable {
 
         // Try out constructing older raptor data format
         transportNetwork.buildStopTrees(); // optional but needed for RaptorWorkerData
-        RaptorWorkerData raptorWorkerData = new RaptorWorkerData(transportNetwork.transitLayer, new LocalDate());
+        //RaptorWorkerData raptorWorkerData = new RaptorWorkerData(transportNetwork.transitLayer, new LocalDate());
 
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));

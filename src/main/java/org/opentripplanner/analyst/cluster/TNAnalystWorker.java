@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.io.FileBackedOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -41,17 +40,7 @@ import org.opentripplanner.transit.TransportNetworkCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
@@ -356,7 +345,7 @@ public class TNAnalystWorker implements Runnable {
             // or a job task (where the result is saved to output location on S3).
             boolean isochrone = (clusterRequest.destinationPointsetId == null);
             boolean singlePoint = (clusterRequest.outputLocation == null);
-            boolean transit = (clusterRequest.profileRequest.transitModes != null && !clusterRequest.profileRequest.transitModes.isTransit());
+            boolean transit = (clusterRequest.profileRequest.transitModes != null && clusterRequest.profileRequest.transitModes.isTransit());
 
             if (singlePoint) {
                 lastHighPriorityRequestProcessed = startTime;
@@ -418,10 +407,10 @@ public class TNAnalystWorker implements Runnable {
                 if (singlePoint) {
                     // Generate a one-time throw-away table if transit is in use but .
                     router.raptorWorkerData =
-                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date); // FIXME repetitive...
+                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date, linkedTargets); // FIXME repetitive...
                 } else {
                     router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () ->
-                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date));
+                            new RaptorWorkerData(transportNetwork.transitLayer, clusterRequest.profileRequest.date, linkedTargets));
                 }
                 // TODO include TempVertex targets and scenario mods, in RaptorWorkerData
             }

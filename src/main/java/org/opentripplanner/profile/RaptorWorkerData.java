@@ -19,11 +19,7 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
-import org.opentripplanner.analyst.scenario.AddTripPattern;
-import org.opentripplanner.analyst.scenario.ConvertToFrequency;
-import org.opentripplanner.analyst.scenario.Scenario;
-import org.opentripplanner.analyst.scenario.TransferRule;
-import org.opentripplanner.analyst.scenario.TripPatternFilter;
+import org.opentripplanner.analyst.scenario.*;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -40,16 +36,15 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.streets.EdgeStore;
+import org.opentripplanner.streets.LinkedPointSet;
+import org.opentripplanner.streets.StreetLayer;
 import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RaptorWorkerData implements Serializable {
@@ -685,11 +680,11 @@ public class RaptorWorkerData implements Serializable {
      * RaptorWorkers are (intentionally) very similar to the TransitLayer of TransportNetworks.
      * For now we'll just perform a copy, filtering out any unused patterns and trips.
      */
-    public RaptorWorkerData (TransitLayer transitLayer, LocalDate date) {
+    public RaptorWorkerData (TransitLayer transitLayer, LocalDate date, LinkedPointSet pointSet) {
         // The RaptorWorkerData is a single-job throwaway item. It includes travel times (not distances, to avoid divides)
         // to a specific PointSet+SampleSet of interest in the task at hand, or to all the street vertices.
         nStops = transitLayer.getStopCount();
-        nTargets = 0; // FIXME
+        nTargets = pointSet.size(); // FIXME
         nPatterns = transitLayer.tripPatterns.size();
         transitLayer.transfersForStop.forEach(t -> transfersForStop.add(t.toArray()));
         transitLayer.patternsForStop.forEach(p -> patternsForStop.add(p.toArray()));
@@ -698,7 +693,9 @@ public class RaptorWorkerData implements Serializable {
         for (int s = 0; s < transitLayer.streetVertexForStop.size(); s++) {
             indexForStop.put(s, transitLayer.streetVertexForStop.get(s));
         }
-        targetsForStop.addAll(transitLayer.stopTrees);
+
+        buildStopTreeCache(transitLayer.stopTrees, pointSet);
+
         // Copy new-style TransportNetwork TripPatterns to RaptorWorkerTimetables
         BitSet servicesActive = transitLayer.getActiveServicesForDate(date);
         for (org.opentripplanner.transit.TripPattern tripPattern : transitLayer.tripPatterns) {
@@ -711,9 +708,63 @@ public class RaptorWorkerData implements Serializable {
         hasFrequencies = false;
     }
 
-    // TODO targets rather than street vertices.
-    // At first we're going to use the street vertices as targets and try to just do isochrones.
-    // TODO set targets on TransitLayer-derived RaptorWorkerData from PointSet
+    /** Build a stop tree cache from stops all the way to the point set. */
+    private void buildStopTreeCache(List<int[]> stopTrees, LinkedPointSet pointSet) {
+        StreetLayer streets = pointSet.streetLayer;
 
+        // Sorted set of int[] { vertex, pointIndex, distance }
+        // This is effectively a multimap without all of the extra object references that would entail
+        NavigableSet<int[]> vertexTargetSet = new TreeSet<>((t1, t2) -> {
+            for (int i = 0; i < 3; i++) {
+                if (t1[i] != t2[i])
+                    // use integer.compare not a - b because it correctly handles overflows, which are
+                    // likely in a treeset where Integer.MIN_VALUE and Integer.MAX_VALUE are used as
+                    // placeholders in subSet.
+                    return Integer.compare(t1[i], t2[i]);
+            }
+            return 0;
+        });
 
+        EdgeStore.Edge edge = streets.edgeStore.getCursor();
+
+        for (int i = 0 ; i < pointSet.size(); i++) {
+            edge.seek(pointSet.edges[i]);
+            int fromv = edge.getFromVertex();
+            int dist = pointSet.distances0_mm[i];
+            vertexTargetSet.add(new int[] {fromv, i, dist});
+
+            int tov = edge.getToVertex();
+            dist = pointSet.distances1_mm[i];
+            vertexTargetSet.add(new int[] {tov, i, dist});
+        }
+
+        TIntList current = new TIntArrayList();
+
+        for (int[] verticesForStop : stopTrees) {
+            // loop over vertices and distances, which are in meters here.
+            // FIXME change distances in stop trees to be in mm.
+            // TODO rounding errors here and in street router
+
+            for (int i = 0; i < verticesForStop.length; i++) {
+                int v = verticesForStop[i++]; // increment after read
+                int d = verticesForStop[i]; // i will be incremented at end of loop
+
+                // find all of the reachable targets
+                for (int[] target : vertexTargetSet.subSet(new int[] {v, Integer.MIN_VALUE, Integer.MIN_VALUE},
+                        new int[] {v, Integer.MAX_VALUE, Integer.MAX_VALUE})) {
+                    // index in pointset
+                    current.add(target[1]);
+                    // distance in m + distance in mm / 1000
+                    current.add(d + target[2] / 1000);
+                }
+            }
+
+            if (current.isEmpty())
+                targetsForStop.add(EMPTY_INT_ARRAY);
+            else
+                targetsForStop.add(current.toArray());
+
+            current.clear();
+        }
+    }
 }
