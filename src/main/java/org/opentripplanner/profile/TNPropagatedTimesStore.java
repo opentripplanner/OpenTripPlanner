@@ -167,9 +167,9 @@ public class TNPropagatedTimesStore {
      */
     public ResultEnvelope makeResults(PointSet pointSet, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultEnvelope envelope = new ResultEnvelope();
-        envelope.worstCase = new ResultSet(mins, pointSet, includeTimes, includeHistograms, includeIsochrones);
+        envelope.worstCase = new ResultSet(maxs, pointSet, includeTimes, includeHistograms, includeIsochrones);
         envelope.avgCase   = new ResultSet(avgs, pointSet, includeTimes, includeHistograms, includeIsochrones);
-        envelope.bestCase  = new ResultSet(maxs, pointSet, includeTimes, includeHistograms, includeIsochrones);
+        envelope.bestCase  = new ResultSet(mins, pointSet, includeTimes, includeHistograms, includeIsochrones);
         return envelope;
     }
 
@@ -180,9 +180,9 @@ public class TNPropagatedTimesStore {
      */
     public ResultEnvelope makeIsochronesForVertices () {
         ResultEnvelope envelope = new ResultEnvelope();
-        envelope.worstCase = makeIsochroneForVertices(mins);
+        envelope.worstCase = makeIsochroneForVertices(maxs);
         envelope.avgCase = makeIsochroneForVertices(avgs);
-        envelope.bestCase = makeIsochroneForVertices(maxs);
+        envelope.bestCase = makeIsochroneForVertices(mins);
         return envelope;
     }
 
