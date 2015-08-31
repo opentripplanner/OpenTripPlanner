@@ -156,7 +156,7 @@ public class TNRepeatedRaptorProfileRouter {
 
         // Turn the results of the search into isochrone geometries or accessibility data as requested.
         long resultSetStart = System.currentTimeMillis();
-        ResultEnvelope envelope = new ResultEnvelope();
+        ResultEnvelope envelope;
         if (isochrone) {
             // No destination point set was provided and we're just making isochrones based on travel time to vertices,
             // rather than finding access times to a set of user-specified points.
