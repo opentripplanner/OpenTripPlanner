@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,6 +59,32 @@ public class EdgeStore implements Serializable {
         toVertices = new TIntArrayList(initialEdgePairs);
         geometries = new ArrayList<>(initialEdgePairs);
         lengths_mm = new TIntArrayList(initialEdgePairs);
+    }
+
+    /** Remove the specified edges from this edge store */
+    public void remove (int[] edgesToOmit) {
+        // be clever: sort the list descending, because removing an edge only affects the indices of
+        // edges that appear later in the graph.
+        Arrays.sort(edgesToOmit);
+
+        int prevEdge = -1;
+        for (int cursor = edgesToOmit.length - 1; cursor >= 0; cursor--) {
+            int edge = edgesToOmit[cursor] / 2;
+
+            if (edge == prevEdge)
+                continue; // ignore duplicates
+
+            prevEdge = edge;
+            // note using 2 int version because it is an offset not a value that we want to remove
+            flags.remove(edge, 1);
+            speeds.remove(edge, 1);
+            fromVertices.remove(edge, 1);
+            toVertices.remove(edge, 1);
+            lengths_mm.remove(edge, 1);
+            // this is not a TIntList
+            geometries.remove(edge);
+            nEdges -= 2;
+        }
     }
 
     // Maybe reserve the first 4-5 bits (or a whole byte, and 16 bits for flags) for mutually exclusive edge types.

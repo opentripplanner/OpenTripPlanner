@@ -6,19 +6,19 @@ import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TLongIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This stores the street layer of OTP routing data.
@@ -70,9 +70,12 @@ public class StreetLayer implements Serializable {
         this.osm = osm;
         for (Map.Entry<Long, Way> entry : osm.ways.entrySet()) {
             Way way = entry.getValue();
-            if ( ! (way.hasTag("highway") || way.hasTag("area", "yes") || way.hasTag("public_transport", "platform"))) {
+            if ( ! (way.hasTag("highway") || way.hasTag("public_transport", "platform"))) {
                 continue;
             }
+
+            // check to make sure that it's not a tiny subgraph
+
             int nEdgesCreated = 0;
             int beginIdx = 0;
             // Break each OSM way into topological segments between intersections, and make one edge per segment.
@@ -87,6 +90,9 @@ public class StreetLayer implements Serializable {
         }
         LOG.info("Done making street edges.");
         LOG.info("Made {} vertices and {} edges.", vertexStore.nVertices, edgeStore.nEdges);
+
+        removeDisconnectedSubgraphs(20);
+
         edgesPerWayHistogram.display();
         pointsPerEdgeHistogram.display();
         // Clear unneeded indexes
@@ -323,5 +329,73 @@ public class StreetLayer implements Serializable {
         return vertexStore.nVertices;
     }
 
+    /**
+     * Find and remove all subgraphs with fewer than minSubgraphSize vertices. Uses a flood fill
+     * algorithm, see http://stackoverflow.com/questions/1348783.
+     */
+    public void removeDisconnectedSubgraphs(int minSubgraphSize) {
+        LOG.info("Removing subgraphs with fewer than {} vertices");
+        boolean edgeListsBuilt = incomingEdges != null;
 
+        if (!edgeListsBuilt)
+            buildEdgeLists();
+
+        // labels for the flood fill algorithm
+        TIntIntMap vertexLabels = new TIntIntHashMap();
+
+        // vertices and edges that should be removed
+        TIntSet verticesToRemove = new TIntHashSet();
+        TIntSet edgesToRemove = new TIntHashSet();
+
+        for (int vertex = 0; vertex < vertexStore.nVertices; vertex++) {
+            // N.B. this is not actually running a search for every vertex as after the first few
+            // almost all of the vertices are labeled
+            if (vertexLabels.containsKey(vertex))
+                continue;
+
+            StreetRouter r = new StreetRouter(this);
+            r.setOrigin(vertex);
+            // walk to the end of the graph
+            r.distanceLimitMeters = 100000;
+            r.route();
+
+            TIntList reachedVertices = new TIntArrayList();
+
+            int nReached = 0;
+            for (int reachedVertex = 0; reachedVertex < vertexStore.nVertices; reachedVertex++) {
+                if (r.getTravelTimeToVertex(reachedVertex) != Integer.MAX_VALUE) {
+                    nReached++;
+                    // use source vertex as label, saves a variable
+                    vertexLabels.put(reachedVertex, vertex);
+                    reachedVertices.add(reachedVertex);
+                }
+            }
+
+            if (nReached < minSubgraphSize) {
+                LOG.info("Removing disconnected subgraph of size {} near {}, {}",
+                        nReached, vertexStore.fixedLats.get(vertex) / VertexStore.FIXED_FACTOR,
+                        vertexStore.fixedLons.get(vertex) / VertexStore.FIXED_FACTOR);
+                verticesToRemove.addAll(reachedVertices);
+                verticesToRemove.forEach(v -> {
+                    incomingEdges.get(v).forEach(edgesToRemove::add);
+                    outgoingEdges.get(v).forEach(edgesToRemove::add);
+                    return true; // iteration should continue
+                });
+            }
+        }
+
+        // rebuild the edge store with some edges removed
+        edgeStore.remove(edgesToRemove.toArray());
+        // TODO remove vertices as well? this is messy because the edges point into them
+
+        // don't forget this
+        if (edgeListsBuilt)
+            buildEdgeLists();
+        else {
+            incomingEdges = null;
+            outgoingEdges = null;
+        }
+
+        LOG.info("Done removing subgraphs. {} edges remain", edgeStore.nEdges);
+    }
 }
