@@ -41,12 +41,22 @@ public class StreetLayer implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetLayer.class);
 
+    /**
+     * Minimum allowable size (in number of vertices) for a disconnected subgraph; subgraphs smaller than these will be removed.
+     * There are several reasons why one might have a disconnected subgraph. The most common is poor quality
+     * OSM data. However, they also could be due to areas that really are disconnected in the street graph,
+     * and are connected only by transit. These could be literal islands (Vashon Island near Seattle comes
+     * to mind), or islands that are isolated by infrastructure (for example, airport terminals reachable
+     * only by transit or driving, for instance BWI or SFO).
+     */
+    public static final int MIN_SUBGRAPH_SIZE = 40;
+
     private static final int SNAP_RADIUS_MM = 5 * 1000;
 
     // Edge lists should be constructed after the fact from edges. This minimizes serialized size too.
     transient List<TIntList> outgoingEdges;
     transient List<TIntList> incomingEdges;
-    transient IntHashGrid spatialIndex = new IntHashGrid();
+    public transient IntHashGrid spatialIndex = new IntHashGrid();
 
     TLongIntMap vertexIndexForOsmNode = new TLongIntHashMap(100_000, 0.75f, -1, -1);
     // TIntLongMap osmWayForEdgeIndex;
@@ -65,7 +75,16 @@ public class StreetLayer implements Serializable {
 
     public TransitLayer linkedTransitLayer = null;
 
-    public void loadFromOsm (OSM osm) {
+    /** Load street layer from an OSM-lib OSM DB */
+    public void loadFromOsm(OSM osm) {
+        loadFromOsm(osm, true, false);
+    }
+
+    /** Load OSM, optionally removing floating subgraphs (recommended) */
+    void loadFromOsm (OSM osm, boolean removeIslands, boolean saveVertexIndex) {
+        if (!osm.intersectionDetection)
+            throw new IllegalArgumentException("Intersection detection not enabled on OSM source");
+
         LOG.info("Making street edges from OSM ways...");
         this.osm = osm;
         for (Map.Entry<Long, Way> entry : osm.ways.entrySet()) {
@@ -74,7 +93,9 @@ public class StreetLayer implements Serializable {
                 continue;
             }
 
-            // check to make sure that it's not a tiny subgraph
+            // don't allow users to use proposed infrastructure
+            if (way.hasTag("highway", "proposed"))
+                continue;
 
             int nEdgesCreated = 0;
             int beginIdx = 0;
@@ -91,12 +112,15 @@ public class StreetLayer implements Serializable {
         LOG.info("Done making street edges.");
         LOG.info("Made {} vertices and {} edges.", vertexStore.nVertices, edgeStore.nEdges);
 
-        removeDisconnectedSubgraphs(20);
+        if (removeIslands)
+            removeDisconnectedSubgraphs(MIN_SUBGRAPH_SIZE);
 
         edgesPerWayHistogram.display();
         pointsPerEdgeHistogram.display();
-        // Clear unneeded indexes
-        vertexIndexForOsmNode = null;
+        // Clear unneeded indexes, allow them to be gc'ed
+        if (!saveVertexIndex)
+            vertexIndexForOsmNode = null;
+
         osm = null;
     }
 
@@ -376,9 +400,16 @@ public class StreetLayer implements Serializable {
                         nReached, vertexStore.fixedLats.get(vertex) / VertexStore.FIXED_FACTOR,
                         vertexStore.fixedLons.get(vertex) / VertexStore.FIXED_FACTOR);
                 verticesToRemove.addAll(reachedVertices);
-                verticesToRemove.forEach(v -> {
-                    incomingEdges.get(v).forEach(edgesToRemove::add);
-                    outgoingEdges.get(v).forEach(edgesToRemove::add);
+                reachedVertices.forEach(v -> {
+                    // can't use method reference here because we always have to return true
+                    incomingEdges.get(v).forEach(e -> {
+                        edgesToRemove.add(e);
+                        return true; // continue iteration
+                    });
+                    outgoingEdges.get(v).forEach(e -> {
+                        edgesToRemove.add(e);
+                        return true; // continue iteration
+                    });
                     return true; // iteration should continue
                 });
             }
