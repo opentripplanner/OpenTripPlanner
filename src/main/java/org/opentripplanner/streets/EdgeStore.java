@@ -41,11 +41,23 @@ public class EdgeStore implements Serializable {
     private VertexStore vertexStore;
 
     int nEdges = 0;
+
+    /** Flags for this edge.  One entry for each forward and each backward edge. */
     protected TIntList flags;
+
+    /** Speed for this edge.  One entry for each forward and each backward edge. */
     protected TIntList speeds;
+
+    /** From vertices. One entry for each edge pair */
     protected TIntList fromVertices;
+
+    /** To vertices. One entry for each edge pair */
     protected TIntList toVertices;
+
+    /** Length (millimeters). One entry for each edge pair */
     protected TIntList lengths_mm;
+
+    /** Geometries. One entry for each edge pair */
     protected List<int[]> geometries; // intermediate points along the edge, other than the intersection endpoints
 
     public EdgeStore (VertexStore vertexStore, int initialSize) {
@@ -76,8 +88,11 @@ public class EdgeStore implements Serializable {
 
             prevEdge = edge;
             // note using 2 int version because it is an offset not a value that we want to remove
-            flags.remove(edge, 1);
-            speeds.remove(edge, 1);
+            // flags and speeds have separate entries for forward and backwards edges
+            flags.remove(edge * 2, 2);
+            speeds.remove(edge * 2, 2);
+
+            // everything else has a single entry for forward and backward edges
             fromVertices.remove(edge, 1);
             toVertices.remove(edge, 1);
             lengths_mm.remove(edge, 1);
