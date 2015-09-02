@@ -157,7 +157,6 @@ public class AnalystWorker implements Runnable {
     private ThreadPoolExecutor highPriorityExecutor, batchExecutor;
 
     public AnalystWorker(Properties config) {
-
         // parse the configuration
         // set up the stats store
         String statsQueue = config.getProperty("statistics-queue");
@@ -637,7 +636,11 @@ public class AnalystWorker implements Runnable {
         }
 
         try {
-            new AnalystWorker(config).run();
+            // jump over to using TransportNetworks if requested
+            if (Boolean.parseBoolean(config.getProperty("use-transport-networks", "false")))
+                new TNAnalystWorker(config).run();
+            else
+                new AnalystWorker(config).run();
         } catch (Exception e) {
             LOG.error("Error in analyst worker", e);
             return;
