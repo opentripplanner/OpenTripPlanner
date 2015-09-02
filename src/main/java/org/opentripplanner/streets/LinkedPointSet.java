@@ -3,9 +3,7 @@ package org.opentripplanner.streets;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.streets.EdgeStore.Edge;
 import org.opentripplanner.transit.TransitLayer;
@@ -167,6 +165,10 @@ public class LinkedPointSet {
         // Iterating over the reached vertices requires additional indexes and I'm not sure it would be any faster.
         Edge edge = streetLayer.edgeStore.getCursor();
         for (int p = 0; p < edges.length; p++) {
+            // edge value of -1 indicates unlinked
+            if (edges[p] == -1)
+                continue;
+
             edge.seek(edges[p]);
             int t0 = router.getTravelTimeToVertex(edge.getFromVertex());
             int t1 = router.getTravelTimeToVertex(edge.getToVertex());
