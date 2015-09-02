@@ -239,11 +239,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             initIntersectionNodes();
 
             buildBasicGraph();
-            if (skipVisibility) {
-                LOG.info("Skipping visibility graph construction for walkable areas.");
-            } else {
-                buildWalkableAreas();
-            }
+            buildWalkableAreas(skipVisibility);
 
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
@@ -394,20 +390,32 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
         }
 
-        private void buildWalkableAreas() {
-            LOG.info("Building visibility graphs for walkable areas.");
+        private void buildWalkableAreas(boolean skipVisibility) {
+            if (skipVisibility) {
+                LOG.info("Skipping visibility graph construction for walkable areas and using just area rings for edges.");
+            } else {
+                LOG.info("Building visibility graphs for walkable areas.");
+            }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
                     wayPropertySet, edgeFactory, this);
-            for (AreaGroup group : areaGroups) {
-                walkableAreaBuilder.build(group);
+            if (skipVisibility) {
+                for (AreaGroup group : areaGroups) {
+                    walkableAreaBuilder.buildWithoutVisibility(group);
+                }
+            } else {
+                for (AreaGroup group : areaGroups) {
+                    walkableAreaBuilder.buildWithVisibility(group);
+                }
             }
-            
             // running a request caches the timezone; we need to clear it now so that when agencies are loaded
             // the graph time zone is set to the agency time zone.
             graph.clearTimeZone();
-            
-            LOG.info("Done building visibility graphs for walkable areas.");
+            if (skipVisibility) {
+                LOG.info("Done building rings for walkable areas.");
+            } else {
+                LOG.info("Done building visibility graphs for walkable areas.");
+            }
         }
 
         private void buildParkAndRideAreas() {
