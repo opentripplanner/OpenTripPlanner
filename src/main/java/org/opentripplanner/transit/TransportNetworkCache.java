@@ -149,6 +149,9 @@ public class TransportNetworkCache {
         // cache the network
         String filename = networkId + "_" + MavenVersion.VERSION.commit + ".dat";
         File cacheLocation = new File(CACHE_DIR, networkId + "_" + MavenVersion.VERSION.commit + ".dat");
+
+        CACHE_DIR.mkdirs();
+
         try {
             FileOutputStream fos = new FileOutputStream(cacheLocation);
             try {
