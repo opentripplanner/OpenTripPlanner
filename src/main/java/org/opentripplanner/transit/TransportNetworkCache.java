@@ -165,6 +165,6 @@ public class TransportNetworkCache {
             cacheLocation.delete();
         }
 
-        return currentNetwork;
+        return network;
     }
 }
