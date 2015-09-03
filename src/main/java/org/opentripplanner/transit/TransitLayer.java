@@ -221,7 +221,7 @@ public class TransitLayer implements Serializable {
         stopTree = new TIntIntMap[getStopCount()];
 
         StreetRouter r = new StreetRouter(linkedStreetLayer);
-        r.distanceLimitMeters = 3000;
+        r.distanceLimitMeters = 2000;
 
         for (int stop = 0; stop < getStopCount(); stop++) {
             int originVertex = streetVertexForStop.get(stop);
