@@ -6,12 +6,12 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.streets.EdgeStore.Edge;
-import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * A LinkedPointSet is a PointSet that has been pre-connected to a StreetLayer in a non-destructive, reversible way.
@@ -87,8 +87,9 @@ public class LinkedPointSet {
         distances0_mm = new int[pointSet.capacity];
         distances1_mm = new int[pointSet.capacity];
         for (int i = 0; i < pointSet.capacity; i++) {
-            Split split = streetLayer.findSplit(pointSet.getLat(i), pointSet.getLon(i), 300);
+            Split split = streetLayer.findSplit(pointSet.getLat(i), pointSet.getLon(i), 1000);
             if (split == null) {
+                LOG.info("Feature {} left unlinked", i);
                 edges[i] = -1;
             } else {
                 edges[i] = split.edge;
@@ -138,6 +139,7 @@ public class LinkedPointSet {
             edge.seek(edges[i]);
             int time0 = travelTimeForVertex.getTravelTime(edge.getFromVertex());
             int time1 = travelTimeForVertex.getTravelTime(edge.getToVertex());
+
             // TODO apply walk speed
             if (time0 != Integer.MAX_VALUE) {
                 time0 += distances0_mm[i] / 1000;
@@ -151,15 +153,12 @@ public class LinkedPointSet {
     }
 
     /**
-     * Get a distance table to all target points in this LinkedPointSet that were reached by the last search
-     * operation on the supplied StreetRouter.
+     * Get a distance table to all target points in this LinkedPointSet that were reached in the provided
+     * stop tree to street vertices.
      * @return A packed array of (pointIndex, distanceMeters) for every reachable point in this set.
      * This is currently returning the weight, which is the distance in meters.
      */
-    private int[] getStopTree (StreetRouter router) {
-        if (router.streetLayer != this.streetLayer) {
-            LOG.error("This LinkedPointSet is not linked to the same StreetLayer as the supplied StreetRouter.");
-        }
+    private int[] getStopTree (TIntIntMap stopTreeToVertices) {
         TIntIntMap distanceToPoint = new TIntIntHashMap(edges.length, 0.5f, Integer.MAX_VALUE, Integer.MAX_VALUE);
         // Iterating over the points, rather than iterating over all the reached vertices, is much simpler.
         // Iterating over the reached vertices requires additional indexes and I'm not sure it would be any faster.
@@ -170,15 +169,17 @@ public class LinkedPointSet {
                 continue;
 
             edge.seek(edges[p]);
-            int t0 = router.getTravelTimeToVertex(edge.getFromVertex());
-            int t1 = router.getTravelTimeToVertex(edge.getToVertex());
-            if (t0 != Integer.MAX_VALUE) {
-                t0 += distances0_mm[p] / 1000;
-            }
-            if (t1 != Integer.MAX_VALUE) {
-                t1 += distances1_mm[p] / 1000;
-            }
-            int t = Math.min(t0, t1);
+
+            int t1 = Integer.MAX_VALUE, t2 = Integer.MAX_VALUE;
+
+            if (stopTreeToVertices.containsKey(edge.getFromVertex()))
+                t1 = (int) (stopTreeToVertices.get(edge.getFromVertex()) / 1.3f + distances0_mm[p] / 1300);
+
+            if (stopTreeToVertices.containsKey(edge.getToVertex()))
+                t1 = (int) (stopTreeToVertices.get(edge.getToVertex()) / 1.3f + distances1_mm[p] / 1300);
+
+            int t = Math.min(t1, t2);
+
             if (t != Integer.MAX_VALUE) {
                 if (t < distanceToPoint.get(p)) {
                     distanceToPoint.put(p, t);
@@ -207,29 +208,29 @@ public class LinkedPointSet {
      * The packed format does not make the serialized size any smaller (the Trove serializers are already smart).
      * However the packed representation uses less live memory: 665 vs 409 MB (including all other data) on Portland.
      *
-     * Currently experimenting with doing both steps at once (trees out to street vertices, then getting the last
-     * meters up to the targets from a LinkedPointSet).
+     * At one point we experimented with doing the entire search here from all transit stops all the way
+     * up to the points. However that takes too long when switching pointsets. So we precache distances
+     * to all street vertices, and then just extend that to points.
      */
     public void makeStopTrees () {
-        StreetRouter router = new StreetRouter(streetLayer);
         LOG.info("Creating travel distance trees from each transit stop...");
-        TransitLayer transitLayer = streetLayer.linkedTransitLayer;
-        int nStops = transitLayer.getStopCount();
-        stopTrees = new ArrayList<>(nStops);
-        StreetRouter streetRouter = new StreetRouter(streetLayer);
-        streetRouter.distanceLimitMeters = 2000;
-        for (int s = 0; s < nStops; s++) {
-            int originStreetVertex = transitLayer.streetVertexForStop.get(s);
-            if (originStreetVertex == -1) {
-                LOG.info("Stop {} is not connected to the street network.", s);
-                // Every iteration must add a map to stopTrees to maintain the right length (one entry per stop).
-                stopTrees.add(null);
-            } else {
-                streetRouter.setOrigin(originStreetVertex);
-                streetRouter.route();
-                stopTrees.add(this.getStopTree(streetRouter));
-            }
-        }
+        int nStops = streetLayer.linkedTransitLayer.getStopCount();
+        int[][] stopTrees = new int[nStops][];
+
+        // create trees in parallel to make this fast, for interactive use
+        IntStream.range(0, nStops).parallel().forEach(s -> {
+            // the tree going as far as vertices
+            TIntIntMap stopTreeToVertices = streetLayer.linkedTransitLayer.stopTree[s];
+
+            // maintain length
+            if (stopTreeToVertices == null)
+                stopTrees[s] = (null);
+            else
+                stopTrees[s] = this.getStopTree(stopTreeToVertices);
+        });
+
+        this.stopTrees = Arrays.asList(stopTrees);
+
         LOG.info("Done creating travel distance trees.");
     }
 }
