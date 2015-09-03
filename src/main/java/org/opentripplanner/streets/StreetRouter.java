@@ -8,16 +8,10 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 
 /**
  * This routes over the street layer of a TransitNetwork.
@@ -60,6 +54,16 @@ public class StreetRouter {
             if (stopIndex >= 0) {
                 result.put(stopIndex, state.weight);
             }
+            return true; // continue iteration
+        });
+        return result;
+    }
+
+    /** Return a map of all the reached vertices to their distances from the origin */
+    public TIntIntMap getReachedVertices () {
+        TIntIntMap result = new TIntIntHashMap();
+        bestStates.forEachEntry((vidx, state) -> {
+            result.put(vidx, state.weight);
             return true; // continue iteration
         });
         return result;
