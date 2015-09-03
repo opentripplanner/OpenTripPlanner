@@ -255,7 +255,11 @@ public class TNAnalystWorker implements Runnable {
         batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         // If an initial graph ID was provided in the config file, build that TransportNetwork on startup.
-        // TODO pre-building graphs may not be necessary once we're just loading them quickly from disk. Actually what is the point of doing this since we can lazy-build? Leaving it out.
+        if (graphIdAffinity != null) {
+            LOG.info("Prebuilding graph {}", graphIdAffinity);
+            transportNetworkCache.getNetwork(graphIdAffinity);
+            LOG.info("Done prebuilding graph {}", graphIdAffinity);
+        }
 
         // Start filling the work queues.
         boolean idle = false;
