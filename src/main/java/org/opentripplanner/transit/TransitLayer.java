@@ -60,6 +60,8 @@ public class TransitLayer implements Serializable {
     public double centerLon;
     public double centerLat;
 
+    public int nTrips = 0;
+
     /** this is the result of running a search from every stop in the graph, map from stop vertex index to (vertex index, distance) */
     public transient TIntIntMap[] stopTree;
 
@@ -229,11 +231,6 @@ public class TransitLayer implements Serializable {
             if (originVertex == -1) {
                 // stop is unlinked
                 LOG.info("Stop {} is unlinked", stop);
-
-                if (stopForIndex != null) {
-                    Stop obj = stopForIndex.get(stop);
-                    LOG.info("unlinked,{},{},{}", obj.stop_name, obj.stop_lat, obj.stop_lon);
-                }
 
                 stopTree[stop] = null;
                 continue;
