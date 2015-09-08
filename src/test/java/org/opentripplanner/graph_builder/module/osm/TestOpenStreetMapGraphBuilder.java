@@ -14,10 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.net.URLDecoder;
 
 import junit.framework.TestCase;
@@ -29,13 +26,22 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.LocalizedString;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
@@ -152,6 +158,87 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             }
             edgeEndpoints.add(endpoints);
         }
+    }
+
+    @Test
+    public void testBuildAreaWithoutVisibility() throws Exception {
+        Graph gg = new Graph();
+
+        OpenStreetMapModule loader = new OpenStreetMapModule();
+        loader.skipVisibility = true;
+        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+
+        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.gz").getFile(), "UTF-8"));
+
+        provider.setPath(file);
+        loader.setProvider(provider);
+
+        loader.buildGraph(gg, extra);
+        new StreetVertexIndexServiceImpl(gg);
+
+        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
+        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", gg));
+
+        Router a = otpServer.getGraphService().getRouter("A");
+        RoutingRequest request = new RoutingRequest("WALK");
+
+        //This are vertices that can be connected only over edges on area (with correct permissions)
+        //It tests if it is possible to route over area without visibility calculations
+        Vertex bottomV = gg.getVertex("osm:node:580290955");
+        Vertex topV = gg.getVertex("osm:node:559271124");
+
+        request.setRoutingContext(a.graph, bottomV, topV);
+
+        GraphPathFinder graphPathFinder = new GraphPathFinder(a);
+        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
+
+        assertNotNull(pathList);
+        assertFalse(pathList.isEmpty());
+        for (GraphPath path: pathList) {
+            assertFalse(path.states.isEmpty());
+        }
+
+    }
+
+    @Test
+    public void testBuildAreaWithVisibility() throws Exception {
+        Graph gg = new Graph();
+
+        OpenStreetMapModule loader = new OpenStreetMapModule();
+        loader.skipVisibility = false;
+        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+
+        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.gz").getFile(), "UTF-8"));
+
+        provider.setPath(file);
+        loader.setProvider(provider);
+        loader.buildGraph(gg, extra);
+
+        new StreetVertexIndexServiceImpl(gg);
+
+        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
+        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", gg));
+
+        Router a = otpServer.getGraphService().getRouter("A");
+
+        RoutingRequest request = new RoutingRequest("WALK");
+
+        Vertex bottomV = gg.getVertex("osm:node:580290955");
+        Vertex topV = gg.getVertex("osm:node:559271124");
+
+        request.setRoutingContext(a.graph, bottomV, topV);
+
+        GraphPathFinder graphPathFinder = new GraphPathFinder(a);
+        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
+
+        assertNotNull(pathList);
+        assertFalse(pathList.isEmpty());
+        for (GraphPath path: pathList) {
+            assertFalse(path.states.isEmpty());
+        }
+
     }
 
     @Test
