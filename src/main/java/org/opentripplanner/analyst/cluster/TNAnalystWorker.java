@@ -255,6 +255,12 @@ public class TNAnalystWorker implements Runnable {
         batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         // If an initial graph ID was provided in the config file, build that TransportNetwork on startup.
+        // Prebuilding the graph is necessary because, if the graph is not cached it can take several
+        // minutes to build it. Even if the graph is cached, reconstructing the indices and stop trees
+        // can take up to a minute. The UI times out after 30 seconds, so the broker needs to return
+        // a 503 (Service Not Available) to tell it to try again later. It can't do that after it's
+        // sent a request to a worker, so the worker needs to not come online until it's ready to process
+        // requests.
         if (graphIdAffinity != null) {
             LOG.info("Prebuilding graph {}", graphIdAffinity);
             transportNetworkCache.getNetwork(graphIdAffinity);
@@ -554,7 +560,7 @@ public class TNAnalystWorker implements Runnable {
             resultSaverRunnable = () -> {
                 // TODO catch the case where the S3 putObject fails. (call deleteRequest based on PutObjectResult in the runnable)
                 // Otherwise the AnalystWorker can freeze piping data to a failed S3 saver thread.
-                String s3key = "/".join(clusterRequest.jobId, fileName);
+                String s3key = String.join("/", clusterRequest.jobId, fileName);
                 s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
             };
         };
