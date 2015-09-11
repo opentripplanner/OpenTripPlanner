@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -107,9 +108,37 @@ public class TestParkAndRide extends TestCase {
         path = tree.getPath(C, false);
         assertNull(path);
 
-        // But we can go from A to C with CAR+WALK mode using P+R.
+        // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false
         options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        //options.arriveBy
         options.setRoutingContext(graph, A, C);
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(C, false);
+        assertNotNull(path);
+
+        // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true
+        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options.setArriveBy(true);
+        options.setRoutingContext(graph, A, C);
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(A, false);
+        assertNotNull(path);
+
+
+        // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true interleavedBidiHeuristic
+        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options.setArriveBy(true);
+        options.setRoutingContext(graph, A, C);
+        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(A, false);
+        assertNotNull(path);
+
+        // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false interleavedBidiHeuristic
+        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        //options.arriveBy
+        options.setRoutingContext(graph, A, C);
+        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
         assertNotNull(path);
