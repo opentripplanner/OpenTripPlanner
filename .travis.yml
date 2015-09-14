@@ -10,7 +10,14 @@ install: true
 
 # Replace Travis's default build step.
 # Run all Maven phases at once up through verify, install, and deploy.
-script: mvn clean deploy
+script: |
+  # only (attempt to) deploy non-pull request commits to master
+  if [ "$TRAVIS_PULL_REQUEST" = false ] && [ "$TRAVIS_BRANCH" = master ]; then
+    mvn clean deploy
+  else
+    # otherwise, just run test suite
+    mvn clean verify
+  fi
 
 env:
   global:
