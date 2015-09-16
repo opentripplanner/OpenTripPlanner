@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -255,7 +256,10 @@ public class RepeatedRaptorProfileRouter {
                 // suffer from roundoff. Great care is taken when splitting to preserve sums.
                 // When cycling, this is not an issue; we already have an explicitly asymmetrical search (cycling at the origin, walking at the destination),
                 // so we need not preserve symmetry.
-                rr.maxWalkDistance = 2000; // FIXME kind of arbitrary
+                // We use the max walk time for the search at the origin, but we clamp it to MAX_WALK_METERS so that we don;t
+                // have every transit stop in the state as an initial transit stop if someone sets max walk time to four days,
+                // and so that symmetry is preserved.
+                rr.maxWalkDistance = Math.min(request.maxWalkTime * 60 * request.walkSpeed, GraphIndex.MAX_WALK_METERS); // FIXME kind of arbitrary
                 rr.softWalkLimiting = false;
                 rr.dominanceFunction = new DominanceFunction.LeastWalk();
             }

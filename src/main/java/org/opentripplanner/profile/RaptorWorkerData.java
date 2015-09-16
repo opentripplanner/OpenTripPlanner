@@ -441,39 +441,30 @@ public class RaptorWorkerData implements Serializable {
         // Record times to nearby intersections for all used stops.
         // We use times rather than distances to avoid a costly floating-point divide during propagation
         if (sampleSet == null) {
+            int maxWalkDistance = (int) (req.maxWalkTime * 60 * req.walkSpeed);
             for (TIntIterator stopIt = stopForIndex.iterator(); stopIt.hasNext();) {
                 int stop = stopIt.next();
 
                 // permanent stop
                 Vertex tstop = graph.getVertexById(stop);
-                if (tstop != null && TransitStop.class.isInstance(tstop)) {
-                    // permanent stop
-                    // convert distance to time
-                    int[] distancesForStop = stc.distancesForStop.get(tstop);
-                    int[] timesForStop = new int[distancesForStop.length];
+                boolean isPermanentStop = tstop != null && TransitStop.class.isInstance(tstop);
+                // convert distance to time
+                int[] distancesForStop = isPermanentStop ? stc.distancesForStop.get(tstop) : temporaryStopTreeCache.get(stop);
+                TIntList timesForStop = new TIntArrayList();
 
-                    for (int i = 0; i < distancesForStop.length; i++) {
-                        timesForStop[i] = distancesForStop[i];
-                        i++; // advance to distance for stop i
+                for (int i = 0; i < distancesForStop.length; i += 2) {
+                    int vidx = distancesForStop[i];
+                    int dist = distancesForStop[i + 1];
+
+                    // only add if it's less than the max walk distance
+                    if (dist <= maxWalkDistance) {
+                        timesForStop.add(vidx);
                         // convert meters to seconds by dividing by meters / second
-                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
+                        timesForStop.add((int) (dist / req.walkSpeed));
                     }
-
-                    targetsForStop.add(timesForStop);
                 }
-                else {
-                    // temporary stop
-                    int[] distancesForStop = temporaryStopTreeCache.get(stop);
-                    int[] timesForStop = new int[distancesForStop.length];
 
-                    for (int i = 0; i < distancesForStop.length; i++) {
-                        timesForStop[i] = distancesForStop[i];
-                        i++; // advance to distance for stop i
-                        // convert meters to seconds by dividing by meters / second
-                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
-                    }
-
-                    targetsForStop.add(timesForStop);                }
+                targetsForStop.add(timesForStop.toArray());
             }
 
             // TODO memory leak when many graphs have been built
