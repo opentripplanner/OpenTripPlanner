@@ -787,7 +787,20 @@ public class IndexGraphQLSchema {
                 .name("stops")
                 .description("Get all stops for the specified graph")
                 .type(new GraphQLList(stopType))
-                .dataFetcher(environment -> new ArrayList<>(index.stopForId.values()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("ids")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> {
+                    if (!(environment.getArgument("ids") instanceof List)) {
+                        return new ArrayList<>(index.stopForId.values());
+                    } else {
+                        return ((List<String>) environment.getArgument("ids"))
+                            .stream()
+                            .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .collect(Collectors.toList());
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByBbox")
