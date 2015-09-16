@@ -39,6 +39,7 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -95,6 +96,9 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
+
+    /** A snapshot of street speeds for looking up real-time or historical traffic data */
+    public final StreetSpeedSnapshot streetSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -233,6 +237,13 @@ public class RoutingContext implements Cloneable {
             timetableSnapshot = null;
             calendarService = null;
         }
+
+        // do the same for traffic
+        if (graph.streetSpeedSource != null)
+            this.streetSpeedSnapshot = graph.streetSpeedSource.getSnapshot();
+        else
+            this.streetSpeedSnapshot = null;
+
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;

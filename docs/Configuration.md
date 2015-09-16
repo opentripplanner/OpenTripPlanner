@@ -414,8 +414,16 @@ connect to a network resource is the `url` field.
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             type: "websocket-gtfs-rt-updater"
+        },
+
+        // OpenTraffic data
+        {
+          "type": "opentraffic-updater",
+          "frequencySec": -1,
+          // relative to OTP's working directory, where is traffic data stored.
+          // Should have subdirectories z/x/y.traffic.pbf (i.e. a tile tree of traffic tiles)
+          "tileDirectory": "traffic"
         }
     ]
 }
 ```
-

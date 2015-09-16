@@ -77,7 +77,7 @@ public class ClusterGraphBuilder {
                 zis.close();
             } catch (Exception e) {
                 // TODO delete graph cache dir which is probably corrupted
-                e.printStackTrace();
+                LOG.info("Error retrieving graph files", e);
             }
         } else {
             LOG.info("Graph input files were found locally. Using these files from the cache.");

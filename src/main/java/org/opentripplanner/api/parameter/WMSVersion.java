@@ -13,14 +13,18 @@
 
 package org.opentripplanner.api.parameter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class WMSVersion extends ArrayList<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(WMSVersion.class);
 
     private static final long serialVersionUID = 20120130L; // YYYYMMDD
 
@@ -37,7 +41,7 @@ public class WMSVersion extends ArrayList<Integer> {
                 this.add(Integer.parseInt(v));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Error parsing WMS version {}", s, e);
             throw new WebApplicationException(Response
                     .status(Status.BAD_REQUEST)
                     .entity("error parsing WMS version: " + e.getMessage())

@@ -12,9 +12,9 @@ public class TransitStopStreetVertex extends OsmVertex {
 
     public String stopCode;
 
-    public TransitStopStreetVertex(Graph g, String label, double x, double y, String name, String stopCode) {
+    public TransitStopStreetVertex(Graph g, String label, double x, double y, long nodeId, String name, String stopCode) {
         //Stop code is always non localized
-        super(g, label, x, y, new NonLocalizedString(name));
+        super(g, label, x, y, nodeId, new NonLocalizedString(name));
         this.stopCode = stopCode;
     }
 

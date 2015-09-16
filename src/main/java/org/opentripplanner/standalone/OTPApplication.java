@@ -83,7 +83,6 @@ public class OTPApplication extends Application {
             PlannerResource.class,
             SIsochrone.class,
             Routers.class,
-            Raster.class,
             LegendResource.class,
             ProfileResource.class,
             SimpleIsochrone.class,

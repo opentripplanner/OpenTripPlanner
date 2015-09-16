@@ -40,13 +40,6 @@ otp.layers.StopsLayer =
 
         this.module.addLayer("stops", this);
         this.module.webapp.map.lmap.on('dragend zoomend', $.proxy(this.refresh, this));
-        this.module.webapp.map.lmap.on('popupopen', function (e) {
-            this_.module.webapp.indexApi.loadRoutesForStop(e.popup._source._stopId, this_, function(data) {
-                _.each(data, function(route) {
-                    ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
-                });
-            });
-        });
     },
 
     refresh : function() {
@@ -67,6 +60,43 @@ otp.layers.StopsLayer =
     updateStops : function(stops) {
         var stops = _.values(this.stopsLookup);
         var this_ = this;
+
+        for(var i=0; i<stops.length; i++) {
+
+            var stop = stops[i];
+            stop.lat = stop.lat || stop.stopLat;
+            stop.lon = stop.lon || stop.stopLon;
+
+            var icon = new StopIcon20();
+
+            m = L.marker([stop.lat, stop.lon], {
+                icon : icon,
+            });
+            m._stop = stop;
+            m._stopId = stop.id;
+            m.addTo(this)
+             .bindPopup('')
+             .on('click', function() {
+                var stopId = this._stopId;
+                var stopIdArr = stopId.split(':');
+                var marker = this;
+                this_.module.webapp.indexApi.loadStopById(stopIdArr[0], stopIdArr[1], this_, function(detailedStop) {
+                    marker.setPopupContent(this_.getPopupContent(detailedStop));
+                    this_.module.webapp.indexApi.loadRoutesForStop(stopId, this_, function(data) {
+                        _.each(data, function(route) {
+                            ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
+                        });
+                    });
+                });
+             });
+
+
+        }
+    },
+
+    getPopupContent : function(stop) {
+        var this_ = this;
+
         var stop_viewer_trans = _tr('Stop Viewer');
         //TRANSLATORS: Plan Trip [From Stop| To Stop] Used in stoplayer popup
         var plan_trip_trans = _tr('Plan Trip');
@@ -76,67 +106,40 @@ otp.layers.StopsLayer =
         var to_stop_trans = _tr('To Stop');
         var routes_stop_trans = _tr('Routes Serving Stop');
 
-        for(var i=0; i<stops.length; i++) {
-
-            var stop = stops[i];
-            stop.lat = stop.lat || stop.stopLat;
-            stop.lon = stop.lon || stop.stopLon;
-
-            // temporary TriMet specific code
-            if(stop.stopUrl && stop.stopUrl.indexOf("http://trimet.org") === 0) {
-                stop.titleLink = 'http://www.trimet.org/go/cgi-bin/cstops.pl?action=entry&resptype=U&lang=en&noCat=Landmark&Loc=' + stop.id.id;
-            }
-            //console.log(stop);
-
-            var icon = new StopIcon20();
-
-            var context = _.clone(stop);
-            context.agencyStopLinkText = otp.config.agencyStopLinkText || "Agency Stop URL";
-            context.stop_viewer = stop_viewer_trans;
-            context.routes_on_stop = routes_stop_trans;
-            context.plan_trip = plan_trip_trans;
-            context.from_stop = from_stop_trans;
-            context.to_stop = to_stop_trans;
-            var popupContent = ich['otp-stopsLayer-popup'](context);
-
-            popupContent.find('.stopViewerLink').data('stop', stop).click(function() {
-                var thisStop = $(this).data('stop');
-                this_.module.stopViewerWidget.show();
-                this_.module.stopViewerWidget.setActiveTime(moment().add("hours", -otp.config.timeOffset).unix()*1000);
-                this_.module.stopViewerWidget.setStop(thisStop.id, thisStop.name);
-                this_.module.stopViewerWidget.bringToFront();
-            });
-
-            popupContent.find('.planFromLink').data('stop', stop).click(function() {
-                var thisStop = $(this).data('stop');
-                this_.module.setStartPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
-                this_.module.webapp.map.lmap.closePopup();
-            });
-
-            popupContent.find('.planToLink').data('stop', stop).click(function() {
-                var thisStop = $(this).data('stop');
-                this_.module.setEndPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
-                this_.module.webapp.map.lmap.closePopup();
-            });
-            /*
-            if(stop.routes) {
-                var routeList = popupContent.find('.routeList');
-                for(var r = 0; r < stop.routes.length; r++) {
-                    var agencyAndId = stop.routes[r].agencyId + '_' + stop.routes[r].id;
-                    //var routeData = this.module.webapp.indexApi.routes[agencyAndId].routeData;
-                    ich['otp-stopsLayer-popupRoute'](routeData).appendTo(routeList);
-                    // TODO: click opens RouteViewer
-                    //routeList.append('<div>'+agencyAndId+'</div>');
-                }
-            }
-            */
-            m = L.marker([stop.lat, stop.lon], {
-                icon : icon,
-            });
-            m._stopId = stop.id;
-            m.addTo(this)
-             .bindPopup(popupContent.get(0));
-
+        // TriMet-specific code
+        if(stop.url && stop.url.indexOf("http://trimet.org") === 0) {
+            var stopId = stop.id.split(':')[1];
+            stop.titleLink = 'http://www.trimet.org/go/cgi-bin/cstops.pl?action=entry&resptype=U&lang=en&noCat=Landmark&Loc=' + stopId;
         }
-    },
+        var context = _.clone(stop);
+        context.agencyStopLinkText = otp.config.agencyStopLinkText || "Agency Stop URL";
+        context.stop_viewer = stop_viewer_trans;
+        context.routes_on_stop = routes_stop_trans;
+        context.plan_trip = plan_trip_trans;
+        context.from_stop = from_stop_trans;
+        context.to_stop = to_stop_trans;
+        var popupContent = ich['otp-stopsLayer-popup'](context);
+
+        popupContent.find('.stopViewerLink').data('stop', stop).click(function() {
+            var thisStop = $(this).data('stop');
+            this_.module.stopViewerWidget.show();
+            this_.module.stopViewerWidget.setActiveTime(moment().add("hours", -otp.config.timeOffset).unix()*1000);
+            this_.module.stopViewerWidget.setStop(thisStop.id, thisStop.name);
+            this_.module.stopViewerWidget.bringToFront();
+        });
+
+        popupContent.find('.planFromLink').data('stop', stop).click(function() {
+            var thisStop = $(this).data('stop');
+            this_.module.setStartPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
+            this_.module.webapp.map.lmap.closePopup();
+        });
+
+        popupContent.find('.planToLink').data('stop', stop).click(function() {
+            var thisStop = $(this).data('stop');
+            this_.module.setEndPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
+            this_.module.webapp.map.lmap.closePopup();
+        });
+
+        return popupContent.get(0);
+    }
 });

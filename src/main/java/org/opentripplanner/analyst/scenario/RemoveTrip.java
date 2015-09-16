@@ -1,7 +1,6 @@
 package org.opentripplanner.analyst.scenario;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -10,6 +9,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  * Remove trips from a scenario
  */
 public class RemoveTrip extends TripFilter {
+    public static final long serialVersionUID = 1L;
 
     @Override
     public String getType() {

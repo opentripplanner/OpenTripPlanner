@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * This holds the results of a one-to-many search from a single origin point to a whole set of destination points.
@@ -50,11 +49,10 @@ public class ResultSet implements Serializable{
     /** Times to reach every feature, may be null */
     public int[] times;
 
-    /** Isochrones from the origin, may be null */
+    /** Isochrone geometries around the origin, may be null. */
     public IsochroneData[] isochrones;
 
     public ResultSet() {
-        // TODO is this ever used?
     }
 
     /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, not including times. */
@@ -80,7 +78,6 @@ public class ResultSet implements Serializable{
     
     private void buildIsochrones(TimeSurface surface) {
         List<IsochroneData> id = SurfaceResource.getIsochronesAccumulative(surface, 5, 24);
-        
         this.isochrones = new IsochroneData[id.size()];
         id.toArray(this.isochrones);
     }
@@ -93,7 +90,10 @@ public class ResultSet implements Serializable{
         id.toArray(this.isochrones);
     }
 
-    /** Build a new ResultSet that contains only isochrones */
+    /**
+     * Build a new ResultSet that contains only isochrones, built by accumulating the times at all street vertices
+     * into a regular grid without an intermediate pointSet.
+     */
     public ResultSet (TimeSurface surface) {
         buildIsochrones(surface);
     }
@@ -116,11 +116,7 @@ public class ResultSet implements Serializable{
      * Each new histogram object will be stored as a part of this result set keyed on its property/category.
      */
     protected void buildHistograms(int[] times, PointSet targets) {
-        for (Entry<String, int[]> entry : targets.properties.entrySet()) {
-            String property = entry.getKey();
-            int[] magnitudes = entry.getValue();
-            this.histograms.put(property, new Histogram(times, magnitudes));
-        }
+        this.histograms = Histogram.buildAll(times, targets);
     }
 
     /**

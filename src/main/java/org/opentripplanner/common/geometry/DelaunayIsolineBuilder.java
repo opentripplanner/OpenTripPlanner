@@ -184,6 +184,7 @@ public class DelaunayIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
             shell.setUserData(new ArrayList<LinearRing>());
         }
         // 3. For each hole, determine which shell it fits in.
+        int nHolesFailed = 0;
         for (LinearRing hole : holes) {
             outer: {
                 // Probably most of the time, the first shell will be the one
@@ -196,8 +197,11 @@ public class DelaunayIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                 // This should not happen, but do not break bad here
                 // as loosing a hole is not critical, we still have
                 // sensible data to return.
-                LOG.error("Cannot find fitting shell for a hole!");
+                nHolesFailed += 1;
             }
+        }
+        if (nHolesFailed > 0) {
+            LOG.error("Could not find a shell for {} holes.", nHolesFailed);
         }
         // 4. Build the list of punched polygons
         List<Polygon> punched = new ArrayList<Polygon>(shells.size());

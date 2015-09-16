@@ -28,6 +28,12 @@ public class GraphBuilderParameters {
     public final boolean htmlAnnotations;
 
     /**
+     * If number of annotations is larger then specified number annotations will be split in multiple files.
+     * Since browsers have problems opening large HTML files.
+     */
+    public final int maxHtmlAnnotationsPerFile;
+
+    /**
      * Include all transit input files (GTFS) from scanned directory.
      */
     public final boolean transit;
@@ -131,6 +137,7 @@ public class GraphBuilderParameters {
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
+        maxHtmlAnnotationsPerFile = config.path("maxHtmlAnnotationsPerFile").asInt(1000);
     }
 
 }
