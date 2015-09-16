@@ -123,10 +123,12 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
+                .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
-                .type(Scalars.GraphQLFloat)
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).distance)
                 .build())
             .build();
 
@@ -850,26 +852,18 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(relay.getConnectionFieldArguments())
-                .dataFetcher(environment -> {
-                    Coordinate coordinate = new Coordinate(
-                        (double) (float) environment.getArgument("lon"),
-                        (double) (float) environment.getArgument("lat"));
-                    return new SimpleListConnection(index.graph.streetIndex
-                        .getNearbyTransitStops(coordinate,
-                            (double) (float) environment.getArgument("radius"))
-                        .stream()
-                        .filter(vertex -> environment.getArgument("agency") == null || vertex
-                            .getStop().getId().getAgencyId()
-                            .equalsIgnoreCase(environment.getArgument("agency")))
-                        .map(vertex -> new ImmutableMap.Builder<String, Object>()
-                            .put("stop", vertex.getStop())
-                            .put("distance", (float) SphericalDistanceLibrary
-                                .fastDistance(vertex.getCoordinate(), coordinate))
-                            .build())
-                        .sorted(Comparator.comparing(s -> (float) s.get("distance")))
-                        .collect(Collectors.toList()))
-                        .get(environment);
-                })
+                .dataFetcher(environment ->
+                    new SimpleListConnection(index.findClosestStopsByWalking(
+                        environment.getArgument("lat"), environment.getArgument("lon"),
+                        environment.getArgument("radius")
+                    )
+                    .stream()
+                    .filter(stopAndDistance -> environment.getArgument("agency") == null ||
+                        stopAndDistance.stop.getId().getAgencyId()
+                        .equalsIgnoreCase(environment.getArgument("agency")))
+                    .sorted(Comparator.comparing(s -> (float) s.distance))
+                    .collect(Collectors.toList()))
+                    .get(environment))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
