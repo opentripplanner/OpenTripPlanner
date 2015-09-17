@@ -334,7 +334,9 @@ public class RaptorWorkerData implements Serializable {
             }
             temporaryStopTreeCache.put(t.index, distances);
 
-            TIntIntMap transfersFromStop = findStopsNear(spt, graph, false);
+            // NB using walk speed of 1 m/s here since we want meters, not seconds
+            // walk speed is applied during search.
+            TIntIntMap transfersFromStop = findStopsNear(spt, graph, false, 1f);
 
             // convert it to use indices in the graph not in the worker data
             TIntIntMap transfersFromStopWithGraphIndices = new TIntIntHashMap();
@@ -358,7 +360,9 @@ public class RaptorWorkerData implements Serializable {
             rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
             spt = astar.getShortestPathTree(rr, 5);
 
-            TIntIntMap transfersToStop = findStopsNear(spt, graph, false);
+            // NB using walk speed of 1 m/s here since we want meters, not seconds
+            // walk speed is applied during search
+            TIntIntMap transfersToStop = findStopsNear(spt, graph, false, 1f);
 
             // turn the array around; these are transfers from elsewhere to this stop.
             for (TIntIntIterator it = transfersToStop.iterator(); it.hasNext(); ) {
@@ -605,7 +609,7 @@ public class RaptorWorkerData implements Serializable {
     }
 
     /** find stops from a given SPT, including temporary stops. If useTimes is true, use times from the SPT, otherwise use distances */
-    public TIntIntMap findStopsNear (ShortestPathTree spt, Graph graph, boolean useTimes) {
+    public TIntIntMap findStopsNear (ShortestPathTree spt, Graph graph, boolean useTimes, float walkSpeed) {
         TIntIntMap accessTimes = new TIntIntHashMap();
 
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
@@ -613,14 +617,13 @@ public class RaptorWorkerData implements Serializable {
             if (s != null) {
                 // note that we calculate the time based on the walk speed here rather than
                 // based on the time. this matches what we do in the stop tree cache.
-                // TODO hardwired walk speed
                 int stopIndex = indexForStop.get(tstop.getIndex());
                 
                 if (stopIndex != -1) {
                     if (useTimes)
                         accessTimes.put(stopIndex, (int) s.getElapsedTimeSeconds());
                     else
-                        accessTimes.put(stopIndex, (int) (s.getWalkDistance() / 1.3f));
+                        accessTimes.put(stopIndex, (int) (s.getWalkDistance() / walkSpeed));
                 }
             }
         }
@@ -657,9 +660,8 @@ public class RaptorWorkerData implements Serializable {
             if (Double.isInfinite(dist))
                 continue;
 
-            // FIXME hardwired walk speed
             // NB using the index in the worker data not the index in the graph!
-            accessTimes.put(it.value(), (int) (dist / 1.3f));
+            accessTimes.put(it.value(), (int) (dist / walkSpeed));
         }
 
         return accessTimes;
