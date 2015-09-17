@@ -858,7 +858,7 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("radius")
                     .description("Radius (in meters) to search for from the specidied location")
-                    .type(Scalars.GraphQLFloat)
+                    .type(Scalars.GraphQLInt)
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
