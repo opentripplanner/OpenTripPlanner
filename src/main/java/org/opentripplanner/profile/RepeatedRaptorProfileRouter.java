@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
@@ -219,7 +220,8 @@ public class RepeatedRaptorProfileRouter {
      * @param data the raptor data table to use. If this is null (i.e. there is no transit) range is extended,
      *             and we don't care if we actually find any stops, we just want the tree of on-street distances.
      */
-    private TIntIntMap findInitialStops (boolean dest, RaptorWorkerData data) {
+    @VisibleForTesting
+    public TIntIntMap findInitialStops(boolean dest, RaptorWorkerData data) {
         LOG.info("Finding initial stops");
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
