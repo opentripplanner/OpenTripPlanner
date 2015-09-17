@@ -276,7 +276,7 @@ public class RepeatedRaptorProfileRouter {
         // Return nearest stops if we're using transit,
         // otherwise return null and leave preTransitSpt around for later use.
         if (data != null) {
-            TIntIntMap accessTimes = data.findStopsNear(preTransitSpt, graph);
+            TIntIntMap accessTimes = data.findStopsNear(preTransitSpt, graph, rr.modes.contains(TraverseMode.BICYCLE));
             LOG.info("Found {} transit stops", accessTimes.size());
             return accessTimes;
         } else {
