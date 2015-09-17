@@ -336,7 +336,7 @@ public class AnalystWorker implements Runnable {
             // or a job task (where the result is saved to output location on S3).
             boolean isochrone = (clusterRequest.destinationPointsetId == null);
             boolean singlePoint = (clusterRequest.outputLocation == null);
-            boolean transit = (clusterRequest.profileRequest.transitModes != null && !clusterRequest.profileRequest.transitModes.isTransit());
+            boolean transit = (clusterRequest.profileRequest.transitModes != null && clusterRequest.profileRequest.transitModes.isTransit());
 
             if (singlePoint) {
                 lastHighPriorityRequestProcessed = startTime;
