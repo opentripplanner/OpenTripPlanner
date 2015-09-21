@@ -116,7 +116,7 @@ public class GtfsLibrary {
         }else if (routeType >= 1000 && routeType < 1100){ //Water Transport Service
             return TraverseMode.FERRY;
         }else if (routeType >= 1100 && routeType < 1200){ //Air Service
-            throw new IllegalArgumentException("Air transport not supported" + routeType);
+            return TraverseMode.AIRPLANE;
         }else if (routeType >= 1200 && routeType < 1300){ //Ferry Service
             return TraverseMode.FERRY;
         }else if (routeType >= 1300 && routeType < 1400){ //Telecabin Service

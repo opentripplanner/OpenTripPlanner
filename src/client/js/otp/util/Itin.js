@@ -70,7 +70,7 @@ otp.util.Itin = {
     },
 
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH" || mode === "AIRPLANE";
     },
 
     includesTransit : function(mode) {
@@ -196,6 +196,7 @@ otp.util.Itin = {
         //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial
         //cable cars where the car is suspended from the cable.
         'GONDOLA' : _tr('Aerial Tram'),
+        'AIRPLANE' : _tr('Airplane'),
     },
 
     modeString : function(mode) {
