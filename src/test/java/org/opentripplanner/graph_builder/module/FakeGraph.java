@@ -118,6 +118,84 @@ public class FakeGraph {
         gtfs.buildGraph(gg, new HashMap<>());
     }
 
+    /** Add many transit lines to a lot of stops */
+    public static void addTransitMultipleLines (Graph g) throws Exception {
+        // using conveyal GTFS lib to build GTFS so a lot of code does not have to be rewritten later
+        // once we're using the conveyal GTFS lib for everything we ought to be able to do this
+        // without even writing out the GTFS to a file.
+        GTFSFeed feed = new GTFSFeed();
+        Agency a = new Agency();
+        a.agency_id = "agency";
+        a.agency_name = "Agency";
+        a.agency_timezone = "America/New_York";
+        a.agency_url = new URL("http://www.example.com");
+        feed.agency.put("agency", a);
+
+        Route r = new Route();
+        r.route_short_name = "1";
+        r.route_long_name = "High Street";
+        r.route_type = 3;
+        r.agency = a;
+        r.route_id = "route";
+        feed.routes.put(r.route_id, r);
+
+        Service s = new Service("service");
+        s.calendar = new Calendar();
+        s.calendar.service = s;
+        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
+                s.calendar.saturday = s.calendar.sunday = 1;
+        s.calendar.start_date = 19991231;
+        s.calendar.end_date = 21001231;
+        feed.services.put(s.service_id, s);
+
+        int stopIdx = 0;
+        while (stopIdx < 10000) {
+            com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
+            s1.stop_id = s1.stop_name = "s" + stopIdx++;
+            s1.stop_lat = 39.9354 + (stopIdx % 100) * 1e-3;
+            s1.stop_lon = -83.0589 + (stopIdx / 100) * 1e-3;
+            feed.stops.put(s1.stop_id, s1);
+
+            com.conveyal.gtfs.model.Stop s2 = new com.conveyal.gtfs.model.Stop();
+            s2.stop_id = s2.stop_name = "s" + stopIdx++;
+            s2.stop_lat = 39.9354 + (stopIdx % 100) * 1e-3;
+            s2.stop_lon = -83.0589 + (stopIdx / 100) * 1e-3;
+            feed.stops.put(s2.stop_id, s2);
+
+            // make timetabled trips
+            int departure = 8 * 3600;
+            Trip t = new Trip();
+            t.trip_id = "trip" + departure + "_" + stopIdx;
+            t.service = s;
+            t.route = r;
+            feed.trips.put(t.trip_id, t);
+
+            StopTime st1 = new StopTime();
+            st1.trip_id = t.trip_id;
+            st1.arrival_time = departure;
+            st1.departure_time = departure;
+            st1.stop_id = s1.stop_id;
+            st1.stop_sequence = 1;
+            feed.stop_times.put(new Fun.Tuple2(st1.trip_id, st1.stop_sequence), st1);
+
+            StopTime st2 = new StopTime();
+            st2.trip_id = t.trip_id;
+            st2.arrival_time = departure + 500;
+            st2.departure_time = departure + 500;
+            st2.stop_sequence = 2;
+            st2.stop_id = s2.stop_id;
+            feed.stop_times.put(new Fun.Tuple2(st2.trip_id, st2.stop_sequence), st2);
+
+        }
+
+        File tempFile = File.createTempFile("gtfs", ".zip");
+        feed.toFile(tempFile.getAbsolutePath());
+
+        // phew. load it into the graph.
+        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
+        gtfs.buildGraph(g, new HashMap<>());
+    }
+
     /** Add a regular grid of stops to the graph */
     public static void addRegularStopGrid(Graph g) {
         int count = 0;

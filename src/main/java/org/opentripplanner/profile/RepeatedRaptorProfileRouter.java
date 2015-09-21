@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
@@ -19,6 +20,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -218,7 +220,8 @@ public class RepeatedRaptorProfileRouter {
      * @param data the raptor data table to use. If this is null (i.e. there is no transit) range is extended,
      *             and we don't care if we actually find any stops, we just want the tree of on-street distances.
      */
-    private TIntIntMap findInitialStops (boolean dest, RaptorWorkerData data) {
+    @VisibleForTesting
+    public TIntIntMap findInitialStops(boolean dest, RaptorWorkerData data) {
         LOG.info("Finding initial stops");
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
@@ -255,7 +258,10 @@ public class RepeatedRaptorProfileRouter {
                 // suffer from roundoff. Great care is taken when splitting to preserve sums.
                 // When cycling, this is not an issue; we already have an explicitly asymmetrical search (cycling at the origin, walking at the destination),
                 // so we need not preserve symmetry.
-                rr.maxWalkDistance = 2000; // FIXME kind of arbitrary
+                // We use the max walk time for the search at the origin, but we clamp it to MAX_WALK_METERS so that we don;t
+                // have every transit stop in the state as an initial transit stop if someone sets max walk time to four days,
+                // and so that symmetry is preserved.
+                rr.maxWalkDistance = Math.min(request.maxWalkTime * 60 * request.walkSpeed, GraphIndex.MAX_WALK_METERS); // FIXME kind of arbitrary
                 rr.softWalkLimiting = false;
                 rr.dominanceFunction = new DominanceFunction.LeastWalk();
             }
@@ -270,7 +276,7 @@ public class RepeatedRaptorProfileRouter {
         // Return nearest stops if we're using transit,
         // otherwise return null and leave preTransitSpt around for later use.
         if (data != null) {
-            TIntIntMap accessTimes = data.findStopsNear(preTransitSpt, graph);
+            TIntIntMap accessTimes = data.findStopsNear(preTransitSpt, graph, rr.modes.contains(TraverseMode.BICYCLE), request.walkSpeed);
             LOG.info("Found {} transit stops", accessTimes.size());
             return accessTimes;
         } else {

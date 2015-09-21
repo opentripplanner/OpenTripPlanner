@@ -334,7 +334,9 @@ public class RaptorWorkerData implements Serializable {
             }
             temporaryStopTreeCache.put(t.index, distances);
 
-            TIntIntMap transfersFromStop = findStopsNear(spt, graph);
+            // NB using walk speed of 1 m/s here since we want meters, not seconds
+            // walk speed is applied during search.
+            TIntIntMap transfersFromStop = findStopsNear(spt, graph, false, 1f);
 
             // convert it to use indices in the graph not in the worker data
             TIntIntMap transfersFromStopWithGraphIndices = new TIntIntHashMap();
@@ -358,7 +360,9 @@ public class RaptorWorkerData implements Serializable {
             rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
             spt = astar.getShortestPathTree(rr, 5);
 
-            TIntIntMap transfersToStop = findStopsNear(spt, graph);
+            // NB using walk speed of 1 m/s here since we want meters, not seconds
+            // walk speed is applied during search
+            TIntIntMap transfersToStop = findStopsNear(spt, graph, false, 1f);
 
             // turn the array around; these are transfers from elsewhere to this stop.
             for (TIntIntIterator it = transfersToStop.iterator(); it.hasNext(); ) {
@@ -441,39 +445,30 @@ public class RaptorWorkerData implements Serializable {
         // Record times to nearby intersections for all used stops.
         // We use times rather than distances to avoid a costly floating-point divide during propagation
         if (sampleSet == null) {
+            int maxWalkDistance = (int) (req.maxWalkTime * 60 * req.walkSpeed);
             for (TIntIterator stopIt = stopForIndex.iterator(); stopIt.hasNext();) {
                 int stop = stopIt.next();
 
                 // permanent stop
                 Vertex tstop = graph.getVertexById(stop);
-                if (tstop != null && TransitStop.class.isInstance(tstop)) {
-                    // permanent stop
-                    // convert distance to time
-                    int[] distancesForStop = stc.distancesForStop.get(tstop);
-                    int[] timesForStop = new int[distancesForStop.length];
+                boolean isPermanentStop = tstop != null && TransitStop.class.isInstance(tstop);
+                // convert distance to time
+                int[] distancesForStop = isPermanentStop ? stc.distancesForStop.get(tstop) : temporaryStopTreeCache.get(stop);
+                TIntList timesForStop = new TIntArrayList();
 
-                    for (int i = 0; i < distancesForStop.length; i++) {
-                        timesForStop[i] = distancesForStop[i];
-                        i++; // advance to distance for stop i
+                for (int i = 0; i < distancesForStop.length; i += 2) {
+                    int vidx = distancesForStop[i];
+                    int dist = distancesForStop[i + 1];
+
+                    // only add if it's less than the max walk distance
+                    if (dist <= maxWalkDistance) {
+                        timesForStop.add(vidx);
                         // convert meters to seconds by dividing by meters / second
-                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
+                        timesForStop.add((int) (dist / req.walkSpeed));
                     }
-
-                    targetsForStop.add(timesForStop);
                 }
-                else {
-                    // temporary stop
-                    int[] distancesForStop = temporaryStopTreeCache.get(stop);
-                    int[] timesForStop = new int[distancesForStop.length];
 
-                    for (int i = 0; i < distancesForStop.length; i++) {
-                        timesForStop[i] = distancesForStop[i];
-                        i++; // advance to distance for stop i
-                        // convert meters to seconds by dividing by meters / second
-                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
-                    }
-
-                    targetsForStop.add(timesForStop);                }
+                targetsForStop.add(timesForStop.toArray());
             }
 
             // TODO memory leak when many graphs have been built
@@ -613,8 +608,8 @@ public class RaptorWorkerData implements Serializable {
         ts.targetCount = nTargets;
     }
 
-    /** find stops from a given SPT, including temporary stops */
-    public TIntIntMap findStopsNear (ShortestPathTree spt, Graph graph) {
+    /** find stops from a given SPT, including temporary stops. If useTimes is true, use times from the SPT, otherwise use distances */
+    public TIntIntMap findStopsNear (ShortestPathTree spt, Graph graph, boolean useTimes, float walkSpeed) {
         TIntIntMap accessTimes = new TIntIntHashMap();
 
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
@@ -622,11 +617,14 @@ public class RaptorWorkerData implements Serializable {
             if (s != null) {
                 // note that we calculate the time based on the walk speed here rather than
                 // based on the time. this matches what we do in the stop tree cache.
-                // TODO hardwired walk speed
                 int stopIndex = indexForStop.get(tstop.getIndex());
                 
-                if (stopIndex != -1)
-                accessTimes.put(stopIndex, (int) (s.getWalkDistance() / 1.3f));
+                if (stopIndex != -1) {
+                    if (useTimes)
+                        accessTimes.put(stopIndex, (int) s.getElapsedTimeSeconds());
+                    else
+                        accessTimes.put(stopIndex, (int) (s.getWalkDistance() / walkSpeed));
+                }
             }
         }
 
@@ -662,9 +660,8 @@ public class RaptorWorkerData implements Serializable {
             if (Double.isInfinite(dist))
                 continue;
 
-            // FIXME hardwired walk speed
             // NB using the index in the worker data not the index in the graph!
-            accessTimes.put(it.value(), (int) (dist / 1.3f));
+            accessTimes.put(it.value(), (int) (dist / walkSpeed));
         }
 
         return accessTimes;
