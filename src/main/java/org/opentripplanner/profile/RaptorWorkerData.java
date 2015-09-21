@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
@@ -265,8 +266,14 @@ public class RaptorWorkerData implements Serializable {
                 if (timetable == null)
                     continue;
 
+                timetable.dataIndex = timetablesForPattern.size();
                 timetablesForPattern.add(timetable);
                 timetable.raptorData = this;
+
+                if (timetable.hasFrequencyTrips())
+                    this.hasFrequencies = true;
+                if (timetable.hasScheduledTrips())
+                    this.hasSchedules = true;
 
                 // TODO: patternForIndex, indexForPattern
 
@@ -301,7 +308,14 @@ public class RaptorWorkerData implements Serializable {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = true;
             rr.from = rr.to = new GenericLocation(t.lat, t.lon);
-            rr.setRoutingContext(graph);
+            try {
+                rr.setRoutingContext(graph);
+            } catch (VertexNotFoundException vnfe) {
+                LOG.warn("Temporary stop at {}, {} not connected to graph", t.lat, t.lon);
+                temporaryStopTreeCache.put(t.index, new int[0]);
+                temporaryTransfers.put(t.index, new TIntIntHashMap());
+                continue;
+            }
             rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
 
             // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
@@ -399,7 +413,7 @@ public class RaptorWorkerData implements Serializable {
             }
         }
 
-        for (int stop = 0; stop < stopForIndex.size(); stop++) {
+        for (int stop = 0; patternsForStopList.containsKey(stop); stop++) {
             patternsForStop.add(patternsForStopList.get(stop).toArray());
         }
 
@@ -604,7 +618,7 @@ public class RaptorWorkerData implements Serializable {
         }
 
         ts.stopCount = nStops = stopForIndex.size();
-        ts.patternCount = nPatterns = patternForIndex.size();
+        ts.patternCount = nPatterns = timetablesForPattern.size();
         ts.targetCount = nTargets;
     }
 
