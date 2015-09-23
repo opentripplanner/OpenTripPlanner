@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graph;
 
+import graphql.ExecutionResult;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -15,6 +16,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that
@@ -94,6 +96,121 @@ public class GraphIndexTest extends GtfsTest {
         assertTrue(stops.contains(stopvM));
         assertTrue(stops.size() >= 3); // Query can overselect
     }
+
+    public void testGraphQLSimple() {
+        String query =
+                "query Agency{" +
+                "    agency(id: \"agency\"){" +
+                "        name" +
+                "    }" +
+                "}";
+
+        ExecutionResult result = graph.index.graphQL.execute(query);
+        assertTrue(result.getErrors().isEmpty());
+        assertEquals("Fake Agency", ((Map) result.getData().get("agency")).get("name"));
+
+    }
+
+    public void testGraphQLNested() {
+        String query =
+                "query Agency{\n" +
+                        "    viewer {" +
+                        "    agency(id: \"agency\"){\n" +
+                        "        name\n" +
+                        "        routes{\n" +
+                        "            shortName" +
+                        "        }" +
+                        "    }}\n" +
+                        "}\n";
+
+        ExecutionResult result = graph.index.graphQL.execute(query);
+        assertTrue(result.getErrors().isEmpty());
+        assertEquals(18, ((List) ((Map) ((Map) result.getData().get("viewer")).get("agency")).get("routes")).size());
+
+    }
+
+    public void testGraphQLIntrospectionQuery() {
+        String query = "  query IntrospectionQuery {\n"
+            + "    __schema {\n"
+            + "      queryType { name }\n"
+            + "      mutationType { name }\n"
+            + "      types {\n"
+            + "        ...FullType\n"
+            + "      }\n"
+            + "      directives {\n"
+            + "        name\n"
+            + "        description\n"
+            + "        args {\n"
+            + "          ...InputValue\n"
+            + "        }\n"
+            + "        onOperation\n"
+            + "        onFragment\n"
+            + "        onField\n"
+            + "      }\n"
+            + "    }\n"
+            + "  }\n"
+            + "\n"
+            + "  fragment FullType on __Type {\n"
+            + "    kind\n"
+            + "    name\n"
+            + "    description\n"
+            + "    fields {\n"
+            + "      name\n"
+            + "      description\n"
+            + "      args {\n"
+            + "        ...InputValue\n"
+            + "      }\n"
+            + "      type {\n"
+            + "        ...TypeRef\n"
+            + "      }\n"
+            + "      isDeprecated\n"
+            + "      deprecationReason\n"
+            + "    }\n"
+            + "    inputFields {\n"
+            + "      ...InputValue\n"
+            + "    }\n"
+            + "    interfaces {\n"
+            + "      ...TypeRef\n"
+            + "    }\n"
+            + "    enumValues {\n"
+            + "      name\n"
+            + "      description\n"
+            + "      isDeprecated\n"
+            + "      deprecationReason\n"
+            + "    }\n"
+            + "    possibleTypes {\n"
+            + "      ...TypeRef\n"
+            + "    }\n"
+            + "  }\n"
+            + "\n"
+            + "  fragment InputValue on __InputValue {\n"
+            + "    name\n"
+            + "    description\n"
+            + "    type { ...TypeRef }\n"
+            + "    defaultValue\n"
+            + "  }\n"
+            + "\n"
+            + "  fragment TypeRef on __Type {\n"
+            + "    kind\n"
+            + "    name\n"
+            + "    ofType {\n"
+            + "      kind\n"
+            + "      name\n"
+            + "      ofType {\n"
+            + "        kind\n"
+            + "        name\n"
+            + "        ofType {\n"
+            + "          kind\n"
+            + "          name\n"
+            + "        }\n"
+            + "      }\n"
+            + "    }\n"
+            + "  }";
+
+        ExecutionResult result = graph.index.graphQL.execute(query);
+        assertTrue(result.getErrors().isEmpty());
+    }
+
 
     public void testParentStations() {
         // graph.index.stopsForParentStation;

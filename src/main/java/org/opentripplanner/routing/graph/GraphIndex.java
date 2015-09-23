@@ -6,8 +6,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import graphql.ExecutionResult;
+import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -20,30 +23,41 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -97,6 +111,8 @@ public class GraphIndex {
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
+
+    public GraphQL graphQL;
 
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
@@ -152,6 +168,9 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
+        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+        ));
         LOG.info("Done indexing graph.");
     }
 
@@ -271,6 +290,57 @@ public class GraphIndex {
         }
         return ret;
     }
+
+    /* TODO: an almost similar function exists in ProfileRouter, combine these.
+    *  Should these live in a separate class? */
+    public List<StopAndDistance> findClosestStopsByWalking(float lat, float lon, int radius) {
+        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+        // TODO make a function that builds normal routing requests from profile requests
+        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        rr.from = new GenericLocation(lat, lon);
+        // FIXME requires destination to be set, not necessary for analyst
+        rr.to = new GenericLocation(lat, lon);
+        rr.setRoutingContext(graph);
+        rr.batch = true;
+        rr.walkSpeed = 1;
+        rr.dominanceFunction = new DominanceFunction.LeastWalk();
+        // RR dateTime defaults to currentTime.
+        // If elapsed time is not capped, searches are very slow.
+        rr.worstTime = (rr.dateTime + radius);
+        AStar astar = new AStar();
+        rr.setNumItineraries(1);
+        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
+        astar.setTraverseVisitor(visitor);
+        astar.getShortestPathTree(rr, 1); // timeout in seconds
+        // Destroy the routing context, to clean up the temporary edges & vertices
+        rr.rctx.destroy();
+        return visitor.stopsFound;
+    }
+
+    public static class StopAndDistance {
+        public Stop stop;
+        public int distance;
+
+        public StopAndDistance(Stop stop, int distance){
+            this.stop = stop;
+            this.distance = distance;
+        }
+    }
+
+    static private class StopFinderTraverseVisitor implements TraverseVisitor {
+        List<StopAndDistance> stopsFound = new ArrayList<>();
+        @Override public void visitEdge(Edge edge, State state) { }
+        @Override public void visitEnqueue(State state) { }
+        // Accumulate stops into ret as the search runs.
+        @Override public void visitVertex(State state) {
+            Vertex vertex = state.getVertex();
+            if (vertex instanceof TransitStop) {
+                stopsFound.add(new StopAndDistance(((TransitStop) vertex).getStop(),
+                    (int) state.getElapsedTimeSeconds()));
+            }
+        }
+    }
+
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
@@ -504,4 +574,17 @@ public class GraphIndex {
 //        }
     }
 
+    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
+        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+        Response.ResponseBuilder res = Response.status(Response.Status.OK);
+        HashMap<String, Object> content = new HashMap<>();
+        if (!executionResult.getErrors().isEmpty()) {
+            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+            content.put("errors", executionResult.getErrors());
+        }
+        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+            content.put("data", executionResult.getData());
+        }
+        return res.entity(content).build();
+    }
 }

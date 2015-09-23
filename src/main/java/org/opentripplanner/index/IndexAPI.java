@@ -51,8 +51,10 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -65,7 +67,9 @@ import javax.ws.rs.core.UriInfo;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
@@ -564,6 +568,33 @@ public class IndexAPI {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
     }
+
+    @POST
+    @Path("/graphql")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGraphQL (HashMap<String, Object> query) {
+        Map<String, Object> variables;
+        if (query.get("variables") instanceof Map) {
+            variables = (Map) query.get("variables");
+        } else {
+            variables = new HashMap<>();
+        }
+        return index.getGraphQLResponse((String) query.get("query"), variables);
+    }
+
+    @POST
+    @Path("/graphql")
+    @Consumes("application/graphql")
+    public Response getGraphQL (String query) {
+        return index.getGraphQLResponse(query, new HashMap<>());
+    }
+
+//    @GET
+//    @Path("/graphql")
+//    public Response getGraphQL (@QueryParam("query") String query,
+//                                @QueryParam("variables") HashMap<String, Object> variables) {
+//        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
+//    }
 
     /** Represents a transfer from a stop */
     private static class Transfer {
