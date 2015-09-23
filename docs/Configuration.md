@@ -283,7 +283,7 @@ Any public field or setter method in this class can be given a default value usi
 Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
 where the check-in process needs to be done in good time before boarding. The boarding time is added to the time when going
 from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
-follows:
+seconds needed for the boarding and alighting processes in `router-config.json` as follows:
 
 ```JSON
 {

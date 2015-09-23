@@ -180,7 +180,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 if (alightTime != 0) {
                     s1.incrementTimeInSeconds(alightTime);
                     s1.incrementWeight(alightTime * options.waitReluctance);
-                    // TODO: should we have different cost for alighting and boarding?
+                    // TODO: should we have different cost for alighting and boarding compared to regular waiting?
                 }
             }
 
