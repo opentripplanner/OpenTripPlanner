@@ -648,7 +648,6 @@ public class RaptorWorkerData implements Serializable {
             
             AddTripPattern.TemporaryStop tstop = it.key(); 
             if (tstop.sample == null) {
-                LOG.warn("Temporary stop unlinked: {}", tstop);
                 continue;
             }
 
