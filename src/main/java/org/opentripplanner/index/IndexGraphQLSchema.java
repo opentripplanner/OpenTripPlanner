@@ -68,6 +68,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
 
+    public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
+
     public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
 
     public GraphQLOutputType patternType = new GraphQLTypeReference("Pattern");
@@ -522,6 +524,26 @@ public class IndexGraphQLSchema {
                     (Trip) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimesForDate")
+                .type(new GraphQLList(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDay")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Trip trip = (Trip) environment.getSource();
+                        return TripTimeShort.fromTripTimes(
+                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
+                                .resolve(index.patternForTrip.get(trip),
+                                    ServiceDate.parseString(environment.getArgument("serviceDay")))
+                                , trip);
+                    } catch (ParseException e) {
+                         return null; // Invalid date format
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
                 .type(Scalars.GraphQLString) //TODO: Should be geometry
                 .dataFetcher(environment -> index.patternForTrip
@@ -529,6 +551,21 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        coordinateType = GraphQLObjectType.newObject()
+            .name("Coordinates")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lat")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(
+                    environment -> (float) ((Coordinate) environment.getSource()).y)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lon")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(
+                    environment -> (float) ((Coordinate) environment.getSource()).x)
+                .build())
+            .build();
 
         patternType = GraphQLObjectType.newObject()
             .name("Pattern")
@@ -574,21 +611,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-                .type(new GraphQLList(GraphQLObjectType.newObject()
-                    .name("coordinates")
-                    .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lat")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(
-                            environment -> (float) ((Coordinate) environment.getSource()).y)
-                        .build())
-                    .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lon")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(
-                            environment -> (float) ((Coordinate) environment.getSource()).x)
-                        .build())
-                    .build()))
+                .type(new GraphQLList(coordinateType))
                 .dataFetcher(environment -> {
                     LineString geometry = ((TripPattern) environment.getSource()).geometry;
                     if (geometry == null) {
@@ -870,13 +893,13 @@ public class IndexGraphQLSchema {
                         environment.getArgument("lat"), environment.getArgument("lon"),
                         environment.getArgument("radius")
                     )
-                    .stream()
-                    .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                        stopAndDistance.stop.getId().getAgencyId()
-                        .equalsIgnoreCase(environment.getArgument("agency")))
-                    .sorted(Comparator.comparing(s -> (float) s.distance))
-                    .collect(Collectors.toList()))
-                    .get(environment))
+                        .stream()
+                        .filter(stopAndDistance -> environment.getArgument("agency") == null ||
+                            stopAndDistance.stop.getId().getAgencyId()
+                                .equalsIgnoreCase(environment.getArgument("agency")))
+                        .sorted(Comparator.comparing(s -> (float) s.distance))
+                        .collect(Collectors.toList()))
+                        .get(environment))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
