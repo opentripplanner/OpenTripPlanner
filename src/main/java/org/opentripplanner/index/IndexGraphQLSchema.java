@@ -524,6 +524,26 @@ public class IndexGraphQLSchema {
                     (Trip) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimesForDate")
+                .type(new GraphQLList(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDay")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Trip trip = (Trip) environment.getSource();
+                        return TripTimeShort.fromTripTimes(
+                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
+                                .resolve(index.patternForTrip.get(trip),
+                                    ServiceDate.parseString(environment.getArgument("serviceDay")))
+                                , trip);
+                    } catch (ParseException e) {
+                         return null; // Invalid date format
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
                 .type(Scalars.GraphQLString) //TODO: Should be geometry
                 .dataFetcher(environment -> index.patternForTrip
@@ -873,13 +893,13 @@ public class IndexGraphQLSchema {
                         environment.getArgument("lat"), environment.getArgument("lon"),
                         environment.getArgument("radius")
                     )
-                    .stream()
-                    .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                        stopAndDistance.stop.getId().getAgencyId()
-                        .equalsIgnoreCase(environment.getArgument("agency")))
-                    .sorted(Comparator.comparing(s -> (float) s.distance))
-                    .collect(Collectors.toList()))
-                    .get(environment))
+                        .stream()
+                        .filter(stopAndDistance -> environment.getArgument("agency") == null ||
+                            stopAndDistance.stop.getId().getAgencyId()
+                                .equalsIgnoreCase(environment.getArgument("agency")))
+                        .sorted(Comparator.comparing(s -> (float) s.distance))
+                        .collect(Collectors.toList()))
+                        .get(environment))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
