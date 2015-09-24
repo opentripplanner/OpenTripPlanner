@@ -68,6 +68,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
 
+    public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
+
     public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
 
     public GraphQLOutputType patternType = new GraphQLTypeReference("Pattern");
@@ -529,6 +531,21 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        coordinateType = GraphQLObjectType.newObject()
+            .name("Coordinates")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lat")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(
+                    environment -> (float) ((Coordinate) environment.getSource()).y)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lon")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(
+                    environment -> (float) ((Coordinate) environment.getSource()).x)
+                .build())
+            .build();
 
         patternType = GraphQLObjectType.newObject()
             .name("Pattern")
@@ -574,21 +591,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-                .type(new GraphQLList(GraphQLObjectType.newObject()
-                    .name("coordinates")
-                    .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lat")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(
-                            environment -> (float) ((Coordinate) environment.getSource()).y)
-                        .build())
-                    .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lon")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(
-                            environment -> (float) ((Coordinate) environment.getSource()).x)
-                        .build())
-                    .build()))
+                .type(new GraphQLList(coordinateType))
                 .dataFetcher(environment -> {
                     LineString geometry = ((TripPattern) environment.getSource()).geometry;
                     if (geometry == null) {
