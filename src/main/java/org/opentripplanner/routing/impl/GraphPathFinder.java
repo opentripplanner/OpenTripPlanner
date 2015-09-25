@@ -145,7 +145,7 @@ public class GraphPathFinder {
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        List<GraphPath> paths = Lists.newArrayList();
+        Set<GraphPath> paths = Sets.newHashSet();
         Set<AgencyAndId> bannedTrips = Sets.newHashSet();
         while (paths.size() < options.numItineraries) {
             // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
@@ -185,8 +185,10 @@ public class GraphPathFinder {
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        Collections.sort(paths, new PathWeightComparator());
-        return paths;
+        
+        ArrayList<GraphPath> pathsList = new ArrayList<GraphPath>(paths);
+        Collections.sort(pathsList, new PathWeightComparator());
+        return pathsList;
     }
 
     /* TODO eliminate the need for pathparsers. They are theoretically efficient but arcane and problematic. */
