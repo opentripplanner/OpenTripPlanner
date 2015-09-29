@@ -26,6 +26,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.i18n.T;
+import org.opentripplanner.util.i18n.translations.Units;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -251,6 +254,98 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
+
+    public String longDescription;
+
+    public String shortDescription;
+
+     /**
+      * Creates route number route name to headsign/stop name if transit stop
+      *
+      * or just to destination name if not
+      * @param requestedLocale
+      * @param removeTagsFromLocalizations If true it removes all tags from step and leg localizations (long and short descriptions)
+      */
+     public void addDescriptions(Locale requestedLocale, boolean removeTagsFromLocalizations) {
+         if (isTransitLeg()) {
+             longDescription = agencyName + ",<b>" + routeShortName + "</b>" + " " + routeLongName;
+             if (headsign != null) {
+                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.tr(" towards "), requestedLocale);
+                 longDescription += headsign;
+             } else {
+                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+                 longDescription += to.name;
+             }
+             //TODO: what if short name is missing
+             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.tr("Route"), requestedLocale) + " " + routeShortName + ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " from "), requestedLocale);
+             shortDescription += from.name;
+         } else {
+             T trans;
+             T short_trans;
+             if (mode.equals(TraverseMode.WALK.toString())) {
+                  trans = T.tr("Walk");
+                  short_trans = trans;
+             } else if (mode.equals(TraverseMode.BICYCLE.toString())) {
+                 trans = T.tr("Cycle");
+                 short_trans = T.tr("Ride");
+             } else if (mode.equals(TraverseMode.CAR.toString())) {
+                 trans = T.tr("Car");
+                 short_trans = T.tr("Drive");
+             } else {
+                 trans = T.tr("Unknown mode");
+                 short_trans = trans;
+             }
+             longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + getDistanceString(requestedLocale) +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             longDescription += to.name;
+
+             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(short_trans, requestedLocale) + ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             shortDescription += to.name;
+
+             if (removeTagsFromLocalizations) {
+                 longDescription = ResourceBundleSingleton.removeHTMLTags(longDescription);
+                 shortDescription = ResourceBundleSingleton.removeHTMLTags(shortDescription);
+             }
+         }
+     }
+
+     /**
+      * Returns string with humanized distance
+      *
+      * Units are based on Locale in {@link ResourceBundleSingleton#getUnits(Locale)}
+      *
+      * Humanized units look like this:
+      * - if less then 528 feet: 123 feet
+      * - else 0.45 miles
+      * - if more then 100 km: 856 km
+      * - if more then 1 km: 5.26 km
+      * - else: 565 m
+      * @param requestedLocale
+      * @return
+      */
+     public String getDistanceString(Locale requestedLocale) {
+         Units units = ResourceBundleSingleton.INSTANCE.getUnits(requestedLocale);
+         if (units == Units.IMPERIAL) {
+             double ft = distance*3.28084;
+             if (ft < 528) {
+                 return String.format(requestedLocale, "%.0f feet", ft);
+             } else {
+                 ft = ft/52.8/100;
+                 return String.format(requestedLocale, "%.2f miles", ft);
+             }
+         } else {
+             double km = distance/1000;
+             if (km > 100) {
+                 //100 km => 99999999 km
+                 return String.format(requestedLocale, "%.0f km", km);
+             } else if(km > 1) {
+                 //1.11 km => 99.99 km
+                 return String.format(requestedLocale, "%.2f km", km);
+             } else {
+                 //1m => 999 m
+                 return String.format(requestedLocale, "%.0f m", distance);
+             }
+         }
+     }
 
     /**
      * Whether this leg is a transit leg or not.

@@ -335,6 +335,12 @@ public abstract class RoutingResource {
     private String locale;
 
     /**
+     * If true it removes all tags from step and leg localizations (long and short descriptions)
+     */
+    @QueryParam("removeTagsFromLocalizations")
+    private Boolean removeTagsFromLocalizations;
+
+    /**
      * If true, realtime updates are ignored during this search.
      */
     @QueryParam("ignoreRealtimeUpdates")
@@ -564,6 +570,9 @@ public abstract class RoutingResource {
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+
+        if (removeTagsFromLocalizations != null)
+            request.removeTagsFromLocalizations = removeTagsFromLocalizations;
         return request;
     }
 

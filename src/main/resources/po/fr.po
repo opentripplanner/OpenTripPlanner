@@ -1,0 +1,677 @@
+# French translations for OpenTripPlanner.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the OpenTripPlanner
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenTripPlanner VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-13 18:15+0200\n"
+"PO-Revision-Date: 2015-06-29 13:10+0100\n"
+"Last-Translator: Nicolas Derive <kalon33@ubuntu.com>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 1.3\n"
+"X-Generator: Poedit 1.8.1\n"
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:273
+msgid " towards "
+msgstr " vers "
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:276
+#: src/main/java/org/opentripplanner/api/model/Leg.java:290
+#: src/main/java/org/opentripplanner/api/model/Leg.java:293
+#: lib/templates/access-leg.html:5 lib/templates/generic-leg.html:4
+#: lib/templates/transit-leg.html:6
+#: src/main/java/org/opentripplanner/api/model/Leg.java:277
+#: src/main/java/org/opentripplanner/api/model/Leg.java:291
+#: src/main/java/org/opentripplanner/api/model/Leg.java:294
+msgctxt "direction"
+msgid " to "
+msgstr " jusqu'à "
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:282
+#: src/main/java/org/opentripplanner/api/model/Leg.java:283
+msgid "Walk"
+msgstr "Marche à pied"
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:284
+#: src/main/java/org/opentripplanner/api/model/Leg.java:285
+msgid "Cycle"
+msgstr "Vélo"
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:286
+#: src/main/java/org/opentripplanner/api/model/Leg.java:287
+msgid "Car"
+msgstr "Voiture"
+
+#: src/main/java/org/opentripplanner/api/model/Leg.java:288
+#: src/main/java/org/opentripplanner/api/model/Leg.java:289
+msgid "Unknown mode"
+msgstr ""
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:70
+#: lib/localization.js:128
+msgid "first"
+msgstr "première"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:71
+#: lib/localization.js:129
+msgid "second"
+msgstr "seconde"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:72
+#: lib/localization.js:130
+msgid "third"
+msgstr "troisième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:73
+#: lib/localization.js:131
+msgid "fourth"
+msgstr "quatrième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:74
+#: lib/localization.js:132
+msgid "fifth"
+msgstr "cinquième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:75
+#: lib/localization.js:133
+msgid "sixth"
+msgstr "sixième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:76
+#: lib/localization.js:134
+msgid "seventh"
+msgstr "septième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:77
+#: lib/localization.js:135
+msgid "eight"
+msgstr "huitième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:78
+#: lib/localization.js:136
+msgid "ninth"
+msgstr "neuvième"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:79
+#: lib/localization.js:137
+msgid "tenth"
+msgstr "dixième"
+
+#. TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
+#. itinerary)
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:83
+#: lib/localization.js:175
+msgctxt "itinerary"
+msgid "depart"
+msgstr "Départ"
+
+#. TRANSLATORS: Take roundabout [clockwise] to [ordinal exit number] on
+#. streetname...
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:84
+#: lib/localization.js:170
+msgid "clockwise"
+msgstr "dans le sens des aiguilles d'une montre"
+
+#. TRANSLATORS: Take roundabout [counter clockwise] to [ordinal exit number] on streetname...
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:85
+#: lib/localization.js:172
+msgid "counter clockwise"
+msgstr "dans le sens contraire des aiguilles d'une montre"
+
+#. TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
+#. on /on to [streetname]
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:86
+#: lib/localization.js:178
+msgid "hard left"
+msgstr "complètement à gauche"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:87
+#: lib/localization.js:179
+msgid "left"
+msgstr "à gauche"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:88
+#: lib/localization.js:180
+msgid "slight left"
+msgstr "légèrement à gauche"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:89
+#: lib/localization.js:181
+msgid "continue"
+msgstr "continuer"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:90
+#: lib/localization.js:182
+msgid "slight right"
+msgstr "légèrement à droite"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:91
+#: lib/localization.js:183
+msgid "right"
+msgstr "à droite"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:92
+#: lib/localization.js:184
+msgid "hard right"
+msgstr "complètement à droite"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:93
+#: lib/localization.js:187
+msgid "elevator"
+msgstr "ascenseur"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:94
+#: lib/localization.js:188
+msgid "U-turn left"
+msgstr "virage en U à gauche"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:95
+#: lib/localization.js:189
+msgid "U-turn right"
+msgstr "virage en U à droite"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:99
+#: lib/localization.js:149
+msgid "north"
+msgstr "nord"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:100
+#: lib/localization.js:151
+msgid "northeast"
+msgstr "nord-est"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:101
+#: lib/localization.js:153
+msgid "east"
+msgstr "est"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:102
+#: lib/localization.js:155
+msgid "southeast"
+msgstr "sud-est"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:103
+#: lib/localization.js:157
+msgid "south"
+msgstr "sud"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:104
+#: lib/localization.js:159
+msgid "southwest"
+msgstr "sud-ouest"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:105
+#: lib/localization.js:161
+msgid "west"
+msgstr "ouest"
+
+#. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:106
+#: lib/localization.js:163
+msgid "northwest"
+msgstr "nord-ouest"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:288
+#: lib/templates/step.html:9
+msgid ""
+"Take roundabout %(relativeDirection)s to %(ordinal_exit_number)s exit on "
+"%(streetName)s"
+msgstr ""
+"Prendre le rond-point %(relativeDirection)s jusqu'à la "
+"%(ordinal_exit_number)s sortie sur %(streetName)s"
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:293
+#: lib/templates/step.html:12
+msgid "Start on <b>%(streetName)s</b> heading %(absoluteDirection)s"
+msgstr ""
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:299
+#: lib/templates/step.html:15
+msgid "<b>%(relativeDirection)s</b> to continue on <b>%(streetName)s</b>"
+msgstr ""
+
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:304
+#: lib/templates/step.html:17
+msgid "<b>%(relativeDirection)s</b> on to <b>%(streetName)s</b>"
+msgstr ""
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:491
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:492
+#: note.caution
+msgid "Caution!"
+msgstr "Attention!"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:494
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:495
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:496
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:497
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:498
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:499
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "Surface non revêtue"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:500
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "Chemin de terre"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:501
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:502
+#: note.toll
+msgid "Toll road"
+msgstr "Péage"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:506
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:507
+#: name.bike_path
+msgid "bike path"
+msgstr "piste cyclable"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:508
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:511
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:513
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "chemin piétonnier"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:509
+#: name.pedestrian_area
+msgid "open area"
+msgstr "plateau piétonnier"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:510
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "chemin"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:512
+#: name.bridleway
+msgid "bridleway"
+msgstr "sentier équestre"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:516
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "Ligne {otp:route_ref}"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:517
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:518
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "Plate-forme {ref}"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:519
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:520
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:521
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:522
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:523
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:524
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:525
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:526
+#: name.platform
+msgid "platform"
+msgstr "plate-forme"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:529
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:530
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:531
+#: name.footbridge
+msgid "footbridge"
+msgstr "passerelle"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:533
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:534
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:535
+#: name.underpass
+msgid "underpass"
+msgstr "tunnel"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:538
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:540
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:543
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:545
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:547
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:549
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:550
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:551
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:552
+#: name.road
+msgid "road"
+msgstr "route sans nom"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:539
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:541
+#: name.ramp
+msgid "ramp"
+msgstr "rampe d'accès"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:544
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:546
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:548
+#: name.link
+msgid "link"
+msgstr "bretelle d'accès"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:553
+#: name.service_road
+msgid "service road"
+msgstr "route de service"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:554
+#: name.alley
+msgid "alley"
+msgstr "ruelle"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:555
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "allée de parking"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:556
+#: name.byway
+msgid "byway"
+msgstr "route secondaire"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:557
+#: name.track
+msgid "track"
+msgstr "chemin"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:559
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:560
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "trottoir"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:562
+#: name.steps
+msgid "steps"
+msgstr "escalier"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:564
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "Parking vélo {name}"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:565
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "Parking vélo"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:567
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "P+R {name}"
+
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:568
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "P+R"
+
+#: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:70
+#: src/test/java/org/opentripplanner/graph_builder/module/osm/TestOpenStreetMapGraphBuilder.java:259
+#: corner
+msgid "corner of %(first_street)s and %(second_street)s"
+msgstr "intersection de %(first_street)s et %(second_street)s"
+
+#: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:75
+#: unnamedStreet
+msgid "unnamed"
+msgstr "rue sans nom"
+
+#. TRANSLATORS: Optimization for bicycle shown in bike triangle. Optimized for speed
+#: lib/bike-triangle-control.js:35
+msgid "Quick"
+msgstr "Le plus Rapide"
+
+#. TRANSLATORS: Optimization for bicycle shown in bike triangle. Optimized for flat terrain
+#: lib/bike-triangle-control.js:37
+msgid "Flat"
+msgstr "Le plus Plat"
+
+#. TRANSLATORS: Optimization for bicycle shown in bike triangle. Optimized for bike friendly infrastructure. Cycle roads etc...
+#: lib/bike-triangle-control.js:39
+msgid "Bike Friendly"
+msgstr "Adapté au vélo"
+
+#. TRANSLATORS: first letter of Bike Friendly
+#: lib/bike-triangle-control.js:77
+msgid "B"
+msgstr "A"
+
+#. TRANSLATORS: first letter of Flat
+#: lib/bike-triangle-control.js:82
+msgid "F"
+msgstr "P"
+
+#. TRANSLATORS: first letter of Quick
+#: lib/bike-triangle-control.js:87
+msgid "Q"
+msgstr "R"
+
+#: lib/plan-request.js:57
+msgid "Click the map or enter an address to select a start location"
+msgstr ""
+
+#: lib/plan-request.js:59
+msgid "Click the map or enter an address to select an end location"
+msgstr ""
+
+#: lib/plan-request.js:76 lib/plan-request.js:84
+msgid ""
+"No transit trips found within 5 miles of your search, try adjusting your "
+"start or end locations. Only major metropolitan areas are currently covered. "
+"Please check back for expanded data coverage."
+msgstr ""
+
+#: lib/plan-request.js:89 lib/plan-request.js:93
+msgid ""
+"Problem finding results for those locations. Please enter a valid start and "
+"end location."
+msgstr ""
+
+#: lib/plan-request.js:98
+msgid "Unable to plan trip."
+msgstr ""
+
+#. TRANSLATORS: "[From] marker location/address" in geocoding input field
+#: lib/request-form.js:101
+msgid "From"
+msgstr ""
+
+#. TRANSLATORS: "[To] marker location/address" in geocoding input field
+#: lib/request-form.js:106
+msgid "To"
+msgstr ""
+
+#. TRANSLATORS: "From/To marker location" in geocoding input fields. Marker is flag on a map
+#: lib/request-form.js:162 lib/request-form.js:178
+msgid "marker location"
+msgstr ""
+
+#. TRANSLATORS: Label for map Start flag which is shown on hover
+#: lib/request-map-view.js:93
+msgid "Start"
+msgstr ""
+
+#. TRANSLATORS: Label for map End flag which is shown on hover
+#: lib/request-map-view.js:110
+msgid "End"
+msgstr ""
+
+#: lib/templates/map-context-menu.html:3
+msgid "Set as Start Location"
+msgstr "Définir comme point de départ"
+
+#: lib/templates/map-context-menu.html:5
+msgid "Set as End Location"
+msgstr "Définir comme point d'arrivée"
+
+#: lib/templates/narrative-adjust.html:2
+msgid ""
+"Drag start and end location pins on the map or use the form above to adjust "
+"trip settings."
+msgstr ""
+
+#: lib/templates/narrative-itinerary.html:5
+msgid "Print Itinerary"
+msgstr ""
+
+#: lib/templates/narrative-itinerary.html:8
+#, fuzzy
+msgid "Option"
+msgstr "Paramètres de l'itinéraire"
+
+#: lib/templates/narrative-new.html:3
+msgid ""
+"<strong>To plan a trip:</strong> select a start and end location by clicking "
+"the map or by entering an address above."
+msgstr ""
+
+#: lib/templates/request-form.html:5
+msgid "Start Address"
+msgstr ""
+
+#: lib/templates/request-form.html:11
+msgid "End Address"
+msgstr ""
+
+#: lib/templates/request-form.html:21
+msgid "Hide Settings"
+msgstr ""
+
+#: lib/templates/request-form.html:22
+msgid "Show Settings"
+msgstr ""
+
+#: lib/templates/request-form.html:31
+msgid "Arrive at"
+msgstr "Arrivée"
+
+#: lib/templates/request-form.html:33
+#, fuzzy
+msgid "Depart by"
+msgstr "Départ"
+
+#: lib/templates/request-form.html:62
+msgid "Travel by"
+msgstr "Voyager par"
+
+#: lib/templates/request-form.html:66
+msgid "Transit"
+msgstr "Transports en commun"
+
+#: lib/templates/request-form.html:68
+msgid "Rail Only"
+msgstr "Ferré uniquement"
+
+#: lib/templates/request-form.html:70
+msgid "Bus Only"
+msgstr "Bus uniquement"
+
+#: lib/templates/request-form.html:72
+msgid "Walk Only"
+msgstr "Marche seulement"
+
+#: lib/templates/request-form.html:74
+msgid "Bicycle Only"
+msgstr "Vélo uniquement"
+
+#: lib/templates/request-form.html:83
+msgid "Find"
+msgstr ""
+
+#: lib/templates/request-form.html:87
+msgid "Quickest trip"
+msgstr ""
+
+#: lib/templates/request-form.html:89
+msgid "Fewest transfers"
+msgstr ""
+
+#: lib/templates/request-form.html:99
+msgid "Wheelchair accessible trip"
+msgstr "Accessible aux fauteuils roulants:"
+
+#: lib/templates/request-form.html:107
+msgid "Maximum walk"
+msgstr "Marcher au maximum"
+
+#: lib/templates/request-form.html:136
+msgid "Maximum bike"
+msgstr "Parcours à vélo maximum"
+
+#: lib/templates/request-form.html:171
+msgid "Select language"
+msgstr ""
+
+#: lib/templates/request-form.html:180
+msgid "Submit"
+msgstr ""
+
+#: lib/templates/request-form.html:183
+#, fuzzy
+msgid "Searching"
+msgstr "Recherche"
+
+#: lib/templates/request-form.html:191
+msgid "First"
+msgstr "Premier"
+
+#: lib/templates/request-form.html:193
+msgid "Previous"
+msgstr "Précédent"
+
+#: lib/templates/request-form.html:195
+msgid "Next"
+msgstr "Suivant"
+
+#: lib/templates/request-form.html:197
+msgid "Last"
+msgstr "Dernier"
+
+#: lib/templates/transit-leg.html:6
+#: src/main/java/org/opentripplanner/api/model/Leg.java:274
+msgctxt "bus_direction"
+msgid " to "
+msgstr " vers "
+
+#: lib/templates/transit-leg.html:19
+msgctxt "itinerary"
+msgid "Depart"
+msgstr "Départ"
+
+#: lib/templates/transit-leg.html:22
+msgid "Time in transit"
+msgstr "Temps de correspondance"
+
+#: lib/templates/transit-leg.html:26
+msgid "Alight"
+msgstr "Descendre"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "Station de vélo libre service {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "Station de vélo libre service"

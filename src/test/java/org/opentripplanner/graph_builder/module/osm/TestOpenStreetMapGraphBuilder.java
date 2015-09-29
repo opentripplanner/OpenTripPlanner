@@ -20,16 +20,15 @@ import java.util.Locale;
 import java.util.Set;
 import java.net.URLDecoder;
 
+import com.google.common.collect.ImmutableMap;
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -37,6 +36,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.i18n.T;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -232,10 +232,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         way.addTag("footway", "sidewalk");
         way.addTag("RLIS:reviewed", "no");
         WayPropertySet propset = new WayPropertySet();
-        CreativeNamer namer = new CreativeNamer("platform");
+        CreativeNamer namer = new CreativeNamer(T.tt("platform"));
         propset.addCreativeNamer(new OSMSpecifier(
                 "railway=platform;highway=footway;footway=sidewalk"), namer);
-        namer = new CreativeNamer("sidewalk");
+        namer = new CreativeNamer(T.tt("sidewalk"));
         propset.addCreativeNamer(new OSMSpecifier("highway=footway;footway=sidewalk"), namer);
         assertEquals("sidewalk", propset.getCreativeNameForWay(way).toString());
     }
@@ -248,19 +248,20 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         way.addTag("access", "no");
 
         CreativeNamer namer = new CreativeNamer();
-        namer.setCreativeNamePattern("Highway with cycleway {cycleway} and access {access} and morx {morx}");
+        namer.setCreativeNamePattern(
+            "Highway with cycleway {cycleway} and access {access} and morx {morx}");
         assertEquals("Highway with cycleway lane and access no and morx ",
                 namer.generateCreativeName(way).toString());
     }
 
     @Test
-    public void testLocalizedString() {
-        LocalizedString localizedString = new LocalizedString("corner",
-                new String[]{"first", "second"});
+    public void testGettextLocalizedString() {
+        LocalizedString localizedString = new LocalizedString(T.tr("corner of %(first_street)s and %(second_street)s"),
+            ImmutableMap.of("first_street", "first", "second_street", "second"));
 
         assertEquals("corner of first and second", localizedString.toString());
         assertEquals("Kreuzung first mit second",
-                localizedString.toString(new Locale("de")));
+            localizedString.toString(new Locale("de")));
     }
 
     // disabled pending discussion with author (AMB)

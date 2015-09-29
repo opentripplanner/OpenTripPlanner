@@ -52,7 +52,8 @@ public class StreetSegment {
             }
         }
         //TODO: localize
-        Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false, new Locale("en"));
+        Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false, new Locale("en"),
+            true);
         for (Leg leg : itin.legs) {
             // populate the streetEdges array
             for(WalkStep walkStep : leg.walkSteps) {

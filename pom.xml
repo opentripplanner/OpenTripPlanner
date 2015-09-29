@@ -409,6 +409,14 @@
             <version>3.0.3</version>
         </dependency>
 
+        <!-- this is necessary for gettext to support plurals -->
+        <dependency>
+	        <groupId>org.gnu.gettext</groupId>
+	        <artifactId>libintl</artifactId>
+	        <version>0.18.2</version>
+        </dependency>
+
+
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
         <dependency>

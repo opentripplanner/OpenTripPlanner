@@ -13,9 +13,12 @@
 
 package org.opentripplanner.util;
 
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.text.MessageFormat;
+import java.util.*;
+
+import gnu.gettext.GettextResource;
+import org.opentripplanner.util.i18n.T;
+import org.opentripplanner.util.i18n.translations.Units;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,101 @@ public enum ResourceBundleSingleton {
 
     public Locale getDefaultLocale() {
         return defaultLocale;
+    }
+
+    /**
+     * Specifies which locale uses which distance unit.
+     *
+     * Currently English - imperial and everything else metric
+     *
+     * @param locale
+     * @return
+     */
+    public Units getUnits(Locale locale) {
+            if (locale.getLanguage().equals("en")) {
+                return Units.IMPERIAL;
+            } else {
+                return Units.METRIC;
+            }
+
+    }
+
+    /**
+     * Do gettext localization and replace parameters with values from arguments
+     * @param msg
+     * @param locale
+     * @param arguments
+     * @return
+     */
+    public String localizeGettext(T msg, Locale locale, Object[] arguments) {
+        String translation = localizeGettext(msg, locale);
+        MessageFormat format = new MessageFormat("", locale);
+        format.applyPattern(translation);
+        return format.format(arguments);
+    }
+
+    /**
+     * This is temporary function that localizes strings with named sprintf parameters
+     *
+     * It uses {@link #localizeGettext(T, Locale)} for localization.
+     *
+     * It is used since current translations all have sprinf named parameters ("%(streetName)s")
+     * and java doesn't support them
+     *
+     * From http://stackoverflow.com/a/2295004
+     * @param msg
+     * @param locale language of translation
+     * @param values map of keys with values that need to be replaced on those places
+     * @return
+     */
+    public String localizeGettextSprintfFormat(T msg, Locale locale, Map<String, String> values) {
+        String format = localizeGettext(msg, locale);
+        StringBuilder convFormat = new StringBuilder(format);
+        Set<String> keys = values.keySet();
+        List<String> valueList = new ArrayList<>();
+        int currentPos = 1;
+        for(String key: keys) {
+            String formatKey = "%(" + key + ")",
+                formatPos = "%" + Integer.toString(currentPos) + "$";
+            int index = -1;
+            while ((index = convFormat.indexOf(formatKey, index)) != -1) {
+                convFormat.replace(index, index + formatKey.length(), formatPos);
+                index += formatPos.length();
+            }
+            valueList.add(values.get(key));
+            ++currentPos;
+        }
+        return String.format(locale, convFormat.toString(), valueList.toArray());
+    }
+
+    public String localizeGettext(T msg, Locale locale) {
+        if (msg == null) {
+            return null;
+        }
+
+        if (locale == null) {
+            locale = getDefaultLocale();
+        }
+        String translation;
+        if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            translation = msg.msgid;
+        } else {
+            try {
+                ResourceBundle resourceBundle = null;
+                resourceBundle = ResourceBundle
+                    .getBundle("org.opentripplanner.util.i18n.translations.Messages", locale);
+                    if (msg.msgctx != null) {
+                        translation = GettextResource
+                            .pgettext(resourceBundle, msg.msgctx, msg.msgid);
+                    } else {
+                        translation = GettextResource.gettext(resourceBundle, msg.msgid);
+                    }
+            } catch (MissingResourceException e) {
+                LOG.error("Missing resource for key: " + msg, e);
+                translation = msg.msgid;
+            }
+        }
+        return translation;
     }
 
     //in singleton because resurce bundles are cached based on calling class
@@ -91,5 +189,13 @@ public enum ResourceBundleSingleton {
                 locale = defaultLocale;
         }
         return locale;
+    }
+
+    public static String removeHTMLTags(String s) {
+        if (s == null) {
+            return s;
+        }
+
+        return s.replaceAll("\\<.*?>","");
     }
 }

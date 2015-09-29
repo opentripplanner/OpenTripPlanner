@@ -14,8 +14,9 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.i18n.T;
 
 /**
  * A CreativeNamer makes up names for ways that don't have one in the OSM data set.
@@ -27,28 +28,27 @@ public class CreativeNamer {
      * A creative name pattern is a template which may contain variables of the form {{tag_name}}.
      * When a way's creative name is created, the value of its tag tag_name is substituted for the
      * variable.
-     * 
+     *
      * For example, "Highway with surface {{surface}}" might become "Highway with surface gravel"
      */
-    private String creativeNamePattern;
+    private T creativeNameLocalPattern;
 
-    public CreativeNamer(String pattern) {
-        this.creativeNamePattern = pattern;
+    public CreativeNamer(T pattern) {
+        this.creativeNameLocalPattern = pattern;
     }
 
     public CreativeNamer() {
     }
-   
+
     public I18NString generateCreativeName(OSMWithTags way) {
-        return new LocalizedString(creativeNamePattern, way);
+        return new LocalizedString(creativeNameLocalPattern, way);
     }
 
     public void setCreativeNamePattern(String creativeNamePattern) {
-        this.creativeNamePattern = creativeNamePattern;
+        this.creativeNameLocalPattern = T.tt(creativeNamePattern);
     }
 
     public String getCreativeNamePattern() {
-        return creativeNamePattern;
+        return this.creativeNameLocalPattern.msgid;
     }
-
 }

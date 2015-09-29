@@ -84,7 +84,7 @@ public abstract class GraphPathToTripPlanConverter {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, requestedLocale);
+            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, requestedLocale, request.removeTagsFromLocalizations);
             itinerary = adjustItinerary(request, itinerary);
             plan.addItinerary(itinerary);
         }
@@ -129,9 +129,11 @@ public abstract class GraphPathToTripPlanConverter {
      *
      * @param path The graph path to base the itinerary on
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
+     * @param removeTagsFromLocalizations
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, Locale requestedLocale) {
+    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops,
+        Locale requestedLocale, boolean removeTagsFromLocalizations) {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -152,10 +154,10 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, requestedLocale));
+            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, requestedLocale, removeTagsFromLocalizations));
         }
 
-        addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
+        addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale, removeTagsFromLocalizations);
 
         fixupLegs(itinerary.legs, legsStates);
 
@@ -287,9 +289,11 @@ public abstract class GraphPathToTripPlanConverter {
      *
      * @param states The array of states to base the leg on
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
+     * @param removeTagsFromLocalizations
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, Locale requestedLocale) {
+    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops,
+        Locale requestedLocale, boolean removeTagsFromLocalizations) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -326,6 +330,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        leg.addDescriptions(requestedLocale, removeTagsFromLocalizations);
         return leg;
     }
 
@@ -354,11 +359,12 @@ public abstract class GraphPathToTripPlanConverter {
     /**
      * Add a {@link WalkStep} {@link List} to a {@link Leg} {@link List}.
      * It's more convenient to process all legs in one go because the previous step should be kept.
-     *
-     * @param legs The legs of the itinerary
+     *  @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
+     * @param removeTagsFromLocalizations
      */
-    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
+    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates,
+        Locale requestedLocale, boolean removeTagsFromLocalizations) {
         WalkStep previousStep = null;
 
         String lastMode = null;
@@ -379,6 +385,10 @@ public abstract class GraphPathToTripPlanConverter {
                 previousStep = walkSteps.get(walkSteps.size() - 1);
             } else {
                 previousStep = null;
+            }
+	    // TODO: this needs to be optional
+            for (WalkStep walkStep : walkSteps) {
+                walkStep.addDescriptions(requestedLocale, removeTagsFromLocalizations);
             }
         }
     }
