@@ -59,8 +59,9 @@ public class ShortestPathTree {
             return Collections.emptyList();
         List<GraphPath> ret = new LinkedList<GraphPath>();
         for (State s : stateList) {
-            if (s.isFinal() && s.allPathParsersAccept())
+            if (s.isFinal() && s.allPathParsersAccept()) {
                 ret.add(new GraphPath(s, optimize));
+            }
         }
         return ret;
     }
@@ -127,7 +128,7 @@ public class ShortestPathTree {
 
         // if the vertex has no states, add one and return
         if (states == null) {
-            states = new ArrayList<State>();
+            states = new ArrayList<>();
             stateSets.put(vertex, states);
             states.add(newState);
             return true;

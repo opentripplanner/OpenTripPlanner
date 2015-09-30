@@ -39,6 +39,12 @@ public abstract class DominanceFunction implements Serializable {
      */
     public boolean betterOrEqualAndComparable(State a, State b) {
 
+        // States before boarding transit and after riding transit are incomparable.
+        // This allows returning transit options even when walking to the destination is the optimal strategy.
+        if (a.isEverBoarded() != b.isEverBoarded()) {
+            return false;
+        }
+
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
         if (a.isBikeRenting() != b.isBikeRenting()) {
             return false;
