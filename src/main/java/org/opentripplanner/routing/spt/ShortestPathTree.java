@@ -59,7 +59,7 @@ public class ShortestPathTree {
             return Collections.emptyList();
         List<GraphPath> ret = new LinkedList<GraphPath>();
         for (State s : stateList) {
-            if (s.isFinal() && s.allPathParsersAccept()) {
+            if (s.isFinal()) {
                 ret.add(new GraphPath(s, optimize));
             }
         }
@@ -165,7 +165,7 @@ public class ShortestPathTree {
         State ret = null;
         // TODO are we only checking path parser acceptance when we fetch states via this specific method?
         for (State s : states) {
-            if ((ret == null || s.weight < ret.weight) && s.isFinal() && s.allPathParsersAccept()) {
+            if ((ret == null || s.weight < ret.weight) && s.isFinal()) {
                 ret = s;
             }
         }

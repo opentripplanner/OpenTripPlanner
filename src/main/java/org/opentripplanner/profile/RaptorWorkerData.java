@@ -34,8 +34,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -316,8 +314,6 @@ public class RaptorWorkerData implements Serializable {
                 temporaryTransfers.put(t.index, new TIntIntHashMap());
                 continue;
             }
-            rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
-
             // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
             // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
             // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
@@ -371,7 +367,6 @@ public class RaptorWorkerData implements Serializable {
 
             // reset routing context because temporary edges face the wrong way
             rr.setRoutingContext(graph);
-            rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
             spt = astar.getShortestPathTree(rr, 5);
 
             // NB using walk speed of 1 m/s here since we want meters, not seconds

@@ -16,38 +16,31 @@ package org.opentripplanner.routing.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import static org.opentripplanner.routing.automata.Nonterminal.choice;
-import static org.opentripplanner.routing.automata.Nonterminal.optional;
-import static org.opentripplanner.routing.automata.Nonterminal.plus;
-import static org.opentripplanner.routing.automata.Nonterminal.seq;
-import static org.opentripplanner.routing.automata.Nonterminal.star;
-
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.automata.DFA;
-import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
@@ -101,9 +94,7 @@ public class GraphPathFinder {
         AStar aStar = new AStar();
         if (options.rctx == null) {
             options.setRoutingContext(router.graph);
-            // Use no PathParsers. They should be eliminated.
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
-            options.rctx.pathParsers = new PathParser[0];
         }
         // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
         if (router.graphVisualizer != null) {
@@ -174,7 +165,7 @@ public class GraphPathFinder {
             }
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
-                path.dump();
+                // path.dump();
                 List<AgencyAndId> tripIds = path.getTrips();
                 for (AgencyAndId tripId : tripIds) {
                     options.banTrip(tripId);

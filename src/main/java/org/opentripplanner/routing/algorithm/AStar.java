@@ -278,7 +278,7 @@ public class AStar {
                     runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal()) {
                 if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
                     continue;
                 }
@@ -364,7 +364,7 @@ public class AStar {
     public List<GraphPath> getPathsToTarget() {
         List<GraphPath> ret = new LinkedList<>();
         for (State s : runState.targetAcceptedStates) {
-            if (s.isFinal() && s.allPathParsersAccept()) {
+            if (s.isFinal()) {
                 ret.add(new GraphPath(s, true));
             }
         }
