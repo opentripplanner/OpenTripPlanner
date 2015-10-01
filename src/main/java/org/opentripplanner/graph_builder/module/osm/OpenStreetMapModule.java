@@ -658,7 +658,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
-
+            // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);

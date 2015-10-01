@@ -263,6 +263,10 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.previousTrip = previousTrip;
     }
+
+    public void setEnteredNoThroughTrafficArea() {
+        child.stateData.enteredNoThroughTrafficArea = true;
+    }
     
     /**
      * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
@@ -516,4 +520,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
     }
+
+    public boolean hasEnteredNoThroughTrafficArea() {
+        return child.hasEnteredNoThruTrafficArea();
+    }
+
 }
