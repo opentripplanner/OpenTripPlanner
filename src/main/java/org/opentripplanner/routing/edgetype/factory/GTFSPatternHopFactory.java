@@ -844,6 +844,8 @@ public class GTFSPatternHopFactory {
             if (runningTime < 0) {
                 LOG.warn(graph.addBuilderAnnotation(new NegativeHopTime(new StopTime(st0), new StopTime(st1))));
                 st1.setArrivalTime(st0.getDepartureTime());
+                if (st1.getDepartureTime() < st1.getArrivalTime())
+                    st1.setDepartureTime(st1.getArrivalTime());
             }
             double hopDistance = SphericalDistanceLibrary.fastDistance(
                    st0.getStop().getLat(), st0.getStop().getLon(),
