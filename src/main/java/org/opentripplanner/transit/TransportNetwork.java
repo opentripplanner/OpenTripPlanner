@@ -44,6 +44,7 @@ public class TransportNetwork implements Serializable {
         result.streetLayer.buildEdgeLists();
         result.streetLayer.indexStreets();
         result.transitLayer.rebuildTransientIndexes();
+        result.transitLayer.buildStopTree();
         LOG.info("Done reading.");
         return result;
     }
@@ -99,6 +100,7 @@ public class TransportNetwork implements Serializable {
         // Edge lists must be built after all inter-layer linking has occurred.
         streetLayer.buildEdgeLists();
         transitLayer.rebuildTransientIndexes();
+        transitLayer.buildStopTree();
 
         // Create transfers
         new TransferFinder(transitLayer, streetLayer, 1000).findTransfers();

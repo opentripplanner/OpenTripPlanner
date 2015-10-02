@@ -220,9 +220,10 @@ public class PropagatedTimesStore {
         final int spacing = 5;
         final int nMax = 24;
         final int cutoffMinutes = 120;
-        final int offroadDistanceMeters = 250;
+        final double gridSize = IsochroneGenerator.GRID_SIZE_METERS;
+        final double offroadDistanceMeters = gridSize * IsochroneGenerator.WALK_DISTANCE_GRID_SIZE_RATIO;
 
-        SparseMatrixZSampleGrid<WTWD> grid = makeSampleGridForVertices(times, offroadDistanceMeters);
+        SparseMatrixZSampleGrid<WTWD> grid = makeSampleGridForVertices(times, gridSize);
         long t0 = System.currentTimeMillis();
         DelaunayIsolineBuilder<WTWD> isolineBuilder =
                 new DelaunayIsolineBuilder<>(grid.delaunayTriangulate(), new WTWD.IsolineMetric());

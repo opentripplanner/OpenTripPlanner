@@ -5,17 +5,14 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.conveyal.geojson.GeoJsonModule;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.FileBackedOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -44,18 +41,7 @@ import org.opentripplanner.transit.TransportNetworkCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
@@ -269,7 +255,17 @@ public class TNAnalystWorker implements Runnable {
         batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         // If an initial graph ID was provided in the config file, build that TransportNetwork on startup.
-        // TODO pre-building graphs may not be necessary once we're just loading them quickly from disk. Actually what is the point of doing this since we can lazy-build? Leaving it out.
+        // Prebuilding the graph is necessary because, if the graph is not cached it can take several
+        // minutes to build it. Even if the graph is cached, reconstructing the indices and stop trees
+        // can take up to a minute. The UI times out after 30 seconds, so the broker needs to return
+        // a 503 (Service Not Available) to tell it to try again later. It can't do that after it's
+        // sent a request to a worker, so the worker needs to not come online until it's ready to process
+        // requests.
+        if (graphIdAffinity != null) {
+            LOG.info("Prebuilding graph {}", graphIdAffinity);
+            transportNetworkCache.getNetwork(graphIdAffinity);
+            LOG.info("Done prebuilding graph {}", graphIdAffinity);
+        }
 
         // Start filling the work queues.
         boolean idle = false;
@@ -388,7 +384,7 @@ public class TNAnalystWorker implements Runnable {
             ts.graphBuild = (int) (System.currentTimeMillis() - graphStartTime);
             // TODO lazy-initialize all additional indexes on transitLayer
             // ts.graphTripCount = transportNetwork.transitLayer...
-            ts.graphStopCount = transportNetwork.transitLayer.streetVertexForStop.size(); // TODO nStops function.
+            ts.graphStopCount = transportNetwork.transitLayer.getStopCount();
             ts.lon = clusterRequest.profileRequest.fromLon;
             ts.lat = clusterRequest.profileRequest.fromLat;
 
@@ -564,7 +560,7 @@ public class TNAnalystWorker implements Runnable {
             resultSaverRunnable = () -> {
                 // TODO catch the case where the S3 putObject fails. (call deleteRequest based on PutObjectResult in the runnable)
                 // Otherwise the AnalystWorker can freeze piping data to a failed S3 saver thread.
-                String s3key = "/".join(clusterRequest.jobId, fileName);
+                String s3key = String.join("/", clusterRequest.jobId, fileName);
                 s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
             };
         };

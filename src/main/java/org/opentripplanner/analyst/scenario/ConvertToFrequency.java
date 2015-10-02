@@ -115,8 +115,9 @@ public class ConvertToFrequency extends Modification {
                 }
             }
 
-            // find a stop that is common to all trip patterns
-            Set<Stop> stops = new HashSet<>(tripPattern.getStops());
+            // find a stop that is common to all trip patterns. Sort the list so that the same common stop is always returned
+            NavigableSet<Stop> stops = new TreeSet<>((s1, s2) -> s1.getId().compareTo(s2.getId()));
+            stops.addAll(tripPattern.getStops());
             patternCount.keySet().stream().forEach(p -> stops.retainAll(p.getStops()));
 
             if (stops.isEmpty()) {

@@ -21,13 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -65,6 +59,11 @@ public class TransitLayer implements Serializable {
     // The coordinates of a place roughly in the center of the transit network, for centering maps and coordinate systems.
     public double centerLon;
     public double centerLat;
+
+    public int nTrips = 0;
+
+    /** this is the result of running a search from every stop in the graph, map from stop vertex index to (vertex index, distance) */
+    public transient TIntIntMap[] stopTree;
 
     /**
      * A transitLayer can only be linked to one StreetLayer, otherwise the street indexes for the transit stops would
@@ -214,6 +213,33 @@ public class TransitLayer implements Serializable {
         stopForStreetVertex = new TIntIntHashMap(streetVertexForStop.size(), 0.5f, -1, -1);
         for (int s = 0; s < streetVertexForStop.size(); s++) {
             stopForStreetVertex.put(streetVertexForStop.get(s), s);
+        }
+    }
+
+    public void buildStopTree () {
+        if (linkedStreetLayer == null)
+            throw new IllegalStateException("Attempt to build stop trees on unlinked transit layer");
+
+        stopTree = new TIntIntMap[getStopCount()];
+
+        StreetRouter r = new StreetRouter(linkedStreetLayer);
+        r.distanceLimitMeters = 2000;
+
+        for (int stop = 0; stop < getStopCount(); stop++) {
+            int originVertex = streetVertexForStop.get(stop);
+
+            if (originVertex == -1) {
+                // stop is unlinked
+                LOG.info("Stop {} is unlinked", stop);
+
+                stopTree[stop] = null;
+                continue;
+            }
+
+            r.setOrigin(originVertex);
+            r.route();
+
+            stopTree[stop] = r.getReachedVertices();
         }
     }
 

@@ -157,7 +157,6 @@ public class AnalystWorker implements Runnable {
     private ThreadPoolExecutor highPriorityExecutor, batchExecutor;
 
     public AnalystWorker(Properties config) {
-
         // parse the configuration
         // set up the stats store
         String statsQueue = config.getProperty("statistics-queue");
@@ -337,7 +336,7 @@ public class AnalystWorker implements Runnable {
             // or a job task (where the result is saved to output location on S3).
             boolean isochrone = (clusterRequest.destinationPointsetId == null);
             boolean singlePoint = (clusterRequest.outputLocation == null);
-            boolean transit = (clusterRequest.profileRequest.transitModes != null && !clusterRequest.profileRequest.transitModes.isTransit());
+            boolean transit = (clusterRequest.profileRequest.transitModes != null && clusterRequest.profileRequest.transitModes.isTransit());
 
             if (singlePoint) {
                 lastHighPriorityRequestProcessed = startTime;
@@ -637,7 +636,11 @@ public class AnalystWorker implements Runnable {
         }
 
         try {
-            new AnalystWorker(config).run();
+            // jump over to using TransportNetworks if requested
+            if (Boolean.parseBoolean(config.getProperty("use-transport-networks", "false")))
+                new TNAnalystWorker(config).run();
+            else
+                new AnalystWorker(config).run();
         } catch (Exception e) {
             LOG.error("Error in analyst worker", e);
             return;

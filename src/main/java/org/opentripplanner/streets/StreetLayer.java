@@ -200,9 +200,9 @@ public class StreetLayer implements Serializable {
         for (int e = 0; e < edgeStore.nEdges; e += 2) {
             edge.seek(e);
             // FIXME for now we are skipping edges over 1km because they can have huge envelopes. TODO Rasterize them.
-            if (edge.getLengthMm() < 1 * 1000 * 1000) {
-                spatialIndex.insert(edge.getEnvelope(), e);
-            }
+            //if (edge.getLengthMm() < 1 * 1000 * 1000) {
+            spatialIndex.insert(edge.getEnvelope(), e);
+            //}
         }
         LOG.info("Done indexing streets.");
     }
@@ -361,6 +361,8 @@ public class StreetLayer implements Serializable {
         LOG.info("Removing subgraphs with fewer than {} vertices");
         boolean edgeListsBuilt = incomingEdges != null;
 
+        int nSubgraphs = 0;
+
         if (!edgeListsBuilt)
             buildEdgeLists();
 
@@ -396,9 +398,10 @@ public class StreetLayer implements Serializable {
             }
 
             if (nReached < minSubgraphSize) {
-                LOG.info("Removing disconnected subgraph of size {} near {}, {}",
+                LOG.debug("Removing disconnected subgraph of size {} near {}, {}",
                         nReached, vertexStore.fixedLats.get(vertex) / VertexStore.FIXED_FACTOR,
                         vertexStore.fixedLons.get(vertex) / VertexStore.FIXED_FACTOR);
+                nSubgraphs++;
                 verticesToRemove.addAll(reachedVertices);
                 reachedVertices.forEach(v -> {
                     // can't use method reference here because we always have to return true
@@ -413,6 +416,11 @@ public class StreetLayer implements Serializable {
                     return true; // iteration should continue
                 });
             }
+
+            if (nSubgraphs > 0)
+                LOG.info("Removed {} disconnected subgraphs", nSubgraphs);
+            else
+                LOG.info("Found no subgraphs to remove, congratulations for having clean OSM data.");
         }
 
         // rebuild the edge store with some edges removed

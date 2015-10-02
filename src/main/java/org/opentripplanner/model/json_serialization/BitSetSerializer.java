@@ -18,7 +18,7 @@ public class BitSetSerializer extends JsonSerializer<BitSet> {
 
         jsonGenerator.writeStartArray();
 
-        for (int i = 0; i < bitSet.cardinality(); i++) {
+        for (int i = 0; i < bitSet.length(); i++) {
             jsonGenerator.writeBoolean(bitSet.get(i));
         }
 

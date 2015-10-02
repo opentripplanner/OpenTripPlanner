@@ -75,6 +75,9 @@ public class RaptorWorkerTimetable implements Serializable {
     /** Index of this pattern in RaptorData */
     public int dataIndex;
 
+    /** for debugging, the ID of the route this represents */
+    public transient String routeId;
+
     /** slack required when boarding a transit vehicle */
     public static final int MIN_BOARD_TIME_SECONDS = 60;
 
@@ -313,10 +316,10 @@ public class RaptorWorkerTimetable implements Serializable {
         });
 
         // Copy the times into the compacted table
-        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(tripTimes.size(), pattern.getStops().size() * 2);
+        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(tripTimes.size(), pattern.getStops().size());
         int t = 0;
         for (TripTimes tt : tripTimes) {
-            int[] times = new int[rwtt.nStops];
+            int[] times = new int[rwtt.nStops * 2];
             for (int s = 0; s < pattern.getStops().size(); s++) {
                 int arrival = tt.getArrivalTime(s);
                 int departure = tt.getDepartureTime(s);
@@ -390,7 +393,7 @@ public class RaptorWorkerTimetable implements Serializable {
                 .sorted((t1, t2) -> t1.startTime - t2.startTime)
                 .collect(Collectors.toList());
 
-        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(timetables.size(), atp.temporaryStops.length * 2);
+        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(timetables.size(), atp.temporaryStops.length);
 
         // create timetabled trips
         int t = 0;
@@ -419,6 +422,7 @@ public class RaptorWorkerTimetable implements Serializable {
         ts.frequencyEntryCount += frequencies.size();
 
         rwtt.mode = atp.mode;
+        rwtt.routeId = atp.name;
 
         return rwtt;
     }

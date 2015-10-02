@@ -75,7 +75,7 @@ public class AddTripPatternTest extends TestCase {
 
         ShortestPathTree spt = aStar.getShortestPathTree(rr);
 
-        TIntIntMap stops = data.findStopsNear(spt, g);
+        TIntIntMap stops = data.findStopsNear(spt, g, false, 1.3f);
 
         // we should have found stops
         assertFalse(stops.isEmpty());
@@ -136,7 +136,7 @@ public class AddTripPatternTest extends TestCase {
 
         ShortestPathTree spt = aStar.getShortestPathTree(rr);
 
-        TIntIntMap stops = data.findStopsNear(spt, g);
+        TIntIntMap stops = data.findStopsNear(spt, g, false, 1.3f);
 
         // we should have found stops
         assertFalse(stops.isEmpty());

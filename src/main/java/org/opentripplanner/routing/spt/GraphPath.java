@@ -185,10 +185,14 @@ public class GraphPath {
     public void dump() {
         System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
         System.out.println(this.toString());
-        for (State s : states)
-            System.out.println(s + " via " + s.getBackEdge());
+        for (State s : states) {
+            //System.out.println(s.getBackEdge() + " leads to " + s);
+            if (s.getBackEdge() != null) {
+                System.out.println(s.getBackEdge().getClass().getSimpleName() + " --> " + s.getVertex().getClass().getSimpleName());
+            }
+        }
         System.out.println(" --- END GRAPHPATH DUMP ---");
-        System.out.println("Total meters walked in this graphpath: " + 
+        System.out.println("Total meters walked in the preceding graphpath: " +
                states.getLast().getWalkDistance());
     }
 

@@ -26,9 +26,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStationStop;
-import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -298,7 +296,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // at this point the vertex is closed (pulled off heap).
             // on reverse search save measured weights.
             // the optimal path may use transit.
-            if (!fromTarget) {
+            //Without instanceOf check P+R and B+R doesn't work in depart by searches
+            if (!fromTarget && ! (v instanceof ParkAndRideVertex || v instanceof BikeParkVertex)) {
                 // Mark vertex as being near origin. We have no idea how far it is to the destination.
                 weights.put(v, -1);
             } else {

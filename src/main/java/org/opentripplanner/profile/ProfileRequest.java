@@ -42,7 +42,23 @@ public class ProfileRequest implements Serializable, Cloneable {
     /** Maximum time to reach the destination without using transit */
     public int    streetTime;
     
-    /** Maximum walk time before and after using transit */
+    /**
+     * Maximum walk time before and after using transit, in minutes
+     *
+     * NB the time to reach the destination after leaving transit is considered separately from the time to reach
+     * transit at the start of the search; e.g. if you set maxWalkTime to 600 (ten minutes), you could potentially walk
+     * up to ten minutes to reach transit, and up to _another_ ten minutes to reach the destination after leaving transit.
+     *
+     * This is required because hard resource limiting on non-objective variables is algorithmically invalid. Consider
+     * a case where there is a destination 10 minutes from transit and an origin 5 minutes walk from a feeder bus and
+     * 15 minutes walk from a fast train, and the walk budget is 20 minutes. If an intermediate point in the search
+     * (for example, a transfer station) is reached by the fast train before it is reached by the bus, the route using
+     * the bus will be dominated. When we leave transit, though, we have already used up 15 minutes of our walk budget
+     * and don't have enough remaining to reach the destination.
+     *
+     * This is solved by using separate walk budgets at the origin and destination. It could also be solved (although this
+     * would slow the algorithm down) by retaining all Pareto-optimal combinations of (travel time, walk distance).
+     */
     public int    maxWalkTime;
     
     /** Maximum bike time when using transit */

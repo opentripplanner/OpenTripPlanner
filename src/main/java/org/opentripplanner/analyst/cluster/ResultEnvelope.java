@@ -140,6 +140,24 @@ public class ResultEnvelope implements Serializable {
 	}
 	
 	public static enum Which {
-		BEST_CASE, WORST_CASE, POINT_ESTIMATE, SPREAD, AVERAGE
+		BEST_CASE, WORST_CASE, POINT_ESTIMATE, SPREAD, AVERAGE;
+
+		/** Return a human readable string of this value */
+		public String toHumanString () {
+			switch (this) {
+				case BEST_CASE:
+					return "best case";
+				case WORST_CASE:
+					return "worst case";
+				case POINT_ESTIMATE:
+					return "point estimate";
+				case SPREAD:
+					return "spread";
+				case AVERAGE:
+					return "average";
+				default:
+					throw new IllegalStateException("Unknown envelope parameter");
+			}
+		}
 	}
 }

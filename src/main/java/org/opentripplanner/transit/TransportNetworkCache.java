@@ -1,15 +1,16 @@
 package org.opentripplanner.transit;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3Object;
+import com.google.common.io.ByteStreams;
 import org.apache.commons.io.IOUtils;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -51,6 +52,66 @@ public class TransportNetworkCache {
             return currentNetwork;
         }
 
+        TransportNetwork network = checkCached(networkId);
+        if (network == null) {
+            LOG.info("Cached transport network for id {} and commit {} was not found. Building it.",
+                    networkId, MavenVersion.VERSION.commit);
+            network = buildNetwork(networkId);
+        }
+
+        currentNetwork = network;
+        currentNetworkId = networkId;
+
+        return network;
+    }
+
+    /** If this transport network is already built and cached, fetch it quick */
+    private TransportNetwork checkCached (String networkId) {
+        try {
+            String filename = networkId + "_" + MavenVersion.VERSION.commit + ".dat";
+            File cacheLocation = new File(CACHE_DIR, networkId + "_" + MavenVersion.VERSION.commit + ".dat");
+
+            if (cacheLocation.exists())
+                // yippee! we have a cached network
+                LOG.info("Found locally-cached transport network for id {} and commit {}", networkId, MavenVersion.VERSION.commit);
+            else {
+                LOG.info("Checking for cached transport network on S3");
+                // try to download from S3
+                S3Object tn;
+                try {
+                    tn = s3.getObject(sourceBucket, filename);
+                } catch (AmazonServiceException ex) {
+                    LOG.info("No cached transport network was found in S3");
+                    return null;
+                }
+
+                CACHE_DIR.mkdirs();
+
+                // get it on the disk to save it for later
+                FileOutputStream fos = new FileOutputStream(cacheLocation);
+                InputStream is = tn.getObjectContent();
+                try {
+                    ByteStreams.copy(is, fos);
+                } finally {
+                    is.close();
+                    fos.close();
+                }
+            }
+
+            FileInputStream fis = new FileInputStream(cacheLocation);
+            try {
+                return TransportNetwork.read(fis);
+            } finally {
+                fis.close();
+            }
+        } catch (Exception e) {
+            LOG.error("Exception occurred retrieving cached transport network", e);
+            return null;
+        }
+    }
+
+    /** If we did not find a cached network, build one */
+    public TransportNetwork buildNetwork (String networkId) {
         // The location of the inputs that will be used to build this graph
         File dataDirectory = new File(CACHE_DIR, networkId);
 
@@ -85,11 +146,28 @@ public class TransportNetworkCache {
 
         // Now we have a local copy of these graph inputs. Make a graph out of them.
         CommandLineParameters params = new CommandLineParameters();
-        currentNetwork = TransportNetwork.fromDirectory(new File(CACHE_DIR, networkId));
-        currentNetworkId = networkId;
-        // TODO Save the built graph on S3 for other workers to use.
-        return currentNetwork;
+        TransportNetwork network = TransportNetwork.fromDirectory(new File(CACHE_DIR, networkId));
 
+        // cache the network
+        String filename = networkId + "_" + MavenVersion.VERSION.commit + ".dat";
+        File cacheLocation = new File(CACHE_DIR, networkId + "_" + MavenVersion.VERSION.commit + ".dat");
+        
+        try {
+            FileOutputStream fos = new FileOutputStream(cacheLocation);
+            try {
+                network.write(fos);
+            } finally {
+                fos.close();
+            }
+
+            // upload to S3
+            s3.putObject(sourceBucket, filename, cacheLocation);
+        } catch (Exception e) {
+            // don't break here as we do have a network to return, we just couldn't cache it.
+            LOG.error("Error saving cached network", e);
+            cacheLocation.delete();
+        }
+
+        return network;
     }
-
 }

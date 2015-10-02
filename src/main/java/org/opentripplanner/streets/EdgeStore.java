@@ -179,6 +179,11 @@ public class EdgeStore implements Serializable {
 
         /** Jump to a specific edge number. */
         public void seek(int pos) {
+            if (pos < 0)
+                throw new ArrayIndexOutOfBoundsException("Attempt to seek to negative edge number");
+            if (pos >= nEdges)
+                throw new ArrayIndexOutOfBoundsException("Attempt to seek beyond end of edge store");
+
             edgeIndex = pos;
             // divide and multiply by two are fast bit shifts
             pairIndex = edgeIndex / 2;

@@ -115,7 +115,7 @@ public class PolylineEncoder {
             lon = lon + rLon[0] * 1e-5;
             strIndex = rLon[1];
 
-            points.add(new Coordinate(lat, lon));
+            points.add(new Coordinate(lon, lat));
         }
 
         return points;
