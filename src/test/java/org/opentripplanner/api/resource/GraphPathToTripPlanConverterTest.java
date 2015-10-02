@@ -161,7 +161,7 @@ public class GraphPathToTripPlanConverterTest {
     public void testEmptyGraphPath() {
         RoutingRequest options = new RoutingRequest();
         Graph graph = new Graph();
-        ExitVertex vertex = new ExitVertex(graph, "Vertex", 0, 0);
+        ExitVertex vertex = new ExitVertex(graph, "Vertex", 0, 0, 0);
 
         options.rctx = new RoutingContext(options, graph, vertex, vertex);
 
@@ -178,9 +178,9 @@ public class GraphPathToTripPlanConverterTest {
         RoutingRequest options = new RoutingRequest();
         Graph graph = new Graph();
 
-        ExitVertex start = new ExitVertex(graph, "Start", 0, -90);
-        ExitVertex middle = new ExitVertex(graph, "Middle", 0, 0);
-        ExitVertex end = new ExitVertex(graph, "End", 0, 90);
+        ExitVertex start = new ExitVertex(graph, "Start", 0, -90, 0);
+        ExitVertex middle = new ExitVertex(graph, "Middle", 0, 0, 0);
+        ExitVertex end = new ExitVertex(graph, "End", 0, 90, 0);
 
         FreeEdge depart = new FreeEdge(start, middle);
         LegSwitchingEdge arrive = new LegSwitchingEdge(middle, end);
@@ -216,7 +216,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Vertices for leg 0
         ExitVertex v0 = new ExitVertex(
-                graph, "Vertex 0", 0, 0);
+                graph, "Vertex 0", 0, 0, 0);
         IntersectionVertex v2 = new IntersectionVertex(
                 graph, "Vertex 2", 0, 0);
         IntersectionVertex v4 = new IntersectionVertex(

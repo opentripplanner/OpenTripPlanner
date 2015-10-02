@@ -55,8 +55,7 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	                return pset;
 	                
 	            } catch (IOException ioex) {
-	                LOG.warn("Exception while loading pointset.");
-					ioex.printStackTrace();
+	                LOG.warn("Exception while loading pointset.", ioex);
 	            }
 	        } else if (name.endsWith(".json")) {
 	            String baseName = name.substring(0, name.length() - 5);

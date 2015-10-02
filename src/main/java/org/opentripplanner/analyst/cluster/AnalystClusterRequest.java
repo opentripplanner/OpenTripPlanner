@@ -28,16 +28,11 @@ public class AnalystClusterRequest implements Serializable {
 	public String id;
 
 	/** To where should the result be POSTed */
+	@Deprecated
 	public String directOutputUrl;
 
 	/** A unique identifier for this request assigned by the queue/broker system. */
 	public int taskId;
-
-	/**
-	 * To what queue should the notification of the result be delivered?
-	 */
-	@Deprecated
-	public String outputQueue;
 
 	/**
 	 * Where should the job be saved?
@@ -45,16 +40,13 @@ public class AnalystClusterRequest implements Serializable {
 	public String outputLocation;
 
 	/**
-	 * The routing parameters to use if this is a one-to-many profile request.
-	 * If profileRequest is provided, it will take precedence and routingRequest will be ignored.
+	 * The routing parameters to use for a one-to-many profile request.
+	 * Non-profile one-to-many requests are represented by simply setting the time window to zero width, i.e.
+	 * in profileRequest fromTime == toTime.
+	 * Non-transit one-to-many requests are represented by setting profileRequest.transitModes to null or empty.
+	 * In that case only the directModes will be used to reach the destinations on the street.
 	 */
 	public ProfileRequest profileRequest;
-
-	/**
-	 * The routing parameters to use if this is a non-profile one-to-many request.
-	 * If profileRequest is not provided, we will fall back on this routingRequest.
-	 */
-	public RoutingRequest routingRequest;
 
 	/** Should times be included in the results (i.e. ResultSetWithTimes rather than ResultSet) */
 	public boolean includeTimes = false;
@@ -64,10 +56,12 @@ public class AnalystClusterRequest implements Serializable {
 		this.graphId = graphId;
 	}
 
-	/** Create a cluster request that wraps a ProfileRequest, and has no RoutingRequest. */
-	public AnalystClusterRequest(String destinationPointsetId, String graphId, ProfileRequest req) {
+	/**
+	 * We're now using ProfileRequests for everything (no RoutingRequests for non-transit searches).
+	 * An AnalystClusterRequest is a wrapper around a ProfileRequest with some additional settings and context.
+	 */
+	 public AnalystClusterRequest(String destinationPointsetId, String graphId, ProfileRequest req) {
 		this(destinationPointsetId, graphId);
-		routingRequest = null;
 		try {
 			profileRequest = req.clone();
 		} catch (CloneNotSupportedException e) {
@@ -78,15 +72,7 @@ public class AnalystClusterRequest implements Serializable {
 		profileRequest.toLon = profileRequest.fromLon;
 	}
 
-	/** Create a cluster request that wraps a RoutingRequest, and has no ProfileRequest. */
-	public AnalystClusterRequest(String destinationPointsetId, String graphId, RoutingRequest req) {
-		this(destinationPointsetId, graphId);
-		profileRequest = null;
-		routingRequest = req.clone();
-		routingRequest.batch = true;
-		routingRequest.rctx = null;
-	}
-
 	/** Used for deserialization from JSON */
 	public AnalystClusterRequest () { /* do nothing */ }
+
 }

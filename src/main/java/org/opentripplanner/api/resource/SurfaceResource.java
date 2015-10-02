@@ -16,6 +16,8 @@ import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TimeSurfaceShort;
+import org.opentripplanner.api.parameter.CRSParameter;
+import org.opentripplanner.api.parameter.IsoTimeParameter;
 import org.opentripplanner.api.parameter.Layer;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.api.parameter.Style;
@@ -261,5 +263,34 @@ public class SurfaceResource extends RoutingResource {
 
         return isochrones;
     }
+
+    /**
+     * Produce a single grayscale raster of travel time, like travel time tiles but not broken into tiles.
+     */
+    @Path("/{surfaceId}/raster")
+    @GET @Produces("image/*")
+    public Response getRaster(
+            @PathParam("surfaceId") Integer surfaceId,
+            @QueryParam("width") @DefaultValue("1024") Integer width,
+            @QueryParam("height") @DefaultValue("768") Integer height,
+            @QueryParam("resolution") Double resolution,
+            @QueryParam("time") IsoTimeParameter time,
+            @QueryParam("format") @DefaultValue("image/geotiff") MIMEImageFormat format,
+            @QueryParam("crs") @DefaultValue("EPSG:4326") CRSParameter crs) throws Exception {
+
+        TimeSurface surface = otpServer.surfaceCache.get(surfaceId);
+        Router router = otpServer.getRouter(surface.routerId);
+        // BoundingBox is a subclass of Envelope, an Envelope2D constructor parameter
+        Envelope2D bbox = new Envelope2D(router.graph.getGeomIndex().getBoundingBox(crs.crs));
+        if (resolution != null) {
+            width  = (int) Math.ceil(bbox.width  / resolution);
+            height = (int) Math.ceil(bbox.height / resolution);
+        }
+
+        TileRequest tileRequest = new TileRequest(bbox, width, height);
+        RenderRequest renderRequest = new RenderRequest(format, Layer.TRAVELTIME, Style.GRAY, false, false);
+        return router.renderer.getResponse(tileRequest, surface, null, renderRequest);
+    }
+
 
 }

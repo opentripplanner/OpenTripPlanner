@@ -13,14 +13,13 @@
 
 package org.opentripplanner.routing.transit_index;
 
-import java.io.Serializable;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
-import org.opentripplanner.routing.graph.Edge;
-
+import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.graph.Edge;
+
+import java.io.Serializable;
 
 /**
  * RouteSegment holds the edges around one stop on particular trip or pattern.
@@ -39,7 +38,7 @@ public class RouteSegment implements Serializable  {
 		this.stop = stop;
 	}
 
-	@JsonSerialize(using=GeoJSONSerializer.class)
+	@JsonSerialize(using= GeometrySerializer.class)
 	public Geometry getGeometry() {
 	    return hopOut.getGeometry();
 	}

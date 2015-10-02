@@ -122,6 +122,10 @@ public class CircularList<T> implements Iterable<T> {
      */
     public T advanceToElement (Predicate<T> predicate) {
         Node<T> start = head;
+
+        if (head == null)
+            return null;
+
         do {
             T currElement = advance();
             if (predicate.test(currElement)) {
@@ -129,6 +133,40 @@ public class CircularList<T> implements Iterable<T> {
             }
         } while (head != start);
         return null;
+    }
+
+    /**
+     * Remove an item from this circular list.
+     */
+    public boolean remove (T obj) {
+        // handle the zero-length and one-length case
+        if (head == null) return false;
+
+        if (head.prev == head) {
+            if (head.element.equals(obj)) {
+                head = null;
+                return true;
+            }
+            else return false;
+        }
+
+        Node<T> start = head;
+        Node<T> current = head;
+        do {
+            if (current.element.equals(obj)) {
+                // remove from rotation
+                current.prev.next = current.next;
+                current.next.prev = current.prev;
+
+                if (current == head)
+                    head = current.next;
+
+                return true;
+            }
+            current = current.next;
+        } while (current != start);
+
+        return false;
     }
 
 }

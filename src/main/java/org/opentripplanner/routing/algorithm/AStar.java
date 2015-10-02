@@ -14,6 +14,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -65,7 +67,7 @@ public class AStar {
         RemainingWeightHeuristic heuristic;
         public RoutingContext rctx;
         public int nVisited;
-        public List<Object> targetAcceptedStates;
+        public List<State> targetAcceptedStates;
         public RunStatus status;
         private RoutingRequest options;
         private SearchTerminationStrategy terminationStrategy;
@@ -276,14 +278,18 @@ public class AStar {
                     runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal()) {
+                if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
+                    continue;
+                }
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
                 //new GraphPath(runState.u, false).dump();
                 /* Only find one path at a time in long distance mode. */
-                if (runState.options.longDistance) break;
+                if (runState.options.longDistance) {
+                    break;
+                }
                 /* Break out of the search if we've found the requested number of paths. */
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
@@ -353,5 +359,15 @@ public class AStar {
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
+    }
+
+    public List<GraphPath> getPathsToTarget() {
+        List<GraphPath> ret = new LinkedList<>();
+        for (State s : runState.targetAcceptedStates) {
+            if (s.isFinal()) {
+                ret.add(new GraphPath(s, true));
+            }
+        }
+        return ret;
     }
 }

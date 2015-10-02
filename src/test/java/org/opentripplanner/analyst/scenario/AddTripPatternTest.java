@@ -9,10 +9,7 @@ import junit.framework.TestCase;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.profile.ProfileRequest;
-import org.opentripplanner.profile.RaptorWorkerData;
-import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
-import org.opentripplanner.profile.TimeWindow;
+import org.opentripplanner.profile.*;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -61,9 +58,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
-
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
         assertEquals(5, data.nStops);
 
         // make sure we can find the stops
@@ -76,7 +75,7 @@ public class AddTripPatternTest extends TestCase {
 
         ShortestPathTree spt = aStar.getShortestPathTree(rr);
 
-        TIntIntMap stops = data.findStopsNear(spt, g);
+        TIntIntMap stops = data.findStopsNear(spt, g, false, 1.3f);
 
         // we should have found stops
         assertFalse(stops.isEmpty());
@@ -85,7 +84,8 @@ public class AddTripPatternTest extends TestCase {
         // This assumes worst-case departure, and the first worst departure is 10:30 after the service
         // starts running (dwell + headway)
         assertEquals(4 * 3600 + 600 + 30,
-                data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360, true));
+                data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360,
+                        -1, null));
     }
 
     /** Test adding trips with a timetable rather than frequencies */
@@ -118,8 +118,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
 
         assertEquals(5, data.nStops);
 
@@ -133,7 +136,7 @@ public class AddTripPatternTest extends TestCase {
 
         ShortestPathTree spt = aStar.getShortestPathTree(rr);
 
-        TIntIntMap stops = data.findStopsNear(spt, g);
+        TIntIntMap stops = data.findStopsNear(spt, g, false, 1.3f);
 
         // we should have found stops
         assertFalse(stops.isEmpty());
@@ -166,8 +169,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp, atp2);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
 
         // make sure that we have transfers a) between the new lines b) from the new lines
         // to the existing lines c) from the existing lines to the new lines

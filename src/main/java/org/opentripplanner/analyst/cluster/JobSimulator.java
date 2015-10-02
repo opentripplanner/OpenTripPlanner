@@ -6,7 +6,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.JodaLocalDateSerializer;
+import org.opentripplanner.api.model.QualifiedModeSetSerializer;
+import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.opentripplanner.profile.ProfileRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,29 +31,45 @@ import java.util.stream.IntStream;
  */
 public class JobSimulator {
 
-    public static String USERID = "userA";
+    public String s3prefix = "S3PREFIX";
+    public String pointSetId = "census";
+    public String graphId = "c4aa8cc8666788c8d51d4fc99201fa56";
+    public int nOrigins = 4;
+
+    DefaultHttpClient httpClient = new DefaultHttpClient();
 
     public static void main(String[] args) {
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        JobSimulator js = new JobSimulator();
+//        js.s3prefix = args[0];
+//        js.pointSetId = args[1];
+//        js.graphId = args[2];
+//        js.nOrigins = Integer.parseInt(args[3]);
+        js.sendFakeJob();
 
-        String s3prefix = args[0];
-        String pointSetId = args[1];
-        String graphId = args[2];
-        int nOrigins = Integer.parseInt(args[3]);
+    }
+
+    public void sendFakeJob() {
 
         String jobId = compactUUID();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.registerModule(AgencyAndIdSerializer.makeModule());
+        mapper.registerModule(QualifiedModeSetSerializer.makeModule());
+        mapper.registerModule(JodaLocalDateSerializer.makeModule());
+        mapper.registerModule(TraverseModeSetSerializer.makeModule());
 
         List<AnalystClusterRequest> requests = new ArrayList<>();
 
         IntStream.range(0, nOrigins).forEach(i -> {
             // Enqueue one fake origin
             ProfileRequest profileRequest = new ProfileRequest();
+            profileRequest.fromLat = 45.515;
+            profileRequest.fromLon = -122.643;
+            profileRequest.transitModes = null; //new TraverseModeSet(TraverseMode.TRANSIT);
+            // profileRequest.accessModes ...
             AnalystClusterRequest clusterRequest = new AnalystClusterRequest(pointSetId, graphId, profileRequest);
-            clusterRequest.userId = USERID;
             clusterRequest.jobId = jobId;
             clusterRequest.id = Integer.toString(i);
             clusterRequest.outputLocation = s3prefix + "_output";
@@ -61,11 +83,11 @@ public class JobSimulator {
 //            throw new RuntimeException(e);
 //        }
 
-        String url = String.format("http://localhost:9001/jobs");
+        String url = String.format("http://localhost:9001/enqueue/jobs");
         HttpPost httpPost = new HttpPost(url);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            objectMapper.writeValue(out, requests);
+            mapper.writeValue(out, requests);
             // System.out.println(out.toString());
             httpPost.setEntity(new ByteArrayEntity(out.toByteArray()));
             HttpResponse response = httpClient.execute(httpPost);

@@ -8,7 +8,9 @@ import java.util.Map;
 
 /**
  * This is a class that stores several result sets: an upper bound, a lower bound, and a central tendency.
- * TODO consider renaming to something more specific. "Envelope" has a geometric meaning, but here we mean "the thing you put a letter in".
+ * This is an "Envelope" in the sense that the results it contains enclose an area on a map or a chart:
+ * either the space between the minimum and maximum extent of an N-minute isochrone, or the space between the minimum
+ * and maximum accessibility curves on the cumulative access chart.
  *
  * @author mattwigway
  */
@@ -31,8 +33,13 @@ public class ResultEnvelope implements Serializable {
 	public ResultSet avgCase;
 	
 	/**
-	 * The point estimate of the accessibility. If profile = false, this is the journey
-	 * time returned by OTP.
+	 * A point estimate of accessibility, in the statistical sense: a single result that serves as a representative point
+	 * in a distribution. When we are not doing profile routing (when we are not varying the departure time or other
+	 * characteristics such as frequency board delays or schedule pulsing) we get only a single set of travel
+	 * times out of a search. This is only one draw out of a distribution, and we don't know how much the values
+	 * can vary around this single example.
+	 *
+	 * Note that this is not a single travel time, but a single set of travel times to all targets (points/vertices).
 	 */
 	public ResultSet pointEstimate;
 	
@@ -133,6 +140,24 @@ public class ResultEnvelope implements Serializable {
 	}
 	
 	public static enum Which {
-		BEST_CASE, WORST_CASE, POINT_ESTIMATE, SPREAD, AVERAGE
+		BEST_CASE, WORST_CASE, POINT_ESTIMATE, SPREAD, AVERAGE;
+
+		/** Return a human readable string of this value */
+		public String toHumanString () {
+			switch (this) {
+				case BEST_CASE:
+					return "best case";
+				case WORST_CASE:
+					return "worst case";
+				case POINT_ESTIMATE:
+					return "point estimate";
+				case SPREAD:
+					return "spread";
+				case AVERAGE:
+					return "average";
+				default:
+					throw new IllegalStateException("Unknown envelope parameter");
+			}
+		}
 	}
 }

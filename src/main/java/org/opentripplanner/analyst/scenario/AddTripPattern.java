@@ -1,14 +1,18 @@
 package org.opentripplanner.analyst.scenario;
 
+import com.conveyal.gtfs.model.Route;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
+import org.apache.commons.math3.analysis.function.Add;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.model.json_serialization.*;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -17,6 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /** Add a trip pattern */
 public class AddTripPattern extends Modification {
+    public static final long serialVersionUID = 1L;
+    public static final Logger LOG = LoggerFactory.getLogger(AddTripPattern.class);
+
     /** The name of this pattern */
     public String name;
 
@@ -35,6 +42,9 @@ public class AddTripPattern extends Modification {
 
     /** used to store the indices of the temporary stops in the graph */
     public transient TemporaryStop[] temporaryStops;
+
+    /** GTFS mode (route_type), see constants in com.conveyal.gtfs.model.Route */
+    public int mode = Route.BUS;
 
     /** Create temporary stops associated with the given graph. Note that a given AddTripPattern can be associated only with a single graph. */
     public void materialize (Graph graph) {
@@ -105,6 +115,13 @@ public class AddTripPattern extends Modification {
             this.lon = lon;
             this.index = nextId.decrementAndGet();
             this.sample = sampleFactory.getSample(this.lon, this.lat);
+
+            if (this.sample == null)
+                LOG.warn("Temporary stop unlinked: {}", this);
+        }
+
+        public String toString () {
+            return "Temporary stop at " + this.lat + ", " + this.lon;
         }
     }
 }

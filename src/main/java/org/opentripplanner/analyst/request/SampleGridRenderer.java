@@ -32,9 +32,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.pathparser.BasicPathParser;
-import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -82,7 +79,6 @@ public class SampleGridRenderer {
                 - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.batch = (true);
         sptRequest.setRoutingContext(graph);
-        sptRequest.rctx.pathParsers = new PathParser[] { new BasicPathParser(), new NoThruTrafficPathParser() };
         // TODO swap in different state dominance logic (earliest arrival, pareto, etc.)
         final ShortestPathTree spt = new AStar().getShortestPathTree(sptRequest);
 
@@ -195,7 +191,7 @@ public class SampleGridRenderer {
 
         public static class IsolineMetric implements IsolineBuilder.ZMetric<WTWD> {
             @Override
-            public int cut(WTWD zA, SampleGridRenderer.WTWD zB, WTWD z0) {
+            public int cut(WTWD zA, WTWD zB, WTWD z0) {
                 double t0 = z0.wTime / z0.w;
                 double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.wTime / zA.w;
                 double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.wTime / zB.w;
@@ -235,10 +231,6 @@ public class SampleGridRenderer {
 
         private double cosLat, offRoadDistanceMeters, offRoadSpeed, gridSizeMeters;
 
-        /**
-         * @param cosLat
-         * @param d0 distance off road?
-         */
         public WTWDAccumulativeMetric (double cosLat, double offRoadDistanceMeters, double offRoadSpeed, double gridSizeMeters) {
             this.cosLat = cosLat;
             this.offRoadDistanceMeters = offRoadDistanceMeters;

@@ -40,7 +40,7 @@ public class BarrierVertexTest {
         assertTrue(simpleBarier.isBollard());
         Graph graph = new Graph();
         String label = "simpleBarrier";
-        BarrierVertex bv = new BarrierVertex(graph, label, simpleBarier.lon, simpleBarier.lat);
+        BarrierVertex bv = new BarrierVertex(graph, label, simpleBarier.lon, simpleBarier.lat, 0);
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
         assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
@@ -112,7 +112,7 @@ public class BarrierVertexTest {
     public void testStreetsWithBollard() {
         Graph _graph = new Graph();
         //default permissions are PEDESTRIAND and BICYCLE
-        BarrierVertex bv = new BarrierVertex(_graph, "start_bollard", 2.0, 2.0);
+        BarrierVertex bv = new BarrierVertex(_graph, "start_bollard", 2.0, 2.0, 0);
 
         StreetVertex endVertex = new IntersectionVertex(_graph, "end_vertex", 1.0, 2.0);
 
@@ -157,8 +157,8 @@ public class BarrierVertexTest {
         assertTrue(endVertex_to_bv_forward.canTraverseIncludingBarrier(TraverseMode.WALK));
 
 
-        //tests bollard which doesn't allo cycling
-        BarrierVertex noBicycleBollard = new BarrierVertex(_graph, "no_bike_bollard", 1.5, 1);
+        //tests bollard which doesn't allow cycling
+        BarrierVertex noBicycleBollard = new BarrierVertex(_graph, "no_bike_bollard", 1.5, 1, 0);
         noBicycleBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
         StreetEdge no_bike_to_endVertex = edge(noBicycleBollard, endVertex, 100, false);
 

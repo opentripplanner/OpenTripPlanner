@@ -26,7 +26,8 @@ If you want to get started right away running your own OTP instance, the best pl
 
 ## Status
 
-[![Build Status](http://ci.opentripplanner.org/buildStatus/icon?job=OpenTripPlanner)](http://ci.opentripplanner.org/job/OpenTripPlanner/)
+[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
+
 OpenTripPlanner is presently at **version 0.18.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips

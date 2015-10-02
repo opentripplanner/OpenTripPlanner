@@ -7,8 +7,9 @@ The main Java server code is in `src/main/`. OTP also includes a Javascript clie
 Additional information and instructions are available in the [main documentation](http://opentripplanner.readthedocs.org/en/latest/), including a 
 [quick introduction](http://opentripplanner.readthedocs.org/en/latest/Basic-Usage/).
 
+[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
-## Development
+## Development 
 
 OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from contributors around the world. We welcome new contributions and prefer to format our code according to GeoTools-based formatting guidelines; an Eclipse autoformatter can be found at the root of this project (https://raw.github.com/openplans/OpenTripPlanner/master/formatter.xml). Further [development guidelines](http://opentripplanner.readthedocs.org/en/latest/Developers-Guide/) can be found in the documentation.
 

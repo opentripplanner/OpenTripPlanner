@@ -21,13 +21,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.google.common.primitives.Ints;
-import org.opentripplanner.common.model.T2;
+import org.apache.commons.io.FileUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -47,12 +45,17 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     //Path to output folder
     private File outPath;
 
+    //If there are more then this number annotations are split into multiple files
+    //This is because browsers aren't made for giant HTML files which can be made with 500k annotations
     private int maxNumberOfAnnotationsPerFile;
 
-    Set<String> classes;
 
-    Multiset<String> classOccurences;
+    //This counts all occurrences of HTML annotations classes
+    //If one annotation class is split into two files it has two entries in this Multiset
+    //IT is used to show numbers in HTML files name and links
+    Multiset<String> annotationClassOccurences;
 
+    //List of writers which are used for actual writing annotations to HTML
     List<HTMLWriter> writers;
 
     //Key is classname, value is annotation message
@@ -63,9 +66,8 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         this.outPath = outpath;
         annotations = ArrayListMultimap.create();
         this.maxNumberOfAnnotationsPerFile = maxNumberOfAnnotationsPerFile;
-        this.classes = new TreeSet<>();
         this.writers = new ArrayList<>();
-        this.classOccurences = HashMultiset.create();
+        this.annotationClassOccurences = HashMultiset.create();
     }
 
 
@@ -77,7 +79,29 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             return;
         }
 
+        outPath = new File(outPath, "report");
+        if (outPath.exists()) {
+            //Removes all files from report directory
+            try {
+                FileUtils.cleanDirectory(outPath);
+            } catch (IOException e) {
+                LOG.error("Failed to clean HTML report directory: " + outPath.toString() + ". HTML report won't be generated!", e);
+                return;
+            }
+        } else {
+            //Creates report directory if it doesn't exist yet
+            try {
+                FileUtils.forceMkdir(outPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOG.error("Failed to create HTML report directory: " + outPath.toString() + ". HTML report won't be generated!", e);
+                return;
+            }
+        }
 
+
+
+        //Groups annotations in multimap according to annotation class
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
             //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
             // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
@@ -86,95 +110,69 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
         LOG.info("Creating Annotations log");
 
-        Map<String, Collection<String>> annotationsMap = annotations.asMap();
-        //saves list of annotation classes and counts
-        List<T2<String, Integer>> counts = new ArrayList<>(annotationsMap.size());
-        for (Map.Entry<String, Collection<String>> entry: annotationsMap.entrySet()) {
-            counts.add(new T2<>(entry.getKey(), entry.getValue().size()));
-        }
 
-        //Orders annotations and counts of annotations usages by number of usages
-        //from most used to the least
-        Collections.sort(counts, (o1, o2) -> Ints.compare(o2.second, o1.second));
-
-        int currentNumberOfAnnotationsPerFile = 0;
-        Multimap<String, String> current_map = ArrayListMultimap.create();
-        String last_added_key = null;
-
-        //Annotations are grouped until the count of annotations is less then maxNumberOfAnnotationsPerFile
-        //otherwise each class of annotations is different file.
-        for (T2<String, Integer> count : counts) {
-            LOG.info("Key: {} ({})", count.first, count.second);
-
-            if ((currentNumberOfAnnotationsPerFile + count.second) <= maxNumberOfAnnotationsPerFile) {
-                LOG.info("Increasing count: {}+{}={}", currentNumberOfAnnotationsPerFile, count.second, currentNumberOfAnnotationsPerFile+count.second);
-                currentNumberOfAnnotationsPerFile+=count.second;
-                current_map.putAll(count.first, annotationsMap.get(count.first));
-                last_added_key = count.first;
+        //Creates list of HTML writers. Each writer has whole class of HTML annotations
+        //Or multiple HTML writers can have parts of one class of HTML annotations if number
+        // of annotations is larger than maxNumberOfAnnotationsPerFile
+        for (Map.Entry<String, Collection<String>> entry: annotations.asMap().entrySet()) {
+            List<String> annotationsList;
+            if (entry.getValue() instanceof List) {
+                annotationsList = (List<String>) entry.getValue();
             } else {
-                LOG.info("Flush count:{}", currentNumberOfAnnotationsPerFile);
-                if (currentNumberOfAnnotationsPerFile > 0) {
-                    addAnnotations(last_added_key, current_map);
-                }
-
-                current_map = ArrayListMultimap.create();
-                current_map.putAll(count.first, annotationsMap.get(count.first));
-                last_added_key = count.first;
-                currentNumberOfAnnotationsPerFile = count.second;
+                annotationsList = new ArrayList<>(entry.getValue());
             }
-
+            addAnnotations(entry.getKey(), annotationsList);
         }
-
-        LOG.info("Flush last count:{}", currentNumberOfAnnotationsPerFile);
-        addAnnotations(last_added_key, current_map);
-
 
         //Actual writing to the file is made here since
         // this is the first place where actual number of files is known (because it depends on annotations count)
         for (HTMLWriter writer : writers) {
-            writer.writeFile(classOccurences);
+            writer.writeFile(annotationClassOccurences, false);
         }
 
+        try {
+            HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
+            indexFileWriter.writeFile(annotationClassOccurences, true);
+        } catch (FileNotFoundException e) {
+            LOG.error("Index file coudn't be created:{}", e);
+        }
 
-        LOG.info("Annotated log is in {}", outPath);
+        LOG.info("Annotated logs are in {}", outPath);
 
 
     }
 
-    private void addAnnotations(String last_added_key, Multimap<String, String> current_map) {
+    /**
+     * Creates file with given class of annotations
+     *
+     * If number of annotations is larger then maxNumberOfAnnotationsPerFile multiple files are generated.
+     * And named annotationClassName1,2,3 etc.
+     *
+     * @param annotationClassName name of annotation class and then also filename
+     * @param annotations list of all annotations with that class
+     */
+    private void addAnnotations(String annotationClassName, List<String> annotations) {
         try {
             HTMLWriter file_writer;
-            if (current_map.keySet().size() == 1) {
-                if (current_map.values().size() > 1.2*maxNumberOfAnnotationsPerFile) {
-                    LOG.info("Number of annotations is very large. Splitting: {}", last_added_key);
-                    List<String> allAnnonations = new ArrayList<>(current_map.values());
-                    List<List<String>> partitions = Lists.partition(allAnnonations, maxNumberOfAnnotationsPerFile);
-                    for (List<String> partition: partitions) {
-                        classOccurences.add(last_added_key);
-                        int labelCount = classOccurences.count(last_added_key);
-                        file_writer =new HTMLWriter(last_added_key+Integer.toString(labelCount), partition);
-                        writers.add(file_writer);
-                    }
-
-                } else {
-                    classOccurences.add(last_added_key);
-                    int labelCount = classOccurences.count(last_added_key);
-                    file_writer = new HTMLWriter(last_added_key + Integer.toString(labelCount),
-                        current_map);
+            if (annotations.size() > 1.2*maxNumberOfAnnotationsPerFile) {
+                LOG.debug("Number of annotations is very large. Splitting: {}", annotationClassName);
+                List<List<String>> partitions = Lists.partition(annotations, maxNumberOfAnnotationsPerFile);
+                for (List<String> partition: partitions) {
+                    annotationClassOccurences.add(annotationClassName);
+                    int labelCount = annotationClassOccurences.count(annotationClassName);
+                    file_writer =new HTMLWriter(annotationClassName+Integer.toString(labelCount), partition);
                     writers.add(file_writer);
                 }
 
             } else {
-                classOccurences.add("rest");
-                int labelCount = classOccurences.count("rest");
-                file_writer = new HTMLWriter("rest" + labelCount, current_map);
+                annotationClassOccurences.add(annotationClassName);
+                int labelCount = annotationClassOccurences.count(annotationClassName);
+                file_writer = new HTMLWriter(annotationClassName + Integer.toString(labelCount),
+                    annotations);
                 writers.add(file_writer);
             }
-
-
         } catch (FileNotFoundException ex) {
             LOG.error("Output folder not found:{} {}", outPath, ex);
-            return;
         }
     }
 
@@ -183,6 +181,13 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
     }
 
+    /**
+     * Groups annotations according to annotation class name
+     *
+     * All annotations are saved together in multimap where key is annotation classname
+     * and values are list of annotations with that class
+     * @param annotation
+     */
     private void addAnnotation(GraphBuilderAnnotation annotation) {
         String className = annotation.getClass().getSimpleName();
         annotations.put(className, annotation.getHTMLMessage());
@@ -192,31 +197,31 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     class HTMLWriter {
         private PrintStream out;
 
-        private Multimap<String, String> lannotations;
+        private Multimap<String, String> writerAnnotations;
 
-        private String current_class;
+        private String annotationClassName;
 
         public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
-            LOG.info("Making file: {}", key);
+            LOG.debug("Making file: {}", key);
             File newFile = new File(outPath, key +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            lannotations = ArrayListMultimap.create();
-            lannotations.putAll(key, annotations);
-            current_class = key;
+            writerAnnotations = ArrayListMultimap.create();
+            writerAnnotations.putAll(key, annotations);
+            annotationClassName = key;
         }
 
         public HTMLWriter(String filename, Multimap<String, String> curMap)
             throws FileNotFoundException {
-            LOG.info("Making file: {}", filename);
+            LOG.debug("Making file: {}", filename);
             File newFile = new File(outPath, filename +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            lannotations = curMap;
-            current_class = filename;
+            writerAnnotations = curMap;
+            annotationClassName = filename;
         }
 
-        private void writeFile(Multiset<String> classes) {
+        private void writeFile(Multiset<String> classes, boolean isIndexFile) {
             println("<html><head><title>Graph report for " + outPath.getParentFile()
                 + "Graph.obj</title>");
             println("\t<meta charset=\"utf-8\">");
@@ -262,88 +267,55 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "";
             println(css);
             println("</head><body>");
-            println("<h1>OpenTripPlanner annotations log</h1>");
+            println(String.format("<h1>OpenTripPlanner annotations log for %s</h1>", annotationClassName));
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
             println("<p>");
             //adds links to the other HTML files
-            for (Multiset.Entry<String> htmlAnnotationClass: classes.entrySet()) {
+            for (Multiset.Entry<String> htmlAnnotationClass : classes.entrySet()) {
                 String label_name = htmlAnnotationClass.getElement();
                 String label;
                 int currentCount = 1;
                 //it needs to add link to every file even if they are split
                 while (currentCount <= htmlAnnotationClass.getCount()) {
                     label = label_name + currentCount;
-                    if (label.equals(current_class)) {
-                        println("<span>" + label + "</span><br />");
+                    if (label.equals(annotationClassName)) {
+                        println(String.format("<button class='pure-button pure-button-disabled button-%s'>%s</button>",
+                            label_name.toLowerCase(), label));
                     } else {
-                        println("<a href=\"" + label + ".html\">" + label + "</a><br />");
+                        println(String.format("<a class='pure-button button-%s' href=\"%s.html\">%s</a>",
+                            label_name.toLowerCase(), label, label));
                     }
                     currentCount++;
                 }
             }
             println("</p>");
-            println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
-
-
-
-            println("\t<script>");
-
-            writeJson();
-            String js = "\t\tvar selected = {};\n"
-                + "\n"
-                + "\t\t//select/deselects filters and correctly styles buttons\n"
-                + "\t\tfunction refilter(item) {\n"
-                + "\t\t\tconsole.debug(item.data.name);\n"
-                + "\t\t\tvar annotation = item.data.name;\n"
-                + "\t\t\tvar keyLower = \"button-\"+annotation.toLowerCase();\n"
-                + "\t\t\tif (annotation in selected) {\n"
-                + "\t\t   \t\tdelete selected[annotation];\t\n"
-                + "\t\t\t\t$(\"button.\"+keyLower).removeClass(keyLower);\n"
-                + "\t\t\t} else {\n"
-                + "\t\t\t\tselected[annotation] = true;\n"
-                + "\t\t\t\t$(\"button:contains('\"+annotation+\"')\").addClass(keyLower);\n"
-                + "\t\t\t}\n"
-                + "\t\t\tresetView();\n"
-                + "\n"
-                + "\t\t}\n"
-                + "\n"
-                + "\t\t//draws list based on selected buttons\n"
-                + "\t\tfunction resetView() {\n"
-                + "\t\t\t$(\"#log\").empty();\n"
-                + "\t\t\t$.each(data, function(key, value) {\n"
-                + "\t\t\t\t//console.log(key);\n"
-                + "\t\t\t\tif (key in selected) {\n"
-                + "\t\t\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                + "\t\t\t\t\t$.each(value, function(index, log) {\n"
-                + "\t\t\t\t\t$(\"#log\").append(\"<li>\"+ \"<span class='pure-button \" + keyLower + \"'>\"+ key + \"</span>\" + log+\"</li>\");\n"
-                + "\t\t\t\t\t});\n"
-                + "\t\t\t\t}\n"
-                + "\t\t\t});\n"
-                + "\t\t}\n"
-                + "\n"
-                + "\t\t//creates buttons\n"
-                + "\t\t$.each(data, function(key, value) {\n"
-                + "\t\t\t//console.info(key);\n"
-                + "\t\t\t//console.info(value);\n"
-                + "\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                + "\t\t\tselected[key] = true;\n"
-                + "\t\t\tlen = value.length;\n"
-                + "\t\t\t$(\"#buttons\").append(\"<button class='pure-button \" + keyLower + \"'>\"+key+ \" (\" + len + \")</button>\");\n"
-                + "\t\t\t$(\".\"+keyLower).on(\"click\", {name: key}, refilter);\n"
-                + "\t\t});\n"
-                + "\n"
-                + "\t\tresetView();\n"
-                + "";
-            println(js);
-            println("\t</script>");
+            if (!isIndexFile) {
+                println("<ul id=\"log\">");
+                writeAnnotations();
+                println("</ul>");
+            }
 
             println("</body></html>");
 
             close();
         }
 
+        /**
+         * Writes annotations as LI html elements
+         */
+        private void writeAnnotations() {
+            String annotationFMT = "<li>%s</li>";
+            for (Map.Entry<String, String> annotation: writerAnnotations.entries()) {
+                print(String.format(annotationFMT, annotation.getValue()));
+            }
+        }
+
         private void println(String bodyhtml) {
             out.println(bodyhtml);
+        }
+
+        private void print(String bodyhtml) {
+            out.print(bodyhtml);
         }
 
         private void close() {
@@ -363,7 +335,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
                 
-                mapper.writeValue(jsonGenerator, lannotations.asMap());
+                mapper.writeValue(jsonGenerator, writerAnnotations.asMap());
                 out.println(";");
 
             } catch (IOException ex) {

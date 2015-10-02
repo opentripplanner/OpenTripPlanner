@@ -53,7 +53,7 @@ import java.util.*;
 public abstract class GraphPathToTripPlanConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
-    private static final double MAX_ZAG_DISTANCE = 30;
+    private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
 
     /**
      * Generates a TripPlan from a set of paths
@@ -786,11 +786,9 @@ public abstract class GraphPathToTripPlanConverter {
                 distance = edge.getDistance();
             } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
                     && (!step.bogusName || !edge.hasBogusName())) ||
-                    // if we are on a roundabout now and weren't before, start a new step
-                    edge.isRoundabout() != (roundaboutExit > 0) ||
-                    isLink(edge) && !isLink(backState.getBackEdge())
-                    ) {
-                /* street name has changed, or we've changed state from a roundabout to a street */
+                    edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
+                    isLink(edge) && !isLink(backState.getBackEdge())) {
+                // Street name has changed, or we've gone on to or off of a roundabout.
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
@@ -798,7 +796,6 @@ public abstract class GraphPathToTripPlanConverter {
                     if (streetNameNoParens.equals(roundaboutPreviousStreet)) {
                         step.stayOn = true;
                     }
-                    // localization
                     roundaboutExit = 0;
                 }
                 /* start a new step */
@@ -949,6 +946,9 @@ public abstract class GraphPathToTripPlanConverter {
                         }
                                 
                         else {
+                            // What is a zag? TODO write meaningful documentation for this.
+                            // It appears to mean simplifying out several rapid turns in succession
+                            // from the description.
                             // total hack to remove zags.
                             steps.remove(last);
                             steps.remove(last - 1);

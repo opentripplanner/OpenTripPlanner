@@ -13,12 +13,14 @@
 
 package org.opentripplanner.visualizer;
 
-import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisualTraverseVisitor implements TraverseVisitor {
+    private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 
     private ShowGraph gui;
 
@@ -46,7 +48,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
             try {
                 Thread.sleep(SLEEP_LEN);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.warn("interrupted", e);
             }
         }
         gui.addNewSPTEdge( state );

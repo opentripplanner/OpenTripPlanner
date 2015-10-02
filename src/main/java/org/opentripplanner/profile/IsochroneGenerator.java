@@ -30,6 +30,11 @@ public abstract class IsochroneGenerator {
 
     public static final double GRID_SIZE_METERS = 300;
 
+    // Off-road max distance MUST be APPROX EQUALS to the grid precision
+    // TODO: Loosen this restriction (by adding more closing samples).
+    // Change the 0.8 magic factor here with caution.
+    public static final double WALK_DISTANCE_GRID_SIZE_RATIO = 0.8;
+
     /**
      * Make a ZSampleGrid from a PointSet and a parallel array of travel times for that PointSet.
      * Those times could come from a ResultSetWithTimes or directly from a PropagatedTimesStore, which has one
@@ -41,11 +46,7 @@ public abstract class IsochroneGenerator {
      * @return a grid suitable for making isochrones, based on an arbitrary PointSet and times to reach all those points.
      */
     public static ZSampleGrid makeGrid (PointSet pointSet, int[] times, double walkSpeed) {
-
-        // Off-road max distance MUST be APPROX EQUALS to the grid precision
-        // TODO: Loosen this restriction (by adding more closing samples).
-        // Change the 0.8 magic factor here with caution.
-        final double D0 = 0.8 * GRID_SIZE_METERS; // offroad walk distance roughly grid size
+        final double D0 = WALK_DISTANCE_GRID_SIZE_RATIO * GRID_SIZE_METERS; // offroad walk distance roughly grid size
         final double V0 = walkSpeed; // off-road walk speed in m/sec
         Coordinate coordinateOrigin = pointSet.getCoordinate(0); // Use the first feature as the center of the projection
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));

@@ -13,6 +13,14 @@
 
 package org.opentripplanner.geocoder.yahoo;
 
+import com.vividsolutions.jts.geom.Envelope;
+import org.opentripplanner.geocoder.Geocoder;
+import org.opentripplanner.geocoder.GeocoderResult;
+import org.opentripplanner.geocoder.GeocoderResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,15 +30,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
-import org.opentripplanner.geocoder.Geocoder;
-import org.opentripplanner.geocoder.GeocoderResult;
-import org.opentripplanner.geocoder.GeocoderResults;
-
-import com.vividsolutions.jts.geom.Envelope;
-
 public class YahooGeocoder implements Geocoder {
+	private static final Logger LOG = LoggerFactory.getLogger(YahooGeocoder.class);
 
 	private String appId;
 	private String locale;
@@ -78,7 +79,7 @@ public class YahooGeocoder implements Geocoder {
             content = sb.toString();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error("Error parsing geocoder response", e);
 			return noGeocoderResult("Error parsing geocoder response");
 		}
 		

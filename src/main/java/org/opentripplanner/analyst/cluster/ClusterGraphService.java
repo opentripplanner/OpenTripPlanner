@@ -16,6 +16,8 @@ import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.GraphSource.Factory;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Collection;
@@ -36,6 +38,8 @@ public class ClusterGraphService extends GraphService {
 	private Boolean workOffline = false;
 	private AmazonS3Client s3;
 
+	private static final Logger LOG = LoggerFactory.getLogger(GraphService.class);
+
 	// don't use more than 60% of free memory to cache graphs
 	private Map<String,Router> graphMap = Maps.newConcurrentMap();
 	
@@ -53,7 +57,7 @@ public class ClusterGraphService extends GraphService {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.error("exception finding graph {}", graphId, e);
 			}
 			
 			CommandLineParameters params = new CommandLineParameters();

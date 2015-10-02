@@ -14,36 +14,14 @@
 package org.opentripplanner.routing.graph;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.prefs.Preferences;
-
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.linked.TDoubleLinkedList;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.linked.TDoubleLinkedList;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -73,6 +51,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -80,27 +59,20 @@ import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
-
-    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
@@ -186,6 +158,12 @@ public class Graph implements Serializable {
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
+    public boolean hasBikeSharing = false;
+
+    public boolean hasParkRide = false;
+
+    public boolean hasBikeRide = false;
+
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
      * graph updaters defined in the configuration.
@@ -210,6 +188,9 @@ public class Graph implements Serializable {
 
     /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
     public boolean hasScheduledService = false;
+
+    /** A speed source for traffic data */
+    public transient StreetSpeedSnapshotSource streetSpeedSource;
 
     public Graph(Graph basedOn) {
         this();

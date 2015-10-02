@@ -1,7 +1,11 @@
 package org.opentripplanner.analyst;
 
 import com.csvreader.CsvReader;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,12 +32,25 @@ import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.streets.StreetLayer;
+import org.opentripplanner.streets.LinkedPointSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,7 +86,10 @@ public class PointSet implements Serializable {
      * duplication of pointset when used across multiple graphs.
      */
     private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-    
+
+    // For TransportNetworks
+    Map<StreetLayer, LinkedPointSet> linkageCache = new HashMap<>();
+
     /**
      * Map from string IDs to their array indices. This is a view into PointSet.ids, namely its reverse mapping.
      */
@@ -85,6 +105,7 @@ public class PointSet implements Serializable {
      * Null in non-indicator pointsets.
      * TODO remove this if unused, result sets are no longer PointSets.
      */
+    @Deprecated
     public int[][] times;
 
     // The characteristics of the features in this PointSet. This is a column store.
@@ -394,8 +415,7 @@ public class PointSet implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("GeoJSON parsing failure: {}", ex.toString());
-            ex.printStackTrace();
+            LOG.error("GeoJSON parsing failure", ex);
             return null;
         }
         return ret;
@@ -809,7 +829,8 @@ public class PointSet implements Serializable {
         // we check again if the map has been built. It's possible that it would have been built
         // by this method in another thread while this instantiation was blocked.
         if (idIndexMap == null) {
-            idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
+            // make a local object, don't expose to public view until it's built
+            TObjectIntMap idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
             
             for (int i = 0; i < this.capacity; i++) {
                 if (ids[i] != null) {
@@ -821,6 +842,9 @@ public class PointSet implements Serializable {
                     }
                 }
             }
+
+            // now expose to public view; reference assignment is an atomic operation
+            this.idIndexMap = idIndexMap;
         }
     }
 
@@ -857,4 +881,33 @@ public class PointSet implements Serializable {
     public Coordinate getCoordinate(int index) {
         return new Coordinate(lons[index], lats[index]);
     }
+
+    /**
+     * Creates an object similar to a SampleSet but for the new TransitNetwork representation.
+     * Or returns one from the cache if this operation has already been performed.
+     * This is a somewhat slow operation involving a lot of geometry calculations. In some sense the point of making
+     * LinkedPointSets is to cache the relationship between the PointSet and a StreetLayer, so we don't have to
+     * repeatedly do a lot of geometry calculations to temporarily connect the points to the streets.
+     */
+    public LinkedPointSet link (StreetLayer streetLayer) {
+        LinkedPointSet linkedPointSet = linkageCache.get(streetLayer);
+        if (linkedPointSet == null) {
+            linkedPointSet = new LinkedPointSet(this, streetLayer);
+            linkageCache.put(streetLayer, linkedPointSet);
+        }
+        return linkedPointSet;
+    }
+
+    /**
+     * Using getter methods here to allow generating coordinates and geometries on demand instead of storing them.
+     * This would allow for implicit geometry, as in a regular grid of points.
+     */
+    public double getLat (int i) {
+        return lats[i];
+    }
+
+    public double getLon (int i) {
+        return lons[i];
+    }
+
 }

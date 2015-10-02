@@ -55,6 +55,9 @@ public class GraphIndex {
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
     private static final int CLUSTER_RADIUS = 400; // meters
 
+    /** maximum distance to walk after leaving transit in Analyst */
+    public static final int MAX_WALK_METERS = 2000;
+
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Agency> agencyForId = Maps.newHashMap();
@@ -441,7 +444,7 @@ public class GraphIndex {
         if (stopTreeCache == null) {
             synchronized (this) {
                 if (stopTreeCache == null) {
-                    stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
+                    stopTreeCache = new StopTreeCache(graph, MAX_WALK_METERS); // TODO make this max-distance variable
                 }
             }
         }
