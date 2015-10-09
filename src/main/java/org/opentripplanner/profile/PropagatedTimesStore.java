@@ -334,7 +334,10 @@ public class PropagatedTimesStore {
          */
         PERCENTILE,
 
-        /** Take the min and the max of the experienced of the experienced times. Only valid for scheduled services. */
+        /**
+         * Take the min and the max of the experienced of the experienced times. Monte Carlo simulations also include
+         * one run with worst-case and one run with best-case boarding, so this is valid even for frequency service.
+         */
         MIN_MAX
     }
 }
