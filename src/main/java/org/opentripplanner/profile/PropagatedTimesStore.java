@@ -204,9 +204,9 @@ public class PropagatedTimesStore {
      */
     public ResultEnvelope makeIsochronesForVertices () {
         ResultEnvelope envelope = new ResultEnvelope();
-        envelope.worstCase = makeIsochroneForVertices(mins);
+        envelope.bestCase = makeIsochroneForVertices(mins);
         envelope.avgCase = makeIsochroneForVertices(avgs);
-        envelope.bestCase = makeIsochroneForVertices(maxs);
+        envelope.worstCase = makeIsochroneForVertices(maxs);
         return envelope;
     }
 
