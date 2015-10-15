@@ -60,18 +60,20 @@ public class PropagatedTimesStore {
     Graph graph;
     int size;
     int[] mins, maxs, avgs;
+    ProfileRequest req;
 
     // number of times to bootstrap the mean.
     public final int N_BOOTSTRAPS = 400;
 
     private static final Random random = new Random();
 
-    public PropagatedTimesStore(Graph graph) {
-        this(graph, Vertex.getMaxIndex());
+    public PropagatedTimesStore(Graph graph, ProfileRequest req) {
+        this(graph, req, Vertex.getMaxIndex());
     }
 
-    public PropagatedTimesStore(Graph graph, int size) {
+    public PropagatedTimesStore(Graph graph, ProfileRequest req, int size) {
         this.graph = graph;
+        this.req = req;
 
         this.size = size;
         mins = new int[size];
@@ -149,7 +151,7 @@ public class PropagatedTimesStore {
             // TODO: due to multiple paths to a target the distribution is not symmetrical though - evaluate the
             // effect of this. Also, transfers muddy the concept of "worst frequency" since there is variation in mid-trip
             // wait times as well.
-            if (count >= times.length / 2)
+            if (count >= times.length * req.reachabilityThreshold)
                 avgs[target] = sum / count;
 
             // TODO: correctly handle partial accessibility for bootstrap and percentile options.

@@ -181,7 +181,7 @@ public class RepeatedRaptorProfileRouter {
             ts.initialStopCount = transitStopAccessTimes.size();
         } else {
             // Nontransit case: skip transit routing and make a propagated times store based on only one row.
-            propagatedTimesStore = new PropagatedTimesStore(graph, nonTransitTimes.length);
+            propagatedTimesStore = new PropagatedTimesStore(graph, request, nonTransitTimes.length);
             int[][] singleRoundResults = new int[1][];
             singleRoundResults[0] = nonTransitTimes;
             propagatedTimesStore.setFromArray(singleRoundResults,

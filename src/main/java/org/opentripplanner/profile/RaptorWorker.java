@@ -140,7 +140,7 @@ public class RaptorWorker {
             initialStops.put(stopIndex, accessTime);
         }
 
-        PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph, data.nTargets);
+        PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph, this.req, data.nTargets);
 
         // optimization: if no schedules, only run Monte Carlo
         int fromTime = req.fromTime;
