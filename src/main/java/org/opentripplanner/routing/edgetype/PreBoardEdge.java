@@ -122,7 +122,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
     }
 
     public String toString() {
-        return "preboard edge at stop " + fromv;
+        return "PreBoardEdge at stop " + fromv;
     }
 
 }

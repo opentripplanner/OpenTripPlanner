@@ -137,6 +137,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         RoutingContext rctx    = s0.getContext();
         RoutingRequest options = s0.getOptions();
 
+        // Forbid taking shortcuts composed of two board-alight edges in a row. Also avoids spurious leg transitions.
+        if (s0.backEdge instanceof TransitBoardAlight) {
+            return null;
+        }
+
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
             return null;

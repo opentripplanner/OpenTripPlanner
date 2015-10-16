@@ -11,6 +11,7 @@ import java.io.Serializable;
  * All the modifiable parameters for profile routing.
  */
 public class ProfileRequest implements Serializable, Cloneable {
+    private static final long serialVersionUID = -6501962907644662303L;
 
     /** The latitude of the origin. */
     public double fromLat;
@@ -96,6 +97,34 @@ public class ProfileRequest implements Serializable, Cloneable {
     
     /** If true, disable all goal direction and propagate results to the street network */
     public boolean analyst = false;
+
+    /**
+     * What is the minimum proportion of the time for which a destination must be accessible for it to be included in
+     * the average?
+     *
+     * This avoids issues where destinations are reachable for some very small percentage of the time, either because
+     * there is a single departure near the start of the time window, or because they take approximately 2 hours
+     * (the default maximum cutoff) to reach.
+
+     * Consider a search run with time window 7AM to 9AM, and an origin and destination connected by an express
+     * bus that runs once at 7:05. For the first five minutes of the time window, accessibility is very good.
+     * For the rest, there is no accessibility; if we didn't have this rule in place, the average would be the average
+     * of the time the destination is reachable, and the time it is unreachable would be excluded from the calculation
+     * (see issue 2148)
+
+     * There is another issue that this rule does not completely address. Consider a trip that takes 1:45
+     * exclusive of wait time and runs every half-hour. Half the time it takes less than two hours and is considered
+     * and half the time it takes more than two hours and is excluded, so the average is biased low on very long trips.
+     * This rule catches the most egregious cases (say where we average only the best four minutes out of a two-hour
+     * span) but does not completely address the issue. However if you're looking at a time cutoff significantly
+     * less than two hours, it's not a big problem. Significantly less is half the headway of your least-frequent service, because
+     * if there is a trip on your least-frequent service that takes on average the time cutoff plus one minute
+     * it will be unbiased and considered unreachable iff the longest trip is less than two hours, which it has
+     * to be if the time cutoff plus half the headway is less than two hours, assuming a symmetric travel time
+     *
+     * The default is 0.5.
+     */
+    public float reachabilityThreshold = 0.5f;
 
     /** What assumption should be used when boarding frequency vehicles? */
     public RaptorWorkerTimetable.BoardingAssumption boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.RANDOM;

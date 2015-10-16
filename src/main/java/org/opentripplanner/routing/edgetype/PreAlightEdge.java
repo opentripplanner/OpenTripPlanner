@@ -123,7 +123,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
     }
 
     public String toString() {
-        return "prealight edge at stop " + tov;
+        return "PreAlightEdge at stop " + tov;
     }
 
 }

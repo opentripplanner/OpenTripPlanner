@@ -60,18 +60,20 @@ public class PropagatedTimesStore {
     Graph graph;
     int size;
     int[] mins, maxs, avgs;
+    ProfileRequest req;
 
     // number of times to bootstrap the mean.
     public final int N_BOOTSTRAPS = 400;
 
     private static final Random random = new Random();
 
-    public PropagatedTimesStore(Graph graph) {
-        this(graph, Vertex.getMaxIndex());
+    public PropagatedTimesStore(Graph graph, ProfileRequest req) {
+        this(graph, req, Vertex.getMaxIndex());
     }
 
-    public PropagatedTimesStore(Graph graph, int size) {
+    public PropagatedTimesStore(Graph graph, ProfileRequest req, int size) {
         this.graph = graph;
+        this.req = req;
 
         this.size = size;
         mins = new int[size];
@@ -83,7 +85,7 @@ public class PropagatedTimesStore {
     }
 
     /**
-     * @param times for search (varying departure time), an array of travel times to each transit stop.
+     * @param times for search (varying departure time), an array of travel times to each destination.
      */
     public void setFromArray(int[][] times, ConfidenceCalculationMethod confidenceCalculationMethod) {
         if (times.length == 0)
@@ -91,7 +93,7 @@ public class PropagatedTimesStore {
             return;
 
         // assume array is rectangular
-        int stops = times[0].length;
+        int nTargets = times[0].length;
 
         // cache random numbers. This should be fine as we're mixing it with the number of minutes
         // at which each destination is accessible, which is sometimes not 120, as well as the stop
@@ -103,8 +105,8 @@ public class PropagatedTimesStore {
         int[] randomNumbers = random.ints().limit(10007).map(Math::abs).toArray();
         int nextRandom = 0;
 
-        // loop over stops on the outside so we can bootstrap
-        STOPS: for (int stop = 0; stop < stops; stop++) {
+        // loop over targets on the outside so we can bootstrap
+        TARGETS: for (int target = 0; target < nTargets; target++) {
             // compute the average
             int sum = 0;
             int count = 0;
@@ -112,19 +114,47 @@ public class PropagatedTimesStore {
             TIntList timeList = new TIntArrayList();
 
             ITERATIONS: for (int i = 0; i < times.length; i++) {
-                if (times[i][stop] == RaptorWorker.UNREACHED)
+                if (times[i][target] == RaptorWorker.UNREACHED)
                     continue ITERATIONS;
 
-                sum += times[i][stop];
+                sum += times[i][target];
                 count++;
-                timeList.add(times[i][stop]);
+                timeList.add(times[i][target]);
             }
 
+            // never reachable
             if (count == 0)
-                continue STOPS;
+                continue TARGETS;
 
-            avgs[stop] = sum / count;
+            // if the destination is reachable less than half the time, consider it unreachable "on average".
+            // This avoids issues where destinations are reachable for some very small percentage of the time, either because
+            // there is a single departure near the start of the time window, or because they take approximately 2 hours
+            // (the default maximum cutoff) to reach.
 
+            // Consider a search run with time window 7AM to 9AM, and an origin and destination connected by an express
+            // bus that runs once at 7:05. For the first five minutes of the time window, accessibility is very good.
+            // For the rest, there is no accessibility; if we didn't have this rule in place, the average would be the average
+            // of the time the destination is reachable, and the time it is unreachable would be excluded from the calculation
+            // (see issue 2148)
+
+            // There is another issue that this rule does not completely address. Consider a trip that takes 1:45
+            // exclusive of wait time and runs every half-hour. Half the time it takes less than two hours and is considered
+            // and half the time it takes more than two hours and is excluded, so the average is biased low on very long trips.
+            // This rule catches the most egregious cases (say where we average only the best four minutes out of a two-hour
+            // span) but does not completely address the issue. However if you're looking at a time cutoff significantly
+            // less than two hours, it's not a big problem. Significantly less is half the headway of your least-frequent service, because
+            // if there is a trip on your least-frequent service that takes on average the time cutoff plus one minute
+            // it will be unbiased and considered unreachable iff the longest trip is less than two hours, which it has
+            // to be if the time cutoff plus half the headway is less than two hours, assuming a symmetric travel time
+            // distribution.
+
+            // TODO: due to multiple paths to a target the distribution is not symmetrical though - evaluate the
+            // effect of this. Also, transfers muddy the concept of "worst frequency" since there is variation in mid-trip
+            // wait times as well.
+            if (count >= times.length * req.reachabilityThreshold)
+                avgs[target] = sum / count;
+
+            // TODO: correctly handle partial accessibility for bootstrap and percentile options.
             switch (confidenceCalculationMethod) {
             case BOOTSTRAP:
                 // now bootstrap out a 95% confidence interval on the time
@@ -144,22 +174,27 @@ public class PropagatedTimesStore {
 
                 Arrays.sort(bootMeans);
                 // 2.5 percentile of distribution of means
-                mins[stop] = bootMeans[N_BOOTSTRAPS / 40];
+                mins[target] = bootMeans[N_BOOTSTRAPS / 40];
                 // 97.5 percentile of distribution of means
-                maxs[stop] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
+                maxs[target] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
                 break;
             case PERCENTILE:
                 timeList.sort();
-                mins[stop] = timeList.get(timeList.size() / 40);
-                maxs[stop] = timeList.get(39 * timeList.size() / 40);
+                mins[target] = timeList.get(timeList.size() / 40);
+                maxs[target] = timeList.get(39 * timeList.size() / 40);
                 break;
             case NONE:
-                mins[stop] = maxs[stop] = avgs[stop];
+                mins[target] = maxs[target] = avgs[target];
                 break;
             case MIN_MAX:
             default:
-                mins[stop] = timeList.min();
-                maxs[stop] = timeList.max();
+                mins[target] = timeList.min();
+
+                // worst case: if it is sometimes unreachable, worst case is unreachable; otherwise use the max from the
+                // time list.
+                if (count == times.length)
+                    maxs[target] = timeList.max();
+
                 break;
             }
         }
@@ -204,9 +239,9 @@ public class PropagatedTimesStore {
      */
     public ResultEnvelope makeIsochronesForVertices () {
         ResultEnvelope envelope = new ResultEnvelope();
-        envelope.worstCase = makeIsochroneForVertices(mins);
+        envelope.bestCase = makeIsochroneForVertices(mins);
         envelope.avgCase = makeIsochroneForVertices(avgs);
-        envelope.bestCase = makeIsochroneForVertices(maxs);
+        envelope.worstCase = makeIsochroneForVertices(maxs);
         return envelope;
     }
 
@@ -334,7 +369,10 @@ public class PropagatedTimesStore {
          */
         PERCENTILE,
 
-        /** Take the min and the max of the experienced of the experienced times. Only valid for scheduled services. */
+        /**
+         * Take the min and the max of the experienced of the experienced times. Monte Carlo simulations also include
+         * one run with worst-case and one run with best-case boarding, so this is valid even for frequency service.
+         */
         MIN_MAX
     }
 }

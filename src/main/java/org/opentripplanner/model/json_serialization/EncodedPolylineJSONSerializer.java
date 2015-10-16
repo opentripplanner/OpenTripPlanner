@@ -40,7 +40,7 @@ public class EncodedPolylineJSONSerializer extends JsonSerializer<Geometry> {
         Coordinate[] lineCoords = arg.getCoordinates();
         List<Coordinate> coords = Arrays.asList(lineCoords);
         
-        jgen.writeObject(PolylineEncoder.createEncodings(coords));
+        jgen.writeObject(PolylineEncoder.createEncodings(coords).getPoints());
     }
 
     @Override

@@ -31,10 +31,9 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -265,8 +264,14 @@ public class RaptorWorkerData implements Serializable {
                 if (timetable == null)
                     continue;
 
+                timetable.dataIndex = timetablesForPattern.size();
                 timetablesForPattern.add(timetable);
                 timetable.raptorData = this;
+
+                if (timetable.hasFrequencyTrips())
+                    this.hasFrequencies = true;
+                if (timetable.hasScheduledTrips())
+                    this.hasSchedules = true;
 
                 // TODO: patternForIndex, indexForPattern
 
@@ -301,9 +306,14 @@ public class RaptorWorkerData implements Serializable {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = true;
             rr.from = rr.to = new GenericLocation(t.lat, t.lon);
-            rr.setRoutingContext(graph);
-            rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
-
+            try {
+                rr.setRoutingContext(graph);
+            } catch (VertexNotFoundException vnfe) {
+                LOG.warn("Temporary stop at {}, {} not connected to graph", t.lat, t.lon);
+                temporaryStopTreeCache.put(t.index, new int[0]);
+                temporaryTransfers.put(t.index, new TIntIntHashMap());
+                continue;
+            }
             // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
             // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
             // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
@@ -357,7 +367,6 @@ public class RaptorWorkerData implements Serializable {
 
             // reset routing context because temporary edges face the wrong way
             rr.setRoutingContext(graph);
-            rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
             spt = astar.getShortestPathTree(rr, 5);
 
             // NB using walk speed of 1 m/s here since we want meters, not seconds
@@ -399,7 +408,7 @@ public class RaptorWorkerData implements Serializable {
             }
         }
 
-        for (int stop = 0; stop < stopForIndex.size(); stop++) {
+        for (int stop = 0; patternsForStopList.containsKey(stop); stop++) {
             patternsForStop.add(patternsForStopList.get(stop).toArray());
         }
 
@@ -604,7 +613,7 @@ public class RaptorWorkerData implements Serializable {
         }
 
         ts.stopCount = nStops = stopForIndex.size();
-        ts.patternCount = nPatterns = patternForIndex.size();
+        ts.patternCount = nPatterns = timetablesForPattern.size();
         ts.targetCount = nTargets;
     }
 
@@ -634,7 +643,6 @@ public class RaptorWorkerData implements Serializable {
             
             AddTripPattern.TemporaryStop tstop = it.key(); 
             if (tstop.sample == null) {
-                LOG.warn("Temporary stop unlinked: {}", tstop);
                 continue;
             }
 

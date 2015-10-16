@@ -35,7 +35,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -114,8 +113,6 @@ public class RoutingContext implements Cloneable {
      * timeouts is applied.
      */
     public long searchAbortTime = 0;
-
-    public PathParser[] pathParsers = new PathParser[] {};
 
     public Vertex startingStop;
 

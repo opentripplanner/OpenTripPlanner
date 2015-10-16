@@ -8,8 +8,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.pathparser.ProfilePropagationPathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -38,7 +36,6 @@ public class StopTreeCache {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
-            rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
             AStar astar = new AStar();
             rr.longDistance = true;
             rr.setNumItineraries(1);

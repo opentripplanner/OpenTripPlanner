@@ -22,8 +22,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -183,7 +181,7 @@ public class RepeatedRaptorProfileRouter {
             ts.initialStopCount = transitStopAccessTimes.size();
         } else {
             // Nontransit case: skip transit routing and make a propagated times store based on only one row.
-            propagatedTimesStore = new PropagatedTimesStore(graph, nonTransitTimes.length);
+            propagatedTimesStore = new PropagatedTimesStore(graph, request, nonTransitTimes.length);
             int[][] singleRoundResults = new int[1][];
             singleRoundResults[0] = nonTransitTimes;
             propagatedTimesStore.setFromArray(singleRoundResults,
@@ -233,7 +231,6 @@ public class RepeatedRaptorProfileRouter {
         //rr.walkSpeed = request.walkSpeed;
         rr.to = rr.from;
         rr.setRoutingContext(graph);
-        rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
         rr.walkSpeed = request.walkSpeed;
