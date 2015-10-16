@@ -39,8 +39,8 @@ public class PatternInterlineDwellTest extends GtfsTest {
         // We should arrive at the destination using two legs, both of which are on
         // the same route and with zero transfers.
         Leg[] legs = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
-        assertEquals(legs[0].routeId, "route1");
-        assertEquals(legs[1].routeId, "route1");
+        assertEquals(legs[0].routeId.getId(), "route1");
+        assertEquals(legs[1].routeId.getId(), "route1");
         assertTrue(itinerary.transfers == 0);
     }
 
