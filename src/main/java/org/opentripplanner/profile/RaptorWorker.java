@@ -33,7 +33,10 @@ public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);
     public static final int UNREACHED = Integer.MAX_VALUE;
-    static final int MAX_DURATION = 120 * 60;
+
+    // this should be somewhat longer than the cutoff in the UI because we don't want to take away, say,
+    // the longer half of the ways to reach a destination and take the average of the rest
+    static final int MAX_DURATION = 180 * 60;
 
     /**
      * The number of randomized frequency schedule draws to take for each minute of the search.
