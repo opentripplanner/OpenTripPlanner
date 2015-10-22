@@ -1081,7 +1081,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         protected I18NString getNameForWay(OSMWithTags way, String id) {
             I18NString name = way.getAssumedName();
 
-            if (customNamer != null) {
+            if (customNamer != null && name != null) {
                 name = new NonLocalizedString(customNamer.name(way, name.toString()));
             }
 
