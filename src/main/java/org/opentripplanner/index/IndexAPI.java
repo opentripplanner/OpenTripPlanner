@@ -524,7 +524,31 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
-    }    
+    }
+
+    /** Return timetable for all timepoints on all trips operating on
+     *  the given date on the given pattern. */
+    @GET
+    @Path("/patterns/{patternId}/timetables/{date}")
+    public Response getTimetableForPattern (
+            @PathParam("patternId") String patternIdString,
+            @PathParam("date") String dateString) {
+        ServiceDate date;
+        try {
+            date = ServiceDate.parseString(dateString);
+        } catch (ParseException e){
+            return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+        }
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            return Response.status(Status.OK).entity(
+                index.timetableForPattern(pattern, date)).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+
 
     // TODO include pattern ID for each trip in responses
 

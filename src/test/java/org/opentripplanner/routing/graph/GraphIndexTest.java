@@ -1,10 +1,14 @@
 package org.opentripplanner.routing.graph;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -14,7 +18,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that
@@ -103,4 +109,40 @@ public class GraphIndexTest extends GtfsTest {
         // graph.index.luceneIndex
     }
 
+    public void testTimetable() {
+        ServiceDate date;
+        try {
+            date = ServiceDate.parseString("20100101");  // Friday
+        } catch (ParseException e){
+            return;
+        }
+
+        List<Map<Integer, Integer>> expected = Lists.newArrayList(
+                ImmutableMap.of(0, 18000, 1, 19800, 2, 21600),
+                // The second stop on second trip isn't a timepoint
+                ImmutableMap.of(0, 82800, 2, 86400),
+                ImmutableMap.of(0, 85200, 1, 87000, 2, 88800));
+        assertEquals(
+            expected,
+            graph.index.timetableForPattern(
+                graph.index.patternsForRoute.get(graph.index.routeForId.get(new AgencyAndId("agency", "4")))
+                    .iterator().next(),
+                date));
+    }
+
+    public void testTimetableOnDayWithoutService() {
+        ServiceDate date;
+        try {
+            date = ServiceDate.parseString("20100102");  // Saturday
+        } catch (ParseException e){
+            return;
+        }
+
+        assertEquals(
+            Lists.newArrayList(), // Route 4 has service only on weekdays, so result should be empty
+            graph.index.timetableForPattern(
+                graph.index.patternsForRoute.get(graph.index.routeForId.get(new AgencyAndId("agency", "4")))
+                    .iterator().next(),
+                date));
+    }
 }
