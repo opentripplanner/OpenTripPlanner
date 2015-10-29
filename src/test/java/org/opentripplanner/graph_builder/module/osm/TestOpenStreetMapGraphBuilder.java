@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -160,12 +161,20 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         }
     }
 
-    @Test
-    public void testBuildAreaWithoutVisibility() throws Exception {
+    /**
+     * This reads test file with area
+     * and tests if it can be routed if visibility is used and if it isn't
+     *
+     * Routing needs to be successful in both options since without visibility calculation
+     * area rings are used.
+     * @param skipVisibility if true visibility calculations are skipped
+     * @throws UnsupportedEncodingException
+     */
+    private void testBuildingAreas(boolean skipVisibility) throws UnsupportedEncodingException {
         Graph gg = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.skipVisibility = true;
+        loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
@@ -198,46 +207,16 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         for (GraphPath path: pathList) {
             assertFalse(path.states.isEmpty());
         }
+    }
 
+    @Test
+    public void testBuildAreaWithoutVisibility() throws Exception {
+        testBuildingAreas(true);
     }
 
     @Test
     public void testBuildAreaWithVisibility() throws Exception {
-        Graph gg = new Graph();
-
-        OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.skipVisibility = false;
-        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
-
-        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.gz").getFile(), "UTF-8"));
-
-        provider.setPath(file);
-        loader.setProvider(provider);
-        loader.buildGraph(gg, extra);
-
-        new StreetVertexIndexServiceImpl(gg);
-
-        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
-        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", gg));
-
-        Router a = otpServer.getGraphService().getRouter("A");
-
-        RoutingRequest request = new RoutingRequest("WALK");
-
-        Vertex bottomV = gg.getVertex("osm:node:580290955");
-        Vertex topV = gg.getVertex("osm:node:559271124");
-
-        request.setRoutingContext(a.graph, bottomV, topV);
-
-        GraphPathFinder graphPathFinder = new GraphPathFinder(a);
-        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
-
-        assertNotNull(pathList);
-        assertFalse(pathList.isEmpty());
-        for (GraphPath path: pathList) {
-            assertFalse(path.states.isEmpty());
-        }
+        testBuildingAreas(false);
 
     }
 
