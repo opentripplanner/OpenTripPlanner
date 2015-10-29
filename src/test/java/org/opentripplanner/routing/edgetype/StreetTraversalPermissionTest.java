@@ -77,4 +77,17 @@ public class StreetTraversalPermissionTest {
         assertFalse(perm.allowsAnything());
         assertTrue(perm.allowsNothing());
     }
+
+    @Test
+    public void testIntersect() {
+        StreetTraversalPermission perm = StreetTraversalPermission.ALL;
+        StreetTraversalPermission bike_walk = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+
+        StreetTraversalPermission combined = perm.intersection(bike_walk);
+
+        assertTrue(perm.allows(StreetTraversalPermission.ALL));
+        assertTrue(combined.allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
+        assertFalse(combined.allows(StreetTraversalPermission.CAR));
+        assertTrue(bike_walk.allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
+    }
 }

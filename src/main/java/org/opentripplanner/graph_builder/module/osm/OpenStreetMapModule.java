@@ -603,7 +603,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2
                             || nodes.subList(0, i).contains(nodes.get(i))
                             || osmEndNode.hasTag("ele")
-                            || osmEndNode.isStop()) {
+                            || osmEndNode.isStop()
+                            || osmEndNode.isBollard()) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
@@ -1163,6 +1164,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
                         iv = tsv;
                     }
+                }
+
+                if (node.isBollard()) {
+                    BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
+                    bv.setBarrierPermissions(OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions));
+                    iv = bv;
                 }
 
                 if (iv == null) {
