@@ -23,10 +23,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.Graphwide;
-import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
-import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
+import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -790,20 +787,28 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
                 for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
                     if (restrictionTag.possibleFrom.isEmpty()) {
-                        LOG.debug("No from edge found for " + restrictionTag);
+                        graph.addBuilderAnnotation(new TurnRestrictionBad(restrictionTag.relationOSMID,
+                            "No from edge found"));
                         continue;
                     }
                     if (restrictionTag.possibleTo.isEmpty()) {
-                        LOG.debug("No to edge found for " + restrictionTag);
+                        graph.addBuilderAnnotation(
+                            new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                "No to edge found"));
                         continue;
                     }
                     for (StreetEdge from : restrictionTag.possibleFrom) {
                         if (from == null) {
-                            LOG.warn("from-edge is null in turn " + restrictionTag);
+                            graph.addBuilderAnnotation(
+                                new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                    "from-edge is null"));
                             continue;
                         }
                         for (StreetEdge to : restrictionTag.possibleTo) {
                             if (from == null || to == null) {
+                                graph.addBuilderAnnotation(
+                                    new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                        "to-edge is null"));
                                 continue;
                             }
                             int angleDiff = from.getOutAngle() - to.getInAngle();
@@ -813,20 +818,35 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             switch (restrictionTag.direction) {
                             case LEFT:
                                 if (angleDiff >= 160) {
+                                    graph.addBuilderAnnotation(
+                                        new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                            "Left turn restriction is not on edges which turn left"));
                                     continue; // not a left turn
                                 }
                                 break;
                             case RIGHT:
-                                if (angleDiff <= 200)
+                                if (angleDiff <= 200) {
+                                    graph.addBuilderAnnotation(
+                                        new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                            "Right turn restriction is not on edges which turn right"));
                                     continue; // not a right turn
+                                }
                                 break;
                             case U:
-                                if ((angleDiff <= 150 || angleDiff > 210))
+                                if ((angleDiff <= 150 || angleDiff > 210)) {
+                                    graph.addBuilderAnnotation(
+                                        new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                            "U-turn restriction is not on U-turn"));
                                     continue; // not a U turn
+                                }
                                 break;
                             case STRAIGHT:
-                                if (angleDiff >= 30 && angleDiff < 330)
+                                if (angleDiff >= 30 && angleDiff < 330) {
+                                    graph.addBuilderAnnotation(
+                                        new TurnRestrictionBad(restrictionTag.relationOSMID,
+                                            "Straight turn restriction is not on edges which go straight"));
                                     continue; // not straight
+                                }
                                 break;
                             }
                             TurnRestriction restriction = new TurnRestriction();
