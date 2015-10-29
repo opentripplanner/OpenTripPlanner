@@ -3,8 +3,7 @@
 ## OpenTripPlanner
 _Note: this documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**opentripplanner.org**](http://www.opentripplanner.org)_
 
-**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license.
-The code is under active development with a variety of [deployments](Deployments) around the world, and we are working toward a 1.0 release in the coming year.
+**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license. The code is under active development with a variety of [deployments](Deployments) around the world, and we are working toward a 1.0 release for the end of 2015.
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
 
@@ -28,7 +27,7 @@ If you want to get started right away running your own OTP instance, the best pl
 
 [![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
-OpenTripPlanner is presently at **version 0.18.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
+OpenTripPlanner is presently at **version 0.19.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors

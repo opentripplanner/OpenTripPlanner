@@ -4,13 +4,8 @@ This page will get you up and running with your own OTP server. If all goes well
 
 ## Get OTP
 
-OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are published
-[here](http://dev.opentripplanner.org/jars/). Grab one of these JARs for the
-[latest released version](http://dev.opentripplanner.org/jars/otp-0.18.0-shaded.jar)
-or if you're feeling adventurous try the
-[bleeding edge development code](http://dev.opentripplanner.org/jars/otp-0.19.0-SNAPSHOT-shaded.jar).
-You may also want to get your own copy of the OTP source code and [build the JAR from scratch](Getting-OTP),
-especially if you plan to do some development yourself.
+OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are published on the Conveyal Maven repository [here](http://maven.conveyal.com/org/opentripplanner/otp/). Grab one of these JARs for the [latest released version 0.19](http://maven.conveyal.com.s3.amazonaws.com/org/opentripplanner/otp/0.19.0/otp-0.19.0-shaded.jar)
+You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP), especially if you plan to do some development yourself.
 
 ## Get some data
 
@@ -59,7 +54,7 @@ If you do not you will need to install a recent OpenJDK or Oracle Java package f
 
 GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory
 when working with the Portland TriMet data set, and several gigabytes for larger inputs. A typical command to start OTP
-looks like `java -Xmx1G -jar otp-0.18.0-shaded.jar <options>`. The `-Xmx` parameter sets
+looks like `java -Xmx1G -jar otp-0.19.0-shaded.jar <options>`. The `-Xmx` parameter sets
 the limit on how much memory OTP is allowed to consume. If you have sufficient memory in your computer,
 set this to a couple of gigabytes; when OTP doesn't have enough "breathing room" it can grind to a halt.
 
@@ -67,7 +62,7 @@ It's possible to analyze the GTFS, OSM and any other input data and save the res
 network (what we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)) to disk.
 For simplicity we'll skip saving this file and start up an OTP server immediately after the graph is built. The command to do so is:
 
-    java -Xmx2G -jar otp-0.18.0-shaded.jar --build /home/username/otp --inMemory
+    java -Xmx2G -jar otp-0.19.0-shaded.jar --build /home/username/otp --inMemory
 
 where `/home/username/otp` should be the directory where you put your input files. The graph build operation should
 take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you can open
