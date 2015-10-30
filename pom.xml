@@ -568,7 +568,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.3.3</version>
+            <version>1.3.5-conveyal-SNAPSHOT</version>
         </dependency>
         <!-- Conveyal GTFS loader, will eventually replace OBA entirely -->
         <dependency>
