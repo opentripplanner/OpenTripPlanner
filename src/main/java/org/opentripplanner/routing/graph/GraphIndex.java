@@ -56,7 +56,7 @@ public class GraphIndex {
     private static final int CLUSTER_RADIUS = 400; // meters
 
     /** maximum distance to walk after leaving transit in Analyst */
-    public static final int MAX_WALK_METERS = 2000;
+    public static final int MAX_WALK_METERS = 3500;
 
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
