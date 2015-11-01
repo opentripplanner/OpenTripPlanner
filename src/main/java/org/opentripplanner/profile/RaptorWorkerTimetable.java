@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
  * within a specific time window. It is used heavily in one-to-many profile routing, where we're interested in seeing
  * how access to opportunities varies over time.
  *
- * This is an alternative representation of all the TripTimes in a single Graph that are running during a particular
- * time range on a particular day. It allows for much faster spatial analysis because it places all
- * data for a single TripPattern in a contiguous region of memory, and because pre-filtering the TripTimes based on
+ * This is an alternative representation of all the TripTimes in a single TripPattern that are running during a
+ * particular time range on a particular day. It packs the times a bit closer together and pre-filters the TripTimes based on
  * whether they are running at all during the time window eliminates run-time checks that need to be performed when we
- * search for the soonest departure.
+ * search for the soonest departure. Note: we're not sure this actually provides a major speedup compared to operating
+ * directly on TripPatterns and TripTimes.
  *
  * Unlike in "normal" OTP searches, we assume non-overtaking (FIFO) vehicle behavior within a single TripPattern,
  * which is generally the case in clean input data. One key difference here is that profile routing and spatial analysis
