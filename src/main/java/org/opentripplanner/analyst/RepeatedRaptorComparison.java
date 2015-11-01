@@ -17,7 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.streets.Histogram;
+import org.opentripplanner.common.Histogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,9 +118,9 @@ public class RepeatedRaptorComparison {
 
         final  BTreeMap<Fun.Tuple3<String, String, ResultEnvelope.Which>, Integer> comparisonResults = comparison;
 
-        org.opentripplanner.streets.Histogram bestCaseHisto = new Histogram("Best case");
-        org.opentripplanner.streets.Histogram avgCaseHisto = new Histogram("Average");
-        org.opentripplanner.streets.Histogram worstCaseHisto = new Histogram("Worst case");
+        Histogram bestCaseHisto = new Histogram("Best case");
+        Histogram avgCaseHisto = new Histogram("Average");
+        Histogram worstCaseHisto = new Histogram("Worst case");
 
         ProfileRequest template = new ProfileRequest();
         template.accessModes = new QualifiedModeSet("WALK");

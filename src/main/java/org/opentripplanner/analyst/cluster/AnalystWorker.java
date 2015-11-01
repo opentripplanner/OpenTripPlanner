@@ -636,11 +636,7 @@ public class AnalystWorker implements Runnable {
         }
 
         try {
-            // jump over to using TransportNetworks if requested
-            if (Boolean.parseBoolean(config.getProperty("use-transport-networks", "false")))
-                new TNAnalystWorker(config).run();
-            else
-                new AnalystWorker(config).run();
+            new AnalystWorker(config).run();
         } catch (Exception e) {
             LOG.error("Error in analyst worker", e);
             return;

@@ -39,8 +39,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.streets.LinkedPointSet;
-import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -686,47 +684,5 @@ public class RaptorWorkerData implements Serializable {
         float distance;
     }
 
-    /**
-     * This is an adapter constructor, which makes Analyst cluster worker data from a new-style TransportNetwork.
-     * RaptorWorkers are (intentionally) very similar to the TransitLayer of TransportNetworks.
-     * For now we'll just perform a copy, filtering out any unused patterns and trips.
-     * TODO study the differences between the two, and merge the two data structures into one class.
-     */
-    public RaptorWorkerData (TransitLayer transitLayer, LinkedPointSet targets, LocalDate date) {
-        if (targets != null && (targets.streetLayer != transitLayer.linkedStreetLayer)) {
-            LOG.error("The supplied targets and the supplied transitLayer are not linked to the same streetLayer.");
-        }
-        // The RaptorWorkerData is a single-job throwaway item. It includes travel times (not distances, to avoid divides)
-        // to a specific PointSet+SampleSet of interest in the task at hand, or to all the street vertices.
-        nStops = transitLayer.getStopCount();
-        nTargets = targets.size();
-        nPatterns = transitLayer.tripPatterns.size();
-        // Copy transfers table.
-        transitLayer.transfersForStop.forEach(t -> transfersForStop.add(t.toArray()));
-        transitLayer.patternsForStop.forEach(p -> patternsForStop.add(p.toArray()));
-        // Copy contiguous zero-based array into a sparse map.
-        indexForStop = new TIntIntHashMap();
-        for (int s = 0; s < transitLayer.streetVertexForStop.size(); s++) {
-            indexForStop.put(s, transitLayer.streetVertexForStop.get(s));
-        }
-        // TODO fn to Eval LinkedSampleSet WRT an SPT map vertex -> travel time. It should be OK to just iterate over the whole target set.
-        // TODO can we just make stop trees on demand? We only need them when linking a target pointset to a TransitNetwork
-        // TODO can we just link backward, from targets to stops? Then a LinkedPointSet can contain links to the street network and the transit stops. However not all target points are reached in a search so iterating this direction may be inefficient. For now I don't have that option, work with the existing data structures.
-        this.targetsForStop.addAll(targets.stopTrees);
-
-        // Copy new-style TransportNetwork TripPatterns to RaptorWorkerTimetables
-        BitSet servicesActive = transitLayer.getActiveServicesForDate(date);
-        for (org.opentripplanner.transit.TripPattern tripPattern : transitLayer.tripPatterns) {
-            // NOTE this is leaving all patterns with zero active trips in the list.
-            // Otherwise we have to re-number all the patterns.
-            RaptorWorkerTimetable timetable = tripPattern.toRaptorWorkerTimetable(servicesActive);
-            timetablesForPattern.add(timetable);
-        }
-        // Currently we only support scheduled services
-        hasSchedules = true;
-        hasFrequencies = false;
-    }
-
-    // At first we're going to use the street vertices as targets and try to just do isochrones.
 
 }
