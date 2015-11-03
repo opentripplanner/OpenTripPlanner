@@ -5,6 +5,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.conveyal.geojson.GeoJsonModule;
+import com.conveyal.r5.R5Main;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -635,11 +636,18 @@ public class AnalystWorker implements Runnable {
             return;
         }
 
-        try {
-            new AnalystWorker(config).run();
-        } catch (Exception e) {
-            LOG.error("Error in analyst worker", e);
-            return;
+        if (Boolean.parseBoolean(config.getProperty("use-transport-networks", "false"))) {
+            // start R5 to work with transport networks
+            LOG.info("Transport network support enabled, deferring computation to R5");
+            com.conveyal.r5.analyst.cluster.AnalystWorker.main(args);
+        }
+        else {
+            try {
+                new AnalystWorker(config).run();
+            } catch (Exception e) {
+                LOG.error("Error in analyst worker", e);
+                return;
+            }
         }
     }
 

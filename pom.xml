@@ -724,6 +724,13 @@
             <artifactId>traffic-engine</artifactId>
             <version>0.2</version>
         </dependency>
+
+        <!-- r5 is needed only so that we can delegate Analyst work to it -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>r5</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
