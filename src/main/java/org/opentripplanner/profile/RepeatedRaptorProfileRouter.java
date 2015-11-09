@@ -184,7 +184,7 @@ public class RepeatedRaptorProfileRouter {
             propagatedTimesStore = new PropagatedTimesStore(graph, request, nonTransitTimes.length);
             int[][] singleRoundResults = new int[1][];
             singleRoundResults[0] = nonTransitTimes;
-            propagatedTimesStore.setFromArray(singleRoundResults,
+            propagatedTimesStore.setFromArray(singleRoundResults, new boolean[] {true},
                     PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         }
         for (int min : propagatedTimesStore.mins) {

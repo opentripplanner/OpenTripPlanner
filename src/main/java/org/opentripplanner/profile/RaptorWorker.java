@@ -180,6 +180,11 @@ public class RaptorWorker {
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
         int[][] timesAtTargetsEachIteration = new int[iterations][data.nTargets];
 
+        // for each iteration, whether it is the result of a schedule or Monte Carlo search, or whether it is an extrema.
+        // extrema are not included in averages.
+        boolean[] includeIterationInAverages = new boolean[iterations];
+        Arrays.fill(includeIterationInAverages, true);
+
         // TODO don't hardwire timestep below
         ts.timeStep = 60;
 
@@ -223,12 +228,19 @@ public class RaptorWorker {
                     // an assumption other than RANDOM, or stops with transfer rules.
                     RaptorWorkerTimetable.BoardingAssumption requestedBoardingAssumption = req.boardingAssumption;
 
-                    if (i == 0 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                    if (i == 0 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM) {
                         req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
-                    else if (i == 1 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                        // don't include extrema in averages
+                        includeIterationInAverages[iteration] = false;
+                    }
+                    else if (i == 1 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM) {
                         req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.BEST_CASE;
+                        // don't include extrema in averages
+                        includeIterationInAverages[iteration] = false;
+                    }
                     else if (requestedBoardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
                         // use a new Monte Carlo draw each time
+                        // included in averages by default
                         offsets.randomize();
 
                     this.runRaptorFrequency(departureTime, bestTimesCopy, bestNonTransferTimesCopy,
@@ -274,7 +286,7 @@ public class RaptorWorker {
         //dumpVariableByte(timesAtTargetsEachMinute);
         // we can use min_max here as we've also run it once with best case and worst case board,
         // so the best and worst cases are meaningful.
-        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration,
+        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration, includeIterationInAverages,
                 PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         return propagatedTimesStore;
     }

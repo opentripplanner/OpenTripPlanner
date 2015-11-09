@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
@@ -86,8 +87,12 @@ public class PropagatedTimesStore {
 
     /**
      * @param times for search (varying departure time), an array of travel times to each destination.
+     * @param includeInAverages for each iteration, whether that iteration should be included in average calculations.
+     *                          In RaptorWorker's Monte Carlo code we also include minima and maxima, which should
+     *                          not be included in averages.
+     *                          Iterations that are not included in averages are still used to determine extrema.
      */
-    public void setFromArray(int[][] times, ConfidenceCalculationMethod confidenceCalculationMethod) {
+    public void setFromArray(int[][] times, boolean[] includeInAverages, ConfidenceCalculationMethod confidenceCalculationMethod) {
         if (times.length == 0)
             // nothing to do
             return;
@@ -105,6 +110,11 @@ public class PropagatedTimesStore {
         int[] randomNumbers = random.ints().limit(10007).map(Math::abs).toArray();
         int nextRandom = 0;
 
+        int effectiveIterations = 0;
+        for (int i = 0; i < includeInAverages.length; i++) {
+            if (includeInAverages[i]) effectiveIterations++;
+        }
+
         // loop over targets on the outside so we can bootstrap
         TARGETS: for (int target = 0; target < nTargets; target++) {
             // compute the average
@@ -117,8 +127,11 @@ public class PropagatedTimesStore {
                 if (times[i][target] == RaptorWorker.UNREACHED)
                     continue ITERATIONS;
 
-                sum += times[i][target];
-                count++;
+                if (includeInAverages[i]) {
+                    sum += times[i][target];
+                    count++;
+                }
+
                 timeList.add(times[i][target]);
             }
 
@@ -151,7 +164,7 @@ public class PropagatedTimesStore {
             // TODO: due to multiple paths to a target the distribution is not symmetrical though - evaluate the
             // effect of this. Also, transfers muddy the concept of "worst frequency" since there is variation in mid-trip
             // wait times as well.
-            if (count >= times.length * req.reachabilityThreshold)
+            if (count >= effectiveIterations * req.reachabilityThreshold)
                 avgs[target] = sum / count;
 
             // TODO: correctly handle partial accessibility for bootstrap and percentile options.
@@ -192,7 +205,8 @@ public class PropagatedTimesStore {
 
                 // worst case: if it is sometimes unreachable, worst case is unreachable; otherwise use the max from the
                 // time list.
-                if (count == times.length)
+                // NB not using count here as it doesn't count iterations that are not included in averages
+                if (timeList.size() == times.length)
                     maxs[target] = timeList.max();
 
                 break;
