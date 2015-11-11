@@ -345,6 +345,25 @@ Bixi, the Dutch OVFiets system, and a generic KML format.
 It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
 
+The generic KML needs to be in format like
+
+```XML
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="citybikes" id="citybikes">
+    <SimpleField name="ID" type="int"></SimpleField>
+</Schema>
+  <Placemark>
+    <name>A Bike Station</name>
+    <ExtendedData><SchemaData schemaUrl="#citybikes">
+        <SimpleData name="ID">0</SimpleData>
+    </SchemaData></ExtendedData>
+      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
+  </Placemark>
+</Document></kml>
+```
+
 ### Configuration
 
 Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer polls the
