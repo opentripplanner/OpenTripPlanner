@@ -29,16 +29,41 @@ public class PropagatedTimesStoreTest extends TestCase {
                 new int[] { RaptorWorker.UNREACHED }
         };
 
-        pts.setFromArray(times, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        pts.setFromArray(times, new boolean[] { true, true, true }, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
 
         // it is reachable at least 0% of the time
         assertEquals(1, pts.avgs[0]);
 
         pr.reachabilityThreshold = 0.5f;
         pts = new PropagatedTimesStore(g, pr, 1);
-        pts.setFromArray(times, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        pts.setFromArray(times, new boolean[] {true, true, true}, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
 
         // it is not reachable 50% of the time
         assertEquals(RaptorWorker.UNREACHED, pts.avgs[0]);
+    }
+
+    /**
+     * Test that adjusting which numbers are included in averages works.
+     * We calculate the min and max for frequency lines, and we don't include the extrema when we do the average.
+     */
+    @Test
+    public static void testAverageInclusion () {
+        ProfileRequest pr = new ProfileRequest();
+        Graph g = new Graph();
+
+        int[][] times = new int[][] {
+                new int[] {1},
+                new int[] {1000}
+        };
+
+        PropagatedTimesStore pts = new PropagatedTimesStore(g, pr, 1);
+        pts.setFromArray(times, new boolean[] { true, true }, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        // average of 1 and 1000 is 500 (int math)
+        assertEquals(500, pts.avgs[0]);
+
+        pts = new PropagatedTimesStore(g, pr, 1);
+        pts.setFromArray(times, new boolean[] { true, false }, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        // 1000 should not be included in average
+        assertEquals(1, pts.avgs[0]);
     }
 }

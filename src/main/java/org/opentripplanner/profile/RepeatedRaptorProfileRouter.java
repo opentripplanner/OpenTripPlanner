@@ -184,7 +184,7 @@ public class RepeatedRaptorProfileRouter {
             propagatedTimesStore = new PropagatedTimesStore(graph, request, nonTransitTimes.length);
             int[][] singleRoundResults = new int[1][];
             singleRoundResults[0] = nonTransitTimes;
-            propagatedTimesStore.setFromArray(singleRoundResults,
+            propagatedTimesStore.setFromArray(singleRoundResults, new boolean[] {true},
                     PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         }
         for (int min : propagatedTimesStore.mins) {
@@ -241,7 +241,7 @@ public class RepeatedRaptorProfileRouter {
         if (data == null) {
             // Non-transit mode. Search out to the full 120 minutes.
             // Should really use directModes.
-            rr.worstTime = rr.dateTime + 120 * 60;
+            rr.worstTime = rr.dateTime + RaptorWorker.MAX_DURATION;
             rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         } else {
             // Transit mode, limit pre-transit travel.

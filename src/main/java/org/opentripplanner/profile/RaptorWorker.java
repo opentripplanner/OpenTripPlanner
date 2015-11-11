@@ -33,6 +33,19 @@ public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);
     public static final int UNREACHED = Integer.MAX_VALUE;
+
+    /**
+     * Destinations with travel time above this threshold are considered unreachable. Note that this will cut off half of the
+     * trips to a particular location if half the time it takes less than the cutoff and half the time more. Use in combination
+     * with the reachability threshold in ProfileRequest to get desired results.
+     *
+     * The fact that there are edge effects here implies a problem with our methodology. We should be taking the approach that
+     * the Accessibility Observatory has taken in which accessibility (rather than travel time) is calculated at each minute.
+     * Alternatively, we could calculate the full OD matrix for each minute and save that to determine whether a particular destination
+     * is reachable in less than x minutes on median for any arbitrary cutoff.
+     *
+     * This should be a number beyond which people would generally consider transit to be completely unreasonable.
+     */
     static final int MAX_DURATION = 120 * 60;
 
     /**
@@ -167,6 +180,11 @@ public class RaptorWorker {
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
         int[][] timesAtTargetsEachIteration = new int[iterations][data.nTargets];
 
+        // for each iteration, whether it is the result of a schedule or Monte Carlo search, or whether it is an extrema.
+        // extrema are not included in averages.
+        boolean[] includeIterationInAverages = new boolean[iterations];
+        Arrays.fill(includeIterationInAverages, true);
+
         // TODO don't hardwire timestep below
         ts.timeStep = 60;
 
@@ -210,12 +228,19 @@ public class RaptorWorker {
                     // an assumption other than RANDOM, or stops with transfer rules.
                     RaptorWorkerTimetable.BoardingAssumption requestedBoardingAssumption = req.boardingAssumption;
 
-                    if (i == 0 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                    if (i == 0 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM) {
                         req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
-                    else if (i == 1 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                        // don't include extrema in averages
+                        includeIterationInAverages[iteration] = false;
+                    }
+                    else if (i == 1 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM) {
                         req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.BEST_CASE;
+                        // don't include extrema in averages
+                        includeIterationInAverages[iteration] = false;
+                    }
                     else if (requestedBoardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
                         // use a new Monte Carlo draw each time
+                        // included in averages by default
                         offsets.randomize();
 
                     this.runRaptorFrequency(departureTime, bestTimesCopy, bestNonTransferTimesCopy,
@@ -261,7 +286,7 @@ public class RaptorWorker {
         //dumpVariableByte(timesAtTargetsEachMinute);
         // we can use min_max here as we've also run it once with best case and worst case board,
         // so the best and worst cases are meaningful.
-        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration,
+        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration, includeIterationInAverages,
                 PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         return propagatedTimesStore;
     }

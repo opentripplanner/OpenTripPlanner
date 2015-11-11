@@ -32,8 +32,6 @@ import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.streets.StreetLayer;
-import org.opentripplanner.streets.LinkedPointSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,9 +84,6 @@ public class PointSet implements Serializable {
      * duplication of pointset when used across multiple graphs.
      */
     private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-
-    // For TransportNetworks
-    Map<StreetLayer, LinkedPointSet> linkageCache = new HashMap<>();
 
     /**
      * Map from string IDs to their array indices. This is a view into PointSet.ids, namely its reverse mapping.
@@ -880,22 +875,6 @@ public class PointSet implements Serializable {
     /** Returns a new coordinate object for the feature at the given index in this set, or its centroid. */
     public Coordinate getCoordinate(int index) {
         return new Coordinate(lons[index], lats[index]);
-    }
-
-    /**
-     * Creates an object similar to a SampleSet but for the new TransitNetwork representation.
-     * Or returns one from the cache if this operation has already been performed.
-     * This is a somewhat slow operation involving a lot of geometry calculations. In some sense the point of making
-     * LinkedPointSets is to cache the relationship between the PointSet and a StreetLayer, so we don't have to
-     * repeatedly do a lot of geometry calculations to temporarily connect the points to the streets.
-     */
-    public LinkedPointSet link (StreetLayer streetLayer) {
-        LinkedPointSet linkedPointSet = linkageCache.get(streetLayer);
-        if (linkedPointSet == null) {
-            linkedPointSet = new LinkedPointSet(this, streetLayer);
-            linkageCache.put(streetLayer, linkedPointSet);
-        }
-        return linkedPointSet;
     }
 
     /**

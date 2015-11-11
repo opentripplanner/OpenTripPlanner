@@ -2,8 +2,8 @@
 
 ## Pre-built JARs
 
-OpenTripPlanner is now distributed as a single stand-alone runnable JAR file. The JAR file for each release is
-published [here](http://dev.opentripplanner.org/jars/).
+OpenTripPlanner is now distributed as a single stand-alone runnable JAR file. The JAR files for each release are
+published to the [Conveyal Maven repository](http://maven.conveyal.com/org/opentripplanner/otp/). Most users will want to navigate into the directory with the highest-numbered non-snapshot version and download the file whose name ends with `shaded.jar`. The latest release is the [0.19.0 shaded JAR](http://maven.conveyal.com.s3.amazonaws.com/org/opentripplanner/otp/0.19.0/otp-0.19.0-shaded.jar).
 
 ## Building from Source
 
@@ -17,7 +17,6 @@ You may also choose to build OTP from its source code. If you will be modifying 
 
 - Maven, a build and dependency management system
 
- 
 You will also need a reliable internet connection so Maven can fetch all of OTP's dependencies (the libraries it uses). 
 To install these software packages on a Debian or Ubuntu system, run:
 
@@ -90,9 +89,8 @@ all the external libraries that OTP uses, runs all the commands to compile the O
 performs tests, and can then deploy the final "artifact" (the runnable JAR file) to our Maven repository, from which it
 can be automatically included in other Java projects.
 
-This repository is machine-readable (by Maven or other build systems) and for the moment does not include any human readable indexes. 
-You can nonetheless fetch an OTP JAR from this repository by constructing the proper URL for the release
-you want. For example, release 0.13.0 will be found at `http://maven.conveyal.com/org/opentripplanner/otp/0.13.0/otp-0.13.0-shaded.jar`.
+This repository is machine-readable (by Maven or other build systems) and also provides decent human readable listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
+you want. For example, release 0.19.0 will be found at `http://maven.conveyal.com/org/opentripplanner/otp/0.19.0/otp-0.19.0-shaded.jar`.
 
 To make use of OTP in another project, you must first specify our Maven repository in the Project Object Model (POM):
 
@@ -112,7 +110,7 @@ And then specify OpenTripPlanner as a dependency:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.18.0</version>
+  <version>0.19.0</version>
 </dependency>
 ```
 
@@ -127,7 +125,3 @@ always fetch the latest work in progress by specifying a snapshot artifact:
   <version>0.19.0-SNAPSHOT</version>
 </dependency>
 ```
- 
-We may eventually migrate to the Gradle build system, but Gradle uses the same dependency management and 
-repository system as Maven.
-

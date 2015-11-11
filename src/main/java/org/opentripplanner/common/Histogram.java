@@ -1,4 +1,4 @@
-package org.opentripplanner.streets;
+package org.opentripplanner.common;
 
 import com.google.common.base.Strings;
 import gnu.trove.iterator.TIntIntIterator;

@@ -32,6 +32,9 @@ class TurnRestrictionTag {
 
     long via;
 
+    //Used only for graph annotations so that it can be visualized which annotations are problematic
+    long relationOSMID;
+
     TurnRestrictionType type;
 
     Direction direction;
@@ -44,10 +47,11 @@ class TurnRestrictionTag {
 
     public TraverseModeSet modes;
 
-    TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction) {
+    TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
         this.via = via;
         this.type = type;
         this.direction = direction;
+        this.relationOSMID = relationOSMID;
     }
 
     @Override

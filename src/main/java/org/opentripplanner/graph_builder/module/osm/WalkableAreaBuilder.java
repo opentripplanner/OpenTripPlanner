@@ -108,7 +108,46 @@ public class WalkableAreaBuilder {
         this.__handler = __handler;
     }
 
-    public void build(AreaGroup group) {
+    /**
+     * For all areas just use outermost rings as edges so that areas can be routable without visibility calculations
+     * @param group
+     */
+    public void buildWithoutVisibility(AreaGroup group) {
+        Set<Edge> edges = new HashSet<Edge>();
+
+        // create polygon and accumulate nodes for area
+        for (Ring ring : group.outermostRings) {
+
+            AreaEdgeList edgeList = new AreaEdgeList();
+            // the points corresponding to concave or hole vertices
+            // or those linked to ways
+            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+
+            // we also want to fill in the edges of this area anyway, because we can,
+            // and to avoid the numerical problems that they tend to cause
+            for (Area area : group.areas) {
+                if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
+                    continue;
+                }
+
+                for (Ring outerRing : area.outermostRings) {
+                    for (int i = 0; i < outerRing.nodes.size(); ++i) {
+                        createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
+                            alreadyAddedEdges);
+                    }
+                    //TODO: is this actually needed?
+                    for (Ring innerRing : outerRing.holes) {
+                        for (int j = 0; j < innerRing.nodes.size(); ++j) {
+                            createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
+                                alreadyAddedEdges);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void buildWithVisibility(AreaGroup group) {
         Set<OSMNode> startingNodes = new HashSet<OSMNode>();
         Set<Vertex> startingVertices = new HashSet<Vertex>();
         Set<Edge> edges = new HashSet<Edge>();

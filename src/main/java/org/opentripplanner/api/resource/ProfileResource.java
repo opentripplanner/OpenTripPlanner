@@ -81,7 +81,7 @@ public class ProfileResource {
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
-        QueryParameter.checkRangeInclusive(walkSpeed, 1, 7);
+        QueryParameter.checkRangeInclusive(walkSpeed, 0.5, 7);
         QueryParameter.checkRangeInclusive(bikeSpeed, 1, 21);
         QueryParameter.checkRangeInclusive(carSpeed,  1, 36);
         QueryParameter.checkRangeInclusive(streetTime,  1, 480);
