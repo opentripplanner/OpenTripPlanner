@@ -814,7 +814,6 @@ public class GTFSPatternHopFactory {
         if (!hasTimepoints) st0.setTimepoint(1);
 
         /* Indicates that stop times in this trip are being shifted forward one day. */
-        boolean midnightCrossed = false;
         
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
@@ -825,12 +824,6 @@ public class GTFSPatternHopFactory {
                 st1.setTimepoint(1);
             }
 
-            if (midnightCrossed) {
-                if (st1.isDepartureTimeSet())
-                    st1.setDepartureTime(st1.getDepartureTime() + 24 * SECONDS_IN_HOUR);
-                if (st1.isArrivalTimeSet())
-                    st1.setArrivalTime(st1.getArrivalTime() + 24 * SECONDS_IN_HOUR);
-            }
             /* Set departure time if it is missing. */
             // TODO: doc: what if arrival time is missing?
             if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
@@ -844,24 +837,15 @@ public class GTFSPatternHopFactory {
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
             if (dwellTime < 0) {
                 LOG.warn(graph.addBuilderAnnotation(new NegativeDwellTime(st0)));
-                if (st0.getArrivalTime() > 23 * SECONDS_IN_HOUR && st0.getDepartureTime() < 1 * SECONDS_IN_HOUR) {
-                    midnightCrossed = true;
-                    st0.setDepartureTime(st0.getDepartureTime() + 24 * SECONDS_IN_HOUR);
-                } else {
-                    st0.setDepartureTime(st0.getArrivalTime());
-                }
+                st0.setDepartureTime(st0.getArrivalTime());
             }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {
                 LOG.warn(graph.addBuilderAnnotation(new NegativeHopTime(new StopTime(st0), new StopTime(st1))));
-                // negative hops are usually caused by incorrect coding of midnight crossings
-                midnightCrossed = true;
-                if (st0.getDepartureTime() > 23 * SECONDS_IN_HOUR && st1.getArrivalTime() < 1 * SECONDS_IN_HOUR) {
-                    st1.setArrivalTime(st1.getArrivalTime() + 24 * SECONDS_IN_HOUR);
-                } else {
-                    st1.setArrivalTime(st0.getDepartureTime());
-                }
+                st1.setArrivalTime(st0.getDepartureTime());
+                if (st1.getDepartureTime() < st1.getArrivalTime())
+                    st1.setDepartureTime(st1.getArrivalTime());
             }
             double hopDistance = SphericalDistanceLibrary.fastDistance(
                    st0.getStop().getLat(), st0.getStop().getLon(),
