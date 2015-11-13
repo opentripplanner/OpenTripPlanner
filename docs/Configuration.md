@@ -358,8 +358,28 @@ or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
 of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, and the Dutch OVFiets system. It is straightforward to extend OTP to support any bike rental system that
+Bixi, the Dutch OVFiets system, and a generic KML format.
+It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
+
+The generic KML needs to be in format like
+
+```XML
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="citybikes" id="citybikes">
+    <SimpleField name="ID" type="int"></SimpleField>
+</Schema>
+  <Placemark>
+    <name>A Bike Station</name>
+    <ExtendedData><SchemaData schemaUrl="#citybikes">
+        <SimpleData name="ID">0</SimpleData>
+    </SchemaData></ExtendedData>
+      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
+  </Placemark>
+</Document></kml>
+```
 
 ### Configuration
 
@@ -396,7 +416,7 @@ connect to a network resource is the `url` field.
 
         // Polling bike rental updater.
         // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
-        // city-bikes, citi-bike-nyc, next-bike, vcub
+        // city-bikes, citi-bike-nyc, next-bike, vcub, kml
         {
             type: "bike-rental",
             frequencySec: 300,
