@@ -27,14 +27,17 @@ import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +47,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -502,6 +507,48 @@ public class GraphIndex {
 //                LOG.info("   {}", stop.getName());
 //            }
 //        }
+    }
+
+    private Stream<AlertPatch> getAlertPatchStream() {
+        return graph.updaterManager.getUpdaterList().stream()
+            .filter(GtfsRealtimeAlertsUpdater.class::isInstance)
+            .map(GtfsRealtimeAlertsUpdater.class::cast)
+            .map(GtfsRealtimeAlertsUpdater::getAlertPatchService)
+            .map(AlertPatchService::getAllAlertPatches)
+            .flatMap(Collection::stream);
+    }
+
+    public List<AlertPatch> getAlerts() {
+        return getAlertPatchStream()
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForRoute(Route route) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getRoute() != null)
+            .filter(alertPatch -> route.getId().equals(alertPatch.getRoute()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForTrip(Trip trip) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTrip() != null)
+            .filter(alertPatch -> trip.getId().equals(alertPatch.getTrip()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForPattern(TripPattern pattern) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTripPatterns() != null)
+            .filter(alertPatch -> alertPatch.getTripPatterns().stream().anyMatch(tripPattern -> pattern.code.equals(tripPattern.code)))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForAgency(Agency agency) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getAgency() != null)
+            .filter(alertPatch -> agency.getId().equals(alertPatch.getAgency()))
+            .collect(Collectors.toList());
     }
 
 }
