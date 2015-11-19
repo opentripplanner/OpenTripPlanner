@@ -179,7 +179,7 @@ public class GraphPathFinder {
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        Collections.sort(paths, new PathWeightComparator());
+        Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
     }
 
