@@ -57,7 +57,7 @@ public class RaptorWorker {
      * (i.e. many minutes look like each other), so several minutes' monte carlo draws are effectively
      * pooled.
      */
-    public static final int MONTE_CARLO_COUNT_PER_MINUTE = 1;
+    public static final int MONTE_CARLO_COUNT_PER_MINUTE = 2;
 
     /** If there are no schedules, the number of Monte Carlo draws to take */
     public static final int TOTAL_MONTE_CARLO_COUNT = 99;
