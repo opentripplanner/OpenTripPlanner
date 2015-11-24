@@ -45,6 +45,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Agency> agencyForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
+    public final Map<AgencyAndId, Stop> stationForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
     public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
@@ -143,6 +145,11 @@ public class GraphIndex {
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
                 stopsForParentStation.put(stop.getParentStation(), stop);
+            }
+            else if (vertex instanceof TransitStation) {
+                TransitStation transitStation = (TransitStation) vertex;
+                Stop stop = transitStation.getStop();
+                stationForId.put(stop.getId(), stop);
             }
         }
         for (TransitStop stopVertex : stopVertexForStop.values()) {
