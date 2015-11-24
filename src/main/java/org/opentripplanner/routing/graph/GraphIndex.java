@@ -144,8 +144,10 @@ public class GraphIndex {
                 Stop stop = transitStop.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(
-                    new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
+                if (stop.getParentStation() != null) {
+                    stopsForParentStation.put(
+                        new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
+                }
             }
             else if (vertex instanceof TransitStation) {
                 TransitStation transitStation = (TransitStation) vertex;
