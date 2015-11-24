@@ -238,9 +238,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new AgencyAndId(
+                .dataFetcher(environment -> ((Stop) environment.getSource()).getParentStation() != null ?
+                    index.stationForId.get(new AgencyAndId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
-                    ((Stop) environment.getSource()).getParentStation())))
+                    ((Stop) environment.getSource()).getParentStation())) : null)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairBoarding")
@@ -267,6 +268,12 @@ public class IndexGraphQLSchema {
                 .type(clusterType)
                 .dataFetcher(environment -> index.stopClusterForStop
                     .get((Stop) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stops")
+                .description("Returns all stops that are childen of this station (Only applicable for locationType = 1)")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment -> index.stopsForParentStation.get(((Stop) environment.getSource()).getId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
