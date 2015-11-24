@@ -87,7 +87,7 @@ public class GraphIndex {
     public final Multimap<Agency, TripPattern> patternsForAgency = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<AgencyAndId, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
@@ -144,7 +144,8 @@ public class GraphIndex {
                 Stop stop = transitStop.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                stopsForParentStation.put(
+                    new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
             }
             else if (vertex instanceof TransitStation) {
                 TransitStation transitStation = (TransitStation) vertex;
