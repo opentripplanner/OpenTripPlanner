@@ -45,6 +45,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Agency> agencyForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
+    public final Map<AgencyAndId, Stop> stationForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
     public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
@@ -85,7 +87,7 @@ public class GraphIndex {
     public final Multimap<Agency, TripPattern> patternsForAgency = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<AgencyAndId, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
@@ -142,7 +144,13 @@ public class GraphIndex {
                 Stop stop = transitStop.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                stopsForParentStation.put(
+                    new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
+            }
+            else if (vertex instanceof TransitStation) {
+                TransitStation transitStation = (TransitStation) vertex;
+                Stop stop = transitStation.getStop();
+                stationForId.put(stop.getId(), stop);
             }
         }
         for (TransitStop stopVertex : stopVertexForStop.values()) {
