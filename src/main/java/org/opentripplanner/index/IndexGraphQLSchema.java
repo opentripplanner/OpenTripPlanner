@@ -20,6 +20,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -73,6 +74,14 @@ public class IndexGraphQLSchema {
         .value("NO_INFORMATION", 0, "There is no bike information for the trip.")
         .value("ALLOWED", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
         .value("NOT_ALLOWED", 2, "No bicycles are allowed on this trip.")
+        .build();
+
+    public static GraphQLEnumType pickupDropoffTypeEnum = GraphQLEnumType.newEnum()
+        .name("PickupDropoffType")
+        .value("SCHEDULED", StopPattern.PICKDROP_SCHEDULED, "Regularly scheduled pickup / drop off.")
+        .value("NONE", StopPattern.PICKDROP_NONE, "No pickup / drop off available.")
+        .value("CALL_AGENCY", StopPattern.PICKDROP_CALL_AGENCY, "Must phone agency to arrange pickup / drop off.")
+        .value("COORDINATE_WITH_DRIVER", StopPattern.PICKDROP_COORDINATE_WITH_DRIVER, "Must coordinate with driver to arrange pickup / drop off.")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -567,6 +576,20 @@ public class IndexGraphQLSchema {
                 .name("realtime")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pickupType")
+                .type(pickupDropoffTypeEnum)
+                .dataFetcher(environment -> index.patternForTrip
+                    .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                    .getBoardType(((TripTimeShort) environment.getSource()).stopIndex))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("dropoffType")
+                .type(pickupDropoffTypeEnum)
+                .dataFetcher(environment -> index.patternForTrip
+                    .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                    .getAlightType(((TripTimeShort) environment.getSource()).stopIndex))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
