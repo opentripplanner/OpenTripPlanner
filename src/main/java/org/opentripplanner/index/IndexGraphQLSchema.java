@@ -801,6 +801,12 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment ->
                     ((TripPattern) environment.getSource()).semanticHashString(null))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the pattern")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForPattern((TripPattern) dataFetchingEnvironment.getSource()))
+                .build())
             .build();
 
 
