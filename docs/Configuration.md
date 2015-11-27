@@ -408,7 +408,11 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            defaultAgencyId: "TriMet",
+            // Defaults to false, if omitted. Makes the feed always incremental even when it states
+            // that it contains a full dataset.
+            // Useful with multiple realtime feeds to prevent last feed from clearing previous feeds.
+            alwaysIncremental: true
         },
 
         // Streaming differential GTFS-RT TripUpdates over websockets

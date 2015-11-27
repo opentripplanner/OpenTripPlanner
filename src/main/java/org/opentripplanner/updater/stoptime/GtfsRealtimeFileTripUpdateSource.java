@@ -42,7 +42,15 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
      * previous updates should be disregarded
      */
     private boolean fullDataset = true;
-    
+
+    /**
+     * True iff updates from this realtime feed should always be considered incremental,
+     * i.e. missing entities will not delete previous realtime data,
+     * even if the feed itself says it contains the full dataset.
+     * Useful when there are several realtime feeds.
+     */
+    private boolean alwaysIncremental = true;
+
     /**
      * Default agency id that is used for the trip ids in the TripUpdates
      */
@@ -52,6 +60,10 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     public void configure(Graph graph, JsonNode config) throws Exception {
         this.agencyId = config.path("defaultAgencyId").asText();
         this.file = new File(config.path("file").asText(""));
+        if (config.path("alwaysIncremental").asBoolean(false)) {
+            LOG.debug("Setting alwaysIncremental for source " + file);
+            this.alwaysIncremental = true;
+        }
     }
 
     @Override
@@ -89,6 +101,9 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
 
     @Override
     public boolean getFullDatasetValueOfLastUpdates() {
+        if (this.alwaysIncremental) {
+            return false;
+        }
         return fullDataset;
     }
     
