@@ -1,9 +1,40 @@
 package org.opentripplanner.index;
 
+import static java.util.Collections.emptyList;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.TranslatedString;
+
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
+
 import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
@@ -19,26 +50,6 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.index.model.StopTimesInPattern;
-import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class IndexGraphQLSchema {
 
@@ -68,6 +79,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
 
+    public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
+
     public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
 
     public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
@@ -85,6 +98,8 @@ public class IndexGraphQLSchema {
     public GraphQLOutputType stopAtDistanceType = new GraphQLTypeReference("StopAtDistance");
 
     public GraphQLOutputType stoptimesInPatternType = new GraphQLTypeReference("StoptimesInPattern");
+
+    public GraphQLOutputType translatedStringType = new GraphQLTypeReference("TranslatedString");
 
     public GraphQLObjectType queryType;
 
@@ -112,13 +127,135 @@ public class IndexGraphQLSchema {
             if (o instanceof Agency){
                 return (GraphQLObjectType) agencyType;
             }
+            if (o instanceof AlertPatch){
+                return (GraphQLObjectType) alertType;
+            }
             return null;
         }
     });
 
+    @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
+
+        translatedStringType = GraphQLObjectType.newObject()
+            .name("TranslatedString")
+            .description("Text with language")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("text")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((Map.Entry<String, String>)environment.getSource()).getValue())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                 .name("language")
+                 .type(Scalars.GraphQLString)
+                 .dataFetcher(environment -> ((Map.Entry<String, String>)environment.getSource()).getKey())
+                 .build())
+            .build();
+
+        alertType = GraphQLObjectType.newObject()
+            .name("Alert")
+            .withInterface(nodeInterface)
+            .description("Simple alert")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay.toGlobalId(
+                    alertType.getName(), ((AlertPatch) environment.getSource()).getId()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("agency")
+                .type(agencyType)
+                .dataFetcher(environment -> index.agencyForId.get(((AlertPatch) environment.getSource()).getAgency()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("route")
+                .type(routeType)
+                .dataFetcher(environment -> index.routeForId.get(((AlertPatch) environment.getSource()).getRoute()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trip")
+                .type(tripType)
+                .dataFetcher(environment -> index.tripForId.get(((AlertPatch) environment.getSource()).getTrip()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stop")
+                .type(stopType)
+                .dataFetcher(environment -> index.stopForId.get(((AlertPatch) environment.getSource()).getStop()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("patterns")
+                .description("Get all patterns for this alert")
+                .type(new GraphQLList(patternType))
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertHeaderText")
+                .type(Scalars.GraphQLString)
+                .description("Header of alert if it exists")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertHeaderText)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertHeaderTextTranslations")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
+                .description("Headers of alert in all different translations available notnull")
+                .dataFetcher(environment -> {
+                    AlertPatch alertPatch = (AlertPatch) environment.getSource();
+                    Alert alert = alertPatch.getAlert();
+                    if (alert.alertHeaderText instanceof TranslatedString) {
+                        return ((TranslatedString)alert.alertHeaderText).getTranslations();
+                    } else {
+                        return emptyList();
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertDescriptionText")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .description("Long description of alert notnull")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertDescriptionText)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertDescriptionTextTranslations")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
+                .description("Long descriptions of alert in all different translations available notnull")
+                .dataFetcher(environment -> {
+                    AlertPatch alertPatch = (AlertPatch) environment.getSource();
+                    Alert alert = alertPatch.getAlert();
+                    if (alert.alertDescriptionText instanceof TranslatedString) {
+                        return ((TranslatedString)alert.alertDescriptionText).getTranslations();
+                    } else {
+                        return emptyList();
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertUrl")
+                .type(Scalars.GraphQLString)
+                .description("Url with more information")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertUrl)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("effectiveStartDate")
+                .type(Scalars.GraphQLLong)
+                .description("When this alert comes into effect")
+                .dataFetcher(environment -> {
+                	Alert alert = ((AlertPatch) environment.getSource()).getAlert();
+					return alert.effectiveStartDate != null ? alert.effectiveStartDate.getTime() / 1000 : null;
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("effectiveEndDate")
+                .type(Scalars.GraphQLLong)
+                .description("When this alert is not in effect anymore")
+                .dataFetcher(environment -> {
+                	Alert alert = ((AlertPatch) environment.getSource()).getAlert();
+					return alert.effectiveEndDate != null ? alert.effectiveEndDate.getTime() / 1000 : null;
+                })
+                .build())
+            .build();
+
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -556,6 +693,12 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.patternForTrip
                     .get((Trip) environment.getSource()).geometry.getCoordinateSequence())
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("alerts")
+                    .description("Get all alerts active for the trip")
+                    .type(new GraphQLList(alertType))
+                    .dataFetcher(dataFetchingEnvironment -> index.getAlertsForTrip((Trip) dataFetchingEnvironment.getSource()))
+                    .build())
             .build();
 
         coordinateType = GraphQLObjectType.newObject()
@@ -720,6 +863,12 @@ public class IndexGraphQLSchema {
                     .distinct()
                     .collect(Collectors.toList()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the route")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForRoute((Route) dataFetchingEnvironment.getSource()))
+                .build())
             .build();
 
         agencyType = GraphQLObjectType.newObject()
@@ -770,6 +919,12 @@ public class IndexGraphQLSchema {
                     .filter(route -> route.getAgency() == environment.getSource())
                     .collect(Collectors.toList()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("alerts")
+                    .description("Get all alerts active for the agency")
+                    .type(new GraphQLList(alertType))
+                    .dataFetcher(dataFetchingEnvironment -> index.getAlertsForAgency((Agency) dataFetchingEnvironment.getSource()))
+                    .build())
             .build();
 
         queryType = GraphQLObjectType.newObject()
@@ -793,6 +948,9 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(agencyType.getName())) {
                     return index.agencyForId.get(id.id);
+                }
+                if (id.type.equals(alertType.getName())) {
+                    return index.getAlertForId(id.id);
                 }
                 return null;
             }))
@@ -1031,6 +1189,12 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(
                     environment -> index.stopClusterForId.get(environment.getArgument("id")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active in the graph")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")

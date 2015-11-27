@@ -639,4 +639,7 @@ public class GraphIndex {
             .collect(Collectors.toList());
     }
 
+    public AlertPatch getAlertForId(String id) {
+        return getAlertPatchStream().filter(alertPatch -> id.equals(alertPatch.getId())).findFirst().get();
+    }
 }
