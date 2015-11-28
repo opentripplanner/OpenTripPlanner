@@ -192,6 +192,7 @@ public class TimetableSnapshotSource {
         try {
             if (fullDataset) {
                 // Remove all updates from the buffer
+                LOG.debug("Clearing all realtime updates");
                 buffer.clear();
             }
 
