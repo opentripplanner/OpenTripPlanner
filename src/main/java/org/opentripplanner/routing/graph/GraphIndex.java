@@ -632,6 +632,13 @@ public class GraphIndex {
             .collect(Collectors.toList());
     }
 
+    public List<AlertPatch> getAlertsForPattern(TripPattern pattern) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTripPatterns() != null)
+            .filter(alertPatch -> alertPatch.getTripPatterns().stream().anyMatch(tripPattern -> pattern.code.equals(tripPattern.code)))
+            .collect(Collectors.toList());
+    }
+
     public List<AlertPatch> getAlertsForAgency(Agency agency) {
         return getAlertPatchStream()
             .filter(alertPatch -> alertPatch.getAgency() != null)
