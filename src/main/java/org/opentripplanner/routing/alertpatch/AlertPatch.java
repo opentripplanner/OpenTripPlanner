@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -108,16 +109,26 @@ public class AlertPatch implements Serializable {
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
-        Collection<TripPattern> tripPatterns = null;
-
         if(trip != null) {
-            tripPatterns = new LinkedList<TripPattern>();
+            tripPatterns = new LinkedList<>();
             TripPattern tripPattern = graph.index.patternForTrip.get(trip);
             if(tripPattern != null) {
                 tripPatterns.add(tripPattern);
+                addAlertPatchToEdges(graph, stop, tripPattern);
             }
         } else if (route != null) {
-           tripPatterns = graph.index.patternsForRoute.get(route);
+           tripPatterns = graph.index.patternsForRoute.get(route).stream()
+               .filter(tripPattern -> {
+                   if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                       return false;
+                   }
+                   if (directionId != -1 && directionId == tripPattern.directionId) {
+                       return false;
+                   }
+                   return true;
+               })
+               .peek(tripPattern -> addAlertPatchToEdges(graph, stop, tripPattern))
+               .collect(Collectors.toList());
         } else if (stop != null) {
             TransitStop transitStop = graph.index.stopVertexForStop.get(stop);
 
@@ -136,26 +147,20 @@ public class AlertPatch implements Serializable {
             }
         } else if (agency != null) {
             tripPatterns = graph.index.patternsForAgency.get(agency);
-        }
-
-        if (tripPatterns != null) {
-            this.tripPatterns = tripPatterns;
             for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
-                    continue;
-                }
-                if (directionId != -1 && directionId == tripPattern.directionId) {
-                    continue;
-                }
-                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
-                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                        graph.addAlertPatch(tripPattern.boardEdges[i], this);
-                        graph.addAlertPatch(tripPattern.alightEdges[i], this);
-                    }
-                }
+                addAlertPatchToEdges(graph, stop, tripPattern);
             }
         } else {
-            this.tripPatterns = emptyList();
+            tripPatterns = emptyList();
+        }
+    }
+
+    private void addAlertPatchToEdges(Graph graph, Stop stop, TripPattern tripPattern) {
+        for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+            if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                graph.addAlertPatch(tripPattern.boardEdges[i], this);
+                graph.addAlertPatch(tripPattern.alightEdges[i], this);
+            }
         }
     }
 
