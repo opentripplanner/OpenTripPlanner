@@ -55,6 +55,8 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
@@ -213,7 +215,9 @@ public class Routers {
         try {
             graph = Graph.load(is, level);
             GraphService graphService = otpServer.getGraphService();
-            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode routerJsonConf = mapper.readTree(graph.routerConfig);
+            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph, routerJsonConf));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
