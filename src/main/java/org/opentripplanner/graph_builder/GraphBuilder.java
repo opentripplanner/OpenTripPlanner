@@ -59,7 +59,7 @@ import java.util.zip.ZipFile;
  * It is modular: GraphBuilderModules are placed in a list and run in sequence.
  */
 public class GraphBuilder implements Runnable {
-    
+
     private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
@@ -67,13 +67,13 @@ public class GraphBuilder implements Runnable {
     private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
     private File graphFile;
-    
+
     private boolean _alwaysRebuild = true;
 
     private List<RoutingRequest> _modeList;
-    
+
     private String _baseGraph = null;
-    
+
     private Graph graph = new Graph();
 
     /* The router configuration JSON that was discovered during the graph build and will be embedded (if any). */
@@ -93,7 +93,7 @@ public class GraphBuilder implements Runnable {
     public void setAlwaysRebuild(boolean alwaysRebuild) {
         _alwaysRebuild = alwaysRebuild;
     }
-    
+
     public void setBaseGraph(String baseGraph) {
         this._baseGraph = baseGraph;
         try {
@@ -110,11 +110,11 @@ public class GraphBuilder implements Runnable {
     public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
     }
-    
+
     public void setPath (String path) {
         graphFile = new File(path.concat("/Graph.obj"));
     }
-    
+
     public void setPath (File path) {
         graphFile = new File(path, "Graph.obj");
     }
@@ -128,7 +128,7 @@ public class GraphBuilder implements Runnable {
         long startTime = System.currentTimeMillis();
 
         if (serializeGraph) {
-        	
+
             if (graphFile == null) {
                 throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
             }
@@ -137,7 +137,7 @@ public class GraphBuilder implements Runnable {
                 LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
                 return;
             }
-        	
+
             try {
                 if (!graphFile.getParentFile().exists()) {
                     if (!graphFile.getParentFile().mkdirs()) {
@@ -154,7 +154,7 @@ public class GraphBuilder implements Runnable {
         for (GraphBuilderModule builder : _graphBuilderModules) {
             builder.checkInputs();
         }
-        
+
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilderModule load : _graphBuilderModules)
             load.buildGraph(graph, extra);
@@ -199,8 +199,7 @@ public class GraphBuilder implements Runnable {
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
-        // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
-        graphBuilder.routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
+        routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
