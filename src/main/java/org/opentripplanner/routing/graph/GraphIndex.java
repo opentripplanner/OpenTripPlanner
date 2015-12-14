@@ -130,7 +130,7 @@ public class GraphIndex {
             agencyForId.put(a.getId(), a);
         }
         Collection<Edge> edges = graph.getEdges();
-        /* We will keep a separate set of all vertices in case some have the same label. 
+        /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         Set<Vertex> vertices = Sets.newHashSet();
         for (Edge edge : edges) {
@@ -603,8 +603,10 @@ public class GraphIndex {
         return res.entity(content).build();
     }
 
-
     private Stream<AlertPatch> getAlertPatchStream() {
+        if (graph.updaterManager == null) {
+            return Stream.empty();
+        }
         return graph.updaterManager.getUpdaterList().stream()
             .filter(GtfsRealtimeAlertsUpdater.class::isInstance)
             .map(GtfsRealtimeAlertsUpdater.class::cast)
