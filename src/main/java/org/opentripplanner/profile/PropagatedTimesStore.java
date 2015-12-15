@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.apache.commons.math3.util.FastMath.toRadians;
@@ -122,12 +123,14 @@ public class PropagatedTimesStore {
             int count = 0;
 
             TIntList timeList = new TIntArrayList();
+            TIntList avgList = new TIntArrayList();
 
             ITERATIONS: for (int i = 0; i < times.length; i++) {
                 if (times[i][target] == RaptorWorker.UNREACHED)
                     continue ITERATIONS;
 
                 if (includeInAverages[i]) {
+                    avgList.add(times[i][target]);
                     sum += times[i][target];
                     count++;
                 }
@@ -172,18 +175,24 @@ public class PropagatedTimesStore {
             case BOOTSTRAP:
                 // now bootstrap out a 95% confidence interval on the time
                 int[] bootMeans = new int[N_BOOTSTRAPS];
-                for (int boot = 0; boot < N_BOOTSTRAPS; boot++) {
+
+                nextRandom += N_BOOTSTRAPS * count % randomNumbers.length; // prevent overflow
+
+                final int randOff = nextRandom;
+                final int finalCount = count;
+
+                IntStream.range(0, N_BOOTSTRAPS).parallel().forEach(boot -> {
                     int bsum = 0;
 
                     // sample from the Monte Carlo distribution with replacement
-                    for (int iter = 0; iter < count; iter++) {
-                        bsum += timeList
-                                .get(randomNumbers[nextRandom++ % randomNumbers.length] % count);
+                    for (int iter = 0; iter < finalCount; iter++) {
+                        bsum += avgList
+                                .get(randomNumbers[(randOff + boot * iter) % randomNumbers.length] % avgList.size());
                         //bsum += timeList.get(random.nextInt(count));
                     }
 
-                    bootMeans[boot] = bsum / count;
-                }
+                     bootMeans[boot] = bsum / finalCount;
+                });
 
                 Arrays.sort(bootMeans);
                 // 2.5 percentile of distribution of means
