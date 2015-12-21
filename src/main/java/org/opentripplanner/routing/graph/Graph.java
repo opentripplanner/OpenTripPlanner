@@ -1048,4 +1048,12 @@ public class Graph implements Serializable {
     public Optional<Coordinate> getCenter() {
         return Optional.ofNullable(center);
     }
+
+    public long getTransitServiceStarts() {
+        return transitServiceStarts;
+    }
+
+    public long getTransitServiceEnds() {
+        return transitServiceEnds;
+    }
 }
