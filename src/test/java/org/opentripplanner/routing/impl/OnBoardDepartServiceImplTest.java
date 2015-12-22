@@ -18,6 +18,16 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.TimeZone;
+
 import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -43,10 +53,6 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
@@ -129,6 +135,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
         when(dwell.getTripPattern()).thenReturn(tripPattern);
@@ -225,6 +232,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
 
@@ -304,6 +312,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
         when(dwell.getTripPattern()).thenReturn(tripPattern);

@@ -54,13 +54,17 @@ public class GtfsGraphBuilderModuleTest {
         _builder.buildGraph(graph, _extra);
         graph.index(new DefaultStreetVertexIndexFactory());
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
+        // Feed id is used instead of the agency id for OBA entities.
+        GtfsBundle gtfsBundle = bundleList.get(0);
+        GtfsFeedId feedId = gtfsBundle.getFeedId();
+
+        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.UNKNOWN,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t0"))));
+                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t1"))));
+                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
     }
 
     @Test
@@ -79,13 +83,17 @@ public class GtfsGraphBuilderModuleTest {
         _builder.buildGraph(graph, _extra);
         graph.index(new DefaultStreetVertexIndexFactory());
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
+        // Feed id is used instead of the agency id for OBA entities.
+        GtfsBundle gtfsBundle = bundleList.get(0);
+        GtfsFeedId feedId = gtfsBundle.getFeedId();
+
+        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t0"))));
+                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.NOT_ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t1"))));
+                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
     }
 
     private MockGtfs getSimpleGtfs() throws IOException {
@@ -101,6 +109,7 @@ public class GtfsGraphBuilderModuleTest {
 
     private static List<GtfsBundle> getGtfsAsBundleList (MockGtfs gtfs) {
         GtfsBundle bundle = new GtfsBundle();
+        bundle.setFeedId(new GtfsFeedId.Builder().id("FEED").build());
         bundle.setPath(gtfs.getPath());
         List<GtfsBundle> list = Lists.newArrayList();
         list.add(bundle);

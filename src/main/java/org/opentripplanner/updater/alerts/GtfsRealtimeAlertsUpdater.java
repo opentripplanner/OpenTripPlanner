@@ -39,7 +39,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
  * myalert.frequencySec = 60
  * myalert.url = http://host.tld/path
  * myalert.earlyStartSec = 3600
- * myalert.defaultAgencyId = TA
+ * myalert.feedId = TA
  * </pre>
  */
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
@@ -51,7 +51,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private String url;
 
-    private String defaultAgencyId;
+    private String feedId;
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
@@ -77,7 +77,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         }
         this.url = url;
         this.earlyStart = config.path("earlyStartSec").asInt(0);
-        this.defaultAgencyId = config.path("defaultAgencyId").asText();
+        this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
@@ -90,7 +90,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             updateHandler = new AlertsUpdateHandler();
         }
         updateHandler.setEarlyStart(earlyStart);
-        updateHandler.setDefaultAgencyId(defaultAgencyId);
+        updateHandler.setFeedId(feedId);
         updateHandler.setAlertPatchService(alertPatchService);
         updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     }

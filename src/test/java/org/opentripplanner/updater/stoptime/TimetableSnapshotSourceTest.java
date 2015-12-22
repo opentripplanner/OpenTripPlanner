@@ -29,11 +29,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -53,6 +52,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 public class TimetableSnapshotSourceTest {
 
@@ -61,12 +61,42 @@ public class TimetableSnapshotSourceTest {
     private static boolean fullDataset = false;
     private static GtfsContext context;
     private static ServiceDate serviceDate = new ServiceDate();
+    private static String feedId;
 
     private TimetableSnapshotSource updater;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+
+        GtfsRelationalDao dao = context.getDao();
+
+        feedId = context.getFeedId().getId();
+
+        for (ShapePoint shapePoint : dao.getAllEntitiesForType(ShapePoint.class)) {
+            shapePoint.getShapeId().setAgencyId(feedId);
+        }
+        for (Route route : dao.getAllEntitiesForType(Route.class)) {
+            route.getId().setAgencyId(feedId);
+        }
+        for (Stop stop : dao.getAllEntitiesForType(Stop.class)) {
+            stop.getId().setAgencyId(feedId);
+        }
+        for (Trip trip : dao.getAllEntitiesForType(Trip.class)) {
+            trip.getId().setAgencyId(feedId);
+        }
+        for (ServiceCalendar serviceCalendar : dao.getAllEntitiesForType(ServiceCalendar.class)) {
+            serviceCalendar.getServiceId().setAgencyId(feedId);
+        }
+        for (ServiceCalendarDate serviceCalendarDate : dao.getAllEntitiesForType(ServiceCalendarDate.class)) {
+            serviceCalendarDate.getServiceId().setAgencyId(feedId);
+        }
+        for (FareAttribute fareAttribute : dao.getAllEntitiesForType(FareAttribute.class)) {
+            fareAttribute.getId().setAgencyId(feedId);
+        }
+        for (Pathway pathway : dao.getAllEntitiesForType(Pathway.class)) {
+            pathway.getId().setAgencyId(feedId);
+        }
 
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
@@ -93,13 +123,13 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testGetSnapshot() throws InvalidProtocolBufferException {
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
 
         TimetableSnapshot snapshot = updater.getTimetableSnapshot();
         assertNotNull(snapshot);
         assertSame(snapshot, updater.getTimetableSnapshot());
 
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
         assertSame(snapshot, updater.getTimetableSnapshot());
 
         updater.maxSnapshotFrequency = (-1);
@@ -110,14 +140,14 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
-        AgencyAndId tripId = new AgencyAndId("agency", "1.1");
-        AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
+        AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
+        AgencyAndId tripId2 = new AgencyAndId(feedId, "1.2");
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
 
         TimetableSnapshot snapshot = updater.getTimetableSnapshot();
         Timetable forToday = snapshot.resolve(pattern, serviceDate);
@@ -135,8 +165,8 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleDelayedTrip() {
-        AgencyAndId tripId = new AgencyAndId("agency", "1.1");
-        AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
+        AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
+        AgencyAndId tripId2 = new AgencyAndId(feedId, "1.2");
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
@@ -166,7 +196,7 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
 
         TimetableSnapshot snapshot = updater.getTimetableSnapshot();
         Timetable forToday = snapshot.resolve(pattern, serviceDate);
@@ -258,13 +288,13 @@ public class TimetableSnapshotSourceTest {
             
             tripUpdate = tripUpdateBuilder.build();
         }
-        
+
         // WHEN
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
-        
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
+
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.stopForId.get(new AgencyAndId("agency", "A"));
+        Stop stopA = graph.index.stopForId.get(new AgencyAndId(feedId, "A"));
         TransitStopDepart transitStopDepartA = graph.index.stopVertexForStop.get(stopA).departVertex;
         // Get trip pattern of last (most recently added) outgoing edge
         List<Edge> outgoingEdges = (List<Edge>) transitStopDepartA.getOutgoing();
@@ -283,16 +313,13 @@ public class TimetableSnapshotSourceTest {
     
     @Test
     public void testHandleModifiedTrip() throws ParseException {
-        // TODO
-        
         // GIVEN
         
         // Get service date of today because old dates will be purged after applying updates
         ServiceDate serviceDate = new ServiceDate(Calendar.getInstance());
         
         String modifiedTripId = "10.1";
-        String modifiedTripAgency = "agency";
-        
+
         TripUpdate tripUpdate;
         {
             TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -386,16 +413,16 @@ public class TimetableSnapshotSourceTest {
             
             tripUpdate = tripUpdateBuilder.build();
         }
-        
+
         // WHEN
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), modifiedTripAgency);
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
         
         // THEN
         TimetableSnapshot snapshot = updater.getTimetableSnapshot();
 
         // Original trip pattern 
         {
-            AgencyAndId tripId = new AgencyAndId(modifiedTripAgency, modifiedTripId);
+            AgencyAndId tripId = new AgencyAndId(feedId, modifiedTripId);
             Trip trip = graph.index.tripForId.get(tripId);
             TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
             
@@ -417,7 +444,7 @@ public class TimetableSnapshotSourceTest {
         
         // New trip pattern 
         {
-            TripPattern newTripPattern = snapshot.getLastAddedTripPattern(modifiedTripId, serviceDate);
+            TripPattern newTripPattern = snapshot.getLastAddedTripPattern(feedId, modifiedTripId, serviceDate);
             assertNotNull("New trip pattern should be found", newTripPattern);
             
             Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
@@ -432,7 +459,7 @@ public class TimetableSnapshotSourceTest {
     
     @Test
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
-        AgencyAndId tripId = new AgencyAndId("agency", "1.1");
+        AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
         ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
@@ -440,7 +467,7 @@ public class TimetableSnapshotSourceTest {
         updater.maxSnapshotFrequency = (0);
         updater.purgeExpiredData = (false);
 
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
         TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
         updater.purgeExpiredData = (true);
@@ -457,7 +484,7 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
         TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
         assertNotSame(snapshotA, snapshotB);
