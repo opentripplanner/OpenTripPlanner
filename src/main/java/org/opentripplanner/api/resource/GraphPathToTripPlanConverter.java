@@ -569,12 +569,12 @@ public abstract class GraphPathToTripPlanConverter {
             leg.headsign = states[states.length - 1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
-            leg.routeId = route.getId().getId();
+            leg.routeId = route.getId();
             leg.routeLongName = route.getLongName();
             leg.routeShortName = route.getShortName();
             leg.routeTextColor = route.getTextColor();
             leg.routeType = route.getType();
-            leg.tripId = trip.getId().getId();
+            leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
 

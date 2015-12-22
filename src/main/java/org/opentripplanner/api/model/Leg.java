@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -133,9 +134,7 @@ public class Leg {
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
      */
-    @XmlAttribute
-    @JsonSerialize
-    public String routeId = null;
+    public AgencyAndId routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
@@ -185,9 +184,7 @@ public class Leg {
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
-    @XmlAttribute
-    @JsonSerialize
-    public String tripId = null;
+    public AgencyAndId tripId = null;
     
     /**
      * For transit legs, the service date of the trip.
