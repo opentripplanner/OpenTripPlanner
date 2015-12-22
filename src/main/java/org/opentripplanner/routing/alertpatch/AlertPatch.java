@@ -16,15 +16,13 @@ package org.opentripplanner.routing.alertpatch;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.google.common.collect.Multimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -38,6 +36,8 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)
@@ -47,6 +47,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
  */
 @XmlRootElement(name = "AlertPatch")
 public class AlertPatch implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(AlertPatch.class);
+
     private static final long serialVersionUID = 20140319L;
 
     private String id;
@@ -67,6 +69,11 @@ public class AlertPatch implements Serializable {
      * The headsign of the alert
      */
     private String direction;
+
+    /**
+     * The id of the feed this patch is intended for.
+     */
+    private String feedId;
 
     /**
      * Direction id of the GTFS trips this alert concerns, set to -1 if no direction.
@@ -99,37 +106,44 @@ public class AlertPatch implements Serializable {
     }
 
     public void apply(Graph graph) {
-        Agency agency = this.agency != null ? graph.index.agencyForId.get(this.agency) : null;
+        Agency agency = null;
+        if (feedId != null) {
+            Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
+            agency = this.agency != null ? agencies.get(this.agency) : null;
+        }
         Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {
-            Collection<TripPattern> tripPatterns;
+            Collection<TripPattern> tripPatterns = null;
 
-            if(trip != null) {
-                tripPatterns = new LinkedList<TripPattern>();
+            if (trip != null) {
+                tripPatterns = new LinkedList<>();
                 TripPattern tripPattern = graph.index.patternForTrip.get(trip);
-                if(tripPattern != null) {
+                if (tripPattern != null) {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
                tripPatterns = graph.index.patternsForRoute.get(route);
             } else {
-               tripPatterns = graph.index.patternsForAgency.get(agency);
+                // Find patterns for the feed.
+                tripPatterns = graph.index.patternsForFeedId.get(feedId);
             }
 
-            for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
-                    continue;
-                }
-                if (directionId != -1 && directionId == tripPattern.directionId) {
-                    continue;
-                }
-                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
-                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                        graph.addAlertPatch(tripPattern.boardEdges[i], this);
-                        graph.addAlertPatch(tripPattern.alightEdges[i], this);
+            if (tripPatterns != null) {
+                for (TripPattern tripPattern : tripPatterns) {
+                    if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                        continue;
+                    }
+                    if (directionId != -1 && directionId == tripPattern.directionId) {
+                        continue;
+                    }
+                    for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+                        if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                            graph.addAlertPatch(tripPattern.boardEdges[i], this);
+                            graph.addAlertPatch(tripPattern.alightEdges[i], this);
+                        }
                     }
                 }
             }
@@ -153,13 +167,17 @@ public class AlertPatch implements Serializable {
     }
 
     public void remove(Graph graph) {
-        Agency agency = this.agency != null ? graph.index.agencyForId.get(this.agency) : null;
+        Agency agency = null;
+        if (feedId != null) {
+            Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
+            agency = this.agency != null ? agencies.get(this.agency) : null;
+        }
         Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {
-            Collection<TripPattern> tripPatterns;
+            Collection<TripPattern> tripPatterns = null;
 
             if(trip != null) {
                 tripPatterns = new LinkedList<TripPattern>();
@@ -170,20 +188,23 @@ public class AlertPatch implements Serializable {
             } else if (route != null) {
                tripPatterns = graph.index.patternsForRoute.get(route);
             } else {
-               tripPatterns = graph.index.patternsForAgency.get(agency);
+                // Find patterns for the feed.
+                tripPatterns = graph.index.patternsForFeedId.get(feedId);
             }
 
-            for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
-                    continue;
-                }
-                if (directionId != -1 && directionId != tripPattern.directionId) {
-                    continue;
-                }
-                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
-                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                        graph.removeAlertPatch(tripPattern.boardEdges[i], this);
-                        graph.removeAlertPatch(tripPattern.alightEdges[i], this);
+            if (tripPatterns != null) {
+                for (TripPattern tripPattern : tripPatterns) {
+                    if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                        continue;
+                    }
+                    if (directionId != -1 && directionId != tripPattern.directionId) {
+                        continue;
+                    }
+                    for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+                        if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                            graph.removeAlertPatch(tripPattern.boardEdges[i], this);
+                            graph.removeAlertPatch(tripPattern.alightEdges[i], this);
+                        }
                     }
                 }
             }
@@ -277,6 +298,18 @@ public class AlertPatch implements Serializable {
         this.stop = stop;
     }
 
+    public String getFeedId() {
+        return feedId;
+    }
+
+    public void setFeedId(String feedId) {
+        this.feedId = feedId;
+    }
+
+    public boolean hasTrip() {
+        return trip != null;
+    }
+
     public boolean equals(Object o) {
         if (!(o instanceof AlertPatch)) {
             return false;
@@ -357,6 +390,15 @@ public class AlertPatch implements Serializable {
                 return false;
             }
         }
+        if (feedId == null) {
+            if (other.feedId != null) {
+                return false;
+            }
+        } else {
+            if (!feedId.equals(other.feedId)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -367,6 +409,7 @@ public class AlertPatch implements Serializable {
                 (trip == null ? 0 : trip.hashCode()) +
                 (stop == null ? 0 : stop.hashCode()) +
                 (route == null ? 0 : route.hashCode()) +
-                (alert == null ? 0 : alert.hashCode()));
+                (alert == null ? 0 : alert.hashCode()) +
+                (feedId == null ? 0 : feedId.hashCode()));
     }
 }

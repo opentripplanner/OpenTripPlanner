@@ -57,6 +57,8 @@ import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
 import org.opentripplanner.graph_builder.annotation.RepeatedStops;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
+import org.opentripplanner.graph_builder.annotation.*;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
@@ -286,6 +288,8 @@ public class GTFSPatternHopFactory {
 
     private static GeometryFactory _geometryFactory = GeometryUtils.getGeometryFactory();
 
+    private GtfsFeedId _feedId;
+
     private GtfsRelationalDao _dao;
 
     private CalendarService _calendarService;
@@ -307,11 +311,13 @@ public class GTFSPatternHopFactory {
     private double maxStopToShapeSnapDistance = 150;
 
     public GTFSPatternHopFactory(GtfsContext context) {
+        this._feedId = context.getFeedId();
         this._dao = context.getDao();
         this._calendarService = context.getCalendarService();
     }
     
     public GTFSPatternHopFactory() {
+        this._feedId = null;
         this._dao = null;
         this._calendarService = null;
     }
@@ -906,7 +912,7 @@ public class GTFSPatternHopFactory {
     
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
-            graph.addAgency(agency);
+            graph.addAgency(_feedId.getId(), agency);
         }
     }
 
