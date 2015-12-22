@@ -1087,7 +1087,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean tripIsBanned(Trip trip) {
         /* check if agency is banned for this plan */
         if (bannedAgencies != null) {
-            if (bannedAgencies.contains(trip.getId().getAgencyId())) {
+            if (bannedAgencies.contains(trip.getRoute().getAgency().getId())) {
                 return true;
             }
         }
