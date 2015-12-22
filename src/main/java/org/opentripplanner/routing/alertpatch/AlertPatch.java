@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.alertpatch;
 
+import static java.util.Collections.emptyList;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -63,6 +66,8 @@ public class AlertPatch implements Serializable {
 
     private AgencyAndId stop;
 
+    private Collection<TripPattern> tripPatterns;
+
     /**
      * The headsign of the alert
      */
@@ -104,35 +109,26 @@ public class AlertPatch implements Serializable {
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
-        if (route != null || trip != null || agency != null) {
-            Collection<TripPattern> tripPatterns;
-
-            if(trip != null) {
-                tripPatterns = new LinkedList<TripPattern>();
-                TripPattern tripPattern = graph.index.patternForTrip.get(trip);
-                if(tripPattern != null) {
-                    tripPatterns.add(tripPattern);
-                }
-            } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
-            } else {
-               tripPatterns = graph.index.patternsForAgency.get(agency);
+        if(trip != null) {
+            tripPatterns = new LinkedList<>();
+            TripPattern tripPattern = graph.index.patternForTrip.get(trip);
+            if(tripPattern != null) {
+                tripPatterns.add(tripPattern);
+                addAlertPatchToEdges(graph, stop, tripPattern);
             }
-
-            for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
-                    continue;
-                }
-                if (directionId != -1 && directionId == tripPattern.directionId) {
-                    continue;
-                }
-                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
-                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                        graph.addAlertPatch(tripPattern.boardEdges[i], this);
-                        graph.addAlertPatch(tripPattern.alightEdges[i], this);
-                    }
-                }
-            }
+        } else if (route != null) {
+           tripPatterns = graph.index.patternsForRoute.get(route).stream()
+               .filter(tripPattern -> {
+                   if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                       return false;
+                   }
+                   if (directionId != -1 && directionId == tripPattern.directionId) {
+                       return false;
+                   }
+                   return true;
+               })
+               .peek(tripPattern -> addAlertPatchToEdges(graph, stop, tripPattern))
+               .collect(Collectors.toList());
         } else if (stop != null) {
             TransitStop transitStop = graph.index.stopVertexForStop.get(stop);
 
@@ -148,6 +144,22 @@ public class AlertPatch implements Serializable {
                     graph.addAlertPatch(edge, this);
                     break;
                 }
+            }
+        } else if (agency != null) {
+            tripPatterns = graph.index.patternsForAgency.get(agency);
+            for (TripPattern tripPattern : tripPatterns) {
+                addAlertPatchToEdges(graph, stop, tripPattern);
+            }
+        } else {
+            tripPatterns = emptyList();
+        }
+    }
+
+    private void addAlertPatchToEdges(Graph graph, Stop stop, TripPattern tripPattern) {
+        for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+            if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                graph.addAlertPatch(tripPattern.boardEdges[i], this);
+                graph.addAlertPatch(tripPattern.alightEdges[i], this);
             }
         }
     }
@@ -271,6 +283,10 @@ public class AlertPatch implements Serializable {
     @XmlElement
     public int getDirectionId() {
         return directionId;
+    }
+
+    public List<TripPattern> getTripPatterns() {
+        return new ArrayList<TripPattern>(tripPatterns);
     }
 
     public void setStop(AgencyAndId stop) {
