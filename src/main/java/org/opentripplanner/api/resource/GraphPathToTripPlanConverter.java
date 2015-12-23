@@ -537,7 +537,7 @@ public abstract class GraphPathToTripPlanConverter {
                     if (alertPatch.hasTrip()) {
                         // If the alert patch contains a trip and that trip match this leg only add the alert for
                         // this leg.
-                        if (alertPatch.getTrip().equals(new AgencyAndId(alertPatch.getFeedId(), leg.tripId))) {
+                        if (alertPatch.getTrip().equals(leg.tripId)) {
                             leg.addAlert(alertPatch.getAlert(), requestedLocale);
                         }
                     } else {
