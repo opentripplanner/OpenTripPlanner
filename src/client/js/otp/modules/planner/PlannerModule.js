@@ -32,6 +32,7 @@ otp.modules.planner.defaultQueryParams = {
     triangleTimeFactor              : 0.333,
     triangleSlopeFactor             : 0.333,
     triangleSafetyFactor            : 0.334,
+    longDistance                    : false
 }
 
 otp.modules.planner.PlannerModule =
@@ -316,7 +317,6 @@ otp.modules.planner.PlannerModule =
         var this_ = this;
 
         var queryParams = null;
-
         if(existingQueryParams) {
         	queryParams = existingQueryParams;
         }
@@ -339,6 +339,7 @@ otp.modules.planner.PlannerModule =
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
+            if(this.longDistance !== null) _.extend(queryParams, { longDistance : this.longDistance });
             if(this.preferredRoutes !== null) {
                 queryParams.preferredRoutes = this.preferredRoutes;
                 if(this.otherThanPreferredRoutesPenalty !== null)
