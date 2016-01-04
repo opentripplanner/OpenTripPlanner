@@ -401,8 +401,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
 
-    /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
-    // TODO remove
+    /* 
+     * Whether we are in "long-distance mode". 
+	 * This setting is now on per-request and defaults to false.
+	*/
     public boolean longDistance = false;
 
     /** Should traffic congestion be considered when driving? */

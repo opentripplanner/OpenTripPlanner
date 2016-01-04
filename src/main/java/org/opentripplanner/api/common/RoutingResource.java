@@ -333,6 +333,12 @@ public abstract class RoutingResource {
 
     @QueryParam("locale")
     private String locale;
+    
+    /*
+     * If true, the LongDistancePathService will be used.
+     */
+    @QueryParam("longDistance")
+    private Boolean longDistance;
 
     /**
      * If true, realtime updates are ignored during this search.
@@ -374,7 +380,7 @@ public abstract class RoutingResource {
 
         if (toPlace != null)
             request.setToString(toPlace);
-
+        
         {
             //FIXME: move into setter method on routing request
             TimeZone tz;
@@ -564,6 +570,9 @@ public abstract class RoutingResource {
 
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
+        
+        if (longDistance != null)
+        	request.longDistance = longDistance;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
