@@ -145,6 +145,7 @@ public class AlertPatch implements Serializable {
                     break;
                 }
             }
+            tripPatterns = emptyList();
         } else if (agency != null) {
             tripPatterns = graph.index.patternsForAgency.get(agency);
             for (TripPattern tripPattern : tripPatterns) {
