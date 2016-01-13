@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -42,9 +43,12 @@ public class AlertPatchTest extends TestCase {
 
     private RoutingRequest options;
 
-    private AStar aStar = new AStar();
+    private AStar aStar;
+
+    private String feedId;
 
     public void setUp() throws Exception {
+        aStar = new AStar();
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         options = new RoutingRequest();
         graph = new Graph();
@@ -52,20 +56,23 @@ public class AlertPatchTest extends TestCase {
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
         graph.index(new DefaultStreetVertexIndexFactory());
+
+        feedId = context.getFeedId().getId();
     }
 
     public void testStopAlertPatch() {
         AlertPatch snp1 = new AlertPatch();
+        snp1.setFeedId(feedId);
         snp1.setTimePeriods(Collections.singletonList(new TimePeriod(
                 0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new AgencyAndId("agency", "A"));
+        snp1.setStop(new AgencyAndId(feedId, "A"));
         snp1.apply(graph);
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_e = graph.getVertex("agency:E_arrive");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_e = graph.getVertex(feedId + ":E_arrive");
 
         ShortestPathTree spt;
         GraphPath optimizedPath, unoptimizedPath;
@@ -97,6 +104,7 @@ public class AlertPatchTest extends TestCase {
 
     public void testTimeRanges() {
         AlertPatch snp1 = new AlertPatch();
+        snp1.setFeedId(feedId);
         LinkedList<TimePeriod> timePeriods = new LinkedList<TimePeriod>();
         long breakTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         timePeriods.add(new TimePeriod(0, breakTime)); // until the beginning of the day
@@ -107,11 +115,11 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new AgencyAndId("agency", "A"));
+        snp1.setStop(new AgencyAndId(feedId, "A"));
         snp1.apply(graph);
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_e = graph.getVertex("agency:E_arrive");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_e = graph.getVertex(feedId + ":E_arrive");
 
         ShortestPathTree spt;
         GraphPath path;
@@ -155,17 +163,19 @@ public class AlertPatchTest extends TestCase {
 
     public void testRouteNotePatch() {
         AlertPatch rnp1 = new AlertPatch();
+        rnp1.setFeedId(feedId);
 
         rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(
                 0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
         Alert note1 = Alert.createSimpleAlerts("The route note");
         rnp1.setAlert(note1);
         rnp1.setId("id1");
+        // Routes isn't patched in tests through GtfsBundle, which is why we have have a reference to agency id here.
         rnp1.setRoute(new AgencyAndId("agency", "1"));
         rnp1.apply(graph);
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_e = graph.getVertex("agency:E_arrive");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_e = graph.getVertex(feedId + ":E_arrive");
 
         ShortestPathTree spt;
         GraphPath path;

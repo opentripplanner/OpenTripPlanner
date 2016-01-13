@@ -702,4 +702,15 @@ public class TripPattern implements Cloneable, Serializable {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Get the feed id this trip pattern belongs to.
+     *
+     * @return feed id for this trip pattern
+     */
+    public String getFeedId() {
+        // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
+        return route.getId().getAgencyId();
+    }
+
 }

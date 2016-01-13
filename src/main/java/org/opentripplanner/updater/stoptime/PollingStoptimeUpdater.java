@@ -34,7 +34,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
  * rt.frequencySec = 60
  * rt.sourceType = gtfs-http
  * rt.url = http://host.tld/path
- * rt.defaultAgencyId = TA
+ * rt.feedId = TA
  * </pre>
  *
  */
@@ -67,9 +67,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     private Boolean purgeExpiredData;
 
     /**
-     * Default agency id that is used for the trip ids in the TripUpdates
+     * Feed id that is used for the trip ids in the TripUpdates
      */
-    private String agencyId;
+    private String feedId;
 
     /**
      * Set only if we should attempt to match the trip_id from other data in TripDescriptor
@@ -84,7 +84,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     @Override
     public void configurePolling(Graph graph, JsonNode config) throws Exception {
         // Create update streamer from preferences
-        agencyId = config.path("defaultAgencyId").asText("");
+        feedId = config.path("feedId").asText("");
         String sourceType = config.path("sourceType").asText();
         if (sourceType != null) {
             if (sourceType.equals("gtfs-http")) {
@@ -162,7 +162,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (updates != null) {
             // Handle trip updates via graph writer runnable
             TripUpdateGraphWriterRunnable runnable =
-                    new TripUpdateGraphWriterRunnable(fullDataset, updates, agencyId);
+                    new TripUpdateGraphWriterRunnable(fullDataset, updates, feedId);
             updaterManager.execute(runnable);
         }
     }

@@ -41,17 +41,9 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     private boolean fullDataset = true;
 
     /**
-     * True iff updates from this realtime feed should always be considered incremental,
-     * i.e. missing entities will not delete previous realtime data,
-     * even if the feed itself says it contains the full dataset.
-     * Useful when there are several realtime feeds.
+     * Feed id that is used to match trip ids in the TripUpdates
      */
-    private boolean alwaysIncremental = true;
-
-    /**
-     * Default agency id that is used for the trip ids in the TripUpdates
-     */
-    private String agencyId;
+    private String feedId;
 
     private String url;
 
@@ -62,11 +54,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.agencyId = config.path("defaultAgencyId").asText();
-        if (config.path("alwaysIncremental").asBoolean(false)) {
-            LOG.debug("Setting alwaysIncremental for source " + url);
-            this.alwaysIncremental = true;
-        }
+        this.feedId = config.path("feedId").asText();
     }
 
     @Override
@@ -115,7 +103,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     }
 
     @Override
-    public String getAgencyId() {
-        return this.agencyId;
+    public String getFeedId() {
+        return this.feedId;
     }
 }

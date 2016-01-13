@@ -64,6 +64,8 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
  * This is a singleton class to hold graph data between test runs, since loading it is slow.
  */
 class Context {
+    public String feedId;
+
     public Graph graph;
 
     public AStar aStar;
@@ -90,14 +92,15 @@ class Context {
         graph.putService(CalendarServiceData.class,
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
 
+        feedId = context.getFeedId().getId();
         // Add simple transfer to make transfer possible between N-K and F-H
-        createSimpleTransfer("agency:K", "agency:F", 100);
+        createSimpleTransfer(feedId + ":K", feedId + ":F", 100);
 
         // Add simple transfer to make transfer possible between O-P and U-V
-        createSimpleTransfer("agency:P", "agency:U", 100);
+        createSimpleTransfer(feedId + ":P", feedId + ":U", 100);
 
         // Add simple transfer to make transfer possible between U-V and I-J
-        createSimpleTransfer("agency:V", "agency:I", 100);
+        createSimpleTransfer(feedId + ":V", feedId + ":I", 100);
 
         // Create dummy TimetableSnapshot
         TimetableSnapshot snapshot = new TimetableSnapshot();
@@ -131,10 +134,13 @@ public class TestTransfers extends TestCase {
 
     private AStar aStar;
 
+    private String feedId;
+
     public void setUp() throws Exception {
-        // Get graph and a star from singleton class
+        // Get graph, a star & feed id from singleton class
         graph = Context.getInstance().graph;
         aStar = Context.getInstance().aStar;
+        feedId = Context.getInstance().feedId;
     }
 
     /**
@@ -226,8 +232,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:N");
-        Vertex destination = graph.getVertex("agency:H");
+        Vertex origin = graph.getVertex(feedId + ":N");
+        Vertex destination = graph.getVertex(feedId + ":H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -245,9 +251,9 @@ public class TestTransfers extends TestCase {
 
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
-        stopK.setId(new AgencyAndId("agency", "K"));
+        stopK.setId(new AgencyAndId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new AgencyAndId("agency", "F"));
+        stopF.setId(new AgencyAndId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
 
         // Plan journey
@@ -267,8 +273,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:N");
-        Vertex destination = graph.getVertex("agency:H");
+        Vertex origin = graph.getVertex(feedId + ":N");
+        Vertex destination = graph.getVertex(feedId + ":H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -287,9 +293,9 @@ public class TestTransfers extends TestCase {
 
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
-        stopK.setId(new AgencyAndId("agency", "K"));
+        stopK.setId(new AgencyAndId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new AgencyAndId("agency", "F"));
+        stopF.setId(new AgencyAndId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
 
         // Plan journey
@@ -309,8 +315,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:O");
-        Vertex destination = graph.getVertex("agency:V");
+        Vertex origin = graph.getVertex(feedId + ":O");
+        Vertex destination = graph.getVertex(feedId + ":V");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -337,9 +343,9 @@ public class TestTransfers extends TestCase {
         // Add transfer to table such that the next trip will be chosen
         // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopP = new Stop();
-        stopP.setId(new AgencyAndId("agency", "P"));
+        stopP.setId(new AgencyAndId(feedId, "P"));
         Stop stopU = new Stop();
-        stopU.setId(new AgencyAndId("agency", "U"));
+        stopU.setId(new AgencyAndId(feedId, "U"));
         table.addTransferTime(stopP, stopU, null, null, null, null, 3675);
 
         // Plan journey
@@ -369,8 +375,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:U");
-        Vertex destination = graph.getVertex("agency:J");
+        Vertex origin = graph.getVertex(feedId + ":U");
+        Vertex destination = graph.getVertex(feedId + ":J");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -400,9 +406,9 @@ public class TestTransfers extends TestCase {
         // Add transfer to table such that the next trip will be chosen
         // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopV = new Stop();
-        stopV.setId(new AgencyAndId("agency", "V"));
+        stopV.setId(new AgencyAndId(feedId, "V"));
         Stop stopI = new Stop();
-        stopI.setId(new AgencyAndId("agency", "I"));
+        stopI.setId(new AgencyAndId(feedId, "I"));
         table.addTransferTime(stopV, stopI, null, null, null, null, 3675);
 
         // Plan journey
@@ -434,8 +440,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:N");
-        Vertex destination = graph.getVertex("agency:H");
+        Vertex origin = graph.getVertex(feedId + ":N");
+        Vertex destination = graph.getVertex(feedId + ":H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -453,9 +459,9 @@ public class TestTransfers extends TestCase {
 
         // Add forbidden transfer to table
         Stop stopK = new Stop();
-        stopK.setId(new AgencyAndId("agency", "K"));
+        stopK.setId(new AgencyAndId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new AgencyAndId("agency", "F"));
+        stopF.setId(new AgencyAndId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null,
                 StopTransfer.FORBIDDEN_TRANSFER);
 
@@ -475,8 +481,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:U");
-        Vertex destination = graph.getVertex("agency:J");
+        Vertex origin = graph.getVertex(feedId + ":U");
+        Vertex destination = graph.getVertex(feedId + ":J");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -495,9 +501,9 @@ public class TestTransfers extends TestCase {
 
         // Add forbidden transfer to table
         Stop stopV = new Stop();
-        stopV.setId(new AgencyAndId("agency", "V"));
+        stopV.setId(new AgencyAndId(feedId, "V"));
         Stop stopI = new Stop();
-        stopI.setId(new AgencyAndId("agency", "I"));
+        stopI.setId(new AgencyAndId(feedId, "I"));
         table.addTransferTime(stopV, stopI, null, null, null, null,
                 StopTransfer.FORBIDDEN_TRANSFER);
 
@@ -519,8 +525,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency:N");
-        Vertex destination = graph.getVertex("agency:H");
+        Vertex origin = graph.getVertex(feedId + ":N");
+        Vertex destination = graph.getVertex(feedId + ":H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -538,13 +544,13 @@ public class TestTransfers extends TestCase {
 
         // Add timed transfer to table
         Stop stopK = new Stop();
-        stopK.setId(new AgencyAndId("agency", "K"));
+        stopK.setId(new AgencyAndId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new AgencyAndId("agency", "F"));
+        stopF.setId(new AgencyAndId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        Vertex fromVertex = graph.getVertex("agency:K_arrive");
-        Vertex toVertex = graph.getVertex("agency:F_depart");
+        Vertex fromVertex = graph.getVertex(feedId + ":K_arrive");
+        Vertex toVertex = graph.getVertex(feedId + ":F_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
         // Plan journey

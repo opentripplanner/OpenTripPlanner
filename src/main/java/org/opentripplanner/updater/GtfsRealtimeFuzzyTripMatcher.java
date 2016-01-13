@@ -28,7 +28,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         this.index = index;
     }
 
-    public TripDescriptor match(String agency, TripDescriptor trip) {
+    public TripDescriptor match(String feedId, TripDescriptor trip) {
         if (trip.hasTripId()) {
             // trip_id already exists
             return trip;
@@ -40,7 +40,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
             return trip;
         }
 
-        AgencyAndId routeId = new AgencyAndId(agency, trip.getRouteId());
+        AgencyAndId routeId = new AgencyAndId(feedId, trip.getRouteId());
         int time = StopTimeFieldMappingFactory.getStringAsSeconds(trip.getStartTime());
         ServiceDate date;
         try {
