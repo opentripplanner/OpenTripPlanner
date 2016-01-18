@@ -346,15 +346,6 @@
         </repository>
     </repositories>
 
-    <!-- Enunciate 1.29 is not yet in Maven Central Repository -->
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>opencast-public</id>
-            <url>http://repository.opencastproject.org/nexus/content/repositories/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencies>
         <!-- Amazon AWS client libraries -->
         <dependency>
