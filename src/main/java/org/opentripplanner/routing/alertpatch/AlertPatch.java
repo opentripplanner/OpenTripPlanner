@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -123,14 +124,6 @@ public class AlertPatch implements Serializable {
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
-<<<<<<< HEAD
-        if(trip != null) {
-            tripPatterns = new LinkedList<>();
-            TripPattern tripPattern = graph.index.patternForTrip.get(trip);
-            if(tripPattern != null) {
-                tripPatterns.add(tripPattern);
-                addAlertPatchToEdges(graph, stop, tripPattern);
-=======
         if (route != null || trip != null || agency != null) {
             Collection<TripPattern> tripPatterns = null;
 
@@ -141,7 +134,18 @@ public class AlertPatch implements Serializable {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
+		tripPatterns = graph.index.patternsForRoute.get(route).stream()
+                  .filter(tripPattern -> {
+                   if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                       return false;
+                   }
+                   if (directionId != -1 && directionId == tripPattern.directionId) {
+                       return false;
+                   }
+                   return true;
+               })
+               .peek(tripPattern -> addAlertPatchToEdges(graph, stop, tripPattern))
+               .collect(Collectors.toList());
             } else {
                 // Find patterns for the feed.
                 tripPatterns = graph.index.patternsForFeedId.get(feedId);
@@ -162,21 +166,7 @@ public class AlertPatch implements Serializable {
                         }
                     }
                 }
->>>>>>> 6cefac54593233359f02c1557349f40d16d0ce90
             }
-        } else if (route != null) {
-           tripPatterns = graph.index.patternsForRoute.get(route).stream()
-               .filter(tripPattern -> {
-                   if (direction != null && !direction.equals(tripPattern.getDirection())) {
-                       return false;
-                   }
-                   if (directionId != -1 && directionId == tripPattern.directionId) {
-                       return false;
-                   }
-                   return true;
-               })
-               .peek(tripPattern -> addAlertPatchToEdges(graph, stop, tripPattern))
-               .collect(Collectors.toList());
         } else if (stop != null) {
             TransitStop transitStop = graph.index.stopVertexForStop.get(stop);
 
@@ -194,11 +184,6 @@ public class AlertPatch implements Serializable {
                 }
             }
             tripPatterns = emptyList();
-        } else if (agency != null) {
-            tripPatterns = graph.index.patternsForAgency.get(agency);
-            for (TripPattern tripPattern : tripPatterns) {
-                addAlertPatchToEdges(graph, stop, tripPattern);
-            }
         } else {
             tripPatterns = emptyList();
         }

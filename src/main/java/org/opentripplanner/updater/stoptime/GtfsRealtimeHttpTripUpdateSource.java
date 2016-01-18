@@ -92,9 +92,6 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
 
     @Override
     public boolean getFullDatasetValueOfLastUpdates() {
-        if (this.alwaysIncremental) {
-            return false;
-        }
         return fullDataset;
     }
     
