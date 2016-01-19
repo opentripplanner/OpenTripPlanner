@@ -327,7 +327,7 @@ public class AlertPatch implements Serializable {
     }
 
     public List<TripPattern> getTripPatterns() {
-        return new ArrayList<TripPattern>(tripPatterns);
+        return tripPatterns!=null ? new ArrayList<TripPattern>(tripPatterns):new ArrayList();
     }
 
     public void setStop(AgencyAndId stop) {
