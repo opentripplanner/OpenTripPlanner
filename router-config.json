@@ -18,14 +18,14 @@
       "url": "http://beta.digitransit.fi/siri2gtfsrt/HSL",
       "defaultAgencyId": "HSL",
       "fuzzyTripMatching": true,
-      "alwaysIncremental": true
+      "feedId": "hsl-stop-times"
     },
     {
       "type": "real-time-alerts",
       "frequencySec": 30,
       "url": "http://beta.digitransit.fi/hslalert/",
-      "defaultAgencyId": "HSL",
       "fuzzyTripMatching": true
+      "feedId": "hsl-alerts",
     }
   ],
   boardTimes: {

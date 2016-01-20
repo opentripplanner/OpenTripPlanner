@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -151,6 +153,9 @@ public class Broker implements Runnable {
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
     public Broker (Properties brokerConfig, String addr, int port) {
+        // print out date on startup so that CloudWatch logs has a unique fingerprint
+        LOG.info("Analyst worker starting at {}", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
         this.config = brokerConfig;
 
         // create a config for the AWS workers

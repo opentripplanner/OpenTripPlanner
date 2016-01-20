@@ -452,7 +452,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
-        rr.dominanceFunction = new DominanceFunction.MinimumWeight();
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         int minAccessTime = 0;
