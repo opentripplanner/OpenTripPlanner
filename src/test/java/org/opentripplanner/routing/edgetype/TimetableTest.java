@@ -95,10 +95,12 @@ public class TimetableTest {
         StopTimeUpdate.Builder stopTimeUpdateBuilder;
         StopTimeEvent.Builder stopTimeEventBuilder;
 
+        String feedId = graph.getFeedIds().iterator().next();
+
         int trip_1_1_index = timetable.getTripIndex(new AgencyAndId("agency", "1.1"));
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_c = graph.getVertex("agency:C");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
         RoutingRequest options = new RoutingRequest();
 
         ShortestPathTree spt;

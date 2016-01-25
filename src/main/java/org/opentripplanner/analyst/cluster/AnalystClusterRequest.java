@@ -11,6 +11,8 @@ import java.io.Serializable;
  * Only one of them should be set in a given instance, with the ProfileRequest taking precedence if both are set.
  */
 public class AnalystClusterRequest implements Serializable {
+	/** The type of this request, provided for compatibility with R5 polymorphic request types. */
+	public final String type = "analyst";
 
 	/** The ID of the destinations pointset */
 	public String destinationPointsetId;

@@ -13,16 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -54,17 +46,23 @@ public class TimetableSnapshot {
     }
     
     /**
-     * Class to use as key in HashMap containing trip id and service date
+     * Class to use as key in HashMap containing feed id, trip id and service date
      */
     protected class TripIdAndServiceDate {
+        private final String feedId;
         private final String tripId;
         private final ServiceDate serviceDate;
         
-        public TripIdAndServiceDate(final String tripId, final ServiceDate serviceDate) {
+        public TripIdAndServiceDate(final String feedId, final String tripId, final ServiceDate serviceDate) {
+            this.feedId = feedId;
             this.tripId = tripId;
             this.serviceDate = serviceDate;
         }
-        
+
+        public String getFeedId() {
+            return feedId;
+        }
+
         public String getTripId() {
             return tripId;
         }
@@ -73,9 +71,10 @@ public class TimetableSnapshot {
             return serviceDate;
         }
 
+
         @Override
         public int hashCode() {
-            int result = Objects.hash(tripId, serviceDate);
+            int result = Objects.hash(tripId, serviceDate, feedId);
             return result;
         }
 
@@ -89,7 +88,8 @@ public class TimetableSnapshot {
                 return false;
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
             boolean result = Objects.equals(this.tripId, other.tripId) &&
-                    Objects.equals(this.serviceDate, other.serviceDate);
+                    Objects.equals(this.serviceDate, other.serviceDate) &&
+                    Objects.equals(this.feedId, other.feedId);
             return result;
         }
     }
@@ -102,11 +102,11 @@ public class TimetableSnapshot {
     // FIXME: this could be made into a flat hashtable with compound keys.
     private HashMap<TripPattern, SortedSet<Timetable>> timetables =
             new HashMap<TripPattern, SortedSet<Timetable>>();
-    
+
     /**
      * <p>
      * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
-     * service date as a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)}
+     * service date as a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)}
      * with trip times of a trip that didn't exist yet in the trip pattern.
      * </p>
      * <p>
@@ -154,15 +154,16 @@ public class TimetableSnapshot {
     
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
-     * a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with trip times of
+     * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of
      * a trip that didn't exist yet in the trip pattern.
-     * 
+     *
+     * @param feedId feed id the trip id belongs to
      * @param tripId trip id (without agency)
      * @param serviceDate service date
      * @return last added trip pattern; null if trip never was added to a trip pattern
      */
-    public TripPattern getLastAddedTripPattern(String tripId, ServiceDate serviceDate) {
-        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
+    public TripPattern getLastAddedTripPattern(String feedId, String tripId, ServiceDate serviceDate) {
+        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
         TripPattern pattern = lastAddedTripPattern.get(tripIdAndServiceDate);
         return pattern;
     }
@@ -176,7 +177,7 @@ public class TimetableSnapshot {
      * @param serviceDate service day for which this update is valid
      * @return whether or not the update was actually applied
      */
-    public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+    public boolean update(String feedId, TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(pattern);
         Preconditions.checkNotNull(serviceDate);
@@ -216,7 +217,7 @@ public class TimetableSnapshot {
             tt.addTripTimes(updatedTripTimes);
             // Remember this pattern for the added trip id and service date
             String tripId = updatedTripTimes.trip.getId().getId();
-            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
+            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
         } else {
             // Set updated trip times of trip
@@ -264,21 +265,42 @@ public class TimetableSnapshot {
     }
 
     /**
-     * Clear all data of snapshot 
+     * Clear all data of snapshot for the provided feed id
+     *
+     * @param feedId feed id to clear the snapshop for
      */
-    public void clear() {
+    public void clear(String feedId) {
         if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
-        
-        // If this snapshot is not empty, it will be dirty after the clear action 
-        if (!timetables.isEmpty() || !lastAddedTripPattern.isEmpty()) {
+        // Clear all data from snapshot.
+        boolean timetableWasModified = clearTimetable(feedId);
+        boolean lastAddedWasModified = clearLastAddedTripPattern(feedId);
+
+        // If this snapshot was modified, it will be dirty after the clear actions.
+        if (timetableWasModified || lastAddedWasModified) {
             dirty = true;
         }
-        
-        // Clear all data from snapshot
-        timetables.clear();
-        lastAddedTripPattern.clear();
+    }
+
+    /**
+     * Clear timetable for all patterns matching the provided feed id.
+     *
+     * @param feedId feed id to clear out
+     * @return true if the timetable changed as a result of the call
+     */
+    protected boolean clearTimetable(String feedId) {
+        return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
+    }
+
+    /**
+     * Clear all last added trip patterns matching the provided feed id.
+     *
+     * @param feedId feed id to clear out
+     * @return true if the lastAddedTripPattern changed as a result of the call
+     */
+    protected boolean clearLastAddedTripPattern(String feedId) {
+        return lastAddedTripPattern.keySet().removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getFeedId()));
     }
 
     /**

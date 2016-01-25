@@ -411,7 +411,7 @@ connect to a network resource is the `url` field.
             type: "real-time-alerts",
             frequencySec: 30,
             url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Polling bike rental updater.
@@ -445,7 +445,7 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet",
+            feedId: "TriMet"
             // Defaults to false, if omitted. Makes the feed always incremental even when it states
             // that it contains a full dataset.
             // Useful with multiple realtime feeds to prevent last feed from clearing previous feeds.

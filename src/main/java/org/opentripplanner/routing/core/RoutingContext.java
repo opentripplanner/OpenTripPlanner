@@ -15,6 +15,7 @@ package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.LineString;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -373,12 +374,14 @@ public class RoutingContext implements Cloneable {
             return;
         }
 
-        for (String agency : graph.getAgencyIds()) {
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
-                    calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
-                    calendarService, agency));
+        for (String feedId : graph.getFeedIds()) {
+            for (Agency agency : graph.getAgencies(feedId)) {
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
+                        calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
+                        calendarService, agency.getId()));
+            }
         }
     }
 

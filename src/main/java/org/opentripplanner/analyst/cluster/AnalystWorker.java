@@ -51,6 +51,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -158,6 +160,9 @@ public class AnalystWorker implements Runnable {
     private ThreadPoolExecutor highPriorityExecutor, batchExecutor;
 
     public AnalystWorker(Properties config) {
+        // print out date on startup so that CloudWatch logs has a unique fingerprint
+        LOG.info("Analyst worker starting at {}", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
         // parse the configuration
         // set up the stats store
         String statsQueue = config.getProperty("statistics-queue");
