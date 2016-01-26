@@ -6,11 +6,14 @@ import org.opentripplanner.analyst.scenario.ScenarioStore;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.EnumMap;
 
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
@@ -109,6 +112,27 @@ public class Router {
             }
         }
         LOG.info("Timeouts for router '{}': {}", this.id, this.timeouts);
+
+
+        JsonNode boardTimes = config.get("boardTimes");
+        if (boardTimes != null && boardTimes.isObject()) {
+            graph.boardTimes = new EnumMap<>(TraverseMode.class);
+            for (TraverseMode mode : TraverseMode.values()) {
+                if (boardTimes.has(mode.name())) {
+                    graph.boardTimes.put(mode, boardTimes.get(mode.name()).asInt(0));
+                }
+            }
+        }
+
+        JsonNode alightTimes = config.get("alightTimes");
+        if (alightTimes != null && alightTimes.isObject()) {
+            graph.alightTimes = new EnumMap<>(TraverseMode.class);
+            for (TraverseMode mode : TraverseMode.values()) {
+                if (alightTimes.has(mode.name())) {
+                    graph.alightTimes.put(mode, alightTimes.get(mode.name()).asInt(0));
+                }
+            }
+        }
 
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);

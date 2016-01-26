@@ -610,6 +610,7 @@ otp.modules.planner.PlannerModule =
         if(mode === "BUS") return '#080';
         if(mode === "TRAM") return '#800';
         if(mode === "CAR") return '#444';
+        if(mode === "AIRPLANE") return '#f0f';
         return '#aaa';
     },
 

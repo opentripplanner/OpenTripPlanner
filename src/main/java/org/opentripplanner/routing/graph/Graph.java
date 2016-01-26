@@ -189,6 +189,12 @@ public class Graph implements Serializable {
     /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
     public boolean hasScheduledService = false;
 
+    /** Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
+
+    /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
+
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
 

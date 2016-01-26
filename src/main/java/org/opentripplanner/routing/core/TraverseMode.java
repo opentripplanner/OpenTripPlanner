@@ -25,7 +25,8 @@ public enum TraverseMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
-    TRANSIT, TRAINISH, BUSISH, LEG_SWITCH;
+    TRANSIT, TRAINISH, BUSISH, LEG_SWITCH,
+    AIRPLANE;
 
     private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
             new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
@@ -47,7 +48,7 @@ public enum TraverseMode {
     public boolean isTransit() {
         return this == TRAM || this == SUBWAY || this == RAIL || this == BUS || this == FERRY
                 || this == CABLE_CAR || this == GONDOLA || this == FUNICULAR || this == TRANSIT
-                || this == TRAINISH || this == BUSISH;
+                || this == TRAINISH || this == BUSISH || this == AIRPLANE;
     }
 
     public boolean isOnStreetNonTransit() {
