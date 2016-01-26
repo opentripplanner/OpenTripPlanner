@@ -189,6 +189,7 @@ public class GraphPath {
             //System.out.println(s.getBackEdge() + " leads to " + s);
             if (s.getBackEdge() != null) {
                 System.out.println(s.getBackEdge().getClass().getSimpleName() + " --> " + s.getVertex().getClass().getSimpleName());
+                System.out.println("  " + s.weight);
             }
         }
         System.out.println(" --- END GRAPHPATH DUMP ---");
