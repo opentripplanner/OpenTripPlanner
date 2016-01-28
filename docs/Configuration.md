@@ -278,6 +278,23 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+## Boarding and alighting times
+
+Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
+where the check-in process needs to be done in good time before boarding. The boarding time is added to the time when going
+from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
+seconds needed for the boarding and alighting processes in `router-config.json` as follows:
+
+```JSON
+{
+  boardTimes: {
+    AIRPLANE: 2700
+  },
+  alightTimes: {
+    AIRPLANE: 1200
+  }
+}
+```
 
 ## Timeouts
 
@@ -341,8 +358,28 @@ or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
 of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, and the Dutch OVFiets system. It is straightforward to extend OTP to support any bike rental system that
+Bixi, the Dutch OVFiets system, and a generic KML format.
+It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
+
+The generic KML needs to be in format like
+
+```XML
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="citybikes" id="citybikes">
+    <SimpleField name="ID" type="int"></SimpleField>
+</Schema>
+  <Placemark>
+    <name>A Bike Station</name>
+    <ExtendedData><SchemaData schemaUrl="#citybikes">
+        <SimpleData name="ID">0</SimpleData>
+    </SchemaData></ExtendedData>
+      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
+  </Placemark>
+</Document></kml>
+```
 
 ### Configuration
 
@@ -374,12 +411,12 @@ connect to a network resource is the `url` field.
             type: "real-time-alerts",
             frequencySec: 30,
             url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Polling bike rental updater.
         // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
-        // city-bikes, citi-bike-nyc, next-bike, vcub
+        // city-bikes, citi-bike-nyc, next-bike, vcub, kml
         {
             type: "bike-rental",
             frequencySec: 300,
@@ -408,7 +445,7 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Streaming differential GTFS-RT TripUpdates over websockets

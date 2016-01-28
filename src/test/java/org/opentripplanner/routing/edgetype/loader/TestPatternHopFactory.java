@@ -34,6 +34,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -65,17 +66,27 @@ public class TestPatternHopFactory extends TestCase {
     private Graph graph;
     private AStar aStar = new AStar();
     private GtfsContext context;
+    private String feedId;
 
     public void setUp() throws Exception {
 
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
+        feedId = context.getFeedId().getId();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
         
-        String[] stops = {"agency:A", "agency:B", "agency:C", "agency:D", "agency:E", "agency:entrance_a", "agency:entrance_b"};
+        String[] stops = {
+                feedId + ":A",
+                feedId + ":B",
+                feedId + ":C",
+                feedId + ":D",
+                feedId + ":E",
+                feedId + ":entrance_a",
+                feedId + ":entrance_b"
+        };
         for (int i = 0; i < stops.length; ++i) {
             TransitStop stop = (TransitStop) (graph.getVertex(stops[i]));
             
@@ -106,8 +117,8 @@ public class TestPatternHopFactory extends TestCase {
     }
     
     public void testBoardAlight() throws Exception {
-        Vertex stop_a_depart = graph.getVertex("agency:A_depart");
-        Vertex stop_b_depart = graph.getVertex("agency:B_depart");
+        Vertex stop_a_depart = graph.getVertex(feedId + ":A_depart");
+        Vertex stop_b_depart = graph.getVertex(feedId + ":B_depart");
         
         assertEquals(1, stop_a_depart.getDegreeOut());
         assertEquals(3, stop_b_depart.getDegreeOut());
@@ -133,8 +144,8 @@ public class TestPatternHopFactory extends TestCase {
     }
     
     public void testBoardAlightStopIndex() {
-        Vertex stop_b_arrive = graph.getVertex("agency:C_arrive");
-        Vertex stop_b_depart = graph.getVertex("agency:C_depart");
+        Vertex stop_b_arrive = graph.getVertex(feedId + ":C_arrive");
+        Vertex stop_b_depart = graph.getVertex(feedId + ":C_depart");
         
         Map<TripPattern, Integer> stopIndex = new HashMap<TripPattern, Integer>();
         for(Edge edge : stop_b_depart.getOutgoing()) {
@@ -161,11 +172,11 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_b = graph.getVertex("agency:B");
-        Vertex stop_c = graph.getVertex("agency:C");
-        Vertex stop_d = graph.getVertex("agency:D");
-        Vertex stop_e = graph.getVertex("agency:E");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_b = graph.getVertex(feedId + ":B");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
+        Vertex stop_e = graph.getVertex(feedId + ":E");
 
         RoutingRequest options = new RoutingRequest();
         // test feed is designed for instantaneous transfers
@@ -221,8 +232,8 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testRoutingOverMidnight() throws Exception {
         // this route only runs on weekdays
-        Vertex stop_g = graph.getVertex("agency:G_depart");
-        Vertex stop_h = graph.getVertex("agency:H_arrive");
+        Vertex stop_g = graph.getVertex(feedId + ":G_depart");
+        Vertex stop_h = graph.getVertex(feedId + ":H_arrive");
 
         ShortestPathTree spt;
         GraphPath path;
@@ -252,7 +263,7 @@ public class TestPatternHopFactory extends TestCase {
 
     /* Somewhat hackish convenience method to grab a hop edge on a particular route leaving a particular stop. */
     private PatternHop getHopEdge(String stopId, String routeId) {
-        Vertex stopDepartVertex = graph.getVertex("agency:" + stopId + "_depart");
+        Vertex stopDepartVertex = graph.getVertex(feedId + ":" + stopId + "_depart");
         for (Edge edge : stopDepartVertex.getOutgoing()) {
             if (edge instanceof TransitBoardAlight) {
                 TransitBoardAlight tba = ((TransitBoardAlight) edge);
@@ -291,8 +302,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testPickupDropoff() throws Exception {
-        Vertex stop_o = graph.getVertex("agency:O_depart");
-        Vertex stop_p = graph.getVertex("agency:P");
+        Vertex stop_o = graph.getVertex(feedId + ":O_depart");
+        Vertex stop_p = graph.getVertex(feedId + ":P");
         assertEquals(2, stop_o.getOutgoing().size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
@@ -319,6 +330,7 @@ public class TestPatternHopFactory extends TestCase {
         TransferTable transferTable = graph.getTransferTable();
         
         // create dummy routes and trips
+        // In tests we don't patch entities with the feed id, only default agency id is used.
         Route fromRoute = new Route();
         fromRoute.setId(new AgencyAndId("agency", "1"));
         Trip fromTrip = new Trip();
@@ -334,9 +346,9 @@ public class TestPatternHopFactory extends TestCase {
         toTrip2.setRoute(toRoute);
         
         // find stops
-        Stop stopK = ((TransitStopArrive)graph.getVertex("agency:K_arrive")).getStop();
-        Stop stopN = ((TransitStopDepart)graph.getVertex("agency:N_depart")).getStop();
-        Stop stopM = ((TransitStopDepart)graph.getVertex("agency:M_depart")).getStop();
+        Stop stopK = ((TransitStopArrive)graph.getVertex(feedId + ":K_arrive")).getStop();
+        Stop stopN = ((TransitStopDepart)graph.getVertex(feedId + ":N_depart")).getStop();
+        Stop stopM = ((TransitStopDepart)graph.getVertex(feedId + ":M_depart")).getStop();
         
         assertTrue(transferTable.hasPreferredTransfers());
         assertEquals(StopTransfer.UNKNOWN_TRANSFER, transferTable.getTransferTime(stopN, stopM, fromTrip, toTrip, true));
@@ -345,13 +357,13 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip, true));
         assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2, true));
         
-        TransitStop e_arrive = (TransitStop) graph.getVertex("agency:E");
-        TransitStop f_depart = (TransitStop) graph.getVertex("agency:F");
+        TransitStop e_arrive = (TransitStop) graph.getVertex(feedId + ":E");
+        TransitStop f_depart = (TransitStop) graph.getVertex(feedId + ":F");
         Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
-        Vertex stop_b = graph.getVertex("agency:B_depart");
-        Vertex stop_g = graph.getVertex("agency:G_arrive");
+        Vertex stop_b = graph.getVertex(feedId + ":B_depart");
+        Vertex stop_g = graph.getVertex(feedId + ":G_arrive");
         RoutingRequest options = new RoutingRequest();
         options.dateTime = startTime;
         options.setRoutingContext(graph, stop_b, stop_g);
@@ -368,8 +380,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testTraverseMode() throws Exception {
-        Vertex stop_a = graph.getVertex("agency:A_depart");
-        Vertex stop_b = graph.getVertex("agency:B_arrive");
+        Vertex stop_a = graph.getVertex(feedId + ":A_depart");
+        Vertex stop_b = graph.getVertex(feedId + ":B_arrive");
 
         ShortestPathTree spt;
 
@@ -389,8 +401,8 @@ public class TestPatternHopFactory extends TestCase {
     }
     
     public void testTimelessStops() throws Exception {
-        Vertex stop_d = graph.getVertex("agency:D");
-        Vertex stop_c = graph.getVertex("agency:C");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 10, 0, 0);
         options.setRoutingContext(graph, stop_d, stop_c);
@@ -402,10 +414,10 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testTripBikesAllowed() throws Exception {
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_b = graph.getVertex("agency:B");
-        Vertex stop_c = graph.getVertex("agency:C");
-        Vertex stop_d = graph.getVertex("agency:D");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_b = graph.getVertex(feedId + ":B");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
 
         RoutingRequest options = new RoutingRequest();
         options.modes.setWalk(false);
@@ -439,12 +451,12 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_1_agency_entrance_a");
-        Vertex near_b = graph.getVertex("near_1_agency_entrance_b");
-        Vertex near_c = graph.getVertex("near_1_agency_C");
-        Vertex near_e = graph.getVertex("near_1_agency_E");
+        Vertex near_a = graph.getVertex("near_1_" + feedId + "_entrance_a");
+        Vertex near_b = graph.getVertex("near_1_" + feedId + "_entrance_b");
+        Vertex near_c = graph.getVertex("near_1_" + feedId + "_C");
+        Vertex near_e = graph.getVertex("near_1_" + feedId + "_E");
 
-        Vertex stop_d = graph.getVertex("agency:D");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
         Vertex split_d = null;
         for (StreetTransitLink e : Iterables.filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
             split_d = e.getToVertex();
@@ -500,14 +512,14 @@ public class TestPatternHopFactory extends TestCase {
          *  from R to S.  If we take the direct-but-slower 11.1, we'll miss
          *  the 8:50 and have to catch the 9:50.
          */
-        Vertex destination = graph.getVertex("agency:T");
+        Vertex destination = graph.getVertex(feedId + ":T");
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
         options.transferSlack = (0);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.dateTime = TestUtils.toSeconds(startTime);
-        options.setRoutingContext(graph, "agency:Q", destination.getLabel());
+        options.setRoutingContext(graph, feedId + ":Q", destination.getLabel());
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(destination, false);
 
@@ -518,8 +530,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testFrequencies() {
-        Vertex stop_u = graph.getVertex("agency:U_depart");
-        Vertex stop_v = graph.getVertex("agency:V_arrive");
+        Vertex stop_u = graph.getVertex(feedId + ":U_depart");
+        Vertex stop_v = graph.getVertex(feedId + ":V_arrive");
 
         ShortestPathTree spt;
         GraphPath path;
@@ -562,8 +574,8 @@ public class TestPatternHopFactory extends TestCase {
     }
     
     public void testFewestTransfers() {
-        Vertex stop_c = graph.getVertex("agency:C");
-        Vertex stop_d = graph.getVertex("agency:D");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
         RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
@@ -588,9 +600,9 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testPathways() throws Exception {
 
-        Vertex entrance = graph.getVertex("agency:entrance_a");
+        Vertex entrance = graph.getVertex(feedId + ":entrance_a");
         assertNotNull(entrance);
-        Vertex stop = graph.getVertex("agency:A");
+        Vertex stop = graph.getVertex(feedId + ":A");
         assertNotNull(stop);
 
         RoutingRequest options = new RoutingRequest();

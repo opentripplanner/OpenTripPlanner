@@ -126,9 +126,9 @@ public class Graph implements Serializable {
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
-    private Collection<String> agenciesIds = new HashSet<String>();
+    private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
-    private Collection<Agency> agencies = new HashSet<Agency>();
+    private Collection<String> feedIds = new HashSet<>();
 
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
@@ -188,6 +188,12 @@ public class Graph implements Serializable {
 
     /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
     public boolean hasScheduledService = false;
+
+    /** Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
+
+    /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
 
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
@@ -882,17 +888,19 @@ public class Graph implements Serializable {
         return removed;
     }
 
-    public Collection<String> getAgencyIds() {
-        return agenciesIds;
+    public Collection<String> getFeedIds() {
+        return feedIds;
     }
 
-    public Collection<Agency> getAgencies() {
-        return agencies;
+    public Collection<Agency> getAgencies(String feedId) {
+        return agenciesForFeedId.get(feedId);
     }
 
-    public void addAgency(Agency agency) {
+    public void addAgency(String feedId, Agency agency) {
+        Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
-        agenciesIds.add(agency.getId());
+        this.agenciesForFeedId.put(feedId, agencies);
+        this.feedIds.add(feedId);
     }
 
     /**
@@ -903,14 +911,17 @@ public class Graph implements Serializable {
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
-            Collection<String> agencyIds = this.getAgencyIds();
-            if (agencyIds.size() == 0) {
+            Collection<Agency> agencies = null;
+            if (agenciesForFeedId.entrySet().size() > 0) {
+                agencies = agenciesForFeedId.entrySet().iterator().next().getValue();
+            }
+            if (agencies == null || agencies.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
                 LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
             } else {
                 CalendarService cs = this.getCalendarService();
-                for (String agencyId : agencyIds) {
-                    TimeZone tz = cs.getTimeZoneForAgencyId(agencyId);
+                for (Agency agency : agencies) {
+                    TimeZone tz = cs.getTimeZoneForAgencyId(agency.getId());
                     if (timeZone == null) {
                         LOG.debug("graph time zone set to {}", tz);
                         timeZone = tz;
@@ -1047,5 +1058,13 @@ public class Graph implements Serializable {
 
     public Optional<Coordinate> getCenter() {
         return Optional.ofNullable(center);
+    }
+
+    public long getTransitServiceStarts() {
+        return transitServiceStarts;
+    }
+
+    public long getTransitServiceEnds() {
+        return transitServiceEnds;
     }
 }

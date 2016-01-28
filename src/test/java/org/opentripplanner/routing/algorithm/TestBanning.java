@@ -39,9 +39,10 @@ public class TestBanning extends TestCase {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
 
+        String feedId = graph.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();
-        Vertex start = graph.getVertex("TriMet:8371");
-        Vertex end = graph.getVertex("TriMet:8374");
+        Vertex start = graph.getVertex(feedId + ":8371");
+        Vertex end = graph.getVertex(feedId + ":8374");
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
         // must set routing context _after_ options is fully configured (time)
         options.setRoutingContext(graph, start, end);
@@ -56,7 +57,7 @@ public class TestBanning extends TestCase {
         for (int i = 0; i < maxLines.length; ++i) {
             String lineName = maxLines[i][0];
             String lineId = maxLines[i][1];
-            String routeSpecStr = "TriMet_" + (lineName != null ? lineName : "")
+            String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
                 options.setBannedRoutes(routeSpecStr);
             spt = aStar.getShortestPathTree(options);
@@ -102,6 +103,7 @@ public class TestBanning extends TestCase {
     public void doTestBannedTrips(boolean partial, int seed) {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+        String feedId = graph.getFeedIds().iterator().next();
         Random rand = new Random(seed);
 
         for (int i = 0; i < 20; i++) {
@@ -111,9 +113,9 @@ public class TestBanning extends TestCase {
             Vertex start = null;
             Vertex end = null;
             while (start == null)
-                start = graph.getVertex("TriMet:" + rand.nextInt(10000));
+                start = graph.getVertex(feedId + ":" + rand.nextInt(10000));
             while (end == null)
-                end = graph.getVertex("TriMet:" + rand.nextInt(10000));
+                end = graph.getVertex(feedId + ":" + rand.nextInt(10000));
             options.setRoutingContext(graph, start, end);
             ShortestPathTree spt = null;
             int n = rand.nextInt(5) + 3;

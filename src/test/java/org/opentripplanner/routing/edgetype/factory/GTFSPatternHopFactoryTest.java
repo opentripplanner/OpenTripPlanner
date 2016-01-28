@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.onebusaway.gtfs.services.MockGtfs;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -39,7 +40,8 @@ public class GTFSPatternHopFactoryTest {
         gtfs.putLines("frequencies.txt", "trip_id,start_time,end_time,headway_secs",
                 "t0,09:00:00,17:00:00,300");
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(GtfsLibrary.createContext(gtfs
+        GtfsFeedId feedId = new GtfsFeedId.Builder().id("FEED").build();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(GtfsLibrary.createContext(feedId, gtfs
                 .read()));
         Graph graph = new Graph();
         factory.run(graph);

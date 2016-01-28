@@ -160,7 +160,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public OSMLevel getLevelForWay(OSMWithTags way) {
-        return wayLevels.get(way);
+        OSMLevel level = wayLevels.get(way);
+        return level != null ? level : OSMLevel.DEFAULT;
     }
 
     public boolean isNodeSharedByMultipleAreas(Long nodeId) {

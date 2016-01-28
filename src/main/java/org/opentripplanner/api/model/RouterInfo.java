@@ -54,6 +54,12 @@ public class RouterInfo {
     @XmlElement
     public Date buildTime;
 
+    @XmlElement
+    public long transitServiceStarts;
+
+    @XmlElement
+    public long transitServiceEnds;
+
     public HashSet<TraverseMode> transitModes;
 
     private WorldEnvelope envelope;
@@ -71,6 +77,8 @@ public class RouterInfo {
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;
+        this.transitServiceStarts = graph.getTransitServiceStarts();
+        this.transitServiceEnds = graph.getTransitServiceEnds();
         this.transitModes = graph.getTransitModes();
         this.envelope = graph.getEnvelope();
         addCenter(graph.getCenter());

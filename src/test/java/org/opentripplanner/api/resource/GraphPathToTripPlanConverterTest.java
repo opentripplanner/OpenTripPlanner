@@ -95,13 +95,7 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -212,6 +206,8 @@ public class GraphPathToTripPlanConverterTest {
         // This set of requested traverse modes implies that bike rental is a possibility.
         RoutingRequest options = new RoutingRequest("BICYCLE_RENT,TRANSIT");
 
+        String feedId = "FEED";
+
         Graph graph = new Graph();
 
         // Vertices for leg 0
@@ -230,42 +226,42 @@ public class GraphPathToTripPlanConverterTest {
         Stop ferryStopDepart = new Stop();
         Stop ferryStopArrive = new Stop();
 
-        trainStopDepart.setId(new AgencyAndId("Train", "Depart"));
+        trainStopDepart.setId(new AgencyAndId(feedId, "Depart"));
         trainStopDepart.setName("Train stop depart");
         trainStopDepart.setLon(1);
         trainStopDepart.setLat(1);
         trainStopDepart.setCode("Train depart code");
         trainStopDepart.setPlatformCode("Train depart platform");
         trainStopDepart.setZoneId("Train depart zone");
-        trainStopDwell.setId(new AgencyAndId("Train", "Dwell"));
+        trainStopDwell.setId(new AgencyAndId(feedId, "Dwell"));
         trainStopDwell.setName("Train stop dwell");
         trainStopDwell.setLon(45);
         trainStopDwell.setLat(23);
         trainStopDwell.setCode("Train dwell code");
         trainStopDwell.setPlatformCode("Train dwell platform");
         trainStopDwell.setZoneId("Train dwell zone");
-        trainStopInterline.setId(new AgencyAndId("Train", "Interline"));
+        trainStopInterline.setId(new AgencyAndId(feedId, "Interline"));
         trainStopInterline.setName("Train stop interline");
         trainStopInterline.setLon(89);
         trainStopInterline.setLat(45);
         trainStopInterline.setCode("Train interline code");
         trainStopInterline.setPlatformCode("Train interline platform");
         trainStopInterline.setZoneId("Train interline zone");
-        trainStopArrive.setId(new AgencyAndId("Train", "Arrive"));
+        trainStopArrive.setId(new AgencyAndId(feedId, "Arrive"));
         trainStopArrive.setName("Train stop arrive");
         trainStopArrive.setLon(133);
         trainStopArrive.setLat(67);
         trainStopArrive.setCode("Train arrive code");
         trainStopArrive.setPlatformCode("Train arrive platform");
         trainStopArrive.setZoneId("Train arrive zone");
-        ferryStopDepart.setId(new AgencyAndId("Ferry", "Depart"));
+        ferryStopDepart.setId(new AgencyAndId(feedId, "Depart"));
         ferryStopDepart.setName("Ferry stop depart");
         ferryStopDepart.setLon(135);
         ferryStopDepart.setLat(67);
         ferryStopDepart.setCode("Ferry depart code");
         ferryStopDepart.setPlatformCode("Ferry depart platform");
         ferryStopDepart.setZoneId("Ferry depart zone");
-        ferryStopArrive.setId(new AgencyAndId("Ferry", "Arrive"));
+        ferryStopArrive.setId(new AgencyAndId(feedId, "Arrive"));
         ferryStopArrive.setName("Ferry stop arrive");
         ferryStopArrive.setLon(179);
         ferryStopArrive.setLat(89);
@@ -301,21 +297,21 @@ public class GraphPathToTripPlanConverterTest {
         Route secondRoute = new Route();
         Route thirdRoute = new Route();
 
-        firstRoute.setId(new AgencyAndId("Train", "A"));
+        firstRoute.setId(new AgencyAndId(feedId, "A"));
         firstRoute.setAgency(trainAgency);
         firstRoute.setShortName("A");
         firstRoute.setLongName("'A' Train");
         firstRoute.setType(2);
         firstRoute.setColor("White");
         firstRoute.setTextColor("Black");
-        secondRoute.setId(new AgencyAndId("Train", "B"));
+        secondRoute.setId(new AgencyAndId(feedId, "B"));
         secondRoute.setAgency(trainAgency);
         secondRoute.setShortName("B");
         secondRoute.setLongName("Another Train");
         secondRoute.setType(2);
         secondRoute.setColor("Cyan");
         secondRoute.setTextColor("Yellow");
-        thirdRoute.setId(new AgencyAndId("Ferry", "C"));
+        thirdRoute.setId(new AgencyAndId(feedId, "C"));
         thirdRoute.setAgency(ferryAgency);
         thirdRoute.setShortName("C");
         thirdRoute.setLongName("Ferry Cross the Mersey");
@@ -328,19 +324,19 @@ public class GraphPathToTripPlanConverterTest {
         Trip secondTrip = new Trip();
         Trip thirdTrip = new Trip();
 
-        firstTrip.setId(new AgencyAndId("Train", "A"));
+        firstTrip.setId(new AgencyAndId(feedId, "A"));
         firstTrip.setTripShortName("A");
         firstTrip.setBlockId("Alock");
         firstTrip.setRoute(firstRoute);
         BikeAccess.setForTrip(firstTrip, BikeAccess.ALLOWED);
         firstTrip.setTripHeadsign("Street Fighting Man");
-        secondTrip.setId(new AgencyAndId("Train", "B"));
+        secondTrip.setId(new AgencyAndId(feedId, "B"));
         secondTrip.setTripShortName("B");
         secondTrip.setBlockId("Block");
         secondTrip.setRoute(secondRoute);
         BikeAccess.setForTrip(secondTrip, BikeAccess.ALLOWED);
         secondTrip.setTripHeadsign("No Expectations");
-        thirdTrip.setId(new AgencyAndId("Ferry", "C"));
+        thirdTrip.setId(new AgencyAndId(feedId, "C"));
         thirdTrip.setTripShortName("C");
         thirdTrip.setBlockId("Clock");
         thirdTrip.setRoute(thirdRoute);
@@ -646,8 +642,8 @@ public class GraphPathToTripPlanConverterTest {
         CalendarServiceData calendarServiceData = new CalendarServiceDataStub(graph.serviceCodes.keySet());
         CalendarServiceImpl calendarServiceImpl = new CalendarServiceImpl(calendarServiceData);
 
-        calendarServiceData.putTimeZoneForAgencyId("Train", timeZone);
-        calendarServiceData.putTimeZoneForAgencyId("Ferry", timeZone);
+        calendarServiceData.putTimeZoneForAgencyId(feedId, timeZone);
+        calendarServiceData.putTimeZoneForAgencyId(feedId, timeZone);
 
         FareServiceStub fareServiceStub = new FareServiceStub();
 
@@ -694,18 +690,19 @@ public class GraphPathToTripPlanConverterTest {
 
         TripTimes updatedTripTimes = thirdTripPattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);
-        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, updatedTripTimes, serviceDate);
+        timetableSnapshotSource.getTimetableSnapshot().update(feedId, thirdTripPattern, updatedTripTimes, serviceDate);
 
         // Further graph initialization
+
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.putService(FareService.class, fareServiceStub);
-        graph.addAgency(trainAgency);
-        graph.addAgency(ferryAgency);
+        graph.addAgency(feedId, trainAgency);
+        graph.addAgency(feedId, ferryAgency);
         graph.timetableSnapshotSource = (timetableSnapshotSource);
         graph.addAlertPatch(e29, alertPatch);
 
         // Routing context creation and initialization
-        ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, null);
+        ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, feedId);
 
         // Temporary graph objects for onboard depart tests
         OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex("Onboard", 23.0, 12.0);
@@ -1036,13 +1033,13 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(2, legs[1].agencyTimeZoneOffset);
         assertNull(legs[1].alerts);
         assertEquals("A", legs[1].route);
-        assertEquals("A", legs[1].routeId);
+        assertEquals("A", legs[1].routeId.getId());
         assertEquals("A", legs[1].routeShortName);
         assertEquals("'A' Train", legs[1].routeLongName);
         assertEquals(2, legs[1].routeType.intValue());
         assertEquals("White", legs[1].routeColor);
         assertEquals("Black", legs[1].routeTextColor);
-        assertEquals("A", legs[1].tripId);
+        assertEquals("A", legs[1].tripId.getId());
         assertEquals("A", legs[1].tripShortName);
         assertEquals("Alock", legs[1].tripBlockId);
         assertEquals("Street Fighting Man", legs[1].headsign);
@@ -1083,13 +1080,13 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(2, legs[2].agencyTimeZoneOffset);
         assertNull(legs[2].alerts);
         assertEquals("B", legs[2].route);
-        assertEquals("B", legs[2].routeId);
+        assertEquals("B", legs[2].routeId.getId());
         assertEquals("B", legs[2].routeShortName);
         assertEquals("Another Train", legs[2].routeLongName);
         assertEquals(2, legs[2].routeType.intValue());
         assertEquals("Cyan", legs[2].routeColor);
         assertEquals("Yellow", legs[2].routeTextColor);
-        assertEquals("B", legs[2].tripId);
+        assertEquals("B", legs[2].tripId.getId());
         assertEquals("B", legs[2].tripShortName);
         assertEquals("Block", legs[2].tripBlockId);
         assertEquals("No Expectations", legs[2].headsign);
@@ -1157,13 +1154,13 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(1, legs[4].alerts.size());
         assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0).alert);
         assertEquals("C", legs[4].route);
-        assertEquals("C", legs[4].routeId);
+        assertEquals("C", legs[4].routeId.getId());
         assertEquals("C", legs[4].routeShortName);
         assertEquals("Ferry Cross the Mersey", legs[4].routeLongName);
         assertEquals(4, legs[4].routeType.intValue());
         assertEquals("Black", legs[4].routeColor);
         assertEquals("White", legs[4].routeTextColor);
-        assertEquals("C", legs[4].tripId);
+        assertEquals("C", legs[4].tripId.getId());
         assertEquals("C", legs[4].tripShortName);
         assertEquals("Clock", legs[4].tripBlockId);
         assertEquals("Handsome Molly", legs[4].headsign);
@@ -1751,44 +1748,44 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(stopIds[0][0]);
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals("Train", stopIds[0][1].getAgencyId());
+            assertEquals("FEED", stopIds[0][1].getAgencyId());
             assertEquals("Depart", stopIds[0][1].getId());
         } else if (type == Type.ONBOARD) {
             assertNull(stopIds[0][1]);
         }
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals("Train", stopIds[1][0].getAgencyId());
+            assertEquals("FEED", stopIds[1][0].getAgencyId());
             assertEquals("Depart", stopIds[1][0].getId());
         } else if (type == Type.ONBOARD) {
             assertNull(stopIds[1][0]);
         }
 
-        assertEquals("Train", stopIds[1][1].getAgencyId());
+        assertEquals("FEED", stopIds[1][1].getAgencyId());
         assertEquals("Dwell", stopIds[1][1].getId());
 
-        assertEquals("Train", stopIds[1][2].getAgencyId());
+        assertEquals("FEED", stopIds[1][2].getAgencyId());
         assertEquals("Interline", stopIds[1][2].getId());
 
-        assertEquals("Train", stopIds[2][0].getAgencyId());
+        assertEquals("FEED", stopIds[2][0].getAgencyId());
         assertEquals("Interline", stopIds[2][0].getId());
 
-        assertEquals("Train", stopIds[2][1].getAgencyId());
+        assertEquals("FEED", stopIds[2][1].getAgencyId());
         assertEquals("Arrive", stopIds[2][1].getId());
 
-        assertEquals("Train", stopIds[3][0].getAgencyId());
+        assertEquals("FEED", stopIds[3][0].getAgencyId());
         assertEquals("Arrive", stopIds[3][0].getId());
 
-        assertEquals("Ferry", stopIds[3][1].getAgencyId());
+        assertEquals("FEED", stopIds[3][1].getAgencyId());
         assertEquals("Depart", stopIds[3][1].getId());
 
-        assertEquals("Ferry", stopIds[4][0].getAgencyId());
+        assertEquals("FEED", stopIds[4][0].getAgencyId());
         assertEquals("Depart", stopIds[4][0].getId());
 
-        assertEquals("Ferry", stopIds[4][1].getAgencyId());
+        assertEquals("FEED", stopIds[4][1].getAgencyId());
         assertEquals("Arrive", stopIds[4][1].getId());
 
-        assertEquals("Ferry", stopIds[5][0].getAgencyId());
+        assertEquals("FEED", stopIds[5][0].getAgencyId());
         assertEquals("Arrive", stopIds[5][0].getId());
 
         assertNull(stopIds[5][1]);

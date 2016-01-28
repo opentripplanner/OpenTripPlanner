@@ -41,7 +41,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 public class AlertsUpdateHandler {
     private static final Logger log = LoggerFactory.getLogger(AlertsUpdateHandler.class);
 
-    private String defaultAgencyId;
+    private String feedId;
 
     private Set<String> patchIds = new HashSet<String>();
 
@@ -93,8 +93,7 @@ public class AlertsUpdateHandler {
         }
         for (EntitySelector informed : alert.getInformedEntityList()) {
             if (fuzzyTripMatcher != null && informed.hasTrip()) {
-                String agency = informed.hasAgencyId() ? informed.getAgencyId() : defaultAgencyId;
-                TripDescriptor trip = fuzzyTripMatcher.match(agency, informed.getTrip());
+                TripDescriptor trip = fuzzyTripMatcher.match(feedId, informed.getTrip());
                 informed = informed.toBuilder().setTrip(trip).build();
             }
             String patchId = createId(id, informed);
@@ -124,30 +123,24 @@ public class AlertsUpdateHandler {
             String agencyId = informed.getAgencyId();
             if (informed.hasAgencyId()) {
                 agencyId = informed.getAgencyId().intern();
-            } else {
-                agencyId = defaultAgencyId;
-            }
-            if (agencyId == null) {
-                log.error("Empty agency id (and no default set) in feed; other ids are route "
-                        + routeId + " and stop " + stopId);
-                continue;
             }
 
             AlertPatch patch = new AlertPatch();
+            patch.setFeedId(feedId);
             if (routeId != null) {
-                patch.setRoute(new AgencyAndId(agencyId, routeId));
+                patch.setRoute(new AgencyAndId(feedId, routeId));
                 // Makes no sense to set direction if we don't have a route
                 if (direction != -1) {
                     patch.setDirectionId(direction);
                 }
             }
             if (tripId != null) {
-                patch.setTrip(new AgencyAndId(agencyId, tripId));
+                patch.setTrip(new AgencyAndId(feedId, tripId));
             }
             if (stopId != null) {
-                patch.setStop(new AgencyAndId(agencyId, stopId));
+                patch.setStop(new AgencyAndId(feedId, stopId));
             }
-            if(agencyId != null && routeId == null && tripId == null && stopId == null) {
+            if (agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);
             }
             patch.setTimePeriods(periods);
@@ -187,9 +180,9 @@ public class AlertsUpdateHandler {
         return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
     }
 
-    public void setDefaultAgencyId(String defaultAgencyId) {
-        if(defaultAgencyId != null)
-            this.defaultAgencyId = defaultAgencyId.intern();
+    public void setFeedId(String feedId) {
+        if(feedId != null)
+            this.feedId = feedId.intern();
     }
 
     public void setAlertPatchService(AlertPatchService alertPatchService) {
