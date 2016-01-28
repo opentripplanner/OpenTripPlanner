@@ -43,18 +43,22 @@ public class TestHopFactory extends TestCase {
 
     private AStar aStar = new AStar();
 
+    private String feedId;
+
     public void setUp() throws Exception {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+
+        feedId = context.getFeedId().getId();
     }
 
     public void testBoardAlight() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency:A_depart");
-        Vertex stop_b_depart = graph.getVertex("agency:B_depart");
+        Vertex stop_a = graph.getVertex(feedId + ":A_depart");
+        Vertex stop_b_depart = graph.getVertex(feedId + ":B_depart");
 
         assertEquals(1, stop_a.getDegreeOut());
         assertEquals(3, stop_b_depart.getDegreeOut());
@@ -81,8 +85,8 @@ public class TestHopFactory extends TestCase {
     }
 
     public void testDwell() throws Exception {
-        Vertex stop_a = graph.getVertex("agency:A_depart");
-        Vertex stop_c = graph.getVertex("agency:C_arrive");
+        Vertex stop_a = graph.getVertex(feedId + ":A_depart");
+        Vertex stop_c = graph.getVertex(feedId + ":C_arrive");
 
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
@@ -98,11 +102,11 @@ public class TestHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_b = graph.getVertex("agency:B");
-        Vertex stop_c = graph.getVertex("agency:C");
-        Vertex stop_d = graph.getVertex("agency:D");
-        Vertex stop_e = graph.getVertex("agency:E");
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_b = graph.getVertex(feedId + ":B");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
+        Vertex stop_d = graph.getVertex(feedId + ":D");
+        Vertex stop_e = graph.getVertex(feedId + ":E");
 
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
