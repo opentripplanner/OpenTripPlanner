@@ -171,9 +171,6 @@ public class TimetableSnapshotSource {
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
      * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
      * 
-     * However, multi-feed support is not completed and we currently assume there is only one static
-     * feed when matching IDs.
-     * 
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
@@ -192,8 +189,7 @@ public class TimetableSnapshotSource {
         try {
             if (fullDataset) {
                 // Remove all updates from the buffer
-                LOG.debug("Clearing all realtime updates");
-                buffer.clear();
+                buffer.clear(feedId);
             }
 
             LOG.debug("message contains {} trip updates", updates.size());
@@ -322,9 +318,9 @@ public class TimetableSnapshotSource {
 
     private boolean handleScheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
-        // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
+        // This does not include Agency ID or feed ID.
         String tripId = tripDescriptor.getTripId();
-        TripPattern pattern = getPatternForTripId(tripId);
+        TripPattern pattern = getPatternForTripId(feedId, tripId);
 
         if (pattern == null) {
             LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
@@ -344,7 +340,7 @@ public class TimetableSnapshotSource {
             return false;
         }
         
-        boolean success = buffer.update(pattern, updatedTripTimes, serviceDate); 
+        boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
         return success;
     }
 
@@ -377,7 +373,7 @@ public class TimetableSnapshotSource {
         
         // Check whether trip id already exists in graph
         String tripId = tripDescriptor.getTripId();
-        Trip trip = getTripForTripId(tripId);
+        Trip trip = getTripForTripId(feedId, tripId);
         if (trip != null) {
             // TODO: should we support this and add a new instantiation of this trip (making it
             // frequency based)?
@@ -399,7 +395,7 @@ public class TimetableSnapshotSource {
         }
         
         // Check whether all stop times are available and all stops exist
-        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(tripUpdate);
+        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
         if (stops == null) {
             return false;
         }
@@ -415,11 +411,12 @@ public class TimetableSnapshotSource {
     /**
      * Check stop time updates of trip update that results in a new trip (ADDED or MODIFIED) and
      * find all stops of that trip.
-     * 
+     *
+     * @param feedId feed id this trip update is intented for
      * @param tripUpdate trip update
      * @return stops when stop time updates are correct; null if there are errors
      */
-    private List<Stop> checkNewStopTimeUpdatesAndFindStops(final TripUpdate tripUpdate) {
+    private List<Stop> checkNewStopTimeUpdatesAndFindStops(final String feedId, final TripUpdate tripUpdate) {
         Integer previousStopSequence = null;
         Long previousTime = null;
         List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
@@ -453,7 +450,7 @@ public class TimetableSnapshotSource {
             // Find stops
             if (stopTimeUpdate.hasStopId()) {
                 // Find stop
-                Stop stop = getStopForStopId(stopTimeUpdate.getStopId());
+                Stop stop = getStopForStopId(feedId, stopTimeUpdate.getStopId());
                 if (stop != null) {
                     // Remember stop
                     stops.add(stop);
@@ -554,7 +551,7 @@ public class TimetableSnapshotSource {
         // Check whether trip id has been used for previously ADDED trip message and cancel
         // previously created trip
         String tripId = tripUpdate.getTrip().getTripId();
-        cancelPreviouslyAddedTrip(tripId, serviceDate);
+        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
         
         //
         // Create added trip
@@ -563,7 +560,7 @@ public class TimetableSnapshotSource {
         Route route = null;
         if (tripUpdate.getTrip().hasRouteId()) {
             // Try to find route
-            route = getRouteForRouteId(tripUpdate.getTrip().getRouteId());
+            route = getRouteForRouteId(feedId, tripUpdate.getTrip().getRouteId());
         }
         
         if (route == null) {
@@ -584,7 +581,6 @@ public class TimetableSnapshotSource {
         
         // Create new Trip
         Trip trip = new Trip();
-        // TODO: which Agency ID to use? Currently use feed id.
         trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
         
@@ -599,7 +595,7 @@ public class TimetableSnapshotSource {
             trip.setServiceId(serviceIds.iterator().next());
         }
         
-        boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate); 
+        boolean success = addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate);
         return success;
     }
 
@@ -613,7 +609,7 @@ public class TimetableSnapshotSource {
      * 
      * @return true iff successful
      */
-    private boolean addTripToGraphAndBuffer(final Graph graph, Trip trip,
+    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, Trip trip,
             final TripUpdate tripUpdate, final List<Stop> stops, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -713,7 +709,7 @@ public class TimetableSnapshotSource {
         newTripTimes.serviceCode = serviceCode;
         
         // Add new trip times to the buffer
-        boolean success = buffer.update(pattern, newTripTimes, serviceDate);
+        boolean success = buffer.update(feedId, pattern, newTripTimes, serviceDate);
         return success;
     }
 
@@ -724,10 +720,10 @@ public class TimetableSnapshotSource {
      * @param serviceDate service date
      * @return true if scheduled trip was cancelled
      */
-    private boolean cancelScheduledTrip(String tripId, final ServiceDate serviceDate) {
+    private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
         boolean success = false;
         
-        TripPattern pattern = getPatternForTripId(tripId);
+        TripPattern pattern = getPatternForTripId(feedId, tripId);
         if (pattern != null) {
             // Cancel scheduled trip times for this trip in this pattern
             Timetable timetable = pattern.scheduledTimetable;
@@ -737,7 +733,7 @@ public class TimetableSnapshotSource {
             } else {
                 TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(pattern, newTripTimes, serviceDate);
+                buffer.update(feedId, pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -748,15 +744,16 @@ public class TimetableSnapshotSource {
     /**
      * Cancel previously added trip from buffer if there is a previously added trip with given trip
      * id (without agency id) on service date
-     * 
+     *
+     * @param feedId feed id the trip id belongs to
      * @param tripId trip id without agency id
      * @param serviceDate service date
      * @return true if a previously added trip was cancelled
      */
-    private boolean cancelPreviouslyAddedTrip(String tripId, final ServiceDate serviceDate) {
+    private boolean cancelPreviouslyAddedTrip(String feedId, String tripId, final ServiceDate serviceDate) {
         boolean success = false;
         
-        TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+        TripPattern pattern = buffer.getLastAddedTripPattern(feedId, tripId, serviceDate);
         if (pattern != null) {
             // Cancel trip times for this trip in this pattern
             Timetable timetable = buffer.resolve(pattern, serviceDate);
@@ -766,7 +763,7 @@ public class TimetableSnapshotSource {
             } else {
                 TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(pattern, newTripTimes, serviceDate);
+                buffer.update(feedId, pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -808,7 +805,7 @@ public class TimetableSnapshotSource {
         
         // Check whether trip id already exists in graph
         String tripId = tripDescriptor.getTripId();
-        Trip trip = getTripForTripId(tripId);
+        Trip trip = getTripForTripId(feedId, tripId);
         if (trip == null) {
             // TODO: should we support this and consider it an ADDED trip?
             LOG.warn("Graph does not contain trip id of MODIFIED trip, skipping.");
@@ -837,7 +834,7 @@ public class TimetableSnapshotSource {
         }
         
         // Check whether all stop times are available and all stops exist
-        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(tripUpdate);
+        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
         if (stops == null) {
             return false;
         }
@@ -871,14 +868,14 @@ public class TimetableSnapshotSource {
         
         // Cancel scheduled trip
         String tripId = tripUpdate.getTrip().getTripId();
-        cancelScheduledTrip(tripId, serviceDate);
+        cancelScheduledTrip(feedId, tripId, serviceDate);
         
         // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
         // previously created trip
-        cancelPreviouslyAddedTrip(tripId, serviceDate);
+        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
         
         // Add new trip
-        boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate); 
+        boolean success = addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate);
         return success;
     }
 
@@ -887,10 +884,10 @@ public class TimetableSnapshotSource {
         if (tripUpdate.getTrip().hasTripId()) {
             // Try to cancel scheduled trip
             String tripId = tripUpdate.getTrip().getTripId();
-            boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate); 
+            boolean cancelScheduledSuccess = cancelScheduledTrip(feedId, tripId, serviceDate);
             
             // Try to cancel previously added trip
-            boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(tripId, serviceDate);
+            boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
             
             if (cancelScheduledSuccess || cancelPreviouslyAddedSuccess) {
                 success = true;
@@ -919,80 +916,52 @@ public class TimetableSnapshotSource {
         return buffer.purgeExpiredData(previously);
     }
 
-    private TripPattern getPatternForTripId(String tripIdWithoutAgency) {
-        Trip trip = getTripForTripId(tripIdWithoutAgency);
+    /**
+     * Retrieve a trip pattern given a feed id and trid id.
+     *
+     * @param feedId feed id for the trip id
+     * @param tripId trip id without agency
+     * @return trip pattern or null if no trip pattern was found
+     */
+    private TripPattern getPatternForTripId(String feedId, String tripId) {
+        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
         TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }
 
     /**
      * Retrieve route given a route id without an agency
-     * 
+     *
+     * @param feedId feed id for the route id
      * @param routeId route id without the agency
      * @return route or null if route can't be found in graph index
      */
-    private Route getRouteForRouteId(String routeId) {
-        /* Lazy-initialize a separate index that ignores agency IDs.
-         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
-        if (graphIndex.routeForIdWithoutAgency == null) {
-            Map<String, Route> map = Maps.newHashMap();
-            for (Route route : graphIndex.routeForId.values()) {
-                Route previousValue = map.put(route.getId().getId(), route);
-                if (previousValue != null) {
-                    LOG.warn("Duplicate route id detected when agency is ignored for "
-                            + "realtime updates: {}", route.getId().getId());
-                }
-            }
-            graphIndex.routeForIdWithoutAgency = map;
-        }
-        Route route = graphIndex.routeForIdWithoutAgency.get(routeId);
+    private Route getRouteForRouteId(String feedId, String routeId) {
+        Route route = graphIndex.routeForId.get(new AgencyAndId(feedId, routeId));
         return route;
     }
     
     /**
      * Retrieve trip given a trip id without an agency
-     * 
+     *
+     * @param feedId feed id for the trip id
      * @param tripId trip id without the agency
      * @return trip or null if trip can't be found in graph index
      */
-    private Trip getTripForTripId(String tripId) {
-        /* Lazy-initialize a separate index that ignores agency IDs.
-         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
-        if (graphIndex.tripForIdWithoutAgency == null) {
-            Map<String, Trip> map = Maps.newHashMap();
-            for (Trip trip : graphIndex.tripForId.values()) {
-                Trip previousValue = map.put(trip.getId().getId(), trip);
-                if (previousValue != null) {
-                    LOG.warn("Duplicate trip id detected when agency is ignored for realtime"
-                            + "updates: {}", trip.getId().getId());
-                }
-            }
-            graphIndex.tripForIdWithoutAgency = map;
-        }
-        Trip trip = graphIndex.tripForIdWithoutAgency.get(tripId);
+    private Trip getTripForTripId(String feedId, String tripId) {
+        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
         return trip;
     }
 
     /**
-     * Retrieve stop given a stop id without an agency
-     * 
+     * Retrieve stop given a feed id and stop id.
+     *
+     * @param feedId feed id for the stop id
      * @param stopId trip id without the agency
      * @return stop or null if stop doesn't exist
      */
-    private Stop getStopForStopId(String stopId) {
-        /* Lazy-initialize a separate index that ignores agency IDs.
-         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
-        if (graphIndex.stopForIdWithoutAgency == null) {
-            Map<String, Stop> map = Maps.newHashMap();
-            for (Stop stop : graphIndex.stopForId.values()) {
-                Stop previousValue = map.put(stop.getId().getId(), stop);
-                if (previousValue != null) {
-                    LOG.warn("Duplicate stop id detected when agency is ignored for realtime updates: {}", stopId);
-                }
-            }
-            graphIndex.stopForIdWithoutAgency = map;
-        }
-        Stop stop = graphIndex.stopForIdWithoutAgency.get(stopId);
+    private Stop getStopForStopId(String feedId, String stopId) {
+        Stop stop = graphIndex.stopForId.get(new AgencyAndId(feedId, stopId));
         return stop;
     }
     

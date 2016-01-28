@@ -358,7 +358,7 @@ or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
 of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, the Dutch OVFiets system, and a generic KML format.
+Bixi, the Dutch OVFiets system, ShareBike and a generic KML format.
 It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
 
@@ -411,7 +411,7 @@ connect to a network resource is the `url` field.
             type: "real-time-alerts",
             frequencySec: 30,
             url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Polling bike rental updater.
@@ -445,7 +445,7 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet",
+            feedId: "TriMet"
             // Defaults to false, if omitted. Makes the feed always incremental even when it states
             // that it contains a full dataset.
             // Useful with multiple realtime feeds to prevent last feed from clearing previous feeds.

@@ -49,9 +49,11 @@ public class TestGraphPath extends TestCase {
 
     public void testGraphPathOptimize() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency:A");
-        Vertex stop_c = graph.getVertex("agency:C");
-        Vertex stop_e = graph.getVertex("agency:E");
+        String feedId = graph.getFeedIds().iterator().next();
+
+        Vertex stop_a = graph.getVertex(feedId + ":A");
+        Vertex stop_c = graph.getVertex(feedId + ":C");
+        Vertex stop_e = graph.getVertex(feedId + ":E");
 
         ShortestPathTree spt;
         GraphPath path;

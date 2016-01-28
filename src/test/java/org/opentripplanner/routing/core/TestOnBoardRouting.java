@@ -74,6 +74,7 @@ public class TestOnBoardRouting extends TestCase {
     @SuppressWarnings("deprecation")
     public void testOnBoardRouting() throws Exception {
 
+        String feedId = graph.getFeedIds().iterator().next();
         // Seed the random generator to make consistent set of tests
         Random rand = new Random(42);
 
@@ -87,8 +88,8 @@ public class TestOnBoardRouting extends TestCase {
             Vertex origin, destination;
             do {
                 /* See FAKE_GTFS for available locations */
-                origin = graph.getVertex("agency:" + (char) (65 + rand.nextInt(20)));
-                destination = graph.getVertex("agency:" + (char) (65 + rand.nextInt(20)));
+                origin = graph.getVertex(feedId + ":" + (char) (65 + rand.nextInt(20)));
+                destination = graph.getVertex(feedId + ":" + (char) (65 + rand.nextInt(20)));
             } while (origin.equals(destination));
 
             /* ...at a random date/time */
