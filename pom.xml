@@ -26,26 +26,16 @@
       <repository>
           <id>shuffle</id>
           <name>Internal rutebanken repository</name>
-          <url>scpexe://shuffle/usr/share/nginx/html/repo</url>
+          <url>scp://shuffle/usr/share/nginx/html/repo</url>
       </repository>
       <snapshotRepository>
           <id>shuffle</id>
           <name>Internal rutebanken repository</name>
-          <url>scpexe://shuffle/usr/share/nginx/html/snapshots</url>
+          <url>scp://shuffle/usr/share/nginx/html/snapshots</url>
       </snapshotRepository>
     </distributionManagement>
 
     <build>
-        <extensions>
-            <!-- maven3 will need wagon-ssh extension in order to be able to release,
-                 Using external variant in order to retain keys, etc -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.10</version>
-            </extension>
-        </extensions>
-
         <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
         <resources>
             <resource>
