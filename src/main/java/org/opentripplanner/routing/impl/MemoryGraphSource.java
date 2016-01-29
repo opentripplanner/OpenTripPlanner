@@ -55,6 +55,12 @@ public class MemoryGraphSource implements GraphSource {
         // TODO will the updaters be started repeatedly due to reload calls?
         ObjectMapper mapper = new ObjectMapper();
         JsonNode routerJsonConf;
+
+        if (router.graph.routerConfig == null){
+            LOG.info("No embedded router config available");
+            return false;
+        }
+
         try {
             routerJsonConf = mapper.readTree(router.graph.routerConfig);
             router.startup(routerJsonConf);
