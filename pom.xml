@@ -36,6 +36,14 @@
     </distributionManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
+
         <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
         <resources>
             <resource>
