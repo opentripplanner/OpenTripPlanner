@@ -335,6 +335,15 @@
             <name>Conveyal Maven Repository</name>
             <url>http://maven.conveyal.com/</url>
         </repository>
+        <!-- Needed  for graphql-java-->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-andimarek-graphql-java</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/andimarek/graphql-java</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -685,6 +694,12 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
             <version>4.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>2015-09-06T17-27-38</version>
         </dependency>
 
         <!-- Support for OTP scripting -->
