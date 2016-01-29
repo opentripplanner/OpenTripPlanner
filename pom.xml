@@ -26,12 +26,12 @@
       <repository>
           <id>shuffle</id>
           <name>Internal rutebanken repository</name>
-          <url>scpexex://shuffle/usr/share/nginx/html/repo</url>
+          <url>scpexe://shuffle/usr/share/nginx/html/repo</url>
       </repository>
       <snapshotRepository>
           <id>shuffle</id>
           <name>Internal rutebanken repository</name>
-          <url>scpexex://shuffle/usr/share/nginx/html/snapshots</url>
+          <url>scpexe://shuffle/usr/share/nginx/html/snapshots</url>
       </snapshotRepository>
     </distributionManagement>
 
