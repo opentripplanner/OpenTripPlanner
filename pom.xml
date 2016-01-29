@@ -23,28 +23,26 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <!-- Also used as snapshotRepository by default -->
-            <id>conveyal-maven-repo</id>
-            <name>Conveyal Maven Repository</name>
-            <url>s3://maven.conveyal.com/</url>
-        </repository>
+      <repository>
+          <id>shuffle</id>
+          <name>Internal rutebanken repository</name>
+          <url>scpexex://shuffle/usr/share/nginx/html/repo</url>
+      </repository>
+      <snapshotRepository>
+          <id>shuffle</id>
+          <name>Internal rutebanken repository</name>
+          <url>scpexex://shuffle/usr/share/nginx/html/snapshots</url>
+      </snapshotRepository>
     </distributionManagement>
 
     <build>
-
-        <!-- "Wagon" necessary for uploading/deploying artifacts to the Conveyal Maven repo on Amazon S3. -->
         <extensions>
-            <!--
-              The Spring S3 Wagon throws ResourceDoesNotExistException when it is asked to put a directory.
-              The site contains a lot of subdirectories, so use the kuali s3 wagon which handles directories.
-              This is only important if you're deploying the OTP site to an S3 bucket as a static web site,
-              which is not a bad idea.
-            -->
+            <!-- maven3 will need wagon-ssh extension in order to be able to release,
+                 Using external variant in order to retain keys, etc -->
             <extension>
-                <groupId>org.kuali.maven.wagons</groupId>
-                <artifactId>maven-s3-wagon</artifactId>
-                <version>1.2.1</version>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>2.10</version>
             </extension>
         </extensions>
 
