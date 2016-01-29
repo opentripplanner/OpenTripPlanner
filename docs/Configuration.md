@@ -424,6 +424,14 @@ connect to a network resource is the `url` field.
             url: "http://host.domain.tld"
         },
 
+        <!--- San Francisco Bay Area bike share -->
+        {
+          "type": "bike-rental",
+          "frequencySec": 300,
+          "sourceType": "sf-bay-area",
+          "url": "http://www.bayareabikeshare.com/stations/json"
+        }
+
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
         {
