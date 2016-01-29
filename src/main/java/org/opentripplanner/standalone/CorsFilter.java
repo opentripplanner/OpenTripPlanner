@@ -30,8 +30,15 @@ public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         if (HttpMethod.OPTIONS.equals(requestContext.getMethod())) {
-            Response preflightResponse = Response.status(Response.Status.OK).build();
-            requestContext.abortWith(preflightResponse);
+            Response.ResponseBuilder preflightResponse = Response.status(Response.Status.OK);
+            if (requestContext.getHeaderString("Access-Control-Request-Headers") != null) {
+                preflightResponse.header("Access-Control-Allow-Headers",
+                    requestContext.getHeaderString("Access-Control-Request-Headers"));
+            }
+            if (requestContext.getHeaderString("Access-Control-Request-Method") != null) {
+                preflightResponse.header("Access-Control-Allow-Method", "GET,POST");
+            }
+            requestContext.abortWith(preflightResponse.build());
         }
     }
 

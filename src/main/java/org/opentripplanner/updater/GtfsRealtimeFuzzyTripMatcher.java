@@ -72,7 +72,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
     }
 
-    private Trip getTrip (Route route, int direction,
+    public Trip getTrip (Route route, int direction,
                           int startTime, ServiceDate date) {
         BitSet services = index.servicesRunning(date);
         for (TripPattern pattern : index.patternsForRoute.get(route)) {
