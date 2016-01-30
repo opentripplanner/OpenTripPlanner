@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -582,13 +583,6 @@ public class GraphIndex {
             cluster.computeCenter();
             stopClusterForId.put(cluster.id, cluster);
         }
-//        LOG.info("Done clustering stops.");
-//        for (StopCluster cluster : stopClusterForId.values()) {
-//            LOG.info("{} at {} {}", cluster.name, cluster.lat, cluster.lon);
-//            for (Stop stop : cluster.children) {
-//                LOG.info("   {}", stop.getName());
-//            }
-//        }
     }
 
     public Response getGraphQLResponse(String query, Map<String, Object> variables) {
@@ -653,4 +647,39 @@ public class GraphIndex {
     public AlertPatch getAlertForId(String id) {
         return getAlertPatchStream().filter(alertPatch -> id.equals(alertPatch.getId())).findFirst().get();
     }
+
+    /**
+     * Fetch an agency by its string ID, ignoring the fact that this ID should be scoped by a feedId.
+     * This is a stopgap (i.e. hack) method for fetching agencies where no feed scope is available.
+     * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
+     * Note that if the same agency ID is defined in several feeds, this will return one of them
+     * at random. That is obviously not the right behavior. The problem is that agencies are
+     * not currently keyed on an AgencyAndId object, but on separate feedId and id Strings.
+     * A real fix will involve replacing or heavily modifying the OBA GTFS loader, which is now
+     * possible since we have forked it.
+     */
+    public Agency getAgencyWithoutFeedId(String agencyId) {
+        // Iterate over the agency map for each feed.
+        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+            Agency agency = agencyForId.get(agencyId);
+            if (agency != null) {
+                return agency;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Construct a set of all Agencies in this graph, spanning across all feed IDs.
+     * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
+     * This should probably be done some other way, see javadoc on getAgencyWithoutFeedId.
+     */
+    public Set<Agency> getAllAgencies() {
+        Set<Agency> allAgencies = new HashSet<>();
+        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+            allAgencies.addAll(agencyForId.values());
+        }
+        return allAgencies;
+    }
+
 }
