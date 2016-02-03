@@ -27,6 +27,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.TranslatedString;
@@ -82,6 +83,19 @@ public class IndexGraphQLSchema {
         .value("NONE", StopPattern.PICKDROP_NONE, "No pickup / drop off available.")
         .value("CALL_AGENCY", StopPattern.PICKDROP_CALL_AGENCY, "Must phone agency to arrange pickup / drop off.")
         .value("COORDINATE_WITH_DRIVER", StopPattern.PICKDROP_COORDINATE_WITH_DRIVER, "Must coordinate with driver to arrange pickup / drop off.")
+        .build();
+
+    public static GraphQLEnumType realtimeStateEnum = GraphQLEnumType.newEnum()
+        .name("RealtimeState")
+        .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
+
+        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+
+        .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
+
+        .value("ADDED", RealTimeState.ADDED, "The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.")
+
+        .value("MODIFIED", RealTimeState.MODIFIED, "The trip information has been updated and resulted in a different trip pattern compared to the trip pattern of the scheduled trip.")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -612,6 +626,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.patternForTrip
                     .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
                     .getAlightType(((TripTimeShort) environment.getSource()).stopIndex))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeState")
+                .type(realtimeStateEnum)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
