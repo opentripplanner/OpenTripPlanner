@@ -273,11 +273,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
                 continue;
             }
-            if (! (v instanceof StreetVertex)) {
-                // We're only exploring the streets, so skip anything not on streets.
-                // This shouldn't happen since we're catching transit stops, but it's here as a failsafe.
-                continue;
-            }
+            // We don't test whether we're on an instanceof StreetVertex here because some other vertex types
+            // (park and ride or bike rental related) that should also be explored and marked as usable.
+            // Record the cost to reach this vertex.
             if (!vertices.containsKey(v)) {
                 vertices.put(v, (int) s.getWeight()); // FIXME time or weight? is RR using right mode?
             }
