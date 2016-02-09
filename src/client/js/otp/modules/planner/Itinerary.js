@@ -2,14 +2,14 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.modules.planner");
@@ -18,16 +18,16 @@ otp.modules.planner.Itinerary = otp.Class({
 
     itinData      : null,
     tripPlan      : null,
-    
+
     firstStopIDs    : null,
 
     hasTransit  : false,
     totalWalk : 0,
-        
+
     initialize : function(itinData, tripPlan) {
         this.itinData = itinData;
         this.tripPlan = tripPlan;
-                
+
         this.firstStopIDs = [ ];
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
@@ -38,7 +38,7 @@ otp.modules.planner.Itinerary = otp.Class({
             if(leg.mode === "WALK") this.totalWalk += leg.distance;
         }
     },
-    
+
 
     getFirstStopID : function() {
         if(this.firstStopIDs.length == 0) return null;
@@ -48,18 +48,18 @@ otp.modules.planner.Itinerary = otp.Class({
     getIconSummaryHTML : function(padding) {
         var html = '';
         for(var i=0; i<this.itinData.legs.length; i++) {
-            var exceedsWalk = (this.itinData.legs[i].mode == "WALK" && this.itinData.legs[i].distance > this.tripPlan.queryParams.maxWalkDistance);            
+            var exceedsWalk = (this.itinData.legs[i].mode == "WALK" && this.itinData.legs[i].distance > this.tripPlan.queryParams.maxWalkDistance);
             html += '<img src="images/mode/'+this.itinData.legs[i].mode.toLowerCase()+'.png" '+(exceedsWalk ? 'style="background:#f88; padding: 0px 2px;"' : "")+'>';
             if(i < this.itinData.legs.length-1)
                 html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
         }
         return html;
     },
-    
+
     getStartTime : function() {
         return this.itinData.legs[0].startTime;
     },
-    
+
     getEndTime : function() {
         return this.itinData.legs[this.itinData.legs.length-1].endTime;
     },
@@ -67,7 +67,7 @@ otp.modules.planner.Itinerary = otp.Class({
     getStartTimeStr : function() {
         return otp.util.Time.formatItinTime(this.getStartTime());
     },
-    
+
     getEndTimeStr : function() {
         return otp.util.Time.formatItinTime(this.getEndTime());
     },
@@ -76,18 +76,18 @@ otp.modules.planner.Itinerary = otp.Class({
         var from = this.itinData.legs[0].from;
         return from.name || "(" + from.lat.toFixed(5) + ", " + from.lon.toFixed(5) +  ")";
     },
-    
+
     getEndLocationStr : function() {
         var to = this.itinData.legs[this.itinData.legs.length-1].to;
         return to.name || "(" + to.lat.toFixed(5) + ", " + to.lon.toFixed(5)+  ")";
     },
-    
+
     getDurationStr : function() {
     	// even though the API communicates in seconds and timestamps, the timestamps are converted to
     	// epoch milliseconds for internal representation.
         return otp.util.Time.secsToHrMin( (this.getEndTime() - this.getStartTime())/1000.0 );
     },
-    
+
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
@@ -102,14 +102,21 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         return "N/A";
     },
-    
+
     differentServiceDayFrom : function(itin, offsetHrs) {
         offsetHrs = offsetHrs || 3; // default to 3 hrs; i.e. use 3am as breakpoint between days
         var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         var time2 = moment(itin.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         return time1 !== time2;
     },
-    
+
+    differentServiceDayFromQuery : function(queryTime, offsetHrs) {
+        offsetHrs = offsetHrs || 3; // default to 3 hrs; i.e. use 3am as breakpoint between days
+        var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
+        var time2 = moment(queryTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
+        return time1 !== time2;
+    },
+
     /*getTransitSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {
@@ -128,14 +135,14 @@ otp.modules.planner.Itinerary = otp.Class({
                     }
                 }
                 stopIndices.push(leg.to.stopIndex);
-                
+
                 var segment = {
                     leg : leg,
                     stopIndices : stopIndices,
                     tripString : leg.agencyId + "_" + leg.tripId + ":" + stopIndices.join(':')
                 }
                 segments.push(segment);
-            } 
+            }
         }
         return segments;
     },*/
@@ -146,7 +153,7 @@ otp.modules.planner.Itinerary = otp.Class({
             var leg = this.itinData.legs[l];
             if(otp.util.Itin.isTransit(leg.mode)) {
                 legs.push(leg);
-            } 
+            }
         }
         return legs;
     },
@@ -157,12 +164,12 @@ otp.modules.planner.Itinerary = otp.Class({
             var leg = this.itinData.legs[l];
             if(leg.mode === mode) {
                 distance += leg.distance;
-            } 
+            }
         }
         return distance;
     },
-    
-        
+
+
     /*getTripSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {
@@ -181,7 +188,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 tripString += leg.to.stopIndex;
                 //console.log("leg "+l+": "+tripString);
                 segments.push(tripString);
-            } 
+            }
         }
         return segments;
     },*/
@@ -193,12 +200,12 @@ otp.modules.planner.Itinerary = otp.Class({
             if(otp.util.Itin.isTransit(leg.mode)) {
                 var tripId = leg.agencyId + "_"+leg.tripId;
                 tripIds.push(tripId);
-            } 
+            }
         }
         return tripIds;
     },
-        
-                
+
+
     getGroupTripCapacity : function() {
         var capacity = 100000;
         for(var l=0; l<this.itinData.legs.length; l++) {
@@ -209,32 +216,32 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         return capacity;
     },
-    
+
     getModeCapacity : function(mode) {
         if(mode === "SUBWAY" || mode === "TRAM") return 80;
         if(mode === "BUS") return 40;
         return 0;
     },
-    
-    
-    /* returns [[south, west], [north, east]] */    
-    
+
+
+    /* returns [[south, west], [north, east]] */
+
     getBoundsArray : function() {
         var start = this.itinData.legs[0].from;
         var end = this.itinData.legs[this.itinData.legs.length-1].to;
         return [[Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
                 [Math.max(start.lat, end.lat), Math.max(start.lon, end.lon)]];
     },
-    
+
     getHtmlNarrative : function() {
         var html = "";
         html += '<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css" />';
         html += '<div class="otp-itin-printWindow">';
-        
+
         //TRANSLATORS: Start: location at [time date] (Used in print itinerary
         //when do you start your trip)
         html += '<h3>' + _tr('Start: %(location)s at %(time_date)s', { 'location': this.getStartLocationStr(), 'time_date': this.getStartTimeStr()}) + '</h3>';
-        
+
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
 
@@ -251,7 +258,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 html += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
             }
             html += '</h4>'
-            
+
             // main content
             if(otp.util.Itin.isTransit(leg.mode)) { // transit
                 html += '<ul>';
@@ -262,33 +269,33 @@ otp.modules.planner.Itinerary = otp.Class({
                 //TRANSLATORS: Alight Public transit route name (agency name
                 //Stop ID ) end time
                 html += '<li><b>' + _tr('Alight') + '</b>: ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.split(':')[0], 'stop_id': leg.to.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '</li>';
-                
+
                 html += '</ul>';
             }
             else if (leg.steps) { // walk / bike / car
-            
+
                 for(var i=0; i<leg.steps.length; i++) {
                     var step = leg.steps[i];
                     var text = otp.util.Itin.getLegStepText(step);
-                    
+
                     html += '<div class="otp-itin-print-step" style="margin-top: .5em;">';
                     html += '<div class="otp-itin-step-icon">';
                     if(step.relativeDirection)
                         html += '<img src="images/directions/' +
                             step.relativeDirection.toLowerCase()+'.png">';
-                    html += '</div>';                
+                    html += '</div>';
                     var dist = otp.util.Itin.distanceString(step.distance);
                     //html += '<div class="otp-itin-step-dist">' +
-                    //    '<span style="font-weight:bold; font-size: 1.2em;">' + 
+                    //    '<span style="font-weight:bold; font-size: 1.2em;">' +
                     //    distArr[0]+'</span><br>'+distArr[1]+'</div>';
                     html += '<div class="otp-itin-step-text">'+text+'<br>'+dist+'</div>';
                     html += '<div style="clear:both;"></div></div>';
-                }            
+                }
             }
-            
+
 
         }
-        
+
         //TRANSLATORS: End: location at [time date] (Used in print itinerary
         //when do you come at a destination)
         html += '<h3>' + _tr('End: %(location)s at %(time_date)s', { 'location': this.getEndLocationStr(), 'time_date': this.getEndTimeStr()} )+'</h3>';
@@ -301,7 +308,7 @@ otp.modules.planner.Itinerary = otp.Class({
         if(this.hasTransit) {
             html += '<div class="otp-itinTripSummaryLabel">' + _tr('Transfers') + '</div><div class="otp-itinTripSummaryText">'+this.itinData.transfers+'</div>';
             if(this.itinData.walkDistance > 0) {
-                html += '<div class="otp-itinTripSummaryLabel">' + _tr('Total Walk') + '</div><div class="otp-itinTripSummaryText">' + 
+                html += '<div class="otp-itinTripSummaryLabel">' + _tr('Total Walk') + '</div><div class="otp-itinTripSummaryText">' +
                     otp.util.Itin.distanceString(this.itinData.walkDistance) + '</div>';
             }
             html += '<div class="otp-itinTripSummaryLabel">' + _tr('Fare') + '</div><div class="otp-itinTripSummaryText">'+this.getFareStr()+'</div>';
@@ -309,17 +316,17 @@ otp.modules.planner.Itinerary = otp.Class({
         html += '</div>';
 
         html += '</div>';
-        
+
         return html;
     },
-    
+
     getTextNarrative : function(itinLink) {
         var text = ''
 
         //TRANSLATORS: Start: location at [time date] (Used in print itinerary
         //when do you start your trip)
         text += _tr('Start: %(location)s at %(time_date)s', { 'location': this.getStartLocationStr(), 'time_date': this.getStartTimeStr()}) + '\n\n';
-        
+
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
 
@@ -335,7 +342,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ' '+ otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ") + otp.util.Itin.getName(leg.to);
             }
             text += '\n';
-            
+
             // content
             if(otp.util.Itin.isTransit(leg.mode)) {
                 //TRANSLATORS: Board Public transit route name (agency name
@@ -347,28 +354,28 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ' - ' + _tr('Alight') + ': ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.split(':')[0], 'stop_id': leg.to.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '\n';
             }
             else if (leg.steps) { // walk / bike / car
-            
+
                 for(var i=0; i<leg.steps.length; i++) {
                     var step = leg.steps[i];
-                    var desc = otp.util.Itin.getLegStepText(step, false);                    
+                    var desc = otp.util.Itin.getLegStepText(step, false);
                     var dist = otp.util.Itin.distanceString(step.distance);
                     text += ' - ' + desc + ' ('+ dist + ')\n';
 
-                }            
+                }
             }
             text += '\n';
-            
+
         }
-        
+
         //TRANSLATORS: End: location at [time date] (Used in print itinerary
         //when do you come at a destination)
         text += _tr('End: %(location)s at %(time_date)s', { 'location': this.getEndLocationStr(), 'time_date': this.getEndTimeStr()} )+'\n';
-        
+
         if(itinLink) {
             //TRANSLATORS: text at end of email %s is link to this itinerary
             text += _tr('\nView itinerary online:\n%(itinerary_link)s\n', {'itinerary_link': itinLink});
         }
         return text;
     }
-    
+
 });

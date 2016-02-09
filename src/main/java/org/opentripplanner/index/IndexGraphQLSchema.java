@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.TranslatedString;
@@ -74,6 +76,19 @@ public class IndexGraphQLSchema {
         .value("NO_INFORMATION", 0, "There is no bike information for the trip.")
         .value("ALLOWED", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
         .value("NOT_ALLOWED", 2, "No bicycles are allowed on this trip.")
+        .build();
+
+    public static GraphQLEnumType realtimeStateEnum = GraphQLEnumType.newEnum()
+        .name("RealtimeState")
+        .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
+
+        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+
+        .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
+
+        .value("ADDED", RealTimeState.ADDED, "The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.")
+
+        .value("MODIFIED", RealTimeState.MODIFIED, "The trip information has been updated and resulted in a different trip pattern compared to the trip pattern of the scheduled trip.")
         .build();
 
     public static GraphQLEnumType pickupDropoffTypeEnum = GraphQLEnumType.newEnum()
@@ -598,6 +613,11 @@ public class IndexGraphQLSchema {
                 .name("realtime")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeState")
+                .type(realtimeStateEnum)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pickupType")
