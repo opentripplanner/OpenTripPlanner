@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -40,7 +39,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
@@ -75,8 +73,6 @@ public class GraphPathFinder {
         this.router = router;
     }
 
-    // Timeout in seconds relative to initial search begin time, for each new path found (generally decreasing)
-
     /**
      * Repeatedly build shortest path trees, retaining the best path to the destination after each try.
      * For search N, all trips used in itineraries retained from trips 0..(N-1) are "banned" to create variety.
@@ -109,36 +105,38 @@ public class GraphPathFinder {
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
+        // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
-           // Only use the BiDi heuristic for transit.
-            heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+            // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
+            // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+            // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
+            heuristic = new InterleavedBidirectionalHeuristic();
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
         }
-        // heuristic = new TrivialRemainingWeightHeuristic(); // DEBUG
-
         options.rctx.remainingWeightHeuristic = heuristic;
-        /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
+
+        /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see
          * itineraries with far more transfers. We do not expect transfer limiting to improve
          * search times on the LongDistancePathService, so we set it to the maximum we ever expect
          * to see. Because people may use either the traditional path services or the 
          * LongDistancePathService, we do not change the global default but override it here. */
         options.maxTransfers = 4;
+        // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
-        /* In long distance mode, maxWalk has a different meaning. It's the radius around the origin or destination
-         * within which you can walk on the streets. If no value is provided, max walk defaults to the largest
-         * double-precision float. This would cause long distance mode to do unbounded street searches and consider
-         * the whole graph walkable. */
+        /* In long distance mode, maxWalk has a different meaning than it used to.
+         * It's the radius around the origin or destination within which you can walk on the streets.
+         * If no value is provided, max walk defaults to the largest double-precision float.
+         * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
-        Set<AgencyAndId> bannedTrips = Sets.newHashSet();
         while (paths.size() < options.numItineraries) {
             // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
             int timeoutIndex = paths.size();
@@ -146,8 +144,8 @@ public class GraphPathFinder {
                 timeoutIndex = router.timeouts.length - 1;
             }
             double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
-            timeout -= System.currentTimeMillis(); // absolute to relative
-            timeout /= 1000; // msec to seconds
+            timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
+            timeout /= 1000; // Convert milliseconds to seconds
             if (timeout <= 0) {
                 // Catch the case where advancing to the next (lower) timeout value means the search is timed out
                 // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".

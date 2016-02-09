@@ -15,6 +15,7 @@ Following are known deployments of OTP in an agency-sponsored production capacit
 * [**Adelaide, Australia**](http://jp.adelaidemetro.com.au/opentripplanner-webapp/) the Adelaide Metro Journey Planner.
 * **Trento Province, Italy** -- <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento" target="_blank">ViaggiaTrento</a> and <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto" target="_blank">ViaggiaRovereto</a> 
   - Implemented as part of <a href="http://www.smartcampuslab.it" target="_blank">SmartCampus Project</a>, the research project founded by <a href="http://trentorise.eu" target="_blank">TrentoRise</a>, <a href="http://www.unitn.it" target="_blank">UNITN</a>, and <a href="http://www.fbk.eu" target="_blank">FBK.</a>
+* [**Oslo, Norway**](http://ruter.no/reiseplanlegger/) Ruter's travel planner for Southeastern Norway.
 
 ## Unofficial Production
 

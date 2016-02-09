@@ -1,16 +1,24 @@
 package org.opentripplanner.index;
 
-import static java.util.Collections.emptyList;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.ImmutableMap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
+import graphql.Scalars;
+import graphql.relay.Relay;
+import graphql.relay.SimpleListConnection;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLTypeReference;
+import graphql.schema.TypeResolver;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -27,30 +35,16 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.TranslatedString;
 
-import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import java.text.ParseException;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import graphql.Scalars;
-import graphql.relay.Relay;
-import graphql.relay.SimpleListConnection;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLTypeReference;
-import graphql.schema.TypeResolver;
+import static java.util.Collections.emptyList;
 
 public class IndexGraphQLSchema {
 
@@ -76,6 +70,19 @@ public class IndexGraphQLSchema {
         .value("NOT_ALLOWED", 2, "No bicycles are allowed on this trip.")
         .build();
 
+    public static GraphQLEnumType realtimeStateEnum = GraphQLEnumType.newEnum()
+        .name("RealtimeState")
+        .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
+
+        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+
+        .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
+
+        .value("ADDED", RealTimeState.ADDED, "The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.")
+
+        .value("MODIFIED", RealTimeState.MODIFIED, "The trip information has been updated and resulted in a different trip pattern compared to the trip pattern of the scheduled trip.")
+        .build();
+    
     public static GraphQLEnumType pickupDropoffTypeEnum = GraphQLEnumType.newEnum()
         .name("PickupDropoffType")
         .value("SCHEDULED", StopPattern.PICKDROP_SCHEDULED, "Regularly scheduled pickup / drop off.")
@@ -600,6 +607,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeState")
+                .type(realtimeStateEnum)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pickupType")
                 .type(pickupDropoffTypeEnum)
                 .dataFetcher(environment -> index.patternForTrip
@@ -612,6 +624,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.patternForTrip
                     .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
                     .getAlightType(((TripTimeShort) environment.getSource()).stopIndex))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeState")
+                .type(realtimeStateEnum)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
@@ -998,7 +1015,7 @@ public class IndexGraphQLSchema {
                     return index.patternForId.get(id.id);
                 }
                 if (id.type.equals(agencyType.getName())) {
-                    return getAgency(index, id.id); //XXX
+                    return index.getAgencyWithoutFeedId(id.id);
                 }
                 if (id.type.equals(alertType.getName())) {
                     return index.getAlertForId(id.id);
@@ -1009,7 +1026,7 @@ public class IndexGraphQLSchema {
                 .name("agencies")
                 .description("Get all agencies for the specified graph")
                 .type(new GraphQLList(agencyType))
-                .dataFetcher(environment -> getAllAgencies(index))  //XXX
+                .dataFetcher(environment -> index.getAllAgencies())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
@@ -1020,7 +1037,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment ->
-                    getAgency(index, environment.getArgument("id"))) //XXX
+                    index.getAgencyWithoutFeedId(environment.getArgument("id")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")

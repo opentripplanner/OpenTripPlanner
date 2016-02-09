@@ -424,6 +424,14 @@ connect to a network resource is the `url` field.
             url: "http://host.domain.tld"
         },
 
+        <!--- San Francisco Bay Area bike share -->
+        {
+          "type": "bike-rental",
+          "frequencySec": 300,
+          "sourceType": "sf-bay-area",
+          "url": "http://www.bayareabikeshare.com/stations/json"
+        }
+
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
         {
@@ -446,10 +454,6 @@ connect to a network resource is the `url` field.
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
             feedId: "TriMet"
-            // Defaults to false, if omitted. Makes the feed always incremental even when it states
-            // that it contains a full dataset.
-            // Useful with multiple realtime feeds to prevent last feed from clearing previous feeds.
-            alwaysIncremental: true
         },
 
         // Streaming differential GTFS-RT TripUpdates over websockets

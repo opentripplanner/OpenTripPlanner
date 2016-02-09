@@ -31,8 +31,8 @@ import org.apache.http.params.HttpParams;
 
 public class HttpUtils {
     
-    private static final int TIMEOUT_CONNECTION = 5000;
-    private static final int TIMEOUT_SOCKET = 5000;
+    private static final int TIMEOUT_CONNECTION = 30000;
+    private static final int TIMEOUT_SOCKET = 30000;
 
     public static InputStream getData(String url) throws IOException {
         return getData(url, null, null);
