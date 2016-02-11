@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -200,8 +201,12 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         }
 
         for (Map.Entry<String, Set<FareAttribute>> kv : fareAttributesPerAgency.entrySet()) {
-            super.fillFareRules(kv.getKey(), kv.getValue(), fareRulesPerAgency.get(kv.getKey()),
-                    regularFareRules);
+
+            Set<FareRule> fareRules = fareRulesPerAgency.get(kv.getKey());
+            if (fareRules == null)
+                fareRules = Collections.emptySet();
+
+            super.fillFareRules(kv.getKey(), kv.getValue(), fareRules, regularFareRules);
         }
     }
 
