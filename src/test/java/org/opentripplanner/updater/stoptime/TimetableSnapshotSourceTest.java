@@ -210,7 +210,7 @@ public class TimetableSnapshotSourceTest {
         assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
 
         assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
-        assertEquals(RealTimeState.UDPATED, forToday.getTripTimes(tripIndex).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
 
         assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
         assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
