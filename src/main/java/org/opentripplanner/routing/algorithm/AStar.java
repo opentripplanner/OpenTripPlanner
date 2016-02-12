@@ -153,7 +153,7 @@ public class AStar {
         }
 
         // interleave some heuristic-improving work (single threaded)
-        // runState.heuristic.doSomeWork();
+        runState.heuristic.doSomeWork();
 
         // get the lowest-weight state in the queue
         runState.u = runState.pq.extract_min();
@@ -190,6 +190,8 @@ public class AStar {
                 }
 
                 double remaining_w = runState.heuristic.estimateRemainingWeight(v);
+
+//                LOG.info("{} {}", v, remaining_w);
 
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;

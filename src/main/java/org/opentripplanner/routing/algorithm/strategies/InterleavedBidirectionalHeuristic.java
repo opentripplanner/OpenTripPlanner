@@ -66,7 +66,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
     // For each step in the main search, how many steps should the reverse search proceed?
-    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 5; // TODO determine a good value empirically
+    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 8; // TODO determine a good value empirically
 
     /** The vertex at which the main search begins. */
     Vertex origin;
@@ -78,7 +78,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * The weight of the lowest-cost path to each vertex within walking distance
      * of the origin (the vertex at which the main search begins).
      */
-    TObjectDoubleMap<Vertex> verticesNearOrigin;
+    TObjectDoubleMap<Vertex> verticesNearOrigin; // TODO rename me
 
     /**
      * The weight of the lowest-cost path to each vertex within walking distance of
@@ -169,8 +169,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         } else {
-            // The main search is not on a street, it's probably on transit. Explore this area of the graph fully.
-            return 0;
+            // The main search is not on a street, it's probably on transit.
+            // If the current part of the transit network has been explored, then return the stored lower bound.
+            // Otherwise return the highest lower bound yet seen -- this location must have a higher cost than that.
+            double h = verticesNearTarget.get(v);
+            if (h == Double.POSITIVE_INFINITY) {
+                return maxWeightSeen;
+            } else {
+                return h;
+            }
         }
     }
 
