@@ -30,6 +30,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 /**
  * This the goal direction heuristic used for transit searches.
  *
@@ -61,7 +63,7 @@ import org.slf4j.LoggerFactory;
  */
 public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
-    private static final long serialVersionUID = 20160126L;
+    private static final long serialVersionUID = 20160215L;
 
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
@@ -74,17 +76,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     /** The vertex that the main search is working towards. */
     Vertex target;
 
-    /**
-     * The weight of the lowest-cost path to each vertex within walking distance
-     * of the origin (the vertex at which the main search begins).
-     */
-    TObjectDoubleMap<Vertex> verticesNearOrigin; // TODO rename me
+    /** All vertices within walking distance of the origin (the vertex at which the main search begins). */
+    Set<Vertex> preTransitVertices;
 
     /**
-     * The weight of the lowest-cost path to each vertex within walking distance of
-     * the target (the vertex at which the main search ends).
+     * A lower bound on the weight of the lowest-cost path to the target (the vertex at which the main search ends)
+     * from each vertex within walking distance of the target. As the heuristic progressively improves, this map will
+     * include lower bounds on path weights for an increasing number of vertices on board transit.
      */
-    TObjectDoubleMap<Vertex> verticesNearTarget;
+    TObjectDoubleMap<Vertex> postBoardingWeights;
 
     Graph graph;
 
@@ -121,13 +121,14 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         request.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
         // Forward street search first, mark street vertices around the origin so H evaluates to 0
-        verticesNearOrigin = streetSearch(request, false, abortTime);
-        if (verticesNearOrigin == null) {
+        TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
+        if (forwardStreetSearchResults == null) {
             return; // Search timed out
         }
+        preTransitVertices = forwardStreetSearchResults.keySet();
         LOG.debug("end forward street search {} ms", System.currentTimeMillis() - start);
-        verticesNearTarget = streetSearch(request, true, abortTime);
-        if (verticesNearTarget == null) {
+        postBoardingWeights = streetSearch(request, true, abortTime);
+        if (postBoardingWeights == null) {
             return; // Search timed out
         }
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
@@ -159,11 +160,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // The main search is on the streets, not on transit.
             if (s.isEverBoarded()) {
                 // If we have already ridden transit we must be near the destination. If not the map returns INF.
-                return verticesNearTarget.get(v);
+                return postBoardingWeights.get(v);
             } else {
                 // We have not boarded transit yet. We have no idea what the weight to the target is so return zero.
                 // We could also use a Euclidean heuristic here.
-                if (verticesNearOrigin.containsKey(v)) {
+                if (preTransitVertices.contains(v)) {
                     return 0;
                 } else {
                     return Double.POSITIVE_INFINITY;
@@ -173,7 +174,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // The main search is not on a street, it's probably on transit.
             // If the current part of the transit network has been explored, then return the stored lower bound.
             // Otherwise return the highest lower bound yet seen -- this location must have a higher cost than that.
-            double h = verticesNearTarget.get(v);
+            double h = postBoardingWeights.get(v);
             if (h == Double.POSITIVE_INFINITY) {
                 return maxWeightSeen;
             } else {
@@ -205,10 +206,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             maxWeightSeen = uWeight;
             // Now that this vertex is closed, we can store its weight for use as a lower bound / heuristic value.
             // We don't implement decrease-key operations though, so check whether a smaller value is already known.
-            double uWeightOld = verticesNearTarget.get(u);
+            double uWeightOld = postBoardingWeights.get(u);
             if (uWeight < uWeightOld) {
                 // Including when uWeightOld is infinite because the vertex is not yet closed.
-                verticesNearTarget.put(u, uWeight);
+                postBoardingWeights.put(u, uWeight);
             } else {
                 // The vertex was already closed. This time it necessarily has a higher weight, so skip it.
                 continue;
@@ -228,7 +229,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                     continue;
                 }
                 double vWeight = uWeight + edgeWeight;
-                double vWeightOld = verticesNearTarget.get(v);
+                double vWeightOld = postBoardingWeights.get(v);
                 if (vWeight < vWeightOld) {
                     // Should only happen when vWeightOld is infinite because it is not yet closed.
                     transitQueue.insert(v, vWeight);
