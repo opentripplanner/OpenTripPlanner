@@ -90,7 +90,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     RoutingRequest routingRequest;
 
-    // The maximum weight yet seen in the reverse transit search. Any unreached transit node must have greater weight than this.
+    // The maximum weight yet seen at a closed node in the reverse search. The priority queue head has a uniformly
+    // increasing weight, so any unreached transit node must have greater weight than this.
     double maxWeightSeen = 0;
 
     // The priority queue for the interleaved backward search through the transit network.
@@ -199,23 +200,38 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             int uWeight = (int) transitQueue.peek_min_key();
             Vertex u = transitQueue.extract_min();
-            // The weight of the queue head is uniformly increasing. This is the highest ever seen.
+            // The weight of the queue head is uniformly increasing.
+            // This is the highest weight ever seen for a closed vertex.
             maxWeightSeen = uWeight;
-            // OUTgoing edges for heuristic search when main search is arriveBy (i.e. reverse direction)
+            // Now that this vertex is closed, we can store its weight for use as a lower bound / heuristic value.
+            // We don't implement decrease-key operations though, so check whether a smaller value is already known.
+            double uWeightOld = verticesNearTarget.get(u);
+            if (uWeight < uWeightOld) {
+                // Including when uWeightOld is infinite because the vertex is not yet closed.
+                verticesNearTarget.put(u, uWeight);
+            } else {
+                // The vertex was already closed. This time it necessarily has a higher weight, so skip it.
+                continue;
+            }
+            // This search is proceeding backward relative to the main search.
+            // When the main search is arriveBy the heuristic search looks at OUTgoing edges.
             for (Edge e : routingRequest.arriveBy ? u.getOutgoing() : u.getIncoming()) {
                 // Do not enter streets in this phase, which should only touch transit.
-                if (e instanceof StreetTransitLink) continue;
+                if (e instanceof StreetTransitLink) {
+                    continue;
+                }
                 Vertex v = routingRequest.arriveBy ? e.getToVertex() : e.getFromVertex();
                 double edgeWeight = e.weightLowerBound(routingRequest);
                 // INF heuristic value indicates unreachable (e.g. non-running transit service)
                 // this saves time by not reverse-exploring those routes and avoids maxFound of INF.
-                if (Double.isInfinite(edgeWeight)) continue;
-                double new_vWeight = uWeight + edgeWeight;
-                double old_vWeight = verticesNearTarget.get(v);
-                if (new_vWeight < old_vWeight) {
-                    // including when old_vw is infinite because it is not yet touched
-                    verticesNearTarget.put(v, (int)new_vWeight);
-                    transitQueue.insert(v, new_vWeight);
+                if (Double.isInfinite(edgeWeight)) {
+                    continue;
+                }
+                double vWeight = uWeight + edgeWeight;
+                double vWeightOld = verticesNearTarget.get(v);
+                if (vWeight < vWeightOld) {
+                    // Should only happen when vWeightOld is infinite because it is not yet closed.
+                    transitQueue.insert(v, vWeight);
                 }
             }
         }
