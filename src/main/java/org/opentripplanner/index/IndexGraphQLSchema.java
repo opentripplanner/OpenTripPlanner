@@ -74,7 +74,7 @@ public class IndexGraphQLSchema {
         .name("RealtimeState")
         .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
 
-        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+        .value("UPDATED", RealTimeState.UPDATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
 
         .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
 
