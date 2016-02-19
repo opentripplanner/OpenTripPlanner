@@ -27,7 +27,7 @@ public class Router {
 
     public String id;
     public Graph graph;
-    public double[] timeouts = {5, 2, 1, 0.5, 0.1};
+    public double[] timeouts = {5, 4, 2};
 
     /* TODO The fields for "components" are slowly disappearing... maybe at some point a router will be nothing but configuration values tied to a Graph. */
 

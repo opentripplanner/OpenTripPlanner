@@ -221,8 +221,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double waitReluctance = 1.0;
 
-    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-    public double waitAtBeginningFactor = 0.9;
+    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding) */
+    public double waitAtBeginningFactor = 0.4;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int walkBoardCost = 60 * 10;
