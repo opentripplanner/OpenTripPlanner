@@ -469,13 +469,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
 
                 // Compute preference value
-                double preferrence = 1;
+                double preference = 1;
                 if (preferredEdges != null && preferredEdges.contains(e)) {
-                    preferrence = 3.0;
+                    preference = 3.0;
                 }
 
                 TraverseModeSet modes = reqs.modes;
-                CandidateEdge ce = new CandidateEdge(se, location, preferrence, modes);
+                CandidateEdge ce = new CandidateEdge(se, location, preference, modes);
 
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
