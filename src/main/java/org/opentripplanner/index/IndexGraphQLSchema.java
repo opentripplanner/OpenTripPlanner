@@ -751,9 +751,18 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-                .type(Scalars.GraphQLString) //TODO: Should be geometry
-                .dataFetcher(environment -> index.patternForTrip
-                    .get((Trip) environment.getSource()).geometry.getCoordinateSequence())
+                .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
+                .dataFetcher(environment ->
+                    Arrays
+                        .asList(index.patternForTrip
+                            .get((Trip) environment.getSource())
+                            .geometry
+                            .getCoordinateSequence()
+                            .toCoordinateArray())
+                        .stream()
+                        .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
+                        .collect(Collectors.toList())
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")

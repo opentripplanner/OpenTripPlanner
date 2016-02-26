@@ -109,7 +109,7 @@ public class GraphIndexTest extends GtfsTest {
 
         ExecutionResult result = graph.index.graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
-        assertEquals("Fake Agency", ((Map) result.getData().get("agency")).get("name"));
+        assertEquals("Fake Agency", ((Map) ((Map) result.getData()).get("agency")).get("name"));
 
     }
 
@@ -127,7 +127,7 @@ public class GraphIndexTest extends GtfsTest {
 
         ExecutionResult result = graph.index.graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
-        assertEquals(18, ((List) ((Map) ((Map) result.getData().get("viewer")).get("agency")).get("routes")).size());
+        assertEquals(18, ((List) ((Map) ((Map) ((Map) result.getData()).get("viewer")).get("agency")).get("routes")).size());
 
     }
 
