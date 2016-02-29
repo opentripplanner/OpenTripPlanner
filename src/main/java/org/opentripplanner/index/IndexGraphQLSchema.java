@@ -25,6 +25,8 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -119,6 +121,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLObjectType queryType;
 
+    public GraphQLOutputType planType = new GraphQLTypeReference("Plan");
+
     public GraphQLSchema indexSchema;
 
     private Relay relay = new Relay();
@@ -174,6 +178,30 @@ public class IndexGraphQLSchema {
 
     @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
+        createPlanType();
+
+        GraphQLFieldDefinition planFieldType = GraphQLFieldDefinition.newFieldDefinition()
+            .name("plan")
+            .description("Gets plan of a route")
+            .type(planType)
+            .argument(GraphQLArgument.newArgument()
+                .name("fromLat")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("fromLon")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("toLat")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("toLon")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
+            .build();
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
 
@@ -1282,10 +1310,49 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLTypeReference("QueryType"))
                 .dataFetcher(DataFetchingEnvironment::getParentType)
                 .build())
+            .field(planFieldType)
             .build();
 
         indexSchema = GraphQLSchema.newSchema()
             .query(queryType)
             .build();
+    }
+
+    private void createPlanType() {
+        final GraphQLObjectType placeType = GraphQLObjectType.newObject()
+                .name("Place")
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("lat")
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                    .dataFetcher(environment -> ((Place)environment.getSource()).lat.floatValue())
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("lon")
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                    .dataFetcher(environment -> ((Place)environment.getSource()).lon.floatValue())
+                    .build())
+                 .build();
+
+        planType = GraphQLObjectType.newObject()
+                .name("Plan")
+                .withInterface(nodeInterface)
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLID))
+                    .dataFetcher(environment -> relay.toGlobalId(
+                        planType.getName(),
+                        "id"))
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("from")
+                    .type(new GraphQLNonNull(placeType))
+                    .dataFetcher(environment -> ((TripPlan)environment.getSource()).from)
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("to")
+                    .type(new GraphQLNonNull(placeType))
+                    .dataFetcher(environment -> ((TripPlan)environment.getSource()).to)
+                    .build())
+                 .build();
     }
 }
