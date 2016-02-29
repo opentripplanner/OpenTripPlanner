@@ -1347,7 +1347,7 @@ public class IndexGraphQLSchema {
                 .name("date")
                 .description("When this plan was made")
                 .type(Scalars.GraphQLLong)
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).date.getTime() / 1000)
+                .dataFetcher(environment -> ((TripPlan)environment.getSource()).date.getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("from")
