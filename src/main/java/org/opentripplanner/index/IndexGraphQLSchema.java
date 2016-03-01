@@ -1451,6 +1451,18 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).isTransitLeg())
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("from")
+                .description("From where the leg starts")
+                .type(new GraphQLNonNull(placeType))
+                .dataFetcher(environment -> ((Leg)environment.getSource()).from)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("to")
+                .description("To where the leg ends")
+                .type(new GraphQLNonNull(placeType))
+                .dataFetcher(environment -> ((Leg)environment.getSource()).to)
+                .build())
             .build();
 
         final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
