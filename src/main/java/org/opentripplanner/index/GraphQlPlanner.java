@@ -24,9 +24,8 @@ public class GraphQlPlanner {
     public TripPlan plan(DataFetchingEnvironment environment) {
         RoutingRequest request = createRequest(environment);
         Router router = index.graph.router;
-        GraphPathFinder gpFinder = new GraphPathFinder(router); // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
+        GraphPathFinder gpFinder = new GraphPathFinder(router);
         List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
-
         TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);        
         return plan;
     }
