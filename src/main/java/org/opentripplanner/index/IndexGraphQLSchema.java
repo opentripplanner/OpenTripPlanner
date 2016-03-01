@@ -25,8 +25,11 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -91,6 +94,14 @@ public class IndexGraphQLSchema {
         .value("NONE", StopPattern.PICKDROP_NONE, "No pickup / drop off available.")
         .value("CALL_AGENCY", StopPattern.PICKDROP_CALL_AGENCY, "Must phone agency to arrange pickup / drop off.")
         .value("COORDINATE_WITH_DRIVER", StopPattern.PICKDROP_COORDINATE_WITH_DRIVER, "Must coordinate with driver to arrange pickup / drop off.")
+        .build();
+
+    public static GraphQLEnumType vertexTypeEnum = GraphQLEnumType.newEnum()
+        .name("VertexType")
+        .value("NORMAL", VertexType.NORMAL, "NORMAL")
+        .value("TRANSIT", VertexType.TRANSIT, "TRANSIT")
+        .value("BIKEPARK", VertexType.BIKEPARK, "BIKEPARK")
+        .value("BIKESHARE", VertexType.BIKESHARE, "BIKESHARE")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -178,7 +189,7 @@ public class IndexGraphQLSchema {
 
     @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
-        createPlanType();
+        createPlanType(index);
 
         GraphQLFieldDefinition planFieldType = GraphQLFieldDefinition.newFieldDefinition()
             .name("plan")
@@ -1318,18 +1329,72 @@ public class IndexGraphQLSchema {
             .build();
     }
 
-    private void createPlanType() {
+    private void createPlanType(GraphIndex index) {
         final GraphQLObjectType placeType = GraphQLObjectType.newObject()
-            .name("Place")
+                .name("Place")
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .dataFetcher(environment -> ((Place)environment.getSource()).name)
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("vertexType")
+                    .type(vertexTypeEnum)
+                    .dataFetcher(environment -> ((Place)environment.getSource()).vertexType)
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("lat")
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                    .dataFetcher(environment -> ((Place)environment.getSource()).lat.floatValue())
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("lon")
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                    .dataFetcher(environment -> ((Place)environment.getSource()).lon.floatValue())
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("stop")
+                    .type(stopType)
+                    .dataFetcher(environment -> index.stopForId.get(((Place) environment.getSource()).stopId))
+                    .build())
+                 .build();
+
+        final GraphQLObjectType legType = GraphQLObjectType.newObject()
+            .name("Leg")
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("lat")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                .dataFetcher(environment -> ((Place)environment.getSource()).lat.floatValue())
+                .name("startTime")
+                .description("When this leg starts")
+                .type(Scalars.GraphQLLong)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).startTime.getTime().getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("lon")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                .dataFetcher(environment -> ((Place)environment.getSource()).lon.floatValue())
+                .name("endTime")
+                .description("When this leg ends")
+                .type(Scalars.GraphQLLong)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).endTime.getTime().getTime())
+                .build())
+             .build();
+
+
+        final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
+            .name("Itinerary")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("startTime")
+                .description("When itinerary starts")
+                .type(Scalars.GraphQLLong)
+                .dataFetcher(environment -> ((Itinerary)environment.getSource()).startTime.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("endTime")
+                .description("When itinerary ends")
+                .type(Scalars.GraphQLLong)
+                .dataFetcher(environment -> ((Itinerary)environment.getSource()).endTime.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("legs")
+                .description("Legs of this itinerary")
+                .type(new GraphQLNonNull(new GraphQLList(legType)))
+                .dataFetcher(environment -> ((Itinerary)environment.getSource()).legs)
                 .build())
              .build();
 
@@ -1360,6 +1425,12 @@ public class IndexGraphQLSchema {
                 .description("To where the plan ends")
                 .type(new GraphQLNonNull(placeType))
                 .dataFetcher(environment -> ((TripPlan)environment.getSource()).to)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("itineraries")
+                .description("Found itineraries")
+                .type(new GraphQLNonNull(new GraphQLList(itineraryType)))
+                .dataFetcher(environment -> ((TripPlan)environment.getSource()).itinerary)
                 .build())
              .build();
     }
