@@ -1463,6 +1463,18 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(placeType))
                 .dataFetcher(environment -> ((Leg)environment.getSource()).to)
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("route")
+                .description("Route of this leg")
+                .type(routeType)
+                .dataFetcher(environment -> index.routeForId.get(((Leg)environment.getSource()).routeId))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trip")
+                .description("Trip of this leg")
+                .type(tripType)
+                .dataFetcher(environment -> index.tripForId.get(((Leg)environment.getSource()).tripId))
+                .build())
             .build();
 
         final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
