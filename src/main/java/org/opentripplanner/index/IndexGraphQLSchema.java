@@ -37,6 +37,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -102,6 +103,26 @@ public class IndexGraphQLSchema {
         .value("TRANSIT", VertexType.TRANSIT, "TRANSIT")
         .value("BIKEPARK", VertexType.BIKEPARK, "BIKEPARK")
         .value("BIKESHARE", VertexType.BIKESHARE, "BIKESHARE")
+        .build();
+
+    public static GraphQLEnumType modeEnum = GraphQLEnumType.newEnum()
+        .name("Mode")
+        .value("AIRPLANE", TraverseMode.AIRPLANE, "AIRPLANE")
+        .value("BICYCLE", TraverseMode.BICYCLE, "BICYCLE")
+        .value("BUS", TraverseMode.BUS, "BUS")
+        .value("BUSISH", TraverseMode.BUSISH, "BUSISH")
+        .value("CABLE_CAR", TraverseMode.CABLE_CAR, "CABLE_CAR")
+        .value("CAR", TraverseMode.CAR, "CAR")
+        .value("FERRY", TraverseMode.FERRY, "FERRY")
+        .value("FUNICULAR", TraverseMode.FUNICULAR, "FUNICULAR")
+        .value("GONDOLA", TraverseMode.GONDOLA, "GONDOLA")
+        .value("LEG_SWITCH", TraverseMode.LEG_SWITCH, "LEG_SWITCH")
+        .value("RAIL", TraverseMode.RAIL, "RAIL")
+        .value("SUBWAY", TraverseMode.SUBWAY, "SUBWAY")
+        .value("TRAINISH", TraverseMode.TRAINISH, "TRAINISH")
+        .value("TRAM", TraverseMode.TRAM, "TRAM")
+        .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
+        .value("WALK", TraverseMode.WALK, "WALK")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -1373,7 +1394,13 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).endTime.getTime().getTime())
                 .build())
-             .build();
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("mode")
+                .description("Mode")
+                .type(modeEnum)
+                .dataFetcher(environment -> Enum.valueOf(TraverseMode.class, ((Leg)environment.getSource()).mode))
+                .build())
+            .build();
 
 
         final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
