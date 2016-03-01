@@ -1428,6 +1428,11 @@ public class IndexGraphQLSchema {
                 .type(legGeometryType)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).legGeometry)
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("agency")
+                .type(agencyType)
+                .dataFetcher(environment -> getAgency(index, ((Leg)environment.getSource()).agencyId))
+                .build())
             .build();
 
         final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
