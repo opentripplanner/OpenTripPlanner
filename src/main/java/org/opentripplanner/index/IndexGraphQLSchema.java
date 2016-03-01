@@ -45,6 +45,7 @@ import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.*;
@@ -1351,6 +1352,21 @@ public class IndexGraphQLSchema {
     }
 
     private void createPlanType(GraphIndex index) {
+        final GraphQLObjectType legGeometryType = GraphQLObjectType.newObject()
+            .name("LegGeometry")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("length")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getLength())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("points")
+                .description("Points")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
+                .build())
+            .build();
+
         final GraphQLObjectType placeType = GraphQLObjectType.newObject()
                 .name("Place")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1400,8 +1416,19 @@ public class IndexGraphQLSchema {
                 .type(modeEnum)
                 .dataFetcher(environment -> Enum.valueOf(TraverseMode.class, ((Leg)environment.getSource()).mode))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("duration")
+                .description("Duration")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> Double.valueOf(((Leg)environment.getSource()).getDuration()).floatValue())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("legGeometry")
+                .description("Leg geometry")
+                .type(legGeometryType)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).legGeometry)
+                .build())
             .build();
-
 
         final GraphQLObjectType itineraryType = GraphQLObjectType.newObject()
             .name("Itinerary")
