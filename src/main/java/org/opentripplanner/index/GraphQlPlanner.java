@@ -50,6 +50,9 @@ public class GraphQlPlanner {
         request.setWalkBoardCost(600);
         request.transferSlack = 180;
         request.disableRemainingWeightHeuristic = false;
+        if (environment.containsArgument("numItineraries")) {
+            request.setNumItineraries(((Number)environment.getArgument("numItineraries")).intValue());
+        }
         return request;
     }
 }

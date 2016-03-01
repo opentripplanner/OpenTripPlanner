@@ -233,6 +233,11 @@ public class IndexGraphQLSchema {
                 .name("toLon")
                 .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("numItineraries")
+                .defaultValue(3)
+                .type(Scalars.GraphQLInt)
+                .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
             .build();
 
