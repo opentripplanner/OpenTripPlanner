@@ -817,9 +817,18 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-                .type(Scalars.GraphQLString) //TODO: Should be geometry
-                .dataFetcher(environment -> index.patternForTrip
-                    .get((Trip) environment.getSource()).geometry.getCoordinateSequence())
+                .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
+                .dataFetcher(environment ->
+                    Arrays
+                        .asList(index.patternForTrip
+                            .get((Trip) environment.getSource())
+                            .geometry
+                            .getCoordinateSequence()
+                            .toCoordinateArray())
+                        .stream()
+                        .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
+                        .collect(Collectors.toList())
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")
@@ -1150,10 +1159,10 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
-                        new Coordinate((double) (float) environment.getArgument("minLon"),
-                            (double) (float) environment.getArgument("minLat")),
-                        new Coordinate((double) (float) environment.getArgument("maxLon"),
-                            (double) (float) environment.getArgument("maxLat"))))
+                        new Coordinate(environment.getArgument("minLon"),
+                            environment.getArgument("minLat")),
+                        new Coordinate(environment.getArgument("maxLon"),
+                            environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
                     .filter(stop -> environment.getArgument("agency") == null || stop.getId()
@@ -1189,7 +1198,7 @@ public class IndexGraphQLSchema {
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment ->
                     new SimpleListConnection(index.findClosestStopsByWalking(
-                        environment.getArgument("lat"), environment.getArgument("lon"),
+                        (float) (double) environment.getArgument("lat"), (float) (double) environment.getArgument("lon"),
                         environment.getArgument("radius")
                     )
                         .stream()
