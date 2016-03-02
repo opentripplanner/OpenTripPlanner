@@ -1534,9 +1534,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
-                .dataFetcher(environment -> relay.toGlobalId(
-                    planType.getName(),
-                    "id"))
+                .dataFetcher(environment -> relay.toGlobalId(planType.getName(), "" + Math.random()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("date")
