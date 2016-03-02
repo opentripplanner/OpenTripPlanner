@@ -1316,7 +1316,17 @@ public class GTFSPatternHopFactory {
             if (prev != null) {
                 if (prev.getStop().equals(st.getStop())) {
                     // OBA gives us unmodifiable lists, but we have copied them.
-                    st.setDepartureTime(st.getDepartureTime());
+
+                    // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
+                    // interpolated stop time
+                    // keep the arrival time of the previous stop, unless it didn't have an arrival time, in which case
+                    // replace it with the arrival time of this stop time
+                    // This is particularly important at the last stop in a route (see issue #2220)
+                    if (prev.getArrivalTime() == StopTime.MISSING_VALUE) prev.setArrivalTime(st.getArrivalTime());
+
+                    // prefer to replace with the departure time of this stop time, unless this stop time has no departure time
+                    if (st.getDepartureTime() != StopTime.MISSING_VALUE) prev.setDepartureTime(st.getDepartureTime());
+
                     it.remove();
                     stopSequencesRemoved.add(st.getStopSequence());
                 }
