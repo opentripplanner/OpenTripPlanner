@@ -52,6 +52,7 @@ public class Router {
     public Router(String id, Graph graph) {
         this.id = id;
         this.graph = graph;
+        graph.router = this;
     }
 
 

@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -32,6 +33,7 @@ import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -42,10 +44,13 @@ import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +64,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -77,6 +84,7 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
+    public final Map<AgencyAndId, Stop> stationForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
     public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
@@ -86,7 +94,7 @@ public class GraphIndex {
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<AgencyAndId, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
@@ -125,7 +133,7 @@ public class GraphIndex {
         }
 
         Collection<Edge> edges = graph.getEdges();
-        /* We will keep a separate set of all vertices in case some have the same label. 
+        /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         Set<Vertex> vertices = Sets.newHashSet();
         for (Edge edge : edges) {
@@ -144,7 +152,15 @@ public class GraphIndex {
                 Stop stop = transitStop.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                if (stop.getParentStation() != null) {
+                    stopsForParentStation.put(
+                        new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
+                }
+            }
+            else if (vertex instanceof TransitStation) {
+                TransitStation transitStation = (TransitStation) vertex;
+                Stop stop = transitStation.getStop();
+                stationForId.put(stop.getId(), stop);
             }
         }
         for (TransitStop stopVertex : stopVertexForStop.values()) {
@@ -171,9 +187,12 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-        ));
+        graphQL = new GraphQL(
+            new IndexGraphQLSchema(this).indexSchema,
+            new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+            ))
+        );
         LOG.info("Done indexing graph.");
     }
 
@@ -578,10 +597,59 @@ public class GraphIndex {
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
-        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+        if (executionResult.getData() != null ) {
             content.put("data", executionResult.getData());
         }
         return res.entity(content).build();
+    }
+
+    private Stream<AlertPatch> getAlertPatchStream() {
+        if (graph.updaterManager == null) {
+            return Stream.empty();
+        }
+        return graph.updaterManager.getUpdaterList().stream()
+            .filter(GtfsRealtimeAlertsUpdater.class::isInstance)
+            .map(GtfsRealtimeAlertsUpdater.class::cast)
+            .map(GtfsRealtimeAlertsUpdater::getAlertPatchService)
+            .map(AlertPatchService::getAllAlertPatches)
+            .flatMap(Collection::stream);
+    }
+
+    public List<AlertPatch> getAlerts() {
+        return getAlertPatchStream()
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForRoute(Route route) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getRoute() != null)
+            .filter(alertPatch -> route.getId().equals(alertPatch.getRoute()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForTrip(Trip trip) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTrip() != null)
+            .filter(alertPatch -> trip.getId().equals(alertPatch.getTrip()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForPattern(TripPattern pattern) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTripPatterns() != null)
+            .filter(alertPatch -> alertPatch.getTripPatterns().stream().anyMatch(tripPattern -> pattern.code.equals(tripPattern.code)))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForAgency(Agency agency) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getAgency() != null)
+            .filter(alertPatch -> agency.getId().equals(alertPatch.getAgency()))
+            .collect(Collectors.toList());
+    }
+
+    public AlertPatch getAlertForId(String id) {
+        return getAlertPatchStream().filter(alertPatch -> id.equals(alertPatch.getId())).findFirst().get();
     }
 
     /**
