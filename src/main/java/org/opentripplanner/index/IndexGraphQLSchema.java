@@ -25,21 +25,26 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.TranslatedString;
 
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 public class IndexGraphQLSchema {
 
@@ -69,7 +74,7 @@ public class IndexGraphQLSchema {
         .name("RealtimeState")
         .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
 
-        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+        .value("UPDATED", RealTimeState.UPDATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
 
         .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
 
@@ -77,10 +82,20 @@ public class IndexGraphQLSchema {
 
         .value("MODIFIED", RealTimeState.MODIFIED, "The trip information has been updated and resulted in a different trip pattern compared to the trip pattern of the scheduled trip.")
         .build();
+    
+    public static GraphQLEnumType pickupDropoffTypeEnum = GraphQLEnumType.newEnum()
+        .name("PickupDropoffType")
+        .value("SCHEDULED", StopPattern.PICKDROP_SCHEDULED, "Regularly scheduled pickup / drop off.")
+        .value("NONE", StopPattern.PICKDROP_NONE, "No pickup / drop off available.")
+        .value("CALL_AGENCY", StopPattern.PICKDROP_CALL_AGENCY, "Must phone agency to arrange pickup / drop off.")
+        .value("COORDINATE_WITH_DRIVER", StopPattern.PICKDROP_COORDINATE_WITH_DRIVER, "Must coordinate with driver to arrange pickup / drop off.")
+        .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
+
+    public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
 
     public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
 
@@ -100,6 +115,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType stoptimesInPatternType = new GraphQLTypeReference("StoptimesInPattern");
 
+    public GraphQLOutputType translatedStringType = new GraphQLTypeReference("TranslatedString");
+
     public GraphQLObjectType queryType;
 
     public GraphQLSchema indexSchema;
@@ -107,32 +124,176 @@ public class IndexGraphQLSchema {
     private Relay relay = new Relay();
 
     private GraphQLInterfaceType nodeInterface = relay.nodeInterface(new TypeResolver() {
-        @Override public GraphQLObjectType getType(Object o) {
-            if (o instanceof StopCluster){
+        @Override
+        public GraphQLObjectType getType(Object o) {
+            if (o instanceof StopCluster) {
                 return (GraphQLObjectType) clusterType;
             }
-            if (o instanceof Stop){
+            if (o instanceof Stop) {
                 return (GraphQLObjectType) stopType;
             }
-            if (o instanceof Trip){
+            if (o instanceof Trip) {
                 return (GraphQLObjectType) tripType;
             }
-            if (o instanceof Route){
+            if (o instanceof Route) {
                 return (GraphQLObjectType) routeType;
             }
-            if (o instanceof TripPattern){
+            if (o instanceof TripPattern) {
                 return (GraphQLObjectType) patternType;
             }
-            if (o instanceof Agency){
+            if (o instanceof Agency) {
                 return (GraphQLObjectType) agencyType;
+            }
+            if (o instanceof AlertPatch) {
+                return (GraphQLObjectType) alertType;
             }
             return null;
         }
     });
 
+    private Agency getAgency(GraphIndex index, String agencyId) {
+        //xxx what if there are duplciate agency ids?
+        //now we return the first
+        for (Map<String, Agency> feedAgencies : index.agenciesForFeedId.values()) {
+            if (feedAgencies.get(agencyId) != null) {
+                return feedAgencies.get(agencyId);
+            }
+        }
+        return null;
+    }
+
+    private List<Agency> getAllAgencies(GraphIndex index) {
+        //xxx what if there are duplciate agency ids?
+        //now we return the first
+        ArrayList<Agency> agencies = new ArrayList<Agency>();
+        for (Map<String, Agency> feedAgencies : index.agenciesForFeedId.values()) {
+            agencies.addAll(feedAgencies.values());
+        }
+        return agencies;
+    }
+
+    @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
+
+        translatedStringType = GraphQLObjectType.newObject()
+            .name("TranslatedString")
+            .description("Text with language")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("text")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getValue())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("language")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey())
+                .build())
+            .build();
+
+        alertType = GraphQLObjectType.newObject()
+            .name("Alert")
+            .withInterface(nodeInterface)
+            .description("Simple alert")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay.toGlobalId(
+                    alertType.getName(), ((AlertPatch) environment.getSource()).getId()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("agency")
+                .type(agencyType)
+                .dataFetcher(environment -> getAgency(index, ((AlertPatch) environment.getSource()).getAgency()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("route")
+                .type(routeType)
+                .dataFetcher(environment -> index.routeForId.get(((AlertPatch) environment.getSource()).getRoute()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trip")
+                .type(tripType)
+                .dataFetcher(environment -> index.tripForId.get(((AlertPatch) environment.getSource()).getTrip()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stop")
+                .type(stopType)
+                .dataFetcher(environment -> index.stopForId.get(((AlertPatch) environment.getSource()).getStop()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("patterns")
+                .description("Get all patterns for this alert")
+                .type(new GraphQLList(patternType))
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertHeaderText")
+                .type(Scalars.GraphQLString)
+                .description("Header of alert if it exists")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertHeaderText)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertHeaderTextTranslations")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
+                .description("Headers of alert in all different translations available notnull")
+                .dataFetcher(environment -> {
+                    AlertPatch alertPatch = (AlertPatch) environment.getSource();
+                    Alert alert = alertPatch.getAlert();
+                    if (alert.alertHeaderText instanceof TranslatedString) {
+                        return ((TranslatedString) alert.alertHeaderText).getTranslations();
+                    } else {
+                        return emptyList();
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertDescriptionText")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .description("Long description of alert notnull")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertDescriptionText)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertDescriptionTextTranslations")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
+                .description("Long descriptions of alert in all different translations available notnull")
+                .dataFetcher(environment -> {
+                    AlertPatch alertPatch = (AlertPatch) environment.getSource();
+                    Alert alert = alertPatch.getAlert();
+                    if (alert.alertDescriptionText instanceof TranslatedString) {
+                        return ((TranslatedString) alert.alertDescriptionText).getTranslations();
+                    } else {
+                        return emptyList();
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alertUrl")
+                .type(Scalars.GraphQLString)
+                .description("Url with more information")
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertUrl)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("effectiveStartDate")
+                .type(Scalars.GraphQLLong)
+                .description("When this alert comes into effect")
+                .dataFetcher(environment -> {
+                    Alert alert = ((AlertPatch) environment.getSource()).getAlert();
+                    return alert.effectiveStartDate != null ? alert.effectiveStartDate.getTime() / 1000 : null;
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("effectiveEndDate")
+                .type(Scalars.GraphQLLong)
+                .description("When this alert is not in effect anymore")
+                .dataFetcher(environment -> {
+                    Alert alert = ((AlertPatch) environment.getSource()).getAlert();
+                    return alert.effectiveEndDate != null ? alert.effectiveEndDate.getTime() / 1000 : null;
+                })
+                .build())
+            .build();
+
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -252,9 +413,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new AgencyAndId(
-                    ((Stop) environment.getSource()).getId().getAgencyId(),
-                    ((Stop) environment.getSource()).getParentStation())))
+                .dataFetcher(environment -> ((Stop) environment.getSource()).getParentStation() != null ?
+                    index.stationForId.get(new AgencyAndId(
+                        ((Stop) environment.getSource()).getId().getAgencyId(),
+                        ((Stop) environment.getSource()).getParentStation())) : null)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairBoarding")
@@ -281,6 +443,12 @@ public class IndexGraphQLSchema {
                 .type(clusterType)
                 .dataFetcher(environment -> index.stopClusterForStop
                     .get((Stop) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stops")
+                .description("Returns all stops that are childen of this station (Only applicable for locationType = 1)")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment -> index.stopsForParentStation.get(((Stop) environment.getSource()).getId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
@@ -377,11 +545,11 @@ public class IndexGraphQLSchema {
                         Long.parseLong(environment.getArgument("startTime")),
                         (int) environment.getArgument("timeRange"),
                         (int) environment.getArgument("numberOfDepartures"))
-                    .stream()
-                    .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
-                    .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
-                    .limit((long) (int) environment.getArgument("numberOfDepartures"))
-                    .collect(Collectors.toList()))
+                        .stream()
+                        .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
+                        .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
+                        .limit((long) (int) environment.getArgument("numberOfDepartures"))
+                        .collect(Collectors.toList()))
                 .build())
             .build();
 
@@ -437,6 +605,25 @@ public class IndexGraphQLSchema {
                 .name("realtime")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeState")
+                .type(realtimeStateEnum)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pickupType")
+                .type(pickupDropoffTypeEnum)
+                .dataFetcher(environment -> index.patternForTrip
+                    .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                    .getBoardType(((TripTimeShort) environment.getSource()).stopIndex))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("dropoffType")
+                .type(pickupDropoffTypeEnum)
+                .dataFetcher(environment -> index.patternForTrip
+                    .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                    .getAlightType(((TripTimeShort) environment.getSource()).stopIndex))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtimeState")
@@ -556,17 +743,32 @@ public class IndexGraphQLSchema {
                             index.graph.timetableSnapshotSource.getTimetableSnapshot()
                                 .resolve(index.patternForTrip.get(trip),
                                     ServiceDate.parseString(environment.getArgument("serviceDay")))
-                                , trip);
+                            , trip);
                     } catch (ParseException e) {
-                         return null; // Invalid date format
+                        return null; // Invalid date format
                     }
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-                .type(Scalars.GraphQLString) //TODO: Should be geometry
-                .dataFetcher(environment -> index.patternForTrip
-                    .get((Trip) environment.getSource()).geometry.getCoordinateSequence())
+                .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
+                .dataFetcher(environment ->
+                    Arrays
+                        .asList(index.patternForTrip
+                            .get((Trip) environment.getSource())
+                            .geometry
+                            .getCoordinateSequence()
+                            .toCoordinateArray())
+                        .stream()
+                        .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
+                        .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the trip")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForTrip((Trip) dataFetchingEnvironment.getSource()))
                 .build())
             .build();
 
@@ -646,6 +848,12 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment ->
                     ((TripPattern) environment.getSource()).semanticHashString(null))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the pattern")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForPattern((TripPattern) dataFetchingEnvironment.getSource()))
                 .build())
             .build();
 
@@ -732,6 +940,12 @@ public class IndexGraphQLSchema {
                     .distinct()
                     .collect(Collectors.toList()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the route")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForRoute((Route) dataFetchingEnvironment.getSource()))
+                .build())
             .build();
 
         agencyType = GraphQLObjectType.newObject()
@@ -782,6 +996,12 @@ public class IndexGraphQLSchema {
                     .filter(route -> route.getAgency() == environment.getSource())
                     .collect(Collectors.toList()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active for the agency")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlertsForAgency((Agency) dataFetchingEnvironment.getSource()))
+                .build())
             .build();
 
         queryType = GraphQLObjectType.newObject()
@@ -805,6 +1025,9 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(agencyType.getName())) {
                     return index.getAgencyWithoutFeedId(id.id);
+                }
+                if (id.type.equals(alertType.getName())) {
+                    return index.getAlertForId(id.id);
                 }
                 return null;
             }))
@@ -870,10 +1093,10 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
-                        new Coordinate((double) (float) environment.getArgument("minLon"),
-                            (double) (float) environment.getArgument("minLat")),
-                        new Coordinate((double) (float) environment.getArgument("maxLon"),
-                            (double) (float) environment.getArgument("maxLat"))))
+                        new Coordinate(environment.getArgument("minLon"),
+                            environment.getArgument("minLat")),
+                        new Coordinate(environment.getArgument("maxLon"),
+                            environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
                     .filter(stop -> environment.getArgument("agency") == null || stop.getId()
@@ -909,7 +1132,7 @@ public class IndexGraphQLSchema {
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment ->
                     new SimpleListConnection(index.findClosestStopsByWalking(
-                        environment.getArgument("lat"), environment.getArgument("lon"),
+                        (float) (double) environment.getArgument("lat"), (float) (double) environment.getArgument("lon"),
                         environment.getArgument("radius")
                     )
                         .stream()
@@ -929,6 +1152,17 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.stopForId
+                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("station")
+                .description("Get a single station (stop with location_type = 1) based on its id (format is Agency:StopId)")
+                .type(stopType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> index.stationForId
                     .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1043,6 +1277,12 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(
                     environment -> index.stopClusterForId.get(environment.getArgument("id")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("alerts")
+                .description("Get all alerts active in the graph")
+                .type(new GraphQLList(alertType))
+                .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")
