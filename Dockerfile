@@ -3,6 +3,8 @@ MAINTAINER Reittiopas version: 0.1
 #RUN apt-get update && apt-get -y install vim
 
 ENV OTP_ROOT="/opt/opentripplanner"
+ENV OTP_DATA_CONTAINER_URL="http://opentripplanner-data-container:8080"
+
 WORKDIR ${OTP_ROOT}
 
 # Fetch maven dependencies
@@ -30,4 +32,4 @@ EXPOSE ${SECURE_PORT}
 
 LABEL io.openshift.expose-services 8080:http
 
-CMD run.sh
+CMD run.sh ${OTP_DATA_CONTAINER_URL}

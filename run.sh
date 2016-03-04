@@ -3,7 +3,7 @@
 
 JAR=`ls target/*-shaded*`
 echo JAR=$JAR
-ROUTE_DATA_URL="http://192.168.99.100:8080/"
+ROUTE_DATA_URL=$1
 function build_graph {
   echo "builgind graph..."
   GRAPHNAME=$1
@@ -28,7 +28,7 @@ function process {
 }
 
 GRAPH_STRING=""
-for GRAPH in `curl -s http://192.168.99.100:8080/routers.txt|cut -d'-' -f2|cut -d'.' -f1`
+for GRAPH in `curl -s $ROUTE_DATA_URL/routers.txt|cut -d'-' -f2|cut -d'.' -f1`
 do
   process $GRAPH
   GRAPH_STRING="$GRAPH_STRING --router $GRAPH"
