@@ -3,9 +3,10 @@
 
 JAR=`ls target/*-shaded*`
 echo JAR=$JAR
-ROUTE_DATA_URL=$1
+ROUTE_DATA_URL=$OTP_DATA_CONTAINER_URL
+
 function build_graph {
-  echo "builgind graph..."
+  echo "building graph..."
   GRAPHNAME=$1
   FILE=$2
   DIR="graphs/$NAME"
@@ -19,7 +20,9 @@ function process {
   URL="$ROUTE_DATA_URL/router-$NAME.zip"
   FILE="$NAME.zip"
   MD5FILE=$FILE.md5
-
+  echo "Name is: $NAME"
+  echo "URL is: $URL"
+  
   if [[ "$(curl $URL -z $FILE -o $FILE -s -L -w %{http_code})" == "200" ]]; then
     build_graph $NAME $FILE
   else
