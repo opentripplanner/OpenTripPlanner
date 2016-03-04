@@ -32,4 +32,4 @@ EXPOSE ${SECURE_PORT}
 
 LABEL io.openshift.expose-services 8080:http
 
-CMD ./run.sh ${OTP_DATA_CONTAINER_URL}
+CMD ./run.sh
