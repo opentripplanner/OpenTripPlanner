@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 JAR=`ls target/*-shaded*`
