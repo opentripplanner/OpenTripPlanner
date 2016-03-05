@@ -561,7 +561,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JPanel pane = new JPanel();
         pane.setLayout(new GridLayout(0, 2));
         
-        // 2 rows: transport mode options
+        // 4 rows (7 elements): transport mode options
         walkCheckBox = new JCheckBox("walk");
         walkCheckBox.setSelected(true);
         pane.add(walkCheckBox);
@@ -578,6 +578,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(transitCheckBox);
         carCheckBox = new JCheckBox("car");
         pane.add(carCheckBox);
+
+		// GridLayout does not support empty cells, so a dummy label is used to fix the layout.
+		JLabel dummyLabel = new JLabel("");
+		pane.add(dummyLabel);
 
         // row: arrive by?
         JLabel arriveByLabel = new JLabel("Arrive by?:");
