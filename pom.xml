@@ -706,7 +706,8 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1-20160307.111216-85</version>
+            <!--version>0.1-SNAPSHOT</version-->
         </dependency>
     </dependencies>
 
