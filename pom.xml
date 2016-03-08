@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.rutebanken.superpom</groupId>
+        <artifactId>superpom</artifactId>
+        <version>0.0.2</version>
+    </parent>
 
     <name>OpenTripPlanner</name>
     <url>http://opentripplanner.org/</url>
@@ -10,9 +15,8 @@
     <packaging>jar</packaging>
 
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
-        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+       <connection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</connection>
+       <developerConnection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</developerConnection>
     </scm>
 
     <properties>
@@ -23,11 +27,6 @@
     </properties>
 
     <distributionManagement>
-      <repository>
-          <id>shuffle</id>
-          <name>Internal rutebanken repository</name>
-          <url>scp://shuffle/usr/share/nginx/html/repo</url>
-      </repository>
       <snapshotRepository>
           <id>shuffle</id>
           <name>Internal rutebanken repository</name>
@@ -36,14 +35,6 @@
     </distributionManagement>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>2.10</version>
-            </extension>
-        </extensions>
-
         <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
         <resources>
             <resource>
@@ -112,56 +103,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <!-- Target Java versions -->
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- This plugin must be configured both here (for attach-javadoc during release)
-                and in "reports" (for site generation), preferably with identical version numbers. -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <configuration>
-                    <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <!-- The site generation step can fail. Run it in release:prepare to make sure it
-                    works before tagging the release. -->
-                    <preparationGoals>clean verify site</preparationGoals>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals><goal>jar</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
-                <configuration>
-                    <argLine>-Xmx2G</argLine>
-                    <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
-                    <disableXmlReport>false</disableXmlReport>
-                </configuration>
-            </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
                   Commit information is stored in Maven variables, which are then substituted
@@ -260,46 +201,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <!--
-        Reporting plugin versions cannot be managed with entries in <build><plugins><pluginmanagement>
-        but would need a separate <reporting><plugins><pluginmanagement> section.
-        -->
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- empty: disable project-info reports -->
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <!-- This plugin must be configured both here (for site generation) and in "build"
-                (for attach-javadoc during release), preferably with identical version numbers. -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <configuration>
-                    <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- enable only aggregate-level javadoc generation -->
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <repositories>
         <!-- Hack to force maven to check central first. Maven central is inherited from the superpom,
