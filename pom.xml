@@ -621,7 +621,8 @@
         <dependency>
             <groupId>crosby.binary</groupId>
             <artifactId>osmpbf</artifactId>
-            <version>1.3.4-SNAPSHOT</version>
+            <!--version>1.3.4-SNAPSHOT</version-->
+            <version>1.3.4-20150914.191218-1</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>

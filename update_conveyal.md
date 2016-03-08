@@ -20,6 +20,12 @@ ssh nexus
 mkdir -p /opt/mavenrepo/org/onebusaway/onebusaway-gtfs/1.3.5-conveyal-20151030.144540-8
 mv onebusaway-gtfs-1.3.5-conveyal-20151030.144540-8.jar /opt/mavenrepo/org/onebusaway/onebusaway-gtfs/1.3.5-conveyal-20151030.144540-8/.
 
+cd ~/.m2/repository/crosby/binary/osmpbf/1.3.4-SNAPSHOT
+scp osmpbf-1.3.4-20150914.191218-1.jar  nexus:.
+ssh nexus
+mkdir -p /opt/mavenrepo/crosby/binary/osmpbf/1.3.4-20150914.191218-1
+mv osmpbf-1.3.4-20150914.191218-1.jar /opt/mavenrepo/crosby/binary/osmpbf/1.3.4-20150914.191218-1/.
+
 ```
 
 Update pom.xml in the appropriate place.
