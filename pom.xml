@@ -2,6 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Unable to use rutebanken superpom due to unknown reasons. Possible java-8 problem? -->
+
     <name>OpenTripPlanner</name>
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
@@ -10,9 +12,8 @@
     <packaging>jar</packaging>
 
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
-        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+      <connection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</connection>
+      <developerConnection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</developerConnection>
     </scm>
 
     <properties>
@@ -24,9 +25,9 @@
 
     <distributionManagement>
       <repository>
-          <id>shuffle</id>
-          <name>Internal rutebanken repository</name>
-          <url>scp://shuffle/usr/share/nginx/html/repo</url>
+          <id>rutebanken-repository</id>
+          <name>Rutebanken Repository</name>
+          <url>scp://nexus/opt/mavenrepo</url>
       </repository>
       <snapshotRepository>
           <id>shuffle</id>
