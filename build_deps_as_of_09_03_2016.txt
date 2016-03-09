@@ -1,0 +1,189 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.opentripplanner:otp:jar:0.20.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-source-plugin is missing. @ line 146, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building OpenTripPlanner 0.20.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ otp ---
+[INFO] org.opentripplanner:otp:jar:0.20.0-SNAPSHOT
+[INFO] +- com.amazonaws:aws-java-sdk-s3:jar:1.9.39:compile
+[INFO] |  +- com.amazonaws:aws-java-sdk-kms:jar:1.9.39:compile
+[INFO] |  \- com.amazonaws:aws-java-sdk-core:jar:1.9.39:compile
+[INFO] +- com.amazonaws:aws-java-sdk-ec2:jar:1.9.39:compile
+[INFO] +- com.amazonaws:aws-java-sdk-sqs:jar:1.9.39:compile
+[INFO] +- de.ruedigermoeller:fst:jar:2.34:compile
+[INFO] |  +- org.javassist:javassist:jar:3.19.0-GA:compile
+[INFO] |  \- org.objenesis:objenesis:jar:2.1:compile
+[INFO] +- ch.qos.logback:logback-classic:jar:1.0.13:compile
+[INFO] |  +- ch.qos.logback:logback-core:jar:1.0.13:compile
+[INFO] |  \- org.slf4j:slf4j-api:jar:1.7.5:compile
+[INFO] +- org.slf4j:jul-to-slf4j:jar:1.7.6:compile
+[INFO] +- org.slf4j:jcl-over-slf4j:jar:1.7.6:compile
+[INFO] +- com.google.guava:guava:jar:18.0:compile
+[INFO] +- net.sf.trove4j:trove4j:jar:3.0.3:compile
+[INFO] +- org.geotools:gt-geojson:jar:10.5:compile
+[INFO] |  +- org.geotools:gt-main:jar:10.5:compile
+[INFO] |  +- com.googlecode.json-simple:json-simple:jar:1.1:compile
+[INFO] |  \- javax.media:jai_core:jar:1.1.3:compile
+[INFO] +- org.geotools:gt-referencing:jar:10.5:compile
+[INFO] |  +- java3d:vecmath:jar:1.3.2:compile
+[INFO] |  +- commons-pool:commons-pool:jar:1.5.4:compile
+[INFO] |  +- org.geotools:gt-metadata:jar:10.5:compile
+[INFO] |  \- jgridshift:jgridshift:jar:1.0:compile
+[INFO] +- org.geotools:gt-coverage:jar:10.5:compile
+[INFO] |  +- org.geotools:gt-api:jar:10.5:compile
+[INFO] |  +- com.vividsolutions:jts:jar:1.13:compile
+[INFO] |  +- javax.media:jai_imageio:jar:1.1:compile
+[INFO] |  +- it.geosolutions.imageio-ext:imageio-ext-tiff:jar:1.1.8:compile
+[INFO] |  |  +- it.geosolutions.imageio-ext:imageio-ext-utilities:jar:1.1.8:compile
+[INFO] |  |  \- javax.media:jai_codec:jar:1.1.3:compile
+[INFO] |  +- org.jaitools:jt-zonalstats:jar:1.3.1:compile
+[INFO] |  \- org.jaitools:jt-utils:jar:1.3.1:compile
+[INFO] +- org.geotools:gt-arcgrid:jar:10.5:compile
+[INFO] |  \- it.geosolutions.imageio-ext:imageio-ext-arcgrid:jar:1.1.8:compile
+[INFO] |     \- it.geosolutions.imageio-ext:imageio-ext-streams:jar:1.1.8:compile
+[INFO] +- org.geotools:gt-shapefile:jar:10.5:compile
+[INFO] |  +- org.geotools:gt-data:jar:10.5:compile
+[INFO] |  \- jdom:jdom:jar:1.0:compile
+[INFO] +- org.geotools:gt-geotiff:jar:10.5:compile
+[INFO] +- org.geotools:gt-wfs:jar:10.5:compile
+[INFO] |  +- org.geotools:gt-xml:jar:10.5:compile
+[INFO] |  |  \- org.apache.xml:xml-commons-resolver:jar:1.2:compile
+[INFO] |  +- org.geotools.xsd:gt-xsd-wfs:jar:10.5:compile
+[INFO] |  |  +- org.geotools.xsd:gt-xsd-filter:jar:10.5:compile
+[INFO] |  |  |  +- org.geotools.xsd:gt-xsd-core:jar:10.5:compile
+[INFO] |  |  |  |  +- org.geotools:gt-graph:jar:10.5:compile
+[INFO] |  |  |  |  +- picocontainer:picocontainer:jar:1.2:compile
+[INFO] |  |  |  |  |  \- xml-apis:xml-apis:jar:1.0.b2:compile
+[INFO] |  |  |  |  +- commons-jxpath:commons-jxpath:jar:1.3:compile
+[INFO] |  |  |  |  +- commons-collections:commons-collections:jar:3.1:compile
+[INFO] |  |  |  |  \- org.eclipse.xsd:xsd:jar:2.6.0:compile
+[INFO] |  |  |  +- org.geotools.xsd:gt-xsd-gml2:jar:10.5:compile
+[INFO] |  |  |  \- org.geotools.xsd:gt-xsd-gml3:jar:10.5:compile
+[INFO] |  |  +- org.geotools.xsd:gt-xsd-fes:jar:10.5:compile
+[INFO] |  |  \- org.geotools.xsd:gt-xsd-ows:jar:10.5:compile
+[INFO] |  |     \- org.geotools.ogc:net.opengis.ows:jar:10.5:compile
+[INFO] |  +- org.geotools.ogc:net.opengis.wfs:jar:10.5:compile
+[INFO] |  |  +- org.geotools.ogc:org.w3.xlink:jar:10.5:compile
+[INFO] |  |  +- org.geotools.ogc:net.opengis.fes:jar:10.5:compile
+[INFO] |  |  +- org.eclipse.emf:common:jar:2.6.0:compile
+[INFO] |  |  \- org.eclipse.emf:ecore:jar:2.6.1:compile
+[INFO] |  +- xpp3:xpp3_min:jar:1.1.4c:compile
+[INFO] |  +- commons-httpclient:commons-httpclient:jar:3.1:compile
+[INFO] |  \- commons-io:commons-io:jar:2.1:compile
+[INFO] +- org.geotools:gt-epsg-hsql:jar:10.5:compile
+[INFO] |  \- hsqldb:hsqldb:jar:1.8.0.7:compile
+[INFO] +- de.grundid.opendatalab:geojson-jackson:jar:1.2:compile
+[INFO] +- com.conveyal:jackson2-geojson:jar:0.8:compile
+[INFO] +- junit:junit:jar:4.8.1:test
+[INFO] +- org.mockito:mockito-all:jar:1.10.19:test
+[INFO] +- org.glassfish.jersey.core:jersey-server:jar:2.17:compile
+[INFO] |  +- org.glassfish.jersey.core:jersey-common:jar:2.17:compile
+[INFO] |  |  +- org.glassfish.jersey.bundles.repackaged:jersey-guava:jar:2.17:compile
+[INFO] |  |  \- org.glassfish.hk2:osgi-resource-locator:jar:1.0.1:compile
+[INFO] |  +- org.glassfish.jersey.core:jersey-client:jar:2.17:compile
+[INFO] |  +- javax.ws.rs:javax.ws.rs-api:jar:2.0.1:compile
+[INFO] |  +- org.glassfish.jersey.media:jersey-media-jaxb:jar:2.17:compile
+[INFO] |  +- javax.annotation:javax.annotation-api:jar:1.2:compile
+[INFO] |  +- org.glassfish.hk2:hk2-api:jar:2.4.0-b10:compile
+[INFO] |  |  +- org.glassfish.hk2:hk2-utils:jar:2.4.0-b10:compile
+[INFO] |  |  \- org.glassfish.hk2.external:aopalliance-repackaged:jar:2.4.0-b10:compile
+[INFO] |  +- org.glassfish.hk2.external:javax.inject:jar:2.4.0-b10:compile
+[INFO] |  +- org.glassfish.hk2:hk2-locator:jar:2.4.0-b10:compile
+[INFO] |  \- javax.validation:validation-api:jar:1.1.0.Final:compile
+[INFO] +- org.glassfish.jersey.media:jersey-media-multipart:jar:2.17:compile
+[INFO] |  \- org.jvnet.mimepull:mimepull:jar:1.9.3:compile
+[INFO] +- org.glassfish.jersey.containers:jersey-container-grizzly2-http:jar:2.17:compile
+[INFO] |  \- org.glassfish.grizzly:grizzly-http-server:jar:2.3.16:compile
+[INFO] |     \- org.glassfish.grizzly:grizzly-http:jar:2.3.16:compile
+[INFO] |        \- org.glassfish.grizzly:grizzly-framework:jar:2.3.16:compile
+[INFO] +- com.fasterxml.jackson.core:jackson-core:jar:2.5.3:compile
+[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.5.3:compile
+[INFO] |  \- com.fasterxml.jackson.core:jackson-annotations:jar:2.5.0:compile
+[INFO] +- com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:jar:2.5.3:compile
+[INFO] |  +- com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:jar:2.5.3:compile
+[INFO] |  \- com.fasterxml.jackson.module:jackson-module-jaxb-annotations:jar:2.5.3:compile
+[INFO] +- com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:jar:2.5.3:compile
+[INFO] |  +- com.fasterxml.jackson.dataformat:jackson-dataformat-xml:jar:2.5.3:compile
+[INFO] |  +- org.codehaus.woodstox:stax2-api:jar:3.1.4:compile
+[INFO] |  \- org.codehaus.woodstox:woodstox-core-asl:jar:4.4.1:compile
+[INFO] |     \- javax.xml.stream:stax-api:jar:1.0-2:compile
+[INFO] +- com.ning:async-http-client:jar:1.8.12:compile
+[INFO] |  \- io.netty:netty:jar:3.9.2.Final:compile
+[INFO] +- javax.servlet:servlet-api:jar:2.5:provided
+[INFO] +- javax.annotation:jsr250-api:jar:1.0:compile
+[INFO] +- javax.inject:javax.inject:jar:1:compile
+[INFO] +- org.onebusaway:onebusaway-gtfs:jar:1.3.5-conveyal-SNAPSHOT:compile
+[INFO] |  \- org.onebusaway:onebusaway-csv-entities:jar:1.1.5-SNAPSHOT:compile
+[INFO] |     \- commons-beanutils:commons-beanutils:jar:1.7.0:compile
+[INFO] +- org.processing:core:jar:1.0.7:compile
+[INFO] +- com.google.protobuf:protobuf-java:jar:2.6.1:compile
+[INFO] +- joda-time:joda-time:jar:2.9.2:compile
+[INFO] +- ar.com.hjg:pngj:jar:2.0.1:compile
+[INFO] +- net.sf.flexjson:flexjson:jar:2.0:compile
+[INFO] +- org.apache.axis:axis:jar:1.4:compile
+[INFO] +- org.apache.axis:axis-jaxrpc:jar:1.4:compile
+[INFO] +- org.apache.commons:commons-compress:jar:1.0:compile
+[INFO] +- commons-discovery:commons-discovery:jar:0.4:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.0.4:compile
+[INFO] +- net.java.dev.jets3t:jets3t:jar:0.8.1:compile
+[INFO] |  +- commons-codec:commons-codec:jar:1.3:compile
+[INFO] |  \- com.jamesmurty.utils:java-xmlbuilder:jar:0.4:compile
+[INFO] +- crosby.binary:osmpbf:jar:1.3.4-SNAPSHOT:compile
+[INFO] +- com.beust:jcommander:jar:1.30:compile
+[INFO] +- net.sourceforge.javacsv:javacsv:jar:2.0:compile
+[INFO] +- org.apache.httpcomponents:httpclient:jar:4.5:compile
+[INFO] |  \- org.apache.httpcomponents:httpcore:jar:4.4.1:compile
+[INFO] +- org.apache.commons:commons-math3:jar:3.0:compile
+[INFO] +- org.apache.lucene:lucene-core:jar:4.7.1:compile
+[INFO] +- org.apache.lucene:lucene-queries:jar:4.7.1:compile
+[INFO] +- org.apache.lucene:lucene-analyzers-common:jar:4.7.1:compile
+[INFO] +- org.apache.lucene:lucene-queryparser:jar:4.7.1:compile
+[INFO] |  \- org.apache.lucene:lucene-sandbox:jar:4.7.1:compile
+[INFO] +- com.graphql-java:graphql-java:jar:2015-09-06T17-27-38:compile
+[INFO] |  \- org.antlr:antlr4-runtime:jar:4.5.1:runtime
+[INFO] +- bsf:bsf:jar:2.4.0:compile
+[INFO] +- io.opentraffic:traffic-engine:jar:0.2:compile
+[INFO] |  +- com.conveyal:osm-lib:jar:0.1-SNAPSHOT:compile
+[INFO] |  |  +- org.mapdb:mapdb:jar:1.0.6:compile
+[INFO] |  |  \- org.openstreetmap.osmosis:osmosis-osm-binary:jar:0.43.1:compile
+[INFO] |  +- org.apache.commons:commons-csv:jar:1.1:compile
+[INFO] |  +- com.github.ben-manes.caffeine:caffeine:jar:1.2.0:compile
+[INFO] |  |  +- com.github.ben-manes.caffeine:tracing-api:jar:1.2.0:compile
+[INFO] |  |  \- com.google.code.findbugs:jsr305:jar:3.0.0:compile
+[INFO] |  \- com.carrotsearch:hppc:jar:0.7.1:compile
+[INFO] \- com.conveyal:r5:jar:0.1-SNAPSHOT:compile
+[INFO]    +- org.geotools:gt-opengis:jar:14.0:compile
+[INFO]    |  \- net.java.dev.jsr-275:jsr-275:jar:1.0-beta-2:compile
+[INFO]    +- com.conveyal:gtfs-lib:jar:0.2-SNAPSHOT:compile
+[INFO]    \- com.sparkjava:spark-core:jar:2.3:compile
+[INFO]       +- org.slf4j:slf4j-simple:jar:1.7.12:compile
+[INFO]       +- org.eclipse.jetty:jetty-server:jar:9.3.2.v20150730:compile
+[INFO]       |  +- javax.servlet:javax.servlet-api:jar:3.1.0:compile
+[INFO]       |  +- org.eclipse.jetty:jetty-http:jar:9.3.2.v20150730:compile
+[INFO]       |  |  \- org.eclipse.jetty:jetty-util:jar:9.3.2.v20150730:compile
+[INFO]       |  \- org.eclipse.jetty:jetty-io:jar:9.3.2.v20150730:compile
+[INFO]       +- org.eclipse.jetty:jetty-webapp:jar:9.3.2.v20150730:compile
+[INFO]       |  +- org.eclipse.jetty:jetty-xml:jar:9.3.2.v20150730:compile
+[INFO]       |  \- org.eclipse.jetty:jetty-servlet:jar:9.3.2.v20150730:compile
+[INFO]       |     \- org.eclipse.jetty:jetty-security:jar:9.3.2.v20150730:compile
+[INFO]       +- org.eclipse.jetty.websocket:websocket-server:jar:9.3.2.v20150730:compile
+[INFO]       |  +- org.eclipse.jetty.websocket:websocket-common:jar:9.3.2.v20150730:compile
+[INFO]       |  \- org.eclipse.jetty.websocket:websocket-client:jar:9.3.2.v20150730:compile
+[INFO]       \- org.eclipse.jetty.websocket:websocket-servlet:jar:9.3.2.v20150730:compile
+[INFO]          \- org.eclipse.jetty.websocket:websocket-api:jar:9.3.2.v20150730:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.044 s
+[INFO] Finished at: 2016-03-09T09:17:38+01:00
+[INFO] Final Memory: 23M/312M
+[INFO] ------------------------------------------------------------------------
