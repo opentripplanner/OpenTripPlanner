@@ -1,11 +1,12 @@
 # com.conveyal.r5
 
 **r5** is a pain in the ass, as it does not have a release.
+The same goes for several of the other conveyal packages.
 
 I find the latest snapshot like this:
 `ls -lart ~/.m2/repository/com/conveyal/r5/0.1-SNAPSHOT`
 
-Deploying this with maven failed, so I do it manually:
+Deploying the jar with maven failed, so I do it manually:
 ```
 cd ~/.m2/repository/com/conveyal/r5/0.1-SNAPSHOT
 scp r5-0.1-20160307.111216-85.jar nexus:.
@@ -28,4 +29,5 @@ mv osmpbf-1.3.4-20150914.191218-1.jar /opt/mavenrepo/crosby/binary/osmpbf/1.3.4-
 
 ```
 
-Update pom.xml in the appropriate place.
+Update pom.xml in the appropriate place by commenting out the snapshot
+dependency, and using the explicit one instead.
