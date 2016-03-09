@@ -680,6 +680,7 @@ public abstract class GraphPathToTripPlanConverter {
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.vertexType = VertexType.BIKESHARE;
+            place.stopId = AgencyAndId.convertFromString(((BikeRentalStationVertex) vertex).getId());
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;
         } else {
