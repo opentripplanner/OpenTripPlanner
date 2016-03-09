@@ -18,17 +18,16 @@ org.onebusaway:onebusaway-csv-entities:jar:1.1.5-SNAPSHOT:compile # Really a tra
 ```
 
 The rest have changes
+```
 crosby.binary:osmpbf:jar:1.3.4-SNAPSHOT:compile
 com.conveyal:osm-lib:jar:0.1-SNAPSHOT:compile # A transitive dependency to a relase package?!
 com.conveyal:r5:jar:0.1-SNAPSHOT:compile
 com.conveyal:gtfs-lib:jar:0.2-SNAPSHOT:compile # Really a transitive dependency
+```
 
-## The dependencies
+The transitive dependencies have been marked in pom file.
 
-commons-beanutils:commons-beanutils:jar:1.7.0:compile
-org.geotools:gt-opengis:jar:14.0:compile
-com.sparkjava:spark-core:jar:2.3:compile
-
+## Operations
 
 **r5** is a pain in the ass, as it does not have a release.
 The same goes for several of the other conveyal packages.
@@ -37,6 +36,7 @@ I find the latest snapshot like this:
 `ls -lart ~/.m2/repository/com/conveyal/r5/0.1-SNAPSHOT`
 
 Deploying the jar with maven failed, so I do it manually:
+
 ```
 cd ~/.m2/repository/com/conveyal/r5/0.1-SNAPSHOT
 scp r5-0.1-20160307.111216-85.jar nexus:.
@@ -50,27 +50,12 @@ ssh nexus
 mkdir -p /opt/mavenrepo/om/conveyal/gtfs-lib/0.2
  mv gtfs-lib-0.2-20160307.194541-8.jar /opt/mavenrepo/om/conveyal/gtfs-lib/0.2
 
-
-# Same procedure for onebusaway-gtfs
-cd ~/.m2/repository/org/onebusaway/onebusaway-gtfs/1.3.5-conveyal-SNAPSHOT
-scp onebusaway-gtfs-1.3.5-conveyal-20151030.144540-8.jar nexus:.
-ssh nexus
-mkdir -p /opt/mavenrepo/org/onebusaway/onebusaway-gtfs/1.3.5-conveyal-20151030.144540-8
-mv onebusaway-gtfs-1.3.5-conveyal-20151030.144540-8.jar /opt/mavenrepo/org/onebusaway/onebusaway-gtfs/1.3.5-conveyal-20151030.144540-8/.
-
 cd ~/.m2/repository/crosby/binary/osmpbf/1.3.4-SNAPSHOT
 scp osmpbf-1.3.4-20150914.191218-1.jar  nexus:.
 ssh nexus
 mkdir -p /opt/mavenrepo/crosby/binary/osmpbf/1.3.4
 mv osmpbf-1.3.4.jar /opt/mavenrepo/crosby/binary/osmpbf/1.3.4-20150914.191218-1/.
-
-cd ~/.m2/repository/org/onebusaway/onebusaway-csv-entities/1.1.5-SNAPSHOT
-scp onebusaway-csv-entities-1.1.5-20150503.062508-2.jar nexus:.
-ssh nexus
-mkdir -p /opt/mavenrepo/org/onebusaway/onebusaway-csv-entities/1.1.5
-mv onebusaway-csv-entities-1.1.5-20150503.062508-2.jar /opt/mavenrepo/org/onebusaway/onebusaway-csv-entities/1.1.5/.
 ```
-
 
 Update pom.xml in the appropriate place by commenting out the snapshot
 dependency, and using the explicit one instead.
@@ -78,7 +63,9 @@ dependency, and using the explicit one instead.
 
 # Extra deps:
 
-Need to make sure the following dependencies are present and OK
+Need to make sure the following dependencies are present and OK.
+(They were - I compared output from `mvn dependency:tree` before
+  and after.)
 
 ```
 [INFO] +- org.onebusaway:onebusaway-gtfs:jar:1.3.5-conveyal-SNAPSHOT:compile
