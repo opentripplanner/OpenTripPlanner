@@ -14,7 +14,8 @@
     <scm>
       <connection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</connection>
       <developerConnection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</developerConnection>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <properties>
         <geotools.version>10.5</geotools.version>
