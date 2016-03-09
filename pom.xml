@@ -30,6 +30,11 @@
           <name>Rutebanken Repository</name>
           <url>scpexe://nexus/opt/mavenrepo</url>
       </repository>
+      <snapshotRepository>
+          <id>shuffle</id>
+          <name>Internal rutebanken repository</name>
+          <url>scp://shuffle/usr/share/nginx/html/snapshots</url>
+      </snapshotRepository>
     </distributionManagement>
 
     <build>
