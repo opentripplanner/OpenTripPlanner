@@ -285,10 +285,10 @@ otp.config.modes = {
         "TRANSIT,WALK"        : _tr("Transit"), 
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
-        "BUSISH,WALK"         : _tr("Bus Only"), 
+        "BUS,WALK"         : _tr("Bus Only"), 
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
-        "TRAINISH,WALK"       : _tr("Rail Only"), 
+        "TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,WALK"       : _tr("Rail Only"), 
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
         "AIRPLANE,WALK"       : _tr("Airplane Only"),

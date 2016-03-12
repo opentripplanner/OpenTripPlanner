@@ -197,10 +197,11 @@ public class CandidateEdge {
      */
     private int calcPlatform(TraverseModeSet mode) {
         int out = 0;
-        if (mode.getTrainish()) {
+        if (mode.getTram() | mode.getRail() | mode.getSubway() | mode.getFunicular()
+                | mode.getGondola()) {
             out |= StreetEdge.CLASS_TRAIN_PLATFORM;
         }
-        if (mode.getBusish() ) { 
+        if (mode.getBus() | mode.getCableCar()) {
             // includes CABLE_CAR
             out |= StreetEdge.CLASS_OTHER_PLATFORM;
         }

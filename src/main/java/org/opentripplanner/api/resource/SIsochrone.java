@@ -166,8 +166,7 @@ public class SIsochrone extends RoutingResource {
         // set the switch-time for shed/area calculation, i.e. to decide if the hull is calculated based on points or on edges
         TraverseModeSet modes = sptRequestA.modes;
         LOG.debug("mode(s): " + modes);
-        if ((modes.contains(TraverseMode.TRANSIT)) || (modes.contains(TraverseMode.BUSISH))
-                || (modes.contains(TraverseMode.TRAINISH))) {
+        if (modes.contains(TraverseMode.TRANSIT)) {
             shedCalcMethodSwitchTimeInSec = 60 * 20; // 20min (use 20min for transit, since buses may not come all the time)
         } else if (modes.contains(TraverseMode.CAR)) {
             shedCalcMethodSwitchTimeInSec = 60 * 10; // 10min
