@@ -52,9 +52,7 @@ public class Router {
     public Router(String id, Graph graph) {
         this.id = id;
         this.graph = graph;
-        graph.router = this;
     }
-
 
     /**
      * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.

@@ -17,6 +17,7 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class GraphQlPlanner {
     private GraphIndex index;
+    private Router router;
 
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
@@ -24,7 +25,7 @@ public class GraphQlPlanner {
 
     public TripPlan plan(DataFetchingEnvironment environment) {
         RoutingRequest request = createRequest(environment);
-        Router router = index.graph.router;
+        Router router = (Router) environment.getContext();
         GraphPathFinder gpFinder = new GraphPathFinder(router);
         List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
         TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);        

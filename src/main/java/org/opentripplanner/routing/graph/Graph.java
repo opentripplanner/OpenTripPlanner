@@ -199,9 +199,6 @@ public class Graph implements Serializable {
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
 
-    /** The router for this graph */
-    public Router router;
-
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
