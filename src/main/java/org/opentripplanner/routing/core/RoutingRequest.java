@@ -35,12 +35,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -1173,5 +1179,26 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
+    }
+
+    public void parseTime(TimeZone tz, String date, String time) {
+        if (date == null && time != null) { // Time was provided but not date
+            LOG.debug("parsing ISO datetime {}", time);
+            try {
+                // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
+                DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
+                GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+                if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                    gregCal.setTimeZone(tz);
+                }
+                Date d2 = gregCal.getTime();
+                setDateTime(d2);
+            } catch (DatatypeConfigurationException e) {
+                setDateTime(date, time, tz);
+            }
+        } else {
+            setDateTime(date, time, tz);
+        }
     }
 }
