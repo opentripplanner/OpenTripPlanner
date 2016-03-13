@@ -1,17 +1,24 @@
 package org.opentripplanner.index;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
+import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 import graphql.schema.DataFetchingEnvironment;
 
@@ -32,50 +39,110 @@ public class GraphQlPlanner {
         return plan;
     }
 
-    private <T> void withArgument(DataFetchingEnvironment environment, String name, Consumer<T> consumer) {
+    private static <T> void call(DataFetchingEnvironment environment, String name, Consumer<T> consumer) {
         if (environment.containsArgument(name)) {
             consumer.accept(environment.getArgument(name));
         }
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
-        RoutingRequest request = new RoutingRequest();
+    private static class CallerWithEnvironment {
+        private final DataFetchingEnvironment environment;
 
-        withArgument(environment, "fromPlace", request::setFromString);
-        withArgument(environment, "toPlace", request::setToString);
-        withArgument(environment, "intermediatePlaces", request::setIntermediatePlacesFromStrings);
+        public CallerWithEnvironment(DataFetchingEnvironment e) {
+            this.environment = e;
+        }
+
+        private <T> void argument(String name, Consumer<T> consumer) {
+            call(environment, name, consumer);
+        }
+    }
+
+    private GenericLocation toGenericLocation(Map<String, Object> m) {
+        double lat = (double) m.get("lat");
+        double lng = (double) m.get("lon");
+        return new GenericLocation(lat, lng);
+    }
+
+    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+        RoutingRequest request = router.defaultRoutingRequest.clone();
+        request.routerId = router.id;
+
+        CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
+
+        callWith.argument("fromPlace", request::setFromString);
+        callWith.argument("toPlace", request::setToString);
+        callWith.argument("intermediatePlaces", request::setIntermediatePlacesFromStrings);
 
         // something for date, time, tz into setDateTime
 
-        withArgument(environment, "arriveBy", request::setArriveBy);
-        withArgument(environment, "wheelchair", request::setWheelchairAccessible);
-        withArgument(environment, "maxWalkDistance", request::setMaxWalkDistance);
-        withArgument(environment, "maxPreTransitTime", request::setMaxPreTransitTime);
-        withArgument(environment, "walkReluctance", request::setWalkReluctance);
-        withArgument(environment, "waitAtBeginningFactor", request::setWaitAtBeginningFactor);
-        withArgument(environment, "walkSpeed", (Double v) -> request.walkSpeed = v);
-        withArgument(environment, "bikeSpeed", (Double v) -> request.bikeSpeed = v);
-        withArgument(environment, "bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
-        withArgument(environment, "bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
+        callWith.argument("arriveBy", request::setArriveBy);
+        callWith.argument("wheelchair", request::setWheelchairAccessible);
+        callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
+        callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
+        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
+        callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
+        callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
+        callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
+        callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 
-        //withArgument(environment, "optimize", request::setOptimize);
-        withArgument(environment, "triangleSafetyFactor", request::setTriangleSafetyFactor);
-        withArgument(environment, "triangleSlopeFactor", request::setTriangleSlopeFactor);
-        withArgument(environment, "triangleTimeFactor", request::setTriangleTimeFactor);
+        //setter.withArgument("optimize", request::setOptimize);
+        callWith.argument("triangleSafetyFactor", request::setTriangleSafetyFactor);
+        callWith.argument("triangleSlopeFactor", request::setTriangleSlopeFactor);
+        callWith.argument("triangleTimeFactor", request::setTriangleTimeFactor);
 
         QualifiedModeSet modes = new QualifiedModeSet("WALK,BUS");
         modes.applyToRoutingRequest(request);
         request.setModes(request.modes);
 
-        withArgument(environment, "minTransferTime", (Integer v) -> request.transferSlack= v);
+        callWith.argument("numItineraries", request::setNumItineraries);
+        callWith.argument("preferredRoutes", request::setPreferredRoutes);
+        callWith.argument("otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
+        callWith.argument("preferredAgencies", request::setPreferredAgencies);
+        callWith.argument("unpreferredRoutes", request::setUnpreferredRoutes);
+        callWith.argument("unpreferredAgencies", request::setUnpreferredAgencies);
+        callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
+        callWith.argument("walkBoardCost", request::setWalkBoardCost);
+        callWith.argument("bikeBoardCost", request::setBikeBoardCost);
+        callWith.argument("bannedRoutes", request::setBannedRoutes);
+        callWith.argument("bannedAgencies", request::setBannedAgencies);
+        callWith.argument("bannedTrips", (String v) -> request.bannedTrips = RoutingResource.makeBannedTripMap(v));
+        callWith.argument("bannedStops", request::setBannedStops);
+        callWith.argument("bannedStopsHard", request::setBannedStopsHard);
+        callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
+//        if (optimize == OptimizeType.TRANSFERS) {
+//            optimize = OptimizeType.QUICK;
+//            request.transferPenalty += 1800;
+//        }
 
+        callWith.argument("nonpreferredTransferPenalty", (Integer v) -> request.nonpreferredTransferPenalty = v);
 
+        callWith.argument("maxTransfers", (Integer v) -> request.maxTransfers = v);
 
+        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
+        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
+        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
-        withArgument(environment, "fromLat", (Double v) -> request.from.lat = v);
-        withArgument(environment, "fromLon", (Double v) -> request.from.lng = v);
-        withArgument(environment, "toLat", (Double v) -> request.to.lat = v);
-        withArgument(environment, "toLon", (Double v) -> request.to.lng = v);
+        callWith.argument("batch", (Boolean v) -> request.batch = v);
+        callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = AgencyAndId.convertFromString(v));
+        callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = AgencyAndId.convertFromString(v));
+        callWith.argument("clamInitialWait", (Long v) -> request.clampInitialWait = v);
+        callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
+        callWith.argument("boardSlack", (Integer v) -> request.boardSlack = v);
+        callWith.argument("alightSlack", (Integer v) -> request.alightSlack = v);
+        callWith.argument("minTransferTime", (Integer v) -> request.transferSlack = v); // TODO RoutingRequest field should be renamed
+
+        if (request.boardSlack + request.alightSlack > request.transferSlack) {
+            throw new RuntimeException("Invalid parameters: " +
+                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        }
+
+        callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
+        callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
+        callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
+
+        callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
+        callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
         request.setPreferredAgencies("HSL");
         request.setWheelchairAccessible(false);
@@ -88,9 +155,6 @@ public class GraphQlPlanner {
         request.setWalkBoardCost(600);
         request.transferSlack = 180;
         request.disableRemainingWeightHeuristic = false;
-        if (environment.containsArgument("numItineraries")) {
-            request.setNumItineraries(((Number)environment.getArgument("numItineraries")).intValue());
-        }
         return request;
     }
 }

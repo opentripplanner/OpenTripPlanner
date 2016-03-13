@@ -11,6 +11,8 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectField;
+import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -213,25 +215,31 @@ public class IndexGraphQLSchema {
     public IndexGraphQLSchema(GraphIndex index) {
         createPlanType(index);
 
+        GraphQLInputObjectType coordinateInputType = GraphQLInputObjectType.newInputObject()
+            .name("InputCoordinates")
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("lat")
+                .description("The latitude of the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("lon")
+                .description("The longitude of the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .build())
+            .build();
+
         GraphQLFieldDefinition planFieldType = GraphQLFieldDefinition.newFieldDefinition()
             .name("plan")
             .description("Gets plan of a route")
             .type(planType)
             .argument(GraphQLArgument.newArgument()
-                .name("fromLat")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .name("from")
+                .type(new GraphQLNonNull(coordinateInputType))
                 .build())
             .argument(GraphQLArgument.newArgument()
-                .name("fromLon")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                .build())
-            .argument(GraphQLArgument.newArgument()
-                .name("toLat")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                .build())
-            .argument(GraphQLArgument.newArgument()
-                .name("toLon")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .name("to")
+                .type(new GraphQLNonNull(coordinateInputType))
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("numItineraries")
