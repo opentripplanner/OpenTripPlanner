@@ -24,15 +24,14 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class GraphQlPlanner {
     private GraphIndex index;
-    private Router router;
 
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
     }
 
     public TripPlan plan(DataFetchingEnvironment environment) {
+        Router router = (Router)environment.getContext();
         RoutingRequest request = createRequest(environment);
-        Router router = (Router) environment.getContext();
         GraphPathFinder gpFinder = new GraphPathFinder(router);
         List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
         TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);        
@@ -64,6 +63,7 @@ public class GraphQlPlanner {
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+        Router router = (Router)environment.getContext();
         RoutingRequest request = router.defaultRoutingRequest.clone();
         request.routerId = router.id;
 
