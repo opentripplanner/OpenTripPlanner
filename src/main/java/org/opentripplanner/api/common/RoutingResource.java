@@ -504,10 +504,7 @@ public abstract class RoutingResource {
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
+        request.assertSlack();
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;

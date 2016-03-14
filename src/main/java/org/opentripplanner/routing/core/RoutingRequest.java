@@ -1216,4 +1216,12 @@ public class RoutingRequest implements Cloneable, Serializable {
             throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
         }
     }
+
+    public void assertSlack() {
+        if (boardSlack + alightSlack > transferSlack) {
+            // TODO thrown exception type is not consistent with assertTriangleParameters
+            throw new RuntimeException("Invalid parameters: " +
+                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        }
+    }
 }
