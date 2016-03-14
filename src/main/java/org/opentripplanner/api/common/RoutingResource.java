@@ -414,19 +414,10 @@ public abstract class RoutingResource {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setOptimize(optimize);
             if (optimize == OptimizeType.TRIANGLE) {
-                if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-                    throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-                }
-                if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-                    throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-                }
-                // FIXME couldn't this be simplified by only specifying TWO of the values?
-                if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-                    throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-                }
-                request.setTriangleSafetyFactor(triangleSafetyFactor);
-                request.setTriangleSlopeFactor(triangleSlopeFactor);
-                request.setTriangleTimeFactor(triangleTimeFactor);
+                RoutingRequest.assertTriangleParameters(triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor);
+                request.setTriangleSafetyFactor(this.triangleSafetyFactor);
+                request.setTriangleSlopeFactor(this.triangleSlopeFactor);
+                request.setTriangleTimeFactor(this.triangleTimeFactor);
             }
         }
 
