@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -71,37 +72,51 @@ public class GraphQlPlanner {
 
         callWith.argument("fromPlace", request::setFromString);
         callWith.argument("toPlace", request::setToString);
-        callWith.argument("intermediatePlaces", request::setIntermediatePlacesFromStrings);
 
-        // something for date, time, tz into setDateTime
+        callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
+        callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
-        callWith.argument("arriveBy", request::setArriveBy);
+        request.parseTime(router.graph.getTimeZone(), environment.getArgument("date"), environment.getArgument("time"));
+
         callWith.argument("wheelchair", request::setWheelchairAccessible);
+        callWith.argument("numItineraries", request::setNumItineraries);
         callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
         callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
         callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
         callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
         callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
         callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 
-        //setter.withArgument("optimize", request::setOptimize);
-        callWith.argument("triangleSafetyFactor", request::setTriangleSafetyFactor);
-        callWith.argument("triangleSlopeFactor", request::setTriangleSlopeFactor);
-        callWith.argument("triangleTimeFactor", request::setTriangleTimeFactor);
+        OptimizeType optimize = null;
+        if (environment.containsArgument("optimize")) {
+            optimize = OptimizeType.valueOf(environment.getArgument("optimize"));
+        }
 
-        QualifiedModeSet modes = new QualifiedModeSet("WALK,BUS");
-        modes.applyToRoutingRequest(request);
-        request.setModes(request.modes);
+        if (optimize == OptimizeType.TRIANGLE) {
+            Double triangleSafetyFactor = environment.getArgument("triangleSafetyFactor");
+            Double triangleSlopeFactor = environment.getArgument("triangleSlopeFactor");
+            Double triangleTimeFactor = environment.getArgument("triangleTimeFactor");
+            try {
+                RoutingRequest.assertTriangleParameters(triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor);
+            } catch (ParameterException e) {
+                throw new RuntimeException(e);
+            }
+            callWith.argument("triangleSafetyFactor", request::setTriangleSafetyFactor);
+            callWith.argument("triangleSlopeFactor", request::setTriangleSlopeFactor);
+            callWith.argument("triangleTimeFactor", request::setTriangleTimeFactor);
+        }
 
-        callWith.argument("numItineraries", request::setNumItineraries);
+        callWith.argument("arriveBy", request::setArriveBy);
+        callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
+        callWith.argument("intermediatePlaces", request::setIntermediatePlacesFromStrings);
         callWith.argument("preferredRoutes", request::setPreferredRoutes);
         callWith.argument("otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
         callWith.argument("preferredAgencies", request::setPreferredAgencies);
         callWith.argument("unpreferredRoutes", request::setUnpreferredRoutes);
         callWith.argument("unpreferredAgencies", request::setUnpreferredAgencies);
-        callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
         callWith.argument("bikeBoardCost", request::setBikeBoardCost);
         callWith.argument("bannedRoutes", request::setBannedRoutes);
@@ -110,12 +125,33 @@ public class GraphQlPlanner {
         callWith.argument("bannedStops", request::setBannedStops);
         callWith.argument("bannedStopsHard", request::setBannedStopsHard);
         callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
-//        if (optimize == OptimizeType.TRANSFERS) {
-//            optimize = OptimizeType.QUICK;
-//            request.transferPenalty += 1800;
-//        }
+        if (optimize == OptimizeType.TRANSFERS) {
+            optimize = OptimizeType.QUICK;
+            request.transferPenalty += 1800;
+        }
 
+        callWith.argument("batch", (Boolean v) -> request.batch = v);
+
+        if (optimize != null) {
+            request.optimize = optimize;
+        }
+
+        if (environment.containsArgument("modes")) {
+            new QualifiedModeSet(environment.getArgument("modes")).applyToRoutingRequest(request);
+            request.setModes(request.modes);
+        }
+
+        if (request.allowBikeRental && !environment.containsArgument("bikeSpeed")) {
+            //slower bike speed for bike sharing, based on empirical evidence from DC.
+            request.bikeSpeed = 4.3;
+        }
+
+        callWith.argument("boardSlack", (Integer v) -> request.boardSlack = v);
+        callWith.argument("alightSlack", (Integer v) -> request.alightSlack = v);
+        callWith.argument("minTransferTime", (Integer v) -> request.transferSlack = v); // TODO RoutingRequest field should be renamed
         callWith.argument("nonpreferredTransferPenalty", (Integer v) -> request.nonpreferredTransferPenalty = v);
+
+        request.assertSlack();
 
         callWith.argument("maxTransfers", (Integer v) -> request.maxTransfers = v);
 
@@ -123,26 +159,14 @@ public class GraphQlPlanner {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
-        callWith.argument("batch", (Boolean v) -> request.batch = v);
         callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = AgencyAndId.convertFromString(v));
         callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = AgencyAndId.convertFromString(v));
         callWith.argument("clamInitialWait", (Long v) -> request.clampInitialWait = v);
         callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
-        callWith.argument("boardSlack", (Integer v) -> request.boardSlack = v);
-        callWith.argument("alightSlack", (Integer v) -> request.alightSlack = v);
-        callWith.argument("minTransferTime", (Integer v) -> request.transferSlack = v); // TODO RoutingRequest field should be renamed
-
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
-
-        callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
         callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
 
-        callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
-        callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
+        callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
 
         request.setPreferredAgencies("HSL");
         request.setWheelchairAccessible(false);
