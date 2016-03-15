@@ -39,6 +39,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -126,6 +127,16 @@ public class IndexGraphQLSchema {
         .value("TRAM", TraverseMode.TRAM, "TRAM")
         .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
         .value("WALK", TraverseMode.WALK, "WALK")
+        .build();
+
+    public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
+        .name("OptimizeTtpe")
+        .value("QUICK", OptimizeType.QUICK, "QUICK")
+        .value("SAFE", OptimizeType.SAFE, "SAFE")
+        .value("FLAT", OptimizeType.FLAT, "FLAT")
+        .value("GREENWAYS", OptimizeType.GREENWAYS, "GREENWAYS")
+        .value("TRIANGLE", OptimizeType.TRIANGLE, "TRIANGLE")
+        .value("TRANSFERS", OptimizeType.TRANSFERS, "TRANSFERS")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
