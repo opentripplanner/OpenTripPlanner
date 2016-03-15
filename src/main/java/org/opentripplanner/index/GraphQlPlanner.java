@@ -90,10 +90,7 @@ public class GraphQlPlanner {
         callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 
-        OptimizeType optimize = null;
-        if (hasArgument(environment, "optimize")) {
-            optimize = OptimizeType.valueOf(environment.getArgument("optimize"));
-        }
+        OptimizeType optimize = environment.getArgument("optimize");
 
         if (optimize == OptimizeType.TRIANGLE) {
             Double triangleSafetyFactor = environment.getArgument("triangleSafetyFactor");
