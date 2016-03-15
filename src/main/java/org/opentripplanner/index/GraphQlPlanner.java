@@ -40,7 +40,7 @@ public class GraphQlPlanner {
     }
 
     private static <T> void call(DataFetchingEnvironment environment, String name, Consumer<T> consumer) {
-        if (environment.containsArgument(name)) {
+        if (hasArgument(environment, name)) {
             consumer.accept(environment.getArgument(name));
         }
     }
@@ -91,7 +91,7 @@ public class GraphQlPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 
         OptimizeType optimize = null;
-        if (environment.containsArgument("optimize")) {
+        if (hasArgument(environment, "optimize")) {
             optimize = OptimizeType.valueOf(environment.getArgument("optimize"));
         }
 
@@ -136,12 +136,12 @@ public class GraphQlPlanner {
             request.optimize = optimize;
         }
 
-        if (environment.containsArgument("modes")) {
+        if (hasArgument(environment, "modes")) {
             new QualifiedModeSet(environment.getArgument("modes")).applyToRoutingRequest(request);
             request.setModes(request.modes);
         }
 
-        if (request.allowBikeRental && !environment.containsArgument("bikeSpeed")) {
+        if (request.allowBikeRental && !hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -180,5 +180,9 @@ public class GraphQlPlanner {
         request.transferSlack = 180;
         request.disableRemainingWeightHeuristic = false;
         return request;
+    }
+
+    public static boolean hasArgument(DataFetchingEnvironment environment, String name) {
+        return environment.containsArgument(name) && environment.getArgument(name) != null;
     }
 }
