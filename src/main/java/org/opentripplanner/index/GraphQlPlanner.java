@@ -1,5 +1,6 @@
 package org.opentripplanner.index;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,9 +40,32 @@ public class GraphQlPlanner {
         return plan;
     }
 
+    private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
+        if (!name.contains(".")) {
+            if (hasArgument(m, name)) {
+                T v = m.get(name);
+                consumer.accept(v);
+            }
+        } else {
+            String[] parts = name.split("\\.");
+            if (hasArgument(m, parts[0])) {
+                Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
+                call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
+            }
+        }
+    }
+
     private static <T> void call(DataFetchingEnvironment environment, String name, Consumer<T> consumer) {
-        if (hasArgument(environment, name)) {
-            consumer.accept(environment.getArgument(name));
+        if (!name.contains(".")) {
+            if (hasArgument(environment, name)) {
+                consumer.accept(environment.getArgument(name));
+            }
+        } else {
+            String[] parts = name.split("\\.");
+            if (hasArgument(environment, parts[0])) {
+                Map<String, T> nm = (Map<String, T>) environment.getArgument(parts[0]);
+                call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
+            }
         }
     }
 
@@ -93,17 +117,14 @@ public class GraphQlPlanner {
         OptimizeType optimize = environment.getArgument("optimize");
 
         if (optimize == OptimizeType.TRIANGLE) {
-            Double triangleSafetyFactor = environment.getArgument("triangleSafetyFactor");
-            Double triangleSlopeFactor = environment.getArgument("triangleSlopeFactor");
-            Double triangleTimeFactor = environment.getArgument("triangleTimeFactor");
+            callWith.argument("triangle.safetyFactor", request::setTriangleSafetyFactor);
+            callWith.argument("triangle.slopeFactor", request::setTriangleSlopeFactor);
+            callWith.argument("triangle.timeFactor", request::setTriangleTimeFactor);
             try {
-                RoutingRequest.assertTriangleParameters(triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor);
+                RoutingRequest.assertTriangleParameters(request.triangleSafetyFactor, request.triangleTimeFactor, request.triangleSlopeFactor);
             } catch (ParameterException e) {
                 throw new RuntimeException(e);
             }
-            callWith.argument("triangleSafetyFactor", request::setTriangleSafetyFactor);
-            callWith.argument("triangleSlopeFactor", request::setTriangleSlopeFactor);
-            callWith.argument("triangleTimeFactor", request::setTriangleTimeFactor);
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
@@ -165,21 +186,23 @@ public class GraphQlPlanner {
 
         callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
 
-        request.setPreferredAgencies("HSL");
-        request.setWheelchairAccessible(false);
-        request.setMaxWalkDistance(2500.0);
-        request.setWalkReluctance(2.0);
-        request.walkSpeed = 1.2;
-        request.setArriveBy(false);
-        request.showIntermediateStops = true;
-        request.setIntermediatePlacesFromStrings(Collections.emptyList());
-        request.setWalkBoardCost(600);
-        request.transferSlack = 180;
-        request.disableRemainingWeightHeuristic = false;
+//        request.setMaxWalkDistance(2500.0);
+//        request.setWalkReluctance(2.0);
+//        request.walkSpeed = 1.2;
+//        request.setArriveBy(false);
+//        request.showIntermediateStops = true;
+//        request.setIntermediatePlacesFromStrings(Collections.emptyList());
+//        request.setWalkBoardCost(600);
+//        request.transferSlack = 180;
+//        request.disableRemainingWeightHeuristic = false;
         return request;
     }
 
     public static boolean hasArgument(DataFetchingEnvironment environment, String name) {
         return environment.containsArgument(name) && environment.getArgument(name) != null;
+    }
+
+    public static <T> boolean hasArgument(Map<String, T> m, String name) {
+        return m.containsKey(name) && m.get(name) != null;
     }
 }
