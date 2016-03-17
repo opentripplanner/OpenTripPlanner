@@ -1566,12 +1566,6 @@ public class IndexGraphQLSchema {
 
         planType = GraphQLObjectType.newObject()
             .name("Plan")
-            .withInterface(nodeInterface)
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("id")
-                .type(new GraphQLNonNull(Scalars.GraphQLID))
-                .dataFetcher(environment -> relay.toGlobalId(planType.getName(), "" + Math.random()))
-                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("date")
                 .description("The time and date of travel")
