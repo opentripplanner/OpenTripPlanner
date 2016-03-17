@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.ParameterException;
@@ -129,7 +130,7 @@ public class GraphQlPlanner {
 
         callWith.argument("arriveBy", request::setArriveBy);
         callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
-        callWith.argument("intermediatePlaces", request::setIntermediatePlacesFromStrings);
+        callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(this::toGenericLocation).collect(Collectors.toList()));
         callWith.argument("preferredRoutes", request::setPreferredRoutes);
         callWith.argument("otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
         callWith.argument("preferredAgencies", request::setPreferredAgencies);
