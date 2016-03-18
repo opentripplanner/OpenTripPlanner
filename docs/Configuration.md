@@ -278,6 +278,14 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+### Drive-to-transit routing defaults
+
+When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time to reach a transit
+stop or park and ride facility is constrained. You can set a drive time limit in seconds by adding a line like
+`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large street graph, routing
+performance may suffer.
+
+
 ## Boarding and alighting times
 
 Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
