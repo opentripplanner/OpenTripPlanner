@@ -131,18 +131,18 @@ public class GraphQlPlanner {
         callWith.argument("arriveBy", request::setArriveBy);
         callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
         callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(this::toGenericLocation).collect(Collectors.toList()));
-        callWith.argument("preferredRoutes", request::setPreferredRoutes);
-        callWith.argument("otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
-        callWith.argument("preferredAgencies", request::setPreferredAgencies);
-        callWith.argument("unpreferredRoutes", request::setUnpreferredRoutes);
-        callWith.argument("unpreferredAgencies", request::setUnpreferredAgencies);
+        callWith.argument("preferred.routes", request::setPreferredRoutes);
+        callWith.argument("preferred.otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
+        callWith.argument("preferred.agencies", request::setPreferredAgencies);
+        callWith.argument("unpreferred.routes", request::setUnpreferredRoutes);
+        callWith.argument("unpreferred.agencies", request::setUnpreferredAgencies);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
         callWith.argument("bikeBoardCost", request::setBikeBoardCost);
-        callWith.argument("bannedRoutes", request::setBannedRoutes);
-        callWith.argument("bannedAgencies", request::setBannedAgencies);
-        callWith.argument("bannedTrips", (String v) -> request.bannedTrips = RoutingResource.makeBannedTripMap(v));
-        callWith.argument("bannedStops", request::setBannedStops);
-        callWith.argument("bannedStopsHard", request::setBannedStopsHard);
+        callWith.argument("banned.routes", request::setBannedRoutes);
+        callWith.argument("banned.agencies", request::setBannedAgencies);
+        callWith.argument("banned.trips", (String v) -> request.bannedTrips = RoutingResource.makeBannedTripMap(v));
+        callWith.argument("banned.stops", request::setBannedStops);
+        callWith.argument("banned.stopsHard", request::setBannedStopsHard);
         callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
