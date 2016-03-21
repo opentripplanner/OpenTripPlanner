@@ -346,7 +346,7 @@ public class IndexGraphQLSchema {
             .argument(GraphQLArgument.newArgument()
                 .name("maxPreTransitTime")
                 .description("")
-                .type(Scalars.GraphQLLong)
+                .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("walkReluctance")
