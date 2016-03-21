@@ -36,8 +36,5 @@ do
   GRAPH_STRING="$GRAPH_STRING --router $GRAPH"
 done
 
-PORT=8080
-SECURE_PORT=8081
-
 echo "graphString is: $GRAPH_STRING"
 java -Xmx10G -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $GRAPH_STRING
