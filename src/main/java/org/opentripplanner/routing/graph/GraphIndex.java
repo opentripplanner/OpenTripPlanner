@@ -315,7 +315,7 @@ public class GraphIndex {
 
     /* TODO: an almost similar function exists in ProfileRouter, combine these.
     *  Should these live in a separate class? */
-    public List<StopAndDistance> findClosestStopsByWalking(float lat, float lon, int radius) {
+    public List<StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         // TODO make a function that builds normal routing requests from profile requests
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
