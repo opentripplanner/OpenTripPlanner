@@ -50,6 +50,7 @@ import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -589,8 +590,8 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
-        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables) {
+        ExecutionResult executionResult = graphQL.execute(query, null, router, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
