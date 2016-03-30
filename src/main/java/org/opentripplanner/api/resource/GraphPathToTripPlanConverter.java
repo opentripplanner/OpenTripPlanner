@@ -16,7 +16,10 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.*;
+import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -679,6 +682,8 @@ public abstract class GraphPathToTripPlanConverter {
             }
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
+            place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
+            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;
