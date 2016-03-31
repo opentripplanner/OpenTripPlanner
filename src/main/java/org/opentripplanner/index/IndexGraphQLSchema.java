@@ -1547,7 +1547,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routesByName")
-                .description("Get all routes with matching namefor the specified graph")
+                .description("Get all routes with matching name for the specified graph")
                 .type(new GraphQLList(routeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("name")
