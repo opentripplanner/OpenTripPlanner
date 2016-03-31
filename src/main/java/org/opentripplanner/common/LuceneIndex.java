@@ -27,6 +27,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -108,7 +109,7 @@ public class LuceneIndex {
         }
         doc.add(new DoubleField("lat", stop.getLat(), Field.Store.YES));
         doc.add(new DoubleField("lon", stop.getLon(), Field.Store.YES));
-        doc.add(new StringField("id", stop.getId().toString(), Field.Store.YES));
+        doc.add(new StringField("id", GtfsLibrary.convertIdToString(stop.getId()), Field.Store.YES));
         doc.add(new StringField("category", Category.STOP.name(), Field.Store.YES));
         iwriter.addDocument(doc);
     }
