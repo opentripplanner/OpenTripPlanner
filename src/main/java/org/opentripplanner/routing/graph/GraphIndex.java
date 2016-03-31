@@ -50,6 +50,7 @@ import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
@@ -338,6 +339,16 @@ public class GraphIndex {
         // Destroy the routing context, to clean up the temporary edges & vertices
         rr.rctx.destroy();
         return visitor.stopsFound;
+    }
+
+    public LuceneIndex getLuceneIndex(OTPServer otpServer) {
+        synchronized (this) {
+            if (luceneIndex == null) {
+                // Synchronously lazy-initialize the Lucene index
+                luceneIndex = new LuceneIndex(this, otpServer.basePath, false);
+            }
+            return luceneIndex;
+        }
     }
 
     public static class StopAndDistance {
