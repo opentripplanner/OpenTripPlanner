@@ -57,6 +57,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -341,11 +345,18 @@ public class GraphIndex {
         return visitor.stopsFound;
     }
 
-    public LuceneIndex getLuceneIndex(OTPServer otpServer) {
+    public LuceneIndex getLuceneIndex() {
         synchronized (this) {
             if (luceneIndex == null) {
+                File directory;
+                try {
+                    directory = Files.createTempDirectory(graph.routerId + "_lucene",
+                        (FileAttribute<?>[]) new FileAttribute[]{}).toFile();
+                } catch (IOException e) {
+                    return null;
+                }
                 // Synchronously lazy-initialize the Lucene index
-                luceneIndex = new LuceneIndex(this, otpServer.basePath, false);
+                luceneIndex = new LuceneIndex(this, directory, false);
             }
             return luceneIndex;
         }

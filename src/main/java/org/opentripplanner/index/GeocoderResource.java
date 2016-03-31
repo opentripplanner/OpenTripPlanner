@@ -28,7 +28,7 @@ public class GeocoderResource {
     public GeocoderResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
         GraphIndex graphIndex = router.graph.index;
-        index = graphIndex.getLuceneIndex(otpServer);
+        index = graphIndex.getLuceneIndex();
     }
 
     /**
