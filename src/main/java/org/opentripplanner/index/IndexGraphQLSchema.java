@@ -1403,31 +1403,35 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
-                    if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.stopForId.values());
-                    } else {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                            .stream()
+                            .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                            .collect(Collectors.toList())
+                            .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
+                    Stream<Stop> stream;
+                    if (environment.getArgument("name") == null) {
+                        stream = index.stopForId.values().stream();
+                    }
+                    else {
+                        stream = index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
+                            .stream()
+                            .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                    }
+                    return stream.collect(Collectors.toList());
                 })
-                .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("stopsByName")
-                .description("Get all stops that match the name")
-                .type(new GraphQLList(stopType))
-                .argument(GraphQLArgument.newArgument()
-                    .name("name")
-                    .type(Scalars.GraphQLString)
-                    .build())
-                .dataFetcher(environment ->
-                    index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
-                        .stream()
-                        .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)))
-                        .collect(Collectors.toList())
-                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByBbox")
