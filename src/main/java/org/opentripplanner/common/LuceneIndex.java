@@ -167,7 +167,8 @@ public class LuceneIndex {
         for (String term : queryString.split(" ")) {
             /* PrefixQuery matches all strings that start with the query string */
             if (autocomplete) {
-                termQuery.add(new PrefixQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+                termQuery.add(new TermQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
+                termQuery.add(new PrefixQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
             /* FuzzyQuery matches with all string stat are maximum 2 edits away from the query sring */
             } else {
                 termQuery.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
