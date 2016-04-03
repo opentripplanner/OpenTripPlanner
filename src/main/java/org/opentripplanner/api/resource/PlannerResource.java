@@ -12,15 +12,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.resource;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -32,7 +23,15 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
+
+import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 /**
  * This is the primary entry point for the trip planning web service.
@@ -43,7 +42,7 @@ import java.util.*;
  * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
-public class PlannerResource extends RoutingResource {
+public class    PlannerResource extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
 

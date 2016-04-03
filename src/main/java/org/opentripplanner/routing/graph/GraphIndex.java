@@ -6,8 +6,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import graphql.ExecutionResult;
+import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -20,30 +23,42 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -55,9 +70,12 @@ public class GraphIndex {
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
     private static final int CLUSTER_RADIUS = 400; // meters
 
+    /** maximum distance to walk after leaving transit in Analyst */
+    public static final int MAX_WALK_METERS = 3500;
+
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
-    public final Map<String, Agency> agencyForId = Maps.newHashMap();
+    public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
@@ -65,7 +83,7 @@ public class GraphIndex {
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-    public final Multimap<Agency, TripPattern> patternsForAgency = ArrayListMultimap.create();
+    public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
@@ -84,25 +102,28 @@ public class GraphIndex {
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
     private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
-    /* Extra indices for applying realtime updates (lazy-initialized). */
-    public Map<String, Route> routeForIdWithoutAgency = null;
-    public Map<String, Trip> tripForIdWithoutAgency = null;
-    public Map<String, Stop> stopForIdWithoutAgency = null;
-
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
+    public GraphQL graphQL;
+
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
-        for (Agency a : graph.getAgencies()) {
-            agencyForId.put(a.getId(), a);
+
+        for (String feedId : graph.getFeedIds()) {
+            for (Agency agency : graph.getAgencies(feedId)) {
+                Map<String, Agency> agencyForId = agenciesForFeedId.getOrDefault(feedId, new HashMap<>());
+                agencyForId.put(agency.getId(), agency);
+                this.agenciesForFeedId.put(feedId, agencyForId);
+            }
         }
+
         Collection<Edge> edges = graph.getEdges();
         /* We will keep a separate set of all vertices in case some have the same label. 
          * Maybe we should just guarantee unique labels. */
@@ -131,8 +152,9 @@ public class GraphIndex {
             stopSpatialIndex.insert(envelope, stopVertex);
         }
         for (TripPattern pattern : patternForId.values()) {
-            patternsForAgency.put(pattern.route.getAgency(), pattern);
+            patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.route, pattern);
+
             for (Trip trip : pattern.getTrips()) {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
@@ -149,6 +171,9 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
+        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+        ));
         LOG.info("Done indexing graph.");
     }
 
@@ -268,6 +293,57 @@ public class GraphIndex {
         }
         return ret;
     }
+
+    /* TODO: an almost similar function exists in ProfileRouter, combine these.
+    *  Should these live in a separate class? */
+    public List<StopAndDistance> findClosestStopsByWalking(float lat, float lon, int radius) {
+        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+        // TODO make a function that builds normal routing requests from profile requests
+        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        rr.from = new GenericLocation(lat, lon);
+        // FIXME requires destination to be set, not necessary for analyst
+        rr.to = new GenericLocation(lat, lon);
+        rr.setRoutingContext(graph);
+        rr.batch = true;
+        rr.walkSpeed = 1;
+        rr.dominanceFunction = new DominanceFunction.LeastWalk();
+        // RR dateTime defaults to currentTime.
+        // If elapsed time is not capped, searches are very slow.
+        rr.worstTime = (rr.dateTime + radius);
+        AStar astar = new AStar();
+        rr.setNumItineraries(1);
+        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
+        astar.setTraverseVisitor(visitor);
+        astar.getShortestPathTree(rr, 1); // timeout in seconds
+        // Destroy the routing context, to clean up the temporary edges & vertices
+        rr.rctx.destroy();
+        return visitor.stopsFound;
+    }
+
+    public static class StopAndDistance {
+        public Stop stop;
+        public int distance;
+
+        public StopAndDistance(Stop stop, int distance){
+            this.stop = stop;
+            this.distance = distance;
+        }
+    }
+
+    static private class StopFinderTraverseVisitor implements TraverseVisitor {
+        List<StopAndDistance> stopsFound = new ArrayList<>();
+        @Override public void visitEdge(Edge edge, State state) { }
+        @Override public void visitEnqueue(State state) { }
+        // Accumulate stops into ret as the search runs.
+        @Override public void visitVertex(State state) {
+            Vertex vertex = state.getVertex();
+            if (vertex instanceof TransitStop) {
+                stopsFound.add(new StopAndDistance(((TransitStop) vertex).getStop(),
+                    (int) state.getElapsedTimeSeconds()));
+            }
+        }
+    }
+
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
@@ -441,7 +517,7 @@ public class GraphIndex {
         if (stopTreeCache == null) {
             synchronized (this) {
                 if (stopTreeCache == null) {
-                    stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
+                    stopTreeCache = new StopTreeCache(graph, MAX_WALK_METERS); // TODO make this max-distance variable
                 }
             }
         }
@@ -492,13 +568,54 @@ public class GraphIndex {
             cluster.computeCenter();
             stopClusterForId.put(cluster.id, cluster);
         }
-//        LOG.info("Done clustering stops.");
-//        for (StopCluster cluster : stopClusterForId.values()) {
-//            LOG.info("{} at {} {}", cluster.name, cluster.lat, cluster.lon);
-//            for (Stop stop : cluster.children) {
-//                LOG.info("   {}", stop.getName());
-//            }
-//        }
+    }
+
+    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
+        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+        Response.ResponseBuilder res = Response.status(Response.Status.OK);
+        HashMap<String, Object> content = new HashMap<>();
+        if (!executionResult.getErrors().isEmpty()) {
+            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+            content.put("errors", executionResult.getErrors());
+        }
+        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+            content.put("data", executionResult.getData());
+        }
+        return res.entity(content).build();
+    }
+
+    /**
+     * Fetch an agency by its string ID, ignoring the fact that this ID should be scoped by a feedId.
+     * This is a stopgap (i.e. hack) method for fetching agencies where no feed scope is available.
+     * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
+     * Note that if the same agency ID is defined in several feeds, this will return one of them
+     * at random. That is obviously not the right behavior. The problem is that agencies are
+     * not currently keyed on an AgencyAndId object, but on separate feedId and id Strings.
+     * A real fix will involve replacing or heavily modifying the OBA GTFS loader, which is now
+     * possible since we have forked it.
+     */
+    public Agency getAgencyWithoutFeedId(String agencyId) {
+        // Iterate over the agency map for each feed.
+        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+            Agency agency = agencyForId.get(agencyId);
+            if (agency != null) {
+                return agency;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Construct a set of all Agencies in this graph, spanning across all feed IDs.
+     * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
+     * This should probably be done some other way, see javadoc on getAgencyWithoutFeedId.
+     */
+    public Set<Agency> getAllAgencies() {
+        Set<Agency> allAgencies = new HashSet<>();
+        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+            allAgencies.addAll(agencyForId.values());
+        }
+        return allAgencies;
     }
 
 }

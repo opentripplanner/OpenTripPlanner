@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.core;
 
 import org.junit.Test;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,14 +32,24 @@ public class RoutingContextTest {
     @Test
     public void testSetServiceDays() throws Exception {
 
+        String feedId = "FEED";
         String agencyId = "AGENCY";
+
+        Agency agency = new Agency();
+        agency.setId(agencyId);
+
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         CalendarService calendarService = mock(CalendarService.class);
 
+        // You're probably not supposed to do this to mocks (access their fields directly)
+        // But I know of no other way to do this since the mock object has only action-free stub methods.
+        routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
+
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Europe/Budapest"));
         when(graph.getCalendarService()).thenReturn(calendarService);
-        when(graph.getAgencyIds()).thenReturn(Collections.<String>singletonList(agencyId));
+        when(graph.getFeedIds()).thenReturn(Collections.singletonList("FEED"));
+        when(graph.getAgencies(feedId)).thenReturn(Collections.singletonList(agency));
         when(calendarService.getTimeZoneForAgencyId(agencyId)).thenReturn(TimeZone.getTimeZone("Europe/Budapest"));
 
         when(routingRequest.getSecondsSinceEpoch())

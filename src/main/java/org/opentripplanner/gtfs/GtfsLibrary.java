@@ -26,41 +26,38 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
 public class GtfsLibrary {
 
     public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
-    public static GtfsContext createContext(GtfsRelationalDao dao) {
+    public static GtfsContext createContext(GtfsFeedId feedId, GtfsRelationalDao dao) {
         CalendarService calendarService = createCalendarService(dao);
-        return createContext(dao,calendarService);
+        return createContext(feedId, dao, calendarService);
     }
 
-    public static GtfsContext createContext(GtfsRelationalDao dao, CalendarService calendarService) {
-        return new GtfsContextImpl(dao, calendarService);
+    public static GtfsContext createContext(GtfsFeedId feedId, GtfsRelationalDao dao, CalendarService calendarService) {
+        return new GtfsContextImpl(feedId, dao, calendarService);
     }
 
     public static GtfsContext readGtfs(File path) throws IOException {
-        return readGtfs(path, null);
-    }
-
-    public static GtfsContext readGtfs(File path, String defaultAgencyId) throws IOException {
-
         GtfsRelationalDaoImpl dao = new GtfsRelationalDaoImpl();
 
         GtfsReader reader = new GtfsReader();
         reader.setInputLocation(path);
         reader.setEntityStore(dao);
 
-        if (defaultAgencyId != null)
-            reader.setDefaultAgencyId(defaultAgencyId);
+        GtfsFeedId feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
+
+        reader.setDefaultAgencyId(feedId.getId());
 
         reader.run();
 
         CalendarService calendarService = createCalendarService(dao);
 
-        return new GtfsContextImpl(dao, calendarService);
+        return new GtfsContextImpl(feedId, dao, calendarService);
     }
 
     public static CalendarService createCalendarService(GtfsRelationalDao dao) {
@@ -116,7 +113,7 @@ public class GtfsLibrary {
         }else if (routeType >= 1000 && routeType < 1100){ //Water Transport Service
             return TraverseMode.FERRY;
         }else if (routeType >= 1100 && routeType < 1200){ //Air Service
-            throw new IllegalArgumentException("Air transport not supported" + routeType);
+            return TraverseMode.AIRPLANE;
         }else if (routeType >= 1200 && routeType < 1300){ //Ferry Service
             return TraverseMode.FERRY;
         }else if (routeType >= 1300 && routeType < 1400){ //Telecabin Service
@@ -153,13 +150,21 @@ public class GtfsLibrary {
 
     private static class GtfsContextImpl implements GtfsContext {
 
+        private GtfsFeedId _feedId;
+
         private GtfsRelationalDao _dao;
 
         private CalendarService _calendar;
         
-        public GtfsContextImpl(GtfsRelationalDao dao, CalendarService calendar) {
+        public GtfsContextImpl(GtfsFeedId feedId, GtfsRelationalDao dao, CalendarService calendar) {
+            _feedId = feedId;
             _dao = dao;
             _calendar = calendar;
+        }
+
+        @Override
+        public GtfsFeedId getFeedId() {
+            return _feedId;
         }
 
         @Override

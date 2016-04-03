@@ -13,10 +13,8 @@
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -26,8 +24,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Walk over a SPT tree to geometrically visit all nodes and edge geometry. For each geometry longer
@@ -114,7 +113,7 @@ public class SPTWalker {
                          * walk...) and edge properties (car max speed, slope, etc...)
                          */
                         TraverseMode mode = s0.getNonTransitMode();
-                        speedAlongEdge = se.calculateSpeed(spt.getOptions(), mode);
+                        speedAlongEdge = se.calculateSpeed(spt.getOptions(), mode, s0.getTimeInMillis());
                         if (mode != TraverseMode.CAR)
                             speedAlongEdge = speedAlongEdge * se.getDistance() / se.getSlopeSpeedEffectiveLength();
                         double avgSpeed = se.getDistance()

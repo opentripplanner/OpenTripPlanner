@@ -13,41 +13,34 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.google.common.collect.Iterables;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.CompactLineString;
-import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.geometry.*;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * This represents a street segment.
@@ -108,6 +101,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private StreetTraversalPermission permission;
 
+    /** The OSM way ID from whence this came - needed to reference traffic data */
+    public long wayId;
+
     private int streetClass = CLASS_OTHERPATH;
     
     /**
@@ -165,6 +161,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
     }
 
+
     //For testing only
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       String name, double length,
@@ -172,23 +169,33 @@ public class StreetEdge extends Edge implements Cloneable {
         this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
-    public boolean canTraverse(RoutingRequest options) {
-        if (options.wheelchairAccessible) {
-            if (!isWheelchairAccessible()) {
-                return false;
-            }
-            if (getMaxSlope() > options.maxSlope) {
-                return false;
-            }
-        }
-        
-        return canTraverse(options.modes);
-    }
-    
+
+    /**
+     * Checks permissions of the street edge if specified modes are allowed to travel.
+     *
+     * Barriers aren't taken into account. So it can happen that canTraverse returns True.
+     * But doTraverse returns false. Since there are barriers on a street.
+     *
+     * This is because this function is used also on street when searching for start/stop.
+     * Those streets are then split. On splitted streets can be possible to drive with a CAR because
+     * it is only blocked from one way.
+     * @param modes
+     * @return
+     */
     public boolean canTraverse(TraverseModeSet modes) {
         return getPermission().allows(modes);
     }
-    
+
+    /**
+     * Checks if edge is accessible for wheelchair if needed according to tags or if slope is too big.
+     *
+     * Then it checks if street can be traversed according to street permissions and start/end barriers.
+     * This is done with intersection of street and barrier permissions in {@link #canTraverseIncludingBarrier(TraverseMode)}
+     *
+     * @param options
+     * @param mode
+     * @return
+     */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
@@ -198,7 +205,34 @@ public class StreetEdge extends Edge implements Cloneable {
                 return false;
             }
         }
-        return getPermission().allows(mode);
+        return canTraverseIncludingBarrier(mode);
+    }
+
+    /**
+     * This checks if start or end vertex is bollard
+     * If it is it creates intersection of street edge permissions
+     * and from/to barriers.
+     * Then it checks if mode is allowed to traverse the edge.
+     *
+     * By default CAR isn't allowed to traverse barrier but foot and bicycle are.
+     * This can be changed with different tags
+     *
+     * If start/end isn't bollard it just checks the street permissions.
+     *
+     * It is used in {@link #canTraverse(RoutingRequest, TraverseMode)}
+     * @param mode
+     * @return
+     */
+    public boolean canTraverseIncludingBarrier(TraverseMode mode) {
+        StreetTraversalPermission permission = getPermission();
+        if (fromv instanceof BarrierVertex) {
+            permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+        }
+        if (tov instanceof BarrierVertex) {
+            permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+        }
+
+        return permission.allows(mode);
     }
 
     public PackedCoordinateSequence getElevationProfile() {
@@ -287,7 +321,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         // Automobiles have variable speeds depending on the edge type
-        double speed = calculateSpeed(options, traverseMode);
+        double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis());
         
         double time = getDistance() / speed;
         double weight;
@@ -363,13 +397,32 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
 
+        /* Handle no through traffic areas. */
+        if (this.isNoThruTraffic()) {
+            // Record transition into no-through-traffic area.
+            if (backEdge instanceof StreetEdge && !((StreetEdge)backEdge).isNoThruTraffic()) {
+                s1.setEnteredNoThroughTrafficArea();
+            }
+            // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+            if (s1.hasEnteredNoThroughTrafficArea()) {
+                // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
+                // on thru _Vertices_. This could certainly be improved somehow.
+                for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
+                    if (!se.isNoThruTraffic()) {
+                        // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
+                        return null;
+                    }
+                }
+            }
+        }
+
         /* Compute turn cost. */
         StreetEdge backPSE;
         if (backEdge != null && backEdge instanceof StreetEdge) {
             backPSE = (StreetEdge) backEdge;
             RoutingRequest backOptions = backWalkingBike ?
                     s0.getOptions().bikeWalkingOptions : s0.getOptions();
-            double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
+            double backSpeed = backPSE.calculateSpeed(backOptions, backMode, s0.getTimeInMillis());
             final double realTurnCost;  // Units are seconds.
 
             // Apply turn restrictions
@@ -495,13 +548,28 @@ public class StreetEdge extends Edge implements Cloneable {
     }
     
     /**
-     * Calculate the speed appropriately given the RoutingRequest and traverseMode.
+     * Calculate the speed appropriately given the RoutingRequest and traverseMode and the current wall clock time.
+     * Note: this is not strictly symmetrical, because in a forward search we get the speed based on the
+     * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
+     * the edge.
      */
-    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
+    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
         if (traverseMode == null) {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
+            if (options.useTraffic) {
+                // the expected speed based on traffic
+                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
+
+                if (source != null) {
+                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
+
+                    if (!Double.isNaN(congestedSpeed))
+                        return congestedSpeed;
+                }
+            }
+
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
@@ -772,5 +840,35 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         return new P2<StreetEdge>(e1, e2);
+    }
+
+    /**
+     * Get the starting OSM node ID of this edge. Note that this information is preserved when an
+     * edge is split, so both edges will have the same starting and ending nodes.
+     */
+    public long getStartOsmNodeId () {
+        if (fromv instanceof OsmVertex)
+            return ((OsmVertex) fromv).nodeId;
+        // get information from the splitter vertex so this edge gets the same traffic information it got before
+        // it was split.
+        else if (fromv instanceof SplitterVertex)
+            return ((SplitterVertex) fromv).previousNodeId;
+        else
+            return -1;
+    }
+
+    /**
+     * Get the ending OSM node ID of this edge. Note that this information is preserved when an
+     * edge is split, so both edges will have the same starting and ending nodes.
+     */
+    public long getEndOsmNodeId () {
+        if (tov instanceof OsmVertex)
+            return ((OsmVertex) tov).nodeId;
+            // get information from the splitter vertex so this edge gets the same traffic information it got before
+            // it was split.
+        else if (tov instanceof SplitterVertex)
+            return ((SplitterVertex) tov).nextNodeId;
+        else
+            return -1;
     }
 }

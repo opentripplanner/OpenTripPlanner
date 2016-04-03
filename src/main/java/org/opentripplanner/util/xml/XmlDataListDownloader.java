@@ -34,10 +34,7 @@ import javax.xml.xpath.XPathFactory;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,6 +55,13 @@ public class XmlDataListDownloader<T> {
     private XPathExpression xpathExpr;
 
     private XmlDataFactory<T> dataFactory;
+
+    // if true, read attributes of elements, instead of the text of their child elements
+    private boolean readAttributes = false;
+
+    public void setReadAttributes(boolean readAttributes) {
+        this.readAttributes = readAttributes;
+    }
 
     public void setPath(String path) {
         this.path = path;
@@ -129,14 +133,27 @@ public class XmlDataListDownloader<T> {
             }
             HashMap<String, String> attributes = new HashMap<String, String>();
             Node child = node.getFirstChild();
-            while (child != null) {
-                if (!(child instanceof Element)) {
-                    child = child.getNextSibling();
-                    continue;
+
+            if (readAttributes) {
+                // read XML attributes of selected nodes
+                NamedNodeMap attrs = node.getAttributes();
+                int lastAttr = attrs.getLength() - 1;
+                for (int j = lastAttr; j--> 0; ) {
+                    Attr attr = (Attr) attrs.item(j);
+                    attributes.put(attr.getNodeName(), attr.getNodeValue());
                 }
-                attributes.put(child.getNodeName(), child.getTextContent());
-                child = child.getNextSibling();
+            } else {
+                // read text of child nodes
+                while (child != null) {
+                    if (!(child instanceof Element)) {
+                        child = child.getNextSibling();
+                        continue;
+                    }
+                    attributes.put(child.getNodeName(), child.getTextContent());
+                    child = child.getNextSibling();
+                }
             }
+
             T t = dataFactory.build(attributes);
             if (t != null)
                 out.add(t);

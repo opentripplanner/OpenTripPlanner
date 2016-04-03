@@ -15,11 +15,13 @@ Following are known deployments of OTP in an agency-sponsored production capacit
 * [**Adelaide, Australia**](http://jp.adelaidemetro.com.au/opentripplanner-webapp/) the Adelaide Metro Journey Planner.
 * **Trento Province, Italy** -- <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento" target="_blank">ViaggiaTrento</a> and <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto" target="_blank">ViaggiaRovereto</a> 
   - Implemented as part of <a href="http://www.smartcampuslab.it" target="_blank">SmartCampus Project</a>, the research project founded by <a href="http://trentorise.eu" target="_blank">TrentoRise</a>, <a href="http://www.unitn.it" target="_blank">UNITN</a>, and <a href="http://www.fbk.eu" target="_blank">FBK.</a>
+* [**Oslo, Norway**](http://ruter.no/reiseplanlegger/) Ruter's travel planner for Southeastern Norway.
 
 ## Unofficial Production
 
 The following OTP-based services are presented as production-quality deployments, but are not backed by an official transportation authority. OTP has also been used by several popular multi-city smartphone applications in their start-up phase before developing proprietary technology.
 
+* [**ViviBus Bologna**](http://bologna.vivibus.it) Bologna, Italy.
 * [**Singapore Nextride**](https://itunes.apple.com/us/app/nextride-singapore-public/id565103559) from [buUuk](http://www.buuuk.com/) is an iOS application, with the default [web-based OTP client](http://map.nextride.sg/) also available.
 * [**BJCTA**](http://www.bjctatripplanner.org) Birmingham-Jefferson Country, Alabama.
 * [**Tel Aviv, Israel**](http://www.tranzmate.co.il) from TranzMate.

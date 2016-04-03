@@ -13,8 +13,6 @@
 
 package org.opentripplanner.analyst.request;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -34,11 +32,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class SampleFactory implements SampleSource {
 
@@ -116,21 +110,64 @@ public class SampleFactory implements SampleSource {
             }
         });
 
-        // we want two vertices but we want to be sure that we're not nondeterministically excluding a third 
-        if (sorted.size() > 2 && 
-                distances.get(sorted.get(2).getIndex()) - distances.get(sorted.get(1).getIndex()) < EPSILON) {
-            return getSample(lon + 1e-6, lat + 1e-6);
-        }
-        else if (sorted.isEmpty()) {
+        Vertex v0, v1;
+
+        if (sorted.isEmpty())
             return null;
+        else if (sorted.size() <= 2) {
+            v0 = sorted.get(0);
+            v1 = sorted.size() > 1 ? sorted.get(1) : null;
+
         }
         else {
-            Vertex v0 = sorted.get(0);
-            Vertex v1 = sorted.size() > 1 ? sorted.get(1) : null;
-            double d0 = v0 != null ? SphericalDistanceLibrary.distance(v0.getLat(),  v0.getLon(), lat, lon) : 0;
-            double d1 = v1 != null ? SphericalDistanceLibrary.distance(v1.getLat(),  v1.getLon(), lat, lon) : 0;
-            return new Sample(v0, (int) d0, v1, (int) d1);
+            int vxi = 0;
+
+            // Group them by distance
+            Vertex[] vx = new Vertex[2];
+
+            ArrayList<Vertex> grouped = new ArrayList<>();
+
+            // here's the idea: accumulate vertices by distance, waiting until we find a gap
+            // of at least EPSILON. Once we've done that, break ties using labels (which are OSM IDs).
+            for (int i = 0; i < sorted.size(); i++) {
+                if (vxi >= 2) break;
+
+                if (grouped.isEmpty()) {
+                    grouped.add(sorted.get(i));
+                    continue;
+                }
+
+                double dlast = distances.get(sorted.get(i - 1).getIndex());
+                double dthis = distances.get(sorted.get(i).getIndex());
+                if (dthis - dlast < EPSILON) {
+                    grouped.add(sorted.get(i));
+                    continue;
+                }
+                else {
+                    // we have a distinct group of vertices
+                    // sort them by OSM IDs
+                    // this seems like it would be slow but keep in mind that it will only do any work
+                    // when there are multiple members of a group, which is relatively rare.
+                    Collections.sort(grouped, (vv1, vv2) -> vv1.getLabel().compareTo(vv2.getLabel()));
+
+                    // then loop over the list until it's empty or we've found two vertices
+                    int gi = 0;
+                    while (vxi < 2 && gi < grouped.size()) {
+                        vx[vxi++] = grouped.get(gi++);
+                    }
+
+                    // get ready for the next group
+                    grouped.clear();
+                }
+            }
+
+            v0 = vx[0];
+            v1 = vx[1];
         }
+
+        double d0 = v0 != null ? SphericalDistanceLibrary.distance(v0.getLat(),  v0.getLon(), lat, lon) : 0;
+        double d1 = v1 != null ? SphericalDistanceLibrary.distance(v1.getLat(),  v1.getLon(), lat, lon) : 0;
+        return new Sample(v0, (int) d0, v1, (int) d1);
     }
 
     /**

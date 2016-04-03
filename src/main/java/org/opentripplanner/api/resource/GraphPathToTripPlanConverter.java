@@ -16,10 +16,7 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -53,7 +50,7 @@ import java.util.*;
 public abstract class GraphPathToTripPlanConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
-    private static final double MAX_ZAG_DISTANCE = 30;
+    private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
 
     /**
      * Generates a TripPlan from a set of paths
@@ -132,10 +129,6 @@ public abstract class GraphPathToTripPlanConverter {
      * @return The generated itinerary
      */
     public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, Locale requestedLocale) {
-        if (path.states.size() < 2) {
-            throw new TrivialPathException();
-        }
-
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -223,6 +216,21 @@ public abstract class GraphPathToTripPlanConverter {
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
      */
     private static State[][] sliceStates(State[] states) {
+        boolean trivial = true;
+
+        for (State state : states) {
+            TraverseMode traverseMode = state.getBackMode();
+
+            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
+                trivial = false;
+                break;
+            }
+        }
+
+        if (trivial) {
+            throw new TrivialPathException();
+        }
+
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
@@ -293,16 +301,12 @@ public abstract class GraphPathToTripPlanConverter {
             leg.distance += edges[i].getDistance();
         }
 
-        addModeAndAlerts(graph, leg, states, requestedLocale);
-
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
         addTripFields(leg, states, requestedLocale);
 
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
-
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -314,6 +318,9 @@ public abstract class GraphPathToTripPlanConverter {
         addFrequencyFields(states, leg);
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+
+        addModeAndAlerts(graph, leg, states, requestedLocale);
+        if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
     }
@@ -527,7 +534,16 @@ public abstract class GraphPathToTripPlanConverter {
 
             for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
                 if (alertPatch.displayDuring(state)) {
-                    leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                    if (alertPatch.hasTrip()) {
+                        // If the alert patch contains a trip and that trip match this leg only add the alert for
+                        // this leg.
+                        if (alertPatch.getTrip().equals(leg.tripId)) {
+                            leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                        }
+                    } else {
+                        // If we are not matching a particular trip add all known alerts for this trip pattern.
+                        leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                    }
                 }
             }
         }
@@ -553,12 +569,12 @@ public abstract class GraphPathToTripPlanConverter {
             leg.headsign = states[states.length - 1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
-            leg.routeId = route.getId().getId();
+            leg.routeId = route.getId();
             leg.routeLongName = route.getLongName();
             leg.routeShortName = route.getShortName();
             leg.routeTextColor = route.getTextColor();
             leg.routeType = route.getType();
-            leg.tripId = trip.getId().getId();
+            leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
 
@@ -775,11 +791,9 @@ public abstract class GraphPathToTripPlanConverter {
                 distance = edge.getDistance();
             } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
                     && (!step.bogusName || !edge.hasBogusName())) ||
-                    // if we are on a roundabout now and weren't before, start a new step
-                    edge.isRoundabout() != (roundaboutExit > 0) ||
-                    isLink(edge) && !isLink(backState.getBackEdge())
-                    ) {
-                /* street name has changed, or we've changed state from a roundabout to a street */
+                    edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
+                    isLink(edge) && !isLink(backState.getBackEdge())) {
+                // Street name has changed, or we've gone on to or off of a roundabout.
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
@@ -787,7 +801,6 @@ public abstract class GraphPathToTripPlanConverter {
                     if (streetNameNoParens.equals(roundaboutPreviousStreet)) {
                         step.stayOn = true;
                     }
-                    // localization
                     roundaboutExit = 0;
                 }
                 /* start a new step */
@@ -938,6 +951,9 @@ public abstract class GraphPathToTripPlanConverter {
                         }
                                 
                         else {
+                            // What is a zag? TODO write meaningful documentation for this.
+                            // It appears to mean simplifying out several rapid turns in succession
+                            // from the description.
                             // total hack to remove zags.
                             steps.remove(last);
                             steps.remove(last - 1);

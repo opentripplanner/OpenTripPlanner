@@ -59,10 +59,6 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         vertices.addAll(graph.getVertices());
 
         for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
-            //Skips stops that aren't in street data envelope (min, max longitude and latitude of loaded street data)
-            if (!graph.containsInOSM(ts.getCoordinate())) {
-                continue;
-            }
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;

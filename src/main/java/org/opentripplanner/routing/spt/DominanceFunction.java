@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -38,9 +39,21 @@ public abstract class DominanceFunction implements Serializable {
      */
     public boolean betterOrEqualAndComparable(State a, State b) {
 
+        // States before boarding transit and after riding transit are incomparable.
+        // This allows returning transit options even when walking to the destination is the optimal strategy.
+        if (a.isEverBoarded() != b.isEverBoarded()) {
+            return false;
+        }
+
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
         if (a.isBikeRenting() != b.isBikeRenting()) {
             return false;
+        }
+
+        // In case of bike renting, different networks (ie incompatible bikes) are not comparable
+        if (a.isBikeRenting()) {
+            if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks()))
+                return false;
         }
 
         // Does one state represent driving a car and the other represent walking after the car was parked?

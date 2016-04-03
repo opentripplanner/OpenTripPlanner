@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Transport Network Visualizer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.4/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.4/leaflet.js"></script>
+  </head>
+  <body>
+    <div id="map" style="width: 1200px; height: 900px">
+    </div>
+    <script type="text/javascript">
+      function updateMap () {
+        if (window.map.layers) {
+          window.map.layers.forEach(function (layer) {
+            window.map.removeLayer(layer);
+          });
+        }
+
+        window.map.layers = [];
+
+        var bbox = window.map.getBounds();
+        var bbstring = '?n=' + bbox.getNorth() + '&s=' + bbox.getSouth() + '&e=' + bbox.getEast() + '&w=' + bbox.getWest();
+
+        // add the street layer
+        $.ajax({
+          url: '/api/streetEdges' + bbstring,
+          success: function (data) {
+            window.map.layers.push(L.geoJson(data).addTo(window.map));
+          }
+        });
+      }
+
+      // initialize Leaflet map
+      // TODO get center from api
+      window.map = L.map('map').setView([42.358056, -71.063611], 11);
+
+      // bg
+      L.tileLayer('//{s}.tiles.mapbox.com/v3/conveyal.hml987j0/{z}/{x}/{y}.png', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 18
+        }).addTo(window.map);
+
+      window.map.on('moveend', updateMap);
+      updateMap();
+    </script>
+  </body>
+</html>

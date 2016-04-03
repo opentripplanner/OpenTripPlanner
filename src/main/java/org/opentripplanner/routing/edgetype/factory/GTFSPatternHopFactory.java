@@ -13,17 +13,21 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.beust.jcommander.internal.Maps;
+import com.google.common.base.Strings;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -41,7 +45,20 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
+import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
+import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
+import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
+import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
+import org.opentripplanner.graph_builder.annotation.HopZeroTime;
+import org.opentripplanner.graph_builder.annotation.NegativeDwellTime;
+import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
+import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
+import org.opentripplanner.graph_builder.annotation.RepeatedStops;
+import org.opentripplanner.graph_builder.annotation.TripDegenerate;
+import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
 import org.opentripplanner.graph_builder.annotation.*;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
@@ -76,19 +93,16 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Maps;
-import com.google.common.base.Strings;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.HashMultimap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
@@ -274,6 +288,8 @@ public class GTFSPatternHopFactory {
 
     private static GeometryFactory _geometryFactory = GeometryUtils.getGeometryFactory();
 
+    private GtfsFeedId _feedId;
+
     private GtfsRelationalDao _dao;
 
     private CalendarService _calendarService;
@@ -295,11 +311,13 @@ public class GTFSPatternHopFactory {
     private double maxStopToShapeSnapDistance = 150;
 
     public GTFSPatternHopFactory(GtfsContext context) {
+        this._feedId = context.getFeedId();
         this._dao = context.getDao();
         this._calendarService = context.getCalendarService();
     }
     
     public GTFSPatternHopFactory() {
+        this._feedId = null;
         this._dao = null;
         this._calendarService = null;
     }
@@ -367,8 +385,9 @@ public class GTFSPatternHopFactory {
             List<StopTime> stopTimes = new ArrayList<StopTime>(_dao.getStopTimesForTrip(trip));
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
-            if (removeRepeatedStops(stopTimes)) {
-                LOG.warn(graph.addBuilderAnnotation(new RepeatedStops(trip)));
+            TIntList removedStopSequences = removeRepeatedStops(stopTimes);
+            if (!removedStopSequences.isEmpty()) {
+                LOG.warn(graph.addBuilderAnnotation(new RepeatedStops(trip, removedStopSequences)));
             }
             filterStopTimes(stopTimes, graph);
             interpolateStopTimes(stopTimes);   
@@ -456,7 +475,7 @@ public class GTFSPatternHopFactory {
                 if (mode == TraverseMode.SUBWAY) {
                     tstop.setStreetToStopTime(subwayAccessTime);
                 }
-                graph.getMetadata().addMode(mode);
+                graph.addTransitMode(mode);
             }
 
         }
@@ -893,7 +912,7 @@ public class GTFSPatternHopFactory {
     
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
-            graph.addAgency(agency);
+            graph.addAgency(_feedId.getId(), agency);
         }
     }
 
@@ -1287,23 +1306,34 @@ public class GTFSPatternHopFactory {
      * 
      * @return whether any repeated stops were filtered out.
      */
-    private boolean removeRepeatedStops (List<StopTime> stopTimes) {
+    private TIntList removeRepeatedStops (List<StopTime> stopTimes) {
         boolean filtered = false;
         StopTime prev = null;
         Iterator<StopTime> it = stopTimes.iterator();
+        TIntList stopSequencesRemoved = new TIntArrayList();
         while (it.hasNext()) {
             StopTime st = it.next();
             if (prev != null) {
                 if (prev.getStop().equals(st.getStop())) {
                     // OBA gives us unmodifiable lists, but we have copied them.
-                    prev.setDepartureTime(st.getDepartureTime());
+
+                    // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
+                    // interpolated stop time
+                    // keep the arrival time of the previous stop, unless it didn't have an arrival time, in which case
+                    // replace it with the arrival time of this stop time
+                    // This is particularly important at the last stop in a route (see issue #2220)
+                    if (prev.getArrivalTime() == StopTime.MISSING_VALUE) prev.setArrivalTime(st.getArrivalTime());
+
+                    // prefer to replace with the departure time of this stop time, unless this stop time has no departure time
+                    if (st.getDepartureTime() != StopTime.MISSING_VALUE) prev.setDepartureTime(st.getDepartureTime());
+
                     it.remove();
-                    filtered = true;
+                    stopSequencesRemoved.add(st.getStopSequence());
                 }
             }
             prev = st;
         }
-        return filtered;
+        return stopSequencesRemoved;
     }
 
     public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {

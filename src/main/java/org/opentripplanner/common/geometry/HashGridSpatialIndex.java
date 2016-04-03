@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,6 +195,23 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         abstract boolean visit(List<T> bin, long mapKey);
     }
 
+    /** Clamp a coordinate to allowable lat/lon values */
+    private static Coordinate clamp (Coordinate coord) {
+        if (Math.abs(coord.x) > 180 || Math.abs(coord.y) > 90) {
+            LOG.warn("Corner of envelope {} was invalid, clamping to valid range. Perhaps you're buffering something near a pole?", coord);
+
+            // make a defensive copy as we're about to modify the coordinate
+            coord = new Coordinate(coord);
+
+            if (coord.x > 180) coord.x = 180;
+            if (coord.x < -180) coord.x = -180;
+            if (coord.y > 90) coord.y = 90;
+            if (coord.y < -90) coord.y = -90;
+        }
+
+        return coord;
+    }
+
     /**
      * Visit each bin touching the envelope.
      * 
@@ -204,6 +222,11 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     private void visit(Envelope envelope, boolean createIfEmpty, final BinVisitor<T> binVisitor) {
         Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());
         Coordinate max = new Coordinate(envelope.getMaxX(), envelope.getMaxY());
+
+        // clamp coordinates to earth. TODO: handle cross-date-line envelopes.
+        min = clamp(min);
+        max = clamp(max);
+
         long minXKey = Math.round(min.x / xBinSize);
         long maxXKey = Math.round(max.x / xBinSize);
         long minYKey = Math.round(min.y / yBinSize);

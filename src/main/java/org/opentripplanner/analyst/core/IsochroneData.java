@@ -13,9 +13,10 @@
 
 package org.opentripplanner.analyst.core;
 
-import java.io.Serializable;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vividsolutions.jts.geom.Geometry;
+
+import java.io.Serializable;
 
 /**
  * A conveyor for an isochrone.
@@ -29,9 +30,9 @@ public class IsochroneData implements Serializable {
 
     public Geometry geometry;
 
-    public Geometry debugGeometry;
+    public transient Geometry debugGeometry;
 
-    public IsochroneData(int cutoffSec, Geometry geometry) {
+    public IsochroneData(@JsonProperty("cutoffSec") int cutoffSec, @JsonProperty("geometry") Geometry geometry) {
         this.cutoffSec = cutoffSec;
         this.geometry = geometry;
     }

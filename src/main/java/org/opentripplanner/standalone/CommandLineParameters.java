@@ -106,6 +106,9 @@ public class CommandLineParameters implements Cloneable {
             description = "Path to directory containing local client files to serve.")
     public File clientDirectory = null;
 
+    @Parameter(names = {"--disableFileCache"}, description = "Disable http server static file cache. Handy for development.")
+    public boolean disableFileCache = false;
+
     @Parameter(names = {"--router"}, validateWith = RouterId.class,
             description = "One or more router IDs to build and/or serve, first one being the default.")
     public List<String> routerIds;
@@ -113,10 +116,6 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--server"},
             description = "Run an OTP API server.")
     public boolean server = false;
-
-    @Parameter(names = {"--worker"},
-            description = "Make this instance an analyst cluster worker.")
-    public boolean worker = false;
 
     @Parameter(names = {"--visualize"},
             description = "Open a graph visualizer window for debugging.")

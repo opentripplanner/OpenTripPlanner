@@ -278,6 +278,31 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+### Drive-to-transit routing defaults
+
+When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time to reach a transit
+stop or park and ride facility is constrained. You can set a drive time limit in seconds by adding a line like
+`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large street graph, routing
+performance may suffer.
+
+
+## Boarding and alighting times
+
+Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
+where the check-in process needs to be done in good time before boarding. The boarding time is added to the time when going
+from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
+seconds needed for the boarding and alighting processes in `router-config.json` as follows:
+
+```JSON
+{
+  boardTimes: {
+    AIRPLANE: 2700
+  },
+  alightTimes: {
+    AIRPLANE: 1200
+  }
+}
+```
 
 ## Timeouts
 
@@ -341,8 +366,28 @@ or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
 of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, and the Dutch OVFiets system. It is straightforward to extend OTP to support any bike rental system that
+Bixi, the Dutch OVFiets system, and a generic KML format.
+It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
+
+The generic KML needs to be in format like
+
+```XML
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="citybikes" id="citybikes">
+    <SimpleField name="ID" type="int"></SimpleField>
+</Schema>
+  <Placemark>
+    <name>A Bike Station</name>
+    <ExtendedData><SchemaData schemaUrl="#citybikes">
+        <SimpleData name="ID">0</SimpleData>
+    </SchemaData></ExtendedData>
+      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
+  </Placemark>
+</Document></kml>
+```
 
 ### Configuration
 
@@ -374,17 +419,26 @@ connect to a network resource is the `url` field.
             type: "real-time-alerts",
             frequencySec: 30,
             url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Polling bike rental updater.
-        // sourceType can be jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, vcub
+        // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
+        // city-bikes, citi-bike-nyc, next-bike, vcub, kml
         {
             type: "bike-rental",
             frequencySec: 300,
             sourceType: "city-bikes",
             url: "http://host.domain.tld"
         },
+
+        <!--- San Francisco Bay Area bike share -->
+        {
+          "type": "bike-rental",
+          "frequencySec": 300,
+          "sourceType": "sf-bay-area",
+          "url": "http://www.bayareabikeshare.com/stations/json"
+        }
 
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
@@ -407,14 +461,22 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
             url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            defaultAgencyId: "TriMet"
+            feedId: "TriMet"
         },
 
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             type: "websocket-gtfs-rt-updater"
+        },
+
+        // OpenTraffic data
+        {
+          "type": "opentraffic-updater",
+          "frequencySec": -1,
+          // relative to OTP's working directory, where is traffic data stored.
+          // Should have subdirectories z/x/y.traffic.pbf (i.e. a tile tree of traffic tiles)
+          "tileDirectory": "traffic"
         }
     ]
 }
 ```
-

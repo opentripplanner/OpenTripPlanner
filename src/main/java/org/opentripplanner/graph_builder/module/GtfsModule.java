@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.module;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -26,21 +27,12 @@ import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.IdentityBean;
-import org.onebusaway.gtfs.model.Pathway;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -106,13 +98,13 @@ public class GtfsModule implements GraphBuilderModule {
         
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
-                // apply global defaults to individual GTFSBundles (if globals have been set) 
+                // apply global defaults to individual GTFSBundles (if globals have been set)
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
                     gtfsBundle.cacheDirectory = cacheDirectory;
                 if (useCached != null && gtfsBundle.useCached == null)
                     gtfsBundle.useCached = useCached;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
-                GtfsContext context = GtfsLibrary.createContext(dao, service);
+                GtfsContext context = GtfsLibrary.createContext(gtfsBundle.getFeedId(), dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
@@ -149,7 +141,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
-        graph.getMetadata().addCenter(graph.getCenter());
 
     }
 
@@ -164,10 +155,13 @@ public class GtfsModule implements GraphBuilderModule {
         store.open();
         LOG.info("reading {}", gtfsBundle.toString());
 
+        GtfsFeedId gtfsFeedId = gtfsBundle.getFeedId();
+
         GtfsReader reader = new GtfsReader();
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
         reader.setInternStrings(true);
+        reader.setDefaultAgencyId(gtfsFeedId.getId());
 
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
@@ -183,13 +177,12 @@ public class GtfsModule implements GraphBuilderModule {
             // set the agencyId here. Each feed ("bundle") is loaded by a separate reader, so there is no risk of
             // agency mappings accumulating.
             if (entityClass == Agency.class) {
-                String defaultAgencyId = null;
                 for (Agency agency : reader.getAgencies()) {
                     String agencyId = agency.getId();
                     LOG.info("This Agency has the ID {}", agencyId);
                     // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
                     // TODO Figure out how and why this is happening.
-                    if (agencyId == null || agencyIdsSeen.contains(agencyId)) {
+                    if (agencyId == null || agencyIdsSeen.contains(gtfsFeedId.getId() + agencyId)) {
                         // Loop in case generated name is already in use.
                         String generatedAgencyId = null;
                         while (generatedAgencyId == null || agencyIdsSeen.contains(generatedAgencyId)) {
@@ -201,10 +194,8 @@ public class GtfsModule implements GraphBuilderModule {
                         agency.setId(generatedAgencyId);
                         agencyId = generatedAgencyId;
                     }
-                    if (agencyId != null) agencyIdsSeen.add(agencyId);
-                    if (defaultAgencyId == null) defaultAgencyId = agencyId;
+                    if (agencyId != null) agencyIdsSeen.add(gtfsFeedId.getId() + agencyId);
                 }
-                reader.setDefaultAgencyId(defaultAgencyId); // not sure this is a good idea, setting it to the first-of-many IDs.
             }
         }
 
@@ -213,6 +204,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
         for (Route route : store.getAllEntitiesForType(Route.class)) {
             route.getId().setAgencyId(reader.getDefaultAgencyId());
+            generateRouteColor(route);
         }
         for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
             stop.getId().setAgencyId(reader.getDefaultAgencyId());
@@ -235,6 +227,47 @@ public class GtfsModule implements GraphBuilderModule {
 
         store.close();
 
+    }
+
+    /**
+     * Generates routeText colors for routes with routeColor and without routeTextColor
+     *
+     * If route doesn't have color or already has routeColor and routeTextColor nothing is done.
+     *
+     * textColor can be black or white. White for dark colors and black for light colors of routeColor.
+     * If color is light or dark is calculated based on luminance formula:
+     * sqrt( 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
+     *
+     * @param route
+     */
+    private void generateRouteColor(Route route) {
+        String routeColor = route.getColor();
+        //No route color - skipping
+        if (routeColor == null) {
+            return;
+        }
+        String textColor = route.getTextColor();
+        //Route already has text color skipping
+        if (textColor != null) {
+            return;
+        }
+
+        Color routeColorColor = Color.decode("#"+routeColor);
+        //gets float of RED, GREEN, BLUE in range 0...1
+        float[] colorComponents = routeColorColor.getRGBColorComponents(null);
+        //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+        double newRed = 0.299*Math.pow(colorComponents[0],2.0);
+        double newGreen = 0.587*Math.pow(colorComponents[1],2.0);
+        double newBlue = 0.114*Math.pow(colorComponents[2],2.0);
+        double luminance = Math.sqrt(newRed+newGreen+newBlue);
+
+        //For brighter colors use black text color and reverse for darker
+        if (luminance > 0.5) {
+            textColor = "000000";
+        } else {
+            textColor = "FFFFFF";
+        }
+        route.setTextColor(textColor);
     }
 
     private class StoreImpl implements GenericMutableDao {

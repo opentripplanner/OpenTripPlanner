@@ -1,11 +1,16 @@
 package org.opentripplanner.analyst;
 
 import com.csvreader.CsvReader;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import gnu.trove.map.TObjectIntMap;
@@ -24,14 +29,26 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.pointset.PropertyMetadata;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,7 +84,7 @@ public class PointSet implements Serializable {
      * duplication of pointset when used across multiple graphs.
      */
     private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-    
+
     /**
      * Map from string IDs to their array indices. This is a view into PointSet.ids, namely its reverse mapping.
      */
@@ -83,6 +100,7 @@ public class PointSet implements Serializable {
      * Null in non-indicator pointsets.
      * TODO remove this if unused, result sets are no longer PointSets.
      */
+    @Deprecated
     public int[][] times;
 
     // The characteristics of the features in this PointSet. This is a column store.
@@ -392,8 +410,7 @@ public class PointSet implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("GeoJSON parsing failure: {}", ex.toString());
-            ex.printStackTrace();
+            LOG.error("GeoJSON parsing failure", ex);
             return null;
         }
         return ret;
@@ -463,6 +480,16 @@ public class PointSet implements Serializable {
         Graph g = this.graphService.getRouter(routerId).graph;
 
         return getSampleSet(g);
+    }
+
+    // TODO refactor the other getSampleSet methods in terms of this one.
+    public SampleSet getOrCreateSampleSet(Graph graph) {
+        SampleSet sampleSet = this.samples.get(graph.routerId);
+        if (sampleSet == null) {
+            sampleSet = new SampleSet(this, graph.getSampleFactory());
+            this.samples.put(graph.routerId, sampleSet);
+        }
+        return sampleSet;
     }
 
     /** 
@@ -797,7 +824,8 @@ public class PointSet implements Serializable {
         // we check again if the map has been built. It's possible that it would have been built
         // by this method in another thread while this instantiation was blocked.
         if (idIndexMap == null) {
-            idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
+            // make a local object, don't expose to public view until it's built
+            TObjectIntMap idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
             
             for (int i = 0; i < this.capacity; i++) {
                 if (ids[i] != null) {
@@ -809,11 +837,56 @@ public class PointSet implements Serializable {
                     }
                 }
             }
+
+            // now expose to public view; reference assignment is an atomic operation
+            this.idIndexMap = idIndexMap;
         }
+    }
+
+    public static PointSet regularGrid (Envelope envelope, double gridSizeMeters) {
+        // non-ideal but for now make a grid in projected space
+        // to see why this is wrong, look at a map of Iowa and note that it leans to the left
+        // This is because they started surveying the township and range system (which is a grid)
+        // from the east, and wound up further west in the north than the south, which led them
+        // to resurvey the baseline every 24 miles, which explains why one is often driving
+        // down a rural road in the midwestern US and comes to a point where the road makes two 90-
+        // degree curves in quick succession to reach the new survey baseline.
+        double gridSizeLat = SphericalDistanceLibrary.metersToDegrees(gridSizeMeters);
+        double gridSizeLon = SphericalDistanceLibrary.metersToLonDegrees(gridSizeMeters, (envelope.getMaxY() + envelope.getMinY()) / 2);
+
+        // how large will it be?
+        int npts = (int) (envelope.getHeight() / gridSizeLat + 1) * (int) (envelope.getWidth() / gridSizeLon + 1);
+
+        PointSet ret = new PointSet(npts);
+
+        int idx = 0;
+        for (double lon = envelope.getMinX(); lon < envelope.getMaxX(); lon += gridSizeLon) {
+            for (double lat = envelope.getMinY(); lat < envelope.getMaxY(); lat += gridSizeLat) {
+                PointFeature pf = new PointFeature("" + idx);
+                pf.setLat(lat);
+                pf.setLon(lon);
+                ret.addFeature(pf, idx++);
+            }
+        }
+
+        return ret;
     }
 
     /** Returns a new coordinate object for the feature at the given index in this set, or its centroid. */
     public Coordinate getCoordinate(int index) {
         return new Coordinate(lons[index], lats[index]);
     }
+
+    /**
+     * Using getter methods here to allow generating coordinates and geometries on demand instead of storing them.
+     * This would allow for implicit geometry, as in a regular grid of points.
+     */
+    public double getLat (int i) {
+        return lats[i];
+    }
+
+    public double getLon (int i) {
+        return lons[i];
+    }
+
 }

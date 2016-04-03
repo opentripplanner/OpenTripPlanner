@@ -13,36 +13,19 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
+import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
+import org.opentripplanner.openstreetmap.model.*;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
-import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMTag;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -51,14 +34,7 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.util.*;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
 
@@ -184,7 +160,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public OSMLevel getLevelForWay(OSMWithTags way) {
-        return wayLevels.get(way);
+        OSMLevel level = wayLevels.get(way);
+        return level != null ? level : OSMLevel.DEFAULT;
     }
 
     public boolean isNodeSharedByMultipleAreas(Long nodeId) {
@@ -237,12 +214,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             areaWaysById.put(wayId, way);
         }
 
-        applyLevelsForWay(way);
-
         /* filter out ways that are not relevant for routing */
         if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking())) {
             return;
         }
+
+        applyLevelsForWay(way);
+
         /* An area can be specified as such, or be one by default as an amenity */
         if ((way.isTag("area", "yes") || way.isTag("amenity", "parking") || way.isTag("amenity",
                 "bicycle_parking")) && way.getNodeRefs().size() > 2) {
@@ -774,7 +752,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relation.getId())));
+            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relation.getId(),
+                "One of from|via|to edges are empty in relation")));
             return;
         }
 
@@ -793,23 +772,31 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         TurnRestrictionTag tag;
         if (relation.isTag("restriction", "no_right_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT,
+                relation.getId());
         } else if (relation.isTag("restriction", "no_left_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT,
+                relation.getId());
         } else if (relation.isTag("restriction", "no_straight_on")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.STRAIGHT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.STRAIGHT,
+                relation.getId());
         } else if (relation.isTag("restriction", "no_u_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U,
+                relation.getId());
         } else if (relation.isTag("restriction", "only_straight_on")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.STRAIGHT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.STRAIGHT,
+                relation.getId());
         } else if (relation.isTag("restriction", "only_right_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.RIGHT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.RIGHT,
+                relation.getId());
         } else if (relation.isTag("restriction", "only_left_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.LEFT);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.LEFT,
+                relation.getId());
         } else if (relation.isTag("restriction", "only_u_turn")) {
-            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
+            tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U,
+                relation.getId());
         } else {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getTag("restriction"))));
+            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction"))));
             return;
         }
         tag.modes = modes.clone();

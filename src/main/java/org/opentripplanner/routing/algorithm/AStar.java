@@ -14,6 +14,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -65,7 +67,7 @@ public class AStar {
         RemainingWeightHeuristic heuristic;
         public RoutingContext rctx;
         public int nVisited;
-        public List<Object> targetAcceptedStates;
+        public List<State> targetAcceptedStates;
         public RunStatus status;
         private RoutingRequest options;
         private SearchTerminationStrategy terminationStrategy;
@@ -110,11 +112,14 @@ public class AStar {
         runState.spt = options.getNewShortestPathTree();
 
         // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
+        // "Batch" means one-to-many mode, where there is no goal to reach so we use a trivial heuristic.
         runState.heuristic = options.batch ?
                 new TrivialRemainingWeightHeuristic() :
                 runState.rctx.remainingWeightHeuristic;
 
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
+        // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
+        // the streets around the origin and destination.
         runState.heuristic.initialize(runState.options, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
@@ -124,13 +129,12 @@ public class AStar {
         }
 
         // Priority Queue.
-        // NOTE(flamholz): the queue is self-resizing, so we initialize it to have 
-        // size = O(sqrt(|V|)) << |V|. For reference, a random, undirected search
-        // on a uniform 2d grid will examine roughly sqrt(|V|) vertices before
-        // reaching its target. 
+        // The queue is self-resizing, so we initialize it to have size = O(sqrt(|V|)) << |V|.
+        // For reference, a random, undirected search on a uniform 2d grid will examine roughly sqrt(|V|) vertices
+        // before reaching its target.
         int initialSize = runState.rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-        runState.pq = new BinHeap<State>(initialSize);
+        runState.pq = new BinHeap<>(initialSize);
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
         
@@ -147,7 +151,7 @@ public class AStar {
             double w = runState.pq.peek_min_key();
             System.out.println("pq min key = " + w);
         }
-        
+
         // interleave some heuristic-improving work (single threaded)
         runState.heuristic.doSomeWork();
 
@@ -184,19 +188,15 @@ public class AStar {
                 if (traverseVisitor != null) {
                     traverseVisitor.visitEdge(edge, v);
                 }
-                // TEST: uncomment to verify that all optimisticTraverse functions are actually
-                // admissible
-                // State lbs = edge.optimisticTraverse(u);
-                // if ( ! (lbs.getWeight() <= v.getWeight())) {
-                // System.out.printf("inadmissible lower bound %f vs %f on edge %s\n",
-                // lbs.getWeightDelta(), v.getWeightDelta(), edge);
-                // }
 
                 double remaining_w = runState.heuristic.estimateRemainingWeight(v);
+
+//                LOG.info("{} {}", v, remaining_w);
+
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w * runState.options.heuristicWeight;
+                double estimate = v.getWeight() + remaining_w;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);
@@ -224,7 +224,7 @@ public class AStar {
                     // report to the visitor if there is one
                     if (traverseVisitor != null)
                         traverseVisitor.visitEnqueue(v);
-                    
+                    //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
                     runState.pq.insert(v, estimate);
                 } 
             }
@@ -254,7 +254,7 @@ public class AStar {
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
              * If it has been dominated, the iteration is over; don't bother checking for termination condition.
              * 
-             * Note that termination is checked after adjacent states are added. This presents the small inefficiency
+             * Note that termination is checked after adjacent states are added. This presents the negligible inefficiency
              * that adjacent states are generated for a state which could be the last one you need to check. The advantage
              * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
              * potential future variations.
@@ -272,18 +272,22 @@ public class AStar {
                 break;
             }
             if (runState.terminationStrategy != null) {
-                if (runState.terminationStrategy.shouldSearchTerminate(
+                if (runState.terminationStrategy.shouldSearchTerminate (
                     runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal()) {
+                if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
+                    continue;
+                }
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
-                //new GraphPath(runState.u, false).dump();
+                // new GraphPath(runState.u, false).dump();
                 /* Only find one path at a time in long distance mode. */
-                if (runState.options.longDistance) break;
+                if (runState.options.longDistance) {
+                    break;
+                }
                 /* Break out of the search if we've found the requested number of paths. */
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
@@ -353,5 +357,15 @@ public class AStar {
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
+    }
+
+    public List<GraphPath> getPathsToTarget() {
+        List<GraphPath> ret = new LinkedList<>();
+        for (State s : runState.targetAcceptedStates) {
+            if (s.isFinal()) {
+                ret.add(new GraphPath(s, true));
+            }
+        }
+        return ret;
     }
 }

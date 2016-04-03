@@ -3,7 +3,9 @@
     <head>
         <title>Profile Analyst Tester</title>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"/>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <!-- CSS is necessary to set html-body-div heights all to 100%, otherwise you will see no map. -->
+        <link rel="stylesheet" href="analyst_tester.css" />
     </head>
     <body>
         <div id="map"></div>
@@ -31,7 +33,7 @@
     // Find center of default region
     var center;
     var req = new XMLHttpRequest();
-    req.open('GET', 'http://localhost:8080/otp/routers/default/metadata', false); // async=false, define center before setting up map
+    req.open('GET', 'http://localhost:8080/otp/routers/default', false); // async=false, define center before setting up map
     req.setRequestHeader("Accept", "application/json");
     req.onload = function() {
         var resp = JSON.parse(req.responseText);

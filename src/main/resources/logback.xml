@@ -1,8 +1,3 @@
-<!-- 
-Logback currently complains about having multiple configs on the classpath, so we have just
-one in the opentripplanner-routing module. It will be picked up when running anything that 
-depends on otp-routing.
--->
 <configuration>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -18,6 +13,7 @@ depends on otp-routing.
 
   <logger name="com.amazonaws" level="INFO"/>
   <logger name="org.apache.http" level="INFO" />
+  <logger name="com.conveyal" level="INFO"/>
 
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />

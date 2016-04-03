@@ -8,8 +8,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.pathparser.ProfilePropagationPathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -34,11 +32,10 @@ public class StopTreeCache {
     public StopTreeCache (Graph graph, int maxWalkMeters) {
         this.maxWalkMeters = maxWalkMeters;
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
-        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
+        graph.index.stopVertexForStop.values().parallelStream().forEach(tstop -> {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
-            rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
             AStar astar = new AStar();
             rr.longDistance = true;
             rr.setNumItineraries(1);
@@ -64,9 +61,13 @@ public class StopTreeCache {
                 distances[i++] = vertex.getIndex();
                 distances[i++] = (int) state.getWalkDistance();
             }
-            distancesForStop.put(tstop, distances);
+
             rr.cleanup();
-        }
+
+            synchronized (distancesForStop) {
+                distancesForStop.put(tstop, distances);
+            }
+        });
         LOG.info("Done caching distances to nearby street intersections from each transit stop.");
     }
 

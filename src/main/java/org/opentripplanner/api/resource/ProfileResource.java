@@ -81,7 +81,7 @@ public class ProfileResource {
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
-        QueryParameter.checkRangeInclusive(walkSpeed, 1, 7);
+        QueryParameter.checkRangeInclusive(walkSpeed, 0.5, 7);
         QueryParameter.checkRangeInclusive(bikeSpeed, 1, 21);
         QueryParameter.checkRangeInclusive(carSpeed,  1, 36);
         QueryParameter.checkRangeInclusive(streetTime,  1, 480);
@@ -149,7 +149,7 @@ public class ProfileResource {
                 ProfileResponse response = router.route();
                 return Response.status(Status.OK).entity(response).build();
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                LOG.error("Exception caught in profile routing", throwable);
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(throwable.toString()).build();
             } finally {
                 router.cleanup(); // destroy routing contexts even when an exception happens

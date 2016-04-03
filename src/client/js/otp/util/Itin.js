@@ -70,7 +70,7 @@ otp.util.Itin = {
     },
 
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH" || mode === "AIRPLANE";
     },
 
     includesTransit : function(mode) {
@@ -196,6 +196,7 @@ otp.util.Itin = {
         //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial
         //cable cars where the car is suspended from the cable.
         'GONDOLA' : _tr('Aerial Tram'),
+        'AIRPLANE' : _tr('Airplane'),
     },
 
     modeString : function(mode) {
@@ -265,7 +266,9 @@ otp.util.Itin = {
         else {
             //TODO: Absolute direction translation
             //TRANSLATORS: Start on [stret name] heading [compas direction]
-            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
+            if(!step.relativeDirection || step.relativeDirection === "DEPART") {
+                text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
+            }
             else {
                 text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.getLocalizedRelativeDirectionString(step.relativeDirection)) +
                             (asHtml ? "</b>" : "") + ' ' +

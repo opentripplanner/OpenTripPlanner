@@ -20,11 +20,9 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,10 +134,6 @@ public class StateEditor {
                 return null;
             }
         }
-        if (!parsePath(this.child)) {
-            return null;
-        }
-
         spawned = true;
         return child;
     }
@@ -267,6 +261,10 @@ public class StateEditor {
     public void setPreviousTrip(Trip previousTrip) {
         cloneStateDataAsNeeded();
         child.stateData.previousTrip = previousTrip;
+    }
+
+    public void setEnteredNoThroughTrafficArea() {
+        child.stateData.enteredNoThroughTrafficArea = true;
     }
     
     /**
@@ -498,37 +496,6 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
-    /** return true if all PathParsers advanced to a state other than REJECT */
-    public boolean parsePath(State state) {
-        if (state.stateData.opt.rctx == null)
-            return true; // a lot of tests don't set a routing context
-        PathParser[] parsers = state.stateData.opt.rctx.pathParsers;
-        int[] parserStates = state.pathParserStates;
-        boolean accept = true;
-        boolean modified = false;
-        int i = 0;
-        for (PathParser parser : parsers) {
-            int terminal = parser.terminalFor(state);
-            int oldState = parserStates[i];
-            int newState = parser.transition(oldState, terminal);
-            if (newState != oldState) {
-                if (!modified) {
-                    // clone the state array so only the new state will see modifications
-                    parserStates = parserStates.clone();
-                    modified = true;
-                }
-                parserStates[i] = newState;
-                if (newState == AutomatonState.REJECT)
-                    accept = false;
-            }
-            i++;
-        }
-        if (modified)
-            state.pathParserStates = parserStates;
-
-        return accept;
-    }
-
     public void alightTransit() {
         cloneStateDataAsNeeded();
         child.stateData.lastTransitWalk = child.getWalkDistance();
@@ -552,4 +519,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
     }
+
+    public boolean hasEnteredNoThroughTrafficArea() {
+        return child.hasEnteredNoThruTrafficArea();
+    }
+
 }

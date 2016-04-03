@@ -13,14 +13,6 @@
 
 package org.opentripplanner.updater;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
@@ -31,6 +23,7 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.traffic.OpenTrafficUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +107,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
+                }
+                else if (type.equals("opentraffic-updater")) {
+                    updater = new OpenTrafficUpdater();
                 }
             }
 

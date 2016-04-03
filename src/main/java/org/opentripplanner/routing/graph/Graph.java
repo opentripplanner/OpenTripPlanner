@@ -14,36 +14,14 @@
 package org.opentripplanner.routing.graph;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.prefs.Preferences;
-
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.linked.TDoubleLinkedList;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.linked.TDoubleLinkedList;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -53,7 +31,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -63,6 +40,7 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -73,33 +51,28 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
-
-    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
@@ -153,17 +126,19 @@ public class Graph implements Serializable {
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
-    private Collection<String> agenciesIds = new HashSet<String>();
+    private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
-    private Collection<Agency> agencies = new HashSet<Agency>();
+    private Collection<String> feedIds = new HashSet<>();
 
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
 
-    private GraphMetadata graphMetadata = null;
+    //Envelope of all OSM and transit vertices. Calculated during build time
+    private WorldEnvelope envelope = null;
 
-    private transient Geometry hull = null; // FIXME we should be saving this stuff in the graph, why is is transient?
+    //ConvexHull of all the graph vertices. Generated at Graph build time.
+    private Geometry convexHull = null;
 
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
@@ -179,6 +154,15 @@ public class Graph implements Serializable {
 
     /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
     public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
+
+    /** List of transit modes that are availible in GTFS data used in this graph**/
+    private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
+
+    public boolean hasBikeSharing = false;
+
+    public boolean hasParkRide = false;
+
+    public boolean hasBikeRide = false;
 
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -204,6 +188,15 @@ public class Graph implements Serializable {
 
     /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
     public boolean hasScheduledService = false;
+
+    /** Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
+
+    /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
+    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
+
+    /** A speed source for traffic data */
+    public transient StreetSpeedSnapshotSource streetSpeedSource;
 
     public Graph(Graph basedOn) {
         this();
@@ -645,6 +638,18 @@ public class Graph implements Serializable {
         return this.graphBuilderAnnotations;
     }
 
+    /**
+     * Adds mode of transport to transit modes in graph
+     * @param mode
+     */
+    public void addTransitMode(TraverseMode mode) {
+        transitModes.add(mode);
+    }
+
+    public HashSet<TraverseMode> getTransitModes() {
+        return transitModes;
+    }
+
     /* (de) serialization */
 
     public enum LoadLevel {
@@ -883,17 +888,19 @@ public class Graph implements Serializable {
         return removed;
     }
 
-    public Collection<String> getAgencyIds() {
-        return agenciesIds;
+    public Collection<String> getFeedIds() {
+        return feedIds;
     }
 
-    public Collection<Agency> getAgencies() {
-        return agencies;
+    public Collection<Agency> getAgencies(String feedId) {
+        return agenciesForFeedId.get(feedId);
     }
 
-    public void addAgency(Agency agency) {
+    public void addAgency(String feedId, Agency agency) {
+        Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
-        agenciesIds.add(agency.getId());
+        this.agenciesForFeedId.put(feedId, agencies);
+        this.feedIds.add(feedId);
     }
 
     /**
@@ -904,14 +911,17 @@ public class Graph implements Serializable {
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
-            Collection<String> agencyIds = this.getAgencyIds();
-            if (agencyIds.size() == 0) {
+            Collection<Agency> agencies = null;
+            if (agenciesForFeedId.entrySet().size() > 0) {
+                agencies = agenciesForFeedId.entrySet().iterator().next().getValue();
+            }
+            if (agencies == null || agencies.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
                 LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
             } else {
                 CalendarService cs = this.getCalendarService();
-                for (String agencyId : agencyIds) {
-                    TimeZone tz = cs.getTimeZoneForAgencyId(agencyId);
+                for (Agency agency : agencies) {
+                    TimeZone tz = cs.getTimeZoneForAgencyId(agency.getId());
                     if (timeZone == null) {
                         LOG.debug("graph time zone set to {}", tz);
                         timeZone = tz;
@@ -945,45 +955,56 @@ public class Graph implements Serializable {
         }
     }
 
-    public GraphMetadata getMetadata() {
-        // Lazy-initialize the graph metadata since it is not serialized.
-        if (graphMetadata == null) {
-            graphMetadata = new GraphMetadata(this);
-        }
-        return graphMetadata;
-    }
-
     /**
-     * @return true if graph has metadata
-     */
-    public boolean hasMetadata() {
-        return graphMetadata != null;
-    }
-
-    /**
-     * This is used in {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} to skip stops
-     * That aren't inside OSM data envelope
+     * Calculates envelope out of all OSM coordinates
      *
-     * @param c Stop coordinate
-     * @return true if coordinate is in graph envelope
+     * Transit stops are added to the envelope as they are added to the graph
      */
-    public boolean containsInOSM(Coordinate c) {
-        if (graphMetadata != null) {
-            return graphMetadata.contains(c);
-        } else {
-            return false;
+    public void calculateEnvelope() {
+        this.envelope = new WorldEnvelope();
+
+        for (Vertex v : this.getVertices()) {
+            Coordinate c = v.getCoordinate();
+            this.envelope.expandToInclude(c);
         }
     }
 
-    public Geometry getHull() {
-        // Lazy-initialize the graph hull since it is not serialized.
-        if (hull == null) {
-            hull = GraphUtils.makeConvexHull(this);
-        }
-        return hull;
+    /**
+     * Calculates convexHull of all the vertices during build time
+     */
+    public void calculateConvexHull() {
+        convexHull = GraphUtils.makeConvexHull(this);
+    }
+
+    /**
+     * @return calculated convexHull;
+     */
+    public Geometry getConvexHull() {
+        return convexHull;
 
     }
-   
+
+    /**
+     * Expands envelope to include given point
+     *
+     * If envelope is empty it creates it (This can happen with a graph without OSM data)
+     * Used when adding stops to OSM envelope
+     *
+     * @param  x  the value to lower the minimum x to or to raise the maximum x to
+     * @param  y  the value to lower the minimum y to or to raise the maximum y to
+     */
+    public void expandToInclude(double x, double y) {
+        //Envelope can be empty if graph building is run without OSM data
+        if (this.envelope == null) {
+            calculateEnvelope();
+        }
+        this.envelope.expandToInclude(x, y);
+    }
+
+    public WorldEnvelope getEnvelope() {
+        return this.envelope;
+    }
+
     // lazy-init geom index on an as needed basis
     public GeometryIndex getGeomIndex() {
     	
@@ -1009,7 +1030,7 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphMetadata
+     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {
@@ -1037,5 +1058,13 @@ public class Graph implements Serializable {
 
     public Optional<Coordinate> getCenter() {
         return Optional.ofNullable(center);
+    }
+
+    public long getTransitServiceStarts() {
+        return transitServiceStarts;
+    }
+
+    public long getTransitServiceEnds() {
+        return transitServiceEnds;
     }
 }

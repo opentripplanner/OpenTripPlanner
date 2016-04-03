@@ -1,0 +1,39 @@
+language: java
+
+# OpenTripPlanner requires Java 8 and Travis doesn't (yet) support OpenJDK 8 
+jdk:
+  - oraclejdk8
+
+# Replace Travis's default Maven installation step with a no-op.
+# This avoids redundantly pre-running 'mvn install -DskipTests' every time.
+install: true
+
+# Replace Travis's default build step.
+# Run all Maven phases at once up through verify, install, and deploy.
+script: |
+  # only (attempt to) deploy non-pull request commits to master
+  if [ "$TRAVIS_PULL_REQUEST" = false ] && [ "$TRAVIS_BRANCH" = master ]; then
+    mvn clean deploy
+  else
+    # otherwise, just run test suite
+    mvn clean verify
+  fi
+
+env:
+  global:
+    # encrypted AWS access/secret keys to allow automated deployment to the Conveyal Maven repo on S3
+    - secure: "d1GabNiRYJwCeu+Zqr/qKnyNf4CY2pH0dLkY708Dzpe1Vgi0k2WLTMeYe9yJ3CyQydpUfOFkvwV64r4KIj4tBRDuW5C72bZyk/0o6oo931IwT1uHKstPfiovf/GiZ8qbn0SDencwfjfDefZUtaZ6I1mF6S638PvUlz4lNgl6kfA="
+    - secure: "DNnCaMx4Cgcuj78m96IEDwZMMtY14HCWIi6voT80DJZB5Rtu50BayT8ljxjrSHATYIfkZ+aLgFaNSPqI8MlNlt22xk2lzjOkA4J3Bn0d3xuYlgS9WT5rh78llKgtGpjH47OeRwHhpFM5PnNTCgFdnXNoj9SlZeNlWHk8+PHi5do="
+
+# If sudo is disabled, CI runs on container based infrastructure (allows caching &c.)
+sudo: false
+
+# Retain the local Maven repository to speed up builds.
+cache:
+  directories:
+    - "$HOME/.m2/repository"
+
+# Notify us of the build status on the Slack channel     
+notifications:
+  slack: conveyal:RQuTZBfE7FBjVtYkKwdnNRjY
+

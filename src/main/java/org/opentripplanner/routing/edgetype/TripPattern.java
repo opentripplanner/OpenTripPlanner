@@ -61,7 +61,7 @@ import java.util.*;
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
  */
-public class TripPattern implements Serializable {
+public class TripPattern implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -692,6 +692,25 @@ public class TripPattern implements Serializable {
         // Many of these have multiple frequency entries. Return the first one for now.
         // TODO return all of them and filter on time window
         return freqs.get(0);
+    }
+
+    public TripPattern clone () {
+        try {
+            return (TripPattern) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* cannot happen */
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get the feed id this trip pattern belongs to.
+     *
+     * @return feed id for this trip pattern
+     */
+    public String getFeedId() {
+        // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
+        return route.getId().getAgencyId();
     }
 
 }

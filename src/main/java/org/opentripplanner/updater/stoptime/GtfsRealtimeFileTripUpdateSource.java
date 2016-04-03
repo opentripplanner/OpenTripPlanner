@@ -46,11 +46,11 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     /**
      * Default agency id that is used for the trip ids in the TripUpdates
      */
-    private String agencyId;
+    private String feedId;
 
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
-        this.agencyId = config.path("defaultAgencyId").asText();
+        this.feedId = config.path("feedId").asText();
         this.file = new File(config.path("file").asText(""));
     }
 
@@ -97,7 +97,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     }
 
     @Override
-    public String getAgencyId() {
-        return this.agencyId;
+    public String getFeedId() {
+        return this.feedId;
     }
 }

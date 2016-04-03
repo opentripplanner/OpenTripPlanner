@@ -1,33 +1,19 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import static org.junit.Assert.*;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import jersey.repackaged.com.google.common.collect.Iterables;
 import jersey.repackaged.com.google.common.collect.Maps;
-
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -36,19 +22,18 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.junit.Assert.*;
+import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 public class LinkingTest {
     /** maximum difference in walk distance, in meters, that is acceptable between the graphs */
@@ -76,8 +61,8 @@ public class LinkingTest {
             // split it but not too close to the end
             double splitVal = Math.random() * 0.95 + 0.025;
 
-            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
-            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
+            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
+            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
             P2<StreetEdge> sp0 = s0.split(sv0);
             P2<StreetEdge> sp1 = s1.split(sv1);
@@ -189,101 +174,6 @@ public class LinkingTest {
                 return input instanceof StreetTransitLink;
             }
         });
-    }
-
-    private Graph buildGraphNoTransit () throws UnsupportedEncodingException {
-        Graph gg = new Graph();
-
-        OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
-
-        File file = new File(URLDecoder.decode(getClass().getResource("columbus.osm.pbf").getFile(), "UTF-8"));
-
-        provider.setPath(file);
-        loader.setProvider(provider);
-
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
-        return gg;
-    }
-
-    /** Add a regular grid of stops to the graph */
-    private static void addRegularStopGrid(Graph g) {
-        int count = 0;
-        for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
-            for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
-                String id = "" + count++;
-                AgencyAndId aid = new AgencyAndId("TEST", id);
-                Stop stop = new Stop();
-                stop.setLat(lat);
-                stop.setLon(lon);
-                stop.setName(id);
-                stop.setCode(id);
-                stop.setId(aid);
-
-                new TransitStop(g, stop);
-                count++;
-            }
-        }
-    }
-
-    /** add some extra stops to the graph */
-    private static void addExtraStops (Graph g) {
-        int count = 0;
-        double lon = -83;
-        for (double lat = 40; lat < 40.01; lat += 0.005) {
-            String id = "EXTRA_" + count++;
-            AgencyAndId aid = new AgencyAndId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
-
-            new TransitStop(g, stop);
-            count++;
-        }
-
-        // add some duplicate stops
-        lon = -83.1341 + 0.1;
-
-        for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
-            String id = "" + count++;
-            AgencyAndId aid = new AgencyAndId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
-
-            new TransitStop(g, stop);
-            count++;
-        }
-
-        // add some almost duplicate stops
-        lon = -83.1341 + 0.15;
-
-        for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
-            String id = "" + count++;
-            AgencyAndId aid = new AgencyAndId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
-
-            new TransitStop(g, stop);
-            count++;
-        }
-    }
-
-    /** link the stops in the graph */
-    private static void link (Graph g) {
-        SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
-        linker.link();
     }
 
     /** get the stop tree cache indexed by label */

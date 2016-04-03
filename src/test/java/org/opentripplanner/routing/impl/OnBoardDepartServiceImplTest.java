@@ -13,12 +13,18 @@
 
 package org.opentripplanner.routing.impl;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.TimeZone;
 
@@ -35,6 +41,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -47,11 +54,10 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /*
  * FIXME: This test has become seriously ugly after recent changes to OTP. Using mocks, which seemed
@@ -78,6 +84,10 @@ public class OnBoardDepartServiceImplTest {
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
+
+        // You're probably not supposed to do this to mocks (access their fields directly)
+        // But I know of no other way to do this since the mock object has only action-free stub methods.
+        routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
 
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT"));
 
@@ -125,6 +135,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
         when(dwell.getTripPattern()).thenReturn(tripPattern);
@@ -181,6 +192,10 @@ public class OnBoardDepartServiceImplTest {
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
 
+        // You're probably not supposed to do this to mocks (access their fields directly)
+        // But I know of no other way to do this since the mock object has only action-free stub methods.
+        routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
+
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT"));
         when(station0.getX()).thenReturn(coordinates[0].x);
         when(station0.getY()).thenReturn(coordinates[0].y);
@@ -217,6 +232,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
 
@@ -251,6 +267,10 @@ public class OnBoardDepartServiceImplTest {
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
+
+        // You're probably not supposed to do this to mocks (access their fields directly)
+        // But I know of no other way to do this since the mock object has only action-free stub methods.
+        routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
 
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT"));
 
@@ -292,6 +312,7 @@ public class OnBoardDepartServiceImplTest {
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        TripPattern.generateUniqueIds(Arrays.asList(tripPattern));
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
         when(dwell.getTripPattern()).thenReturn(tripPattern);
