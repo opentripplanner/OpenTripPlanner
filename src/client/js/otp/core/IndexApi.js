@@ -143,17 +143,15 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
-    readVariantForTrip : function(tripAgency, routeId, tripId, callbackTarget, callback) {
+    readVariantForTrip : function(routeId, tripId, callbackTarget, callback) {
         var this_ = this;
-        var agency_routeId = tripAgency + ':' + routeId;
-        var agency_Tripid = tripAgency + ':' + tripId;
-        var route = this_.routes[agency_routeId];
+        var route = this_.routes[routeId];
         var variantData = {};
         // since the new index api does not provide variant/pattern for trip (yet)
         // we have to iterate on route's patterns searching for the current trip.
         _.each(route.variants, function(pattern) {
             var tripIds = _.pluck(pattern.trips, 'id');
-            if (_.contains(tripIds, agency_Tripid)) {
+            if (_.contains(tripIds, tripId)) {
                 variantData = pattern;
             }
         });
