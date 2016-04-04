@@ -1,12 +1,11 @@
 package org.opentripplanner.updater.bike_rental;
 
+import junit.framework.TestCase;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 
 public class TestShareBikeRentalStationSource extends TestCase {
 
@@ -25,7 +24,7 @@ public class TestShareBikeRentalStationSource extends TestCase {
         assertTrue(prinsen.networks.contains("dummyid"));
         
         assertEquals("01", prinsen.name.toString());
-        assertEquals("dummyid-1", prinsen.id);
+        assertEquals("dummyid_1", prinsen.id);
         assertEquals(10.392981, prinsen.x);
         assertEquals(63.426637, prinsen.y);
         assertEquals(9, prinsen.spacesAvailable);

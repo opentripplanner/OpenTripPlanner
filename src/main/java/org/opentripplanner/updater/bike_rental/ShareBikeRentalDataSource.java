@@ -1,22 +1,16 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.*;
 
 public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
@@ -100,7 +94,7 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
         brstation.networks = new HashSet<String>();
         brstation.networks.add(this.networkID);
 		
-		brstation.id = networkID+"-"+rentalStationNode.path("StationID").toString();
+		brstation.id = networkID+"_"+rentalStationNode.path("StationID").toString();
 		brstation.x = rentalStationNode.path("Longitude").asDouble();
 		brstation.y = rentalStationNode.path("Latitude").asDouble();
 		brstation.name = new NonLocalizedString(rentalStationNode.path("StationName").asText("").trim());
