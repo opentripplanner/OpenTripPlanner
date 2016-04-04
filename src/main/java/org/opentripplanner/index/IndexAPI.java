@@ -108,7 +108,15 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
     }
 
-   /** Return a list of all agencies in the graph. */
+    /** Return a list of all agencies in the graph. */
+    @GET
+    @Path("/agencies")
+    public Response getAgencies () {
+        return Response.status(Status.OK).entity(
+                index.getAllAgencies()).build();
+    }
+
+   /** Return a list of all agencies for specific feed. */
    @GET
    @Path("/agencies/{feedId}")
    public Response getAgencies (@PathParam("feedId") String feedId) {
