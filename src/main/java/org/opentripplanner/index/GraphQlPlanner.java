@@ -129,7 +129,7 @@ public class GraphQlPlanner {
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
-        callWith.argument("showIntermediateStops", (Boolean v) -> request.showIntermediateStops = v);
+        request.showIntermediateStops = true;
         callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(this::toGenericLocation).collect(Collectors.toList()));
         callWith.argument("preferred.routes", request::setPreferredRoutes);
         callWith.argument("preferred.otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
