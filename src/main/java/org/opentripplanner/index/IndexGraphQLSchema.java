@@ -411,11 +411,6 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
-                .name("showIntermediateStops")
-                .description("Whether the planner should return intermediate stops lists for transit legs.")
-                .type(Scalars.GraphQLBoolean)
-                .build())
-            .argument(GraphQLArgument.newArgument()
                 .name("intermediatePlaces")
                 .description("An ordered list of intermediate locations to be visited.")
                 .type(new GraphQLList(coordinateInputType))
@@ -1783,6 +1778,18 @@ public class IndexGraphQLSchema {
                 .description("For transit legs, the trip. For non-transit legs, null.")
                 .type(tripType)
                 .dataFetcher(environment -> index.tripForId.get(((Leg)environment.getSource()).tripId))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediateStops")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null.")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment -> {
+                    return ((Leg)environment.getSource()).stop.stream()
+                        .filter(place -> place.stopId != null)
+                        .map(placeWithStop -> index.stopForId.get(placeWithStop.stopId))
+                        .filter(stop -> stop != null)
+                        .collect(Collectors.toList());
+                })
                 .build())
             .build();
 
