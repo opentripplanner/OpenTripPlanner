@@ -27,6 +27,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -108,7 +109,7 @@ public class LuceneIndex {
         }
         doc.add(new DoubleField("lat", stop.getLat(), Field.Store.YES));
         doc.add(new DoubleField("lon", stop.getLon(), Field.Store.YES));
-        doc.add(new StringField("id", stop.getId().toString(), Field.Store.YES));
+        doc.add(new StringField("id", GtfsLibrary.convertIdToString(stop.getId()), Field.Store.YES));
         doc.add(new StringField("category", Category.STOP.name(), Field.Store.YES));
         iwriter.addDocument(doc);
     }
@@ -166,7 +167,8 @@ public class LuceneIndex {
         for (String term : queryString.split(" ")) {
             /* PrefixQuery matches all strings that start with the query string */
             if (autocomplete) {
-                termQuery.add(new PrefixQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+                termQuery.add(new TermQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
+                termQuery.add(new PrefixQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
             /* FuzzyQuery matches with all string stat are maximum 2 edits away from the query sring */
             } else {
                 termQuery.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);

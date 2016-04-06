@@ -32,6 +32,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -53,6 +54,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 
@@ -1412,15 +1414,34 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
-                    if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.stopForId.values());
-                    } else {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                            .stream()
+                            .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                            .collect(Collectors.toList())
+                            .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
+                    Stream<Stop> stream;
+                    if (environment.getArgument("name") == null) {
+                        stream = index.stopForId.values().stream();
+                    }
+                    else {
+                        stream = index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
+                            .stream()
+                            .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                    }
+                    return stream.collect(Collectors.toList());
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1530,15 +1551,46 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("modes")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
-                    if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.routeForId.values());
-                    } else {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                            .stream()
+                            .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                            .collect(Collectors.toList())
+                            .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
+                    Stream<Route> stream = index.routeForId.values().stream();
+                    if (environment.getArgument("name") != null) {
+                        stream = stream
+                            .filter(route -> route.getShortName() != null)
+                            .filter(route -> route.getShortName().startsWith(environment.getArgument("name")));
+                    }
+                    if (environment.getArgument("modes") != null) {
+                        Set<TraverseMode> modes = new QualifiedModeSet(
+                            environment.getArgument("modes")).qModes
+                            .stream()
+                            .map(qualifiedMode -> qualifiedMode.mode)
+                            .filter(TraverseMode::isTransit)
+                            .collect(Collectors.toSet());
+                        stream = stream
+                            .filter(route ->
+                                modes.contains(GtfsLibrary.getTraverseMode(route)));
+                    }
+                    return stream.collect(Collectors.toList());
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
