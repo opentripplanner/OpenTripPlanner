@@ -370,7 +370,7 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             else if(leg.agencyId !== null) {
-                headerHtml += ": "+leg.agencyId+", ";
+                headerHtml += ": "+leg.agencyName+", ";
                 if(leg.route !== leg.routeLongName) {
                     headerHtml += "("+leg.route+") ";
                 }
