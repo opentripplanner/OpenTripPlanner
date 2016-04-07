@@ -104,6 +104,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
                 source = new GbfsBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("smoove")) {
+                source = new SmooveBikeRentalDataSource();
             }
         }
 
