@@ -310,6 +310,8 @@ public class GTFSPatternHopFactory {
 
     private double maxStopToShapeSnapDistance = 150;
 
+    public int maxInterlineDistance = 200;
+
     public GTFSPatternHopFactory(GtfsContext context) {
         this._feedId = context.getFeedId();
         this._dao = context.getDao();
@@ -562,7 +564,7 @@ public class GTFSPatternHopFactory {
                     Stop toStop   = currPattern.getStop(0);
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                                         fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
-                    if (teleportationDistance > 200) {
+                    if (teleportationDistance > maxInterlineDistance) {
                         // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
                         // means that they are served by the same vehicle, not that interlining is automatically allowed.
                         // see #1654
