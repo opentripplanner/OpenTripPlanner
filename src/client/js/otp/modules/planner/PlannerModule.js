@@ -163,7 +163,7 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
 
-        this.webapp.indexApi.loadAgencies(this);
+        //this.webapp.indexApi.loadAgencies(this);
         this.webapp.indexApi.loadRoutes(this, function() {
             this.routesLoaded();
         });

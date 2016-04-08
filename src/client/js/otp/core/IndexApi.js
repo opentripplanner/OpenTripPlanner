@@ -18,33 +18,25 @@ otp.core.IndexApi = otp.Class({
 
     webapp          : null,
 
-    agencies        : null,
+    feeds           : null,
     routes          : null,
 
     initialize : function(webapp) {
         this.webapp = webapp;
     },
 
-    loadAgencies : function(callbackTarget, callback) {
+    loadFeeds : function(callbackTarget, callback) {
         var this_ = this;
-        if(this.agencies) {
+        if(this.feeds) {
             if(callback) callback.call(callbackTarget);
             return;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/agencies';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/feeds';
         $.ajax(url, {
             success: function(data) {
-                this_.agencies = {};
-
-                for(var i=0; i<data.length; i++) {
-                    var agencyData = data[i];
-                    this_.agencies[agencyData.id] = {
-                        index : i,
-                        agencyData : agencyData,
-                    };
-                }
-
+                this_.feeds = data;
+                console.log('got feeds', this_.feeds);
                 if(callback) callback.call(callbackTarget);
             }
         });
