@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
@@ -35,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -243,18 +243,26 @@ public class GraphPathFinder {
             places.add(request.to);
             request.clearIntermediatePlaces();
             List<GraphPath> paths = new ArrayList<>();
+            DebugOutput debugOutput = null;
 
             for (GenericLocation to : places) {
-                request.dateTime = time;
-                request.from = from;
-                request.to = to;
-                request.rctx = null;
-                request.setRoutingContext(router.graph);
-                // TODO request only one itinerary here
+                RoutingRequest intermediateRequest = request.clone();
+                intermediateRequest.setNumItineraries(1);
+                intermediateRequest.dateTime = time;
+                intermediateRequest.from = from;
+                intermediateRequest.to = to;
+                intermediateRequest.rctx = null;
+                intermediateRequest.setRoutingContext(router.graph);
 
-                List<GraphPath> partialPaths = getPaths(request);
-                if (partialPaths == null || partialPaths.size() == 0) {
-                    return null;
+                if (debugOutput != null) {// Restore the previous debug info accumulator
+                    intermediateRequest.rctx.debugOutput = debugOutput;
+                } else {// Store the debug info accumulator
+                    debugOutput = intermediateRequest.rctx.debugOutput;
+                }
+                List<GraphPath> partialPaths = getPaths(intermediateRequest);
+                assert partialPaths != null;
+                if (partialPaths.size() == 0) {
+                    return partialPaths;
                 }
 
                 GraphPath path = partialPaths.get(0);
@@ -262,8 +270,10 @@ public class GraphPathFinder {
                 from = to;
                 time = path.getEndTime();
             }
+            request.setRoutingContext(router.graph);
+            request.rctx.debugOutput = debugOutput;
 
-            return Arrays.asList(joinPaths(paths));
+            return Collections.singletonList(joinPaths(paths));
         } else {
             return getPaths(request);
         }
