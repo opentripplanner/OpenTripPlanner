@@ -42,6 +42,10 @@ public class FareRuleSet implements Serializable {
         // TODO With new GTFS lib, read value from fareAttribute directly?
         this.agency = agency;
     }
+    
+    public String getAgency() {
+    	return agency;
+    }
 
     public void addOriginDestination(String origin, String destination) {
         originDestinations.add(new P2<String>(origin, destination));
@@ -57,6 +61,10 @@ public class FareRuleSet implements Serializable {
     
     public void addRoute(AgencyAndId route) {
         routes.add(route);
+    }
+    
+    public Set<AgencyAndId> getRoutes() {
+    	return routes;
     }
 
     public FareAttribute getFareAttribute() {
