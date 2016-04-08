@@ -36,7 +36,6 @@ otp.core.IndexApi = otp.Class({
         $.ajax(url, {
             success: function(data) {
                 this_.feeds = data;
-                console.log('got feeds', this_.feeds);
                 if(callback) callback.call(callbackTarget);
             }
         });
@@ -201,13 +200,13 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
-    getTripHash : function(agencyId, tripId, callbackTarget, callback) {
+    getTripHash : function(tripId, callbackTarget, callback) {
         var params = {}
         if(typeof otp.config.routerId !== 'undefined') {
             params.routerId = otp.config.routerId;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/trips/' + agencyId + ':' + tripId + '/semanticHash';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/trips/' + tripId + '/semanticHash';
         $.ajax(url, {
             dataType: "text",
             success: function(data) {

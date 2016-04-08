@@ -53,7 +53,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.geocodedOrigins = {};
         this.geocodedDestinations = {};
 
-        this.tripHashLookup = {} // maps agencyAndId to tripHash
+        this.tripHashLookup = {} // maps tripId to tripHash
     },
 
     activate : function() {
@@ -129,9 +129,11 @@ otp.modules.fieldtrip.FieldTripModule =
                     var grpItin = fieldTrip.groupItineraries[i];
                     for(var gt =0 ; gt < grpItin.trips.length; gt++) {
                         var gtfsTrip = grpItin.trips[gt];
-                        // (gtfsTrip already includes fields agencyAndId, fromStopIndex, and toStopIndex)
-                        gtfsTrip.agencyAndId = convertAgencyAndId(gtfsTrip.agencyAndId);
+                        // Note: tripIds still stored as 'agencyAndId' in DB
+                        gtfsTrip.tripId = convertAgencyAndId(gtfsTrip.agencyAndId);
                         gtfsTrip.passengers = grpItin.passengers;
+                        // (gtfsTrip already includes fields fromStopIndex and toStopIndex)
+
                         this.tripsInUse.push(gtfsTrip);
                     }
                 }
@@ -151,9 +153,8 @@ otp.modules.fieldtrip.FieldTripModule =
 
         _.each(tripPlan.itineraries, function(itin) {
             _.each(itin.legs, function(leg) {
-                if(leg.agencyId && leg.tripId) {
-                    var agencyAndId = leg.agencyId + ':' + leg.tripId;
-                    if(!(agencyAndId in this.tripHashLookup)) {
+                if(leg.tripId) {
+                    if(!(leg.tripId in this.tripHashLookup)) {
                         hashQueryLegs.push(leg);
                     }
                 }
@@ -167,15 +168,14 @@ otp.modules.fieldtrip.FieldTripModule =
             var queriesFinished = 0;
             for(var i =0; i < hashQueryLegs.length; i++) {
                 var leg = hashQueryLegs[i];
-                var agencyAndId = leg.agencyId + ':' + leg.tripId;
 
-                this.webapp.indexApi.getTripHash(leg.agencyId, leg.tripId, this, _.bind(function(data) {
-                    this.ftmodule.tripHashLookup[this.agencyAndId] = data;
+                this.webapp.indexApi.getTripHash(leg.tripId, this, _.bind(function(data) {
+                    this.ftmodule.tripHashLookup[this.tripId] = data;
                     queriesFinished++;
                     if(queriesFinished == hashQueryLegs.length) {
                         callback.call(this);
                     }
-                }, { ftmodule: this, agencyAndId : agencyAndId}));
+                }, { ftmodule: this, tripId : leg.tripId}));
             }
         }
     },
@@ -207,7 +207,7 @@ otp.modules.fieldtrip.FieldTripModule =
         for(var i = 0; i < transitLegs.length; i++) {
             var leg = transitLegs[i];
             this.bannedSegments.push({
-                agencyAndId : leg.agencyId + ':' + leg.tripId,
+                tripId : leg.tripId,
                 fromStopIndex : leg.from.stopIndex,
                 toStopIndex : leg.to.stopIndex,
             });
@@ -252,7 +252,7 @@ otp.modules.fieldtrip.FieldTripModule =
     setBannedTrips : function() {
         var tripIds = [];
         for(var i=0; i<this.bannedSegments.length; i++) {
-            tripIds.push(this.bannedSegments[i].agencyAndId);
+            tripIds.push(this.bannedSegments[i].tripId);
         }
 
         this.bannedTrips = tripIds.length > 0 ? tripIds.join(',') : null;
@@ -295,12 +295,11 @@ otp.modules.fieldtrip.FieldTripModule =
             for(var l = 0; l < legs.length; l++) {
                 var leg = legs[l];
                 var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || "");
-                var agencyAndId = leg.agencyId + ':' + leg.tripId;
-                var tripHash = this.tripHashLookup[agencyAndId];
+                var tripHash = this.tripHashLookup[leg.tripId];
 
                 data['gtfsTrips['+i+']['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss");
                 data['gtfsTrips['+i+']['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss");
-                data['gtfsTrips['+i+']['+l+'].agencyAndId'] = agencyAndId;
+                data['gtfsTrips['+i+']['+l+'].agencyAndId'] = leg.tripId;
                 data['gtfsTrips['+i+']['+l+'].tripHash'] = tripHash;
                 data['gtfsTrips['+i+']['+l+'].routeName'] = routeName;
                 data['gtfsTrips['+i+']['+l+'].fromStopIndex'] = leg.from.stopIndex;
@@ -323,7 +322,6 @@ otp.modules.fieldtrip.FieldTripModule =
 
     checkTripValidity : function(tripId, leg, itin) {
         var capacityInUse = 0;
-        //console.log('checkTripValidity ' + tripId + ' from ' + leg.from.stopIndex + ' to ' + leg.to.stopIndex);
         for(var i = 0; i < this.tripsInUse.length; i++) {
             var tripInUse  = this.tripsInUse[i];
 
@@ -332,8 +330,8 @@ otp.modules.fieldtrip.FieldTripModule =
             if(tripId in this.tripHashLookup && tripInUse.tripHash) { // use the trip hashes if available
                 sameVehicleTrip = (this.tripHashLookup[tripId] === tripInUse.tripHash);
             }
-            else { // as fallback, compare the agencyAndId strings
-                sameVehicleTrip = (tripId === tripInUse.agencyAndId);
+            else { // as fallback, compare the tripId strings
+                sameVehicleTrip = (tripId === tripInUse.tripId);
             }
             if(!sameVehicleTrip) continue;
 
