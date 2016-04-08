@@ -557,11 +557,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		return pane;
 	}
 	
-	private JComponent makePrefsPanel(){
+    private JComponent makePrefsPanel() {
         JPanel pane = new JPanel();
         pane.setLayout(new GridLayout(0, 2));
-        
-        // 2 rows: transport mode options
+
+        // 4 rows (7 elements): transport mode options
         walkCheckBox = new JCheckBox("walk");
         walkCheckBox.setSelected(true);
         pane.add(walkCheckBox);
@@ -579,6 +579,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         carCheckBox = new JCheckBox("car");
         pane.add(carCheckBox);
 
+        // GridLayout does not support empty cells, so a dummy label is used to fix the layout.
+        JLabel dummyLabel = new JLabel("");
+        pane.add(dummyLabel);
+
         // row: arrive by?
         JLabel arriveByLabel = new JLabel("Arrive by?:");
         pane.add(arriveByLabel);
@@ -590,126 +594,130 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(boardPenaltyLabel);
         boardingPenaltyField = new JTextField("5");
         pane.add(boardingPenaltyField);
-        
+
         // row: max walk
         JLabel maxWalkLabel = new JLabel("Maximum walk (meters):");
         pane.add(maxWalkLabel);
         maxWalkField = new JTextField("5000");
         pane.add(maxWalkField);
-        
+
         // row: walk speed
         JLabel walkSpeedLabel = new JLabel("Walk speed (m/s):");
         pane.add(walkSpeedLabel);
         walkSpeed = new JTextField("1.33");
         pane.add(walkSpeed);
-        
+
         // row: bike speed
         JLabel bikeSpeedLabel = new JLabel("Bike speed (m/s):");
         pane.add(bikeSpeedLabel);
         bikeSpeed = new JTextField("5.0");
         pane.add(bikeSpeed);
-        
+
         // row: heuristic weight
         JLabel heuristicWeightLabel = new JLabel("Heuristic weight:");
         pane.add(heuristicWeightLabel);
         heuristicWeight = new JTextField("1.0");
         pane.add(heuristicWeight);
-        
+
         // row: soft walk?
         JLabel softWalkLimitLabel = new JLabel("Soft walk-limit?:");
         pane.add(softWalkLimitLabel);
         softWalkLimiting = new JCheckBox("soft walk-limiting");
         pane.add(softWalkLimiting);
-        
+
         // row: soft walk-limit penalty
         JLabel softWalkLimitPenaltyLabel = new JLabel("Soft walk-limiting penalty:");
         pane.add(softWalkLimitPenaltyLabel);
         softWalkPenalty = new JTextField("60.0");
         pane.add(softWalkPenalty);
-        
+
         // row: soft walk-limit overage
         JLabel softWalkLimitOverageLabel = new JLabel("Soft walk-limiting overage:");
         pane.add(softWalkLimitOverageLabel);
         softWalkOverageRate = new JTextField("5.0");
         pane.add(softWalkOverageRate);
-        
+
         // row: nPaths
         JLabel nPathsLabel = new JLabel("nPaths:");
         pane.add(nPathsLabel);
         nPaths = new JTextField("1");
         pane.add(nPaths);
-        
-        //viz preferences
-        ItemListener onChangeVizPrefs = new ItemListener(){
-        	@Override
-        	public void itemStateChanged(ItemEvent e) {
-        		showGraph.setShowTransit( showTransitCheckbox.isSelected() );
-        		showGraph.setShowStreets( showStreetsCheckbox.isSelected() );
-        		showGraph.setShowMultistateVertices( showMultistateVerticesCheckbox.isSelected() );
-        		showGraph.setShowHightlights( showHighlightedCheckbox.isSelected() );
-        		showGraph.setShowSPT( showSPTCheckbox.isSelected() );
-        		showGraph.redraw();
-        	}
+
+        // viz preferences
+        ItemListener onChangeVizPrefs = new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                showGraph.setShowTransit(showTransitCheckbox.isSelected());
+                showGraph.setShowStreets(showStreetsCheckbox.isSelected());
+                showGraph.setShowMultistateVertices(showMultistateVerticesCheckbox.isSelected());
+                showGraph.setShowHightlights(showHighlightedCheckbox.isSelected());
+                showGraph.setShowSPT(showSPTCheckbox.isSelected());
+                showGraph.redraw();
+            }
         };
         showTransitCheckbox = new JCheckBox("show transit");
         showTransitCheckbox.setSelected(true);
-        showTransitCheckbox.addItemListener( onChangeVizPrefs );
+        showTransitCheckbox.addItemListener(onChangeVizPrefs);
         pane.add(showTransitCheckbox);
         showStreetsCheckbox = new JCheckBox("show streets");
-    	showStreetsCheckbox.setSelected(true);
-    	showStreetsCheckbox.addItemListener( onChangeVizPrefs );
-    	pane.add(showStreetsCheckbox);
-    	showHighlightedCheckbox = new JCheckBox("show highlighted");
-    	showHighlightedCheckbox.setSelected(true);
-    	showHighlightedCheckbox.addItemListener( onChangeVizPrefs );
-    	pane.add(showHighlightedCheckbox);     
-    	showSPTCheckbox = new JCheckBox("show SPT");
-    	showSPTCheckbox.setSelected(true);
-    	showSPTCheckbox.addItemListener( onChangeVizPrefs );
-    	pane.add(showSPTCheckbox);
-    	showMultistateVerticesCheckbox = new JCheckBox("show multistate vertices");
-    	showMultistateVerticesCheckbox.setSelected(true);
-    	showMultistateVerticesCheckbox.addItemListener( onChangeVizPrefs );
-    	pane.add(showMultistateVerticesCheckbox);
-    	
-    	// row: SPT flattening
-    	JLabel sptFlatteningLabel = new JLabel("SPT flattening:");
-    	pane.add(sptFlatteningLabel);
-    	sptFlattening = new JTextField("0.3");
-    	pane.add(sptFlattening);
+        showStreetsCheckbox.setSelected(true);
+        showStreetsCheckbox.addItemListener(onChangeVizPrefs);
+        pane.add(showStreetsCheckbox);
+        showHighlightedCheckbox = new JCheckBox("show highlighted");
+        showHighlightedCheckbox.setSelected(true);
+        showHighlightedCheckbox.addItemListener(onChangeVizPrefs);
+        pane.add(showHighlightedCheckbox);
+        showSPTCheckbox = new JCheckBox("show SPT");
+        showSPTCheckbox.setSelected(true);
+        showSPTCheckbox.addItemListener(onChangeVizPrefs);
+        pane.add(showSPTCheckbox);
+        showMultistateVerticesCheckbox = new JCheckBox("show multistate vertices");
+        showMultistateVerticesCheckbox.setSelected(true);
+        showMultistateVerticesCheckbox.addItemListener(onChangeVizPrefs);
+        pane.add(showMultistateVerticesCheckbox);
 
-    	// row: SPT thickness
-    	JLabel sptThicknessLabel = new JLabel("SPT thickness:");
-    	pane.add(sptThicknessLabel);
-    	sptThickness = new JTextField("0.1");
-    	pane.add(sptThickness);
-        
+        // GridLayout does not support empty cells, so a dummy label is used to fix the layout.
+        JLabel dummyLabel2 = new JLabel("");
+        pane.add(dummyLabel2);
+
+        // row: SPT flattening
+        JLabel sptFlatteningLabel = new JLabel("SPT flattening:");
+        pane.add(sptFlatteningLabel);
+        sptFlattening = new JTextField("0.3");
+        pane.add(sptFlattening);
+
+        // row: SPT thickness
+        JLabel sptThicknessLabel = new JLabel("SPT thickness:");
+        pane.add(sptThicknessLabel);
+        sptThickness = new JTextField("0.1");
+        pane.add(sptThickness);
+
         // radio buttons: optimize type
         JLabel optimizeTypeLabel = new JLabel("Optimize type:");
         pane.add(optimizeTypeLabel);
-    	
+
         opQuick = new JRadioButton("Quick");
         opQuick.setSelected(true);
         opSafe = new JRadioButton("Safe");
         opFlat = new JRadioButton("Flat");
-        opGreenways = new  JRadioButton("Greenways");
-        
+        opGreenways = new JRadioButton("Greenways");
+
         optimizeTypeGrp = new ButtonGroup();
         optimizeTypeGrp.add(opQuick);
         optimizeTypeGrp.add(opSafe);
         optimizeTypeGrp.add(opFlat);
         optimizeTypeGrp.add(opGreenways);
-        
+
         JPanel optimizeTypePane = new JPanel();
         optimizeTypePane.add(opQuick);
         optimizeTypePane.add(opSafe);
         optimizeTypePane.add(opFlat);
         optimizeTypePane.add(opGreenways);
-        
+
         pane.add(optimizeTypePane);
-        
-		return pane;
-	}
+
+        return pane;
+    }
 	
 	OptimizeType getSelectedOptimizeType(){
 		if(opQuick.isSelected()){

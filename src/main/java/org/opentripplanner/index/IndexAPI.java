@@ -94,13 +94,15 @@ public class IndexAPI {
     private final StreetVertexIndexService streetIndex;
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        Router router = otpServer.getRouter(routerId);
+        router = otpServer.getRouter(routerId);
         index = router.graph.index;
         streetIndex = router.graph.streetIndex;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
    @Context UriInfo uriInfo;
+
+   private Router router;
 
     @GET
     @Path("/feeds")
@@ -588,14 +590,14 @@ public class IndexAPI {
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse((String) query.get("query"), variables);
+        return index.getGraphQLResponse((String) query.get("query"), router, variables);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
     public Response getGraphQL (String query) {
-        return index.getGraphQLResponse(query, new HashMap<>());
+        return index.getGraphQLResponse(query, router, new HashMap<>());
     }
 
 //    @GET
