@@ -1386,7 +1386,7 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).spacesAvailable)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("realTimeData")
+                .name("realtime")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).realTimeData)
                 .build())
