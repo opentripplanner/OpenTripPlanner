@@ -49,6 +49,7 @@ import org.opentripplanner.util.ResourceBundleSingleton;
  */
 public abstract class RoutingResource { 
 
+
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
     /**
