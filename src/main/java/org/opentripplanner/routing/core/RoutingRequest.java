@@ -13,34 +13,42 @@
 
 package org.opentripplanner.routing.core;
 
-import com.google.common.base.Objects;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+        import com.google.common.base.Objects;
+        import org.onebusaway.gtfs.model.AgencyAndId;
+        import org.onebusaway.gtfs.model.Route;
+        import org.onebusaway.gtfs.model.Trip;
+        import org.opentripplanner.api.parameter.QualifiedModeSet;
+        import org.opentripplanner.common.MavenVersion;
+        import org.opentripplanner.common.model.GenericLocation;
+        import org.opentripplanner.common.model.NamedPlace;
+        import org.opentripplanner.routing.graph.Edge;
+        import org.opentripplanner.routing.graph.Graph;
+        import org.opentripplanner.routing.graph.Vertex;
+        import org.opentripplanner.routing.request.BannedStopSet;
+        import org.opentripplanner.routing.spt.DominanceFunction;
+        import org.opentripplanner.routing.spt.ShortestPathTree;
+        import org.opentripplanner.util.DateUtils;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+
+
+        import javax.xml.datatype.DatatypeConfigurationException;
+        import javax.xml.datatype.DatatypeConstants;
+        import javax.xml.datatype.DatatypeFactory;
+        import javax.xml.datatype.XMLGregorianCalendar;
+        import java.util.*;
+
+        import java.io.Serializable;
+        import java.util.ArrayList;
+        import java.util.Arrays;
+        import java.util.Date;
+        import java.util.HashMap;
+        import java.util.HashSet;
+        import java.util.List;
+        import java.util.Locale;
+        import java.util.Map;
+        import java.util.TimeZone;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -155,7 +163,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
-    
+
     /** Multiplicative factor on expected turning time. */
     public double turnReluctance = 1.0;
 
@@ -241,17 +249,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
-    
+    public StopMatcher bannedStops = StopMatcher.emptyMatcher();
+
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
-    
+    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher();
+
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
-    
+
     /** Set of preferred agencies by user. */
     public HashSet<String> preferredAgencies = new HashSet<String>();
-    
+
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -260,7 +268,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
-    
+
     /** Set of unpreferred agencies for given user. */
     public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
@@ -347,7 +355,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
     public double carAccelerationSpeed = 2.9;
-    
+
     /**
      * When true, realtime updates are ignored during this search.
      */
@@ -365,7 +373,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
      * initial states with different times and vertices from a single TraverseOptions, without setting all the transit
      * context or building temporary vertices (with all the exception-throwing checks that entails).
-     * 
+     *
      * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying
      * RoutingContext (and vice versa) so that both do not need to be passed/injected separately into tight inner loops
      * within routing algorithms. These references should be set to null when the request scope is torn down -- the
@@ -376,7 +384,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** A transit stop that this trip must start from */
     public AgencyAndId startingTransitStopId;
-    
+
     /** A trip where this trip must start from (depart-onboard routing) */
     public AgencyAndId startingTransitTripId;
 
@@ -552,7 +560,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-    
+
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
@@ -560,10 +568,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (modes.isTransit() || (batch && !softWalkLimiting)) {
             return maxWalkDistance;
         } else {
-            return Double.MAX_VALUE;            
+            return Double.MAX_VALUE;
         }
     }
-    
+
     public void setWalkBoardCost(int walkBoardCost) {
         if (walkBoardCost < 0) {
             this.walkBoardCost = 0;
@@ -572,7 +580,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.walkBoardCost = walkBoardCost;
         }
     }
-    
+
     public void setBikeBoardCost(int bikeBoardCost) {
         if (bikeBoardCost < 0) {
             this.bikeBoardCost = 0;
@@ -581,7 +589,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.bikeBoardCost = bikeBoardCost;
         }
     }
-    
+
     public void setPreferredAgencies(String s) {
         if (s != null && !s.equals(""))
             preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
@@ -593,17 +601,17 @@ public class RoutingRequest implements Cloneable, Serializable {
         else
             preferredRoutes = RouteMatcher.emptyMatcher();
     }
-    
+
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
         if(penalty < 0) penalty = 0;
         this.otherThanPreferredRoutesPenalty = penalty;
     }
-    
+
     public void setUnpreferredAgencies(String s) {
         if (s != null && !s.equals(""))
             unpreferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
     }
-    
+
     public void setUnpreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             unpreferredRoutes = RouteMatcher.parse(s);
@@ -635,7 +643,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bannedStopsHard = StopMatcher.emptyMatcher();
         }
     }
-    
+
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
@@ -678,8 +686,22 @@ public class RoutingRequest implements Cloneable, Serializable {
         return new Date(dateTime * 1000);
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(Date dateTime){
         this.dateTime = dateTime.getTime() / 1000;
+    }
+    public void setDateTime(String dateTime, TimeZone tz) {
+        try {
+            DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+            XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(dateTime);
+            GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+            if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                gregCal.setTimeZone(tz);
+            }
+            Date d2 = gregCal.getTime();
+            setDateTime(d2);
+        } catch (DatatypeConfigurationException e) {
+            setDateTime(null, null, tz);
+        }
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
@@ -687,7 +709,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
-    public int getNumItineraries() { 
+
+    public int getNumItineraries() {
         if (modes.isTransit()) {
             return numItineraries;
         } else {
@@ -723,14 +746,14 @@ public class RoutingRequest implements Cloneable, Serializable {
             intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
         }
     }
-    
+
     /** Clears any intermediate places from this request. */
     public void clearIntermediatePlaces() {
         if (this.intermediatePlaces != null) {
             this.intermediatePlaces.clear();
         }
     }
-    
+
     /**
      * Returns true if there are any intermediate places set.
      */
@@ -828,7 +851,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.rctx = new RoutingContext(this, graph, from, to);
         this.rctx.originBackEdge = fromBackEdge;
     }
-    
+
     public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
         setRoutingContext(graph, null, from, to);
     }
@@ -987,14 +1010,14 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double getSpeed(TraverseMode mode) {
         switch (mode) {
-        case WALK:
-            return walkSpeed;
-        case BICYCLE:
-            return bikeSpeed;
-        case CAR:
-            return carSpeed;
-        default:
-            break;
+            case WALK:
+                return walkSpeed;
+            case BICYCLE:
+                return bikeSpeed;
+            case CAR:
+                return carSpeed;
+            default:
+                break;
         }
         throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }
@@ -1093,8 +1116,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void banTrip(AgencyAndId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
-    
-    /** 
+
+    /**
      * tripIsBanned is a misnomer: this checks whether the agency or route are banned.
      * banning of individual trips is actually performed inside the trip search, 
      * in TripTimes.tripAcceptable.
