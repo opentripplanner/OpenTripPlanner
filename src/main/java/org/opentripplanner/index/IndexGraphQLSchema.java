@@ -40,6 +40,8 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -143,6 +145,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
 
+    public GraphQLOutputType bikeRentalStationType = new GraphQLTypeReference("BikeRentalStation");
+
     public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
 
     public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
@@ -194,6 +198,9 @@ public class IndexGraphQLSchema {
             }
             if (o instanceof AlertPatch) {
                 return (GraphQLObjectType) alertType;
+            }
+            if (o instanceof BikeRentalStation) {
+                return (GraphQLObjectType) bikeRentalStationType;
             }
             return null;
         }
@@ -1362,6 +1369,62 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        bikeRentalStationType = GraphQLObjectType.newObject()
+            .name("BikeRentalStation")
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay
+                    .toGlobalId(bikeRentalStationType.getName(), ((BikeRentalStation) environment.getSource()).id))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stationId")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).id)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("name")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).getName())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("bikesAvailable")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).bikesAvailable)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("spacesAvailable")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).spacesAvailable)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtime")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).realTimeData)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("allowDropoff")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).allowDropoff)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("networks")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .dataFetcher(environment -> new ArrayList<>(((BikeRentalStation) environment.getSource()).networks))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lon")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).x)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lat")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).y)
+                .build())
+            .build();
+
         queryType = GraphQLObjectType.newObject()
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
@@ -1386,6 +1449,15 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(alertType.getName())) {
                     return index.getAlertForId(id.id);
+                }
+                if (id.type.equals(bikeRentalStationType.getName())) {
+                    // No index exists for bikeshare station ids
+                    return index.graph.getService(BikeRentalStationService.class)
+                        .getBikeRentalStations()
+                        .stream()
+                        .filter(bikeRentalStation -> bikeRentalStation.id.equals(id.id))
+                        .findFirst()
+                        .get();
                 }
                 return null;
             }))
@@ -1694,6 +1766,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("bikeRentalStations")
+                .type(new GraphQLList(bikeRentalStationType))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")
                 .description(
                     "Needed until https://github.com/facebook/relay/issues/112 is resolved")
@@ -1757,7 +1834,7 @@ public class IndexGraphQLSchema {
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId.get(((Place) environment.getSource()).stopId))
                 .build())
-             .build();
+            .build();
 
         final GraphQLObjectType legType = GraphQLObjectType.newObject()
             .name("Leg")
@@ -1814,6 +1891,12 @@ public class IndexGraphQLSchema {
                 .description("Whether this leg is a transit leg or not.")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).isTransitLeg())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("rentedBike")
+                .description("Whether this leg is with a rented bike.")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).rentedBike)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("from")
