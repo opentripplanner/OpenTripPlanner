@@ -129,7 +129,7 @@ public class TestParkAndRide extends TestCase {
         options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
         options.setArriveBy(true);
         options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic();
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(A, false);
         assertNotNull(path);
@@ -138,7 +138,7 @@ public class TestParkAndRide extends TestCase {
         options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
         //options.arriveBy
         options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic();
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
         assertNotNull(path);

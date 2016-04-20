@@ -84,9 +84,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
-     * ride or kiss and ride). Defaults to unlimited.
+     * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
+     * large graphs the search becomes very slow.
      */
-    public int maxPreTransitTime = Integer.MAX_VALUE;
+    public int maxPreTransitTime = 30 * 60;
 
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
     public long worstTime = Long.MAX_VALUE;
@@ -221,8 +222,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double waitReluctance = 1.0;
 
-    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-    public double waitAtBeginningFactor = 0.9;
+    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding) */
+    public double waitAtBeginningFactor = 0.4;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int walkBoardCost = 60 * 10;

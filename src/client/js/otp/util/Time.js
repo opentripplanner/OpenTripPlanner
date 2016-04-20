@@ -2,14 +2,14 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.util");
@@ -17,38 +17,37 @@ otp.namespace("otp.util");
 /**
  * Utility routines for date/time conversion
  */
- 
+
 otp.util.Time = {
 
     secsToHrMin : function(secs) {
         //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);
         var mins = Math.floor(secs / 60) % 60;
-       
-        //TRANSLATORS: n hour/hours use short form  
-        var str = (hrs > 0 ? (" " + ngettext("%d hr", "%d hrs", hrs) ) : "");
+
+        //TRANSLATORS: n hour/hours use short form
+        var str = (hrs > 0 ? (ngettext("%d hr", "%d hrs", hrs) + ", ") : "");
         if (mins > 0) {
-            str += ", "
             //TRANSLATORS: n minute/minutes use short form
             str += ngettext("%d min", "%d mins", mins);
         }
-    
+
         return str;
     },
-    
+
     secsToHrMinSec : function(secs) {
         //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);
         var mins = Math.floor(secs / 60) % 60;
         var secs = secs % 60;
-        
+
         var str = (hrs > 0 ? (" " + ngettext("%d hr", "%d hrs", hrs) + ", ") : "") + (mins > 0 ? (ngettext("%d min", "%d mins", mins) + ", ") : "");
         //TRANSLATORS: n second/seconds use short form
         str += ngettext("%d sec", "%d secs", secs);
-    
+
         return str;
     },
-        
+
     formatItinTime : function(timestamp, formatStr) {
         formatStr = formatStr || otp.config.locale.time.time_format+", "+otp.config.locale.time.date_format;
         return moment(timestamp).add("hours", otp.config.timeOffset).format(formatStr);
@@ -73,7 +72,7 @@ otp.util.Time = {
         var m = parseInt(ttime[2], 10) || null;
         var am = ttime[3];
 
-        // step 3: fix up the hours string (make sure it's 1 or 2 chracters long ... if longer, fix) 
+        // step 3: fix up the hours string (make sure it's 1 or 2 chracters long ... if longer, fix)
         if(h && h.length > 2)
         {
             if(m == null)
@@ -92,7 +91,7 @@ otp.util.Time = {
                 am = 'p';
         }
 
-        // step 5: fix up the minutes, making sure they're 
+        // step 5: fix up the minutes, making sure they're
         if (m == null || m > 59 || m < 0)
         {
             m = "00";
@@ -114,7 +113,7 @@ otp.util.Time = {
                 am = "pm"
             else
                 am = "am"
-        } 
+        }
         else
         {
             // step 6b: when no a/p given, choose best fit for transit (e.g., 12pm and 8am are more popular times than 12am and 8pm)

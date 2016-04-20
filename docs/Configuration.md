@@ -278,6 +278,14 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+### Drive-to-transit routing defaults
+
+When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time to reach a transit
+stop or park and ride facility is constrained. You can set a drive time limit in seconds by adding a line like
+`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large street graph, routing
+performance may suffer.
+
+
 ## Boarding and alighting times
 
 Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
@@ -332,6 +340,35 @@ response, providing more only when it won't hurt response time. The timeout valu
 reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
 have two for comparison, but we only care about having three, four, or more options if completing those extra searches
 doesn't cause annoyingly long response times.
+
+## Logging incoming requests
+
+You can log some characteristics of trip planning requests in a file for later analysis. Some transit agencies and
+operators find this information useful for identifying existing or unmet transportation demand. Logging will be
+performed only if you specify a log file name in the router config:
+
+```JSON
+// router-config.json
+{
+  requestLogFile: "/var/otp/request.log"
+}
+```
+
+Each line in the resulting log file will look like this:
+
+`2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3`
+
+The fields are separated by whitespace and are (in order):
+
+1. Date and time the request was received
+2. IP address of the user
+3. Arrive or depart search
+4. The arrival or departure time
+5. A comma-separated list of all transport modes selected
+6. Origin latitude and longitude
+7. Destination latitude and longitude
+
+Finally, for each itinerary returned to the user, there is a travel duration in seconds and the number of transit vehicles used in that itinerary.
 
 
 ## Real-time data

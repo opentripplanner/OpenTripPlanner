@@ -257,6 +257,7 @@ public class GraphBuilder implements Runnable {
                 }
                 gtfsBundle.parentStationTransfers = builderParams.stationTransfers;
                 gtfsBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
+                gtfsBundle.maxInterlineDistance = builderParams.maxInterlineDistance;
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
