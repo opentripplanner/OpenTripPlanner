@@ -15,10 +15,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Get fake graphs.
@@ -70,13 +72,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
@@ -145,13 +141,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         int stopIdx = 0;
@@ -340,13 +330,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
@@ -506,13 +490,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
