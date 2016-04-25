@@ -38,6 +38,8 @@ public class LegSwitchingEdge extends Edge {
 	public State traverse(State s0) {
 		StateEditor editor = s0.edit(this);
 		editor.setBackMode(TraverseMode.LEG_SWITCH);
+		//Forget the last pattern to allow taking the same route from an intermediate place
+		editor.setLastPattern(null);
 		return editor.makeState();
 	}
 

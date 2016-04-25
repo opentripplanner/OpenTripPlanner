@@ -8,6 +8,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -25,14 +26,16 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.Assert.*;
-import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 /**
  * Tests for planning with intermediate places
  */
 public class TestIntermediatePlaces {
 
-    public static final double DELTA = 0.001;
+    /**
+     * The spacial deviation that we allow in degrees
+     */
+    public static final double DELTA = 0.005;
 
     private static TimeZone timeZone;
 
@@ -40,9 +43,9 @@ public class TestIntermediatePlaces {
 
     @BeforeClass public static void setUp() {
         try {
-            Graph graph = buildGraphNoTransit();
-            addTransit(graph);
-            link(graph);
+            Graph graph = FakeGraph.buildGraphNoTransit();
+            FakeGraph.addPerpendicularRoutes(graph);
+            FakeGraph.link(graph);
             graph.index(new DefaultStreetVertexIndexFactory());
 
             OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
@@ -65,7 +68,7 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = {};
 
-        handleRequest(fromLocation, toLocation, intermediateLocations);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", false);
     }
 
     @Test public void testOneIntermediatePlace() {
@@ -73,7 +76,7 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.92099, -82.95570) };
 
-        handleRequest(fromLocation, toLocation, intermediateLocations);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", false);
     }
 
     @Test public void testTwoIntermediatePlaces() {
@@ -83,11 +86,48 @@ public class TestIntermediatePlaces {
         intermediateLocations[0] = new GenericLocation(39.92099, -82.95570);
         intermediateLocations[1] = new GenericLocation(39.96146, -82.99552);
 
-        handleRequest(fromLocation, toLocation, intermediateLocations);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "CAR", false);
     }
 
-    private void handleRequest(GenericLocation from, GenericLocation to, GenericLocation[] via) {
-        RoutingRequest request = new RoutingRequest("WALK");
+    @Test public void testTransitWithoutIntermediatePlaces() {
+        GenericLocation fromLocation = new GenericLocation(39.9308, -83.0118);
+        GenericLocation toLocation = new GenericLocation(39.9998, -83.0198);
+        GenericLocation[] intermediateLocations = {};
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+    }
+
+    @Test public void testThreeBusStopPlaces() {
+        GenericLocation fromLocation = new GenericLocation(39.9058, -83.1341);
+        GenericLocation toLocation = new GenericLocation(39.9058, -82.8841);
+        GenericLocation[] intermediateLocations = { new GenericLocation(39.9058, -82.9841) };
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT", false);
+    }
+
+    @Test public void testTransitOneIntermediatePlace() {
+        GenericLocation fromLocation = new GenericLocation(39.9108, -83.0118);
+        GenericLocation toLocation = new GenericLocation(39.9698, -83.0198);
+        GenericLocation[] intermediateLocations = { new GenericLocation(39.9948, -83.0148) };
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+    }
+
+    @Test public void testTransitTwoIntermediatePlaces() {
+        GenericLocation fromLocation = new GenericLocation(39.9908, -83.0118);
+        GenericLocation toLocation = new GenericLocation(39.9998, -83.0198);
+        GenericLocation[] intermediateLocations = new GenericLocation[2];
+        intermediateLocations[0] = new GenericLocation(40.0000, -82.900);
+        intermediateLocations[1] = new GenericLocation(39.9100, -83.100);
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+    }
+
+    private void handleRequest(GenericLocation from, GenericLocation to, GenericLocation[] via,
+        String modes, boolean arriveBy) {
+        RoutingRequest request = new RoutingRequest(modes);
+        request.setDateTime("2016-04-20", "13:00", timeZone);
+        request.setArriveBy(arriveBy);
         request.from = from;
         request.to = to;
         for (GenericLocation intermediateLocation : via) {
@@ -101,31 +141,54 @@ public class TestIntermediatePlaces {
         TripPlan plan = GraphPathToTripPlanConverter.generatePlan(pathList, request);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
-        assertEquals(1, plan.itinerary.size());
-        Itinerary itinerary = plan.itinerary.get(0);
-        assertEquals(1 + via.length, itinerary.legs.size());
-        validateLegsTemporally(request, itinerary);
-        validateLegsSpatially(plan, itinerary);
+        assertTrue(1 <= plan.itinerary.size());
+        for (Itinerary itinerary : plan.itinerary) {
+            validateIntermediatePlacesVisited(itinerary, via);
+            assertTrue(via.length < itinerary.legs.size());
+            validateLegsTemporally(request, itinerary);
+            validateLegsSpatially(plan, itinerary);
+            if (modes.contains("TRANSIT")) {
+                assert itinerary.transitTime > 0;
+            }
+        }
     }
 
+    // Check that every via location is visited in the right order
+    private void validateIntermediatePlacesVisited(Itinerary itinerary, GenericLocation[] via) {
+        int legIndex = 0;
+
+        for (GenericLocation location : via) {
+            Leg leg;
+            do {
+                assertTrue("Intermediate location was not an endpoint of any leg",
+                    legIndex < itinerary.legs.size());
+                leg = itinerary.legs.get(legIndex);
+                legIndex++;
+            } while (Math.abs(leg.to.lat - location.lat) > DELTA
+                || Math.abs(leg.to.lon - location.lng) > DELTA);
+        }
+    }
+
+    // Check that the end point of a leg is also the start point of the next leg
     private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
         Place place = plan.from;
         for (Leg leg : itinerary.legs) {
-            assertPlacesAreEqual(place, leg.from);
+            assertPlacesAreVeryClose(place, leg.from);
             place = leg.to;
         }
-        assertPlacesAreEqual(place, plan.to);
+        assertPlacesAreVeryClose(place, plan.to);
     }
 
+    // Check that the start time and end time of each leg are consistent
     private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
         Calendar departTime = Calendar.getInstance(timeZone);
         Calendar arriveTime = Calendar.getInstance(timeZone);
         if (request.arriveBy) {
-            departTime.setTimeInMillis(0);
-            arriveTime.setTimeInMillis(request.dateTime);
+            departTime = itinerary.legs.get(0).from.departure;
+            arriveTime.setTimeInMillis(request.dateTime * 1000);
         } else {
-            departTime.setTimeInMillis(request.dateTime);
-            arriveTime.setTimeInMillis(Long.MAX_VALUE);
+            departTime.setTimeInMillis(request.dateTime * 1000);
+            arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).to.arrival;
         }
         long sumOfDuration = 0;
         for (Leg leg : itinerary.legs) {
@@ -137,8 +200,13 @@ public class TestIntermediatePlaces {
             departTime = leg.to.arrival;
             sumOfDuration += leg.getDuration();
         }
+        sumOfDuration += itinerary.waitingTime;
+
         assertFalse(departTime.after(arriveTime));
-        assertEquals(sumOfDuration, itinerary.duration.longValue());
+
+        // Check the total duration of the legs,
+        int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
+        assertEquals(sumOfDuration, itinerary.duration.doubleValue(), accuracy);
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {
@@ -146,8 +214,7 @@ public class TestIntermediatePlaces {
         assertEquals(location.lng, place.lon, DELTA);
     }
 
-    private void assertPlacesAreEqual(Place a, Place b) {
-        assertEquals(a.name, b.name);
+    private void assertPlacesAreVeryClose(Place a, Place b) {
         assertEquals(a.lat, b.lat, DELTA);
         assertEquals(a.lon, b.lon, DELTA);
     }

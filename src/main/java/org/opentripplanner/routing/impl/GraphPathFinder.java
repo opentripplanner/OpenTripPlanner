@@ -283,6 +283,10 @@ public class GraphPathFinder {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
         Vertex lastVertex = lastState.getVertex();
+
+        //With more paths we should allow more transfers
+        lastState.getOptions().maxTransfers *= paths.size();
+
         for (GraphPath path : paths.subList(1, paths.size())) {
             lastState = newPath.states.getLast();
             // add a leg-switching state
