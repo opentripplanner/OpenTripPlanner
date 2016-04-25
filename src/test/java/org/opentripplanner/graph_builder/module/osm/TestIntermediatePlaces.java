@@ -69,6 +69,7 @@ public class TestIntermediatePlaces {
         GenericLocation[] intermediateLocations = {};
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", true);
     }
 
     @Test public void testOneIntermediatePlace() {
@@ -77,6 +78,7 @@ public class TestIntermediatePlaces {
         GenericLocation[] intermediateLocations = { new GenericLocation(39.92099, -82.95570) };
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", true);
     }
 
     @Test public void testTwoIntermediatePlaces() {
@@ -87,6 +89,7 @@ public class TestIntermediatePlaces {
         intermediateLocations[1] = new GenericLocation(39.96146, -82.99552);
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "CAR", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "CAR", true);
     }
 
     @Test public void testTransitWithoutIntermediatePlaces() {
@@ -95,6 +98,7 @@ public class TestIntermediatePlaces {
         GenericLocation[] intermediateLocations = {};
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
     }
 
     @Test public void testThreeBusStopPlaces() {
@@ -103,6 +107,7 @@ public class TestIntermediatePlaces {
         GenericLocation[] intermediateLocations = { new GenericLocation(39.9058, -82.9841) };
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT", true);
     }
 
     @Test public void testTransitOneIntermediatePlace() {
@@ -111,6 +116,7 @@ public class TestIntermediatePlaces {
         GenericLocation[] intermediateLocations = { new GenericLocation(39.9948, -83.0148) };
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
     }
 
     @Test public void testTransitTwoIntermediatePlaces() {
@@ -121,6 +127,7 @@ public class TestIntermediatePlaces {
         intermediateLocations[1] = new GenericLocation(39.9100, -83.100);
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
     }
 
     private void handleRequest(GenericLocation from, GenericLocation to, GenericLocation[] via,

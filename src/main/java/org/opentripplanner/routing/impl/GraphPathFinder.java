@@ -233,24 +233,30 @@ public class GraphPathFinder {
 
     /**
      * Break up a RoutingRequest with intermediate places into separate requests, in the given order.
-     * If there are no intermediate places, issue a single request.
+     *
+     * If there are no intermediate places, issue a single request. Otherwise process the places
+     * list [from, i1, i2, ..., to] either from left to right (if {@code request.arriveBy==false})
+     * or from right to left (if {@code request.arriveBy==true}). In the latter case the order of
+     * the requested subpaths is (i2, to), (i1, i2), and (from, i1) which has to be reversed at
+     * the end.
      */
     private List<GraphPath> getGraphPathsConsideringIntermediates (RoutingRequest request) {
         if (request.hasIntermediatePlaces()) {
-            long time = request.dateTime;
-            GenericLocation from = request.from;
-            List<GenericLocation> places = Lists.newLinkedList(request.intermediatePlaces);
+            List<GenericLocation> places = Lists.newArrayList(request.from);
+            places.addAll(request.intermediatePlaces);
             places.add(request.to);
-            request.clearIntermediatePlaces();
+            long time = request.dateTime;
+
             List<GraphPath> paths = new ArrayList<>();
             DebugOutput debugOutput = null;
+            int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
 
-            for (GenericLocation to : places) {
+            while (0 < placeIndex && placeIndex < places.size()) {
                 RoutingRequest intermediateRequest = request.clone();
                 intermediateRequest.setNumItineraries(1);
                 intermediateRequest.dateTime = time;
-                intermediateRequest.from = from;
-                intermediateRequest.to = to;
+                intermediateRequest.from = places.get(placeIndex - 1);
+                intermediateRequest.to = places.get(placeIndex);
                 intermediateRequest.rctx = null;
                 intermediateRequest.setRoutingContext(router.graph);
 
@@ -259,20 +265,22 @@ public class GraphPathFinder {
                 } else {// Store the debug info accumulator
                     debugOutput = intermediateRequest.rctx.debugOutput;
                 }
+
                 List<GraphPath> partialPaths = getPaths(intermediateRequest);
-                assert partialPaths != null;
                 if (partialPaths.size() == 0) {
                     return partialPaths;
                 }
 
                 GraphPath path = partialPaths.get(0);
                 paths.add(path);
-                from = to;
-                time = path.getEndTime();
+                time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
+                placeIndex += (request.arriveBy ? -1 : +1);
             }
             request.setRoutingContext(router.graph);
             request.rctx.debugOutput = debugOutput;
-
+            if (request.arriveBy) {
+                Collections.reverse(paths);
+            }
             return Collections.singletonList(joinPaths(paths));
         } else {
             return getPaths(request);
