@@ -57,11 +57,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -126,11 +122,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -315,11 +307,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -475,11 +463,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
