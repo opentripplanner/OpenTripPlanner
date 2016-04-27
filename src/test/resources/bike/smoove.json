@@ -17,6 +17,15 @@
          "avl_bikes" : 5,
          "free_slots" : 5,
          "total_slots" : 5
+      },
+      {
+         "name" : "006 Foo",
+         "operative" : true,
+         "coordinates" : "61,25",
+         "style" : "",
+         "avl_bikes" : 5,
+         "free_slots" : 5,
+         "total_slots" : 5
       }
    ]
 }

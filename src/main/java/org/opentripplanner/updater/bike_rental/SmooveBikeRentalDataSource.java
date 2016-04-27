@@ -35,7 +35,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      *       {
      *          "name" : "004 Hamn",
      *          "operative" : true,
-     *          "coordinates" : "60.167913, 24.952269",
+     *          "coordinates" : "60.167913,24.952269",
      *          "style" : "",
      *          "avl_bikes" : 1,
      *          "free_slots" : 11,
@@ -47,16 +47,18 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      * </pre>
      */
     public BikeRentalStation makeStation(JsonNode node) {
-        if (!node.path("operative").asText().equals("true")) {
-            return null;
-        }
         BikeRentalStation station = new BikeRentalStation();
         station.id = node.path("name").asText();
         station.name = new NonLocalizedString(node.path("name").asText());
-        station.y = Double.parseDouble(node.path("coordinates").asText().split(", ")[0]);
-        station.x = Double.parseDouble(node.path("coordinates").asText().split(", ")[1]);
-        station.bikesAvailable = node.path("avl_bikes").asInt();
-        station.spacesAvailable = node.path("free_slots").asInt();
+        station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
+        station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
+        if (!node.path("operative").asText().equals("true")) {
+            station.bikesAvailable = 0;
+            station.spacesAvailable = 0;
+        } else {
+            station.bikesAvailable = node.path("avl_bikes").asInt();
+            station.spacesAvailable = node.path("free_slots").asInt();
+        }
         return station;
     }
 }

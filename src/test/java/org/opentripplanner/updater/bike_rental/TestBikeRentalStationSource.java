@@ -47,16 +47,35 @@ public class TestBikeRentalStationSource extends TestCase {
         source.setUrl("file:src/test/resources/bike/smoove.json");
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
-        assertEquals(1, rentalStations.size());
+        assertEquals(3, rentalStations.size());
         for (BikeRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
         }
         BikeRentalStation hamn = rentalStations.get(0);
         assertEquals("004 Hamn", hamn.name.toString());
         assertEquals("004 Hamn", hamn.id);
+        // Ignore whitespace in coordinates string
         assertEquals(24.952269, hamn.x);
         assertEquals(60.167913, hamn.y);
         assertEquals(11, hamn.spacesAvailable);
         assertEquals(1, hamn.bikesAvailable);
+
+        BikeRentalStation fake = rentalStations.get(1);
+        assertEquals("005 Fake", fake.name.toString());
+        assertEquals("005 Fake", fake.id);
+        assertEquals(24.0, fake.x);
+        assertEquals(60.0, fake.y);
+        // operative: false overrides available bikes and slots
+        assertEquals(0, fake.spacesAvailable);
+        assertEquals(0, fake.bikesAvailable);
+
+        BikeRentalStation foo = rentalStations.get(2);
+        assertEquals("006 Foo", foo.name.toString());
+        assertEquals("006 Foo", foo.id);
+        assertEquals(25.0, foo.x);
+        assertEquals(61.0, foo.y);
+        assertEquals(5, foo.spacesAvailable);
+        assertEquals(5, foo.bikesAvailable);
+        // Ignores mismatch with total_slots
     }
 }
