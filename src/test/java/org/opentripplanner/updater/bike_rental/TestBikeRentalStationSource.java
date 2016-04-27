@@ -52,8 +52,8 @@ public class TestBikeRentalStationSource extends TestCase {
             System.out.println(rentalStation);
         }
         BikeRentalStation hamn = rentalStations.get(0);
-        assertEquals("004 Hamn", hamn.name.toString());
-        assertEquals("004 Hamn", hamn.id);
+        assertEquals("Hamn", hamn.name.toString());
+        assertEquals("A04", hamn.id);
         // Ignore whitespace in coordinates string
         assertEquals(24.952269, hamn.x);
         assertEquals(60.167913, hamn.y);
@@ -61,8 +61,8 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(1, hamn.bikesAvailable);
 
         BikeRentalStation fake = rentalStations.get(1);
-        assertEquals("005 Fake", fake.name.toString());
-        assertEquals("005 Fake", fake.id);
+        assertEquals("Fake", fake.name.toString());
+        assertEquals("B05", fake.id);
         assertEquals(24.0, fake.x);
         assertEquals(60.0, fake.y);
         // operative: false overrides available bikes and slots
@@ -70,8 +70,8 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(0, fake.bikesAvailable);
 
         BikeRentalStation foo = rentalStations.get(2);
-        assertEquals("006 Foo", foo.name.toString());
-        assertEquals("006 Foo", foo.id);
+        assertEquals("Foo", foo.name.toString());
+        assertEquals("B06", foo.id);
         assertEquals(25.0, foo.x);
         assertEquals(61.0, foo.y);
         assertEquals(5, foo.spacesAvailable);

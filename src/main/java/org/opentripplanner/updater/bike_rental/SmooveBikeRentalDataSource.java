@@ -48,8 +48,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      */
     public BikeRentalStation makeStation(JsonNode node) {
         BikeRentalStation station = new BikeRentalStation();
-        station.id = node.path("name").asText();
-        station.name = new NonLocalizedString(node.path("name").asText());
+        station.id = node.path("name").asText().split("\\s", 2)[0];
+        station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
         station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
         station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
         if (!node.path("operative").asText().equals("true")) {
