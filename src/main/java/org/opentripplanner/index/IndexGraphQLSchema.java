@@ -1845,6 +1845,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStation")
+                .type(bikeRentalStationType)
                 .description("The bike rental station related to the place")
                 .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE) ?
                     index.graph.getService(BikeRentalStationService.class)
