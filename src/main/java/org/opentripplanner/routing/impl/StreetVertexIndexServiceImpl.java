@@ -315,10 +315,24 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
                 TemporaryStreetLocation closest = new TemporaryStreetLocation(
                         "corner " + Math.random(), coord, calculatedName, endVertex);
+
+                //This searches for all the vertices that are at the same coordinate as found intersection
+                //since found street splits can be problematic, because they split the street only in one direction
+                List <Vertex> verticesOnSameLoc = getVerticesForEnvelope(new Envelope(intersection.getCoordinate()));
                 if (endVertex) {
                     new TemporaryFreeEdge(intersection, closest);
+                    for (Vertex vertex: verticesOnSameLoc) {
+                        if (!intersection.equals(vertex)) {
+                            new TemporaryFreeEdge(vertex, closest);
+                        }
+                    }
                 } else {
                     new TemporaryFreeEdge(closest, intersection);
+                    for (Vertex vertex: verticesOnSameLoc) {
+                        if (!intersection.equals(vertex)) {
+                            new TemporaryFreeEdge(closest, vertex);
+                        }
+                    }
                 }
 
                 return closest;
