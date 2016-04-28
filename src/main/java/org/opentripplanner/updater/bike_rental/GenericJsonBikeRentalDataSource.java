@@ -153,6 +153,10 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
 
     @Override
@@ -170,6 +174,6 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
         }
-        this.url = url;
+        setUrl(url);
     }
 }
