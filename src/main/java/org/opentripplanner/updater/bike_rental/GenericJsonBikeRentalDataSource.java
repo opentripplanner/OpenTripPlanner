@@ -166,7 +166,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     }
 
     public void setUrl(String url) {
-    	this.url = url;
+        this.url = url;
     }
 
     public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
