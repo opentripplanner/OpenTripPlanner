@@ -32,6 +32,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -55,6 +56,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 
@@ -329,14 +331,30 @@ public class IndexGraphQLSchema {
             .description("Gets plan of a route")
             .type(planType)
             .argument(GraphQLArgument.newArgument()
+                .name("date")
+                .type(Scalars.GraphQLString)
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("time")
+                .type(Scalars.GraphQLString)
+                .build())
+            .argument(GraphQLArgument.newArgument()
                 .name("from")
                 .description("The start location")
-                .type(new GraphQLNonNull(coordinateInputType))
+                .type(coordinateInputType)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("to")
                 .description("The end location")
-                .type(new GraphQLNonNull(coordinateInputType))
+                .type(coordinateInputType)
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("fromPlace")
+                .type(Scalars.GraphQLString)
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("toPlace")
+                .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("wheelchair")
@@ -407,11 +425,6 @@ public class IndexGraphQLSchema {
             .argument(GraphQLArgument.newArgument()
                 .name("arriveBy")
                 .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
-                .type(Scalars.GraphQLBoolean)
-                .build())
-            .argument(GraphQLArgument.newArgument()
-                .name("showIntermediateStops")
-                .description("Whether the planner should return intermediate stops lists for transit legs.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -1473,15 +1486,34 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
-                    if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.stopForId.values());
-                    } else {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                            .stream()
+                            .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                            .collect(Collectors.toList())
+                            .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
+                    Stream<Stop> stream;
+                    if (environment.getArgument("name") == null) {
+                        stream = index.stopForId.values().stream();
+                    }
+                    else {
+                        stream = index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
+                            .stream()
+                            .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                    }
+                    return stream.collect(Collectors.toList());
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1591,15 +1623,46 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("modes")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
-                    if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.routeForId.values());
-                    } else {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                            .stream()
+                            .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                            .collect(Collectors.toList())
+                            .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
+                    Stream<Route> stream = index.routeForId.values().stream();
+                    if (environment.getArgument("name") != null) {
+                        stream = stream
+                            .filter(route -> route.getShortName() != null)
+                            .filter(route -> route.getShortName().startsWith(environment.getArgument("name")));
+                    }
+                    if (environment.getArgument("modes") != null) {
+                        Set<TraverseMode> modes = new QualifiedModeSet(
+                            environment.getArgument("modes")).qModes
+                            .stream()
+                            .map(qualifiedMode -> qualifiedMode.mode)
+                            .filter(TraverseMode::isTransit)
+                            .collect(Collectors.toSet());
+                        stream = stream
+                            .filter(route ->
+                                modes.contains(GtfsLibrary.getTraverseMode(route)));
+                    }
+                    return stream.collect(Collectors.toList());
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1856,6 +1919,12 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((Leg)environment.getSource()).isTransitLeg())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("rentedBike")
+                .description("Whether this leg is with a rented bike.")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).rentedBike)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("from")
                 .description("The Place where the leg originates.")
                 .type(new GraphQLNonNull(placeType))
@@ -1878,6 +1947,18 @@ public class IndexGraphQLSchema {
                 .description("For transit legs, the trip. For non-transit legs, null.")
                 .type(tripType)
                 .dataFetcher(environment -> index.tripForId.get(((Leg)environment.getSource()).tripId))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediateStops")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null.")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment -> {
+                    return ((Leg)environment.getSource()).stop.stream()
+                        .filter(place -> place.stopId != null)
+                        .map(placeWithStop -> index.stopForId.get(placeWithStop.stopId))
+                        .filter(stop -> stop != null)
+                        .collect(Collectors.toList());
+                })
                 .build())
             .build();
 
