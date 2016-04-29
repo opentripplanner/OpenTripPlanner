@@ -11,7 +11,7 @@ function build_graph {
   DIR="graphs/$NAME"
   mkdir -p $DIR
   unzip -o -j -d $DIR $FILE
-  java -Xmx8G -jar $JAR --build $DIR
+  java -Xmx7500M -jar $JAR --build $DIR
 }
 
 function process {
@@ -21,7 +21,7 @@ function process {
   MD5FILE=$FILE.md5
   echo "Name is: $NAME"
   echo "URL is: $URL"
-  
+
   if [[ "$(curl $URL -z $FILE -o $FILE -s -L -w %{http_code})" == "200" ]]; then
     build_graph $NAME $FILE
   else
@@ -37,4 +37,4 @@ do
 done
 
 echo "graphString is: $GRAPH_STRING"
-java -Xmx10G -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $GRAPH_STRING
+java -Xmx7500M -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $GRAPH_STRING
