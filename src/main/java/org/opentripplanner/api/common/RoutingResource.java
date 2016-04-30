@@ -49,6 +49,7 @@ import org.opentripplanner.util.ResourceBundleSingleton;
  */
 public abstract class RoutingResource { 
 
+
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
     /**
@@ -81,7 +82,11 @@ public abstract class RoutingResource {
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time")
     protected String time;
-    
+
+    /** The ISO8601 date and time that the trip should depart (or arrive, for requests where arriveBy is true). */
+    @QueryParam("dateTime")
+    protected String dateTime;
+
     /** Whether the trip should depart or arrive at the specified date and time. */
     @QueryParam("arriveBy")
     protected Boolean arriveBy;
@@ -379,21 +384,13 @@ public abstract class RoutingResource {
             //FIXME: move into setter method on routing request
             TimeZone tz;
             tz = router.graph.getTimeZone();
-            if (date == null && time != null) { // Time was provided but not date
+            if(dateTime != null){ //time and date are provided by the ISO8601
+                LOG.debug("parsing ISO datetime {}", dateTime);
+                request.setDateTime(dateTime, tz);
+            }
+            else if (date == null && time != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", time);
-                try {
-                    // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
-                    DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
-                    XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
-                    GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
-                    if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                        gregCal.setTimeZone(tz);
-                    }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
-                } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(date, time, tz);
-                }
+                request.setDateTime(time, tz);
             } else {
                 request.setDateTime(date, time, tz);
             }
