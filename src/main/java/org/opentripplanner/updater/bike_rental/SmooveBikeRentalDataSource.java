@@ -15,6 +15,8 @@ package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,6 +25,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @see BikeRentalDataSource
  */
 public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+
+    private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
     public SmooveBikeRentalDataSource() {
         super("result");
@@ -50,15 +54,21 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         BikeRentalStation station = new BikeRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
-        station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
-        station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
-        if (!node.path("operative").asText().equals("true")) {
-            station.bikesAvailable = 0;
-            station.spacesAvailable = 0;
-        } else {
-            station.bikesAvailable = node.path("avl_bikes").asInt();
-            station.spacesAvailable = node.path("free_slots").asInt();
+        try {
+            station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
+            station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
+            if (!node.path("operative").asText().equals("true")) {
+                station.bikesAvailable = 0;
+                station.spacesAvailable = 0;
+            } else {
+                station.bikesAvailable = node.path("avl_bikes").asInt();
+                station.spacesAvailable = node.path("free_slots").asInt();
+            }
+            return station;
+        } catch (NumberFormatException e) {
+            // E.g. coordinates is empty
+            log.warn("Error parsing bike rental station " + station.id, e);
+            return null;
         }
-        return station;
     }
 }
