@@ -47,10 +47,13 @@ public class TestBikeRentalStationSource extends TestCase {
         source.setUrl("file:src/test/resources/bike/smoove.json");
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
+
+        // Invalid station without coordinates shoulf be ignored, so only 3
         assertEquals(3, rentalStations.size());
         for (BikeRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
         }
+
         BikeRentalStation hamn = rentalStations.get(0);
         assertEquals("Hamn", hamn.name.toString());
         assertEquals("A04", hamn.id);
