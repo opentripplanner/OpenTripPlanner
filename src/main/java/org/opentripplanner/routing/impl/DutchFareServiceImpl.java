@@ -119,7 +119,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
         float cost = 0f;
 
-        String fareId = fareZone + ":" + units;
+        String fareId = fareZone + ":" + (units + prevSumUnits);
         for (FareRuleSet ruleSet : fareRules) {
             if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
                 cost = ruleSet.getFareAttribute().getPrice();
@@ -221,6 +221,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                     LOG.warn("4. Swiched Rail Agency");
 
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
+                    prevSumUnits += units;
                     units = 0;
                     startTariefEenheden = ride.startZone;
                 }
