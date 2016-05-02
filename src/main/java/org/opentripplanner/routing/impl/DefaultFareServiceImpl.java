@@ -173,13 +173,13 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             FareType fareType = kv.getKey();
             Collection<FareRuleSet> fareRules = kv.getValue();
 
-            // pick up a random currency from fareAttributes,
-            // we assume that all tickets use the same currency
+            // hardcode the fareAttribute currency, because the configuration
+            // parameter is ignored, and the assumption that all tickets are in the same currency
+            // doesn't hold for a feed with distance units
             Currency currency = null;
             WrappedCurrency wrappedCurrency = null;
             if (fareRules.size() > 0) {
-                currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute()
-                        .getCurrencyType());
+                currency = Currency.getInstance("EUR");
                 wrappedCurrency = new WrappedCurrency(currency);
             }
 
