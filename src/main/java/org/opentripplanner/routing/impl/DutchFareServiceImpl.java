@@ -88,17 +88,19 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
-    private UnitsFareZone getUnitsByZones(String startZone, String endZone, Collection<FareRuleSet> fareRules) {
+    private UnitsFareZone getUnitsByZones(String agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
         P2<String> od = new P2<String>(startZone, endZone);
 
         LOG.warn("Search " + startZone + " and " + endZone);
 
+        String fareIdStartsWith = agencyId + "::";
+
         for (FareRuleSet ruleSet : fareRules) {
-            /* TODO: agency selectie moet hier ook nog, dordrecht geldermalsen */
-            if (ruleSet.getOriginDestinations().contains(od)) {
+            if (ruleSet.getFareAttribute().getId().getId().startsWith(fareIdStartsWith) &&
+                ruleSet.getOriginDestinations().contains(od)) {
                 String fareId = ruleSet.getFareAttribute().getId().getId();
-                String[] parts = fareId.split(":");
-                String fareZone = parts[0] + ':' + parts[1];
+                String[] parts = fareId.split("::");
+                String fareZone = parts[1];
 
                 LOG.warn("Between " + startZone + " and " + endZone + ": " + (int) ruleSet.getFareAttribute().getPrice() + " (" + fareZone + ")");
                 return new UnitsFareZone((int) ruleSet.getFareAttribute().getPrice(), fareZone);
@@ -202,7 +204,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 /* When a user has checked out, we first calculate the units made until then. */
                 if (mustHaveCheckedOut && lastAgencyId != null) {
                     LOG.warn("2. Must Have Checked Out");
-                    UnitsFareZone unitsFareZone = getUnitsByZones(startTariefEenheden, endTariefEenheden, fareRules);
+                    UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
                     if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
                     lastFareZone = unitsFareZone.fareZone;
                     units += unitsFareZone.units;
@@ -249,7 +251,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         }
 
         LOG.warn("6. Final");
-        UnitsFareZone unitsFareZone = getUnitsByZones(startTariefEenheden, endTariefEenheden, fareRules);
+        UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
         if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
 
         lastFareZone = unitsFareZone.fareZone;
