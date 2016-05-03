@@ -162,9 +162,11 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 cost = ruleSet.getFareAttribute().getPrice();
                 break;
             }
+
+            LOG.warn("Can't find price for " + firstStop + " to " + lastStop + " operated on " + route.getId());
         }
 
-        if (entranceFee) cost += 0.89f; /* TODO: Configurable? */
+        if (entranceFee) cost += 89f; /* TODO: Configurable? */
 
         return cost;
     }
