@@ -143,29 +143,31 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             }
 
             LOG.warn("Can't find price for " + fareZone + " with " + prevSumUnits + " units");
+
+            return Float.POSITIVE_INFINITY;
         }
 
         return cost;
     }
 
-    private float getEasyTripFareByLineFromTo(AgencyAndId route, String firstStop, String lastStop,
+    private float getEasyTripFareByLineFromTo(String route, String firstStop, String lastStop,
                                               boolean entranceFee, Collection<FareRuleSet> fareRules) {
 
-        float cost = 0f;
+        float cost = Float.POSITIVE_INFINITY;
+
+        String fareId = route + ":" + firstStop + "-" + lastStop;
 
         for (FareRuleSet ruleSet : fareRules) {
-            Set<String> agencies = new HashSet<>();
-            agencies.add(route.getAgencyId());
-
-            Set<AgencyAndId> routes = new HashSet<>();
-            routes.add(route);
-
-            if (ruleSet.matches(agencies, firstStop, lastStop, new HashSet<String>(), routes)) {
+            if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
                 cost = ruleSet.getFareAttribute().getPrice();
                 break;
             }
+        }
 
-            LOG.warn("Can't find price for " + firstStop + " to " + lastStop + " operated on " + route.getId());
+        if (cost == Float.POSITIVE_INFINITY) {
+            LOG.warn("Can't find price for " + firstStop + " to " + lastStop + " operated on " + route);
+
+            return cost;
         }
 
         if (entranceFee) cost += 89f; /* TODO: Configurable? */
@@ -195,7 +197,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             LOG.warn(String.format("%s %s %s %s %s %s", ride.startZone, ride.endZone, ride.firstStop, ride.lastStop, ride.route, ride.agency));
 
             if (ride.agency.startsWith("IFF:")) {
-                LOG.warn("1. NS");
+                LOG.warn("1. Trains");
 		        /* In Reizen op Saldo we will try to fares as long as possible. */
 
                 /* If our previous agency isn't this agency, then we must have checked out */
@@ -203,7 +205,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
                 /* When a user has checked out, we first calculate the units made until then. */
                 if (mustHaveCheckedOut && lastAgencyId != null) {
-                    LOG.warn("2. Must Have Checked Out");
+                    LOG.warn("2. Must have checked out from a station");
                     UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
                     if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
                     lastFareZone = unitsFareZone.fareZone;
@@ -216,6 +218,8 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime) {
                     LOG.warn("3. Exceeded Transfer Time");
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
+                    if (cost == Float.POSITIVE_INFINITY) return cost;
+
                     startTariefEenheden = ride.startZone;
                     units = 0;
                     prevSumUnits = 0;
@@ -225,6 +229,8 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                     LOG.warn("4. Swiched Rail Agency");
 
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
+                    if (cost == Float.POSITIVE_INFINITY) return cost;
+
                     prevSumUnits += units;
                     units = 0;
                     startTariefEenheden = ride.startZone;
@@ -244,19 +250,24 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 boolean entranceFee = ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime);
 
                 /* EasyTrip will always calculate its price per leg */
-                cost += getEasyTripFareByLineFromTo(ride.route, ride.firstStop.toString(), ride.lastStop.toString(), entranceFee, fareRules);
+                cost += getEasyTripFareByLineFromTo(ride.route.getId(), ride.startZone, ride.endZone, entranceFee, fareRules);
+                if (cost == Float.POSITIVE_INFINITY) return cost;
 
                 alightedEasyTrip = ride.endTime;
             }
         }
 
         LOG.warn("6. Final");
-        UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
-        if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
+        if (lastAgencyId != null) {
+            UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
+            if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
 
-        lastFareZone = unitsFareZone.fareZone;
-        units += unitsFareZone.units;
-        cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
+            lastFareZone = unitsFareZone.fareZone;
+            units += unitsFareZone.units;
+            cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
+        }
+
+        if (cost == Float.POSITIVE_INFINITY) return cost;
 
         return cost / 100f;
     }
