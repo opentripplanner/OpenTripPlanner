@@ -3,6 +3,7 @@
 JAR=`ls target/*-shaded*`
 echo JAR=$JAR
 ROUTE_DATA_URL=$OTP_DATA_CONTAINER_URL
+SLEEP_TIME=5
 
 function build_graph {
   echo "building graph..."
@@ -19,19 +20,34 @@ function process {
   URL="$ROUTE_DATA_URL/router-$NAME.zip"
   FILE="$NAME.zip"
   MD5FILE=$FILE.md5
-  echo "Name is: $NAME"
-  echo "URL is: $URL"
 
-  if [[ "$(curl $URL -z $FILE -o $FILE -s -L -w %{http_code})" == "200" ]]; then
-    build_graph $NAME $FILE
-  else
-    echo "file is the same, skipping graph-building"
-  fi
+  echo "Retrieving graph bundle from $URL"
+  until curl -f -s $URL -o $FILE
+  do
+    echo "Error retrieving graph bundle from otp-data-server... retrying in $SLEEP_TIME s..."
+    sleep $SLEEP_TIME
+  done
+
+  build_graph $NAME $FILE
+}
+
+
+function getRouteConfig {
+  URL=$ROUTE_DATA_URL/routers.txt
+  echo "Retrieving router config metadata from $URL"
+  until CONFIG=`curl -f -s $URL`
+  do
+    echo "Error retrieving graph config from otp-data-server... retrying in $SLEEP_TIME s..."
+    sleep $SLEEP_TIME
+  done
 }
 
 GRAPH_STRING=""
-for GRAPH in `curl -s $ROUTE_DATA_URL/routers.txt|cut -d'-' -f2|cut -d'.' -f1`
+getRouteConfig
+
+for GRAPHFILE in $CONFIG
 do
+  GRAPH=`echo $GRAPHFILE|cut -d '.' -f 1|cut -d'-' -f2` 
   process $GRAPH
   GRAPH_STRING="$GRAPH_STRING --router $GRAPH"
 done
