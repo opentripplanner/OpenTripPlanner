@@ -22,11 +22,13 @@ function process {
   MD5FILE=$FILE.md5
 
   echo "Retrieving graph bundle from $URL"
-  until `curl -f -s $URL`
+  until curl -f -s $URL -o $FILE
   do
     echo "Error retrieving graph bundle from otp-data-server... retrying in $SLEEP_TIME s..."
     sleep $SLEEP_TIME
   done
+
+  build_graph $NAME $FILE
 }
 
 
@@ -43,9 +45,9 @@ function getRouteConfig {
 GRAPH_STRING=""
 getRouteConfig
 
-for GRAPH in `echo $CONFIG |cut -d'-' -f2|cut -d'.' -f1`
-
+for GRAPHFILE in $CONFIG
 do
+  GRAPH=`echo $GRAPHFILE|cut -d '.' -f 1|cut -d'-' -f2` 
   process $GRAPH
   GRAPH_STRING="$GRAPH_STRING --router $GRAPH"
 done
