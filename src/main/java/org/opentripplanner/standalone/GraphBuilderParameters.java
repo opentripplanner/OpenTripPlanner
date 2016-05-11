@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -96,6 +97,11 @@ public class GraphBuilderParameters {
      * A custom OSM namer to use.
      */
     public final CustomNamer customNamer;
+    
+    /**
+     * Custom OSM way properties
+     */
+    public final WayPropertySetSource wayPropertySet;
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
@@ -134,6 +140,7 @@ public class GraphBuilderParameters {
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
+        wayPropertySet = WayPropertySetSource.WayPropertySetSourceFactory.fromConfig(config.path("osmWayPropertySet"));
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);

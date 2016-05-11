@@ -575,13 +575,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         return props;
     }
 
-    private void createNames(WayPropertySet propset, String spec, String patternKey) {
+    protected void createNames(WayPropertySet propset, String spec, String patternKey) {
         String pattern = patternKey;
         CreativeNamer namer = new CreativeNamer(pattern);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
-    private void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
+    protected void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
         String pattern = patternKey;
         //TODO: notes aren't localized
         NoteProperties properties = new NoteProperties(pattern, matcher);
@@ -596,12 +596,12 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     /**
      * Note that the safeties here will be adjusted such that the safest street has a safety value of 1, with all others scaled proportionately.
      */
-    private void setProperties(WayPropertySet propset, String spec,
+    protected void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission, double safety, double safetyBack) {
         setProperties(propset, spec, permission, safety, safetyBack, false);
     }
 
-    private void setProperties(WayPropertySet propset, String spec,
+    protected void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
         WayProperties properties = new WayProperties();
         properties.setPermission(permission);
@@ -609,7 +609,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         propset.addProperties(new OSMSpecifier(spec), properties, mixin);
     }
 
-    private void setCarSpeed(WayPropertySet propset, String spec, float speed) {
+    protected void setCarSpeed(WayPropertySet propset, String spec, float speed) {
         SpeedPicker picker = new SpeedPicker();
         picker.specifier = new OSMSpecifier(spec);
         picker.speed = speed;

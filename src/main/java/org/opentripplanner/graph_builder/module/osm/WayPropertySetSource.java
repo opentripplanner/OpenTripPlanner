@@ -13,16 +13,50 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+
 /**
  * Factory interface for providing a {@link WayPropertySet} that determine how OSM
  * streets can be traversed in various modes and named.
  *
- * TODO clarify why we need a factory interface for this.
- *
- * @author bdferris, novalis
- * @see WayProperty
- * @see OpenStreetMapModule#setWayPropertySetSource(WayPropertySetSource)
+ * @author bdferris, novalis, seime
  */
 public interface WayPropertySetSource {
+
     public WayPropertySet getWayPropertySet();
+    
+    public class WayPropertySetSourceFactory {
+
+        /**
+         * Return default way properties if not configured or if 
+         */
+        public static WayPropertySetSource fromConfig(JsonNode config) {
+            String type = null;
+            if (config == null || config instanceof MissingNode) {
+                /* Empty block, fallback to default */
+                return new DefaultWayPropertySetSource();
+            } else if (config.isTextual()) {
+                /* Simplest form: { wayPropertySet : "norway" } */
+                type = config.asText();
+            }
+
+            WayPropertySetSource retval;
+            switch (type) {
+            // Support "default" as well
+            case "default":
+                retval = new DefaultWayPropertySetSource();
+                break;
+            case "norway":
+                retval = new NorwayWayPropertySetSource();
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'",
+                        type));
+            }
+
+            return retval;
+        }
+    }
+
 }

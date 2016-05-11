@@ -47,6 +47,8 @@ Finally, bicycles are *not*allowed on *highway=footway* when any of the followin
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
 
+See [osmWayPropertySet config attribute](Configuration#Way-property-sets)
+
 ### Further information
 * [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
 * [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)

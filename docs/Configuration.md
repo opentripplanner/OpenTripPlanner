@@ -235,8 +235,22 @@ The current list of `combinationStrategy` is:
 
 - `additive` - simply adds all sub-fares.
 
+## OSM / OpenStreetMap configuration
 
-## Custom OSM naming
+### Way property sets
+
+You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
+
+```JSON
+// build-config.json
+{
+  osmWayPropertySet: "norway"
+}
+```
+
+There are currently 2 wayPropertySets defined; "default" and "norway".
+
+### Custom naming
 
 You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field in `build-config.json`,
 such as:
