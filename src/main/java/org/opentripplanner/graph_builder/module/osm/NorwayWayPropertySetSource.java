@@ -33,9 +33,9 @@ public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
     public WayPropertySet getWayPropertySet() {
         
         // Override only the default values
-        WayPropertySet props = super.getWayPropertySet();
+        WayPropertySet props = new WayPropertySet();
         
-
+        // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
         setProperties(props, "highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
                 2.06);
         setProperties(props, "highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
@@ -45,6 +45,7 @@ public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
 
         /*
          * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
+         * 
          */
         setCarSpeed(props, "highway=motorway", 25); // 90kph
         setCarSpeed(props, "highway=motorway_link", 15); // = 54kph
@@ -53,7 +54,8 @@ public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
         setCarSpeed(props, "highway=primary", 22.22f); // 80kph
         setCarSpeed(props, "highway=primary_link", 15); // = 54kph
 
-        // Other car speeds are not specified, using default values from parent class
+        // Read the rest from the default set
+        super.populateProperties(props);
         
         return props;
     }
