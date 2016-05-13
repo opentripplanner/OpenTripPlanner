@@ -61,7 +61,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     @Override
     public WayPropertySet getWayPropertySet() {
         WayPropertySet props = new WayPropertySet();
-
+        populateProperties(props);
+        return props;
+        
+    }
+    
+    /* Populate properties on existing WayPropertySet. Makes it easer to override any properties by sub classes. */
+    protected void populateProperties(WayPropertySet props) {
         /* no bicycle tags */
 
         /* NONE */
@@ -572,7 +578,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
         props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
-        return props;
     }
 
     protected void createNames(WayPropertySet propset, String spec, String patternKey) {
@@ -608,7 +613,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
         propset.addProperties(new OSMSpecifier(spec), properties, mixin);
     }
-
+    
     protected void setCarSpeed(WayPropertySet propset, String spec, float speed) {
         SpeedPicker picker = new SpeedPicker();
         picker.specifier = new OSMSpecifier(spec);
