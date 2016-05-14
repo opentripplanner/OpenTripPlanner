@@ -181,6 +181,9 @@ public class IndexGraphQLSchema {
             if (o instanceof StopCluster) {
                 return (GraphQLObjectType) clusterType;
             }
+            if (o instanceof GraphIndex.StopAndDistance) {
+                return (GraphQLObjectType) stopAtDistanceType;
+            }
             if (o instanceof Stop) {
                 return (GraphQLObjectType) stopType;
             }
@@ -662,6 +665,14 @@ public class IndexGraphQLSchema {
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay.toGlobalId(stopAtDistanceType.getName(),
+                    Integer.toString(((GraphIndex.StopAndDistance) environment.getSource()).distance) + ";" +
+                    GtfsLibrary.convertIdToString(((GraphIndex.StopAndDistance) environment.getSource()).stop.getId())))
+                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
@@ -1426,6 +1437,11 @@ public class IndexGraphQLSchema {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
                 if (id.type.equals(clusterType.getName())) {
                     return index.stopClusterForId.get(id.id);
+                }
+                if (id.type.equals(stopAtDistanceType.getName())) {
+                    return new GraphIndex.StopAndDistance(
+                        index.stopForId.get(GtfsLibrary.convertIdFromString(id.id.split(";", 2)[1])),
+                        Integer.parseInt(id.id.split(";", 2)[0], 10));
                 }
                 if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
