@@ -46,6 +46,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -1590,19 +1591,25 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(relay.getConnectionFieldArguments())
-                .dataFetcher(environment ->
-                    new SimpleListConnection(index.findClosestStopsByWalking(
-                        environment.getArgument("lat"),
-                        environment.getArgument("lon"),
-                        environment.getArgument("radius")
-                    )
-                        .stream()
-                        .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                            stopAndDistance.stop.getId().getAgencyId()
-                                .equalsIgnoreCase(environment.getArgument("agency")))
-                        .sorted(Comparator.comparing(s -> s.distance))
-                        .collect(Collectors.toList()))
-                        .get(environment))
+                .dataFetcher(environment -> {
+                    List<GraphIndex.StopAndDistance> stops;
+                    try {
+                        stops = index.findClosestStopsByWalking(
+                            environment.getArgument("lat"),
+                            environment.getArgument("lon"),
+                            environment.getArgument("radius"))
+                            .stream()
+                            .filter(stopAndDistance -> environment.getArgument("agency") == null ||
+                                stopAndDistance.stop.getId().getAgencyId()
+                                    .equalsIgnoreCase(environment.getArgument("agency")))
+                            .sorted(Comparator.comparing(s -> s.distance))
+                            .collect(Collectors.toList());
+                    } catch (VertexNotFoundException e) {
+                        stops = Collections.emptyList();
+                    }
+
+                    return new SimpleListConnection(stops).get(environment);
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
