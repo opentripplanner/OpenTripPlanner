@@ -46,6 +46,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -180,6 +181,9 @@ public class IndexGraphQLSchema {
         public GraphQLObjectType getType(Object o) {
             if (o instanceof StopCluster) {
                 return (GraphQLObjectType) clusterType;
+            }
+            if (o instanceof GraphIndex.StopAndDistance) {
+                return (GraphQLObjectType) stopAtDistanceType;
             }
             if (o instanceof Stop) {
                 return (GraphQLObjectType) stopType;
@@ -662,6 +666,14 @@ public class IndexGraphQLSchema {
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay.toGlobalId(stopAtDistanceType.getName(),
+                    Integer.toString(((GraphIndex.StopAndDistance) environment.getSource()).distance) + ";" +
+                    GtfsLibrary.convertIdToString(((GraphIndex.StopAndDistance) environment.getSource()).stop.getId())))
+                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
@@ -1427,6 +1439,11 @@ public class IndexGraphQLSchema {
                 if (id.type.equals(clusterType.getName())) {
                     return index.stopClusterForId.get(id.id);
                 }
+                if (id.type.equals(stopAtDistanceType.getName())) {
+                    return new GraphIndex.StopAndDistance(
+                        index.stopForId.get(GtfsLibrary.convertIdFromString(id.id.split(";", 2)[1])),
+                        Integer.parseInt(id.id.split(";", 2)[0], 10));
+                }
                 if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
                 }
@@ -1574,19 +1591,25 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(relay.getConnectionFieldArguments())
-                .dataFetcher(environment ->
-                    new SimpleListConnection(index.findClosestStopsByWalking(
-                        environment.getArgument("lat"),
-                        environment.getArgument("lon"),
-                        environment.getArgument("radius")
-                    )
-                        .stream()
-                        .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                            stopAndDistance.stop.getId().getAgencyId()
-                                .equalsIgnoreCase(environment.getArgument("agency")))
-                        .sorted(Comparator.comparing(s -> s.distance))
-                        .collect(Collectors.toList()))
-                        .get(environment))
+                .dataFetcher(environment -> {
+                    List<GraphIndex.StopAndDistance> stops;
+                    try {
+                        stops = index.findClosestStopsByWalking(
+                            environment.getArgument("lat"),
+                            environment.getArgument("lon"),
+                            environment.getArgument("radius"))
+                            .stream()
+                            .filter(stopAndDistance -> environment.getArgument("agency") == null ||
+                                stopAndDistance.stop.getId().getAgencyId()
+                                    .equalsIgnoreCase(environment.getArgument("agency")))
+                            .sorted(Comparator.comparing(s -> s.distance))
+                            .collect(Collectors.toList());
+                    } catch (VertexNotFoundException e) {
+                        stops = Collections.emptyList();
+                    }
+
+                    return new SimpleListConnection(stops).get(environment);
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")

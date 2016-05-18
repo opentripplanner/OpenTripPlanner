@@ -26,6 +26,15 @@
          "avl_bikes" : 5,
          "free_slots" : 5,
          "total_slots" : 5
+      },
+      {
+         "name" : "B08 Invalid",
+         "operative" : true,
+         "coordinates" : "",
+         "style" : "",
+         "avl_bikes" : 5,
+         "free_slots" : 5,
+         "total_slots" : 5
       }
    ]
 }
