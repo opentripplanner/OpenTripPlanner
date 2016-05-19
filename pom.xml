@@ -12,9 +12,8 @@
     <packaging>jar</packaging>
 
     <scm>
-      <connection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</connection>
-      <developerConnection>scm:git:ssh://git@bitbucket.org/rutebanken/opentripplanner.git</developerConnection>
-      <tag>HEAD</tag>
+      <connection>scm:git:ssh://git@github.com:rutebanken/OpenTripPlanner.git</connection>
+      <developerConnection>scm:git:ssh://git@github.com:rutebanken/OpenTripPlanner.git</developerConnection>
   </scm>
 
     <properties>
