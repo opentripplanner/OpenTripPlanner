@@ -171,7 +171,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         } else {
-            // The main search is not on a street, it's probably on transit.
+            // The main search is not currently on a street vertex, it's probably on transit.
             // If the current part of the transit network has been explored, then return the stored lower bound.
             // Otherwise return the highest lower bound yet seen -- this location must have a higher cost than that.
             double h = postBoardingWeights.get(v);
@@ -265,6 +265,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * TODO what if the egress segment is by bicycle or car mode? This is no longer admissible.
      */
     private TObjectDoubleMap<Vertex> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
+        LOG.debug("Heuristic street search around the {}.", fromTarget ? "target" : "origin");
         rr = rr.clone();
         if (fromTarget) {
             rr.setArriveBy(!rr.arriveBy);
@@ -287,7 +288,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // This is the lowest cost we will ever see for this vertex. We can record the cost to reach it.
             if (v instanceof TransitStop) {
                 // We don't want to continue into the transit network yet, but when searching around the target
-                // place vertices on the transit queue so we can explore it later.
+                // place vertices on the transit queue so we can explore the transit network backward later.
                 if (fromTarget) {
                     double weight = s.getWeight();
                     transitQueue.insert(v, weight);
@@ -315,6 +316,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         }
+        LOG.debug("Heuristric street search hit {} vertices.", vertices.size());
+        LOG.debug("Heuristric street search hit {} transit stops.", transitQueue.size());
         return vertices;
     }
  

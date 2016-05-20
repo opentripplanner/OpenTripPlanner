@@ -113,6 +113,11 @@ public class GraphBuilderParameters {
     public boolean staticBikeParkAndRide = false;
 
     /**
+     * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
+     */
+    public int maxInterlineDistance = 200;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -138,6 +143,7 @@ public class GraphBuilderParameters {
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
         maxHtmlAnnotationsPerFile = config.path("maxHtmlAnnotationsPerFile").asInt(1000);
+        maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
     }
 
 }

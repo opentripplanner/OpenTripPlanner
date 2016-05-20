@@ -49,8 +49,6 @@ public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
-    public static final String OTP_CONFIG_FILENAME = "otp-config.json";
-
     private final CommandLineParameters params;
     public OTPServer otpServer = null;
     public GraphService graphService = null;

@@ -29,7 +29,6 @@
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
   <!-- Avoid printing ugly warning message when unable to create websocket connection -->
   <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="error" />
-  
   <logger name="com.sun.jersey" level="debug" />
-  
+
 </configuration>
