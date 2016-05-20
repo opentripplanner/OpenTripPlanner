@@ -1,0 +1,40 @@
+{
+   "result" : [
+      {
+         "name" : "A04 Hamn",
+         "operative" : true,
+         "coordinates" : "60.167913, 24.952269",
+         "style" : "",
+         "avl_bikes" : 1,
+         "free_slots" : 11,
+         "total_slots" : 12
+      },
+      {
+         "name" : "B05 Fake",
+         "operative" : false,
+         "coordinates" : "60, 24",
+         "style" : "",
+         "avl_bikes" : 5,
+         "free_slots" : 5,
+         "total_slots" : 5
+      },
+      {
+         "name" : "B06 Foo",
+         "operative" : true,
+         "coordinates" : "61,25",
+         "style" : "",
+         "avl_bikes" : 5,
+         "free_slots" : 5,
+         "total_slots" : 5
+      },
+      {
+         "name" : "B08 Invalid",
+         "operative" : true,
+         "coordinates" : "",
+         "style" : "",
+         "avl_bikes" : 5,
+         "free_slots" : 5,
+         "total_slots" : 5
+      }
+   ]
+}

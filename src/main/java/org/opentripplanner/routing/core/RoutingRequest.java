@@ -17,6 +17,8 @@ import com.google.common.base.Objects;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -35,12 +37,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -1174,5 +1182,47 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
+    }
+
+    public void parseTime(TimeZone tz, String date, String time) {
+        if (date == null && time != null) { // Time was provided but not date
+            LOG.debug("parsing ISO datetime {}", time);
+            try {
+                // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
+                DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
+                GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+                if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                    gregCal.setTimeZone(tz);
+                }
+                Date d2 = gregCal.getTime();
+                setDateTime(d2);
+            } catch (DatatypeConfigurationException e) {
+                setDateTime(date, time, tz);
+            }
+        } else {
+            setDateTime(date, time, tz);
+        }
+    }
+
+    public static void assertTriangleParameters(Double triangleSafetyFactor, Double triangleTimeFactor, Double triangleSlopeFactor) throws ParameterException {
+        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
+            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
+        }
+        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
+            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
+        }
+        // FIXME couldn't this be simplified by only specifying TWO of the values?
+        if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
+            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
+        }
+    }
+
+    public void assertSlack() {
+        if (boardSlack + alightSlack > transferSlack) {
+            // TODO thrown exception type is not consistent with assertTriangleParameters
+            throw new RuntimeException("Invalid parameters: " +
+                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        }
     }
 }
