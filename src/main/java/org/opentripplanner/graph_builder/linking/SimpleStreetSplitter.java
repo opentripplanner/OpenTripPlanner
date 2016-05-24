@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely close to the street
@@ -98,23 +99,56 @@ public class SimpleStreetSplitter {
                     else if (v instanceof BikeParkVertex)
                         LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
                 };
+            }
         }
     }
 
-    /** Link this vertex into the graph */
-    public boolean link (Vertex vertex) {
-        // find nearby street edges
-        // TODO: we used to use an expanding-envelope search, which is more efficient in
-        // dense areas. but first let's see how inefficient this is. I suspect it's not too
-        // bad and the gains in simplicity are considerable.
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
+    /**
+     * Iteratively search the area around a location and find all the close by edges that can be traversed.
+     * This method tries to collect at least 10 candidates per iteration in order to prevent the loss of
+     * edges that are approximately at the same distance from the center. This number is arbitrary, though.
+     * <p>
+     * Note that the returned list is unsorted.
+     *
+     * @param vertex the center vertex
+     * @return a (possibly empty) list of edges close to the vertex
+     */
+    private List<StreetEdge> getCandidateEdges(Vertex vertex) {
+        List<StreetEdge> edges;
+        double maxRadiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
+        int iteration = 7; // We double the radius at most n times
 
-        Envelope env = new Envelope(vertex.getCoordinate());
+        final TraverseModeSet traverseModeSet = new TraverseModeSet(TraverseMode.WALK);
+        final Envelope env = new Envelope(vertex.getCoordinate());
+        double xscale = Math.cos(vertex.getLat() * Math.PI / 180);
+        double radius = maxRadiusDeg / (1 << (iteration - 1));
+        env.expandBy(radius / xscale, radius);
+
+        do {
+            //Do the envelope query and filter edges that can be traversed and that are still in the
+            //graph
+            edges = idx.query(env).stream().parallel().filter(edge ->
+                    edge.canTraverse(traverseModeSet) &&
+                            edge.getToVertex().getIncoming().contains(edge)
+            ).collect(Collectors.toList());
+
+            iteration--;
+            radius = maxRadiusDeg / (1 << iteration);
+            env.expandBy(radius / xscale, radius);
+        } while (edges.size() < 10 && iteration > 0);
+
+        return edges;
+    }
+
+    /**
+     * Link this vertex into the graph
+     */
+    public boolean link(Vertex vertex) {
+        // find nearby street edges
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
 
         // local equirectangular projection
         final double xscale = Math.cos(vertex.getLat() * Math.PI / 180);
-
-        env.expandBy(radiusDeg / xscale, radiusDeg);
 
         double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
@@ -122,20 +156,7 @@ public class SimpleStreetSplitter {
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
-        // TODO all the code below looks like a good candidate for Java 8 streams and lambdas
-        List<StreetEdge> candidateEdges = new ArrayList<StreetEdge>(
-                Collections2.filter(idx.query(env), new Predicate<StreetEdge>() {
-
-                    @Override
-                    public boolean apply(StreetEdge edge) {
-                        // note: not filtering by radius here as distance calculation is expensive
-                        // we do that below.
-                        return edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)) &&
-                                // only link to edges still in the graph.
-                                edge.getToVertex().getIncoming().contains(edge);
-                    }
-                })
-                );
+        List<StreetEdge> candidateEdges = getCandidateEdges(vertex);
 
         // make a map of distances
         final TIntDoubleMap distances = new TIntDoubleHashMap();
@@ -145,19 +166,8 @@ public class SimpleStreetSplitter {
         }
 
         // sort the list
-        Collections.sort(candidateEdges, new Comparator<StreetEdge> () {
-
-            @Override
-            public int compare(StreetEdge o1, StreetEdge o2) {
-                double diff = distances.get(o1.getId()) - distances.get(o2.getId());
-                if (diff < 0)
-                    return -1;
-                if (diff > 0)
-                    return 1;
-                return 0;
-            }
-
-        });
+        Collections.sort(candidateEdges, (o1, o2) ->
+                Double.compare(distances.get(o1.getId()), distances.get(o2.getId())));
 
         // find the closest candidate edges
         if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg)
