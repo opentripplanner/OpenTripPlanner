@@ -41,7 +41,7 @@ public class OSMSpecifier {
     }
 
     public void setKvpairs(String spec) {
-        String[] pairs = spec.split(";");
+        String[] pairs = spec.toLowerCase().split(";");
         for (String pair : pairs) {
             String[] kv = pair.split("=");
             kvpairs.add(new P2<String>(kv[0], kv[1]));
@@ -64,8 +64,8 @@ public class OSMSpecifier {
         for (P2<String> pair : kvpairs) {
             // TODO why are we repeatedly converting these to lower case every time they are used?
             // Probably because it used to be possible to set them from Spring XML.
-            String tag = pair.first.toLowerCase();
-            String value = pair.second.toLowerCase();
+            String tag = pair.first;
+            String value = pair.second;
             String leftMatchValue = match.getTag(tag + ":left");
             String rightMatchValue = match.getTag(tag + ":right");
             String matchValue = match.getTag(tag);
