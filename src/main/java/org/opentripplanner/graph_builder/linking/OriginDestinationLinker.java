@@ -13,6 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,9 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
     @Override
     protected void makeLinkEdges(Vertex from, StreetVertex to) {
         TemporaryStreetLocation tse = (TemporaryStreetLocation) from;
+        if (to instanceof TemporarySplitterVertex) {
+            tse.setWheelchairAccessible(((TemporarySplitterVertex) to).isWheelchairAccessible());
+        }
         if (tse.isEndVertex()) {
             LOG.debug("Linking end vertex to {} -> {}", to, tse);
             new TemporaryFreeEdge(to, tse);

@@ -252,6 +252,11 @@ public class SimpleStreetSplitter {
         if (temporarySplit) {
             v = new TemporarySplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
                 edge, endVertex);
+            if (edge.isWheelchairAccessible()) {
+                ((TemporarySplitterVertex) v).setWheelchairAccessible(true);
+            } else {
+                ((TemporarySplitterVertex) v).setWheelchairAccessible(false);
+            }
         } else {
             v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
                 edge);

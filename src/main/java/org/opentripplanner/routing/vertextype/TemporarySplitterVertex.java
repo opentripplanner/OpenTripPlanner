@@ -11,6 +11,9 @@ import org.opentripplanner.routing.graph.Graph;
  * Created by mabu on 20.5.2016.
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
+
+    private boolean wheelchairAccessible;
+
     final private boolean endVertex;
 
     public TemporarySplitterVertex(Graph g, String label, double x, double y, StreetEdge streetEdge,
@@ -59,5 +62,13 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
         for (Object temp : endVertex ? getIncoming() : getOutgoing()) {
             ((TemporaryEdge) temp).dispose();
         }
+    }
+
+    public boolean isWheelchairAccessible() {
+        return wheelchairAccessible;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 }
