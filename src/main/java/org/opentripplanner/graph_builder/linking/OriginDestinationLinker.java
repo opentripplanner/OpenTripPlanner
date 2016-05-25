@@ -46,14 +46,17 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
         TemporaryStreetLocation closest = new TemporaryStreetLocation(
             "corner " + Math.random(), coord, new NonLocalizedString("generated point"), endVertex);
 
-        TraverseModeSet modes = options.modes;
         TraverseMode nonTransitMode = TraverseMode.WALK;
-        if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
-        else if (modes.getWalk())
-            nonTransitMode = TraverseMode.WALK;
-        else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
+        //It can be null in tests
+        if (options != null) {
+            TraverseModeSet modes = options.modes;
+            if (modes.getCar())
+                nonTransitMode = TraverseMode.CAR;
+            else if (modes.getWalk())
+                nonTransitMode = TraverseMode.WALK;
+            else if (modes.getBicycle())
+                nonTransitMode = TraverseMode.BICYCLE;
+        }
 
         if(!link(closest, nonTransitMode)) {
             LOG.warn("Couldn't link {}", location);
