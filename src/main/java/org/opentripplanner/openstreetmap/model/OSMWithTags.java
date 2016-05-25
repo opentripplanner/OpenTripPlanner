@@ -57,7 +57,7 @@ public class OSMWithTags {
         if (_tags == null)
             _tags = new HashMap<String, String>();
 
-        _tags.put(tag.getK().toLowerCase(), tag.getV().toLowerCase());
+        _tags.put(tag.getK().toLowerCase(), tag.getV());
     }
 
     /**
@@ -70,7 +70,7 @@ public class OSMWithTags {
         if (_tags == null)
             _tags = new HashMap<String, String>();
 
-        _tags.put(key.toLowerCase(), value.toLowerCase());
+        _tags.put(key.toLowerCase(), value);
     }
 
     /**
@@ -125,7 +125,8 @@ public class OSMWithTags {
 
     /** @return a tag's value, converted to lower case. */
     public String getTag(String tag) {
-        if (_tags != null) {
+        tag = tag.toLowerCase();
+        if (_tags != null && _tags.containsKey(tag)) {
             return _tags.get(tag);
         }
         return null;
