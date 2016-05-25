@@ -31,6 +31,8 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,8 +103,13 @@ public class SimpleStreetSplitter {
         }
     }
 
-    /** Link this vertex into the graph */
+    /** Link this vertex into the graph to the closest walkable edge */
     public boolean link (Vertex vertex) {
+        return link(vertex, TraverseMode.WALK);
+    }
+
+    /** Link this vertex into the graph */
+    public boolean link(Vertex vertex, TraverseMode traverseMode) {
         // find nearby street edges
         // TODO: we used to use an expanding-envelope search, which is more efficient in
         // dense areas. but first let's see how inefficient this is. I suspect it's not too
@@ -130,7 +137,7 @@ public class SimpleStreetSplitter {
                     public boolean apply(StreetEdge edge) {
                         // note: not filtering by radius here as distance calculation is expensive
                         // we do that below.
-                        return edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)) &&
+                        return edge.canTraverse(new TraverseModeSet(traverseMode)) &&
                                 // only link to edges still in the graph.
                                 edge.getToVertex().getIncoming().contains(edge);
                     }
@@ -209,43 +216,76 @@ public class SimpleStreetSplitter {
             makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
         }
 
-        else {	
+        else {
+
+            TemporaryVertex temporaryVertex = null;
+            boolean endVertex = false;
+            if (tstop instanceof TemporaryVertex) {
+                temporaryVertex = (TemporaryVertex) tstop;
+                endVertex = temporaryVertex.isEndVertex();
+
+            }
             // split the edge, get the split vertex
-            SplitterVertex v0 = split(edge, ll);
+            SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
         }
     }
 
-    /** Split the street edge at the given fraction */
-    private SplitterVertex split (StreetEdge edge, LinearLocation ll) {
+
+    /**
+     * Split the street edge at the given fraction
+     *
+     * @param edge to be split
+     * @param ll fraction at which to split the edge
+     * @param temporarySplit if true this is temporary split at origin/destinations search and only temporary edges vertices are created
+     * @param endVertex if this is temporary edge this is true if this is end vertex otherwise it doesn't matter
+     * @return Splitter vertex with added new edges
+     */
+    private SplitterVertex split (StreetEdge edge, LinearLocation ll, boolean temporarySplit, boolean endVertex) {
         LineString geometry = edge.getGeometry();
 
         // create the geometries
         Coordinate splitPoint = ll.getCoordinate(geometry);
 
         // every edge can be split exactly once, so this is a valid label
-        SplitterVertex v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y, edge);
+        SplitterVertex v;
+        if (temporarySplit) {
+            v = new TemporarySplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
+                edge, endVertex);
+        } else {
+            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
+                edge);
+        }
 
         // make the edges
         // TODO this is using the StreetEdge implementation of split, which will discard elevation information
         // on edges that have it
-        P2<StreetEdge> edges = edge.split(v);
+        P2<StreetEdge> edges = edge.split(v, !temporarySplit);
 
-        // update indices
-        idx.insert(edges.first.getGeometry().getEnvelopeInternal(), edges.first);
-        idx.insert(edges.second.getGeometry().getEnvelopeInternal(), edges.second);
+        //this functions are created so they can be overridden in OriginDestinationLinker where they should do nothing.
+        updateIndex(edges);
 
-        // (no need to remove original edge, we filter it when it comes out of the index)
-
-        // remove original edge
-        edge.getToVertex().removeIncoming(edge);
-        edge.getFromVertex().removeOutgoing(edge);
+        removeOriginalEdge(edge);
 
         return v;
     }
 
+    protected void removeOriginalEdge(StreetEdge edge) {
+        // remove original edge from the graph
+        edge.getToVertex().removeIncoming(edge);
+        edge.getFromVertex().removeOutgoing(edge);
+    }
+
+    protected void updateIndex(P2<StreetEdge> edges) {
+        // update indices of new edges
+        idx.insert(edges.first.getGeometry().getEnvelopeInternal(), edges.first);
+        idx.insert(edges.second.getGeometry().getEnvelopeInternal(), edges.second);
+
+        // (no need to remove original edge, we filter it when it comes out of the index)
+    }
+
     /** Make the appropriate type of link edges from a vertex */
-    private void makeLinkEdges (Vertex from, StreetVertex to) {
+    protected void makeLinkEdges (Vertex from, StreetVertex to) {
         if  (from instanceof TransitStop)
             makeTransitLinkEdges((TransitStop) from, to);
         else if (from instanceof BikeRentalStationVertex)
