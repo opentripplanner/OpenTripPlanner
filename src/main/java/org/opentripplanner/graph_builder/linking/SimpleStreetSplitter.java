@@ -125,6 +125,12 @@ public class SimpleStreetSplitter {
 
         double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
+        final TraverseModeSet traverseModeSet;
+        if (traverseMode == TraverseMode.BICYCLE) {
+            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
+        } else {
+            traverseModeSet = new TraverseModeSet(traverseMode);
+        }
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
@@ -137,7 +143,7 @@ public class SimpleStreetSplitter {
                     public boolean apply(StreetEdge edge) {
                         // note: not filtering by radius here as distance calculation is expensive
                         // we do that below.
-                        return edge.canTraverse(new TraverseModeSet(traverseMode)) &&
+                        return edge.canTraverse(traverseModeSet) &&
                                 // only link to edges still in the graph.
                                 edge.getToVertex().getIncoming().contains(edge);
                     }
