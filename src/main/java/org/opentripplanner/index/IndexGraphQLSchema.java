@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
@@ -2054,10 +2056,22 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).itinerary)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("messages")
-                .description("A list of possible error messages")
+                .name("messageEnums")
+                .description("A list of possible error messages as enum")
                 .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-                .dataFetcher(environment -> (((Map)environment.getSource()).get("messages")))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream().map(message -> message.name()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("messageStrings")
+                .description("A list of possible error messages in cleartext")
+                .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream()
+                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(
+                        environment.getArgument("locale")
+                    )))
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("debugOutput")

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.Place;
@@ -50,7 +51,7 @@ public class GraphQlPlanner {
             new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
             new Place(request.to.lng, request.to.lat, request.getToPlace().name),
             request.getDateTime());
-        List<String> messages = new ArrayList<>();
+        List<Message> messages = new ArrayList<>();
         DebugOutput debugOutput = null;
 
         try {
@@ -60,7 +61,7 @@ public class GraphQlPlanner {
             PlannerError error = new PlannerError(e);
             if(!PlannerError.isPlanningError(e.getClass()))
                 LOG.warn("Error while planning path: ", e);
-            messages.add(error.message.get(request.locale));
+            messages.add(error.message);
         } finally {
             if (request != null) {
                 if (request.rctx != null) {
