@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
@@ -2033,26 +2035,56 @@ public class IndexGraphQLSchema {
                 .name("date")
                 .description("The time and date of travel")
                 .type(Scalars.GraphQLLong)
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).date.getTime())
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).date.getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("from")
                 .description("The origin")
                 .type(new GraphQLNonNull(placeType))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).from)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).from)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("to")
                 .description("The destination")
                 .type(new GraphQLNonNull(placeType))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).to)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).to)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("itineraries")
                 .description("A list of possible itineraries")
                 .type(new GraphQLNonNull(new GraphQLList(itineraryType)))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).itinerary)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).itinerary)
                 .build())
-             .build();
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("messageEnums")
+                .description("A list of possible error messages as enum")
+                .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream().map(message -> message.name()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("messageStrings")
+                .description("A list of possible error messages in cleartext")
+                .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream()
+                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(
+                        environment.getArgument("locale")
+                    )))
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("debugOutput")
+                .description("Information about the timings for the plan generation")
+                .type(new GraphQLNonNull(GraphQLObjectType.newObject()
+                    .name("debugOutput")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("totalTime")
+                        .type(Scalars.GraphQLLong)
+                        .build())
+                    .build()))
+                .dataFetcher(environment -> (((Map)environment.getSource()).get("debugOutput")))
+                .build())
+            .build();
     }
 }

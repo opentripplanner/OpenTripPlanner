@@ -1,18 +1,23 @@
 package org.opentripplanner.index;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -24,21 +29,53 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphQlPlanner {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GraphQlPlanner.class);
+
     private GraphIndex index;
 
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
     }
 
-    public TripPlan plan(DataFetchingEnvironment environment) {
+    public Map<String, Object> plan(DataFetchingEnvironment environment) {
         Router router = (Router)environment.getContext();
         RoutingRequest request = createRequest(environment);
         GraphPathFinder gpFinder = new GraphPathFinder(router);
-        List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
-        TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);        
-        return plan;
+
+        TripPlan plan = new TripPlan(
+            new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
+            new Place(request.to.lng, request.to.lat, request.getToPlace().name),
+            request.getDateTime());
+        List<Message> messages = new ArrayList<>();
+        DebugOutput debugOutput = null;
+
+        try {
+            List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
+            plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
+        } catch (Exception e) {
+            PlannerError error = new PlannerError(e);
+            if(!PlannerError.isPlanningError(e.getClass()))
+                LOG.warn("Error while planning path: ", e);
+            messages.add(error.message);
+        } finally {
+            if (request != null) {
+                if (request.rctx != null) {
+                    debugOutput = request.rctx.debugOutput;
+                }
+                request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
+            }
+        }
+
+        return ImmutableMap.<String, Object>builder()
+            .put("plan", plan)
+            .put("messages", messages)
+            .put("debugOutput", debugOutput)
+            .build();
     }
 
     private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
