@@ -1201,6 +1201,29 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripsForDate")
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDay")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .type(new GraphQLList(new GraphQLNonNull(tripType)))
+                .dataFetcher(environment -> {
+                    try {
+                        TripPattern pattern = (TripPattern) environment.getSource();
+                        BitSet services = index.servicesRunning(
+                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                        );
+                        return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
+                            .stream()
+                            .filter(times -> services.get(times.serviceCode))
+                            .map(times -> times.trip)
+                            .collect(Collectors.toList());
+                    } catch (ParseException e) {
+                        return null; // Invalid date format
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
                 .type(new GraphQLList(new GraphQLNonNull(stopType)))
                 .build())

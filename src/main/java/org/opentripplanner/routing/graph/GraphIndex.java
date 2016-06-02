@@ -617,6 +617,7 @@ public class GraphIndex {
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
+            // TODO: Put correct error code, eg. 400 for synax error
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
