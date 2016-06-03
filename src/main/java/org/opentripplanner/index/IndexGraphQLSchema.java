@@ -1045,6 +1045,16 @@ public class IndexGraphQLSchema {
                     .convertIdToString(((Trip) environment.getSource()).getServiceId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("activeDates")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .dataFetcher(environment -> index.graph.getCalendarService()
+                    .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
+                    .stream()
+                    .map(ServiceDate::getAsString)
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("tripShortName")
                 .type(Scalars.GraphQLString)
                 .build())
@@ -1209,7 +1219,6 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
                 .dataFetcher(environment -> {
                     try {
-                        TripPattern pattern = (TripPattern) environment.getSource();
                         BitSet services = index.servicesRunning(
                             ServiceDate.parseString(environment.getArgument("serviceDay"))
                         );
