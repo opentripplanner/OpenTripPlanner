@@ -1045,6 +1045,16 @@ public class IndexGraphQLSchema {
                     .convertIdToString(((Trip) environment.getSource()).getServiceId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("activeDates")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .dataFetcher(environment -> index.graph.getCalendarService()
+                    .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
+                    .stream()
+                    .map(ServiceDate::getAsString)
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("tripShortName")
                 .type(Scalars.GraphQLString)
                 .build())
@@ -1199,6 +1209,28 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripsForDate")
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDay")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .type(new GraphQLList(new GraphQLNonNull(tripType)))
+                .dataFetcher(environment -> {
+                    try {
+                        BitSet services = index.servicesRunning(
+                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                        );
+                        return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
+                            .stream()
+                            .filter(times -> services.get(times.serviceCode))
+                            .map(times -> times.trip)
+                            .collect(Collectors.toList());
+                    } catch (ParseException e) {
+                        return null; // Invalid date format
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
