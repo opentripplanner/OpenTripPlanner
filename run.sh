@@ -53,4 +53,4 @@ do
 done
 
 echo "graphString is: $GRAPH_STRING"
-java -Xmx7500M -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $GRAPH_STRING
+java -Xmx14000M -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $GRAPH_STRING
