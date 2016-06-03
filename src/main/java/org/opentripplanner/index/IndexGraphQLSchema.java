@@ -43,6 +43,8 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -2059,7 +2061,30 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(new GraphQLList(legType)))
                 .dataFetcher(environment -> ((Itinerary)environment.getSource()).legs)
                 .build())
-             .build();
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("fares")
+                .description("Information about the fares for this itinerary")
+                .type(new GraphQLList(GraphQLObjectType.newObject()
+                    .name("fare")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("type")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getKey().name())
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("currency")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getValue().getCurrency().getCurrencyCode())
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("cents")
+                        .type(Scalars.GraphQLInt)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getValue().getCents())
+                        .build())
+                    .build()))
+                .dataFetcher(environment -> new ArrayList<>(((Itinerary)environment.getSource()).fare.fare.entrySet()))
+                .build())
+            .build();
 
         planType = GraphQLObjectType.newObject()
             .name("Plan")
