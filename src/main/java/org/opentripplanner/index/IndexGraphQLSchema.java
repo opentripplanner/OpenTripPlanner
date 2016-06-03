@@ -2082,7 +2082,8 @@ public class IndexGraphQLSchema {
                         .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getValue().getCents())
                         .build())
                     .build()))
-                .dataFetcher(environment -> new ArrayList<>(((Itinerary)environment.getSource()).fare.fare.entrySet()))
+                .dataFetcher(environment -> ((Itinerary)environment.getSource()).fare != null ?
+                    new ArrayList<>(((Itinerary)environment.getSource()).fare.fare.entrySet()) : null)
                 .build())
             .build();
 
