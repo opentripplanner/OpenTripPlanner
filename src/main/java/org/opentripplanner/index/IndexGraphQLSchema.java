@@ -1702,7 +1702,7 @@ public class IndexGraphQLSchema {
                         stream = stream
                             .filter(route -> route.getShortName() != null)
                             .filter(route -> route.getShortName().toLowerCase().startsWith(
-                                    environment.getArgument("name").toLowerCase())
+                                    ((String) environment.getArgument("name")).toLowerCase())
                             );
                     }
                     if (environment.getArgument("modes") != null) {
