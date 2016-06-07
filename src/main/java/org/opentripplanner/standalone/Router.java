@@ -65,7 +65,6 @@ public class Router {
         this.graph = graph;
     }
 
-
     /**
      * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
      * Current responsibilities are: 1) Binding proper services (depending on the configuration from command-line or
