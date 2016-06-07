@@ -1701,7 +1701,9 @@ public class IndexGraphQLSchema {
                     if (environment.getArgument("name") != null) {
                         stream = stream
                             .filter(route -> route.getShortName() != null)
-                            .filter(route -> route.getShortName().startsWith(environment.getArgument("name")));
+                            .filter(route -> route.getShortName().toLowerCase().startsWith(
+                                    ((String) environment.getArgument("name")).toLowerCase())
+                            );
                     }
                     if (environment.getArgument("modes") != null) {
                         Set<TraverseMode> modes = new QualifiedModeSet(
