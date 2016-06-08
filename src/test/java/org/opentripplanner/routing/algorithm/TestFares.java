@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -108,4 +109,46 @@ public class TestFares extends TestCase {
         // thread on gtfs-changes.
         // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
     }
+    
+    
+    public void testKCM() throws Exception {
+    	
+    	Graph gg = new Graph();
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.KCM_GTFS));
+        
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.setFareServiceFactory(new SeattleFareServiceFactory());
+        
+        factory.run(gg);
+        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        RoutingRequest options = new RoutingRequest();
+        String feedId = gg.getFeedIds().iterator().next();
+       
+        String vertex0 = feedId + ":2010";
+        String vertex1 = feedId + ":2140";
+        ShortestPathTree spt;
+        GraphPath path = null;
+        
+        FareService fareService = gg.getService(FareService.class);        
+        
+        long offPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
+        options.dateTime = offPeakStartTime;
+        options.setRoutingContext(gg, vertex0, vertex1);
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(vertex1), true);
+
+        Fare costOffPeak = fareService.getCost(path);
+        assertEquals(costOffPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 250));
+        
+        long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
+        options.dateTime = onPeakStartTime;
+        options.setRoutingContext(gg, vertex0, vertex1);
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(vertex1), true);
+
+        Fare costOnPeak = fareService.getCost(path);
+        assertEquals(costOnPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 275));
+        
+    }
+
 }

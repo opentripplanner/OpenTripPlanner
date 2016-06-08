@@ -27,6 +27,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -46,6 +47,8 @@ class Ride {
 
     AgencyAndId route;
 
+    AgencyAndId trip;
+    
     Set<String> zones;
 
     String startZone;
@@ -147,6 +150,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.route = state.getRoute();
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
+                ride.trip = state.getTripId();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();
@@ -227,6 +231,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
         Set<String> agencies = new HashSet<String>();
+        Set<AgencyAndId> trips = new HashSet<AgencyAndId>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
@@ -248,6 +253,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             agencies.add(ride.agency);
             routes.add(ride.route);
             zones.addAll(ride.zones);
+            trips.add(ride.trip);
             transfersUsed += 1;
         }
         
@@ -255,6 +261,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         float bestFare = Float.POSITIVE_INFINITY;
         long tripTime = lastRideStartTime - startTime;
         long journeyTime = lastRideEndTime - startTime;
+        	
         // find the best fare that matches this set of rides
         for (FareRuleSet ruleSet : fareRules) {
             FareAttribute attribute = ruleSet.getFareAttribute();
@@ -262,7 +269,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             // check only if the fare is not mapped to an agency
             if (!ruleSet.hasAgencyDefined() && !attribute.getId().getAgencyId().equals(feedId))
                 continue;
-            if (ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
+            
+            if (ruleSet.matches(agencies, startZone, endZone, zones, routes, trips)) {
                 // TODO Maybe move the code below in FareRuleSet::matches() ?
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;

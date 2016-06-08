@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
@@ -69,6 +71,9 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         for (AgencyAndId route : fareRule.getRoutes())
             newFareRule.addRoute(route);
         
+        for (AgencyAndId trip : fareRule.getTrips())
+        	newFareRule.addTrip(trip);
+        
         fareRules.put(fare.getId(), newFareRule);
     }
     
@@ -86,5 +91,33 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     @Override
     public void configure(JsonNode config) {
         // No config for the moment
+    }
+    
+    @Override
+    public void processGtfs(GtfsRelationalDao dao) {
+    	// Add custom extension: trips may have a fare ID specified in KCM GTFS.
+    	// Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
+    	// since fare IDs may not be unique across feeds and trip agency IDs
+    	// may not match fare attribute agency IDs (which are feed IDs).
+    	
+    	Map<AgencyAndId, FareRuleSet> feedFareRules = new HashMap<>();
+    	fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), feedFareRules);
+    	
+    	regularFareRules.putAll(feedFareRules);
+    	
+    	Map<String, FareRuleSet> feedFareRulesById = new HashMap<>();
+            
+        for (FareRuleSet rule : regularFareRules.values()) {
+        	String id = rule.getFareAttribute().getId().getId();
+        	feedFareRulesById.put(id, rule);
+        }
+        
+        for (Trip trip : dao.getAllTrips()) {
+        	String fareId = trip.getFareId();
+        	FareRuleSet rule = feedFareRulesById.get(fareId);
+        	if (rule != null)
+        		rule.addTrip(trip.getId());        	
+        }
+        	
     }
 }
