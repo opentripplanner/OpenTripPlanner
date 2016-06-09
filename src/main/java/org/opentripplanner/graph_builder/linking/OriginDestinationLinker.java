@@ -45,7 +45,7 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
         Coordinate coord = location.getCoordinate();
         //TODO: add nice name
         TemporaryStreetLocation closest = new TemporaryStreetLocation(
-            "corner " + Math.random(), coord, new NonLocalizedString("generated point"), endVertex);
+            "Start point " + Math.random(), coord, new NonLocalizedString("Start point " + Math.random()), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
         //It can be null in tests
