@@ -127,6 +127,23 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>com.webcohesion.enunciate</groupId>
+                <artifactId>enunciate-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <executions>
+                    <execution>
+                        <!-- override default binding to process-sources phase (enunciate generates web services). -->
+                        <phase>site</phase>
+                        <goals>
+                            <goal>docs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <docsDir>${project.build.directory}/site/enunciate</docsDir>
+                </configuration>
+            </plugin>
+            <plugin>
                 <!-- This plugin must be configured both here (for attach-javadoc during release)
                 and in "reports" (for site generation), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
