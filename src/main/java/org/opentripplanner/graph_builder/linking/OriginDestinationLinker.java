@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.linking;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.index.SpatialIndex;
 import org.apache.lucene.store.TrackingDirectoryWrapper;
+import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -9,6 +11,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
@@ -28,6 +31,19 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
     /**
      * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
      * active on a graph at any given time.
+     *
+     * @param graph
+     * @param hashGridSpatialIndex If not null this index is used instead of creating new one
+     */
+    public OriginDestinationLinker(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex) {
+        super(graph, hashGridSpatialIndex);
+    }
+
+    /**
+     * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
+     * active on a graph at any given time.
+     *
+     * It creates new HashGridSpatialIndex
      *
      * @param graph
      */

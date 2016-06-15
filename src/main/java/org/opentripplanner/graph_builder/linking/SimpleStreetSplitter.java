@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.linking;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -25,6 +23,7 @@ import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
@@ -37,7 +36,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -69,7 +67,7 @@ public class SimpleStreetSplitter {
 
     private Graph graph;
 
-    private HashGridSpatialIndex<StreetEdge> idx;
+    private HashGridSpatialIndex<Edge> idx;
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
@@ -77,16 +75,34 @@ public class SimpleStreetSplitter {
      * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
      * active on a graph at any given time.
      * @param graph
+     * @param hashGridSpatialIndex If not null this index is used instead of creating new one
      */
-    public SimpleStreetSplitter (Graph graph) {
+    public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex) {
         this.graph = graph;
 
-        // build a nice private spatial index, since we're adding and removing edges
-        idx = new HashGridSpatialIndex<StreetEdge>();
+        //We build a spatial index if it isn't provided
+        if (hashGridSpatialIndex == null) {
+            // build a nice private spatial index, since we're adding and removing edges
+            idx = new HashGridSpatialIndex<Edge>();
 
-        for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-            idx.insert(se.getGeometry().getEnvelopeInternal(), se);
+            for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
+                idx.insert(se.getGeometry().getEnvelopeInternal(), se);
+            }
+        } else {
+            idx = hashGridSpatialIndex;
         }
+
+    }
+
+    /**
+     * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
+     * active on a graph at any given time.
+     *
+     * SimpleStreetSplitter generates index on graph
+     * @param graph
+     */
+    public SimpleStreetSplitter(Graph graph) {
+        this(graph, null);
     }
 
     /** Link all relevant vertices to the street network */
@@ -137,6 +153,8 @@ public class SimpleStreetSplitter {
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
         List<StreetEdge> candidateEdges = idx.query(env).stream()
+            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
+            .map(edge -> (StreetEdge) edge)
             // note: not filtering by radius here as distance calculation is expensive
             // we do that below.
             .filter(edge -> edge.canTraverse(traverseModeSet) &&
