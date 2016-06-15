@@ -1,6 +1,6 @@
 FROM maven:3-jdk-8
 MAINTAINER Reittiopas version: 0.1
-#RUN apt-get update && apt-get -y install vim
+RUN apt-get update && apt-get -y install curl
 
 ENV OTP_ROOT="/opt/opentripplanner"
 ENV OTP_DATA_CONTAINER_URL="http://opentripplanner-data-container:8080"
