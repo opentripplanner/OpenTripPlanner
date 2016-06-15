@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely close to the street
@@ -135,20 +136,13 @@ public class SimpleStreetSplitter {
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
-        // TODO all the code below looks like a good candidate for Java 8 streams and lambdas
-        List<StreetEdge> candidateEdges = new ArrayList<StreetEdge>(
-                Collections2.filter(idx.query(env), new Predicate<StreetEdge>() {
-
-                    @Override
-                    public boolean apply(StreetEdge edge) {
-                        // note: not filtering by radius here as distance calculation is expensive
-                        // we do that below.
-                        return edge.canTraverse(traverseModeSet) &&
-                                // only link to edges still in the graph.
-                                edge.getToVertex().getIncoming().contains(edge);
-                    }
-                })
-                );
+        List<StreetEdge> candidateEdges = idx.query(env).stream()
+            // note: not filtering by radius here as distance calculation is expensive
+            // we do that below.
+            .filter(edge -> edge.canTraverse(traverseModeSet) &&
+                // only link to edges still in the graph.
+                edge.getToVertex().getIncoming().contains(edge))
+            .collect(Collectors.toList());
 
         // make a map of distances
         final TIntDoubleMap distances = new TIntDoubleHashMap();
