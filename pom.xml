@@ -6,7 +6,7 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>0.20.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
@@ -124,6 +124,23 @@
                     <!-- Target Java versions -->
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.webcohesion.enunciate</groupId>
+                <artifactId>enunciate-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <executions>
+                    <execution>
+                        <!-- override default binding to process-sources phase (enunciate generates web services). -->
+                        <phase>site</phase>
+                        <goals>
+                            <goal>docs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
             </plugin>
             <plugin>
