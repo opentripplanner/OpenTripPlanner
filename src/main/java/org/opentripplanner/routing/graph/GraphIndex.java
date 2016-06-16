@@ -1,6 +1,12 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Calendar;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -522,6 +528,20 @@ public class GraphIndex {
             }
         }
         return stopTreeCache;
+    }
+
+    /**
+     * Get the most up-to-date timetable for the given TripPattern, as of right now.
+     * There should probably be a less awkward way to do this that just gets the latest entry from the resolver without
+     * making a fake routing request.
+     */
+    public Timetable currentUpdatedTimetableForTripPattern (TripPattern tripPattern) {
+        RoutingRequest req = new RoutingRequest();
+        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
+        Calendar calendar = Calendar.getInstance();
+        ServiceDate serviceDate = new ServiceDate(calendar.getTime());
+        Timetable table = req.rctx.timetableSnapshot.resolve(tripPattern, serviceDate);
+        return table;
     }
 
     /**
