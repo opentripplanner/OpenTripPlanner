@@ -109,9 +109,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
+            originDestinationLinker = new OriginDestinationLinker(this.graph);
+        } else {
+            originDestinationLinker = new OriginDestinationLinker(this.graph,
+                (HashGridSpatialIndex<Edge>) edgeTree);
         }
 
-        originDestinationLinker = new OriginDestinationLinker(this.graph);
     }
 
     /**
