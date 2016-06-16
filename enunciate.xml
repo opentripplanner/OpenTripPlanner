@@ -1,23 +1,25 @@
 <enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.23.xsd">
-  <!-- We only use Enunciate to generate documentation for the trip planner
-  API. This is a barebones config file that moslty just turns off modules we
-  don't need. -->
-  <disable-rule id="jaxb.noarg.constructor"/>
-  <services> 
-    <rest defaultRestSubcontext="/ws/">
-      <!-- Workaround for enunciate bug 678, for more info see: https://jira.codehaus.org/browse/ENUNCIATE-678 -->
-      <custom-resource-parameter-annotation qualifiedName="org.glassfish.jersey.media.multipart.FormDataParam" />
-      <content-types> 
-        <content-type type="text/plain" id="txt"/> 
-      </content-types> 
-    </rest> 
-  </services> 
-  <modules> 
-    <c disabled="true"/> 
-    <obj-c disabled="true"/> 
-    <csharp disabled="true"/> 
-    <jaxws-client disabled="true"/> 
-    <docs title="OpenTripPlanner API" disableRestMountpoint="true"/>
-  </modules> 
-</enunciate> 
+           xsi:noNamespaceSchemaLocation="http://enunciate.webcohesion.com/schemas/enunciate-2.4.0.xsd">
+
+  <!--
+  We only use Enunciate to generate documentation for the trip planner API.
+  This is a barebones config file that moslty just turns off modules we don't need.
+  See https://github.com/stoicflame/enunciate/wiki/User-Guide#configuration
+  -->
+
+  <modules>
+    <c-xml-client disabled="true"/>
+    <csharp-xml-client disabled="true"/>
+    <java-xml-client disabled="true"/>
+    <java-json-client disabled="true"/>
+    <gwt-json-overlay disabled="true"/>
+    <obj-c-xml-client disabled="true"/>
+    <php-xml-client disabled="true"/>
+    <php-json-client disabled="true"/>
+    <ruby-json-client disabled="true"/>
+    <idl disabled="true"/>
+    <swagger disabled="true"/>
+    <docs disableRestMountpoint="true"/>
+  </modules>
+
+</enunciate>

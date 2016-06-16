@@ -29,17 +29,17 @@
             {{routeLongName}}
         </div>
 
-        {{#direction}}
+        {{#headsign}}
             <div class="otp-stopViewer-headsignRow">
-				{{to}}{{direction}}
+				{{to}}{{headsign}}
             </div>
-        {{/direction}}
+        {{/headsign}}
 
-        {{#trip.blockId}}
+        {{#blockId}}
             <div class="otp-stopViewer-blockRow">
-				{{block}} {{trip.blockId}}
+				{{block}} {{blockId}}
             </div>
-        {{/trip.blockId}}
+        {{/blockId}}
     </div>
 </script>
 
