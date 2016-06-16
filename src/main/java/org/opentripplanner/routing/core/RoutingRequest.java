@@ -21,6 +21,8 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -412,6 +414,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Accept only paths that use transit (no street-only paths). */
     public boolean onlyTransitTrips = false;
+
+    /** Saves split edge which can be split on origin/destination search
+     *
+     * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
+     */
+    private StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -1174,5 +1182,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
+    }
+
+    /**
+     * Does nothing if different edge is split in origin/destination search
+     *
+     * But throws TrivialPathException if same edge is split in origin/destination search.
+     *
+     * used in {@link org.opentripplanner.graph_builder.linking.OriginDestinationLinker} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
+     * @param edge
+     */
+    public void canSplitEdge(StreetEdge edge) {
+        if (splitEdge == null) {
+            splitEdge = edge;
+        } else {
+            if (splitEdge.equals(edge)) {
+                throw new TrivialPathException();
+            }
+        }
+
     }
 }

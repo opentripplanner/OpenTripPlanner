@@ -51,6 +51,7 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
         super(graph);
     }
 
+    //Will throw ThrivialPathException if origin and destination Location are on the same edge
     public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
         boolean endVertex) {
         if (endVertex) {
@@ -81,7 +82,7 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!link(closest, nonTransitMode)) {
+        if(!link(closest, nonTransitMode, options)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;
