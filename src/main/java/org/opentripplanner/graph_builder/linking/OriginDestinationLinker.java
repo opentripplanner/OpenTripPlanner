@@ -21,6 +21,8 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 /** Linking seems to work.
  *
  *
@@ -62,13 +64,18 @@ public class OriginDestinationLinker extends SimpleStreetSplitter {
         Coordinate coord = location.getCoordinate();
         //TODO: add nice name
         String name;
-        if (endVertex) {
-            name = "Destination ";
+
+        if (location.name == null || location.name.isEmpty()) {
+            if (endVertex) {
+                name = "Destination";
+            } else {
+                name = "Origin";
+            }
         } else {
-            name = "Origin ";
+            name = location.name;
         }
-        TemporaryStreetLocation closest = new TemporaryStreetLocation(
-            name + Math.random(), coord, new NonLocalizedString(name + Math.random()), endVertex);
+        TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
+            coord, new NonLocalizedString(name), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
         //It can be null in tests
