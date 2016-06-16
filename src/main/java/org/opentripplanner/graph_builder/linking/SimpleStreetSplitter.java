@@ -86,7 +86,7 @@ public class SimpleStreetSplitter {
             idx = new HashGridSpatialIndex<Edge>();
 
             for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-                idx.insert(se.getGeometry().getEnvelopeInternal(), se);
+                idx.insert(se.getGeometry(), se);
             }
         } else {
             idx = hashGridSpatialIndex;
@@ -301,8 +301,8 @@ public class SimpleStreetSplitter {
 
     protected void updateIndex(P2<StreetEdge> edges) {
         // update indices of new edges
-        idx.insert(edges.first.getGeometry().getEnvelopeInternal(), edges.first);
-        idx.insert(edges.second.getGeometry().getEnvelopeInternal(), edges.second);
+        idx.insert(edges.first.getGeometry(), edges.first);
+        idx.insert(edges.second.getGeometry(), edges.second);
 
         // (no need to remove original edge, we filter it when it comes out of the index)
     }
