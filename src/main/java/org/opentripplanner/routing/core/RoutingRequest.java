@@ -415,7 +415,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Accept only paths that use transit (no street-only paths). */
     public boolean onlyTransitTrips = false;
 
-    private StreetEdge splittedEdge = null;
+    /** Saves split edge which can be split on origin/destination search
+     *
+     * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
+     */
+    private StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -1189,10 +1193,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @param edge
      */
     public void canSplitEdge(StreetEdge edge) {
-        if (splittedEdge == null) {
-            splittedEdge = edge;
+        if (splitEdge == null) {
+            splitEdge = edge;
         } else {
-            if (splittedEdge.equals(edge)) {
+            if (splitEdge.equals(edge)) {
                 throw new TrivialPathException();
             }
         }
