@@ -1189,7 +1189,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * But throws TrivialPathException if same edge is split in origin/destination search.
      *
-     * used in {@link org.opentripplanner.graph_builder.linking.OriginDestinationLinker} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
+     * used in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
      * @param edge
      */
     public void canSplitEdge(StreetEdge edge) {

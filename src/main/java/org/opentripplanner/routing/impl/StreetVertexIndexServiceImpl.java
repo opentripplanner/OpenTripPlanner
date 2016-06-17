@@ -27,7 +27,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.linking.OriginDestinationLinker;
+import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -87,7 +87,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
-    private OriginDestinationLinker originDestinationLinker;
+    private SimpleStreetSplitter simpleStreetSplitter;
 
     public StreetVertexIndexServiceImpl(Graph graph) {
         this(graph, true);
@@ -108,10 +108,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
-            originDestinationLinker = new OriginDestinationLinker(this.graph);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, false);
         } else {
-            originDestinationLinker = new OriginDestinationLinker(this.graph,
-                (HashGridSpatialIndex<Edge>) edgeTree);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
+                (HashGridSpatialIndex<Edge>) edgeTree, false);
         }
 
     }
@@ -573,7 +573,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
             //return getClosestVertex(loc, options, endVertex);
-            return originDestinationLinker.getClosestVertex(loc, options, endVertex);
+            return simpleStreetSplitter.getClosestVertex(loc, options, endVertex);
         }
 
         // No Coordinate available.

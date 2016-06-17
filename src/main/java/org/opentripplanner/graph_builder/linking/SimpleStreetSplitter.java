@@ -13,6 +13,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
@@ -24,9 +25,11 @@ import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
@@ -34,12 +37,14 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -72,14 +77,21 @@ public class SimpleStreetSplitter {
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
+    //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
+    //If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
+    private final boolean destructiveSplitting;
+
     /**
      * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
      * active on a graph at any given time.
      * @param graph
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
+     * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
-    public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex) {
+    public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
+        boolean destructiveSplitting) {
         this.graph = graph;
+        this.destructiveSplitting = destructiveSplitting;
 
         //We build a spatial index if it isn't provided
         if (hashGridSpatialIndex == null) {
@@ -99,11 +111,11 @@ public class SimpleStreetSplitter {
      * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
      * active on a graph at any given time.
      *
-     * SimpleStreetSplitter generates index on graph
+     * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
      * @param graph
      */
     public SimpleStreetSplitter(Graph graph) {
-        this(graph, null);
+        this(graph, null, true);
     }
 
     /** Link all relevant vertices to the street network */
@@ -291,40 +303,56 @@ public class SimpleStreetSplitter {
         // on edges that have it
         P2<StreetEdge> edges = edge.split(v, !temporarySplit);
 
-        //this functions are created so they can be overridden in OriginDestinationLinker where they should do nothing.
-        updateIndex(edges);
+        if (destructiveSplitting) {
+            // update indices of new edges
+            idx.insert(edges.first.getGeometry(), edges.first);
+            idx.insert(edges.second.getGeometry(), edges.second);
 
-        removeOriginalEdge(edge);
+            // (no need to remove original edge, we filter it when it comes out of the index)
+
+            // remove original edge from the graph
+            edge.getToVertex().removeIncoming(edge);
+            edge.getFromVertex().removeOutgoing(edge);
+        }
 
         return v;
     }
 
-    protected void removeOriginalEdge(StreetEdge edge) {
-        // remove original edge from the graph
-        edge.getToVertex().removeIncoming(edge);
-        edge.getFromVertex().removeOutgoing(edge);
-    }
-
-    protected void updateIndex(P2<StreetEdge> edges) {
-        // update indices of new edges
-        idx.insert(edges.first.getGeometry(), edges.first);
-        idx.insert(edges.second.getGeometry(), edges.second);
-
-        // (no need to remove original edge, we filter it when it comes out of the index)
-    }
-
     /** Make the appropriate type of link edges from a vertex */
-    protected void makeLinkEdges (Vertex from, StreetVertex to) {
-        if  (from instanceof TransitStop)
+    private void makeLinkEdges(Vertex from, StreetVertex to) {
+        if (from instanceof TemporaryStreetLocation) {
+            makeTemporaryEdges((TemporaryStreetLocation) from, to);
+        } else if (from instanceof TransitStop) {
             makeTransitLinkEdges((TransitStop) from, to);
-        else if (from instanceof BikeRentalStationVertex)
+        } else if (from instanceof BikeRentalStationVertex) {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
-        else if (from instanceof BikeParkVertex)
+        } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to);
+        }
+    }
+
+    /** Make temporary edges to origin/destination vertex in origin/destination search **/
+    private void makeTemporaryEdges(TemporaryStreetLocation from, StreetVertex to) {
+        if (destructiveSplitting) {
+            throw new RuntimeException("Destructive splitting is used on temporary edges. Something is wrong!");
+        }
+        if (to instanceof TemporarySplitterVertex) {
+            from.setWheelchairAccessible(((TemporarySplitterVertex) to).isWheelchairAccessible());
+        }
+        if (from.isEndVertex()) {
+            LOG.debug("Linking end vertex to {} -> {}", to, from);
+            new TemporaryFreeEdge(to, from);
+        } else {
+            LOG.debug("Linking start vertex to {} -> {}", from, to);
+            new TemporaryFreeEdge(from, to);
+        }
     }
 
     /** Make bike park edges */
     private void makeBikeParkEdges(BikeParkVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Bike park edges are created with non destructive splitting!");
+        }
         for (StreetBikeParkLink sbpl : Iterables.filter(from.getOutgoing(), StreetBikeParkLink.class)) {
             if (sbpl.getToVertex() == to)
                 return;
@@ -338,6 +366,9 @@ public class SimpleStreetSplitter {
      * Make street transit link edges, unless they already exist.
      */
     private void makeTransitLinkEdges (TransitStop tstop, StreetVertex v) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Transitedges are created with non destructive splitting!");
+        }
         // ensure that the requisite edges do not already exist
         // this can happen if we link to duplicate ways that have the same start/end vertices.
         for (StreetTransitLink e : Iterables.filter(tstop.getOutgoing(), StreetTransitLink.class)) {
@@ -351,6 +382,9 @@ public class SimpleStreetSplitter {
 
     /** Make link edges for bike rental */
     private void makeBikeRentalLinkEdges (BikeRentalStationVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Bike rental edges are created with non destructive splitting!");
+        }
         for (StreetBikeRentalLink sbrl : Iterables.filter(from.getOutgoing(), StreetBikeRentalLink.class)) {
             if (sbrl.getToVertex() == to)
                 return;
@@ -379,5 +413,62 @@ public class SimpleStreetSplitter {
         }
 
         return geometryFactory.createLineString(coords);
+    }
+
+    /**
+     * Used to link origin and destination points to graph non destructively.
+     *
+     * Split edges don't replace existing ones and only temporary edges and vertices are created.
+     *
+     * Will throw ThrivialPathException if origin and destination Location are on the same edge
+     *
+     * @param location
+     * @param options
+     * @param endVertex true if this is destination vertex
+     * @return
+     */
+    public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
+        boolean endVertex) {
+        if (destructiveSplitting) {
+            throw new RuntimeException("Origin and destination search is used with destructive splitting. Something is wrong!");
+        }
+        if (endVertex) {
+            LOG.debug("Finding end vertex for {}", location);
+        } else {
+            LOG.debug("Finding start vertex for {}", location);
+        }
+        Coordinate coord = location.getCoordinate();
+        //TODO: add nice name
+        String name;
+
+        if (location.name == null || location.name.isEmpty()) {
+            if (endVertex) {
+                name = "Destination";
+            } else {
+                name = "Origin";
+            }
+        } else {
+            name = location.name;
+        }
+        TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
+            coord, new NonLocalizedString(name), endVertex);
+
+        TraverseMode nonTransitMode = TraverseMode.WALK;
+        //It can be null in tests
+        if (options != null) {
+            TraverseModeSet modes = options.modes;
+            if (modes.getCar())
+                nonTransitMode = TraverseMode.CAR;
+            else if (modes.getWalk())
+                nonTransitMode = TraverseMode.WALK;
+            else if (modes.getBicycle())
+                nonTransitMode = TraverseMode.BICYCLE;
+        }
+
+        if(!link(closest, nonTransitMode, options)) {
+            LOG.warn("Couldn't link {}", location);
+        }
+        return closest;
+
     }
 }
