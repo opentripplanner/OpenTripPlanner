@@ -3,7 +3,7 @@ MAINTAINER Reittiopas version: 0.1
 RUN apt-get update && apt-get -y install curl
 
 ENV OTP_ROOT="/opt/opentripplanner"
-ENV OTP_DATA_CONTAINER_URL="http://opentripplanner-data-container:8080"
+ENV ROUTER_DATA_CONTAINER_URL="http://opentripplanner-data-container:8080"
 
 WORKDIR ${OTP_ROOT}
 
@@ -19,7 +19,6 @@ ADD src ${OTP_ROOT}/src
 RUN mvn package \
   && chmod -R a+rwX .
 
-
 ADD run.sh ${OTP_ROOT}/run.sh
 
 RUN chown -R 9999:9999 ${OTP_ROOT}
@@ -29,6 +28,8 @@ ENV PORT=8080
 EXPOSE ${PORT}
 ENV SECURE_PORT=8081
 EXPOSE ${SECURE_PORT}
+ENV ROUTER_NAME=finland
+ENV JAVA_OPTS="-Xms8G -Xmx8G"
 
 LABEL io.openshift.expose-services 8080:http
 
