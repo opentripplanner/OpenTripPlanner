@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import gnu.trove.map.TIntDoubleMap;
@@ -41,6 +42,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -75,6 +77,8 @@ public class SimpleStreetSplitter {
 
     private HashGridSpatialIndex<Edge> idx;
 
+    private SpatialIndex transitStopIndex;
+
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
@@ -86,11 +90,13 @@ public class SimpleStreetSplitter {
      * active on a graph at any given time.
      * @param graph
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
+     * @param transitStopIndex Index of all transitStops which is generated in {@link org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl}
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
-        boolean destructiveSplitting) {
+        SpatialIndex transitStopIndex, boolean destructiveSplitting) {
         this.graph = graph;
+        this.transitStopIndex = transitStopIndex;
         this.destructiveSplitting = destructiveSplitting;
 
         //We build a spatial index if it isn't provided
@@ -115,7 +121,7 @@ public class SimpleStreetSplitter {
      * @param graph
      */
     public SimpleStreetSplitter(Graph graph) {
-        this(graph, null, true);
+        this(graph, null, null, true);
     }
 
     /** Link all relevant vertices to the street network */
@@ -198,27 +204,80 @@ public class SimpleStreetSplitter {
         });
 
         // find the closest candidate edges
-        if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg)
-            return false;
+        if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg) {
+            //We only link to stops if we are searching for origin/destination and for that we need transitStopIndex
+            if (destructiveSplitting || transitStopIndex == null) {
+                return false;
+            }
+            LOG.debug("No street edge was found for {}", vertex);
+            //we search for closest stops (since this is only used in origin/destination linking if no edges were found)
+            //in same way as closest edges are found
+            List<TransitStop> candidateStops = new ArrayList<>();
+            transitStopIndex.query(env).forEach(candidateStop ->
+                candidateStops.add((TransitStop) candidateStop)
+            );
 
-        // find the best edges
-        List<StreetEdge> bestEdges = Lists.newArrayList();
+            final TIntDoubleMap stopDistances = new TIntDoubleHashMap();
 
-        // add edges until there is a break of epsilon meters.
-        // we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
-        // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
-        // fall just inside or beyond the cutoff depending on floating-point operations.
-        int i = 0;
-        do {
-            bestEdges.add(candidateEdges.get(i++));
-        } while (i < candidateEdges.size() &&
-                distances.get(candidateEdges.get(i).getId()) - distances.get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
+            for (TransitStop t : candidateStops) {
+                stopDistances.put(t.getIndex(), distance(vertex, t, xscale));
+            }
 
-        for (StreetEdge edge : bestEdges) {
-            link(vertex, edge, xscale, options);
+            Collections.sort(candidateStops, (o1, o2) -> {
+                    double diff = stopDistances.get(o1.getIndex()) - stopDistances.get(o2.getIndex());
+                    if (diff < 0) {
+                        return -1;
+                    }
+                    if (diff > 0) {
+                        return 1;
+                    }
+                    return 0;
+            });
+            if (candidateStops.isEmpty() || stopDistances.get(candidateStops.get(0).getIndex()) > radiusDeg) {
+                LOG.debug("Stops aren't close either!");
+                return false;
+            } else {
+                List<TransitStop> bestStops = Lists.newArrayList();
+
+                // add stops until there is a break of epsilon meters.
+                // we do this to enforce determinism. if there are a lot of stops that are all extremely close to each other,
+                // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
+                // fall just inside or beyond the cutoff depending on floating-point operations.
+                int i = 0;
+                do {
+                    bestStops.add(candidateStops.get(i++));
+                } while (i < candidateStops.size() &&
+                    stopDistances.get(candidateStops.get(i).getIndex()) - stopDistances
+                        .get(candidateStops.get(i - 1).getIndex()) < duplicateDeg);
+
+                for (TransitStop stop: bestStops) {
+                    LOG.debug("Linking vertex to stop: {}", stop.getName());
+                    makeTemporaryEdges((TemporaryStreetLocation)vertex, stop);
+                }
+                return true;
+            }
+        } else {
+
+            // find the best edges
+            List<StreetEdge> bestEdges = Lists.newArrayList();
+
+            // add edges until there is a break of epsilon meters.
+            // we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
+            // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
+            // fall just inside or beyond the cutoff depending on floating-point operations.
+            int i = 0;
+            do {
+                bestEdges.add(candidateEdges.get(i++));
+            } while (i < candidateEdges.size() &&
+                distances.get(candidateEdges.get(i).getId()) - distances
+                    .get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
+
+            for (StreetEdge edge : bestEdges) {
+                link(vertex, edge, xscale, options);
+            }
+
+            return true;
         }
-
-        return true;
     }
 
     /** split the edge and link in the transit stop */
@@ -332,7 +391,7 @@ public class SimpleStreetSplitter {
     }
 
     /** Make temporary edges to origin/destination vertex in origin/destination search **/
-    private void makeTemporaryEdges(TemporaryStreetLocation from, StreetVertex to) {
+    private void makeTemporaryEdges(TemporaryStreetLocation from, Vertex to) {
         if (destructiveSplitting) {
             throw new RuntimeException("Destructive splitting is used on temporary edges. Something is wrong!");
         }
@@ -399,6 +458,12 @@ public class SimpleStreetSplitter {
         // use JTS internal tools wherever possible
         LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
         return transformed.distance(geometryFactory.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
+    }
+
+    /** projected distance from stop to edge, in latitude degrees */
+    private static double distance (Vertex tstop, Vertex tstop2, double xscale) {
+        // use JTS internal tools wherever possible
+        return new Coordinate(tstop.getLon() * xscale, tstop.getLat()).distance(new Coordinate(tstop2.getLon() * xscale, tstop2.getLat()));
     }
 
     /** project this linestring to an equirectangular projection */

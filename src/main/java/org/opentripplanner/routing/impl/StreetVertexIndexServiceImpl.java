@@ -108,10 +108,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, false);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null, false);
         } else {
             simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
-                (HashGridSpatialIndex<Edge>) edgeTree, false);
+                (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree, false);
         }
 
     }
