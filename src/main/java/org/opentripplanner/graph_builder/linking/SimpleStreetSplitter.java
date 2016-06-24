@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -189,18 +188,13 @@ public class SimpleStreetSplitter {
         }
 
         // sort the list
-        Collections.sort(candidateEdges, new Comparator<StreetEdge> () {
-
-            @Override
-            public int compare(StreetEdge o1, StreetEdge o2) {
-                double diff = distances.get(o1.getId()) - distances.get(o2.getId());
-                if (diff < 0)
-                    return -1;
-                if (diff > 0)
-                    return 1;
-                return 0;
-            }
-
+        Collections.sort(candidateEdges, (o1, o2) -> {
+            double diff = distances.get(o1.getId()) - distances.get(o2.getId());
+            if (diff < 0)
+                return -1;
+            if (diff > 0)
+                return 1;
+            return 0;
         });
 
         // find the closest candidate edges
