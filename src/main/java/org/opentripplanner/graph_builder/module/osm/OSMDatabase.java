@@ -663,7 +663,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             processedAreas.add(relation);
             try {
                 newArea(new Area(relation, outerWays, innerWays, nodesById));
-            } catch (Area.AreaConstructionException e) {
+            } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
                 continue;
             }
 
