@@ -87,12 +87,14 @@ public class ClosestEdgesTest {
         StreetEdge rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry()
                 .reverse(), "rightBack", 1500, StreetTraversalPermission.CAR, true);
 
+        addPlatformEdge();
+
         StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);
         finder = myFinder;
     }
 
     private void checkClosestEdgeModes(GenericLocation loc, TraversalRequirements reqs,
-            int minResults) {
+                                       int minResults) {
         CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
         assertTrue(minResults <= edges.size());
 
@@ -144,7 +146,7 @@ public class ClosestEdgesTest {
      * Checks that the best edge found is this one and that the number of edges found matches.
      */
     private void checkBest(TraversalRequirements reqs, GenericLocation loc,
-            StreetEdge expectedBest, int expectedCandidates) {
+                           StreetEdge expectedBest, int expectedCandidates) {
         // Should give me the top edge as the best edge.
         // topBack is worse because of the heading.
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
@@ -161,7 +163,7 @@ public class ClosestEdgesTest {
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
         reqs.modes = modes;
-        
+
         for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
             // Location along the top edge, traveling with the forward edge
             // exactly.
@@ -176,7 +178,7 @@ public class ClosestEdgesTest {
             checkBest(reqs, loc, top, 2);
         }
     }
-    
+
     @Test
     public void testSorting() {
         // Lies along the top edge
@@ -186,22 +188,67 @@ public class ClosestEdgesTest {
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
         reqs.modes = modes;
-        
+
         // Location along the top edge, traveling with the forward edge
         // exactly.
         GenericLocation loc = new GenericLocation(c);
         loc.heading = top.getAzimuth();
-        
+
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
         Collections.sort(candidates, new CandidateEdge.CandidateEdgeScoreComparator());
-        
+
         // Check that scores are in ascending order.
         double lastScore = candidates.best.score;
         for (CandidateEdge ce : candidates) {
             assertTrue(ce.score >= lastScore);
             lastScore = ce.score;
         }
-        
+
         assertEquals(candidates.best.score, candidates.get(0).score, 0.0);
-    }    
+    }
+
+    /**
+     * A point should not be snapped to a platform if a traversable road is in
+     * between.
+     */
+    @Test
+    public void testPlatform() {
+        Coordinate c = new Coordinate(-74.0099, 40.005);
+        TraversalRequirements reqs = new TraversalRequirements();
+        TraverseModeSet modes = new TraverseModeSet();
+        modes.setWalk(true);
+        modes.setBicycle(true);
+        reqs.modes = modes;
+
+        GenericLocation loc = new GenericLocation(c);
+        loc.heading = left.getAzimuth();
+
+        CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
+
+        assertTrue(candidates.size() > 0);
+        assertEquals(left, candidates.best.edge);
+    }
+
+    /**
+     * Create a train platform on the lhs of the "left" edge
+     */
+    private void addPlatformEdge() {
+        String prefix = "platform";
+        IntersectionVertex platformNorth = new IntersectionVertex(graph, prefix + "North", -74.0102, 40.01);
+        IntersectionVertex platformSouth = new IntersectionVertex(graph, prefix + "South", -74.0102, 40.00);
+
+        LineString geometry = GeometryUtils.makeLineString(platformSouth.getLon(), platformSouth.getLat(),
+                platformNorth.getLon(), platformNorth.getLat());
+
+        StreetEdge platformEdge = new StreetEdge(platformSouth, platformNorth,
+                geometry, prefix, 1500,
+                StreetTraversalPermission.PEDESTRIAN, false);
+
+        platformEdge.setStreetClass(StreetEdge.CLASS_TRAIN_PLATFORM);
+        StreetEdge platformEdgeBack = new StreetEdge(platformNorth, platformSouth,
+                (LineString) platformEdge.getGeometry().reverse(), prefix + "Back", 1500,
+                StreetTraversalPermission.PEDESTRIAN, true);
+
+        platformEdgeBack.setStreetClass(StreetEdge.CLASS_TRAIN_PLATFORM);
+    }
 }
