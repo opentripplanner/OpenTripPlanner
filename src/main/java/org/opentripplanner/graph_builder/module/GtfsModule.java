@@ -118,6 +118,7 @@ public class GtfsModule implements GraphBuilderModule {
                 service.addData(data, dao);
 
                 hf.subwayAccessTime = gtfsBundle.subwayAccessTime;
+                hf.maxInterlineDistance = gtfsBundle.maxInterlineDistance;
                 hf.run(graph);
 
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {

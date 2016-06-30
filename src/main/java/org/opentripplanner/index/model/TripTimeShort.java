@@ -28,6 +28,8 @@ public class TripTimeShort {
     public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
     public long serviceDay;
     public AgencyAndId tripId;
+    public String blockId;
+    public String headsign;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -45,6 +47,8 @@ public class TripTimeShort {
         realtime           = !tt.isScheduled();
         tripId             = tt.trip.getId();
         realtimeState      = tt.getRealTimeState();
+        blockId            = tt.trip.getBlockId();
+        headsign           = tt.getHeadsign(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {

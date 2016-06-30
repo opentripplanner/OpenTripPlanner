@@ -25,10 +25,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -68,7 +68,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private Graph graph;
 
-    private NetworkLinkerLibrary networkLinkerLibrary;
+    private SimpleStreetSplitter linker;
 
     private BikeRentalStationService bikeService;
 
@@ -106,8 +106,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     @Override
     public void setup() throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
-        networkLinkerLibrary = new NetworkLinkerLibrary(graph,
-                Collections.<Class<?>, Object> emptyMap());
+        linker = new SimpleStreetSplitter(graph);
 
         // Adding a bike park station service needs a graph writer runnable
         updaterManager.executeBlocking(new GraphWriterRunnable() {
@@ -155,7 +154,10 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    networkLinkerLibrary.connectVertexToStreets(bikeParkVertex);
+                    if (!linker.link(bikeParkVertex)) {
+                        // the toString includes the text "Bike park"
+                        LOG.warn("{} not near any streets; it will not be usable.", bikePark);
+                    }
                     verticesByPark.put(bikePark, bikeParkVertex);
                     new BikeParkEdge(bikeParkVertex);
                 } else {

@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -42,6 +43,8 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -51,6 +54,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
@@ -1043,6 +1047,16 @@ public class IndexGraphQLSchema {
                     .convertIdToString(((Trip) environment.getSource()).getServiceId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("activeDates")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .dataFetcher(environment -> index.graph.getCalendarService()
+                    .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
+                    .stream()
+                    .map(ServiceDate::getAsString)
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("tripShortName")
                 .type(Scalars.GraphQLString)
                 .build())
@@ -1197,6 +1211,28 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripsForDate")
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDay")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .type(new GraphQLList(new GraphQLNonNull(tripType)))
+                .dataFetcher(environment -> {
+                    try {
+                        BitSet services = index.servicesRunning(
+                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                        );
+                        return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
+                            .stream()
+                            .filter(times -> services.get(times.serviceCode))
+                            .map(times -> times.trip)
+                            .collect(Collectors.toList());
+                    } catch (ParseException e) {
+                        return null; // Invalid date format
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
@@ -1667,7 +1703,9 @@ public class IndexGraphQLSchema {
                     if (environment.getArgument("name") != null) {
                         stream = stream
                             .filter(route -> route.getShortName() != null)
-                            .filter(route -> route.getShortName().startsWith(environment.getArgument("name")));
+                            .filter(route -> route.getShortName().toLowerCase().startsWith(
+                                    ((String) environment.getArgument("name")).toLowerCase())
+                            );
                     }
                     if (environment.getArgument("modes") != null) {
                         Set<TraverseMode> modes = new QualifiedModeSet(
@@ -2025,7 +2063,31 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(new GraphQLList(legType)))
                 .dataFetcher(environment -> ((Itinerary)environment.getSource()).legs)
                 .build())
-             .build();
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("fares")
+                .description("Information about the fares for this itinerary")
+                .type(new GraphQLList(GraphQLObjectType.newObject()
+                    .name("fare")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("type")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getKey().name())
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("currency")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getValue().getCurrency().getCurrencyCode())
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("cents")
+                        .type(Scalars.GraphQLInt)
+                        .dataFetcher(environment -> ((Map.Entry<Fare.FareType,Money>) environment.getSource()).getValue().getCents())
+                        .build())
+                    .build()))
+                .dataFetcher(environment -> ((Itinerary)environment.getSource()).fare != null ?
+                    new ArrayList<>(((Itinerary)environment.getSource()).fare.fare.entrySet()) : null)
+                .build())
+            .build();
 
         planType = GraphQLObjectType.newObject()
             .name("Plan")
@@ -2033,26 +2095,56 @@ public class IndexGraphQLSchema {
                 .name("date")
                 .description("The time and date of travel")
                 .type(Scalars.GraphQLLong)
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).date.getTime())
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).date.getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("from")
                 .description("The origin")
                 .type(new GraphQLNonNull(placeType))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).from)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).from)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("to")
                 .description("The destination")
                 .type(new GraphQLNonNull(placeType))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).to)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).to)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("itineraries")
                 .description("A list of possible itineraries")
                 .type(new GraphQLNonNull(new GraphQLList(itineraryType)))
-                .dataFetcher(environment -> ((TripPlan)environment.getSource()).itinerary)
+                .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).itinerary)
                 .build())
-             .build();
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("messageEnums")
+                .description("A list of possible error messages as enum")
+                .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream().map(message -> message.name()).collect(Collectors.toList()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("messageStrings")
+                .description("A list of possible error messages in cleartext")
+                .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+                .dataFetcher(environment -> ((List<Message>)((Map)environment.getSource()).get("messages"))
+                    .stream()
+                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(
+                        environment.getArgument("locale"))))
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("debugOutput")
+                .description("Information about the timings for the plan generation")
+                .type(new GraphQLNonNull(GraphQLObjectType.newObject()
+                    .name("debugOutput")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("totalTime")
+                        .type(Scalars.GraphQLLong)
+                        .build())
+                    .build()))
+                .dataFetcher(environment -> (((Map)environment.getSource()).get("debugOutput")))
+                .build())
+            .build();
     }
 }
