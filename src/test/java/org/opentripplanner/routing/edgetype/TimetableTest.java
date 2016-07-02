@@ -270,9 +270,29 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        // Updated trip times should be null because we set departure time to a negative value which means that we're
+        // ahead of schedule and since arrival time is not set departure time is earlier than the arrival time.
+        assertNull(updatedTripTimes);
+
+        // update trip departure time only
+        tripDescriptorBuilder = TripDescriptor.newBuilder();
+        tripDescriptorBuilder.setTripId("1.1");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+        tripUpdateBuilder = TripUpdate.newBuilder();
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+        stopTimeEventBuilder.setDelay(1);
+        tripUpdate = tripUpdateBuilder.build();
+        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+
 
         // update trip using stop id
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -286,10 +306,12 @@ public class TimetableTest {
         stopTimeUpdateBuilder.setScheduleRelationship(
                 StopTimeUpdate.ScheduleRelationship.SCHEDULED);
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-        stopTimeEventBuilder.setDelay(-1);
+        stopTimeEventBuilder.setDelay(1);
         tripUpdate = tripUpdateBuilder.build();
         updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
         assertNotNull(updatedTripTimes);
+        // Ensure that times past the updated one is still valid.
+        assertEquals(0, updatedTripTimes.getDepartureDelay(0));
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
         // update trip arrival time at first stop and make departure time incoherent at second stop

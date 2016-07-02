@@ -83,11 +83,11 @@ public class Timetable implements Serializable {
      */
     private transient int minDwellTimes[];
 
-    /** 
+    /**
      * Helps determine whether a particular pattern is worth searching for departures at a given time. 
      */
     private transient int minTime, maxTime;
-    
+
     /** Construct an empty Timetable. */
     public Timetable(TripPattern pattern) {
         this.pattern = pattern;
@@ -193,7 +193,7 @@ public class Timetable implements Serializable {
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search
-                if (depTime < 0) continue; 
+                if (depTime < 0) continue;
                 if (depTime >= adjustedTime && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
@@ -332,7 +332,7 @@ public class Timetable implements Serializable {
 
     /**
      * Set new trip times for trip given a trip index
-     * 
+     *
      * @param tripIndex trip index of trip
      * @param tt new trip times for trip
      * @return old trip times of trip
@@ -362,7 +362,7 @@ public class Timetable implements Serializable {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return null;
         }
-        
+
         // Though all timetables have the same trip ordering, some may have extra trips due to
         // the dynamic addition of unscheduled trips.
         // However, we want to apply trip updates on top of *scheduled* times
@@ -400,7 +400,7 @@ public class Timetable implements Serializable {
             StopTimeUpdate update = updates.next();
 
             int numStops = newTimes.getNumStops();
-            Integer delay = null;
+            int delay = 0;
 
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;
@@ -447,11 +447,7 @@ public class Timetable implements Serializable {
                                 return null;
                             }
                         } else {
-                            if (delay == null) {
-                                newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                            } else {
-                                newTimes.updateArrivalDelay(i, delay);
-                            }
+                            newTimes.updateArrivalDelay(i, delay);
                         }
 
                         if (update.hasDeparture()) {
@@ -473,11 +469,7 @@ public class Timetable implements Serializable {
                                 return null;
                             }
                         } else {
-                            if (delay == null) {
-                                newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
-                            } else {
-                                newTimes.updateDepartureDelay(i, delay);
-                            }
+                            newTimes.updateDepartureDelay(i, delay);
                         }
                     }
 
@@ -487,13 +479,8 @@ public class Timetable implements Serializable {
                         update = null;
                     }
                 } else {
-                    if (delay == null) {
-                        newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
-                    } else {
-                        newTimes.updateArrivalDelay(i, delay);
-                        newTimes.updateDepartureDelay(i, delay);
-                    }
+                    newTimes.updateArrivalDelay(i, delay);
+                    newTimes.updateDepartureDelay(i, delay);
                 }
             }
             if (update != null) {
@@ -558,7 +545,7 @@ public class Timetable implements Serializable {
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
-    
+
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
