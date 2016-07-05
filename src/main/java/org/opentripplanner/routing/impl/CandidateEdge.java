@@ -225,8 +225,8 @@ public class CandidateEdge {
         }
         // apply strong preference to car edges and to platforms for the specified modes
         // only apply for car modes -- TODO Check this.
-        if (modes.getCar() && (edge.getPermission().allows(StreetTraversalPermission.CAR)
-                || (edge.getStreetClass() & platform) != 0)) {
+        if (modes.getCar() && edge.getPermission().allows(StreetTraversalPermission.CAR)
+                || (edge.getStreetClass() & platform) != 0) {
             // we're subtracting here because no matter how close we are to a
             // good non-car non-platform edge, we really want to avoid it in
             // case it's a Pedway or other weird and unlikely starting location.
