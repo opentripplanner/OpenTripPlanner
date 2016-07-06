@@ -516,17 +516,19 @@ public class GraphIndex {
     }
 
     /**
-     * Fetch next n upcoming vehicle departures for each stops of pattern. It
-     * goes though all patterns passing the stop for the previous, current and
-     * next service date. It uses a priority queue to keep track of the next
-     * departures. The queue is shared between all dates, as services from the
-     * previous service date can visit the stop later than the current service
-     * date's services. This happens eg. with sleeper trains.
+     * Fetch next n upcoming vehicle departures for a stop of pattern. It goes
+     * though the previous, current and next service date. It uses a priority
+     * queue to keep track of the next departures. The queue is shared between
+     * all dates, as services from the previous service date can visit the stop
+     * later than the current service date's services. This happens eg. with
+     * sleeper trains.
      *
      * @param stop
      *            Stop object to perform the search for
      * @param startTime
      *            Start time for the search. Seconds from UNIX epoch
+     * @param TripPattern
+     *            The selected pattern. If null an empty list is returned.
      * @param timeRange
      *            Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures
@@ -536,7 +538,7 @@ public class GraphIndex {
     public List<TripTimeShort> stopTimesForPattern(Stop stop, TripPattern pattern, long startTime, int timeRange,
             int numberOfDepartures) {
 
-        if (pattern == null) { // pattern was null
+        if (pattern == null) { 
             return Collections.EMPTY_LIST;
         }
 
@@ -585,8 +587,6 @@ public class GraphIndex {
                         if (!sd.serviceRunning(triptimes.serviceCode))
                             continue;
                         int stopDepartureTime = triptimes.getDepartureTime(stopIndex);
-                        System.out.println("stopIndex " + stopIndex);
-                        System.out.println("stopDepartureTime " + stopDepartureTime);
                         if (stopDepartureTime != -1 && stopDepartureTime >= starttimeSecondsSinceMidnight) {
                             ret.insertWithOverflow(new TripTimeShort(triptimes, stopIndex, currStop, sd));
                         }
@@ -617,15 +617,14 @@ public class GraphIndex {
         List<TripTimeShort> result = new ArrayList<>();
         for (int i = 0; i < numberOfDepartures; i++) {
             if (ret.size() > 0) {
-                System.out.println("pq size was not null!");
                 result.add(ret.pop());
             } else {
-                System.out.println("pq size was 0, adding null");
                 result.add(null);
             }
         }
-
-        return result;
+        Collections.reverse(result);
+        
+        return result; 
     }
   
     
