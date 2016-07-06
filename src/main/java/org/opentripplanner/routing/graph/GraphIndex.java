@@ -50,7 +50,6 @@ import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
@@ -64,6 +63,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -515,6 +515,120 @@ public class GraphIndex {
         return ret;
     }
 
+    /**
+     * Fetch next n upcoming vehicle departures for each stops of pattern. It
+     * goes though all patterns passing the stop for the previous, current and
+     * next service date. It uses a priority queue to keep track of the next
+     * departures. The queue is shared between all dates, as services from the
+     * previous service date can visit the stop later than the current service
+     * date's services. This happens eg. with sleeper trains.
+     *
+     * @param stop
+     *            Stop object to perform the search for
+     * @param startTime
+     *            Start time for the search. Seconds from UNIX epoch
+     * @param timeRange
+     *            Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures
+     *            Number of departures to fetch per pattern
+     * @return
+     */
+    public List<TripTimeShort> stopTimesForPattern(Stop stop, TripPattern pattern, long startTime, int timeRange,
+            int numberOfDepartures) {
+
+        if (pattern == null) { // pattern was null
+            return Collections.EMPTY_LIST;
+        }
+
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis() / 1000;
+        }
+
+        final PriorityQueue<TripTimeShort> ret = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
+            @Override
+            protected boolean lessThan(TripTimeShort tripTimeShort, TripTimeShort t1) {
+                return (tripTimeShort.serviceDay + tripTimeShort.realtimeDeparture) > (t1.serviceDay
+                        + t1.realtimeDeparture);
+            }
+        };
+
+        TimetableSnapshot snapshot = null;
+        if (graph.timetableSnapshotSource != null) {
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
+
+        final ServiceDate[] serviceDates = { new ServiceDate().previous(), new ServiceDate(),
+                new ServiceDate().next() };
+
+        // Loop through all possible days
+        for (ServiceDate serviceDate : serviceDates) {
+            final ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService,
+                    pattern.route.getAgency().getId());
+            Timetable tt;
+
+            if (snapshot != null) {
+                tt = snapshot.resolve(pattern, serviceDate);
+            } else {
+                tt = pattern.scheduledTimetable;
+            }
+
+            if (!tt.temporallyViable(sd, startTime, timeRange, true))
+                continue;
+
+            int starttimeSecondsSinceMidnight = sd.secondsSinceMidnight(startTime);
+            int stopIndex = 0;
+
+            // loop through all stops of pattern
+            for (Stop currStop : pattern.stopPattern.stops) {
+                if (currStop.equals(stop)) {
+                    for (TripTimes triptimes : tt.tripTimes) {
+                        if (!sd.serviceRunning(triptimes.serviceCode))
+                            continue;
+                        int stopDepartureTime = triptimes.getDepartureTime(stopIndex);
+                        System.out.println("stopIndex " + stopIndex);
+                        System.out.println("stopDepartureTime " + stopDepartureTime);
+                        if (stopDepartureTime != -1 && stopDepartureTime >= starttimeSecondsSinceMidnight) {
+                            ret.insertWithOverflow(new TripTimeShort(triptimes, stopIndex, currStop, sd));
+                        }
+                    }
+
+                    // TODO: This needs to be adapted after #1647 is merged
+                    for (FrequencyEntry freq : tt.frequencyEntries) {
+                        if (!sd.serviceRunning(freq.tripTimes.serviceCode))
+                            continue;
+                        int departureTime = freq.nextDepartureTime(stopIndex, starttimeSecondsSinceMidnight);
+                        if (departureTime == -1)
+                            continue;
+                        int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(stopIndex)
+                                - freq.tripTimes.getDepartureTime(0);
+
+                        while (departureTime <= lastDeparture && ret.size() < numberOfDepartures) {
+                            ret.insertWithOverflow(new TripTimeShort(freq.materialize(stopIndex, departureTime, true),
+                                    stopIndex, currStop, sd));
+                            departureTime += freq.headway;
+                        }
+                    }
+                }
+
+                stopIndex++;
+            }
+        }
+
+        List<TripTimeShort> result = new ArrayList<>();
+        for (int i = 0; i < numberOfDepartures; i++) {
+            if (ret.size() > 0) {
+                System.out.println("pq size was not null!");
+                result.add(ret.pop());
+            } else {
+                System.out.println("pq size was 0, adding null");
+                result.add(null);
+            }
+        }
+
+        return result;
+    }
+  
+    
     /**
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
      * timetables for a single day.
