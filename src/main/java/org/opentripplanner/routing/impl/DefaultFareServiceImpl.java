@@ -285,7 +285,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                     journeyTime > attribute.getJourneyDuration()) {
                     continue;
                 }
-                float newFare = attribute.getPrice();
+                float newFare = getFarePrice(attribute, fareType);
                 if (newFare < bestFare) {
                     bestAttribute = attribute;
                     bestFare = newFare;
@@ -298,6 +298,25 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         return bestFare;
 
+    }
+    
+    private float getFarePrice(FareAttribute fare, FareType type) {
+    	switch(type) {
+		case senior:
+			if (fare.getSeniorPrice() >= 0) {
+				return fare.getSeniorPrice();
+			}
+			break;
+		case youth:
+			if (fare.getYouthPrice() >= 0) {
+				return fare.getYouthPrice();
+			}
+			break;
+		case regular:
+		default:
+			break;
+    	}
+    	return fare.getPrice();
     }
 
 }
