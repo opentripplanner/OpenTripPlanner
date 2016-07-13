@@ -969,7 +969,7 @@ public class IndexGraphQLSchema {
                 .name("realtimeDeparture")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
-                    environment -> ((TripTimeShort) environment.getSource()).realtimeArrival)
+                    environment -> ((TripTimeShort) environment.getSource()).realtimeDeparture)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("departureDelay")
