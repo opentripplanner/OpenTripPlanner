@@ -1,11 +1,11 @@
-<img src="https://github.com/opentripplanner/OpenTripPlanner/wiki/Home/otp_logo_wiki.png" align="right"/>
+<img src="http://www.opentripplanner.org/build/boot/logo.png" align="right"/>
 
 ## OpenTripPlanner
 _Note: this documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**opentripplanner.org**](http://www.opentripplanner.org)_
 
-**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license. The code is under active development with a variety of [deployments](Deployments) around the world.
+**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license. The code is under active development with a variety of [deployments](Deployments.md) around the world.
 
-If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
+If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage.md) page.
 
 **Latest Project Updates**
 
@@ -31,7 +31,7 @@ If you want to get started right away running your own OTP instance, the best pl
 
 [![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
-After seven years of hard work, a **1.0 release of OTP is planned for August of 2016**! OTP is in feature freeze, with all work concentrating on bug fixes and API cleanup. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
+After seven years of hard work, a **1.0 release of OTP is planned for August of 2016**! OTP is in feature freeze, with all work concentrating on bug fixes and API cleanup. See the [changelog](Changelog.md) and the [version notes](Version-Notes.md) to decide which branch or tag you want to work with. The software currently:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors
@@ -60,13 +60,13 @@ The **OTP Analyst Web Services** provide network analysis results such as travel
 
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
 
-The **OTP Scripting API** allow the execution of routing requests from within scripts (such as _Python_). It is composed of a stable internal API, and an embedded Jython interpreter. It can be used in different contexts, such as batch analysis or automated regression testing. [More information here](Scripting).
+The **OTP Scripting API** allow the execution of routing requests from within scripts (such as _Python_). It is composed of a stable internal API, and an embedded Jython interpreter. It can be used in different contexts, such as batch analysis or automated regression testing. [More information here](Scripting.md).
 
 ## Additional Documentation
 
- * [Basic Usage (get started quickly)](Basic-Usage)
+ * [Basic Usage (get started quickly)](Basic-Usage.md)
  * [Internationalization and Translations](https://github.com/opentripplanner/OpenTripPlanner/blob/master/README_LOCALIZATION.md)
- * [Developers Guide](Developers-Guide) (code conventions, how to submit patches, etc)
+ * [Developers Guide](Developers-Guide.md) (code conventions, how to submit patches, etc)
 
 Some other types of documentation are generated for OTP from its source code:
 
@@ -83,7 +83,7 @@ File bug reports via the Github [issue tracker](https://github.com/openplans/Ope
 
 ## Background
 
-The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of FivePoints, [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](History) page.
+The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of FivePoints, [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](History.md) page.
 In November of 2013, OpenTripPlanner became the thirty-first member project of the <a href="http://sfconservancy.org/">Software Freedom Conservancy.</a>
 
 ## Financial Support
