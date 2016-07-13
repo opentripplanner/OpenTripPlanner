@@ -752,6 +752,36 @@ public class IndexGraphQLSchema {
                     GtfsLibrary.convertIdToString(((Stop) environment.getSource()).getId())))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stopTimesForPattern")
+                .type(new GraphQLList(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(Scalars.GraphQLString)
+                    .defaultValue(null)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("startTime")
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0l) // Default value is current time
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("timeRange")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(24 * 60 * 60)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("numberOfDepartures")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(2)
+                    .build())
+                .dataFetcher(environment ->
+                    index.stopTimesForPattern((Stop) environment.getSource(),
+                        index.patternForId.get(environment.getArgument("id")),
+                        environment.getArgument("startTime"),
+                        environment.getArgument("timeRange"),
+                        environment.getArgument("numberOfDepartures")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
