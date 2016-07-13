@@ -46,6 +46,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -1151,15 +1152,20 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
+                    .defaultValue(null)
                     .build())
                 .dataFetcher(environment -> {
                     try {
-                        Trip trip = (Trip) environment.getSource();
+                        final Trip trip = (Trip) environment.getSource();
+                        final String argServiceDay = environment.getArgument("serviceDay");
+                        final ServiceDate serviceDate = argServiceDay != null
+                            ? ServiceDate.parseString(argServiceDay) : new ServiceDate();
+                        final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
+                            index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
                         return TripTimeShort.fromTripTimes(
-                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
-                                .resolve(index.patternForTrip.get(trip),
-                                    ServiceDate.parseString(environment.getArgument("serviceDay")))
-                            , trip);
+                            index.graph.timetableSnapshotSource.getTimetableSnapshot().resolve(
+                                index.patternForTrip.get(trip), serviceDate),
+                            trip, serviceDay);
                     } catch (ParseException e) {
                         return null; // Invalid date format
                     }
