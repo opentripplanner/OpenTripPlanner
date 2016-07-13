@@ -27,7 +27,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.linking.OriginDestinationLinker;
+import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -48,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
@@ -88,7 +87,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
-    private OriginDestinationLinker originDestinationLinker;
+    private SimpleStreetSplitter simpleStreetSplitter;
 
     public StreetVertexIndexServiceImpl(Graph graph) {
         this(graph, true);
@@ -109,10 +108,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
-            originDestinationLinker = new OriginDestinationLinker(this.graph);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null, false);
         } else {
-            originDestinationLinker = new OriginDestinationLinker(this.graph,
-                (HashGridSpatialIndex<Edge>) edgeTree);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
+                (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree, false);
         }
 
     }
@@ -228,7 +227,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternEdge)
+                if (e instanceof PatternEdge || e instanceof SimpleTransfer)
                     continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {
@@ -287,7 +286,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
-        List<StreetVertex> intersections = getIntersectionsAt(coord);
+        StreetVertex intersection = getIntersectionAt(coord);
         I18NString calculatedName = null;
         Locale locale;
         if (options == null) {
@@ -298,42 +297,36 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (location.name != null) {
             calculatedName = new NonLocalizedString(location.name);
         }
-        if (intersections != null && !intersections.isEmpty()) {
+        if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false;
             if (options == null) {
                 canEscape = true; // Some tests do not supply options.
             } else {
                 TraversalRequirements reqs = new TraversalRequirements(options);
-                //Filters out vertices for which reqs.canBeTraversed doesn't returns true for at least one edge
-                List<StreetVertex> filteredIntersections = intersections.stream().filter(intersectionVertex -> {
-                    Collection<Edge> streetEdges = options.arriveBy ? intersectionVertex.getIncoming() : intersectionVertex.getOutgoing();
-                    return streetEdges.stream()
-                        .filter((StreetEdge.class)::isInstance)
-                        .anyMatch(e -> reqs.canBeTraversed((StreetEdge) e));
-                }).collect(Collectors.toList());
-                canEscape = !filteredIntersections.isEmpty();
-
-            }
-            if (canEscape) {
+                for (StreetEdge e : Iterables.filter ( options.arriveBy ?
+                        intersection.getIncoming() : intersection.getOutgoing(),
+                        StreetEdge.class)) {
+                    if (reqs.canBeTraversed(e)) {
+                        canEscape = true;
+                        break;
+                    }
+                }
+            }       
+            if (canEscape) { 
                 // Coordinate is at an intersection or street endpoint, and has traversible edges.
                 if (!location.hasName()) {
-                    LOG.debug("found intersections {}. not splitting.", intersections);
+                    LOG.debug("found intersection {}. not splitting.", intersection);
 
-                    calculatedName = intersections.get(0).getIntersectionName(locale);
+                    calculatedName = intersection.getIntersectionName(locale);
 
                 }
                 TemporaryStreetLocation closest = new TemporaryStreetLocation(
                         "corner " + Math.random(), coord, calculatedName, endVertex);
-
                 if (endVertex) {
-                    for (Vertex vertex: intersections) {
-                        new TemporaryFreeEdge(vertex, closest);
-                    }
+                    new TemporaryFreeEdge(intersection, closest);
                 } else {
-                    for (Vertex vertex: intersections) {
-                        new TemporaryFreeEdge(closest, vertex);
-                    }
+                    new TemporaryFreeEdge(closest, intersection);
                 }
 
                 return closest;
@@ -573,43 +566,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return nearest;
     }
-
-    /**
-     * @param coordinate Location to search intersection at. Look in a MAX_CORNER_DISTANCE_METERS radius.
-     * @return The nearest intersections, null if none found. It returns multiple intersections only if they are all on same coordinate
-     */
-    public List<StreetVertex> getIntersectionsAt(Coordinate coordinate) {
-        double dLon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CORNER_DISTANCE_METERS,
-            coordinate.y);
-        double dLat = SphericalDistanceLibrary.metersToDegrees(MAX_CORNER_DISTANCE_METERS);
-        Envelope envelope = new Envelope(coordinate);
-        envelope.expandBy(dLon, dLat);
-        List<Vertex> nearby = getVerticesForEnvelope(envelope);
-        //List with all the nearest vertices that are the same coordinate and nearest to search coordinate
-        List<StreetVertex> nearestVertices = new ArrayList<>();
-        double bestDistanceMeter = Double.POSITIVE_INFINITY;
-        for (Vertex v : nearby) {
-            if (v instanceof StreetVertex) {
-                //Vertices with same coordinates as currently closest are just added to the list
-                if (!nearestVertices.isEmpty() &&
-                    v.getCoordinate().equals(nearestVertices.get(0).getCoordinate())) {
-                    nearestVertices.add((StreetVertex) v);
-                    continue;
-                }
-                double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
-                //When we found vertex which is closer then current bestDistance we need to replace
-                //the list of closest vertices with new vertex
-                if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
-                    if (distanceMeter < bestDistanceMeter) {
-                        bestDistanceMeter = distanceMeter;
-                        nearestVertices.clear();
-                        nearestVertices.add((StreetVertex) v);
-                    }
-                }
-            }
-        }
-        return nearestVertices;
-    }
     
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
@@ -617,7 +573,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
             //return getClosestVertex(loc, options, endVertex);
-            return originDestinationLinker.getClosestVertex(loc, options, endVertex);
+            return simpleStreetSplitter.getClosestVertex(loc, options, endVertex);
         }
 
         // No Coordinate available.
