@@ -13,31 +13,33 @@
 
 package org.opentripplanner.routing.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import java.io.IOException;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An implementation of GraphSource that store a transient graph in memory.
  */
 public class MemoryGraphSource implements GraphSource {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MemoryGraphSource.class);
+
     private Router router;
 
-    private JsonNode config;
-
-    /** Create an in-memory graph source with no runtime router configuration. */
+    /**
+     * Create an in-memory graph source. If the graph contains an embedded runtime-server
+     * configuration, it will be used.
+     */
     public MemoryGraphSource(String routerId, Graph graph) {
-        this(routerId, graph, MissingNode.getInstance());
-    }
-
-    /** Create an in-memory graph source with the specififed runtime router configuration JSON. */
-    public MemoryGraphSource(String routerId, Graph graph, JsonNode config) {
         router = new Router(routerId, graph);
         router.graph.routerId = routerId;
-        this.config = config;
         // We will start up the router later on (updaters and runtime configuration options)
     }
 
@@ -51,8 +53,23 @@ public class MemoryGraphSource implements GraphSource {
         // "Reloading" does not make sense for memory-graph, but we want to support mixing in-memory and file-based graphs.
         // Start up graph updaters and apply runtime configuration options
         // TODO will the updaters be started repeatedly due to reload calls?
-        router.startup(config);
-        return true;
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode routerJsonConf;
+
+        if (router.graph.routerConfig == null){
+            LOG.info("No embedded router config available");
+            return false;
+        }
+
+        try {
+            routerJsonConf = mapper.readTree(router.graph.routerConfig);
+            router.startup(routerJsonConf);
+            return true;
+        } catch (IOException e) {
+            LOG.error("Can't startup graph: error with embed config (" + router.graph.routerConfig
+                    + ")", e);
+            return false;
+        }
     }
 
     @Override

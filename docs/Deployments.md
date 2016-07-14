@@ -7,6 +7,7 @@ Following are known deployments of OTP in an agency-sponsored production capacit
 * **New York State** Department of Transportation's 511 [transit trip planner](http://511ny.org/tripplanner/default.aspx) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 * **Arlington, Virginia**'s [commute planning site](http://www.carfreea2z.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
 * **Portland, Oregon, USA** TriMet [Regional Trip Planner](http://ride.trimet.org), the agency originally behind OpenTripPlanner.
+* The **Helsinki** Regional Transport Authority (HSL) [trip planner](https://digitransit.fi/en/) based on OpenTripPlanner is in public beta as of spring 2016. Source code for their new UI is [available on Github](https://github.com/HSLdevcom/digitransit-ui).
 * [**Valencia, Spain**](http://www.emtvalencia.es/geoportal/?lang=en_otp) from the Municipal Transport Company of Valencia S.A.U.
 * [**Grenoble, France**](http://www.metromobilite.fr/) from SMTC, Grenoble Alpes métropole, l'État Français, the Rhône-alpes region, the Isère council and the City of Grenoble.
 * **Rennes, France** where the STAR network provides an OTP client for [iOS](https://itunes.apple.com/us/app/starbusmetro/id899970416?mt=8), [Android](https://play.google.com/store/apps/details?id=com.bookbeo.starbusmetro), Windows Phone et Web.

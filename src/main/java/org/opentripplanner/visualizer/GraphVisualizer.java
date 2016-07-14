@@ -968,11 +968,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JButton snapButton = new JButton("Snap location");
         snapButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
-                        "");
-                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
-                Coordinate c = graph.streetIndex.getClosestPointOnStreet(loc.getCoordinate());
-                if (c != null) showGraph.highlightCoordinate(c);
+                LOG.error("StreetIndex.getClosestPointOnStreet no longer exists.");
             }
         });
         buttonPanel.add(snapButton);
@@ -1374,8 +1370,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         modeSet.setWalk(walkCheckBox.isSelected());
         modeSet.setBicycle(bikeCheckBox.isSelected());
         modeSet.setFerry(ferryCheckBox.isSelected());
-        modeSet.setTrainish(trainCheckBox.isSelected());
-        modeSet.setBusish(busCheckBox.isSelected());
+        modeSet.setRail(trainCheckBox.isSelected());
+        modeSet.setTram(trainCheckBox.isSelected());
+        modeSet.setSubway(trainCheckBox.isSelected());
+        modeSet.setFunicular(trainCheckBox.isSelected());
+        modeSet.setGondola(trainCheckBox.isSelected());
+        modeSet.setBus(busCheckBox.isSelected());
+        modeSet.setCableCar(busCheckBox.isSelected());
         modeSet.setCar(carCheckBox.isSelected());
         // must set generic transit mode last, and only when it is checked
         // otherwise 'false' will clear trainish and busish
