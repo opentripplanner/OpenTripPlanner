@@ -20,9 +20,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import junit.framework.TestCase;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Test;
+import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -243,5 +248,27 @@ public class GraphServiceTest extends TestCase {
         assertEquals("A", graphService.getRouter().graph.routerId);
         assertEquals("A", graphService.getRouter("A").graph.routerId);
 
+    }
+
+    @Test
+    public final void testGraphServiceMemoryRouterConfig () throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode config = mapper.createObjectNode();
+        config.put("timeout", 8);
+        EmbedConfig embedConfig = new EmbedConfig(null, config);
+        embedConfig.buildGraph(emptyGraph, null);
+
+        GraphService graphService = new GraphService();
+        graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
+        assertEquals(1, graphService.getRouterIds().size());
+
+        Graph graph = graphService.getRouter("A").graph;
+        assertNotNull(graph);
+        assertEquals(emptyGraph, graph);
+        assertEquals("A", emptyGraph.routerId);
+
+        JsonNode routerConfig = mapper.readTree(graph.routerConfig);
+        assertEquals(routerConfig, config);
+        assertEquals(routerConfig.get("timeout"), config.get("timeout"));
     }
 }
