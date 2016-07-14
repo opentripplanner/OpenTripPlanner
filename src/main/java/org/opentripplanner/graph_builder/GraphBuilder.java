@@ -76,9 +76,6 @@ public class GraphBuilder implements Runnable {
     
     private Graph graph = new Graph();
 
-    /* The router configuration JSON that was discovered during the graph build and will be embedded (if any). */
-    public JsonNode routerConfig;
-
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
 
@@ -200,7 +197,7 @@ public class GraphBuilder implements Runnable {
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
         // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
-        graphBuilder.routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
+        routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
