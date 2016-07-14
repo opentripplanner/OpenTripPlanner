@@ -40,6 +40,10 @@ public class Alert implements Serializable {
     @XmlElement
     public Date effectiveStartDate;
 
+    //null means unknown
+    @XmlElement
+    public Date effectiveEndDate;
+
     public static HashSet<Alert> newSimpleAlertSet(String text) {
         Alert note = createSimpleAlerts(text);
         HashSet<Alert> notes = new HashSet<Alert>(1);
