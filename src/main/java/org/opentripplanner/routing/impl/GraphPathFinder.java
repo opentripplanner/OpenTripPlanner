@@ -205,29 +205,33 @@ public class GraphPathFinder {
             throw e;
         }
 
+        // Detect and report that most obnoxious of bugs: path reversal asymmetry.
+        // Removing paths might result in an empty list, so do this check before the empty list check.
+        if (paths != null) {
+            Iterator<GraphPath> gpi = paths.iterator();
+            while (gpi.hasNext()) {
+                GraphPath graphPath = gpi.next();
+                // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
+                if (request.arriveBy) {
+                    if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
+                        LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                } else {
+                    if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
+                        LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                }
+            }
+        }
+
         if (paths == null || paths.size() == 0) {
             LOG.debug("Path not found: " + request.from + " : " + request.to);
             request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
-        /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
-        Iterator<GraphPath> gpi = paths.iterator();
-        while (gpi.hasNext()) {
-            GraphPath graphPath = gpi.next();
-            // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-            if (request.arriveBy) {
-                if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
-                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            } else {
-                if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
-                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            }
-        }
         return paths;
     }
 
