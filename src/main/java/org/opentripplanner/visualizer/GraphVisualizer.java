@@ -968,11 +968,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JButton snapButton = new JButton("Snap location");
         snapButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
-                        "");
-                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
-                Coordinate c = graph.streetIndex.getClosestPointOnStreet(loc.getCoordinate());
-                if (c != null) showGraph.highlightCoordinate(c);
+                LOG.error("StreetIndex.getClosestPointOnStreet no longer exists.");
             }
         });
         buttonPanel.add(snapButton);
