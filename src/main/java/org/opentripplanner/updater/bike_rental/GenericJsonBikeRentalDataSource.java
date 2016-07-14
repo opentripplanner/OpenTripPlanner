@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -70,7 +71,18 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     @Override
     public boolean update() {
         try {
-            InputStream data = HttpUtils.getData(url, "ApiKey", apiKey);
+            InputStream data = null;
+        	
+        	URL url2 = new URL(url);
+        	
+            String proto = url2.getProtocol();
+            if (proto.equals("http") || proto.equals("https")) {
+            	data = HttpUtils.getData(url, "ApiKey", apiKey);
+            } else {
+                // Local file probably, try standard java
+                data = url2.openStream();
+            }
+
             if (data == null) {
                 log.warn("Failed to get data from url " + url);
                 return false;
@@ -151,6 +163,10 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
     public String getUrl() {
         return url;
+    }
+    
+    public void setUrl(String url) {
+    	this.url = url;
     }
 
     public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
