@@ -348,7 +348,7 @@ public class TimetableSnapshotSource {
         }
 
         // Make sure that updated trip times have the correct real time state
-        updatedTripTimes.setRealTimeState(RealTimeState.UDPATED);
+        updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
 
         final boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
         return success;
