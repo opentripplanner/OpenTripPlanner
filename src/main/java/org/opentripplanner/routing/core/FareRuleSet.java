@@ -30,12 +30,14 @@ public class FareRuleSet implements Serializable {
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
     private FareAttribute fareAttribute;
+    private Set<AgencyAndId> trips;
     
     public FareRuleSet(FareAttribute fareAttribute) {
         this.fareAttribute = fareAttribute;
         routes = new HashSet<AgencyAndId>();
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
+        trips = new HashSet<AgencyAndId>();
     }
 
     public void setAgency(String agency) {
@@ -75,8 +77,16 @@ public class FareRuleSet implements Serializable {
         return agency != null;
     }
 
+    public void addTrip(AgencyAndId trip) {
+    	trips.add(trip);
+    }
+    
+    public Set<AgencyAndId> getTrips() {
+    	return trips;
+    }
+    
     public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
-            Set<AgencyAndId> routesVisited) {
+            Set<AgencyAndId> routesVisited, Set<AgencyAndId> tripsVisited) {
         //check for matching agency
         if (agency != null) {
             if (agencies.size() != 1 || !agencies.contains(agency))
@@ -109,6 +119,13 @@ public class FareRuleSet implements Serializable {
             if (!routes.containsAll(routesVisited)) {
                 return false;
             }
+        }
+        
+        //check for matching trips
+        if (trips.size() != 0) {
+        	if (!trips.containsAll(tripsVisited)) {
+        		return false;
+        	}
         }
 
         return true;
