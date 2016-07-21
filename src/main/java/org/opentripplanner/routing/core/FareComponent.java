@@ -27,10 +27,12 @@ import java.util.List;
  */
 public class FareComponent {
 
+    public AgencyAndId fareId;
     public Money price;
     public List<AgencyAndId> routes;
 
-    public FareComponent(Money amount) {
+    public FareComponent(AgencyAndId fareId, Money amount) {
+        this.fareId = fareId;
         price = amount;
         routes = new ArrayList<AgencyAndId>();
     }
@@ -41,6 +43,8 @@ public class FareComponent {
 
     public String toString() {
         StringBuffer buffer = new StringBuffer("FareComponent(");
+        buffer.append(fareId.toString());
+        buffer.append(", ");
         buffer.append(price.toString());
         buffer.append(", ");
         for (AgencyAndId routeId : routes) {

@@ -179,6 +179,7 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
 
         // D -> E, null case
@@ -196,8 +197,10 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
+        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BC"));
         assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
 
         // B -> D, 2 fully connected components
@@ -208,6 +211,7 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "BD"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "2"));
         assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "3"));
 
@@ -219,6 +223,7 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
         assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
 
@@ -230,6 +235,7 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "CD"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "3"));
 
         // D -> G, missing fare before
@@ -240,6 +246,7 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
         assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
 
@@ -251,8 +258,10 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
         assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
+        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BD"));
         assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
         assertEquals(fareComponents.get(1).routes.get(1), new AgencyAndId("agency", "3"));
     }

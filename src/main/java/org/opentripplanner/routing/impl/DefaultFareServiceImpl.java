@@ -119,6 +119,10 @@ class FareSearch {
     // This is used for reconstructing which rides are grouped together
     int[][] next;
 
+    // Cell [i,j] holds the id of the fare that corresponds to the relevant cost
+    // we can't just use FareAndId for resultTable because you need to sum them
+    AgencyAndId[][] fareIds;
+
     // Cell [i] holds the index of the last ride that ride[i] has a fare to
     // If it's -1, the ride does not have fares to anywhere
     int[] endOfComponent;
@@ -126,8 +130,20 @@ class FareSearch {
     FareSearch(int size) {
         resultTable = new float[size][size];
         next = new int[size][size];
+        fareIds = new AgencyAndId[size][size];
         endOfComponent = new int[size];
         Arrays.fill(endOfComponent, -1);
+    }
+}
+
+/** Holds fare and corresponding fareId */
+class FareAndId {
+    float fare;
+    AgencyAndId fareId;
+
+    FareAndId(float fare, AgencyAndId fareId) {
+        this.fare = fare;
+        this.fareId = fareId;
     }
 }
 
@@ -234,7 +250,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                float cost = calculateCost(fareType, rides.subList(j, j + i + 1), fareRules);
+                FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
+                float cost = best.fare;
                 if (cost < 0) {
                     LOG.error("negative cost for a ride sequence");
                     cost = Float.POSITIVE_INFINITY;
@@ -244,6 +261,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                     r.next[j][j + i] = j + i;
                 }
                 r.resultTable[j][j + i] = cost;
+                r.fareIds[j][j + i] = best.fareId;
                 for (int k = 0; k < i; k++) {
                     float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
                     if (r.resultTable[j][j + i] > via) {
@@ -302,7 +320,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
             int via = r.next[start][r.endOfComponent[start]];
             float cost = r.resultTable[start][via];
-            FareComponent detail = new FareComponent(getMoney(currency, cost));
+            AgencyAndId fareId = r.fareIds[start][via];
+            FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
             for(int i = start; i <= via; ++i) {
                 detail.addRoute(rides.get(i).route);
             }
@@ -317,6 +336,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     }
 
     protected float calculateCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
+        return getBestFareAndId(fareType, rides, fareRules).fare;
+    }
+
+    private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
@@ -335,7 +359,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (Ride ride : rides) {
             if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
-                return Float.POSITIVE_INFINITY;
+                return new FareAndId(Float.POSITIVE_INFINITY, null);
             }
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
@@ -386,8 +410,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         if (bestFare == Float.POSITIVE_INFINITY) {
             LOG.debug("No fare for a ride sequence: {}", rides);
         }
-        return bestFare;
-
+        return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
     }
     
     private float getFarePrice(FareAttribute fare, FareType type) {
