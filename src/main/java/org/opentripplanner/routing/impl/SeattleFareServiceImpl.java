@@ -16,11 +16,13 @@ package org.opentripplanner.routing.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.slf4j.Logger;
@@ -66,6 +68,17 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
     public void addDefaultFare(FareType fareType, String agencyId, float cost) {
         defaultFares.put(new T2<FareType, String>(fareType, agencyId), cost);
+    }
+
+    @Override
+    protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
+        float lowestCost = getLowestCost(fareType, rides, fareRules);
+        if(lowestCost != Float.POSITIVE_INFINITY) {
+            fare.addFare(fareType, getMoney(currency, lowestCost));
+            return true;
+        }
+        return false;
     }
 
     @Override

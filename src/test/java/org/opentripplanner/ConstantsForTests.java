@@ -35,6 +35,8 @@ public class ConstantsForTests {
     
     public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
 
+    public static final String FARE_COMPONENT_GTFS = "src/test/resources/farecomponent_gtfs.zip";
+
     private static ConstantsForTests instance = null;
 
     private Graph portlandGraph = null;
