@@ -38,6 +38,8 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.routing.car_park.CarParkService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -430,6 +432,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
+            CarParkService carParkService = graph.getService(
+                CarParkService.class, true);
             Envelope envelope = new Envelope();
             // Process all nodes from outer rings
             // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
@@ -492,14 +496,27 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 // but this is an issue with OSM data.
             }
             // Place the P+R at the center of the envelope
-            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId,
-                    "P+R_" + osmId, (envelope.getMinX() + envelope.getMaxX()) / 2,
-                    (envelope.getMinY() + envelope.getMaxY()) / 2, creativeName);
+            CarPark carPark = new CarPark();
+            carPark.id = "P+R" + osmId;
+            carPark.name = creativeName;
+            carPark.realTimeData = false;
+            carPark.x = (envelope.getMinX() + envelope.getMaxX()) / 2;
+            carPark.y = (envelope.getMinY() + envelope.getMaxY()) / 2;
+            int capacity;
+            try {
+                capacity = Integer.parseInt(group.getSomeOSMObject().getTag("capacity"), 10);
+            } catch (NumberFormatException e) {
+                capacity = Integer.MAX_VALUE;
+            }
+            carPark.maxCapacity = carPark.spacesAvailable = capacity;
+
+            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, carPark);
             new ParkAndRideEdge(parkAndRideVertex);
             for (OsmVertex accessVertex : accessVertexes) {
                 new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
                 new ParkAndRideLinkEdge(accessVertex, parkAndRideVertex);
             }
+            carParkService.addCarPark(carPark);
             LOG.debug("Created P+R '{}' ({})", creativeName, osmId);
             return true;
         }

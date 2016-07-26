@@ -105,9 +105,10 @@ public class Place {
     public String bikeShareId;
 
     /**
-     * In case the vertex is of type Bike parking.
+     * In case the vertex is of a parking type.
      */
     public String bikeParkId;
+    public String carParkId;
 
     /**
      * Returns the geometry in GeoJSON format

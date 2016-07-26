@@ -44,6 +44,8 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.routing.car_park.CarParkService;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -154,6 +156,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType bikeParkType = new GraphQLTypeReference("BikePark");
 
+    public GraphQLOutputType carParkType = new GraphQLTypeReference("CarPark");
+
     public GraphQLOutputType coordinateType = new GraphQLTypeReference("Coordinates");
 
     public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
@@ -214,6 +218,9 @@ public class IndexGraphQLSchema {
             }
             if (o instanceof BikePark) {
                 return (GraphQLObjectType) bikeParkType;
+            }
+            if (o instanceof CarPark) {
+                return (GraphQLObjectType) carParkType;
             }
             return null;
         }
@@ -1553,6 +1560,47 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        carParkType = GraphQLObjectType.newObject()
+            .name("CarPark")
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay
+                    .toGlobalId(carParkType.getName(), ((CarPark) environment.getSource()).id))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("carParkId")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).id)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("name")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).name)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("spacesAvailable")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).spacesAvailable)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtime")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).realTimeData)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lon")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).x)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lat")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).y)
+                .build())
+            .build();
+
         queryType = GraphQLObjectType.newObject()
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
@@ -1593,11 +1641,20 @@ public class IndexGraphQLSchema {
                         .get();
                 }
                 if (id.type.equals(bikeParkType.getName())) {
-                    // No index exists for bikeshare station ids
+                    // No index exists for bike parking ids
                     return index.graph.getService(BikeRentalStationService.class)
                         .getBikeParks()
                         .stream()
-                        .filter(bikeRentalStation -> bikeRentalStation.id.equals(id.id))
+                        .filter(bikePark -> bikePark.id.equals(id.id))
+                        .findFirst()
+                        .get();
+                }
+                if (id.type.equals(carParkType.getName())) {
+                    // No index exists for car parking ids
+                    return index.graph.getService(CarParkService.class)
+                        .getCarParks()
+                        .stream()
+                        .filter(carPark -> carPark.id.equals(id.id))
                         .findFirst()
                         .get();
                 }
@@ -1954,6 +2011,25 @@ public class IndexGraphQLSchema {
                     .get())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("carParks")
+                .type(new GraphQLList(carParkType))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("carPark")
+                .type(carParkType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> index.graph.getService(CarParkService.class)
+                    .getCarParks()
+                    .stream()
+                    .filter(carPark -> carPark.id.equals(environment.getArgument("id")))
+                    .findFirst()
+                    .get())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")
                 .description(
                     "Needed until https://github.com/facebook/relay/issues/112 is resolved")
@@ -2039,6 +2115,19 @@ public class IndexGraphQLSchema {
                         .getBikeParks()
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
+                        .findFirst()
+                        .get()
+                    : null)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("carPark")
+                .type(carParkType)
+                .description("The car parking related to the place")
+                .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
+                    index.graph.getService(CarParkService.class)
+                        .getCarParks()
+                        .stream()
+                        .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
                         .findFirst()
                         .get()
                     : null)
