@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -72,7 +73,7 @@ public class TestIntermediatePlaces {
         handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", true);
     }
 
-    @Test public void testOneIntermediatePlace() {
+    @Test @Ignore public void testOneIntermediatePlace() {
         GenericLocation fromLocation = new GenericLocation(39.93080, -82.98522);
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.92099, -82.95570) };
@@ -81,7 +82,7 @@ public class TestIntermediatePlaces {
         handleRequest(fromLocation, toLocation, intermediateLocations, "WALK", true);
     }
 
-    @Test public void testTwoIntermediatePlaces() {
+    @Test @Ignore public void testTwoIntermediatePlaces() {
         GenericLocation fromLocation = new GenericLocation(39.93080, -82.98522);
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = new GenericLocation[2];
