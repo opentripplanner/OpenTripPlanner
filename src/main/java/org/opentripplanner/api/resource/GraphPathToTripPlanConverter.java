@@ -684,6 +684,8 @@ public abstract class GraphPathToTripPlanConverter {
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
+            place.bikeParkId = ((BikeParkVertex) vertex).getId();
+            LOG.trace("Added bike parking Id {} to place", place.bikeParkId);
             place.vertexType = VertexType.BIKEPARK;
         } else {
             place.vertexType = VertexType.NORMAL;
