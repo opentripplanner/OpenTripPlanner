@@ -33,6 +33,8 @@ public class ParkAndRideVertex extends Vertex {
 
     private String id;
 
+    public int spacesAvailable = Integer.MAX_VALUE;
+
     public ParkAndRideVertex(Graph g, String label, String id, double x, double y, I18NString name) {
         super(g, label, x, y, name);
         setId(id);
@@ -40,6 +42,7 @@ public class ParkAndRideVertex extends Vertex {
 
     public ParkAndRideVertex(Graph graph, CarPark carPark) {
         super(graph, carPark.id, carPark.x, carPark.y, carPark.name);
+        this.spacesAvailable = carPark.spacesAvailable;
         setId(carPark.id);
     }
 
