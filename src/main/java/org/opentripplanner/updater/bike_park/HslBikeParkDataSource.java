@@ -31,6 +31,7 @@ public class HslBikeParkDataSource extends GenericJsonBikeParkDataSource{
             Point geometry = parseGeometry(node.path("location")).getCentroid();
             station.y = geometry.getY();
             station.x = geometry.getX();
+            station.realTimeData = false;
             if (!node.path("status").asText().equals("IN_OPERATION")) {
                 station.spacesAvailable = 0;
             } else {
