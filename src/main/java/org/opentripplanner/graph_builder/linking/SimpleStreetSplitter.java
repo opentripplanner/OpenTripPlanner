@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -33,6 +34,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -381,6 +383,8 @@ public class SimpleStreetSplitter {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to);
+        } else if (from instanceof ParkAndRideVertex) {
+            makeCarParkEdges((ParkAndRideVertex) from, to);
         }
     }
 
@@ -413,6 +417,20 @@ public class SimpleStreetSplitter {
 
         new StreetBikeParkLink(from, to);
         new StreetBikeParkLink(to, from);
+    }
+
+    /** Make car park edges */
+    private void makeCarParkEdges(ParkAndRideVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Car park edges are created with non destructive splitting!");
+        }
+        for (ParkAndRideLinkEdge sbpl : Iterables.filter(from.getOutgoing(), ParkAndRideLinkEdge.class)) {
+            if (sbpl.getToVertex() == to)
+                return;
+        }
+
+        new ParkAndRideLinkEdge(from, to);
+        new ParkAndRideLinkEdge(to, from);
     }
 
     /** 

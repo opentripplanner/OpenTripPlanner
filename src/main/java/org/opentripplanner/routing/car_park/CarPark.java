@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.car_park;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.util.I18NString;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -56,6 +57,8 @@ public class CarPark implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
+
+    public Geometry geometry;
 
     public boolean equals(Object o) {
         if (!(o instanceof CarPark)) {
