@@ -116,6 +116,7 @@ public class IndexGraphQLSchema {
         .value("TRANSIT", VertexType.TRANSIT, "TRANSIT")
         .value("BIKEPARK", VertexType.BIKEPARK, "BIKEPARK")
         .value("BIKESHARE", VertexType.BIKESHARE, "BIKESHARE")
+        .value("PARKANDRIDE", VertexType.PARKANDRIDE, "PARKANDRIDE")
         .build();
 
     public static GraphQLEnumType modeEnum = GraphQLEnumType.newEnum()
@@ -1580,6 +1581,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((CarPark) environment.getSource()).name)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("maxCapacity")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((CarPark) environment.getSource()).maxCapacity)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("spacesAvailable")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((CarPark) environment.getSource()).spacesAvailable)
@@ -2013,7 +2019,20 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("carParks")
                 .type(new GraphQLList(carParkType))
-                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("ids")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        Map<String, CarPark> carParks = index.graph.getService(CarParkService.class).getCarParkById();
+                        return ((List<String>) environment.getArgument("ids"))
+                            .stream()
+                            .map(carParks::get)
+                            .collect(Collectors.toList());
+                    }
+                    return new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks());
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("carPark")
