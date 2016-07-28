@@ -37,6 +37,8 @@ class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
             if (requestContext.getHeaderString("Access-Control-Request-Method") != null) {
                 preflightResponse.header("Access-Control-Allow-Method", "GET,POST");
             }
+            // Allow caching of pre-flight options for up to an hour
+            preflightResponse.header("Access-Control-Max-Age", "3600");
             requestContext.abortWith(preflightResponse.build());
         }
     }
