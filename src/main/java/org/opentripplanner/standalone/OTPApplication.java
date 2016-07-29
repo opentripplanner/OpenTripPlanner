@@ -96,7 +96,8 @@ public class OTPApplication extends Application {
             RepeatedRaptorTestResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             CorsFilter.class,
-            MultiPartFeature.class
+            MultiPartFeature.class,
+            VehiclePositions.class
         ));
         
         if (this.secure) {

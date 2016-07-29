@@ -24,13 +24,16 @@ import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.opentripplanner.updater.traffic.OpenTrafficUpdater;
+
+import org.opentripplanner.updater.vehiclepositions.PollingVehiclePositionsUpdater;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
  * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
+ *
  * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
  * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
  * called "updaters". Each child element represents one updater.
@@ -56,7 +59,7 @@ public abstract class GraphUpdaterConfigurator {
         JsonNode embeddedConfig = null; // graph.routerConfig;
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
-        
+
         // Apply configuration
         // FIXME why are we returning the same updatermanager object that has been modified ? this method could just create it.
         updaterManager = applyConfigurationToGraph(graph, updaterManager, mainConfig);
@@ -83,6 +86,7 @@ public abstract class GraphUpdaterConfigurator {
             // For each sub-node, determine which kind of updater is being created.
             String type = configItem.path("type").asText();
             GraphUpdater updater = null;
+
             if (type != null) {
                 if (type.equals("bike-rental")) {
                     updater = new BikeRentalUpdater();
@@ -95,6 +99,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("websocket-gtfs-rt-updater")) {
                     updater = new WebsocketGtfsRealtimeUpdater();
+                }
+                else if (type.equals("vehicle-position-updater")){
+                    updater = new PollingVehiclePositionsUpdater();
                 }
                 else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
