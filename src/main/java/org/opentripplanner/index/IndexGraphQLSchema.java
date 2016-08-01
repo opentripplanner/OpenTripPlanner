@@ -1351,6 +1351,9 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("type")
                 .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
+                    (Route) environment.getSource())) //TODO: Remove the data fetcher to export proper type when upgrading to v2 of the HSL scheme
+                .deprecate("The meaning of the type field will be changed to v2. Please use the mode-field instead. Type will export the raw type integer form the GTFS source.")
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
