@@ -1182,7 +1182,7 @@ public class IndexGraphQLSchema {
                             timetable = timetableSnapshotSource.getTimetableSnapshot().resolve(
                                 index.patternForTrip.get(trip), serviceDate);
                         } else {
-                            timetable = index.patternForTrip.get(trip).scheduledTimetable
+                            timetable = index.patternForTrip.get(trip).scheduledTimetable;
                         }
                         return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
                     } catch (ParseException e) {
