@@ -52,12 +52,14 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -1174,10 +1176,15 @@ public class IndexGraphQLSchema {
                             ? ServiceDate.parseString(argServiceDay) : new ServiceDate();
                         final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
                             index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
-                        return TripTimeShort.fromTripTimes(
-                            index.graph.timetableSnapshotSource.getTimetableSnapshot().resolve(
-                                index.patternForTrip.get(trip), serviceDate),
-                            trip, serviceDay);
+                        TimetableSnapshotSource timetableSnapshotSource = index.graph.timetableSnapshotSource;
+                        Timetable timetable;
+                        if (timetableSnapshotSource != null) {
+                            timetable = timetableSnapshotSource.getTimetableSnapshot().resolve(
+                                index.patternForTrip.get(trip), serviceDate);
+                        } else {
+                            timetable = index.patternForTrip.get(trip).scheduledTimetable
+                        }
+                        return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
                     } catch (ParseException e) {
                         return null; // Invalid date format
                     }
