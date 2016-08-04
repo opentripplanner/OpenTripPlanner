@@ -17,10 +17,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.util.Collection;
@@ -46,30 +44,6 @@ public interface StreetVertexIndexService {
     public Collection<Edge> getEdgesForEnvelope(Envelope envelope);
 
     /**
-     * Get the closest edges to this location are traversable given these preferences.
-     * 
-     * @param location
-     * @param extraEdges Additional edges to consider, may be null
-     * @param preferredEdges Edges which are preferred, may be null
-     * @param possibleTransitLinksOnly Only include possible transit links.
-     * @return
-     */
-    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
-            TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
-            boolean possibleTransitLinksOnly);
-
-    /**
-     * Get the closest edges to this location are traversable given these preferences.
-     * 
-     * Convenience wrapper for above.
-     * 
-     * @param location
-     * @return
-     */
-    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
-            TraversalRequirements reqs);
-
-    /**
      * @param coordinate
      * @param radiusMeters
      * @return The transit stops within a certain radius of the given location.
@@ -92,14 +66,6 @@ public interface StreetVertexIndexService {
      */
     public Vertex getVertexForLocation(GenericLocation place, RoutingRequest options,
                                        boolean endVertex);
-
-    /**
-     * Finds the on-street coordinate closest to a given coordinate
-     *
-     * @param coordinate The coordinate to be found on the street network
-     * @return The on-street {@link Coordinate} that's closest to the given input {@link Coordinate}
-     */
-    public Coordinate getClosestPointOnStreet(Coordinate coordinate);
 
 	/** Get a vertex at a given coordinate, using the same logic as in Samples. Used in Analyst
 	 * so that origins and destinations are linked the same way. */

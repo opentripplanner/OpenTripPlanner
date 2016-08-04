@@ -31,6 +31,11 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class Ring {
+
+    public static class RingConstructionException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+
     public List<OSMNode> nodes;
 
     public VLPolygon geometry;
@@ -85,7 +90,12 @@ public class Ring {
         }
         GeometryFactory factory = GeometryUtils.getGeometryFactory();
 
-        LinearRing shell = factory.createLinearRing(toCoordinates(geometry));
+        LinearRing shell;
+        try {
+            shell = factory.createLinearRing(toCoordinates(geometry));
+        } catch (IllegalArgumentException e) {
+            throw new RingConstructionException();
+        }
 
         // we need to merge connected holes here, because JTS does not believe in
         // holes that touch at multiple points (and, weirdly, does not have a method

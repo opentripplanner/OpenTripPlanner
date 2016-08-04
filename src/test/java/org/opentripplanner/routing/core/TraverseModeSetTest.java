@@ -25,7 +25,11 @@ public class TraverseModeSetTest {
         
         assertTrue(modeSet.getCar());
         assertFalse(modeSet.isTransit());
-        assertFalse(modeSet.getTrainish());
+        assertFalse(modeSet.getRail());
+        assertFalse(modeSet.getTram());
+        assertFalse(modeSet.getSubway());
+        assertFalse(modeSet.getFunicular());
+        assertFalse(modeSet.getGondola());
         assertFalse(modeSet.getWalk());
         assertFalse(modeSet.getBicycle());        
     }
@@ -37,7 +41,11 @@ public class TraverseModeSetTest {
         assertTrue(modeSet.getWalk());
         assertFalse(modeSet.getCar());
         assertFalse(modeSet.isTransit());
-        assertFalse(modeSet.getTrainish());
+        assertFalse(modeSet.getRail());
+        assertFalse(modeSet.getTram());
+        assertFalse(modeSet.getSubway());
+        assertFalse(modeSet.getFunicular());
+        assertFalse(modeSet.getGondola());
         assertFalse(modeSet.getBicycle());
     }
     
@@ -49,7 +57,11 @@ public class TraverseModeSetTest {
         assertFalse(modeSet.getWalk());
         assertFalse(modeSet.getCar());
         assertFalse(modeSet.isTransit());
-        assertFalse(modeSet.getTrainish());
+        assertFalse(modeSet.getRail());
+        assertFalse(modeSet.getTram());
+        assertFalse(modeSet.getSubway());
+        assertFalse(modeSet.getFunicular());
+        assertFalse(modeSet.getGondola());
         assertFalse(modeSet.getWalk());
     }
 

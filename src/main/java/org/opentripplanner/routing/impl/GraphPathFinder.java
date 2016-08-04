@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
@@ -35,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -205,65 +205,87 @@ public class GraphPathFinder {
             throw e;
         }
 
+        // Detect and report that most obnoxious of bugs: path reversal asymmetry.
+        // Removing paths might result in an empty list, so do this check before the empty list check.
+        if (paths != null) {
+            Iterator<GraphPath> gpi = paths.iterator();
+            while (gpi.hasNext()) {
+                GraphPath graphPath = gpi.next();
+                // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
+                if (request.arriveBy) {
+                    if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
+                        LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                } else {
+                    if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
+                        LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                }
+            }
+        }
+
         if (paths == null || paths.size() == 0) {
             LOG.debug("Path not found: " + request.from + " : " + request.to);
             request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
-        /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
-        Iterator<GraphPath> gpi = paths.iterator();
-        while (gpi.hasNext()) {
-            GraphPath graphPath = gpi.next();
-            // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-            if (request.arriveBy) {
-                if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
-                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            } else {
-                if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
-                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            }
-        }
         return paths;
     }
 
     /**
      * Break up a RoutingRequest with intermediate places into separate requests, in the given order.
-     * If there are no intermediate places, issue a single request.
+     *
+     * If there are no intermediate places, issue a single request. Otherwise process the places
+     * list [from, i1, i2, ..., to] either from left to right (if {@code request.arriveBy==false})
+     * or from right to left (if {@code request.arriveBy==true}). In the latter case the order of
+     * the requested subpaths is (i2, to), (i1, i2), and (from, i1) which has to be reversed at
+     * the end.
      */
     private List<GraphPath> getGraphPathsConsideringIntermediates (RoutingRequest request) {
         if (request.hasIntermediatePlaces()) {
-            long time = request.dateTime;
-            GenericLocation from = request.from;
-            List<GenericLocation> places = Lists.newLinkedList(request.intermediatePlaces);
+            List<GenericLocation> places = Lists.newArrayList(request.from);
+            places.addAll(request.intermediatePlaces);
             places.add(request.to);
-            request.clearIntermediatePlaces();
+            long time = request.dateTime;
+
             List<GraphPath> paths = new ArrayList<>();
+            DebugOutput debugOutput = null;
+            int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
 
-            for (GenericLocation to : places) {
-                request.dateTime = time;
-                request.from = from;
-                request.to = to;
-                request.rctx = null;
-                request.setRoutingContext(router.graph);
-                // TODO request only one itinerary here
+            while (0 < placeIndex && placeIndex < places.size()) {
+                RoutingRequest intermediateRequest = request.clone();
+                intermediateRequest.setNumItineraries(1);
+                intermediateRequest.dateTime = time;
+                intermediateRequest.from = places.get(placeIndex - 1);
+                intermediateRequest.to = places.get(placeIndex);
+                intermediateRequest.rctx = null;
+                intermediateRequest.setRoutingContext(router.graph);
 
-                List<GraphPath> partialPaths = getPaths(request);
-                if (partialPaths == null || partialPaths.size() == 0) {
-                    return null;
+                if (debugOutput != null) {// Restore the previous debug info accumulator
+                    intermediateRequest.rctx.debugOutput = debugOutput;
+                } else {// Store the debug info accumulator
+                    debugOutput = intermediateRequest.rctx.debugOutput;
+                }
+
+                List<GraphPath> partialPaths = getPaths(intermediateRequest);
+                if (partialPaths.size() == 0) {
+                    return partialPaths;
                 }
 
                 GraphPath path = partialPaths.get(0);
                 paths.add(path);
-                from = to;
-                time = path.getEndTime();
+                time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
+                placeIndex += (request.arriveBy ? -1 : +1);
             }
-
-            return Arrays.asList(joinPaths(paths));
+            request.setRoutingContext(router.graph);
+            request.rctx.debugOutput = debugOutput;
+            if (request.arriveBy) {
+                Collections.reverse(paths);
+            }
+            return Collections.singletonList(joinPaths(paths));
         } else {
             return getPaths(request);
         }
@@ -273,6 +295,10 @@ public class GraphPathFinder {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
         Vertex lastVertex = lastState.getVertex();
+
+        //With more paths we should allow more transfers
+        lastState.getOptions().maxTransfers *= paths.size();
+
         for (GraphPath path : paths.subList(1, paths.size())) {
             lastState = newPath.states.getLast();
             // add a leg-switching state

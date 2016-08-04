@@ -15,10 +15,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Get fake graphs.
@@ -55,11 +57,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -70,13 +68,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
@@ -130,11 +122,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -145,13 +133,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         int stopIdx = 0;
@@ -202,17 +184,130 @@ public class FakeGraph {
         gtfs.buildGraph(g, new HashMap<>());
     }
 
+    public static void addPerpendicularRoutes(Graph graph) throws Exception {
+        GTFSFeed feed = new GTFSFeed();
+        Agency agencyA = createDummyAgency("agencyA", "Agency A", "America/New_York");
+        feed.agency.put("agencyA", agencyA);
+        Agency agencyB = createDummyAgency("agencyB", "Agency B", "America/New_York");
+        feed.agency.put("agencyB", agencyB);
+        Service s = createDummyService();
+        feed.services.put(s.service_id, s);
+
+        int stopIdX = 0;
+        int stopIdY = 0;
+        for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
+            stopIdX = 0;
+            for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
+                com.conveyal.gtfs.model.Stop stop = new com.conveyal.gtfs.model.Stop();
+                stop.stop_id = stop.stop_name = String.format("s-%d-%d", stopIdX, stopIdY);
+                stop.stop_lat = lat;
+                stop.stop_lon = lon;
+                feed.stops.put(stop.stop_id, stop);
+                stopIdX++;
+            }
+            stopIdY++;
+        }
+
+        for (int i = 0; i < stopIdY; i++) {
+            Route route = new Route();
+            route.route_short_name = "hr" + i;
+            route.route_long_name = i + "th Horizontal Street";
+            route.route_type = Route.BUS;
+            route.agency = agencyA;
+            route.route_id = "horizontalroute" + i;
+            feed.routes.put(route.route_id, route);
+        }
+        for (int i = 0; i < stopIdX; i++) {
+            Route route = new Route();
+            route.route_short_name = "vr" + i;
+            route.route_long_name = i + "th Vertical Street";
+            route.route_type = Route.TRAM;
+            route.agency = agencyB;
+            route.route_id = "verticalroute" + i;
+            feed.routes.put(route.route_id, route);
+        }
+
+        Map<String, Route> routes = feed.routes;
+        com.conveyal.gtfs.model.Stop stop;
+        for (Route route : routes.values()) {
+            int routeId = Integer.parseInt(route.route_short_name.substring(2));
+            int x, y;
+            boolean isHorizontal = route.route_short_name.startsWith("hr");
+            for (int departure = 7 * 3600; departure < 20 * 3600; departure += FREQUENCY) {
+                Trip t = new Trip();
+                t.trip_id = "trip:" + route.route_id + ":" + departure;
+                t.service = s;
+                t.route = route;
+                feed.trips.put(t.trip_id, t);
+
+                int departureTime = departure;
+                int nrOfStops = (isHorizontal ? stopIdX : stopIdY);
+                for (int stopSequenceNr = 0; stopSequenceNr < nrOfStops; stopSequenceNr++) {
+                    x = (isHorizontal ? stopSequenceNr : routeId);
+                    y = (isHorizontal ? routeId : stopSequenceNr);
+                    stop = feed.stops.get(String.format("s-%d-%d", x, y));
+                    StopTime st1 = new StopTime();
+                    st1.trip_id = t.trip_id;
+                    st1.arrival_time = departureTime;
+                    st1.departure_time = departureTime;
+                    st1.stop_id = stop.stop_id;
+                    st1.stop_sequence = stopSequenceNr + 1;
+                    feed.stop_times.put(new Fun.Tuple2(st1.trip_id, st1.stop_sequence), st1);
+                    //connect last stop to first so graph is fully reachable
+                    if (stopSequenceNr == 0) {
+                        StopTime stopTime = new StopTime();
+                        stopTime.trip_id = t.trip_id;
+                        stopTime.arrival_time = departureTime + nrOfStops * 120 + 30 * 60;
+                        stopTime.departure_time = departureTime + nrOfStops * 120 + 30 * 60;
+                        stopTime.stop_id = stop.stop_id;
+                        stopTime.stop_sequence = stopSequenceNr + 1 + nrOfStops;
+                        feed.stop_times.put(new Fun.Tuple2(stopTime.trip_id, stopTime.stop_sequence), stopTime);
+                    }
+                    departureTime += 120;
+                }
+            }
+        }
+        File tempFile = File.createTempFile("gtfs", ".zip");
+        feed.toFile(tempFile.getAbsolutePath());
+
+        // phew. load it into the graph.
+        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
+        gtfs.buildGraph(graph, new HashMap<>());
+    }
+
+    private static Service createDummyService() {
+        Service s = new Service("service");
+        s.calendar = new Calendar();
+        s.calendar.service = s;
+        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
+                s.calendar.saturday = s.calendar.sunday = 1;
+        s.calendar.start_date = 19991231;
+        s.calendar.end_date = 21001231;
+        return s;
+    }
+
+    private static Agency createDummyAgency(String id, String name, String timeZone) {
+        Agency a = new Agency();
+        a.agency_id = id;
+        a.agency_name = name;
+        a.agency_timezone = timeZone;
+        try {
+            a.agency_url = new URL("http://www.example.com/" + id);
+        } catch (MalformedURLException e) {
+            // This really can't happen
+            assert false;
+            a.agency_url = null;
+        }
+        return a;
+    }
+
     /** Add a transit line with multiple patterns to a Columbus graph. Most trips serve stops s1, s2, s3 but some serve only s1, s3 */
     public static void addMultiplePatterns (Graph gg) throws Exception {
         // using conveyal GTFS lib to build GTFS so a lot of code does not have to be rewritten later
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -223,13 +318,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
@@ -374,11 +463,7 @@ public class FakeGraph {
         // once we're using the conveyal GTFS lib for everything we ought to be able to do this
         // without even writing out the GTFS to a file.
         GTFSFeed feed = new GTFSFeed();
-        Agency a = new Agency();
-        a.agency_id = "agency";
-        a.agency_name = "Agency";
-        a.agency_timezone = "America/New_York";
-        a.agency_url = new URL("http://www.example.com");
+        Agency a = createDummyAgency("agency", "Agency", "America/New_York");
         feed.agency.put("agency", a);
 
         Route r = new Route();
@@ -389,13 +474,7 @@ public class FakeGraph {
         r.route_id = "route";
         feed.routes.put(r.route_id, r);
 
-        Service s = new Service("service");
-        s.calendar = new Calendar();
-        s.calendar.service = s;
-        s.calendar.monday = s.calendar.tuesday = s.calendar.wednesday = s.calendar.thursday = s.calendar.friday =
-                s.calendar.saturday = s.calendar.sunday = 1;
-        s.calendar.start_date = 19991231;
-        s.calendar.end_date = 21001231;
+        Service s = createDummyService();
         feed.services.put(s.service_id, s);
 
         com.conveyal.gtfs.model.Stop s1 = new com.conveyal.gtfs.model.Stop();
