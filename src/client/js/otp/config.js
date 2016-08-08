@@ -5,7 +5,7 @@ otp.config = {
     //If enabled it shows inspector layers overlays which can be used for Graph
     //debugging
     //Can be also enabled in URL parameters as ?debug_layers=true
-    debug_layers: false,
+    debug_layers: true,
 
     //This is default locale when wanted locale isn't found
     //Locale language is set based on wanted language in url >
@@ -68,12 +68,17 @@ otp.config = {
      */
 
     baseLayers: [
-        {
-            name: 'Transport Tiles',
-            tileUrl: 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
-            subdomains : ['a','b','c'],
-            attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. Tiles from <a href="http://www.thunderforest.com/transport/">Andy Allan</a>'
-        },
+         {
+             name: 'Rutebanken OSM',
+             tileUrl: 'https://test.rutebanken.org/apiman-gateway/rutebanken/map/1.0/{z}/{x}/{y}.png',
+             attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+         },
+         {
+             name: 'Transport Tiles',
+             tileUrl: 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
+             subdomains : ['a','b','c'],
+             attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. Tiles from <a href="http://www.thunderforest.com/transport/">Andy Allan</a>'
+         },
         {
             name: 'MapQuest OSM',
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
@@ -100,10 +105,10 @@ otp.config = {
      * properties, when set, override that behavioir.
      */
      
-    // initLatLng : new L.LatLng(<lat>, <lng>),
-    // initZoom : 14,
-    // minZoom : 10,
-    // maxZoom : 20,
+    initLatLng : new L.LatLng(59.91162, 10.75047),
+     initZoom : 12,
+     minZoom : 8,
+     maxZoom : 20,
     
     /* Whether the map should be moved to contain the full itinerary when a result is received. */
     zoomToFitResults    : false,
@@ -112,14 +117,14 @@ otp.config = {
      * Site name / description / branding display options
      */
 
-    siteName            : "My OTP Instance",
+    siteName            : "Rutebanken OpenTripPlanner",
     siteDescription     : "An OpenTripPlanner deployment.",
     logoGraphic         : 'images/otp_logo_darkbg_40px.png',
     // bikeshareName    : "",
     //Enable this if you want to show frontend language chooser
-    showLanguageChooser : true,
+    showLanguageChooser : false,
 
-    showLogo            : true,
+    showLogo            : false,
     showTitle           : true,
     showModuleSelector  : true,
     metric              : false,
@@ -141,7 +146,7 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'MapQuest OSM',
+            defaultBaseLayer : 'Rutebanken OSM',
             isDefault: true
         },
         {
@@ -192,8 +197,8 @@ otp.config = {
      * Formats to use for date and time displays, expressed as ISO-8601 strings.
      */    
      
-    timeFormat  : "h:mma",
-    dateFormat  : "MMM Do YYYY"
+    timeFormat  : "hh:mm",
+    dateFormat  : "DD MM YYYY"
 
 };
 var options = {
