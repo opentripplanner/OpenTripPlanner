@@ -74,6 +74,11 @@ otp.config = {
             attribution : 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
         },
         {
+            name: 'Carto Positron',
+            tileUrl: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+            attribution : 'Map tiles by Carto/MapZen. Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        },
+        {
             name: 'Transport Tiles',
             tileUrl: 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
             subdomains : ['a','b','c'],
@@ -85,14 +90,14 @@ otp.config = {
             attribution : 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
         },
         {
+            name: 'Carto Dark Matter',
+            tileUrl: 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            attribution : 'Map tiles by Carto/MapZen. Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        },
+        {
             name: 'OSM Standard Tiles',
             tileUrl: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution : 'Map data and tiles © OpenStreetMap contributors'
-        },
-        {
-            name: 'Conveyal Tiles',
-            tileUrl: 'http://a.tiles.mapbox.com/v3/conveyal.hml987j0/{z}/{x}/{y}.png',
-            attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. Tiles from MapBox.</a>'
         }
     ],
     
