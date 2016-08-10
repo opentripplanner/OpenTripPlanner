@@ -16,11 +16,13 @@ package org.opentripplanner.updater;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.alerts.SiriSXUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.siri.SiriVMUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.opentripplanner.updater.traffic.OpenTrafficUpdater;
@@ -110,6 +112,12 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("opentraffic-updater")) {
                     updater = new OpenTrafficUpdater();
+                }
+                else if (type.equals("siri-sx-updater")) {
+                    updater = new SiriSXUpdater();
+                }
+                else if (type.equals("siri-vm-updater")) {
+                    updater = new SiriVMUpdater();
                 }
             }
 
