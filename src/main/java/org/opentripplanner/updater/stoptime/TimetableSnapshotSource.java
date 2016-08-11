@@ -14,11 +14,11 @@
 package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,14 +39,17 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.SiriFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import uk.org.siri.siri20.*;
+
+import javax.xml.datatype.Duration;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -114,6 +117,8 @@ public class TimetableSnapshotSource {
     private final Agency dummyAgency;
 
     public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+    public SiriFuzzyTripMatcher siriFuzzyTripMatcher;
+    private String SIRI_FEED_ID = "1";
 
     public TimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();
@@ -123,6 +128,8 @@ public class TimetableSnapshotSource {
         dummyAgency = new Agency();
         dummyAgency.setId("");
         dummyAgency.setName("");
+
+        siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graphIndex);
     }
 
     /**
@@ -169,7 +176,7 @@ public class TimetableSnapshotSource {
 
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
-     * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
+     * GTFS-RT feed is always applied against a single static feed (indicated by SIRI_FEED_ID).
 <<<<<<< HEAD
      * 
 =======
@@ -280,6 +287,222 @@ public class TimetableSnapshotSource {
             // Always release lock
             bufferLock.unlock();
         }
+    }
+
+    /**
+     * Method to apply a trip update list to the most recent version of the timetable snapshot.
+     *
+     *
+     * @param graph graph to update (needed for adding/changing stop patterns)
+     * @param fullDataset true iff the list with updates represent all updates that are active right
+     *        now, i.e. all previous updates should be disregarded
+     * @param updates SIRI VehicleMonitoringDeliveries that should be applied atomically
+     */
+    public void applyVehicleMonitoring(final Graph graph, final boolean fullDataset, final List<VehicleMonitoringDeliveryStructure> updates) {
+        if (updates == null) {
+            LOG.warn("updates is null");
+            return;
+        }
+
+        // Acquire lock on buffer
+        bufferLock.lock();
+
+        try {
+            if (fullDataset) {
+                // Remove all updates from the buffer
+                buffer.clear(SIRI_FEED_ID);
+            }
+
+
+            for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
+
+                ServiceDate serviceDate = new ServiceDate();
+
+                LOG.info("Handling VehicleMonitoringDeliveryStructure");
+                List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
+                if (activities != null) {
+                    //Handle activities
+                    LOG.info("TODO: Handle {} activities.", activities.size());
+                    for (VehicleActivityStructure activity : activities) {
+                        handleModifiedTrip(graph, activity, serviceDate);
+                    }
+                }
+                List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
+                if (cancellations != null) {
+                    //Handle cancellations
+                    LOG.info("TODO: Handle {} cancellations.", cancellations.size());
+                }
+
+                List<NaturalLanguageStringStructure> notes = vmDelivery.getVehicleActivityNotes();
+                if (notes != null) {
+                    //Handle notes
+                    LOG.info("TODO: Handle {} notes.", notes.size());
+                }
+
+            }
+
+            LOG.debug("message contains {} trip updates", updates.size());
+            int uIndex = 0;
+            LOG.debug("end of update message");
+
+            // Make a snapshot after each message in anticipation of incoming requests
+            // Purge data if necessary (and force new snapshot if anything was purged)
+            // Make sure that the public (locking) getTimetableSnapshot function is not called.
+            if (purgeExpiredData) {
+                final boolean modified = purgeExpiredData();
+                getTimetableSnapshot(modified);
+            } else {
+                getTimetableSnapshot(false);
+            }
+        } finally {
+            // Always release lock
+            bufferLock.unlock();
+        }
+    }
+
+    private boolean handleModifiedTrip(Graph graph, VehicleActivityStructure activity, ServiceDate serviceDate) {
+        if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
+            //Activity has expired
+            return false;
+        }
+
+
+        if (activity.getMonitoredVehicleJourney() == null ||
+                activity.getMonitoredVehicleJourney().getVehicleRef() == null) {
+            //No vehicle reference
+            return false;
+        }
+        if (activity.getMonitoredVehicleJourney() == null && activity.getMonitoredVehicleJourney().getLineRef() != null) {
+            //No linereference
+            return false;
+        }
+
+        Trip trip = siriFuzzyTripMatcher.match(activity);
+
+        if (trip == null) {
+            boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
+            String lineRef = (activity.getMonitoredVehicleJourney().getLineRef() != null ? activity.getMonitoredVehicleJourney().getLineRef().getValue():null);
+            String vehicleRef = (activity.getMonitoredVehicleJourney().getVehicleRef() != null ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue():null);
+            String tripId =  (activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue():null);
+            LOG.info("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
+
+            return false;
+        }
+
+        final TripPattern pattern = getPatternForTrip(trip);
+
+        if (pattern == null) {
+            LOG.warn("No pattern found skipping VehicleActivity.");
+            return false;
+        }
+
+        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+        final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(activity, timeZone, trip.getId());
+
+        if (updatedTripTimes == null) {
+            return false;
+        }
+
+        final List<Stop> stops = pattern.getStops();
+
+        // Create StopTimes
+        final List<StopTime> stopTimes = new ArrayList<>(updatedTripTimes.getNumStops());
+
+        int accumulatedDelayTime = 0;
+
+
+        // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
+        final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
+        final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+
+        VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
+
+        if (monitoredVehicleJourney != null) {
+            Duration delay = monitoredVehicleJourney.getDelay();
+
+            MonitoredCallStructure monitoredCall = monitoredVehicleJourney.getMonitoredCall();
+            if (monitoredCall != null) {
+                if (monitoredCall.getStopPointRef() != null) {
+
+                    for (int index = 0; index < updatedTripTimes.getNumStops(); ++index) {
+
+                        final Stop stop = stops.get(index);
+
+                        // Create stop time
+                        final StopTime stopTime = new StopTime();
+                        stopTime.setTrip(trip);
+                        stopTime.setStop(stop);
+
+                        if (stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue())) {
+                            if (delay != null) {
+                                accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
+                                updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
+                                LOG.info("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
+                            }
+                        }
+
+                        stopTime.setArrivalTime(updatedTripTimes.getArrivalTime(index));
+                        stopTime.setDepartureTime(updatedTripTimes.getDepartureTime(index));
+
+                        stopTime.setTimepoint(1); // Exact time
+
+                        // Set pickup type
+                        // Set different pickup type for last stop
+                        if (index == updatedTripTimes.getNumStops() - 1) {
+                            stopTime.setPickupType(1); // No pickup available
+                        } else {
+                            stopTime.setPickupType(0); // Regularly scheduled pickup
+                        }
+                        // Set drop off type
+                        // Set different drop off type for first stop
+                        if (index == 0) {
+                            stopTime.setDropOffType(1); // No drop off available
+                        } else {
+                            stopTime.setDropOffType(0); // Regularly scheduled drop off
+                        }
+
+                        // Add stop time to list
+                        stopTimes.add(stopTime);
+                    }
+                }
+            }
+
+        }
+
+        // TODO: filter/interpolate stop times like in GTFSPatternHopFactory?
+
+        // Create StopPattern
+        final StopPattern stopPattern = new StopPattern(stopTimes);
+
+        // Get cached trip pattern or create one if it doesn't exist yet
+        final TripPattern updatedPattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
+
+        // Add service code to bitset of pattern if needed (using copy on write)
+        final int serviceCode = graph.serviceCodes.get(trip.getServiceId());
+        if (!updatedPattern.getServices().get(serviceCode)) {
+            final BitSet services = (BitSet) updatedPattern.getServices().clone();
+            services.set(serviceCode);
+            pattern.setServices(services);
+        }
+
+        // Create new trip times
+        final TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
+
+        // Update all times to mark trip times as realtime
+        // TODO: should we incorporate the delay field if present?
+        for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
+            updatedTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
+            updatedTripTimes.updateDepartureTime(stopIndex, newTripTimes.getScheduledDepartureTime(stopIndex));
+        }
+
+        // Set service code of new trip times
+        updatedTripTimes.serviceCode = serviceCode;
+
+        // Make sure that updated trip times have the correct real time state
+        updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
+
+        final boolean success = buffer.update(SIRI_FEED_ID, pattern, updatedTripTimes, serviceDate);
+        return success;
     }
 
     /**
@@ -946,6 +1169,10 @@ public class TimetableSnapshotSource {
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
         Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
+        return getPatternForTrip(trip);
+    }
+
+    private TripPattern getPatternForTrip(Trip trip) {
         TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }

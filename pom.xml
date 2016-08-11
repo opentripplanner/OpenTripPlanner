@@ -502,6 +502,13 @@
             <version>0.8</version>
         </dependency>
 
+        <!-- SIRI -->
+        <dependency>
+            <groupId>org.rutebanken</groupId>
+            <artifactId>siri-java-model</artifactId>
+            <version>0.1</version>
+        </dependency>
+
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
