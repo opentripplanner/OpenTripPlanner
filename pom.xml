@@ -8,13 +8,13 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>0.20.2-SNAPSHOT</version>
+    <version>0.20.2</version>
     <packaging>jar</packaging>
 
     <scm>
       <connection>scm:git:ssh://git@github.com/rutebanken/OpenTripPlanner.git</connection>
       <developerConnection>scm:git:ssh://git@github.com/rutebanken/OpenTripPlanner.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>otp-0.20.2</tag>
   </scm>
 
     <properties>
