@@ -9,16 +9,26 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package org.opentripplanner.api.model;
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+package org.opentripplanner.updater.car_park;
+
+import org.opentripplanner.routing.car_park.CarPark;
+
+import java.util.List;
+
 
 /**
- * Represent type of vertex, used in Place aka from, to in API
- * for easier client side localization
+ * A (static or dynamic) source of car-parks for park and ride.
  *
- * @author mabu
+ * @author hannesj
  */
-public enum VertexType {
-    NORMAL, BIKESHARE, BIKEPARK, TRANSIT, PARKANDRIDE
-    
+public interface CarParkDataSource {
+
+    /** Update the data from the source;
+     * returns true if there might have been changes */
+    public boolean update();
+
+    public List<CarPark> getCarParks();
+
 }

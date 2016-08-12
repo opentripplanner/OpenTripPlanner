@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.car_park.CarPark;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.I18NString;
@@ -32,11 +33,19 @@ public class ParkAndRideVertex extends Vertex {
 
     private String id;
 
+    public int spacesAvailable = Integer.MAX_VALUE;
+
     public ParkAndRideVertex(Graph g, String label, String id, double x, double y, I18NString name) {
         super(g, label, x, y, name);
         setId(id);
     }
-    
+
+    public ParkAndRideVertex(Graph graph, CarPark carPark) {
+        super(graph, carPark.id, carPark.x, carPark.y, carPark.name);
+        this.spacesAvailable = carPark.spacesAvailable;
+        setId(carPark.id);
+    }
+
     public void setId(String id){
     	this.id = id;
     }

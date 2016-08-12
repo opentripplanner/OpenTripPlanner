@@ -18,6 +18,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.car_park.CarParkUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -89,6 +90,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("bike-park")) {
                     updater = new BikeParkUpdater();
+                }
+                else if (type.equals("car-park")) {
+                    updater = new CarParkUpdater();
                 }
                 else if (type.equals("stop-time-updater")) {
                     updater = new PollingStoptimeUpdater();
