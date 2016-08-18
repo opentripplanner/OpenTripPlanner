@@ -15,12 +15,7 @@ package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.onebusaway.gtfs.model.Agency;
@@ -322,19 +317,19 @@ public class TimetableSnapshotSource {
                 List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
                 if (activities != null) {
                     //Handle activities
-                    LOG.info("TODO: Handle {} activities.", activities.size());
+                    LOG.info("Handling {} activities.", activities.size());
                     for (VehicleActivityStructure activity : activities) {
                         handleModifiedTrip(graph, activity, serviceDate);
                     }
                 }
                 List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
-                if (cancellations != null) {
+                if (cancellations != null && !cancellations.isEmpty()) {
                     //Handle cancellations
                     LOG.info("TODO: Handle {} cancellations.", cancellations.size());
                 }
 
                 List<NaturalLanguageStringStructure> notes = vmDelivery.getVehicleActivityNotes();
-                if (notes != null) {
+                if (notes != null && !notes.isEmpty()) {
                     //Handle notes
                     LOG.info("TODO: Handle {} notes.", notes.size());
                 }
@@ -377,19 +372,22 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        Trip trip = siriFuzzyTripMatcher.match(activity);
+        Set<Trip> trips = siriFuzzyTripMatcher.match(activity);
 
-        if (trip == null) {
+        if (trips == null || trips.isEmpty()) {
             boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
             String lineRef = (activity.getMonitoredVehicleJourney().getLineRef() != null ? activity.getMonitoredVehicleJourney().getLineRef().getValue():null);
             String vehicleRef = (activity.getMonitoredVehicleJourney().getVehicleRef() != null ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue():null);
             String tripId =  (activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue():null);
-            LOG.info("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
+            LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
 
             return false;
         }
 
-        final TripPattern pattern = getPatternForTrip(trip);
+        //Find the trip that best corresponds to MonitoredVehicleJourney
+        Trip trip = getTripForJourney(trips, activity.getMonitoredVehicleJourney());
+
+        final TripPattern pattern = getPatternForTrip(trips, activity.getMonitoredVehicleJourney());
 
         if (pattern == null) {
             LOG.warn("No pattern found skipping VehicleActivity.");
@@ -1169,13 +1167,66 @@ public class TimetableSnapshotSource {
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
         Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
-        return getPatternForTrip(trip);
+        return graphIndex.patternForTrip.get(trip);
     }
 
-    private TripPattern getPatternForTrip(Trip trip) {
-        TripPattern pattern = graphIndex.patternForTrip.get(trip);
-        return pattern;
+    private TripPattern getPatternForTrip(Set<Trip> matches, VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney) {
+
+        for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
+            Trip next = iterator.next();
+            TripPattern tripPattern = graphIndex.patternForTrip.get(next);
+
+            if (monitoredVehicleJourney.getOriginRef() == null) {
+                return tripPattern;
+            }
+
+            Stop firstStop = tripPattern.getStop(0);
+            Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+
+            String siriOriginRef = monitoredVehicleJourney.getOriginRef().getValue();
+            String siriDestinationRef = monitoredVehicleJourney.getDestinationRef().getValue();
+
+            if (firstStop.getId().getId().equals(siriOriginRef) & lastStop.getId().getId().equals(siriDestinationRef)) {
+                // Origin and destination matches
+                return tripPattern;
+            }
+
+
+        }
+        return null;
     }
+
+    /**
+     * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
+     * @param trips
+     * @param monitoredVehicleJourney
+     * @return
+     */
+    private Trip getTripForJourney(Set<Trip> trips, VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney) {
+        ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
+        if (date == null) {
+            //If no date is set - assume Realtime-data is reported for 'today'.
+            date = ZonedDateTime.now();
+        }
+        ServiceDate serviceDate = new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+
+        for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
+
+            Trip trip = iterator.next();
+            Set<ServiceDate> serviceDatesForServiceId = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+
+            for (Iterator<ServiceDate> serviceDateIterator = serviceDatesForServiceId.iterator(); serviceDateIterator.hasNext(); ) {
+                ServiceDate next = serviceDateIterator.next();
+                if (next.equals(serviceDate)) {
+                    return trip;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
 
     /**
      * Retrieve route given a route id without an agency
