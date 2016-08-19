@@ -387,6 +387,11 @@ public class TimetableSnapshotSource {
         //Find the trip that best corresponds to MonitoredVehicleJourney
         Trip trip = getTripForJourney(trips, activity.getMonitoredVehicleJourney());
 
+        if (trip == null) {
+            LOG.warn("No matching trip found - skipping VehicleActivity.");
+            return false;
+        }
+
         final TripPattern pattern = getPatternForTrip(trips, activity.getMonitoredVehicleJourney());
 
         if (pattern == null) {
