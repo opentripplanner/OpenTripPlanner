@@ -73,7 +73,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
             if (is != null) {
                 // Decode message
                 long t1 = System.currentTimeMillis();
-                siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(HttpUtils.getData(url));
+                siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(is);
                 LOG.info("Fetching VM-data took {} ms", (System.currentTimeMillis()-t1));
 
                 if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
