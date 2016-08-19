@@ -1702,7 +1702,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(bikeRentalStation -> bikeRentalStation.id.equals(id.id))
                         .findFirst()
-                        .get();
+                        .orElse(null);
                 }
                 if (id.type.equals(bikeParkType.getName())) {
                     // No index exists for bike parking ids
@@ -1711,7 +1711,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(id.id))
                         .findFirst()
-                        .get();
+                        .orElse(null);
                 }
                 if (id.type.equals(carParkType.getName())) {
                     // No index exists for car parking ids
@@ -1720,7 +1720,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(carPark -> carPark.id.equals(id.id))
                         .findFirst()
-                        .get();
+                        .orElse(null);
                 }
                 return null;
             }))
@@ -2059,7 +2059,7 @@ public class IndexGraphQLSchema {
                     .stream()
                     .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument("id")))
                     .findFirst()
-                    .get())
+                    .orElse(null))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeParks")
@@ -2186,7 +2186,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(bikeRentalStation -> bikeRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
                         .findFirst()
-                        .get()
+                        .orElse(null)
                 : null)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2199,7 +2199,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
                         .findFirst()
-                        .get()
+                        .orElse(null)
                     : null)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2212,7 +2212,7 @@ public class IndexGraphQLSchema {
                         .stream()
                         .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
                         .findFirst()
-                        .get()
+                        .orElse(null)
                     : null)
                 .build())
             .build();
