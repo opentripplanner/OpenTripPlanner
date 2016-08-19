@@ -914,13 +914,22 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
+                    ServiceDate date;
                     try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
-                        return index.getStopTimesForStop(
-                            (Stop) environment.getSource(),
-                            ServiceDate.parseString(environment.getArgument("date")));
+                        date = ServiceDate.parseString(environment.getArgument("date"));
                     } catch (ParseException e) {
                         return null;
                     }
+                    Stop stop = (Stop) environment.getSource();
+                    if (stop.getLocationType() == 1) {
+                        // Merge all stops if this is a station
+                        return index.stopsForParentStation
+                            .get(stop.getId())
+                            .stream()
+                            .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date).stream())
+                            .collect(Collectors.toList());
+                    }
+                    return index.getStopTimesForStop(stop, date);
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -941,11 +950,28 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
-                .dataFetcher(environment ->
-                    index.stopTimesForStop((Stop) environment.getSource(),
+                .dataFetcher(environment -> {
+                    Stop stop = (Stop) environment.getSource();
+                    if (stop.getLocationType() == 1) {
+                        // Merge all stops if this is a station
+                        return index.stopsForParentStation
+                            .get(stop.getId())
+                            .stream()
+                            .flatMap(singleStop ->
+                                index.stopTimesForStop(singleStop,
+                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("timeRange"),
+                                    environment.getArgument("numberOfDepartures"))
+                                .stream()
+                            )
+                            .collect(Collectors.toList());
+                    }
+                    return index.stopTimesForStop(stop,
                         Long.parseLong(environment.getArgument("startTime")),
-                        (int) environment.getArgument("timeRange"),
-                        (int) environment.getArgument("numberOfDepartures")))
+                        environment.getArgument("timeRange"),
+                        environment.getArgument("numberOfDepartures"));
+
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesWithoutPatterns")
@@ -965,17 +991,34 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
-                .dataFetcher(environment ->
-                    index.stopTimesForStop(
-                        (Stop) environment.getSource(),
-                        Long.parseLong(environment.getArgument("startTime")),
-                        (int) environment.getArgument("timeRange"),
-                        (int) environment.getArgument("numberOfDepartures"))
-                        .stream()
-                        .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
-                        .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
-                        .limit((long) (int) environment.getArgument("numberOfDepartures"))
-                        .collect(Collectors.toList()))
+                .dataFetcher(environment -> {
+                    Stop stop = (Stop) environment.getSource();
+                    Stream<StopTimesInPattern> stream;
+                    if (stop.getLocationType() == 1) {
+                        stream = index.stopsForParentStation
+                            .get(stop.getId())
+                            .stream()
+                            .flatMap(singleStop ->
+                                index.stopTimesForStop(singleStop,
+                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("timeRange"),
+                                    environment.getArgument("numberOfDepartures"))
+                                    .stream()
+                            );
+                    }
+                    else {
+                        stream = index.stopTimesForStop(
+                            (Stop) environment.getSource(),
+                            Long.parseLong(environment.getArgument("startTime")),
+                            environment.getArgument("timeRange"),
+                            environment.getArgument("numberOfDepartures")
+                        ).stream();
+                    }
+                    return stream.flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
+                    .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
+                    .limit((long) (int) environment.getArgument("numberOfDepartures"))
+                    .collect(Collectors.toList());
+                })
                 .build())
             .build();
 
