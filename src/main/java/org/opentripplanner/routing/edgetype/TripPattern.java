@@ -217,6 +217,10 @@ public class TripPattern implements Cloneable, Serializable {
         return Arrays.asList(stopPattern.stops);
     }
 
+    public int getStopIndex(Stop stop) {
+        return getStops().indexOf(stop);
+    }
+
     public List<PatternHop> getPatternHops() {
         return Arrays.asList(patternHops);
     }

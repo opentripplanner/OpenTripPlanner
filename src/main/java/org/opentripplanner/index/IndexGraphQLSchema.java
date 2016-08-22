@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.adapters.RouteType;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -57,6 +58,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -139,6 +141,25 @@ public class IndexGraphQLSchema {
         .value("WALK", TraverseMode.WALK, "WALK")
         .build();
 
+    public static GraphQLEnumType filterModeEnum = GraphQLEnumType.newEnum()
+        .name("FilterMode")
+        .value("AIRPLANE", TraverseMode.AIRPLANE, "AIRPLANE")
+        .value("BICYCLE", TraverseMode.BICYCLE, "BICYCLE")
+        .value("BICYCLE_RENT", "BICYCLE_RENT", "BICYCLE_RENT")
+        .value("BUS", TraverseMode.BUS, "BUS")
+        .value("CABLE_CAR", TraverseMode.CABLE_CAR, "CABLE_CAR")
+        .value("CAR", TraverseMode.CAR, "CAR")
+        .value("FERRY", TraverseMode.FERRY, "FERRY")
+        .value("FUNICULAR", TraverseMode.FUNICULAR, "FUNICULAR")
+        .value("GONDOLA", TraverseMode.GONDOLA, "GONDOLA")
+        .value("LEG_SWITCH", TraverseMode.LEG_SWITCH, "LEG_SWITCH")
+        .value("RAIL", TraverseMode.RAIL, "RAIL")
+        .value("SUBWAY", TraverseMode.SUBWAY, "SUBWAY")
+        .value("TRAM", TraverseMode.TRAM, "TRAM")
+        .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
+        .value("WALK", TraverseMode.WALK, "WALK")
+        .build();
+
     public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
         .name("OptimizeTtpe")
         .value("QUICK", OptimizeType.QUICK, "QUICK")
@@ -180,6 +201,10 @@ public class IndexGraphQLSchema {
     public GraphQLOutputType stoptimesInPatternType = new GraphQLTypeReference("StoptimesInPattern");
 
     public GraphQLOutputType translatedStringType = new GraphQLTypeReference("TranslatedString");
+
+    public GraphQLOutputType departureRowType = new GraphQLTypeReference("DepartureRow");
+
+    public GraphQLOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
 
     public GraphQLObjectType queryType;
 
@@ -224,6 +249,22 @@ public class IndexGraphQLSchema {
             }
             if (o instanceof CarPark) {
                 return (GraphQLObjectType) carParkType;
+            }
+            if (o instanceof GraphIndex.DepartureRow) {
+                return (GraphQLObjectType) departureRowType;
+            }
+            return null;
+        }
+    });
+
+    private GraphQLInterfaceType placeInterface = relay.nodeInterface(new TypeResolver() {
+        @Override
+        public GraphQLObjectType getType(Object o) {
+            if (o instanceof GraphIndex.DepartureRow) {
+                return (GraphQLObjectType) departureRowType;
+            }
+            if (o instanceof BikeRentalStation) {
+                return (GraphQLObjectType) bikeRentalStationType;
             }
             return null;
         }
@@ -702,6 +743,71 @@ public class IndexGraphQLSchema {
                 .name("distance")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).distance)
+                .build())
+            .build();
+
+        departureRowType = GraphQLObjectType.newObject()
+            .name("DepartureRow")
+            .withInterface(nodeInterface)
+            .withInterface(placeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay.toGlobalId(departureRowType.getName(), ((GraphIndex.DepartureRow)environment.getSource()).id))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stop")
+                .type(stopType)
+                .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).stop)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pattern")
+                .type(patternType)
+                .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).pattern)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimes")
+                .type(new GraphQLList(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("startTime")
+                    .description("What is the start time for the times. Default is to use current time. (0)")
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0l) // Default value is current time
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("timeRange")
+                    .description("How many seconds ahead to search for departures. Default is one day.")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(24 * 60 * 60)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("numberOfDepartures")
+                    .description("Maximum number of departures to return.")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(2)
+                    .build())
+                .dataFetcher(environment -> {
+                    GraphIndex.DepartureRow departureRow = (GraphIndex.DepartureRow)environment.getSource();
+                    long startTime = environment.getArgument("startTime");
+                    int timeRange = environment.getArgument("timeRange");
+                    int maxDepartures = environment.getArgument("numberOfDepartures");
+                    return departureRow.getStoptimes(index, startTime, timeRange, maxDepartures);
+                })
+                .build())
+            .build();
+
+        placeAtDistanceType = GraphQLObjectType.newObject()
+            .name("placeAtDistance")
+            //.withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("place")
+                .type(placeInterface)
+                .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).place)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("distance")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).distance)
                 .build())
             .build();
 
@@ -1525,6 +1631,7 @@ public class IndexGraphQLSchema {
         bikeRentalStationType = GraphQLObjectType.newObject()
             .name("BikeRentalStation")
             .withInterface(nodeInterface)
+            .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
@@ -1538,7 +1645,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("name")
-                .type(Scalars.GraphQLString)
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).getName())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1695,6 +1802,9 @@ public class IndexGraphQLSchema {
                 if (id.type.equals(alertType.getName())) {
                     return index.getAlertForId(id.id);
                 }
+                if (id.type.equals(departureRowType.getName())) {
+                    return GraphIndex.DepartureRow.fromId(index, id.id);
+                }
                 if (id.type.equals(bikeRentalStationType.getName())) {
                     // No index exists for bikeshare station ids
                     return index.graph.getService(BikeRentalStationService.class)
@@ -1728,7 +1838,7 @@ public class IndexGraphQLSchema {
                 .name("agencies")
                 .description("Get all agencies for the specified graph")
                 .type(new GraphQLList(agencyType))
-                .dataFetcher(environment -> index.getAllAgencies())
+                .dataFetcher(environment -> new ArrayList<>(index.getAllAgencies()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
@@ -1834,7 +1944,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("radius")
-                    .description("Radius (in meters) to search for from the specidied location")
+                    .description("Radius (in meters) to search for from the specified location")
                     .type(Scalars.GraphQLInt)
                     .build())
                 .argument(GraphQLArgument.newArgument()
@@ -1861,6 +1971,106 @@ public class IndexGraphQLSchema {
 
                     return new SimpleListConnection(stops).get(environment);
                 })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("nearest")
+                .description(
+                    "Get all places (stops, stations, etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
+                .type(relay.connectionType("placeAtDistance",
+                    relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
+                    new ArrayList<>()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("lat")
+                    .description("Latitude of the location")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("lon")
+                    .description("Longitude of the location")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("maxDistance")
+                    .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
+                    .defaultValue(2000)
+                    .type(Scalars.GraphQLInt)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("maxResults")
+                    .description("Maximum number of results. Search is stopped when this is reached. Default is 20.")
+                    .defaultValue(20)
+                    .type(Scalars.GraphQLInt)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("filterByTypes")
+                    .description("Only include places that imply this type. i.e. mode for stops, station etc. Also BICYCLE_RENT for bike rental stations.")
+                    .type(new GraphQLList(filterModeEnum))
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("filterByIds")
+                    .description("Only include places that match one of the given IDs.")
+                    .type(new GraphQLList(Scalars.GraphQLID))
+                    .build())
+//                    .argument(GraphQLArgument.newArgument()
+//                        .name("filterByAgency")
+//                        .description("Only include places of given agency")
+//                        .type(Scalars.GraphQLString)
+//                        .build())
+                .argument(relay.getConnectionFieldArguments())
+                .dataFetcher(environment -> {
+                    Set<AgencyAndId> filterByStops = null;
+                    Set<AgencyAndId> filterByRoutes = null;
+                    Set<String> filterByBikeRentalStations = null;
+                    Iterable<String> filterByIds = (Iterable<String>)environment.getArgument("filterByIds");
+                    if (filterByIds != null) {
+                        filterByStops = new HashSet<AgencyAndId>();                                
+                        filterByRoutes = new HashSet<AgencyAndId>();
+                        filterByBikeRentalStations = new HashSet<String>();
+                        for (String idString : filterByIds) {
+                            Relay.ResolvedGlobalId id = relay.fromGlobalId(idString);
+                            if (id.type.equals(stopType.getName())) {
+                                filterByStops.add(GtfsLibrary.convertIdFromString(id.id));
+                            } else if (id.type.equals(routeType.getName())) {
+                                filterByRoutes.add(GtfsLibrary.convertIdFromString(id.id));
+                            } else if (id.type.equals(bikeRentalStationType.getName())) {
+                                filterByBikeRentalStations.add(id.id);
+                            }
+                        }
+                    }
+
+                    List<Object> filterByTypes = environment.getArgument("filterByTypes");
+
+                    List<GraphIndex.PlaceAndDistance> places;
+                    try {
+                        places = index.findClosestPlacesByWalking(
+                            environment.getArgument("lat"),
+                            environment.getArgument("lon"),
+                            environment.getArgument("maxDistance"),
+                            environment.getArgument("maxResults"),
+                            filterByTypes,
+                            filterByStops,
+                            filterByRoutes,
+                            filterByBikeRentalStations
+                            )
+                            .stream()
+                            //.sorted(Comparator.comparing(s -> s.distance))
+                            .collect(Collectors.toList());
+                    } catch (VertexNotFoundException e) {
+                        places = Collections.emptyList();
+                    }
+
+                    return new SimpleListConnection(places).get(environment);
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureRow")
+                .description("Get a single departure row based on its id (format is Agency:StopId:PatternId)")
+                .type(departureRowType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> GraphIndex.DepartureRow.fromId(index, environment.getArgument("id")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
