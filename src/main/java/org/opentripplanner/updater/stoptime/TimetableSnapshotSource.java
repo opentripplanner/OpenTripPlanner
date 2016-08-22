@@ -395,7 +395,7 @@ public class TimetableSnapshotSource {
         final TripPattern pattern = getPatternForTrip(trips, activity.getMonitoredVehicleJourney());
 
         if (pattern == null) {
-            LOG.warn("No pattern found skipping VehicleActivity.");
+            LOG.info("No pattern found skipping VehicleActivity.");
             return false;
         }
 
@@ -440,7 +440,7 @@ public class TimetableSnapshotSource {
                             if (delay != null) {
                                 accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
                                 updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
-                                LOG.info("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
+                                LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
                             }
                         }
 
