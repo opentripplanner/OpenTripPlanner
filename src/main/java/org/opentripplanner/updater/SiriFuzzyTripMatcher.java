@@ -40,36 +40,58 @@ public class SiriFuzzyTripMatcher {
 
             if (tripId != null) {
                 //TripId is provided in VM-delivery
-                //Exact tripId is provided
-                if (!mappedTripsCache.containsKey(tripId)) {
-                    //Result is not cached - rebuild cache
-                    Map<String, Set<Trip>> updatedCache = new HashMap<>();
-
-                    Set<Trip> trips = index.patternForTrip.keySet();
-                    for (Trip trip : trips) {
-
-                        String currentTripId = getUnpaddedTripId(trip);
-
-                        if (updatedCache.containsKey(currentTripId)) {
-                            updatedCache.get(currentTripId).add(trip);
-                        } else {
-                            Set<Trip> initialSet = new HashSet<>();
-                            initialSet.add(trip);
-                            updatedCache.put(currentTripId, initialSet);
-                        }
-                    }
-
-                    mappedTripsCache.clear();
-                    mappedTripsCache.putAll(updatedCache);
-                    LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
-                }
-                Set<Trip> trips = mappedTripsCache.get(tripId);
-                LOG.trace("Found trip-matches [{}].", trips.size());
-                return trips;
+                return getTripsBySiriId(tripId);
             }
         }
 
         return null;
+    }
+
+
+    /**
+     * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
+     */
+    public Set<Trip> match(EstimatedVehicleJourney journey) {
+
+        VehicleJourneyRef monitoredVehicleJourney = journey.getVehicleJourneyRef();
+
+        if (monitoredVehicleJourney != null) {
+
+            String tripId = monitoredVehicleJourney.getValue();
+            if (tripId != null) {
+                return getTripsBySiriId(tripId);
+            }
+        }
+
+        return null;
+    }
+
+    private Set<Trip> getTripsBySiriId(String tripId) {
+        if (!mappedTripsCache.containsKey(tripId)) {
+            //Result is not cached - rebuild cache
+            Map<String, Set<Trip>> updatedCache = new HashMap<>();
+
+            Set<Trip> trips = index.patternForTrip.keySet();
+            for (Trip trip : trips) {
+
+                String currentTripId = getUnpaddedTripId(trip);
+
+                if (updatedCache.containsKey(currentTripId)) {
+                    updatedCache.get(currentTripId).add(trip);
+                } else {
+                    Set<Trip> initialSet = new HashSet<>();
+                    initialSet.add(trip);
+                    updatedCache.put(currentTripId, initialSet);
+                }
+            }
+
+            mappedTripsCache.clear();
+            mappedTripsCache.putAll(updatedCache);
+            LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
+        }
+        Set<Trip> trips = mappedTripsCache.get(tripId);
+        LOG.trace("Found trip-matches [{}].", trips.size());
+        return trips;
     }
 
     private String getUnpaddedTripId(Trip trip) {
