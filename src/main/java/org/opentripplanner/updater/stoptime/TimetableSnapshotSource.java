@@ -355,6 +355,67 @@ public class TimetableSnapshotSource {
         }
     }
 
+    /**
+     * Method to apply a trip update list to the most recent version of the timetable snapshot.
+     *
+     *  @param graph graph to update (needed for adding/changing stop patterns)
+     * @param fullDataset true iff the list with updates represent all updates that are active right
+     *        now, i.e. all previous updates should be disregarded
+     * @param updates SIRI VehicleMonitoringDeliveries that should be applied atomically
+     */
+    public void applyEstimatedTimetable(final Graph graph, final boolean fullDataset, final List<EstimatedTimetableDeliveryStructure> updates) {
+        if (updates == null) {
+            LOG.warn("updates is null");
+            return;
+        }
+
+        // Acquire lock on buffer
+        bufferLock.lock();
+
+        try {
+            if (fullDataset) {
+                // Remove all updates from the buffer
+                buffer.clear(SIRI_FEED_ID);
+            }
+
+
+            for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
+
+                ServiceDate serviceDate = new ServiceDate();
+
+                LOG.info("Handling EstimatedTimetableDeliveryStructure");
+                List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
+                if (estimatedJourneyVersions != null) {
+                    //Handle deliveries
+                    LOG.info("Handling {} deliveries.", estimatedJourneyVersions.size());
+                    for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
+                        List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
+                        for (EstimatedVehicleJourney journey : journeys) {
+                            handleModifiedTrip(graph, journey, serviceDate);
+                        }
+                    }
+                }
+            }
+
+            LOG.debug("message contains {} trip updates", updates.size());
+            int uIndex = 0;
+            LOG.debug("end of update message");
+
+            // Make a snapshot after each message in anticipation of incoming requests
+            // Purge data if necessary (and force new snapshot if anything was purged)
+            // Make sure that the public (locking) getTimetableSnapshot function is not called.
+            if (purgeExpiredData) {
+                final boolean modified = purgeExpiredData();
+                getTimetableSnapshot(modified);
+            } else {
+                getTimetableSnapshot(false);
+            }
+        } finally {
+            // Always release lock
+            bufferLock.unlock();
+        }
+    }
+
     private boolean handleModifiedTrip(Graph graph, VehicleActivityStructure activity, ServiceDate serviceDate) {
         if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
             //Activity has expired
@@ -506,6 +567,126 @@ public class TimetableSnapshotSource {
 
         final boolean success = buffer.update(SIRI_FEED_ID, pattern, updatedTripTimes, serviceDate);
         return success;
+    }
+
+
+    private boolean handleModifiedTrip(Graph graph, EstimatedVehicleJourney activity, ServiceDate serviceDate) {
+
+        if (activity.getEstimatedCalls() == null) {
+            //No vehicle reference
+            return false;
+        }
+        if (activity.getLineRef() == null) {
+            //No linereference
+            return false;
+        }
+
+        Set<Trip> trips = siriFuzzyTripMatcher.match(activity);
+
+        if (trips == null || trips.isEmpty()) {
+            boolean isMonitored = activity.isMonitored();
+            String lineRef = (activity.getLineRef() != null ? activity.getLineRef().getValue():null);
+            String vehicleRef = (activity.getVehicleJourneyRef() != null ? activity.getVehicleJourneyRef().getValue():null);
+            LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}], skipping EstimatedVehicleJourney.", isMonitored, lineRef, vehicleRef);
+
+            return false;
+        }
+
+        //Find the trip that best corresponds to EstimatedVehicleJourney
+        Trip trip = getTripForJourney(trips, activity);
+
+        if (trip == null) {
+            LOG.warn("No matching trip found - skipping VehicleActivity.");
+            return false;
+        }
+
+        final TripPattern pattern = getPatternForTrip(trips, activity);
+
+        if (pattern == null) {
+            LOG.info("No pattern found skipping VehicleActivity.");
+            return false;
+        }
+
+        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+        final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(activity, timeZone, trip.getId());
+
+        if (updatedTripTimes == null) {
+            return false;
+        }
+
+        final List<Stop> stops = pattern.getStops();
+
+        // Create StopTimes
+        final List<StopTime> stopTimes = new ArrayList<>(updatedTripTimes.getNumStops());
+
+        int accumulatedDelayTime = 0;
+
+
+        // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
+        final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
+        final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+
+        EstimatedVehicleJourney.EstimatedCalls estimatedCalls = activity.getEstimatedCalls();
+
+        List<EstimatedCall> estimatedCallsList = estimatedCalls.getEstimatedCalls();
+
+        for (EstimatedCall estimatedCall : estimatedCallsList) {
+            String stopPointRef = estimatedCall.getStopPointRef().getValue();
+
+            int arrivalTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime());
+            int departureTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime());
+
+            int stopsCounter = 0;
+            for (Stop stop : stops) {
+                if (stop.getId().getId().equals(stopPointRef)) {
+                    updatedTripTimes.updateArrivalTime(stopsCounter, arrivalTimeSec);
+                    updatedTripTimes.updateDepartureTime(stopsCounter, departureTimeSec);
+                    stop.setPlatformCode(estimatedCall.getDeparturePlatformName().getValue());
+                    break;
+                }
+                stopsCounter++;
+            }
+        }
+
+
+        // TODO: filter/interpolate stop times like in GTFSPatternHopFactory?
+
+        // Create StopPattern
+        final StopPattern stopPattern = new StopPattern(stopTimes);
+
+        // Get cached trip pattern or create one if it doesn't exist yet
+        final TripPattern updatedPattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
+
+        // Add service code to bitset of pattern if needed (using copy on write)
+        final int serviceCode = graph.serviceCodes.get(trip.getServiceId());
+        if (!updatedPattern.getServices().get(serviceCode)) {
+            final BitSet services = (BitSet) updatedPattern.getServices().clone();
+            services.set(serviceCode);
+            pattern.setServices(services);
+        }
+
+        // Create new trip times
+        final TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
+
+        // Update all times to mark trip times as realtime
+        // TODO: should we incorporate the delay field if present?
+        for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
+            updatedTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
+            updatedTripTimes.updateDepartureTime(stopIndex, newTripTimes.getScheduledDepartureTime(stopIndex));
+        }
+
+        // Set service code of new trip times
+        updatedTripTimes.serviceCode = serviceCode;
+
+        // Make sure that updated trip times have the correct real time state
+        updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
+
+        final boolean success = buffer.update(SIRI_FEED_ID, pattern, updatedTripTimes, serviceDate);
+        return success;
+    }
+
+    private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
+        return dateTime.toLocalTime().toSecondOfDay();
     }
 
     /**
@@ -1201,6 +1382,32 @@ public class TimetableSnapshotSource {
         return null;
     }
 
+    private TripPattern getPatternForTrip(Set<Trip> matches, EstimatedVehicleJourney journey) {
+
+        for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
+            Trip next = iterator.next();
+            TripPattern tripPattern = graphIndex.patternForTrip.get(next);
+
+            if (journey.getOriginRef() == null) {
+                return tripPattern;
+            }
+
+            Stop firstStop = tripPattern.getStop(0);
+            Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+
+            String siriOriginRef = journey.getOriginRef().getValue();
+            String siriDestinationRef = journey.getDestinationRef().getValue();
+
+            if (firstStop.getId().getId().equals(siriOriginRef) & lastStop.getId().getId().equals(siriDestinationRef)) {
+                // Origin and destination matches
+                return tripPattern;
+            }
+
+
+        }
+        return null;
+    }
+
     /**
      * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
      * @param trips
@@ -1229,6 +1436,41 @@ public class TimetableSnapshotSource {
         }
 
         return null;
+    }
+
+
+    /**
+     * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
+     * @param trips
+     * @param journey
+     * @return
+     */
+    private Trip getTripForJourney(Set<Trip> trips, EstimatedVehicleJourney journey) {
+        DatedVehicleJourneyRef datedVehicleJourneyRef = journey.getDatedVehicleJourneyRef();
+        VehicleJourneyRef vehicleJourneyRef = journey.getVehicleJourneyRef();
+
+        throw new RuntimeException(("Not yet implemented"));
+//
+//        if (date == null) {
+//            //If no date is set - assume Realtime-data is reported for 'today'.
+//            date = ZonedDateTime.now();
+//        }
+//        ServiceDate serviceDate = new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+//
+//        for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
+//
+//            Trip trip = iterator.next();
+//            Set<ServiceDate> serviceDatesForServiceId = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+//
+//            for (Iterator<ServiceDate> serviceDateIterator = serviceDatesForServiceId.iterator(); serviceDateIterator.hasNext(); ) {
+//                ServiceDate next = serviceDateIterator.next();
+//                if (next.equals(serviceDate)) {
+//                    return trip;
+//                }
+//            }
+//        }
+//
+//        return null;
     }
 
 

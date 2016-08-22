@@ -14,11 +14,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 import com.beust.jcommander.internal.Lists;
 
@@ -40,9 +37,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import uk.org.siri.siri20.MonitoredCallStructure;
-import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
-import uk.org.siri.siri20.VehicleActivityStructure;
+import uk.org.siri.siri20.*;
 
 
 /**
@@ -528,6 +523,81 @@ public class Timetable implements Serializable {
      *         with the id specified in the trip descriptor of the TripUpdate; null if something
      *         went wrong
      */
+    public TripTimes createUpdatedTripTimes(EstimatedVehicleJourney journey, TimeZone timeZone, AgencyAndId tripId) {
+        if (journey == null) {
+            LOG.error("A null EstimatedVehicleJourney pointer was passed to the Timetable class update method.");
+            return null;
+        }
+
+        int tripIndex = getTripIndex(tripId);
+        if (tripIndex == -1) {
+            LOG.info("tripId {} not found in pattern.", tripId);
+            return null;
+        } else {
+            LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
+        }
+
+        TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
+
+        EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
+
+        if (journeyCalls == null) {
+            LOG.error("Part of a TripUpdate object could not be applied successfully.");
+            return null;
+        }
+
+
+        List<EstimatedCall> estimatedCalls = journeyCalls.getEstimatedCalls();
+
+        List<Stop> stops = pattern.getStops();
+
+        for (EstimatedCall estimatedCall : estimatedCalls) {
+            String stopPointRef = estimatedCall.getStopPointRef().getValue();
+
+            int arrivalTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime());
+            int departureTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime());
+
+            int stopsCounter = 0;
+            for (Stop stop : stops) {
+                if (stop.getId().getId().equals(stopPointRef)) {
+                    newTimes.updateArrivalTime(stopsCounter, arrivalTimeSec);
+                    newTimes.updateDepartureTime(stopsCounter, departureTimeSec);
+                    stop.setPlatformCode(estimatedCall.getDeparturePlatformName().getValue());
+                    break;
+                }
+                stopsCounter++;
+            }
+        }
+
+        if (!newTimes.timesIncreasing()) {
+            LOG.error("TripTimes are non-increasing after applying SIRI delay propagation.");
+            return null;
+        }
+
+        LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
+        return newTimes;
+    }
+
+    private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
+        return dateTime.toLocalTime().toSecondOfDay();
+    }
+
+    /**
+     * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
+     * must not be modified directly because they may be shared with the underlying
+     * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
+     * protective copying of this Timetable. It is not done in this update method to avoid
+     * repeatedly cloning the same Timetable when several updates are applied to it at once. We
+     * assume here that all trips in a timetable are from the same feed, which should always be the
+     * case.
+     *
+     * @param activity SIRI-VM VehicleActivity
+     * @param timeZone time zone of trip update
+     * @param tripId
+     * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
+     *         with the id specified in the trip descriptor of the TripUpdate; null if something
+     *         went wrong
+     */
     public TripTimes createUpdatedTripTimes(VehicleActivityStructure activity, TimeZone timeZone, AgencyAndId tripId) {
         if (activity == null) {
             LOG.error("A null VehicleActivityStructure pointer was passed to the Timetable class update method.");
@@ -570,7 +640,7 @@ public class Timetable implements Serializable {
                 delay = mvj.getDelay().getSeconds();
             }
 
-            if (match) {
+            if (match && delay > 0) {
                 newTimes.updateArrivalDelay(i, delay);
                 newTimes.updateDepartureDelay(i, delay);
             }
