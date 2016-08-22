@@ -19,7 +19,7 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.*;
+import uk.org.siri.siri20.Siri;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,9 +27,9 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, JsonConfigurable {
+public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, JsonConfigurable {
     private static final Logger LOG =
-            LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
+            LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
 
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -73,10 +73,10 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
             InputStream is = HttpUtils.getData(url);
             if (is != null) {
                 // Decode message
-                LOG.info("Fetching VM-data took {} ms", (System.currentTimeMillis()-t1));
+                LOG.info("Fetching ET-data took {} ms", (System.currentTimeMillis()-t1));
                 t1 = System.currentTimeMillis();
                 siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(is);
-                LOG.info("Unmarshalling VM-data took {} ms", (System.currentTimeMillis()-t1));
+                LOG.info("Unmarshalling ET-data took {} ms", (System.currentTimeMillis()-t1));
 
                 if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
                     LOG.info("Newer data has already been processed");
@@ -88,7 +88,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
 
             }
         } catch (Exception e) {
-            LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
+            LOG.warn("Failed to parse SIRI-ET feed from " + url + ":", e);
         }
         return null;
     }
@@ -99,7 +99,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     }
     
     public String toString() {
-        return "SiriVMHttpTripUpdateSource(" + url + ")";
+        return "SiriETHttpTripUpdateSource(" + url + ")";
     }
 
     @Override

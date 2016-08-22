@@ -1,18 +1,10 @@
 package org.opentripplanner.updater;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.DestinationRef;
-import uk.org.siri.siri20.JourneyPlaceRefStructure;
-import uk.org.siri.siri20.VehicleActivityStructure;
+import uk.org.siri.siri20.*;
 
 import java.util.*;
 
@@ -26,15 +18,17 @@ public class SiriFuzzyTripMatcher {
 
     private GraphIndex index;
 
+    private Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+
     public SiriFuzzyTripMatcher(GraphIndex index) {
         this.index = index;
     }
+
 
     /**
      * Matches VehicleActivity to a set of possible Trips based on tripId
      */
     public Set<Trip> match(VehicleActivityStructure activity) {
-
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
         if (monitoredVehicleJourney != null) {
@@ -46,19 +40,62 @@ public class SiriFuzzyTripMatcher {
 
             if (tripId != null) {
                 //TripId is provided in VM-delivery
-                //Exact tripId is provided
-                Set<Trip> trips = index.patternForTrip.keySet();
-                Set<Trip> matches = new HashSet<>();
-                for (Trip trip : trips) {
-                    if (trip.getId().getId().startsWith(tripId + "-")) {
-                        matches.add(trip);
-                    }
-                }
-                LOG.trace("Found trip-matches [{}].", matches.size());
-                return matches;
+                return getTripsBySiriId(tripId);
             }
         }
 
         return null;
+    }
+
+
+    /**
+     * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
+     */
+    public Set<Trip> match(EstimatedVehicleJourney journey) {
+
+        VehicleJourneyRef monitoredVehicleJourney = journey.getVehicleJourneyRef();
+
+        if (monitoredVehicleJourney != null) {
+
+            String tripId = monitoredVehicleJourney.getValue();
+            if (tripId != null) {
+                return getTripsBySiriId(tripId);
+            }
+        }
+
+        return null;
+    }
+
+    private Set<Trip> getTripsBySiriId(String tripId) {
+        if (!mappedTripsCache.containsKey(tripId)) {
+            //Result is not cached - rebuild cache
+            Map<String, Set<Trip>> updatedCache = new HashMap<>();
+
+            Set<Trip> trips = index.patternForTrip.keySet();
+            for (Trip trip : trips) {
+
+                String currentTripId = getUnpaddedTripId(trip);
+
+                if (updatedCache.containsKey(currentTripId)) {
+                    updatedCache.get(currentTripId).add(trip);
+                } else {
+                    Set<Trip> initialSet = new HashSet<>();
+                    initialSet.add(trip);
+                    updatedCache.put(currentTripId, initialSet);
+                }
+            }
+
+            mappedTripsCache.clear();
+            mappedTripsCache.putAll(updatedCache);
+            LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
+        }
+        Set<Trip> trips = mappedTripsCache.get(tripId);
+        LOG.trace("Found trip-matches [{}].", trips.size());
+        return trips;
+    }
+
+    private String getUnpaddedTripId(Trip trip) {
+        String id = trip.getId().getId();
+        return id.substring(0, id.indexOf("-"));
     }
 }
