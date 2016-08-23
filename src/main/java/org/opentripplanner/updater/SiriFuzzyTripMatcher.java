@@ -90,6 +90,10 @@ public class SiriFuzzyTripMatcher {
             LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
         }
         Set<Trip> trips = mappedTripsCache.get(tripId);
+        if (trips == null) {
+            //Explicitly cache empty result for future use
+            mappedTripsCache.put(tripId, new HashSet<>());
+        }
         LOG.trace("Found trip-matches [{}].", (trips == null ? 0:trips.size()));
         return trips;
     }

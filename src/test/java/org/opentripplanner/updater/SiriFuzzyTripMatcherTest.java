@@ -56,7 +56,7 @@ public class SiriFuzzyTripMatcherTest extends GtfsTest {
         activity.setMonitoredVehicleJourney(monitoredVehicleJourney);
         Set<Trip> match = matcher.match(activity);
 
-        assertNull(match);
+        assertTrue(match == null || match.isEmpty());
 
     }
 
