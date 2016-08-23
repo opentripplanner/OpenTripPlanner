@@ -33,4 +33,4 @@ ENV JAVA_OPTS="-Xms8G -Xmx8G"
 
 LABEL io.openshift.expose-services 8080:http
 
-CMD ./run.sh
+ENTRYPOINT exec ./run.sh
