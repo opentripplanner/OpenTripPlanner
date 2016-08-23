@@ -90,12 +90,16 @@ public class SiriFuzzyTripMatcher {
             LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
         }
         Set<Trip> trips = mappedTripsCache.get(tripId);
-        LOG.trace("Found trip-matches [{}].", trips.size());
+        LOG.trace("Found trip-matches [{}].", (trips == null ? 0:trips.size()));
         return trips;
     }
 
     private String getUnpaddedTripId(Trip trip) {
         String id = trip.getId().getId();
-        return id.substring(0, id.indexOf("-"));
+        if (id.indexOf("-") > 0) {
+            return id.substring(0, id.indexOf("-"));
+        } else {
+            return id;
+        }
     }
 }
