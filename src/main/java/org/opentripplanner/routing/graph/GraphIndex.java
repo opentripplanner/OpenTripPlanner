@@ -499,7 +499,7 @@ public class GraphIndex {
         private Set<AgencyAndId> filterByStops;
         private Set<AgencyAndId> filterByRoutes;
         private Set<String> filterByBikeRentalStation;
-        private Set<String> seen = new HashSet<String>();
+        private Set<String> seenDepartureRows = new HashSet<String>();
         private boolean includeBikeShares;
 
         public PlaceFinderTraverseVisitor(List<Object> filterByTypes,
@@ -559,11 +559,11 @@ public class GraphIndex {
 
             for (TripPattern pattern : patterns) {
                 String seenKey = GtfsLibrary.convertIdToString(pattern.route.getId()) + ":" + pattern.code;
-                if (!seen.contains(seenKey)) {
+                if (!seenDepartureRows.contains(seenKey)) {
                     DepartureRow row = new DepartureRow(stop, pattern);
                     PlaceAndDistance place = new PlaceAndDistance(row, distance);
                     placesFound.add(place);
-                    seen.add(seenKey);
+                    seenDepartureRows.add(seenKey);
                 }
             }
         }
