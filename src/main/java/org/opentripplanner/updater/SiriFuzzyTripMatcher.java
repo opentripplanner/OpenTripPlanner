@@ -18,12 +18,12 @@ public class SiriFuzzyTripMatcher {
 
     private GraphIndex index;
 
-    private Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+    private static Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
 
     public SiriFuzzyTripMatcher(GraphIndex index) {
         this.index = index;
+        initCache(this.index);
     }
-
 
     /**
      * Matches VehicleActivity to a set of possible Trips based on tripId
@@ -37,38 +37,34 @@ public class SiriFuzzyTripMatcher {
             if (monitoredVehicleJourney.getCourseOfJourneyRef() != null) {
                 tripId = monitoredVehicleJourney.getCourseOfJourneyRef().getValue();
             }
-
-            if (tripId != null) {
-                //TripId is provided in VM-delivery
-                return getTripsBySiriId(tripId);
-            }
+            //TripId is provided in VM-delivery
+            return getCachedTripsBySiriId(tripId);
         }
 
         return null;
     }
-
 
     /**
      * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
      */
     public Set<Trip> match(EstimatedVehicleJourney journey) {
 
-        VehicleJourneyRef monitoredVehicleJourney = journey.getVehicleJourneyRef();
+        VehicleJourneyRef vehicleJourney = journey.getVehicleJourneyRef();
 
-        if (monitoredVehicleJourney != null) {
-
-            String tripId = monitoredVehicleJourney.getValue();
-            if (tripId != null) {
-                return getTripsBySiriId(tripId);
-            }
+        if (vehicleJourney != null) {
+            return getCachedTripsBySiriId(vehicleJourney.getValue());
         }
 
         return null;
     }
 
-    private Set<Trip> getTripsBySiriId(String tripId) {
-        if (!mappedTripsCache.containsKey(tripId)) {
-            //Result is not cached - rebuild cache
+    private Set<Trip> getCachedTripsBySiriId(String tripId) {
+        if (tripId == null) {return null;}
+        return mappedTripsCache.get(tripId);
+    }
+
+    private static void initCache(GraphIndex index) {
+        if (mappedTripsCache.isEmpty()) {
             Map<String, Set<Trip>> updatedCache = new HashMap<>();
 
             Set<Trip> trips = index.patternForTrip.keySet();
@@ -85,16 +81,12 @@ public class SiriFuzzyTripMatcher {
                 }
             }
 
-            mappedTripsCache.clear();
-            mappedTripsCache.putAll(updatedCache);
+            mappedTripsCache = updatedCache;
             LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
         }
-        Set<Trip> trips = mappedTripsCache.get(tripId);
-        LOG.trace("Found trip-matches [{}].", (trips == null ? 0:trips.size()));
-        return trips;
     }
 
-    private String getUnpaddedTripId(Trip trip) {
+    private static String getUnpaddedTripId(Trip trip) {
         String id = trip.getId().getId();
         if (id.indexOf("-") > 0) {
             return id.substring(0, id.indexOf("-"));
