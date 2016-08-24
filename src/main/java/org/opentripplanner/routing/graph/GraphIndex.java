@@ -500,6 +500,7 @@ public class GraphIndex {
         private Set<AgencyAndId> filterByRoutes;
         private Set<String> filterByBikeRentalStation;
         private Set<String> seenDepartureRows = new HashSet<String>();
+        private Set<AgencyAndId> seenStops = new HashSet<AgencyAndId>();
         private boolean includeBikeShares;
 
         public PlaceFinderTraverseVisitor(List<Object> filterByTypes,
@@ -549,6 +550,11 @@ public class GraphIndex {
         }
         private void addResults(Stop stop, int distance) {
             if (filterByStops != null && !filterByStops.isEmpty() && !filterByStops.contains(stop.getId())) return;
+
+            if (!seenStops.contains(stop.getId())) {
+                placesFound.add(new PlaceAndDistance(stop, distance));
+                seenStops.add(stop.getId());
+            }
 
             List<TripPattern> patterns = patternsForStop.get(stop)
                 .stream()

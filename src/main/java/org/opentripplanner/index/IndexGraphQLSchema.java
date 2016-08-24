@@ -260,6 +260,9 @@ public class IndexGraphQLSchema {
     private GraphQLInterfaceType placeInterface = relay.nodeInterface(new TypeResolver() {
         @Override
         public GraphQLObjectType getType(Object o) {
+            if (o instanceof Stop) {
+                return (GraphQLObjectType) stopType;
+            }
             if (o instanceof GraphIndex.DepartureRow) {
                 return (GraphQLObjectType) departureRowType;
             }
@@ -865,6 +868,7 @@ public class IndexGraphQLSchema {
         stopType = GraphQLObjectType.newObject()
             .name("Stop")
             .withInterface(nodeInterface)
+            .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
