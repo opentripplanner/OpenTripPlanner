@@ -2011,11 +2011,6 @@ public class IndexGraphQLSchema {
                     .description("Only include places that match one of the given IDs.")
                     .type(new GraphQLList(Scalars.GraphQLID))
                     .build())
-//                    .argument(GraphQLArgument.newArgument()
-//                        .name("filterByAgency")
-//                        .description("Only include places of given agency")
-//                        .type(Scalars.GraphQLString)
-//                        .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
                     Set<AgencyAndId> filterByStops = null;
