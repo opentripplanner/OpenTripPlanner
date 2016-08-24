@@ -313,13 +313,19 @@ public class TimetableSnapshotSource {
 
                 ServiceDate serviceDate = new ServiceDate();
 
-                LOG.info("Handling VehicleMonitoringDeliveryStructure");
                 List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
                 if (activities != null) {
                     //Handle activities
                     LOG.info("Handling {} activities.", activities.size());
+                    int handledCounter = 0;
                     for (VehicleActivityStructure activity : activities) {
-                        handleModifiedTrip(graph, activity, serviceDate);
+                        boolean handled = handleModifiedTrip(graph, activity, serviceDate);
+                        if (handled) {
+                            handledCounter++;
+                        }
+                        if (handledCounter % 100 == 0) { //Update every 100th line
+                            LOG.info("Applied {} modified trips.", handledCounter);
+                        }
                     }
                 }
                 List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
@@ -336,10 +342,6 @@ public class TimetableSnapshotSource {
 
             }
 
-            LOG.debug("message contains {} trip updates", updates.size());
-            int uIndex = 0;
-            LOG.debug("end of update message");
-
             // Make a snapshot after each message in anticipation of incoming requests
             // Purge data if necessary (and force new snapshot if anything was purged)
             // Make sure that the public (locking) getTimetableSnapshot function is not called.
@@ -352,6 +354,10 @@ public class TimetableSnapshotSource {
         } finally {
             // Always release lock
             bufferLock.unlock();
+            if (keepLogging) {
+                LOG.info("Reducing SIRI-VM logging until restart");
+                keepLogging = false;
+            }
         }
     }
 
@@ -416,6 +422,8 @@ public class TimetableSnapshotSource {
         }
     }
 
+private static boolean keepLogging = true;
+
     private boolean handleModifiedTrip(Graph graph, VehicleActivityStructure activity, ServiceDate serviceDate) {
         if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
             //Activity has expired
@@ -440,7 +448,9 @@ public class TimetableSnapshotSource {
             String lineRef = (activity.getMonitoredVehicleJourney().getLineRef() != null ? activity.getMonitoredVehicleJourney().getLineRef().getValue():null);
             String vehicleRef = (activity.getMonitoredVehicleJourney().getVehicleRef() != null ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue():null);
             String tripId =  (activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue():null);
-            LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
+            if (keepLogging) {
+                LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
+            }
 
             return false;
         }
@@ -449,14 +459,12 @@ public class TimetableSnapshotSource {
         Trip trip = getTripForJourney(trips, activity.getMonitoredVehicleJourney());
 
         if (trip == null) {
-            LOG.warn("No matching trip found - skipping VehicleActivity.");
             return false;
         }
 
         final TripPattern pattern = getPatternForTrip(trips, activity.getMonitoredVehicleJourney());
 
         if (pattern == null) {
-            LOG.info("No pattern found skipping VehicleActivity.");
             return false;
         }
 
@@ -501,7 +509,9 @@ public class TimetableSnapshotSource {
                             if (delay != null) {
                                 accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
                                 updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
-                                LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
+                                if (keepLogging) {
+                                    LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
+                                }
                             }
                         }
 
@@ -566,6 +576,7 @@ public class TimetableSnapshotSource {
         updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
 
         final boolean success = buffer.update(SIRI_FEED_ID, pattern, updatedTripTimes, serviceDate);
+
         return success;
     }
 
