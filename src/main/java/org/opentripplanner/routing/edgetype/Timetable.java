@@ -620,7 +620,6 @@ public class Timetable implements Serializable {
 
         MonitoredCallStructure update = mvj.getMonitoredCall();
         if (update == null) {
-            LOG.error("Part of a TripUpdate object could not be applied successfully.");
             return null;
         }
 
