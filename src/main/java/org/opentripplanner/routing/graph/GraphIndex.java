@@ -500,6 +500,7 @@ public class GraphIndex {
         private Set<AgencyAndId> filterByRoutes;
         private Set<String> filterByBikeRentalStation;
         private Set<String> seen = new HashSet<String>();
+        private boolean includeBikeShares;
 
         public PlaceFinderTraverseVisitor(List<Object> filterByTypes,
                 Set<AgencyAndId> filterByStops,
@@ -509,6 +510,13 @@ public class GraphIndex {
             this.filterByStops = filterByStops;
             this.filterByRoutes = filterByRoutes;
             this.filterByBikeRentalStation = filterByBikeRentalStations;
+
+            includeBikeShares = filterByTypes == null;
+            if (filterByTypes != null) {
+                if (filterByTypes.contains("BICYCLE_RENT")) {
+                    includeBikeShares = true;
+                }
+            }
         }
         @Override public void visitEdge(Edge edge, State state) {
         }
@@ -526,19 +534,15 @@ public class GraphIndex {
             }
         }
         private void addResults(BikeRentalStation station, int distance) {
-            boolean passesTypesFilter = filterByTypes == null;
-            if (filterByTypes != null) {
-                if (filterByTypes.contains("BICYCLE_RENT")) {
-                    passesTypesFilter = true;
-                }
-            }
+            if (!includeBikeShares) return;
+
             boolean passesBikeRentalStationsFilter = filterByBikeRentalStation == null;
             if (filterByBikeRentalStation != null) {
                 if (filterByBikeRentalStation.contains(station.id)) {
                     passesBikeRentalStationsFilter = true;
                 }
             }
-            if (passesTypesFilter && passesBikeRentalStationsFilter) {
+            if (passesBikeRentalStationsFilter) {
                 PlaceAndDistance place = new PlaceAndDistance(station, distance);
                 placesFound.add(place);
             }
