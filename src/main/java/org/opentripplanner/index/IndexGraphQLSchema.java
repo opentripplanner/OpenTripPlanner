@@ -784,7 +784,7 @@ public class IndexGraphQLSchema {
                     .name("numberOfDepartures")
                     .description("Maximum number of departures to return.")
                     .type(Scalars.GraphQLInt)
-                    .defaultValue(2)
+                    .defaultValue(1)
                     .build())
                 .dataFetcher(environment -> {
                     GraphIndex.DepartureRow departureRow = (GraphIndex.DepartureRow)environment.getSource();
