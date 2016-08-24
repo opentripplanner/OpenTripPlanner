@@ -1,24 +1,19 @@
 package org.opentripplanner.updater;
 
-import com.google.transit.realtime.GtfsRealtime;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.GtfsTest;
 import uk.org.siri.siri20.CourseOfJourneyRefStructure;
 import uk.org.siri.siri20.VehicleActivityStructure;
 
-import java.util.Map;
 import java.util.Set;
 
 public class SiriFuzzyTripMatcherTest extends GtfsTest {
 
+    private final boolean forceCacheRebuild = true;
+
     public void testMatch() throws Exception {
-        String feedId = graph.getFeedIds().iterator().next();
-
-        SiriFuzzyTripMatcher matcher = new SiriFuzzyTripMatcher(graph.index);
-
-        Set<Map.Entry<AgencyAndId, Trip>> entries = graph.index.tripForId.entrySet();
-
+        SiriFuzzyTripMatcher matcher = new SiriFuzzyTripMatcher(graph.index, forceCacheRebuild);
 
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = new VehicleActivityStructure.MonitoredVehicleJourney();
         CourseOfJourneyRefStructure courseOfJourney = new CourseOfJourneyRefStructure();
@@ -39,12 +34,7 @@ public class SiriFuzzyTripMatcherTest extends GtfsTest {
     }
 
     public void testNoMatch() throws Exception {
-        String feedId = graph.getFeedIds().iterator().next();
-
-        SiriFuzzyTripMatcher matcher = new SiriFuzzyTripMatcher(graph.index);
-
-        Set<Map.Entry<AgencyAndId, Trip>> entries = graph.index.tripForId.entrySet();
-
+        SiriFuzzyTripMatcher matcher = new SiriFuzzyTripMatcher(graph.index, forceCacheRebuild);
 
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = new VehicleActivityStructure.MonitoredVehicleJourney();
         CourseOfJourneyRefStructure courseOfJourney = new CourseOfJourneyRefStructure();
