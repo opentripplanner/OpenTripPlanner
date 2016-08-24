@@ -25,6 +25,17 @@ public class SiriFuzzyTripMatcher {
         initCache(this.index);
     }
 
+    //For testing only
+    protected SiriFuzzyTripMatcher(GraphIndex index, boolean forceCacheRebuild) {
+        LOG.error("For testing only");
+        this.index = index;
+
+        if (forceCacheRebuild) {
+            mappedTripsCache.clear();
+        }
+        initCache(this.index);
+    }
+
     /**
      * Matches VehicleActivity to a set of possible Trips based on tripId
      */
