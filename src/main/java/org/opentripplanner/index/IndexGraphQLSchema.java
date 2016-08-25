@@ -141,23 +141,11 @@ public class IndexGraphQLSchema {
         .value("WALK", TraverseMode.WALK, "WALK")
         .build();
 
-    public static GraphQLEnumType filterModeEnum = GraphQLEnumType.newEnum()
-        .name("FilterMode")
-        .value("AIRPLANE", TraverseMode.AIRPLANE, "AIRPLANE")
-        .value("BICYCLE", TraverseMode.BICYCLE, "BICYCLE")
-        .value("BICYCLE_RENT", "BICYCLE_RENT", "BICYCLE_RENT")
-        .value("BUS", TraverseMode.BUS, "BUS")
-        .value("CABLE_CAR", TraverseMode.CABLE_CAR, "CABLE_CAR")
-        .value("CAR", TraverseMode.CAR, "CAR")
-        .value("FERRY", TraverseMode.FERRY, "FERRY")
-        .value("FUNICULAR", TraverseMode.FUNICULAR, "FUNICULAR")
-        .value("GONDOLA", TraverseMode.GONDOLA, "GONDOLA")
-        .value("LEG_SWITCH", TraverseMode.LEG_SWITCH, "LEG_SWITCH")
-        .value("RAIL", TraverseMode.RAIL, "RAIL")
-        .value("SUBWAY", TraverseMode.SUBWAY, "SUBWAY")
-        .value("TRAM", TraverseMode.TRAM, "TRAM")
-        .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
-        .value("WALK", TraverseMode.WALK, "WALK")
+    public static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
+        .name("FilterPlaceType")
+        .value("STOP", GraphIndex.PlaceType.STOP, "Stops")
+        .value("DEPARTURE_ROW", GraphIndex.PlaceType.DEPARTURE_ROW, "Departure rows")
+        .value("BICYCLE_RENT", GraphIndex.PlaceType.BICYCLE_RENT, "Bicycle rent stations")
         .build();
 
     public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
@@ -2001,14 +1989,19 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("maxResults")
-                    .description("Maximum number of results. Search is stopped when this is reached. Default is 20.")
+                    .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
                     .defaultValue(20)
                     .type(Scalars.GraphQLInt)
                     .build())
                 .argument(GraphQLArgument.newArgument()
-                    .name("filterByTypes")
+                    .name("filterByPlaceTypes")
                     .description("Only include places that imply this type. i.e. mode for stops, station etc. Also BICYCLE_RENT for bike rental stations.")
-                    .type(new GraphQLList(filterModeEnum))
+                    .type(new GraphQLList(filterPlaceTypeEnum))
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("filterByModes")
+                    .description("Only include places that include this mode. Only checked for places with mode i.e. stops, departure rows.")
+                    .type(new GraphQLList(modeEnum))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("filterByIds")
@@ -2017,14 +2010,14 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
-                    Set<AgencyAndId> filterByStops = null;
-                    Set<AgencyAndId> filterByRoutes = null;
-                    Set<String> filterByBikeRentalStations = null;
+                    List<AgencyAndId> filterByStops = null;
+                    List<AgencyAndId> filterByRoutes = null;
+                    List<String> filterByBikeRentalStations = null;
                     Iterable<String> filterByIds = (Iterable<String>)environment.getArgument("filterByIds");
                     if (filterByIds != null) {
-                        filterByStops = new HashSet<AgencyAndId>();                                
-                        filterByRoutes = new HashSet<AgencyAndId>();
-                        filterByBikeRentalStations = new HashSet<String>();
+                        filterByStops = new ArrayList<AgencyAndId>();
+                        filterByRoutes = new ArrayList<AgencyAndId>();
+                        filterByBikeRentalStations = new ArrayList<String>();
                         for (String idString : filterByIds) {
                             Relay.ResolvedGlobalId id = relay.fromGlobalId(idString);
                             if (id.type.equals(stopType.getName())) {
@@ -2037,7 +2030,8 @@ public class IndexGraphQLSchema {
                         }
                     }
 
-                    List<Object> filterByTypes = environment.getArgument("filterByTypes");
+                    List<String> filterByModes = environment.getArgument("filterByModes");
+                    List<GraphIndex.PlaceType> filterByPlaceTypes = environment.getArgument("filterByPlaceTypes");
 
                     List<GraphIndex.PlaceAndDistance> places;
                     try {
@@ -2046,7 +2040,8 @@ public class IndexGraphQLSchema {
                             environment.getArgument("lon"),
                             environment.getArgument("maxDistance"),
                             environment.getArgument("maxResults"),
-                            filterByTypes,
+                            filterByModes,
+                            filterByPlaceTypes,
                             filterByStops,
                             filterByRoutes,
                             filterByBikeRentalStations

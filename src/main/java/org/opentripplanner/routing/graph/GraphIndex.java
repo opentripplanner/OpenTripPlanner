@@ -68,6 +68,7 @@ import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.GraphIndex.PlaceType;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -368,10 +369,11 @@ public class GraphIndex {
     }
 
     public List<PlaceAndDistance> findClosestPlacesByWalking(double lat, double lon, int maxDistance, int maxResults,
-            List<Object> filterByTypes,
-            Set<AgencyAndId> filterByStops,
-            Set<AgencyAndId> filterByRoutes,
-            Set<String> filterByBikeRentalStations) {
+            List<String> filterByModes,
+            List<PlaceType> filterByPlaceTypes,
+            List<AgencyAndId> filterByStops,
+            List<AgencyAndId> filterByRoutes,
+            List<String> filterByBikeRentalStations) {
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.allowBikeRental = true;
         rr.from = new GenericLocation(lat, lon);
@@ -383,7 +385,7 @@ public class GraphIndex {
         // If elapsed time is not capped, searches are very slow.
         rr.worstTime = (rr.dateTime + maxDistance);
         rr.setNumItineraries(1);
-        PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(filterByTypes, filterByStops, filterByRoutes, filterByBikeRentalStations);
+        PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(filterByModes, filterByPlaceTypes, filterByStops, filterByRoutes, filterByBikeRentalStations);
         AStar astar = new AStar();
         astar.setTraverseVisitor(visitor);
         SearchTerminationStrategy strategy = new SearchTerminationStrategy() {
@@ -442,6 +444,10 @@ public class GraphIndex {
         }
     }
 
+    public static enum PlaceType {
+        STOP, DEPARTURE_ROW, BICYCLE_RENT;
+    }
+
     public static class PlaceAndDistance {
         public Object place;
         public int distance;
@@ -493,32 +499,41 @@ public class GraphIndex {
         }
     }
 
+    private static <T> Set<T> toSet(List<T> list) {
+        if (list == null) return null;
+        return new HashSet<T>(list);
+    }
+
     private class PlaceFinderTraverseVisitor implements TraverseVisitor {
         public List<PlaceAndDistance> placesFound = new ArrayList<>();
-        private List<Object> filterByTypes;
+        private Set<PlaceType> filterByPlaceTypes;
         private Set<AgencyAndId> filterByStops;
         private Set<AgencyAndId> filterByRoutes;
         private Set<String> filterByBikeRentalStation;
         private Set<String> seenDepartureRows = new HashSet<String>();
         private Set<AgencyAndId> seenStops = new HashSet<AgencyAndId>();
+        private boolean includeStops;
+        private boolean includeDepartureRows;
         private boolean includeBikeShares;
+        private Set<String> filterByModes;
 
-        public PlaceFinderTraverseVisitor(List<Object> filterByTypes,
-                Set<AgencyAndId> filterByStops,
-                Set<AgencyAndId> filterByRoutes,
-                Set<String> filterByBikeRentalStations) {
-            this.filterByTypes = filterByTypes;
-            this.filterByStops = filterByStops;
-            this.filterByRoutes = filterByRoutes;
-            this.filterByBikeRentalStation = filterByBikeRentalStations;
+        public PlaceFinderTraverseVisitor(
+                List<String> filterByModes,
+                List<PlaceType> filterByPlaceTypes,
+                List<AgencyAndId> filterByStops,
+                List<AgencyAndId> filterByRoutes,
+                List<String> filterByBikeRentalStations) {
+            this.filterByModes = toSet(filterByModes);
+            this.filterByPlaceTypes = toSet(filterByPlaceTypes);
+            this.filterByStops = toSet(filterByStops);
+            this.filterByRoutes = toSet(filterByRoutes);
+            this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
 
-            includeBikeShares = filterByTypes == null;
-            if (filterByTypes != null) {
-                if (filterByTypes.contains("BICYCLE_RENT")) {
-                    includeBikeShares = true;
-                }
-            }
+            includeStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.STOP);
+            includeDepartureRows = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.DEPARTURE_ROW);
+            includeBikeShares = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
         }
+
         @Override public void visitEdge(Edge edge, State state) {
         }
         @Override public void visitEnqueue(State state) {
@@ -549,30 +564,37 @@ public class GraphIndex {
             }
         }
         private void addResults(Stop stop, int distance) {
-            if (filterByStops != null && !filterByStops.isEmpty() && !filterByStops.contains(stop.getId())) return;
+            if (filterByStops != null && !filterByStops.contains(stop.getId())) return;
 
-            if (!seenStops.contains(stop.getId())) {
+            if (includeStops && !seenStops.contains(stop.getId()) && (filterByModes == null || stopHasRoutesWithMode(stop, filterByModes))) {
                 placesFound.add(new PlaceAndDistance(stop, distance));
                 seenStops.add(stop.getId());
             }
 
-            List<TripPattern> patterns = patternsForStop.get(stop)
-                .stream()
-                .filter(pattern -> filterByTypes == null || filterByTypes.isEmpty() || filterByTypes.contains(pattern.mode))
-                .filter(pattern -> filterByRoutes == null || filterByRoutes.isEmpty() || filterByRoutes.contains(pattern.route.getId()))
-                .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
-                .collect(toList());
+            if (includeDepartureRows) {
+                List<TripPattern> patterns = patternsForStop.get(stop)
+                    .stream()
+                    .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.mode))
+                    .filter(pattern -> filterByRoutes == null || filterByRoutes.contains(pattern.route.getId()))
+                    .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
+                    .collect(toList());
 
-            for (TripPattern pattern : patterns) {
-                String seenKey = GtfsLibrary.convertIdToString(pattern.route.getId()) + ":" + pattern.code;
-                if (!seenDepartureRows.contains(seenKey)) {
-                    DepartureRow row = new DepartureRow(stop, pattern);
-                    PlaceAndDistance place = new PlaceAndDistance(row, distance);
-                    placesFound.add(place);
-                    seenDepartureRows.add(seenKey);
+                for (TripPattern pattern : patterns) {
+                    String seenKey = GtfsLibrary.convertIdToString(pattern.route.getId()) + ":" + pattern.code;
+                    if (!seenDepartureRows.contains(seenKey)) {
+                        DepartureRow row = new DepartureRow(stop, pattern);
+                        PlaceAndDistance place = new PlaceAndDistance(row, distance);
+                        placesFound.add(place);
+                        seenDepartureRows.add(seenKey);
+                    }
                 }
             }
         }
+
+    }
+
+    private boolean stopHasRoutesWithMode(Stop stop, Set<String> modes) {
+        return !Sets.intersection(routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode).collect(Collectors.toSet()), modes).isEmpty();
     }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
