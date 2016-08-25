@@ -308,7 +308,6 @@ public class TimetableSnapshotSource {
                 buffer.clear(SIRI_FEED_ID);
             }
 
-
             for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
 
                 ServiceDate serviceDate = new ServiceDate();
@@ -323,10 +322,8 @@ public class TimetableSnapshotSource {
                         if (handled) {
                             handledCounter++;
                         }
-                        if (handledCounter % 100 == 0) { //Update every 100th line
-                            LOG.info("Applied {} modified trips.", handledCounter);
-                        }
                     }
+                    LOG.info("Applied {} modified trips.", handledCounter);
                 }
                 List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
                 if (cancellations != null && !cancellations.isEmpty()) {
@@ -422,7 +419,7 @@ public class TimetableSnapshotSource {
         }
     }
 
-private static boolean keepLogging = true;
+    private static boolean keepLogging = true;
 
     private boolean handleModifiedTrip(Graph graph, VehicleActivityStructure activity, ServiceDate serviceDate) {
         if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
@@ -432,23 +429,20 @@ private static boolean keepLogging = true;
 
 
         if (activity.getMonitoredVehicleJourney() == null ||
-                activity.getMonitoredVehicleJourney().getVehicleRef() == null) {
-            //No vehicle reference
-            return false;
-        }
-        if (activity.getMonitoredVehicleJourney() == null && activity.getMonitoredVehicleJourney().getLineRef() != null) {
-            //No linereference
+                activity.getMonitoredVehicleJourney().getVehicleRef() == null ||
+                activity.getMonitoredVehicleJourney().getLineRef() == null) {
+            //No vehicle reference or line reference
             return false;
         }
 
         Set<Trip> trips = siriFuzzyTripMatcher.match(activity);
 
         if (trips == null || trips.isEmpty()) {
-            boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
-            String lineRef = (activity.getMonitoredVehicleJourney().getLineRef() != null ? activity.getMonitoredVehicleJourney().getLineRef().getValue():null);
-            String vehicleRef = (activity.getMonitoredVehicleJourney().getVehicleRef() != null ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue():null);
-            String tripId =  (activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue():null);
             if (keepLogging) {
+                boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
+                String lineRef = (activity.getMonitoredVehicleJourney().getLineRef() != null ? activity.getMonitoredVehicleJourney().getLineRef().getValue():null);
+                String vehicleRef = (activity.getMonitoredVehicleJourney().getVehicleRef() != null ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue():null);
+                String tripId =  (activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue():null);
                 LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.", isMonitored, lineRef, vehicleRef, tripId);
             }
 
@@ -493,51 +487,49 @@ private static boolean keepLogging = true;
             Duration delay = monitoredVehicleJourney.getDelay();
 
             MonitoredCallStructure monitoredCall = monitoredVehicleJourney.getMonitoredCall();
-            if (monitoredCall != null) {
-                if (monitoredCall.getStopPointRef() != null) {
+            if (monitoredCall != null && monitoredCall.getStopPointRef() != null) {
 
-                    for (int index = 0; index < updatedTripTimes.getNumStops(); ++index) {
+                for (int index = 0; index < updatedTripTimes.getNumStops(); ++index) {
 
-                        final Stop stop = stops.get(index);
+                    final Stop stop = stops.get(index);
 
-                        // Create stop time
-                        final StopTime stopTime = new StopTime();
-                        stopTime.setTrip(trip);
-                        stopTime.setStop(stop);
+                    // Create stop time
+                    final StopTime stopTime = new StopTime();
+                    stopTime.setTrip(trip);
+                    stopTime.setStop(stop);
 
-                        if (stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue())) {
-                            if (delay != null) {
-                                accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
-                                updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
-                                if (keepLogging) {
-                                    LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
-                                }
+                    if (stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue())) {
+                        if (delay != null) {
+                            accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
+                            updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
+                            if (keepLogging) {
+                                LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
                             }
                         }
-
-                        stopTime.setArrivalTime(updatedTripTimes.getArrivalTime(index));
-                        stopTime.setDepartureTime(updatedTripTimes.getDepartureTime(index));
-
-                        stopTime.setTimepoint(1); // Exact time
-
-                        // Set pickup type
-                        // Set different pickup type for last stop
-                        if (index == updatedTripTimes.getNumStops() - 1) {
-                            stopTime.setPickupType(1); // No pickup available
-                        } else {
-                            stopTime.setPickupType(0); // Regularly scheduled pickup
-                        }
-                        // Set drop off type
-                        // Set different drop off type for first stop
-                        if (index == 0) {
-                            stopTime.setDropOffType(1); // No drop off available
-                        } else {
-                            stopTime.setDropOffType(0); // Regularly scheduled drop off
-                        }
-
-                        // Add stop time to list
-                        stopTimes.add(stopTime);
                     }
+
+                    stopTime.setArrivalTime(updatedTripTimes.getArrivalTime(index));
+                    stopTime.setDepartureTime(updatedTripTimes.getDepartureTime(index));
+
+                    stopTime.setTimepoint(1); // Exact time
+
+                    // Set pickup type
+                    // Set different pickup type for last stop
+                    if (index == updatedTripTimes.getNumStops() - 1) {
+                        stopTime.setPickupType(1); // No pickup available
+                    } else {
+                        stopTime.setPickupType(0); // Regularly scheduled pickup
+                    }
+                    // Set drop off type
+                    // Set different drop off type for first stop
+                    if (index == 0) {
+                        stopTime.setDropOffType(1); // No drop off available
+                    } else {
+                        stopTime.setDropOffType(0); // Regularly scheduled drop off
+                    }
+
+                    // Add stop time to list
+                    stopTimes.add(stopTime);
                 }
             }
 
