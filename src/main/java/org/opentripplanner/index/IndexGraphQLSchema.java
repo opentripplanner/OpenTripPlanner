@@ -2030,7 +2030,7 @@ public class IndexGraphQLSchema {
                         }
                     }
 
-                    List<String> filterByModes = environment.getArgument("filterByModes");
+                    List<TraverseMode> filterByModes = environment.getArgument("filterByModes");
                     List<GraphIndex.PlaceType> filterByPlaceTypes = environment.getArgument("filterByPlaceTypes");
 
                     List<GraphIndex.PlaceAndDistance> places;

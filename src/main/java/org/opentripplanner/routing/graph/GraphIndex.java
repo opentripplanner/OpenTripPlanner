@@ -369,7 +369,7 @@ public class GraphIndex {
     }
 
     public List<PlaceAndDistance> findClosestPlacesByWalking(double lat, double lon, int maxDistance, int maxResults,
-            List<String> filterByModes,
+            List<TraverseMode> filterByModes,
             List<PlaceType> filterByPlaceTypes,
             List<AgencyAndId> filterByStops,
             List<AgencyAndId> filterByRoutes,
@@ -506,6 +506,7 @@ public class GraphIndex {
 
     private class PlaceFinderTraverseVisitor implements TraverseVisitor {
         public List<PlaceAndDistance> placesFound = new ArrayList<>();
+        private Set<TraverseMode> filterByModes;
         private Set<PlaceType> filterByPlaceTypes;
         private Set<AgencyAndId> filterByStops;
         private Set<AgencyAndId> filterByRoutes;
@@ -515,10 +516,9 @@ public class GraphIndex {
         private boolean includeStops;
         private boolean includeDepartureRows;
         private boolean includeBikeShares;
-        private Set<String> filterByModes;
 
         public PlaceFinderTraverseVisitor(
-                List<String> filterByModes,
+                List<TraverseMode> filterByModes,
                 List<PlaceType> filterByPlaceTypes,
                 List<AgencyAndId> filterByStops,
                 List<AgencyAndId> filterByRoutes,
@@ -593,12 +593,12 @@ public class GraphIndex {
 
     }
 
-    private Set<TraverseMode> modesForStop(Stop stop) {
-        return routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode).collect(Collectors.toSet());
+    private Stream<TraverseMode> modesForStop(Stop stop) {
+        return routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode);
     }
 
-    private boolean stopHasRoutesWithMode(Stop stop, Set<String> modes) {
-        return !Sets.intersection(modesForStop(stop), modes).isEmpty();
+    private boolean stopHasRoutesWithMode(Stop stop, Set<TraverseMode> modes) {
+        return modesForStop(stop).anyMatch(modes::contains);
     }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
