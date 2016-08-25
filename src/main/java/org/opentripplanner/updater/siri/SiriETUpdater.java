@@ -91,11 +91,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
         updateSource = new SiriETHttpTripUpdateSource();
 
         // Configure update source
-        if (updateSource == null) {
+        if (updateSource instanceof JsonConfigurable) {
+            ((JsonConfigurable) updateSource).configure(graph, config);
+        } else {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
-        } else if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config);
         }
 
         int logFrequency = config.path("logFrequency").asInt(-1);

@@ -629,7 +629,7 @@ public class Timetable implements Serializable {
 
         boolean match = false;
         for (int i = 0; i < numStops; i++) {
-            if (!match && update != null) {
+            if (!match) {
                 if (update.getStopPointRef() != null) {
                     match = pattern.getStop(i).getId().getId().equals(update.getStopPointRef().getValue());
                 }

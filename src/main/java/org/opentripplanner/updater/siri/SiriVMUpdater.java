@@ -90,11 +90,11 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         updateSource = new SiriVMHttpTripUpdateSource();
 
         // Configure update source
-        if (updateSource == null) {
+        if (updateSource instanceof JsonConfigurable) {
+            ((JsonConfigurable) updateSource).configure(graph, config);
+        } else {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
-        } else if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config);
         }
 
         int logFrequency = config.path("logFrequency").asInt(-1);
