@@ -593,8 +593,12 @@ public class GraphIndex {
 
     }
 
+    private Set<TraverseMode> modesForStop(Stop stop) {
+        return routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode).collect(Collectors.toSet());
+    }
+
     private boolean stopHasRoutesWithMode(Stop stop, Set<String> modes) {
-        return !Sets.intersection(routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode).collect(Collectors.toSet()), modes).isEmpty();
+        return !Sets.intersection(modesForStop(stop), modes).isEmpty();
     }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
