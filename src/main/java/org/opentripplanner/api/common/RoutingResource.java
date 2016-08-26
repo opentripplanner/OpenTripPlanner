@@ -405,8 +405,10 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
-        if (maxWalkDistance != null)
+        if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
+            request.maxTransferWalkDistance = maxWalkDistance;
+        }
 
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
