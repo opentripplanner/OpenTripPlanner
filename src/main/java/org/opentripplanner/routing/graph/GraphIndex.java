@@ -542,35 +542,29 @@ public class GraphIndex {
             Vertex vertex = state.getVertex();
             int distance = (int)state.getElapsedTimeSeconds();
             if (vertex instanceof TransitStop) {
-                Stop stop = ((TransitStop)vertex).getStop();
-                addResults(stop, distance);
+                visitStop(((TransitStop)vertex).getStop(), distance);
             } else if (vertex instanceof BikeRentalStationVertex) {
-                BikeRentalStation station = ((BikeRentalStationVertex)vertex).getStation();
-                addResults(station, distance);
+                visitBikeRentalStation(((BikeRentalStationVertex)vertex).getStation(), distance);
             }
         }
-        private void addResults(BikeRentalStation station, int distance) {
-            if (!includeBikeShares) return;
+        private void visitBikeRentalStation(BikeRentalStation station, int distance) {
+            handleBikeRentalStation(station, distance);
+        }
 
-            boolean passesBikeRentalStationsFilter = filterByBikeRentalStation == null;
-            if (filterByBikeRentalStation != null) {
-                if (filterByBikeRentalStation.contains(station.id)) {
-                    passesBikeRentalStationsFilter = true;
-                }
-            }
-            if (passesBikeRentalStationsFilter) {
-                PlaceAndDistance place = new PlaceAndDistance(station, distance);
-                placesFound.add(place);
-            }
+        private void visitStop(Stop stop, int distance) {
+            handleStop(stop, distance);
+            handleDepartureRows(stop, distance);
         }
-        private void addResults(Stop stop, int distance) {
+
+        private void handleStop(Stop stop, int distance) {
             if (filterByStops != null && !filterByStops.contains(stop.getId())) return;
-
             if (includeStops && !seenStops.contains(stop.getId()) && (filterByModes == null || stopHasRoutesWithMode(stop, filterByModes))) {
                 placesFound.add(new PlaceAndDistance(stop, distance));
                 seenStops.add(stop.getId());
             }
+        }
 
+        private void handleDepartureRows(Stop stop, int distance) {
             if (includeDepartureRows) {
                 List<TripPattern> patterns = patternsForStop.get(stop)
                     .stream()
@@ -591,6 +585,12 @@ public class GraphIndex {
             }
         }
 
+        private void handleBikeRentalStation(BikeRentalStation station, int distance) {
+            if (!includeBikeShares) return;
+            if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) return;
+
+            placesFound.add(new PlaceAndDistance(station, distance));
+        }
     }
 
     private Stream<TraverseMode> modesForStop(Stop stop) {

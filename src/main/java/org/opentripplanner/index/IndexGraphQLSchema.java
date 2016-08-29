@@ -1764,6 +1764,25 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
+            .name("InputFilters")
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("stops")
+                .description("Stops to include by GTFS id.")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("routes")
+                .description("Routes to include by GTFS id.")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("bikeRentalStations")
+                .description("Bike rentals to include by GTFS id.")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .build())
+            .build();
+
         queryType = GraphQLObjectType.newObject()
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
@@ -2005,29 +2024,20 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("filterByIds")
-                    .description("Only include places that match one of the given IDs.")
-                    .type(new GraphQLList(Scalars.GraphQLID))
+                    .description("Only include places that match one of the given GTFS ids.")
+                    .type(filterInputType)
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
                     List<AgencyAndId> filterByStops = null;
                     List<AgencyAndId> filterByRoutes = null;
                     List<String> filterByBikeRentalStations = null;
-                    Iterable<String> filterByIds = (Iterable<String>)environment.getArgument("filterByIds");
+                    @SuppressWarnings("rawtypes")
+                    Map filterByIds = (Map)environment.getArgument("filterByIds");
                     if (filterByIds != null) {
-                        filterByStops = new ArrayList<AgencyAndId>();
-                        filterByRoutes = new ArrayList<AgencyAndId>();
-                        filterByBikeRentalStations = new ArrayList<String>();
-                        for (String idString : filterByIds) {
-                            Relay.ResolvedGlobalId id = relay.fromGlobalId(idString);
-                            if (id.type.equals(stopType.getName())) {
-                                filterByStops.add(GtfsLibrary.convertIdFromString(id.id));
-                            } else if (id.type.equals(routeType.getName())) {
-                                filterByRoutes.add(GtfsLibrary.convertIdFromString(id.id));
-                            } else if (id.type.equals(bikeRentalStationType.getName())) {
-                                filterByBikeRentalStations.add(id.id);
-                            }
-                        }
+                        filterByStops = toIdList(((List<String>) filterByIds.get("stops")));
+                        filterByRoutes = toIdList(((List<String>) filterByIds.get("routes")));
+                        filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
                     }
 
                     List<TraverseMode> filterByModes = environment.getArgument("filterByModes");
@@ -2047,7 +2057,6 @@ public class IndexGraphQLSchema {
                             filterByBikeRentalStations
                             )
                             .stream()
-                            //.sorted(Comparator.comparing(s -> s.distance))
                             .collect(Collectors.toList());
                     } catch (VertexNotFoundException e) {
                         places = Collections.emptyList();
@@ -2329,6 +2338,11 @@ public class IndexGraphQLSchema {
         indexSchema = GraphQLSchema.newSchema()
             .query(queryType)
             .build();
+    }
+
+    private List<AgencyAndId> toIdList(List<String> ids) {
+        if (ids == null) return Collections.emptyList();
+        return ids.stream().map(GtfsLibrary::convertIdFromString).collect(Collectors.toList());
     }
 
     private void createPlanType(GraphIndex index) {
