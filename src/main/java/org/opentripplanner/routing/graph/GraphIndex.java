@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -54,15 +55,22 @@ import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.ExtendedTraverseVisitor;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.car_park.CarPark;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -74,7 +82,9 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.Router;
@@ -373,9 +383,14 @@ public class GraphIndex {
             List<PlaceType> filterByPlaceTypes,
             List<AgencyAndId> filterByStops,
             List<AgencyAndId> filterByRoutes,
-            List<String> filterByBikeRentalStations) {
+            List<String> filterByBikeRentalStations,
+            List<String> filterByBikeParks,
+            List<String> filterByCarParks) {
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.allowBikeRental = true;
+        //rr.bikeParkAndRide = true;
+        //rr.parkAndRide = true;
+        //rr.modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
         rr.from = new GenericLocation(lat, lon);
         rr.batch = true;
         rr.setRoutingContext(graph);
@@ -385,7 +400,8 @@ public class GraphIndex {
         // If elapsed time is not capped, searches are very slow.
         rr.worstTime = (rr.dateTime + maxDistance);
         rr.setNumItineraries(1);
-        PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(filterByModes, filterByPlaceTypes, filterByStops, filterByRoutes, filterByBikeRentalStations);
+        //rr.arriveBy = true;
+        PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(filterByModes, filterByPlaceTypes, filterByStops, filterByRoutes, filterByBikeRentalStations, filterByBikeParks, filterByCarParks);
         AStar astar = new AStar();
         astar.setTraverseVisitor(visitor);
         SearchTerminationStrategy strategy = new SearchTerminationStrategy() {
@@ -445,7 +461,7 @@ public class GraphIndex {
     }
 
     public static enum PlaceType {
-        STOP, DEPARTURE_ROW, BICYCLE_RENT;
+        STOP, DEPARTURE_ROW, BICYCLE_RENT, BIKE_PARK, CAR_PARK;
     }
 
     public static class PlaceAndDistance {
@@ -504,7 +520,7 @@ public class GraphIndex {
         return new HashSet<T>(list);
     }
 
-    private class PlaceFinderTraverseVisitor implements TraverseVisitor {
+    private class PlaceFinderTraverseVisitor implements ExtendedTraverseVisitor {
         public List<PlaceAndDistance> placesFound = new ArrayList<>();
         private Set<TraverseMode> filterByModes;
         private Set<PlaceType> filterByPlaceTypes;
@@ -513,38 +529,63 @@ public class GraphIndex {
         private Set<String> filterByBikeRentalStation;
         private Set<String> seenDepartureRows = new HashSet<String>();
         private Set<AgencyAndId> seenStops = new HashSet<AgencyAndId>();
+        private Set<String> seenBicycleRentalStations = new HashSet<String>();
+        private Set<String> seenBikeParks = new HashSet<String>();
+        private Set<String> seenCarParks = new HashSet<String>();
+        private Set<String> filterByBikeParks;
+        private Set<String> filterByCarParks;
         private boolean includeStops;
         private boolean includeDepartureRows;
         private boolean includeBikeShares;
+        private boolean includeBikeParks;
+        private boolean includeCarParks;
 
         public PlaceFinderTraverseVisitor(
                 List<TraverseMode> filterByModes,
                 List<PlaceType> filterByPlaceTypes,
                 List<AgencyAndId> filterByStops,
                 List<AgencyAndId> filterByRoutes,
-                List<String> filterByBikeRentalStations) {
+                List<String> filterByBikeRentalStations,
+                List<String> filterByBikeParks,
+                List<String> filterByCarParks) {
             this.filterByModes = toSet(filterByModes);
             this.filterByPlaceTypes = toSet(filterByPlaceTypes);
             this.filterByStops = toSet(filterByStops);
             this.filterByRoutes = toSet(filterByRoutes);
             this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
+            this.filterByBikeParks = toSet(filterByBikeParks);
+            this.filterByCarParks = toSet(filterByCarParks);
 
             includeStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.STOP);
             includeDepartureRows = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.DEPARTURE_ROW);
             includeBikeShares = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
+            includeBikeParks = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BIKE_PARK);
+            includeCarParks = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.CAR_PARK);
         }
 
+        @Override public void preVisitEdge(Edge edge, State state) {
+            if (edge instanceof ParkAndRideLinkEdge) {
+                visitVertex(state.edit(edge).makeState());
+            } else if (edge instanceof StreetBikeParkLink) {
+                visitVertex(state.edit(edge).makeState());
+            }
+        }
         @Override public void visitEdge(Edge edge, State state) {
         }
         @Override public void visitEnqueue(State state) {
         }
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
+            System.out.println("vertex " + vertex + " " + state.getNonTransitMode());
             int distance = (int)state.getElapsedTimeSeconds();
             if (vertex instanceof TransitStop) {
                 visitStop(((TransitStop)vertex).getStop(), distance);
             } else if (vertex instanceof BikeRentalStationVertex) {
                 visitBikeRentalStation(((BikeRentalStationVertex)vertex).getStation(), distance);
+            } else if (vertex instanceof BikeParkVertex) {
+                visitBikePark(((BikeParkVertex)vertex).getBikePark(), distance);
+            } else if (vertex instanceof ParkAndRideVertex) {
+                visitCarPark(((ParkAndRideVertex)vertex).getCarPark(), distance);
             }
         }
         private void visitBikeRentalStation(BikeRentalStation station, int distance) {
@@ -554,6 +595,14 @@ public class GraphIndex {
         private void visitStop(Stop stop, int distance) {
             handleStop(stop, distance);
             handleDepartureRows(stop, distance);
+        }
+
+        private void visitBikePark(BikePark bikePark, int distance) {
+            handleBikePark(bikePark, distance);
+        }
+
+        private void visitCarPark(CarPark carPark, int distance) {
+            handleCarPark(carPark, distance);
         }
 
         private void handleStop(Stop stop, int distance) {
@@ -588,8 +637,25 @@ public class GraphIndex {
         private void handleBikeRentalStation(BikeRentalStation station, int distance) {
             if (!includeBikeShares) return;
             if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) return;
-
+            if (seenBicycleRentalStations.contains(station.id)) return;
+            seenBicycleRentalStations.add(station.id);
             placesFound.add(new PlaceAndDistance(station, distance));
+        }
+
+        private void handleBikePark(BikePark bikePark, int distance) {
+            if (!includeBikeParks) return;
+            if (filterByBikeParks != null && !filterByBikeParks.contains(bikePark.id)) return;
+            if (seenBikeParks.contains(bikePark.id)) return;
+            seenBikeParks.add(bikePark.id);
+            placesFound.add(new PlaceAndDistance(bikePark, distance));
+        }
+
+        private void handleCarPark(CarPark carPark, int distance) {
+            if (!includeCarParks) return;
+            if (filterByCarParks != null && !filterByCarParks.contains(carPark.id)) return;
+            if (seenCarParks.contains(carPark.id)) return;
+            seenCarParks.add(carPark.id);
+            placesFound.add(new PlaceAndDistance(carPark, distance));
         }
     }
 

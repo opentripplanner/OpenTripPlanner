@@ -146,6 +146,8 @@ public class IndexGraphQLSchema {
         .value("STOP", GraphIndex.PlaceType.STOP, "Stops")
         .value("DEPARTURE_ROW", GraphIndex.PlaceType.DEPARTURE_ROW, "Departure rows")
         .value("BICYCLE_RENT", GraphIndex.PlaceType.BICYCLE_RENT, "Bicycle rent stations")
+        .value("BIKE_PARK", GraphIndex.PlaceType.BIKE_PARK, "Bike parks")
+        .value("CAR_PARK", GraphIndex.PlaceType.CAR_PARK, "Car parks")
         .build();
 
     public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
@@ -256,6 +258,12 @@ public class IndexGraphQLSchema {
             }
             if (o instanceof BikeRentalStation) {
                 return (GraphQLObjectType) bikeRentalStationType;
+            }
+            if (o instanceof BikePark) {
+                return (GraphQLObjectType) bikeParkType;
+            }
+            if (o instanceof CarPark) {
+                return (GraphQLObjectType) carParkType;
             }
             return null;
         }
@@ -1680,6 +1688,7 @@ public class IndexGraphQLSchema {
         bikeParkType = GraphQLObjectType.newObject()
             .name("BikePark")
             .withInterface(nodeInterface)
+            .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
@@ -1721,6 +1730,7 @@ public class IndexGraphQLSchema {
         carParkType = GraphQLObjectType.newObject()
             .name("CarPark")
             .withInterface(nodeInterface)
+            .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
@@ -1779,6 +1789,16 @@ public class IndexGraphQLSchema {
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("bikeRentalStations")
                 .description("Bike rentals to include by id.")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("bikeParks")
+                .description("Bike parks to include by id.")
+                .type(new GraphQLList(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("carParks")
+                .description("Car parks to include by id.")
                 .type(new GraphQLList(Scalars.GraphQLString))
                 .build())
             .build();
@@ -2032,12 +2052,16 @@ public class IndexGraphQLSchema {
                     List<AgencyAndId> filterByStops = null;
                     List<AgencyAndId> filterByRoutes = null;
                     List<String> filterByBikeRentalStations = null;
+                    List<String> filterByBikeParks = null;
+                    List<String> filterByCarParks = null;
                     @SuppressWarnings("rawtypes")
                     Map filterByIds = (Map)environment.getArgument("filterByIds");
                     if (filterByIds != null) {
                         filterByStops = toIdList(((List<String>) filterByIds.get("stops")));
                         filterByRoutes = toIdList(((List<String>) filterByIds.get("routes")));
                         filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
+                        filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
+                        filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
                     }
 
                     List<TraverseMode> filterByModes = environment.getArgument("filterByModes");
@@ -2054,7 +2078,9 @@ public class IndexGraphQLSchema {
                             filterByPlaceTypes,
                             filterByStops,
                             filterByRoutes,
-                            filterByBikeRentalStations
+                            filterByBikeRentalStations,
+                            filterByBikeParks,
+                            filterByCarParks
                             )
                             .stream()
                             .collect(Collectors.toList());
