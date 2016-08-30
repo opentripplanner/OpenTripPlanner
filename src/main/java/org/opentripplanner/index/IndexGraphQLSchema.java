@@ -1778,7 +1778,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("bikeRentalStations")
-                .description("Bike rentals to include by GTFS id.")
+                .description("Bike rentals to include by id.")
                 .type(new GraphQLList(Scalars.GraphQLString))
                 .build())
             .build();
