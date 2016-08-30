@@ -84,7 +84,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
                 }
                 lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
 
-                return siri.getServiceDelivery().getVehicleMonitoringDeliveries();
+                return siri.getServiceDelivery().getEstimatedTimetableDeliveries();
 
             }
         } catch (Exception e) {
