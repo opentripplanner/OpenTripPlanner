@@ -576,7 +576,6 @@ public class GraphIndex {
         }
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
-            System.out.println("vertex " + vertex + " " + state.getNonTransitMode());
             int distance = (int)state.getElapsedTimeSeconds();
             if (vertex instanceof TransitStop) {
                 visitStop(((TransitStop)vertex).getStop(), distance);
