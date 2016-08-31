@@ -19,6 +19,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
 import org.onebusaway.gtfs.model.Agency;
@@ -57,6 +58,7 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.graph.GraphIndex.PlaceAndDistance;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -247,27 +249,42 @@ public class IndexGraphQLSchema {
         }
     });
 
-    private GraphQLInterfaceType placeInterface = relay.nodeInterface(new TypeResolver() {
-        @Override
-        public GraphQLObjectType getType(Object o) {
-            if (o instanceof Stop) {
-                return (GraphQLObjectType) stopType;
+    private GraphQLInterfaceType placeInterface = GraphQLInterfaceType.newInterface()
+        .name("PlaceInterface")
+        .description("Interface for places, i.e. stops, stations, parks")
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("id")
+            .type(new GraphQLNonNull(Scalars.GraphQLID))
+            .build())
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("lat")
+            .type(Scalars.GraphQLFloat)
+            .build())
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("lon")
+            .type(Scalars.GraphQLFloat)
+            .build())
+        .typeResolver(new TypeResolver() {
+            @Override
+            public GraphQLObjectType getType(Object o) {
+                if (o instanceof Stop) {
+                    return (GraphQLObjectType) stopType;
+                }
+                if (o instanceof GraphIndex.DepartureRow) {
+                    return (GraphQLObjectType) departureRowType;
+                }
+                if (o instanceof BikeRentalStation) {
+                    return (GraphQLObjectType) bikeRentalStationType;
+                }
+                if (o instanceof BikePark) {
+                    return (GraphQLObjectType) bikeParkType;
+                }
+                if (o instanceof CarPark) {
+                    return (GraphQLObjectType) carParkType;
+                }
+                return null;
             }
-            if (o instanceof GraphIndex.DepartureRow) {
-                return (GraphQLObjectType) departureRowType;
-            }
-            if (o instanceof BikeRentalStation) {
-                return (GraphQLObjectType) bikeRentalStationType;
-            }
-            if (o instanceof BikePark) {
-                return (GraphQLObjectType) bikeParkType;
-            }
-            if (o instanceof CarPark) {
-                return (GraphQLObjectType) carParkType;
-            }
-            return null;
-        }
-    });
+        }).build();
 
     private Agency getAgency(GraphIndex index, String agencyId) {
         //xxx what if there are duplciate agency ids?
@@ -760,6 +777,16 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lat")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).stop.getLat())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("lon")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).stop.getLon())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
                 .type(patternType)
                 .dataFetcher(environment -> ((GraphIndex.DepartureRow)environment.getSource()).pattern)
@@ -914,12 +941,12 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("lat")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .type(Scalars.GraphQLFloat)
                 .dataFetcher(environment -> (((Stop) environment.getSource()).getLat()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("lon")
-                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                .type(Scalars.GraphQLFloat)
                 .dataFetcher(environment -> (((Stop) environment.getSource()).getLon()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2361,9 +2388,12 @@ public class IndexGraphQLSchema {
             .field(planFieldType)
             .build();
 
+        Set<GraphQLType> dictionary = new HashSet<GraphQLType>();
+        dictionary.add(placeInterface);
+
         indexSchema = GraphQLSchema.newSchema()
             .query(queryType)
-            .build();
+            .build(dictionary);
     }
 
     private List<AgencyAndId> toIdList(List<String> ids) {
