@@ -1365,7 +1365,7 @@ public class TimetableSnapshotSource {
             Trip next = iterator.next();
             TripPattern tripPattern = graphIndex.patternForTrip.get(next);
 
-            if (monitoredVehicleJourney.getOriginRef() == null) {
+            if (monitoredVehicleJourney.getOriginRef() == null | monitoredVehicleJourney.getDestinationRef() == null) {
                 return tripPattern;
             }
 
