@@ -13,6 +13,14 @@
 
 package org.opentripplanner.routing.services;
 
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.standalone.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,15 +30,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.annotation.PreDestroy;
-
-import org.geotools.referencing.factory.DeferredAuthorityFactory;
-import org.geotools.util.WeakCollectionCleaner;
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.standalone.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A GraphService maps RouterIds to Graphs.
