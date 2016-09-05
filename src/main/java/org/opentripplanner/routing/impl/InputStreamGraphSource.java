@@ -223,12 +223,14 @@ public class InputStreamGraphSource implements GraphSource {
         // Even if a config file is not present on disk one could be bundled inside.
         try (InputStream is = streams.getConfigInputStream()) {
             JsonNode config = MissingNode.getInstance();
+            // TODO reuse the exact same JSON loader from OTPConfigurator
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
             if (is != null) {
-                // TODO reuse the exact same JSON loader from OTPConfigurator
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
                 config = mapper.readTree(is);
+            } else if (newGraph.routerConfig != null) {
+                config = mapper.readTree(newGraph.routerConfig);
             }
             Router newRouter = new Router(routerId, newGraph);
             newRouter.startup(config);
