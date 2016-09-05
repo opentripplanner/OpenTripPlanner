@@ -1361,27 +1361,54 @@ public class TimetableSnapshotSource {
 
     private TripPattern getPatternForTrip(Set<Trip> matches, VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney) {
 
-        for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
-            Trip next = iterator.next();
-            TripPattern tripPattern = graphIndex.patternForTrip.get(next);
+        if (monitoredVehicleJourney.getOriginRef() == null) {
+            return null;
+        }
 
-            if (monitoredVehicleJourney.getOriginRef() == null | monitoredVehicleJourney.getDestinationRef() == null) {
-                return tripPattern;
+        ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
+        if (date == null) {
+            //If no date is set - assume Realtime-data is reported for 'today'.
+            date = ZonedDateTime.now();
+        }
+        ServiceDate realTimeReportedServiceDate = new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+
+        Set<TripPattern> patterns = new HashSet<>();
+        for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
+            Trip currentTrip = iterator.next();
+            TripPattern tripPattern = graphIndex.patternForTrip.get(currentTrip);
+            Set<ServiceDate> serviceDates = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(currentTrip.getServiceId());
+
+            if (!serviceDates.contains(realTimeReportedServiceDate)) {
+                // Current trip has no service on the date of the 'MonitoredVehicleJourney'
+                continue;
             }
 
             Stop firstStop = tripPattern.getStop(0);
             Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
 
             String siriOriginRef = monitoredVehicleJourney.getOriginRef().getValue();
-            String siriDestinationRef = monitoredVehicleJourney.getDestinationRef().getValue();
 
-            if (firstStop.getId().getId().equals(siriOriginRef) & lastStop.getId().getId().equals(siriDestinationRef)) {
-                // Origin and destination matches
-                return tripPattern;
+            if (monitoredVehicleJourney.getDestinationRef() != null) {
+                String siriDestinationRef = monitoredVehicleJourney.getDestinationRef().getValue();
+
+                if (firstStop.getId().getId().equals(siriOriginRef) & lastStop.getId().getId().equals(siriDestinationRef)) {
+                    // Origin and destination matches
+                    patterns.add(tripPattern);
+                }
+            } else {
+                //Match origin only - since destination is not defined
+                if (firstStop.getId().getId().equals(siriOriginRef)) {
+                    tripPattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(0);
+                    patterns.add(tripPattern);
+                }
             }
 
 
         }
+        if (patterns.size() == 1) {
+            return patterns.iterator().next();
+        }
+        LOG.warn("TripPattern not found uniquely - found {} patterns.", patterns.size());
         return null;
     }
 
