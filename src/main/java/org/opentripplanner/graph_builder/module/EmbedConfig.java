@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -26,10 +28,9 @@ public class EmbedConfig implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            graph.builderConfig = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(builderConfig);
-            graph.routerConfig = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(routerConfig);
+            graph.builderConfig = serializedConfiguration(builderConfig);
+            graph.routerConfig = serializedConfiguration(routerConfig);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -38,6 +39,12 @@ public class EmbedConfig implements GraphBuilderModule {
     @Override
     public void checkInputs() {
 
+    }
+
+    private String serializedConfiguration(JsonNode config) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        return config.isMissingNode() ? null : writer.writeValueAsString(config);
     }
 
 }
