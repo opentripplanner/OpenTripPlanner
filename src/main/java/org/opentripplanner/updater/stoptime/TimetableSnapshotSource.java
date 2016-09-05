@@ -1408,7 +1408,7 @@ public class TimetableSnapshotSource {
         if (patterns.size() == 1) {
             return patterns.iterator().next();
         }
-        LOG.warn("TripPattern not found uniquely - found {} patterns.", patterns.size());
+        LOG.debug("TripPattern not found uniquely - found {} patterns.", patterns.size());
         return null;
     }
 
