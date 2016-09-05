@@ -574,45 +574,45 @@ public class TimetableSnapshotSource {
     }
 
 
-    private boolean handleModifiedTrip(Graph graph, EstimatedVehicleJourney activity, ServiceDate serviceDate) {
+    private boolean handleModifiedTrip(Graph graph, EstimatedVehicleJourney estimatedVehicleJourney, ServiceDate serviceDate) {
 
-        if (activity.getEstimatedCalls() == null) {
+        if (estimatedVehicleJourney.getEstimatedCalls() == null) {
             //No vehicle reference
             return false;
         }
-        if (activity.getLineRef() == null) {
+        if (estimatedVehicleJourney.getLineRef() == null) {
             //No linereference
             return false;
         }
 
-        Set<Trip> trips = siriFuzzyTripMatcher.match(activity);
+        Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney);
 
         if (trips == null || trips.isEmpty()) {
-            boolean isMonitored = activity.isMonitored();
-            String lineRef = (activity.getLineRef() != null ? activity.getLineRef().getValue():null);
-            String vehicleRef = (activity.getVehicleJourneyRef() != null ? activity.getVehicleJourneyRef().getValue():null);
+            boolean isMonitored = estimatedVehicleJourney.isMonitored();
+            String lineRef = (estimatedVehicleJourney.getLineRef() != null ? estimatedVehicleJourney.getLineRef().getValue():null);
+            String vehicleRef = (estimatedVehicleJourney.getVehicleJourneyRef() != null ? estimatedVehicleJourney.getVehicleJourneyRef().getValue():null);
             LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}], skipping EstimatedVehicleJourney.", isMonitored, lineRef, vehicleRef);
 
             return false;
         }
 
         //Find the trip that best corresponds to EstimatedVehicleJourney
-        Trip trip = getTripForJourney(trips, activity);
+        Trip trip = getTripForJourney(trips, estimatedVehicleJourney);
 
         if (trip == null) {
-            LOG.warn("No matching trip found - skipping VehicleActivity.");
+            LOG.warn("No matching trip found - skipping EstimatedVehicleJourney.");
             return false;
         }
 
-        final TripPattern pattern = getPatternForTrip(trips, activity);
+        final TripPattern pattern = getPatternForTrip(trips, estimatedVehicleJourney);
 
         if (pattern == null) {
-            LOG.info("No pattern found skipping VehicleActivity.");
+            LOG.info("No pattern found skipping EstimatedVehicleJourney.");
             return false;
         }
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
-        final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(activity, timeZone, trip.getId());
+        final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(estimatedVehicleJourney, timeZone, trip.getId());
 
         if (updatedTripTimes == null) {
             return false;
@@ -630,7 +630,7 @@ public class TimetableSnapshotSource {
         final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
         final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
 
-        EstimatedVehicleJourney.EstimatedCalls estimatedCalls = activity.getEstimatedCalls();
+        EstimatedVehicleJourney.EstimatedCalls estimatedCalls = estimatedVehicleJourney.getEstimatedCalls();
 
         List<EstimatedCall> estimatedCallsList = estimatedCalls.getEstimatedCalls();
 
@@ -1408,8 +1408,9 @@ public class TimetableSnapshotSource {
         }
         if (patterns.size() == 1) {
             return patterns.iterator().next();
+        } else if (patterns.size() > 1) {
+            LOG.warn("TripPattern not found uniquely - found {} matching patterns.", patterns.size());
         }
-        LOG.debug("TripPattern not found uniquely - found {} patterns.", patterns.size());
         return null;
     }
 
