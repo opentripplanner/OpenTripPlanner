@@ -501,10 +501,11 @@ public class TimetableSnapshotSource {
                     if (stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue())) {
                         if (delay != null) {
                             accumulatedDelayTime += delay.getHours() *3600 + delay.getMinutes() *60 + delay.getSeconds();
-                            updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
-                            if (keepLogging) {
-                                LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
-                            }
+                        }
+                        //If we get realtime data for a stop, flag as realtime also when delay == null
+                        updatedTripTimes.updateArrivalDelay(index, accumulatedDelayTime);
+                        if (keepLogging) {
+                            LOG.debug("Added delay of [{}s] before stop [{}] on trip [{}]", accumulatedDelayTime, monitoredCall.getStopPointRef().getValue(), trip.getId());
                         }
                     }
 
