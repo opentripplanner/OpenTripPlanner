@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
@@ -53,16 +54,17 @@ public class MemoryGraphSource implements GraphSource {
         // "Reloading" does not make sense for memory-graph, but we want to support mixing in-memory and file-based graphs.
         // Start up graph updaters and apply runtime configuration options
         // TODO will the updaters be started repeatedly due to reload calls?
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode routerJsonConf;
-
-        if (router.graph.routerConfig == null){
-            LOG.info("No embedded router config available");
-            return false;
-        }
 
         try {
-            routerJsonConf = mapper.readTree(router.graph.routerConfig);
+            // There is no on-disk set of files for this graph, so only check for embedded router-config JSON.
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode routerJsonConf;
+            if (router.graph.routerConfig == null) {
+                LOG.info("No embedded router config available");
+                routerJsonConf = NullNode.getInstance();
+            } else {
+                routerJsonConf = mapper.readTree(router.graph.routerConfig);
+            }
             router.startup(routerJsonConf);
             return true;
         } catch (IOException e) {
