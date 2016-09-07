@@ -13,19 +13,11 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import junit.framework.TestCase;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -35,6 +27,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import java.io.*;
+
 
 public class GraphServiceTest extends TestCase {
 
@@ -253,9 +248,10 @@ public class GraphServiceTest extends TestCase {
     @Test
     public final void testGraphServiceMemoryRouterConfig () throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode config = mapper.createObjectNode();
-        config.put("timeout", 8);
-        EmbedConfig embedConfig = new EmbedConfig(null, config);
+        JsonNode buildConfig = MissingNode.getInstance();
+        ObjectNode routerConfig = mapper.createObjectNode();
+        routerConfig.put("timeout", 8);
+        EmbedConfig embedConfig = new EmbedConfig(buildConfig, routerConfig);
         embedConfig.buildGraph(emptyGraph, null);
 
         GraphService graphService = new GraphService();
@@ -267,8 +263,8 @@ public class GraphServiceTest extends TestCase {
         assertEquals(emptyGraph, graph);
         assertEquals("A", emptyGraph.routerId);
 
-        JsonNode routerConfig = mapper.readTree(graph.routerConfig);
-        assertEquals(routerConfig, config);
-        assertEquals(routerConfig.get("timeout"), config.get("timeout"));
+        JsonNode graphRouterConfig = mapper.readTree(graph.routerConfig);
+        assertEquals(graphRouterConfig, routerConfig);
+        assertEquals(graphRouterConfig.get("timeout"), routerConfig.get("timeout"));
     }
 }
