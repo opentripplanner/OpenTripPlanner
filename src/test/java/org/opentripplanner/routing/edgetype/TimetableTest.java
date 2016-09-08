@@ -310,7 +310,7 @@ public class TimetableTest {
         tripUpdate = tripUpdateBuilder.build();
         updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
         assertNotNull(updatedTripTimes);
-        // Ensure that times past the updated one is still valid.
+        // Check that stops upstream of the updated one are still valid, but have no delay
         assertEquals(0, updatedTripTimes.getDepartureDelay(0));
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
