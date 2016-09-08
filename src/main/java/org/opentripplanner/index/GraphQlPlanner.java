@@ -52,7 +52,7 @@ public class GraphQlPlanner {
             new Place(request.to.lng, request.to.lat, request.getToPlace().name),
             request.getDateTime());
         List<Message> messages = new ArrayList<>();
-        DebugOutput debugOutput = null;
+        DebugOutput debugOutput = new DebugOutput();
 
         try {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
