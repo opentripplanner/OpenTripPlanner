@@ -119,6 +119,11 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             return 0f;
         }
 
+        /* Train-units cannot exceed 250 units; http://wiki.ovinnederland.nl/wiki/Tariefeenheid#Tarieven_NS */
+        if (units > 250) {
+            units = 250;
+        }
+
         float cost = 0f;
 
         String fareId = fareZone + ":" + (units + prevSumUnits);
