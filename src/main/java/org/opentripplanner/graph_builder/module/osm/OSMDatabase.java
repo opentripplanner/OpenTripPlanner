@@ -608,7 +608,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             }
             try {
                 newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(), nodesById));
-            } catch (Area.AreaConstructionException e) {
+            } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
                 // the area; we'll mark it as processed so that we don't retry.

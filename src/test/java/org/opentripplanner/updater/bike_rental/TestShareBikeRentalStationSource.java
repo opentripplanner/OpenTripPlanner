@@ -30,4 +30,16 @@ public class TestShareBikeRentalStationSource extends TestCase {
         assertEquals(9, prinsen.spacesAvailable);
         assertEquals(6, prinsen.bikesAvailable);
     }
+
+    public void testShareBikeMissingSystemIDParameter() throws UnsupportedEncodingException, MalformedURLException {
+
+        ShareBikeRentalDataSource shareBikeSource = new ShareBikeRentalDataSource();
+        shareBikeSource.setUrl("file:src/test/resources/bike/share-bike.json");
+        assertTrue(shareBikeSource.update());
+        List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
+        BikeRentalStation prinsen = rentalStations.get(0);
+        
+        //  Should be random value
+        assertFalse(prinsen.networks.contains("dummyid"));
+    }
 }

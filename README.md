@@ -17,6 +17,8 @@ The OpenTripPlanner project was launched by Portland, Oregon's transport agency 
 
 In summer of 2013, the OpenTripPlanner project was accepted for membership in the Software Freedom Conservancy (SFC). SFC handles the legal and financial details common to many open source projects, providing a formal framework for OTP and allowing contributors to concentrate on the code. For more information, see the SFC website at http://sfconservancy.org/.
 
+After seven years of hard work and almost 10,000 commits from over 100 contributors around the world, version 1.0 was released on 9 September 2016.
+
 
 ## Mailing Lists
 
