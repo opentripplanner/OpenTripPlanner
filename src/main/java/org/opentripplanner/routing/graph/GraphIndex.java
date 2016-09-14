@@ -500,7 +500,7 @@ public class GraphIndex {
         }
 
         private static String toId(Stop stop, TripPattern pattern) {
-            return stop.getId().getAgencyId() + ":" + stop.getId().getId() + ":" + pattern.code;
+            return stop.getId().getAgencyId() + ";" + stop.getId().getId() + ";" + pattern.code;
         }
 
         public List<TripTimeShort> getStoptimes(GraphIndex index, long startTime, int timeRange, int numberOfDepartures) {
@@ -508,7 +508,7 @@ public class GraphIndex {
         }
 
         public static DepartureRow fromId(GraphIndex index, String id) {
-            String[] parts = id.split(":");
+            String[] parts = id.split(";", 3);
             AgencyAndId stopId = new AgencyAndId(parts[0], parts[1]);
             String code = parts[2];
             return new DepartureRow(index.stopForId.get(stopId), index.patternForId.get(code));
