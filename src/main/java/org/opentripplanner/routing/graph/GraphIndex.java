@@ -576,7 +576,7 @@ public class GraphIndex {
         }
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
-            int distance = (int)state.getElapsedTimeSeconds();
+            int distance = (int)state.getWalkDistance();
             if (vertex instanceof TransitStop) {
                 visitStop(((TransitStop)vertex).getStop(), distance);
             } else if (vertex instanceof BikeRentalStationVertex) {
