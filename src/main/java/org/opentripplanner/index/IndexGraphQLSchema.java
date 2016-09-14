@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom.LineString;
 import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
+import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
@@ -244,6 +245,9 @@ public class IndexGraphQLSchema {
             }
             if (o instanceof GraphIndex.DepartureRow) {
                 return (GraphQLObjectType) departureRowType;
+            }
+            if (o instanceof PlaceAndDistance) {
+                return (GraphQLObjectType) placeAtDistanceType;
             }
             return null;
         }
@@ -824,7 +828,24 @@ public class IndexGraphQLSchema {
 
         placeAtDistanceType = GraphQLObjectType.newObject()
             .name("placeAtDistance")
-            //.withInterface(nodeInterface)
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> {
+                    Object place = ((PlaceAndDistance) environment.getSource()).place;
+                    return relay.toGlobalId(placeAtDistanceType.getName(),
+                        Integer.toString(((PlaceAndDistance) environment.getSource()).distance) + ";" +
+                            placeInterface.getTypeResolver()
+                                .getType(place)
+                                .getFieldDefinition("id")
+                                .getDataFetcher()
+                                .get(new DataFetchingEnvironment(place, null, null,
+                                    null, null, placeAtDistanceType, null))
+
+                    );
+                })
+                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("place")
                 .type(placeInterface)
@@ -1830,10 +1851,13 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
-        queryType = GraphQLObjectType.newObject()
-            .name("QueryType")
-            .field(relay.nodeField(nodeInterface, environment -> {
-                Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
+        DataFetcher nodeDataFetcher = new DataFetcher() {
+            @Override public Object get(DataFetchingEnvironment environment) {
+                return getObject(environment.getArgument("id"));
+            }
+
+            private Object getObject(String idString) {
+                Relay.ResolvedGlobalId id = relay.fromGlobalId(idString);
                 if (id.type.equals(clusterType.getName())) {
                     return index.stopClusterForId.get(id.id);
                 }
@@ -1890,8 +1914,16 @@ public class IndexGraphQLSchema {
                         .findFirst()
                         .orElse(null);
                 }
+                if (id.type.equals(placeAtDistanceType.getName())) {
+                    return new PlaceAndDistance(getObject(id.id.split(";", 2)[1]), Integer.parseInt(id.id.split(";", 2)[0], 10));
+                }
                 return null;
-            }))
+            }
+        };
+
+        queryType = GraphQLObjectType.newObject()
+            .name("QueryType")
+            .field(relay.nodeField(nodeInterface, nodeDataFetcher))
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agencies")
                 .description("Get all agencies for the specified graph")
