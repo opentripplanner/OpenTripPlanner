@@ -804,7 +804,7 @@ public class GraphIndex {
                         if (!sd.serviceRunning(triptimes.serviceCode))
                             continue;
                         int stopDepartureTime = triptimes.getDepartureTime(stopIndex);
-                        if (stopDepartureTime != -1 && stopDepartureTime >= starttimeSecondsSinceMidnight) {
+                        if (stopDepartureTime != -1 && stopDepartureTime >= starttimeSecondsSinceMidnight && stopDepartureTime < starttimeSecondsSinceMidnight + timeRange) {
                             ret.insertWithOverflow(new TripTimeShort(triptimes, stopIndex, currStop, sd));
                         }
                     }
