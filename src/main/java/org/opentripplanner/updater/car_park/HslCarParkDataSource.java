@@ -1,11 +1,21 @@
 package org.opentripplanner.updater.car_park;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Load car parks from the HSL Park and Ride API.
@@ -17,6 +27,10 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
     private static final Logger log = LoggerFactory.getLogger(HslCarParkDataSource.class);
 
     private GeometryFactory gf = new GeometryFactory();
+
+    private final static String UTILIZATION_URL = "https://p.hsl.fi/api/v1/utilizations";
+
+    private Map<String, Integer> utilizations = Collections.EMPTY_MAP;
 
     public HslCarParkDataSource() {
         super("results");
@@ -33,10 +47,12 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
             station.geometry = parseGeometry(node.path("location"));
             station.y = station.geometry.getCentroid().getY();
             station.x = station.geometry.getCentroid().getX();
-            station.realTimeData = false;
+            station.realTimeData = utilizations.containsKey(station.id);
             station.maxCapacity = node.path("builtCapacity").path("CAR").asInt();
             if (!node.path("status").asText().equals("IN_OPERATION")) {
                 station.spacesAvailable = 0;
+            } else if (station.realTimeData) {
+                station.spacesAvailable = utilizations.get(station.id);
             } else {
                 station.spacesAvailable = station.maxCapacity;
             }
@@ -47,6 +63,51 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
         }
     }
 
+    public boolean update() {
+        InputStream data = null;
+
+        try {
+            data = HttpUtils.getData(UTILIZATION_URL);
+            if (data != null) {
+                parseUtilizations(data);
+            }
+            data.close();
+
+        } catch (IOException e) {
+            log.warn("Error parsing car park feed from " + UTILIZATION_URL, e);
+        }
+        return super.update();
+    }
+
+    private void parseUtilizations(InputStream dataStream) throws JsonProcessingException,
+        IllegalArgumentException, IOException {
+
+        Map<String, Integer> out = new HashMap<>();
+
+        String utilitiesString = convertStreamToString(dataStream);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(utilitiesString);
+
+        for (int i = 0; i < rootNode.size(); i++) {
+            JsonNode node = rootNode.get(i);
+            if (node == null) {
+                continue;
+            }
+            if (!Objects.equals(node.path("capacityType").textValue(), "CAR")) {
+                continue;
+            }
+
+            String id = node.path("facilityId").asText();
+            Integer available = node.path("spacesAvailable").asInt();
+
+            // Sum if multiple availabilities exist
+            out.merge(id, available, Integer::sum);
+        }
+        synchronized(this) {
+            utilizations = out;
+        }
+    }
 
     // TODO: These are inlined from GeometryDeserializer
     private Geometry parseGeometry(JsonNode root) {
