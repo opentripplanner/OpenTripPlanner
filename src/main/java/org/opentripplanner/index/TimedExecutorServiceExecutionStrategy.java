@@ -66,15 +66,11 @@ public class TimedExecutorServiceExecutionStrategy extends ExecutionStrategy {
             for (int i = 0; i < executionResults.size(); i++) {
                 // TODO: Is there some kind of zip stream which could take this?
                 Future<ExecutionResult> executionResultFuture = executionResults.get(i);
-                try {
-                    ExecutionResult executionResult = executionResultFuture.get();
-                    results.put(fieldNames.get(i),
-                        executionResult != null ? executionResult.getData() : null);
-                } catch (CancellationException e) {
-                    results.put(fieldNames.get(i), null);
-                    executionContext.addError(new ExceptionWhileDataFetching(e));
-                }
+                ExecutionResult executionResult = executionResultFuture.get();
+                results.put(fieldNames.get(i), executionResult != null ? executionResult.getData() : null);
             }
+        } catch (CancellationException e) {
+            executionContext.addError(new ExceptionWhileDataFetching(e));
         } catch (ExecutionException|InterruptedException e) {
             throw new GraphQLException(e);
         }
