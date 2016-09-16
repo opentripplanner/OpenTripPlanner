@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,6 +48,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.IndexGraphQLSchema;
+import org.opentripplanner.index.TimedExecutorServiceExecutionStrategy;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
@@ -228,9 +230,9 @@ public class GraphIndex {
         this.graph = graph;
         graphQL = new GraphQL(
             new IndexGraphQLSchema(this).indexSchema,
-            new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
+            new TimedExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-            ))
+            ), 10, TimeUnit.SECONDS)
         );
         LOG.info("Done indexing graph.");
     }
