@@ -135,7 +135,7 @@ public abstract class GenericJsonCarParkDataSource implements CarParkDataSource,
         }
     }
 
-    private String convertStreamToString(java.io.InputStream is) {
+    String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner scanner = null;
         String result="";
         try {
