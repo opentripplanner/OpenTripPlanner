@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
 
     private GeometryFactory gf = new GeometryFactory();
 
-    private final static String UTILIZATION_URL = "https://p.hsl.fi/api/v1/utilizations";
+    private String utilizationUrl = "https://p.hsl.fi/api/v1/utilizations";
 
     private Map<String, Integer> utilizations = Collections.EMPTY_MAP;
 
@@ -67,14 +68,14 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
         InputStream data = null;
 
         try {
-            data = HttpUtils.getData(UTILIZATION_URL);
+            data = HttpUtils.getData(utilizationUrl);
             if (data != null) {
                 parseUtilizations(data);
             }
             data.close();
 
         } catch (IOException e) {
-            log.warn("Error parsing car park feed from " + UTILIZATION_URL, e);
+            log.warn("Error parsing car park feed from " + utilizationUrl, e);
         }
         return super.update();
     }
@@ -106,6 +107,20 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
         }
         synchronized(this) {
             utilizations = out;
+        }
+    }
+
+
+    /**
+     * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
+     * from the JSON coming in from the update source.
+     */
+    @Override
+    public void configure (Graph graph, JsonNode jsonNode) {
+        super.configure(graph, jsonNode);
+        String utilizationUrl = jsonNode.path("utilizationUrl").asText(); // path() returns MissingNode not null.
+        if (utilizationUrl != null) {
+            this.utilizationUrl = utilizationUrl;
         }
     }
 
