@@ -1862,9 +1862,10 @@ public class IndexGraphQLSchema {
                     return index.stopClusterForId.get(id.id);
                 }
                 if (id.type.equals(stopAtDistanceType.getName())) {
+                    String[] parts = id.id.split(";", 2);
                     return new GraphIndex.StopAndDistance(
-                        index.stopForId.get(GtfsLibrary.convertIdFromString(id.id.split(";", 2)[1])),
-                        Integer.parseInt(id.id.split(";", 2)[0], 10));
+                        index.stopForId.get(GtfsLibrary.convertIdFromString(parts[1])),
+                        Integer.parseInt(parts[0], 10));
                 }
                 if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
@@ -1915,7 +1916,8 @@ public class IndexGraphQLSchema {
                         .orElse(null);
                 }
                 if (id.type.equals(placeAtDistanceType.getName())) {
-                    return new PlaceAndDistance(getObject(id.id.split(";", 2)[1]), Integer.parseInt(id.id.split(";", 2)[0], 10));
+                    String[] parts = id.id.split(";", 2);
+                    return new PlaceAndDistance(getObject(parts[1]), Integer.parseInt(parts[0], 10));
                 }
                 return null;
             }
