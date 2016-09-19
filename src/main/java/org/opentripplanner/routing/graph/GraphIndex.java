@@ -234,6 +234,7 @@ public class GraphIndex {
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
             ), 10, TimeUnit.SECONDS)
         );
+        getLuceneIndex();
         LOG.info("Done indexing graph.");
     }
 
