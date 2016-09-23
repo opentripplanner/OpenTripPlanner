@@ -8,21 +8,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.List;
-import java.util.Map;
 import java.util.Map;
 import java.util.Set;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -30,17 +25,16 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response;
 
+import graphql.schema.GraphQLSchema;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -62,23 +56,17 @@ import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.car_park.CarPark;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.GraphIndex.PlaceType;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -106,7 +94,6 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.execution.ExecutorServiceExecutionStrategy;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -157,10 +144,12 @@ public class GraphIndex {
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
-    public GraphQL graphQL;
-
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
+
+    final GraphQLSchema indexSchema;
+
+    final ExecutorService threadPool;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -228,12 +217,12 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQL = new GraphQL(
-            new IndexGraphQLSchema(this).indexSchema,
-            new TimedExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-            ), 10, TimeUnit.SECONDS)
+        threadPool = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
+                .build()
         );
+
+        indexSchema = new IndexGraphQLSchema(this).indexSchema;
         getLuceneIndex();
         LOG.info("Done indexing graph.");
     }
@@ -956,7 +945,12 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables) {
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, int timeout) {
+        GraphQL graphQL = new GraphQL(
+            indexSchema,
+            new TimedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS)
+        );
+
         ExecutionResult executionResult = graphQL.execute(query, null, router, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();

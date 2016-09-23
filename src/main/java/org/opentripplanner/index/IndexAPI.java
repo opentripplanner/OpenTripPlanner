@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -584,21 +585,21 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> query) {
+    public Response getGraphQL (HashMap<String, Object> query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout) {
         Map<String, Object> variables;
         if (query.get("variables") instanceof Map) {
             variables = (Map) query.get("variables");
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse((String) query.get("query"), router, variables);
+        return index.getGraphQLResponse((String) query.get("query"), router, variables, timeout);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query) {
-        return index.getGraphQLResponse(query, router, new HashMap<>());
+    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") int timeout) {
+        return index.getGraphQLResponse(query, router, new HashMap<>(), timeout);
     }
 
 //    @GET

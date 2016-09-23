@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.graph;
 
 import graphql.ExecutionResult;
+import graphql.GraphQL;
+import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -107,7 +109,9 @@ public class GraphIndexTest extends GtfsTest {
                 "    }" +
                 "}";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new GraphQL(
+            graph.index.indexSchema, new ExecutorServiceExecutionStrategy(graph.index.threadPool)
+        ).execute(query);
         assertTrue(result.getErrors().isEmpty());
         assertEquals("Fake Agency", ((Map) ((Map) result.getData()).get("agency")).get("name"));
 
@@ -125,7 +129,9 @@ public class GraphIndexTest extends GtfsTest {
                         "    }}\n" +
                         "}\n";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new GraphQL(
+            graph.index.indexSchema, new ExecutorServiceExecutionStrategy(graph.index.threadPool)
+        ).execute(query);
         assertTrue(result.getErrors().isEmpty());
         assertEquals(18, ((List) ((Map) ((Map) ((Map) result.getData()).get("viewer")).get("agency")).get("routes")).size());
 
@@ -209,7 +215,9 @@ public class GraphIndexTest extends GtfsTest {
             + "    }\n"
             + "  }";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new GraphQL(
+            graph.index.indexSchema, new ExecutorServiceExecutionStrategy(graph.index.threadPool)
+        ).execute(query);
         assertTrue(result.getErrors().isEmpty());
     }
 
