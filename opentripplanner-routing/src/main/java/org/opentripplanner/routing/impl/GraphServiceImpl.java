@@ -239,6 +239,11 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
     }
 
     @Override
+    public String getDefaultRouterId() {
+        return this.defaultRouterId;
+    }
+    
+    @Override
     public boolean registerGraph(String routerId, boolean preEvict) {
         if (preEvict)
             evictGraph(routerId);

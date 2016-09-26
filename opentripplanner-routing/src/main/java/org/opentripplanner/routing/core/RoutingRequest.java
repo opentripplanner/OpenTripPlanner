@@ -769,6 +769,15 @@ public class RoutingRequest implements Cloneable, Serializable {
         RoutingRequest other = (RoutingRequest) o;
         if (this.batch != other.batch)
             return false;
+        if (!this.routerId.equals(other.routerId))
+            // This check added to make sure new SPT is built for analyst
+            // requests on different graphs.
+        	// Note: the check is not always strictly true perhaps if using a 
+            // default router id and the same graph is also in the other graphs
+            // list loaded. But that seems to be an unusual use-case (and in
+            // any case re-building SPTs due to an equals() check fail
+            // shouldn't cause problems.
+        	return false;
         boolean endpointsMatch;
         if (this.batch) {
             if (this.arriveBy) {

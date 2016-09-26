@@ -118,6 +118,13 @@ class SimpleGraphServiceImpl implements GraphService {
         return graphs.keySet();
     }
 
+    @Override
+    public String getDefaultRouterId() {
+        // See the getGraph() impl above, default graph has null key in this
+        // class.
+        return null;
+    }
+    
     public void putGraph(String graphId, Graph graph) {
         graphs.put(graphId, graph);
     }

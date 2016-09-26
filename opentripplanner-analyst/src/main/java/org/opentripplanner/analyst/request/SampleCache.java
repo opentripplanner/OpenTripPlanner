@@ -39,11 +39,11 @@ public class SampleCache implements SampleSource {
     // should distinguish between null sample and key not found
     
     @Override
-    public Sample getSample(double lon, double lat) {
+    public Sample getSample(double lon, double lat, String routerId) {
         SampleRequest sr = new SampleRequest(lon, lat);
         Sample ret = cache.get(sr);
         if (ret == null) {
-            ret = sampleFactory.getSample(lon, lat);
+            ret = sampleFactory.getSample(lon, lat, routerId);
             if (ret == null)
                 ret = emptySample;
             cache.put(sr, ret);
