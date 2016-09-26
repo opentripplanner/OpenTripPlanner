@@ -119,7 +119,7 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
     public void configure (Graph graph, JsonNode jsonNode) {
         super.configure(graph, jsonNode);
         String utilizationUrl = jsonNode.path("utilizationUrl").asText(); // path() returns MissingNode not null.
-        if (utilizationUrl != null) {
+        if (utilizationUrl != null && utilizationUrl.length() != 0) {
             this.utilizationUrl = utilizationUrl;
         }
     }
