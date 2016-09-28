@@ -598,7 +598,7 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") int timeout) {
+    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout) {
         return index.getGraphQLResponse(query, router, new HashMap<>(), timeout);
     }
 
