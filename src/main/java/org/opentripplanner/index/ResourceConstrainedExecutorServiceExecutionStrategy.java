@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * TODO: write JavaDoc
  *
  */
-public class TimedExecutorServiceExecutionStrategy extends ExecutionStrategy {
+public class ResourceConstrainedExecutorServiceExecutionStrategy extends ExecutionStrategy {
 
     ExecutorService executorService;
 
@@ -36,7 +36,7 @@ public class TimedExecutorServiceExecutionStrategy extends ExecutionStrategy {
     private final long maxResolves;
     private AtomicLong resolveCount = new AtomicLong();
 
-    public TimedExecutorServiceExecutionStrategy(ExecutorService executorService, long timeout, TimeUnit timeUnit, long maxResolves) {
+    public ResourceConstrainedExecutorServiceExecutionStrategy(ExecutorService executorService, long timeout, TimeUnit timeUnit, long maxResolves) {
         this.executorService = executorService;
         this.timeout = timeout;
         this.timeUnit = timeUnit;

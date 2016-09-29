@@ -42,7 +42,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.IndexGraphQLSchema;
-import org.opentripplanner.index.TimedExecutorServiceExecutionStrategy;
+import org.opentripplanner.index.ResourceConstrainedExecutorServiceExecutionStrategy;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
@@ -948,7 +948,7 @@ public class GraphIndex {
     public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, int timeout, long maxResolves) {
         GraphQL graphQL = new GraphQL(
             indexSchema,
-            new TimedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
+            new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         );
 
         ExecutionResult executionResult = graphQL.execute(query, null, router, variables);
