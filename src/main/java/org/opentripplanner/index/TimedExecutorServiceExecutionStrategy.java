@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * TODO: write JavaDoc
@@ -30,13 +31,24 @@ public class TimedExecutorServiceExecutionStrategy extends ExecutionStrategy {
     ExecutorService executorService;
 
     private final long timeout;
-
     private final TimeUnit timeUnit;
 
-    public TimedExecutorServiceExecutionStrategy(ExecutorService executorService, long timeout, TimeUnit timeUnit) {
+    private final long maxResolves;
+    private AtomicLong resolveCount = new AtomicLong();
+
+    public TimedExecutorServiceExecutionStrategy(ExecutorService executorService, long timeout, TimeUnit timeUnit, long maxResolves) {
         this.executorService = executorService;
         this.timeout = timeout;
         this.timeUnit = timeUnit;
+        this.maxResolves = maxResolves;
+    }
+
+    @Override
+    protected void countResolve() {
+        long count = resolveCount.incrementAndGet();
+        if (maxResolves > 0 && count > maxResolves) {
+            throw new RuntimeException("Maximum limit of resolves (" + maxResolves + ") met while executing, reduce the result size of your query.");
+        }
     }
 
     @Override
