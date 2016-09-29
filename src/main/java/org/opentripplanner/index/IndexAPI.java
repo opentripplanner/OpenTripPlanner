@@ -585,21 +585,21 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout) {
+    public Response getGraphQL (HashMap<String, Object> query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
         Map<String, Object> variables;
         if (query.get("variables") instanceof Map) {
             variables = (Map) query.get("variables");
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse((String) query.get("query"), router, variables, timeout);
+        return index.getGraphQLResponse((String) query.get("query"), router, variables, timeout, maxResolves);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout) {
-        return index.getGraphQLResponse(query, router, new HashMap<>(), timeout);
+    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+        return index.getGraphQLResponse(query, router, new HashMap<>(), timeout, maxResolves);
     }
 
 //    @GET

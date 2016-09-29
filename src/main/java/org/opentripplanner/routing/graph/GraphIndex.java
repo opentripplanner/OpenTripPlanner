@@ -945,10 +945,10 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, int timeout) {
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, int timeout, long maxResolves) {
         GraphQL graphQL = new GraphQL(
             indexSchema,
-            new TimedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS)
+            new TimedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         );
 
         ExecutionResult executionResult = graphQL.execute(query, null, router, variables);
