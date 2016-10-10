@@ -516,7 +516,7 @@ public class Timetable implements Serializable {
      * assume here that all trips in a timetable are from the same feed, which should always be the
      * case.
      *
-     * @param activity SIRI-VM VehicleActivity
+     * @param journey SIRI-ET EstimatedVehicleJourney
      * @param timeZone time zone of trip update
      * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
@@ -551,26 +551,62 @@ public class Timetable implements Serializable {
 
         List<Stop> stops = pattern.getStops();
 
+        List<Integer> visitedStops = new ArrayList<>();
         for (EstimatedCall estimatedCall : estimatedCalls) {
+
             String stopPointRef = estimatedCall.getStopPointRef().getValue();
+            int stopPointIndex = -1;
 
-            int arrivalTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime());
-            int departureTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime());
-
-            int stopsCounter = 0;
-            for (Stop stop : stops) {
-                if (stop.getId().getId().equals(stopPointRef)) {
-                    newTimes.updateArrivalTime(stopsCounter, arrivalTimeSec);
-                    newTimes.updateDepartureTime(stopsCounter, departureTimeSec);
-                    stop.setPlatformCode(estimatedCall.getDeparturePlatformName().getValue());
-                    break;
+            if (estimatedCall.getOrder() != null) {
+                // StopIndex is set in ET-data - first stop has order=1
+                stopPointIndex = estimatedCall.getOrder().intValue()-1;
+            } else {
+                // Find first stop with same reference
+                int stopsCounter = 0;
+                for (Stop stop : stops) {
+                    if (stop.getId().getId().equals(stopPointRef)) {
+                        //Same StopPointRef
+                        if (!visitedStops.contains(stopPointIndex)) {
+                            //Stop has not yet been visited in this pattern/ca
+                            stopPointIndex = stopsCounter;
+                            break;
+                        }
+                    }
+                    stopsCounter++;
                 }
-                stopsCounter++;
+            }
+            visitedStops.add(stopPointIndex);
+
+            if (stopPointIndex >= 0) {
+
+                // Estimated Arrival
+                if (stopPointIndex == 0  && estimatedCall.getExpectedDepartureTime() != null){
+                    //First stop has no arrival - using departure
+                    newTimes.updateArrivalTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getExpectedDepartureTime()));
+                } else if (estimatedCall.getExpectedArrivalTime() != null) {
+                    // Using realtime-data
+                    newTimes.updateArrivalTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getExpectedArrivalTime()));
+                } else if (estimatedCall.getAimedArrivalTime() != null) {
+                    //Realtime-data does not exist - use original data
+                    newTimes.updateArrivalTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime()));
+                }
+
+                // Estimated Departure
+                if (stopPointIndex == stops.size()-1 && estimatedCall.getExpectedArrivalTime() != null){
+                    //last stop has no departure - using arrival
+                    newTimes.updateDepartureTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getExpectedArrivalTime()));
+                } else if (estimatedCall.getExpectedDepartureTime() != null) {
+                    //Using realtime-data
+                    newTimes.updateDepartureTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getExpectedDepartureTime()));
+                } else  if (estimatedCall.getAimedDepartureTime() != null) {
+                    //Realtime-data does not exist - use original data
+                    newTimes.updateDepartureTime(stopPointIndex, calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime()));
+                }
             }
         }
 
         if (!newTimes.timesIncreasing()) {
-            LOG.error("TripTimes are non-increasing after applying SIRI delay propagation.");
+            LOG.error("TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}.", journey.getLineRef().getValue());
             return null;
         }
 

@@ -317,13 +317,16 @@ public class TimetableSnapshotSource {
                     //Handle activities
                     LOG.info("Handling {} activities.", activities.size());
                     int handledCounter = 0;
+                    int skippedCounter = 0;
                     for (VehicleActivityStructure activity : activities) {
                         boolean handled = handleModifiedTrip(graph, activity, serviceDate);
                         if (handled) {
                             handledCounter++;
+                        } else {
+                            skippedCounter++;
                         }
                     }
-                    LOG.info("Applied {} modified trips.", handledCounter);
+                    LOG.info("Applied {} modified trips, skipped {}.", handledCounter, skippedCounter);
                 }
                 List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
                 if (cancellations != null && !cancellations.isEmpty()) {
@@ -393,9 +396,17 @@ public class TimetableSnapshotSource {
                     LOG.info("Handling {} deliveries.", estimatedJourneyVersions.size());
                     for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
                         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
+                        int handledCounter = 0;
+                        int skippedCounter = 0;
                         for (EstimatedVehicleJourney journey : journeys) {
-                            handleModifiedTrip(graph, journey, serviceDate);
+                            boolean handled = handleModifiedTrip(graph, journey, serviceDate);
+                            if (handled) {
+                                handledCounter++;
+                            } else {
+                                skippedCounter++;
+                            }
                         }
+                        LOG.info("Applied {} estimated timetables, skipped {}.", handledCounter, skippedCounter);
                     }
                 }
             }
@@ -589,7 +600,7 @@ public class TimetableSnapshotSource {
 
         if (trips == null || trips.isEmpty()) {
             boolean isMonitored = estimatedVehicleJourney.isMonitored();
-            String lineRef = (estimatedVehicleJourney.getLineRef() != null ? estimatedVehicleJourney.getLineRef().getValue():null);
+            String lineRef = estimatedVehicleJourney.getLineRef().getValue();
             String vehicleRef = (estimatedVehicleJourney.getVehicleJourneyRef() != null ? estimatedVehicleJourney.getVehicleJourneyRef().getValue():null);
             LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}], skipping EstimatedVehicleJourney.", isMonitored, lineRef, vehicleRef);
 
@@ -604,7 +615,7 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        final TripPattern pattern = getPatternForTrip(trips, estimatedVehicleJourney);
+        final TripPattern pattern = getPatternForTrip(trip, estimatedVehicleJourney);
 
         if (pattern == null) {
             LOG.info("No pattern found skipping EstimatedVehicleJourney.");
@@ -623,33 +634,37 @@ public class TimetableSnapshotSource {
         // Create StopTimes
         final List<StopTime> stopTimes = new ArrayList<>(updatedTripTimes.getNumStops());
 
-        int accumulatedDelayTime = 0;
+        for (int index = 0; index < updatedTripTimes.getNumStops(); ++index) {
 
+            final Stop stop = stops.get(index);
 
-        // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
-        final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
-        final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+            // Create stop time
+            final StopTime stopTime = new StopTime();
+            stopTime.setTrip(trip);
+            stopTime.setStop(stop);
 
-        EstimatedVehicleJourney.EstimatedCalls estimatedCalls = estimatedVehicleJourney.getEstimatedCalls();
+            stopTime.setArrivalTime(updatedTripTimes.getArrivalTime(index));
+            stopTime.setDepartureTime(updatedTripTimes.getDepartureTime(index));
 
-        List<EstimatedCall> estimatedCallsList = estimatedCalls.getEstimatedCalls();
+            stopTime.setTimepoint(1); // Exact time
 
-        for (EstimatedCall estimatedCall : estimatedCallsList) {
-            String stopPointRef = estimatedCall.getStopPointRef().getValue();
-
-            int arrivalTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime());
-            int departureTimeSec = calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime());
-
-            int stopsCounter = 0;
-            for (Stop stop : stops) {
-                if (stop.getId().getId().equals(stopPointRef)) {
-                    updatedTripTimes.updateArrivalTime(stopsCounter, arrivalTimeSec);
-                    updatedTripTimes.updateDepartureTime(stopsCounter, departureTimeSec);
-                    stop.setPlatformCode(estimatedCall.getDeparturePlatformName().getValue());
-                    break;
-                }
-                stopsCounter++;
+            // Set pickup type
+            // Set different pickup type for last stop
+            if (index == updatedTripTimes.getNumStops() - 1) {
+                stopTime.setPickupType(1); // No pickup available
+            } else {
+                stopTime.setPickupType(0); // Regularly scheduled pickup
             }
+            // Set drop off type
+            // Set different drop off type for first stop
+            if (index == 0) {
+                stopTime.setDropOffType(1); // No drop off available
+            } else {
+                stopTime.setDropOffType(0); // Regularly scheduled drop off
+            }
+
+            // Add stop time to list
+            stopTimes.add(stopTime);
         }
 
 
@@ -1414,29 +1429,30 @@ public class TimetableSnapshotSource {
         return null;
     }
 
-    private TripPattern getPatternForTrip(Set<Trip> matches, EstimatedVehicleJourney journey) {
+    private TripPattern getPatternForTrip(Trip trip, EstimatedVehicleJourney journey) {
 
-        for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
-            Trip next = iterator.next();
-            TripPattern tripPattern = graphIndex.patternForTrip.get(next);
+        TripPattern tripPattern = graphIndex.patternForTrip.get(trip);
 
-            if (journey.getOriginRef() == null) {
-                return tripPattern;
-            }
+        Set<ServiceDate> serviceDates = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
 
-            Stop firstStop = tripPattern.getStop(0);
-            Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+        Stop firstStop = tripPattern.getStop(0);
+        Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
 
-            String siriOriginRef = journey.getOriginRef().getValue();
-            String siriDestinationRef = journey.getDestinationRef().getValue();
+        List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+        String journeyFirstStop = estimatedCalls.get(0).getStopPointRef().getValue();
+        String journeyLastStop = estimatedCalls.get(estimatedCalls.size()-1).getStopPointRef().getValue();
 
-            if (firstStop.getId().getId().equals(siriOriginRef) & lastStop.getId().getId().equals(siriDestinationRef)) {
+        ServiceDate journeyDate = new ServiceDate(Date.from(estimatedCalls.get(0).getAimedDepartureTime().toInstant()));
+
+        if (serviceDates.contains(journeyDate)) {
+            if (firstStop.getId().getId().equals(journeyFirstStop) & lastStop.getId().getId().equals(journeyLastStop)) {
                 // Origin and destination matches
-                return tripPattern;
+                if (estimatedCalls.size() == tripPattern.getStops().size()) {
+                    return tripPattern;
+                }
             }
-
-
         }
+
         return null;
     }
 
@@ -1481,28 +1497,33 @@ public class TimetableSnapshotSource {
         DatedVehicleJourneyRef datedVehicleJourneyRef = journey.getDatedVehicleJourneyRef();
         VehicleJourneyRef vehicleJourneyRef = journey.getVehicleJourneyRef();
 
-        throw new RuntimeException(("Not yet implemented"));
-//
-//        if (date == null) {
-//            //If no date is set - assume Realtime-data is reported for 'today'.
-//            date = ZonedDateTime.now();
-//        }
-//        ServiceDate serviceDate = new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-//
-//        for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
-//
-//            Trip trip = iterator.next();
-//            Set<ServiceDate> serviceDatesForServiceId = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
-//
-//            for (Iterator<ServiceDate> serviceDateIterator = serviceDatesForServiceId.iterator(); serviceDateIterator.hasNext(); ) {
-//                ServiceDate next = serviceDateIterator.next();
-//                if (next.equals(serviceDate)) {
-//                    return trip;
-//                }
-//            }
-//        }
-//
-//        return null;
+
+        EstimatedCall firstCall = journey.getEstimatedCalls().getEstimatedCalls().get(0);
+        ZonedDateTime date = firstCall.getAimedDepartureTime();
+
+        if (date == null) {
+            //If no date is set - assume Realtime-data is reported for 'today'.
+            date = ZonedDateTime.now();
+        }
+        ServiceDate serviceDate = new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+
+        for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
+
+            Trip trip = iterator.next();
+            Set<ServiceDate> serviceDatesForServiceId = graphIndex.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+            if (serviceDatesForServiceId.contains(serviceDate)) {
+
+                for (TripPattern pattern : graphIndex.patternsForRoute.get(trip.getRoute())) {
+                    for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
+                        if (times.getScheduledDepartureTime(0) == calculateSecondsSinceMidnight(date)) {
+                            return times.trip;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 

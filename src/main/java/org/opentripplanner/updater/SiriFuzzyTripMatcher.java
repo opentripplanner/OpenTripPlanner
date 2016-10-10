@@ -1,11 +1,18 @@
 package org.opentripplanner.updater;
 
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.*;
+import uk.org.siri.siri20.EstimatedCall;
+import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri20.VehicleActivityStructure;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -19,6 +26,7 @@ public class SiriFuzzyTripMatcher {
     private GraphIndex index;
 
     private static Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+    private static Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
 
     public SiriFuzzyTripMatcher(GraphIndex index) {
         this.index = index;
@@ -60,13 +68,16 @@ public class SiriFuzzyTripMatcher {
      */
     public Set<Trip> match(EstimatedVehicleJourney journey) {
 
-        VehicleJourneyRef vehicleJourney = journey.getVehicleJourneyRef();
+        List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+        EstimatedCall firstStop = estimatedCalls.get(0);
+        EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size()-1);
 
-        if (vehicleJourney != null) {
-            return getCachedTripsBySiriId(vehicleJourney.getValue());
-        }
+        String firstStopPoint = firstStop.getStopPointRef().getValue();
+        String lastStopPoint = lastStop.getStopPointRef().getValue();
 
-        return null;
+        ZonedDateTime departureTime = firstStop.getAimedDepartureTime();
+
+        return start_stop_tripCache.get(createStartStopKey(firstStopPoint, lastStopPoint, departureTime.toLocalTime().toSecondOfDay()));
     }
 
     private Set<Trip> getCachedTripsBySiriId(String tripId) {
@@ -76,25 +87,59 @@ public class SiriFuzzyTripMatcher {
 
     private static void initCache(GraphIndex index) {
         if (mappedTripsCache.isEmpty()) {
-            Map<String, Set<Trip>> updatedCache = new HashMap<>();
 
             Set<Trip> trips = index.patternForTrip.keySet();
             for (Trip trip : trips) {
 
                 String currentTripId = getUnpaddedTripId(trip);
 
-                if (updatedCache.containsKey(currentTripId)) {
-                    updatedCache.get(currentTripId).add(trip);
+                if (mappedTripsCache.containsKey(currentTripId)) {
+                    mappedTripsCache.get(currentTripId).add(trip);
                 } else {
                     Set<Trip> initialSet = new HashSet<>();
                     initialSet.add(trip);
-                    updatedCache.put(currentTripId, initialSet);
+                    mappedTripsCache.put(currentTripId, initialSet);
+                }
+
+                TripPattern tripPattern = index.patternForTrip.get(trip);
+                String firstStopId = tripPattern.getStops().get(0).getId().getId();
+                String lastStopId = tripPattern.getStops().get(tripPattern.getStops().size()-1).getId().getId();
+
+                TripTimes tripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
+                int departureTime = tripTimes.getDepartureTime(0);
+
+                String key = createStartStopKey(firstStopId, lastStopId, departureTime);
+                if (start_stop_tripCache.containsKey(key)) {
+                    start_stop_tripCache.get(key).add(trip);
+                } else {
+                    Set<Trip> initialSet = new HashSet<>();
+                    initialSet.add(trip);
+                    start_stop_tripCache.put(key, initialSet);
                 }
             }
 
-            mappedTripsCache = updatedCache;
-            LOG.trace("Built trips-cache [{}].", mappedTripsCache.size());
+            LOG.info("Built trips-cache [{}].", mappedTripsCache.size());
+            LOG.info("Built start-stop-cache [{}].", start_stop_tripCache.size());
         }
+    }
+
+    public Trip getTrip (Route route, int direction,
+                         int startTime, ServiceDate date) {
+        BitSet services = index.servicesRunning(date);
+        for (TripPattern pattern : index.patternsForRoute.get(route)) {
+            if (pattern.directionId != direction) continue;
+            for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
+                if (times.getScheduledDepartureTime(0) == startTime &&
+                        services.get(times.serviceCode)) {
+                    return times.trip;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String createStartStopKey(String firstStopId, String lastStopId, int departureTime) {
+        return firstStopId + ":" + lastStopId + ":" + departureTime;
     }
 
     private static String getUnpaddedTripId(Trip trip) {
