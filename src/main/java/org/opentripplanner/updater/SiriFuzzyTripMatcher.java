@@ -106,15 +106,17 @@ public class SiriFuzzyTripMatcher {
                 String lastStopId = tripPattern.getStops().get(tripPattern.getStops().size()-1).getId().getId();
 
                 TripTimes tripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
-                int departureTime = tripTimes.getDepartureTime(0);
+                if (tripTimes != null) {
+                    int departureTime = tripTimes.getDepartureTime(0);
 
-                String key = createStartStopKey(firstStopId, lastStopId, departureTime);
-                if (start_stop_tripCache.containsKey(key)) {
-                    start_stop_tripCache.get(key).add(trip);
-                } else {
-                    Set<Trip> initialSet = new HashSet<>();
-                    initialSet.add(trip);
-                    start_stop_tripCache.put(key, initialSet);
+                    String key = createStartStopKey(firstStopId, lastStopId, departureTime);
+                    if (start_stop_tripCache.containsKey(key)) {
+                        start_stop_tripCache.get(key).add(trip);
+                    } else {
+                        Set<Trip> initialSet = new HashSet<>();
+                        initialSet.add(trip);
+                        start_stop_tripCache.put(key, initialSet);
+                    }
                 }
             }
 
