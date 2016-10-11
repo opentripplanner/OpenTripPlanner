@@ -74,7 +74,14 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
-        this.url = url + "?requestorId="+ UUID.randomUUID().toString();
+
+        String uniquenessParameter = "?";
+        if (url.contains("?")) {
+            uniquenessParameter = "&";
+        }
+        uniquenessParameter += "requestorId="+ UUID.randomUUID().toString();
+
+        this.url = url + uniquenessParameter;
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {

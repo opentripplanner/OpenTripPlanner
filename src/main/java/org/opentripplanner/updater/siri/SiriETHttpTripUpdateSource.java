@@ -53,7 +53,13 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
-        this.url = url + "?requestorId="+UUID.randomUUID().toString();
+
+        String uniquenessParameter = "?";
+        if (url.contains("?")) {
+            uniquenessParameter = "&";
+        }
+        uniquenessParameter += "requestorId="+ UUID.randomUUID().toString();
+        this.url = url + uniquenessParameter;
         this.feedId = config.path("feedId").asText();
 
         try {
