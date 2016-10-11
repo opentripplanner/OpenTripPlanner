@@ -598,7 +598,7 @@ public class TimetableSnapshotSource {
         Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney);
 
         if (trips == null || trips.isEmpty()) {
-            boolean isMonitored = estimatedVehicleJourney.isMonitored();
+            Boolean isMonitored = estimatedVehicleJourney.isMonitored();
             String lineRef = estimatedVehicleJourney.getLineRef().getValue();
             String vehicleRef = (estimatedVehicleJourney.getVehicleJourneyRef() != null ? estimatedVehicleJourney.getVehicleJourneyRef().getValue():null);
             LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}], skipping EstimatedVehicleJourney.", isMonitored, lineRef, vehicleRef);
