@@ -389,13 +389,12 @@ public class TimetableSnapshotSource {
 
                 ServiceDate serviceDate = new ServiceDate();
 
-                LOG.info("Handling EstimatedTimetableDeliveryStructure");
                 List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
                 if (estimatedJourneyVersions != null) {
                     //Handle deliveries
-                    LOG.info("Handling {} deliveries.", estimatedJourneyVersions.size());
                     for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
                         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
+                        LOG.info("Handling {} EstimatedVehicleJourneys.", journeys.size());
                         int handledCounter = 0;
                         int skippedCounter = 0;
                         for (EstimatedVehicleJourney journey : journeys) {
@@ -611,14 +610,14 @@ public class TimetableSnapshotSource {
         Trip trip = getTripForJourney(trips, estimatedVehicleJourney);
 
         if (trip == null) {
-            LOG.warn("No matching trip found - skipping EstimatedVehicleJourney.");
+            LOG.debug("No matching trip found - skipping EstimatedVehicleJourney [lineRef={}].", estimatedVehicleJourney.getLineRef().getValue());
             return false;
         }
 
         final TripPattern pattern = getPatternForTrip(trip, estimatedVehicleJourney);
 
         if (pattern == null) {
-            LOG.info("No pattern found skipping EstimatedVehicleJourney.");
+            LOG.debug("No pattern found skipping EstimatedVehicleJourney [lineRef={}].", estimatedVehicleJourney.getLineRef().getValue());
             return false;
         }
 

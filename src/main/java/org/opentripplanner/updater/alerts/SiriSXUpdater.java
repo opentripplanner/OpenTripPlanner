@@ -27,6 +27,7 @@ import uk.org.siri.siri20.Siri;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  *
@@ -73,7 +74,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
-        this.url = url;
+        this.url = url + "?requestorId="+ UUID.randomUUID().toString();
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
