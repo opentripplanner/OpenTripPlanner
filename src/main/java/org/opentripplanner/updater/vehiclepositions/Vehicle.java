@@ -21,9 +21,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.transit.realtime.GtfsRealtime.VehiclePosition.OccupancyStatus;
 
 public class Vehicle implements Serializable{
-	private static final long serialVersionUID = 3333460609708083333L;
+    private static final long serialVersionUID = 3333460609708084444L;
 
     @XmlAttribute
     @JsonSerialize	
@@ -46,5 +47,8 @@ public class Vehicle implements Serializable{
     @XmlElement
     @JsonSerialize	
     public long lastUpdate;  
+    @XmlElement
+    @JsonSerialize
+    public OccupancyStatus occupancyStatus;
 
 }

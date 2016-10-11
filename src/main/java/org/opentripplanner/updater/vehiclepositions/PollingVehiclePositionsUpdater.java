@@ -168,7 +168,8 @@ public class PollingVehiclePositionsUpdater extends PollingGraphUpdater {
         				v.agencyId=agencyId;
         				v.bearing=position.getBearing();
         				v.lastUpdate=System.currentTimeMillis();
-        				
+        				v.occupancyStatus=updates.get(x).getOccupancyStatus();
+	
         				//setting up the hash map
         				Vehicle existing = vehiclesById.get(vehicleId);
         				if (existing == null || existing.lat != v.lat || existing.lon != v.lon) {
