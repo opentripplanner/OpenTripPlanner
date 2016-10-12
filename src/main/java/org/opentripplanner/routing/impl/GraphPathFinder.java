@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
@@ -173,7 +174,11 @@ public class GraphPathFinder {
                     options.onlyTransitTrips = true;
                 }
             }
-            paths.addAll(newPaths);
+
+            paths.addAll(newPaths.stream()
+                    .filter(path -> path.getDuration() < options.maxHours * 60 * 60)
+                    .collect(Collectors.toList()));
+
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);

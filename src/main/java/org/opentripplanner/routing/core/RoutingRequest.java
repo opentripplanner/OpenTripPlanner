@@ -106,6 +106,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The worst possible weight that we will accept when planning a trip. */
     public double maxWeight = Double.MAX_VALUE;
 
+    /** The maximum duration of a returned itinerary, in hours. */
+    public double maxHours = Double.MAX_VALUE;
+
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
