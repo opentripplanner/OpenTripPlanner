@@ -597,12 +597,15 @@ public class TimetableSnapshotSource {
 
         Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney);
 
-        if (trips == null || trips.isEmpty()) {
-            Boolean isMonitored = estimatedVehicleJourney.isMonitored();
-            String lineRef = estimatedVehicleJourney.getLineRef().getValue();
-            String vehicleRef = (estimatedVehicleJourney.getVehicleJourneyRef() != null ? estimatedVehicleJourney.getVehicleJourneyRef().getValue():null);
-            LOG.debug("No trip found for [isMonitored={}, lineRef={}, vehicleRef={}], skipping EstimatedVehicleJourney.", isMonitored, lineRef, vehicleRef);
 
+        //Values used in logging
+        Boolean isMonitored = estimatedVehicleJourney.isMonitored();
+        String lineRef = estimatedVehicleJourney.getLineRef().getValue();
+        String vehicleRef = (estimatedVehicleJourney.getVehicleJourneyRef() != null ? estimatedVehicleJourney.getVehicleJourneyRef().getValue():null);
+        String operatorRef = (estimatedVehicleJourney.getOperatorRef() != null ? estimatedVehicleJourney.getOperatorRef().getValue():null);
+
+        if (trips == null || trips.isEmpty()) {
+            LOG.info("No trips found for EstimatedVehicleJourney (firstStopId, lastStopId, departureTime). [operator={}, isMonitored={}, lineRef={}, vehicleRef={}]", operatorRef, isMonitored, lineRef, vehicleRef);
             return false;
         }
 
@@ -610,14 +613,14 @@ public class TimetableSnapshotSource {
         Trip trip = getTripForJourney(trips, estimatedVehicleJourney);
 
         if (trip == null) {
-            LOG.debug("No matching trip found - skipping EstimatedVehicleJourney [lineRef={}].", estimatedVehicleJourney.getLineRef().getValue());
+            LOG.info("None of the trips match EstimatedVehicleJourney  (serviceDate, departureTime). [operator={}, isMonitored={}, lineRef={}, vehicleRef={}]", operatorRef, isMonitored, lineRef, vehicleRef);
             return false;
         }
 
         final TripPattern pattern = getPatternForTrip(trip, estimatedVehicleJourney);
 
         if (pattern == null) {
-            LOG.debug("No pattern found skipping EstimatedVehicleJourney [lineRef={}].", estimatedVehicleJourney.getLineRef().getValue());
+            LOG.info("No pattern found for matching trip (firstStopId, lastStopId, numberOfStops. [operator={}, isMonitored={}, lineRef={}, vehicleRef={}]", operatorRef, isMonitored, lineRef, vehicleRef);
             return false;
         }
 
@@ -1493,9 +1496,6 @@ public class TimetableSnapshotSource {
      * @return
      */
     private Trip getTripForJourney(Set<Trip> trips, EstimatedVehicleJourney journey) {
-        DatedVehicleJourneyRef datedVehicleJourneyRef = journey.getDatedVehicleJourneyRef();
-        VehicleJourneyRef vehicleJourneyRef = journey.getVehicleJourneyRef();
-
 
         EstimatedCall firstCall = journey.getEstimatedCalls().getEstimatedCalls().get(0);
         ZonedDateTime date = firstCall.getAimedDepartureTime();
