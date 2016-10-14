@@ -1,6 +1,8 @@
 package org.opentripplanner.updater;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -151,5 +153,35 @@ public class SiriFuzzyTripMatcher {
         } else {
             return id;
         }
+    }
+
+    public AgencyAndId getStop(String siriStopId) {
+        Collection<Stop> stops = index.stopForId.values();
+        for (Stop stop : stops) {
+            if (stop.getId().getId().equals(siriStopId)) {
+                return stop.getId();
+            }
+        }
+        return null;
+    }
+
+    public AgencyAndId getRoute(String lineRefValue) {
+        Collection<Route> routes = index.routeForId.values();
+        for (Route route : routes) {
+            if (route.getShortName().equals(lineRefValue)) {
+                return route.getId();
+            }
+        }
+        return null;
+    }
+
+    public AgencyAndId getTripId(String vehicleJourney) {
+        Collection<Trip> trips = index.tripForId.values();
+        for (Trip trip : trips) {
+            if (trip.getId().getId().equals(vehicleJourney)) {
+                return trip.getId();
+            }
+        }
+        return null;
     }
 }

@@ -52,8 +52,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
-
     private AlertPatchService alertPatchService;
 
     private long earlyStart;
@@ -79,7 +77,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
-            this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
         }
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
     }
@@ -93,7 +90,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         updateHandler.setFeedId(feedId);
         updateHandler.setAlertPatchService(alertPatchService);
         updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
-        updateHandler.setSiriFuzzyTripMatcher(siriFuzzyTripMatcher);
     }
 
     @Override

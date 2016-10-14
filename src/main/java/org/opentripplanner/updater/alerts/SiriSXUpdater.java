@@ -81,12 +81,12 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         }
         uniquenessParameter += "requestorId="+ UUID.randomUUID().toString();
 
-        this.url = url + uniquenessParameter;
+        this.url = url;// + uniquenessParameter;
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.feedId = config.path("feedId").asText();
-        if (config.path("fuzzyTripMatching").asBoolean(false)) {
-            this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
-        }
+
+        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+
         LOG.info("Creating real-time alert updater (SIRI SX) running every {} seconds : {}", frequencySec, url);
     }
 
@@ -145,6 +145,10 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     public void teardown() {
+    }
+
+    public AlertPatchService getAlertPatchService() {
+        return alertPatchService;
     }
 
     public String toString() {

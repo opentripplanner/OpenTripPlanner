@@ -74,14 +74,13 @@ public class AlertsUpdateHandler {
     }
 
     public void update(ServiceDelivery delivery) {
-        alertPatchService.expire(patchIds);
-        patchIds.clear();
-
         for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
             SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
-            for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-                String id = sxElement.getSituationNumber().getValue();
-                handleAlert(id, sxElement);
+            if (situations != null) {
+                for (PtSituationElement sxElement : situations.getPtSituationElements()) {
+                    String id = sxElement.getSituationNumber().getValue();
+                    handleAlert(id, sxElement);
+                }
             }
         }
     }
@@ -89,14 +88,8 @@ public class AlertsUpdateHandler {
     private void handleAlert(String id, PtSituationElement situation) {
         Alert alert = new Alert();
 
-        List<DefaultedTextStructure> descriptions = situation.getDescriptions();
-        if (descriptions != null && descriptions.size() > 0) {
-            alert.alertDescriptionText = locale -> (descriptions.get(0).getValue());
-        }
-        List<DefaultedTextStructure> summaries = situation.getSummaries();
-        if (summaries != null && summaries.size() > 0) {
-            alert.alertHeaderText = locale -> (summaries.get(0).getValue());
-        }
+        alert.alertDescriptionText = getTranslatedString(situation.getDescriptions());
+        alert.alertHeaderText = getTranslatedString(situation.getSummaries());
 
         ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         if(situation.getValidityPeriods().size() > 0) {
@@ -162,7 +155,7 @@ public class AlertsUpdateHandler {
                 String stopId = stopPointRef.getValue();
 
                 AlertPatch alertPatch = new AlertPatch();
-                alertPatch.setStop(new AgencyAndId(feedId, stopId));
+                alertPatch.setStop(siriFuzzyTripMatcher.getStop(stopId));
                 alertPatch.setId(situationNumber);
                 patches.add(alertPatch);
             }
@@ -183,9 +176,11 @@ public class AlertsUpdateHandler {
                             if (lineRef == null || lineRef.getValue() == null) {
                                 continue;
                             }
-                            String ref = lineRef.getValue();
+
+                            AgencyAndId lineId = siriFuzzyTripMatcher.getRoute(lineRef.getValue());
+
                             AlertPatch alertPatch = new AlertPatch();
-                            alertPatch.setRoute(new AgencyAndId(feedId, ref));
+                            alertPatch.setRoute(lineId);
                             alertPatch.setId(situationNumber);
                             patches.add(alertPatch);
                         }
@@ -213,11 +208,11 @@ public class AlertsUpdateHandler {
                 if (stopPlace == null || stopPlace.getValue() == null) {
                     continue;
                 }
-                String stopId = stopPlace.getValue();
+                AgencyAndId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue());
 
                 AlertPatch alertPatch = new AlertPatch();
-                alertPatch.setStop(new AgencyAndId(feedId, stopId));
-                alertPatch.setId(stopId);
+                alertPatch.setStop(stopId);
+                alertPatch.setId(stopPlace.getValue());
                 patches.add(alertPatch);
             }
         }
@@ -240,22 +235,24 @@ public class AlertsUpdateHandler {
 
                 if (!(hasTripRefs || hasStopRefs)) {
                     if (lineRef != null) {
+                        AgencyAndId routeId = siriFuzzyTripMatcher.getRoute(lineRef);
                         AlertPatch alertPatch = new AlertPatch();
-                        alertPatch.setRoute(new AgencyAndId(feedId, lineRef));
+                        alertPatch.setRoute(routeId);
                         patches.add(alertPatch);
                     }
                 } else if (hasTripRefs && hasStopRefs) {
                     for (VehicleJourneyRef vjRef : vj.getVehicleJourneyReves()) {
-                        String tripId = vjRef.getValue();
 
+                        AgencyAndId tripId = siriFuzzyTripMatcher.getTripId(vjRef.getValue());
 
                         for (AffectedCallStructure call : stopRefs.getCalls()) {
-                            String stopId = call.getStopPointRef().getValue();
+                            AgencyAndId stopId = siriFuzzyTripMatcher.getStop(call.getStopPointRef().getValue());
+                            AgencyAndId routeId = siriFuzzyTripMatcher.getRoute(lineRef);
 
                             AlertPatch alertPatch = new AlertPatch();
-                            alertPatch.setRoute(new AgencyAndId(feedId, lineRef));
-                            alertPatch.setTrip(new AgencyAndId(feedId, tripId));
-                            alertPatch.setStop(new AgencyAndId(feedId, stopId));
+                            alertPatch.setRoute(routeId);
+                            alertPatch.setTrip(tripId);
+                            alertPatch.setStop(stopId);
                             alertPatch.setId("VehicleJourneyCall_" + stopId);
                             patches.add(alertPatch);
                         }
@@ -418,6 +415,26 @@ public class AlertsUpdateHandler {
             String string = translation.getText();
             translations.put(language, string);
         }
+        return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
+    }
+
+    /**
+     * convert a protobuf TranslatedString to a OTP TranslatedString
+     *
+     * @return A TranslatedString containing the same information as the input
+     * @param input
+     */
+    private I18NString getTranslatedString(List<DefaultedTextStructure> input) {
+        Map<String, String> translations = new HashMap<>();
+        if (input != null && input.size() > 0) {
+            translations.put("nb", input.get(0).getValue());
+            translations.put("en", "EN: "+input.get(0).getValue());
+        } else {
+
+            translations.put("nb", "");
+            translations.put("en", "EN: ");
+        }
+
         return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
     }
 
