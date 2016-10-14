@@ -155,6 +155,11 @@ public class SiriFuzzyTripMatcher {
         }
     }
 
+    public Set<Route> getRoutesForStop(AgencyAndId siriStopId) {
+        Stop stop = index.stopForId.get(siriStopId);
+        return index.routesForStop(stop);
+    }
+
     public AgencyAndId getStop(String siriStopId) {
         Collection<Stop> stops = index.stopForId.values();
         for (Stop stop : stops) {
