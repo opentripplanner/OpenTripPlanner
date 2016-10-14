@@ -526,6 +526,7 @@ public class SimpleStreetSplitter {
 
         if(!link(closest, nonTransitMode, options)) {
             LOG.warn("Couldn't link {}", location);
+            return null;
         }
         return closest;
 
