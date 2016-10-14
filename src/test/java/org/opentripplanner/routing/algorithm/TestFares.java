@@ -14,12 +14,14 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
@@ -32,6 +34,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
 
 import java.io.File;
+import java.util.List;
 
 public class TestFares extends TestCase {
 
@@ -151,4 +154,115 @@ public class TestFares extends TestCase {
         
     }
 
+    public void testFareComponent() throws Exception {
+        Graph gg = new Graph();
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FARE_COMPONENT_GTFS));
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(gg);
+        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        String feedId = gg.getFeedIds().iterator().next();
+        RoutingRequest options = new RoutingRequest();
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+        options.dateTime = startTime;
+        ShortestPathTree spt;
+        GraphPath path = null;
+        Fare fare = null;
+        List<FareComponent> fareComponents = null;
+        FareService fareService = gg.getService(FareService.class);
+        Money tenUSD = new Money(new WrappedCurrency("USD"), 1000);
+
+        // A -> B, base case
+        options.setRoutingContext(gg, feedId+":A", feedId+":B");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":B"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 1);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+
+        // D -> E, null case
+        options.setRoutingContext(gg, feedId+":D", feedId+":E");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":E"), true);
+        fare = fareService.getCost(path);
+        assertNull(fare);
+
+        // A -> C, 2 components in a path
+        options.setRoutingContext(gg, feedId+":A", feedId+":C");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":C"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 2);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+        assertEquals(fareComponents.get(1).price, tenUSD);
+        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BC"));
+        assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
+
+        // B -> D, 2 fully connected components
+        options.setRoutingContext(gg, feedId+":B", feedId+":D");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":D"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 1);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "BD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "2"));
+        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "3"));
+
+        // E -> G, missing in between fare
+        options.setRoutingContext(gg, feedId+":E", feedId+":G");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":G"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 1);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
+
+        // C -> E, missing fare after
+        options.setRoutingContext(gg, feedId+":C", feedId+":E");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":E"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 1);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "CD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "3"));
+
+        // D -> G, missing fare before
+        options.setRoutingContext(gg, feedId+":D", feedId+":G");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":G"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 1);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
+
+        // A -> D, use individual component parts
+        options.setRoutingContext(gg, feedId+":A", feedId+":D");
+        spt = aStar.getShortestPathTree(options);
+        path = spt.getPath(gg.getVertex(feedId+":D"), true);
+        fare = fareService.getCost(path);
+        fareComponents = fare.getDetails(FareType.regular);
+        assertEquals(fareComponents.size(), 2);
+        assertEquals(fareComponents.get(0).price, tenUSD);
+        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+        assertEquals(fareComponents.get(1).price, tenUSD);
+        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BD"));
+        assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
+        assertEquals(fareComponents.get(1).routes.get(1), new AgencyAndId("agency", "3"));
+    }
 }
