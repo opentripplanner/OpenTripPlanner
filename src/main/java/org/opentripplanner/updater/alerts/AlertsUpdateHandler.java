@@ -436,7 +436,7 @@ public class AlertsUpdateHandler {
     }
 
     /**
-     * convert a protobuf TranslatedString to a OTP TranslatedString
+     * convert a SIRI DefaultedTextStructure to a OTP TranslatedString
      *
      * @return A TranslatedString containing the same information as the input
      * @param input
@@ -445,11 +445,11 @@ public class AlertsUpdateHandler {
         Map<String, String> translations = new HashMap<>();
         if (input != null && input.size() > 0) {
             translations.put("nb", input.get(0).getValue());
-            translations.put("en", "EN: "+input.get(0).getValue());
+            translations.put("en", "EN: "+input.get(0).getValue()); //Hack to allow non-translated string being returned as "translated"
         } else {
 
             translations.put("nb", "");
-            translations.put("en", "EN: ");
+            translations.put("en", "EN: ");  //Hack to allow non-translated string being returned as "translated"
         }
 
         return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
