@@ -49,8 +49,6 @@ public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
-    public static final String OTP_CONFIG_FILENAME = "otp-config.json";
-
     private final CommandLineParameters params;
     public OTPServer otpServer = null;
     public GraphService graphService = null;
@@ -116,7 +114,7 @@ public class OTPMain {
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
                     // FIXME set true router IDs
-                    graphService.registerGraph("", new MemoryGraphSource("", graph, graphBuilder.routerConfig));
+                    graphService.registerGraph("", new MemoryGraphSource("", graph));
                 }
             } else {
                 LOG.error("An error occurred while building the graph. Exiting.");

@@ -2,26 +2,26 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.modules.fieldtrip");
 
-otp.modules.fieldtrip.FieldTripRequestWidget = 
+otp.modules.fieldtrip.FieldTripRequestWidget =
     otp.Class(otp.widgets.Widget, {
 
     module : null,
-        
+
     initialize : function(id, module, request) {
-        var this_ = this;  
-        
+        var this_ = this;
+
         this.module = module;
         this.request = request;
         //console.log("request "+request.id+":");
@@ -32,12 +32,12 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             resizable : true,
             closeable : true,
         });
-        
+
         //this.contentDiv  = $('<div class="otp-fieldTrip-requestWidget-content notDraggable" />').appendTo(this.mainDiv);
         this.render();
         this.centerX();
     },
-    
+
     render : function() {
         var this_ = this;
 
@@ -59,12 +59,12 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         else if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
         else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
         else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
-        
+
         var outboundTrip = otp.util.FieldTrip.getOutboundTrip(this.request);
         if(outboundTrip) context.outboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
         var inboundTrip = otp.util.FieldTrip.getInboundTrip(this.request);
         if(inboundTrip) context.inboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
-        
+
         context.internalNotes = [];
         context.operationalNotes = [];
         for(var i = 0; i < context.notes.length; i++) {
@@ -74,29 +74,29 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
 
         if(this.content) this.content.remove();
         this.content = ich['otp-fieldtrip-request'](context).appendTo(this.mainDiv);
-        
+
         if(outboundTrip) {
             this.content.find('.outboundPlanInfo').css('cursor', 'pointer').click(function() {
                 this_.module.renderTrip(outboundTrip);
             });
         }
-        
+
         if(inboundTrip) {
             this.content.find('.inboundPlanInfo').css('cursor', 'pointer').click(function() {
                 this_.module.renderTrip(inboundTrip);
             });
         }
-                 
+
         //$('#' + this.id + '-outboundPlanButton').click(function(evt) {
         this.content.find('.outboundPlanButton').click(function(evt) {
             this_.module.planOutbound(this_.request);
         });
-        
+
         this.content.find('.outboundSaveButton').click(function(evt) {
             this_.module.saveRequestTrip(this_.request, "outbound");
         });
-        
-        this.content.find('.inboundPlanButton').click(function(evt) {            
+
+        this.content.find('.inboundPlanButton').click(function(evt) {
             this_.module.planInbound(this_.request);
         });
 
@@ -116,6 +116,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                     this_.module.setRequestDate(this_.request, date);
                 }
             });
+        });
+
+        this.content.find('.changeGroupSizeLink').click(function(evt) {
+            this_.showGroupSizeDialog();
         });
 
         this.content.find('.editTeacherNotesLink').click(function(evt) {
@@ -139,10 +143,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
             if(outboundTrip) context.outboundItineraries = outboundTrip.groupItineraries;
             if(inboundTrip) context.inboundItineraries = inboundTrip.groupItineraries;
-            
+
             console.log(context);
             var content = ich['otp-fieldtrip-printablePlan'](context);
-            
+
             // populate itin details
             if(outboundTrip) {
                 var itins = outboundTrip.groupItineraries;
@@ -153,7 +157,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
-            
+
             if(inboundTrip) {
                 var itins = inboundTrip.groupItineraries;
                 for(var i = 0; i < itins.length; i++) {
@@ -167,11 +171,11 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             var html = "";
             html += '<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css" />';
             html += '<link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css" />';
-            
+
             html += content.html();
             printWindow.document.write(html);
         });
-        
+
         this.content.find('.cancelRequestButton').click(function(evt) {
             if(confirm("Are you sure you want to cancel this request? Any associated trips will be deleted.")) {
                 this_.module.cancelRequest(this_.request);
@@ -190,7 +194,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             });*/
             this_.showNoteDialog();
         });
-        
+
         for(var i = 0; i < this.request.notes.length; i++) {
             //console.log("note "+this.request.notes[i].id);
             var note = this.request.notes[i];
@@ -198,17 +202,17 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 var note = $(this).data("note");
                 var msg = 'Are you sure you want to delete the note "' + note.note + '" from Field Trip Request #' + this_.request.id + '?';
                 otp.widgets.Dialogs.showYesNoDialog(msg, 'Confirm Note Delete', function() {
-                    this_.module.deleteNote(note);                  
-                });                
+                    this_.module.deleteNote(note);
+                });
             });
         }
-        
+
     },
-    
+
     onClose : function() {
         delete this.module.requestWidgets[this.request.id];
     },
-    
+
     tripPlanned : function() {
         $('#' + this.id + '-outboundSaveButton').removeAttr("disabled");
         $('#' + this.id + '-inboundSaveButton').removeAttr("disabled");
@@ -266,10 +270,39 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         });
     },
 
+    showGroupSizeDialog : function() {
+        var this_ = this;
+        var dialog = ich['otp-fieldtrip-groupSizeDialog']({
+            numStudents : this_.request.numStudents,
+            minimumAge : this_.request.minimumAge,
+            maximumAge : this_.request.maximumAge,
+            numChaperones : this_.request.numChaperones
+        }).dialog({
+            title : "Edit Group Size",
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 240
+        });
+
+        dialog.find(".okButton").button().click(function() {
+            var numStudents = dialog.find(".numStudents").val();
+            var numChaperones = dialog.find(".numChaperones").val();
+            var minimumAge = dialog.find(".minimumAge").val();
+            var maximumAge = dialog.find(".maximumAge").val();
+            this_.module.editGroupSize(this_.request, numStudents, numChaperones, minimumAge, maximumAge);
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },
+
     savingTrip : function(requestOrder) {
         console.log('saving ' + requestOrder);
         if(requestOrder === 0) this.content.find('.outboundPlanInfo').html('Saving...');
         if(requestOrder === 1) this.content.find('.inboundPlanInfo').html('Saving...');
     }
-    
+
 });

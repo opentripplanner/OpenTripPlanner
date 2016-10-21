@@ -15,14 +15,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -36,7 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Lucene based index of streets, stops, etc.
@@ -163,20 +159,33 @@ public class LuceneIndex {
         /* Turn the query string into a Lucene query.*/
         BooleanQuery query = new BooleanQuery();
         BooleanQuery termQuery = new BooleanQuery();
-        for (String term : queryString.split(" ")) {
-            /* PrefixQuery matches all strings that start with the query string */
-            if (autocomplete) {
-                termQuery.add(new PrefixQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
-            /* FuzzyQuery matches with all string stat are maximum 2 edits away from the query sring */
-            } else {
-                termQuery.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+
+        if (autocomplete) {
+            termQuery.add(new PrefixQuery(new Term("name", queryString)), BooleanClause.Occur.SHOULD);
+        } else {
+            List<String> list = new ArrayList<String>();
+            Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(queryString);
+            while (m.find()) {
+                String token = m.group(1);
+
+                // if token is a quoted search phrase
+                if (token.startsWith("\"") && token.endsWith("\"")) {
+                    PhraseQuery phraseQuery = new PhraseQuery();
+                    for (String phraseToken : token.substring(1, token.length() - 1).split(" ")) {
+                        phraseQuery.add(new Term("name", phraseToken.toLowerCase()));
+                    }
+                    termQuery.add(phraseQuery, BooleanClause.Occur.SHOULD);
+                } else { // a regular unquoted search term
+                    termQuery.add(new FuzzyQuery(new Term("name", token)), BooleanClause.Occur.SHOULD);
+
+                    // This makes it possible to search for a stop code
+                    termQuery.add(new TermQuery(new Term("code", token)), BooleanClause.Occur.SHOULD);
+                }
             }
-            /* TermQuery matches if the string is equal to the query string.
-             This makes it possible to search for a stop code */
-            termQuery.add(new TermQuery(new Term("code", term)), BooleanClause.Occur.SHOULD);
         }
 
         query.add(termQuery, BooleanClause.Occur.MUST);
+
         if (stops || clusters || corners) {
             BooleanQuery typeQuery = new BooleanQuery();
             if (stops) {

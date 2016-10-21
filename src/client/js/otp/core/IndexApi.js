@@ -18,33 +18,24 @@ otp.core.IndexApi = otp.Class({
 
     webapp          : null,
 
-    agencies        : null,
+    feeds           : null,
     routes          : null,
 
     initialize : function(webapp) {
         this.webapp = webapp;
     },
 
-    loadAgencies : function(callbackTarget, callback) {
+    loadFeeds : function(callbackTarget, callback) {
         var this_ = this;
-        if(this.agencies) {
+        if(this.feeds) {
             if(callback) callback.call(callbackTarget);
             return;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/agencies';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/feeds';
         $.ajax(url, {
             success: function(data) {
-                this_.agencies = {};
-
-                for(var i=0; i<data.length; i++) {
-                    var agencyData = data[i];
-                    this_.agencies[agencyData.id] = {
-                        index : i,
-                        agencyData : agencyData,
-                    };
-                }
-
+                this_.feeds = data;
                 if(callback) callback.call(callbackTarget);
             }
         });
@@ -96,7 +87,7 @@ otp.core.IndexApi = otp.Class({
 
     loadVariants : function(agencyAndId, callbackTarget, callback) {
         var this_ = this;
-        //console.log("loadVariants: "+agencyAndId);
+        console.log("loadVariants: "+agencyAndId);
         var route = this_.routes[agencyAndId];
         if(route.variants) {
             if(callback) callback.call(callbackTarget, route.variants);
@@ -143,22 +134,18 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
-    readVariantForTrip : function(tripAgency, routeId, tripId, callbackTarget, callback) {
+    readVariantForTrip : function(routeId, tripId, callbackTarget, callback) {
         var this_ = this;
-        var agency_routeId = tripAgency + ':' + routeId;
-        var agency_Tripid = tripAgency + ':' + tripId;
-        var route = this_.routes[agency_routeId];
+        var route = this_.routes[routeId];
         var variantData = {};
         // since the new index api does not provide variant/pattern for trip (yet)
         // we have to iterate on route's patterns searching for the current trip.
         _.each(route.variants, function(pattern) {
             var tripIds = _.pluck(pattern.trips, 'id');
-            if (_.contains(tripIds, agency_Tripid)) {
+            if (_.contains(tripIds, tripId)) {
                 variantData = pattern;
             }
         });
-        //console.log("vFT result:");
-        //console.log(variantData);
         callback.call(callbackTarget, variantData);
     },
 
@@ -213,12 +200,13 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
-    getTripHash : function(agencyId, tripId, callbackTarget, callback) {
+    getTripHash : function(tripId, callbackTarget, callback) {
+        var params = {}
         if(typeof otp.config.routerId !== 'undefined') {
             params.routerId = otp.config.routerId;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/trips/' + agencyId + ':' + tripId + '/semanticHash';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/trips/' + tripId + '/semanticHash';
         $.ajax(url, {
             dataType: "text",
             success: function(data) {

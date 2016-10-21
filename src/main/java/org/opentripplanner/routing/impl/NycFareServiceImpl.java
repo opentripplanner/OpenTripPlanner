@@ -82,7 +82,12 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		final List<AgencyAndId> SIR_BONUS_ROUTES = makeMtaStopList("M5", "M20",
 				"M15-SBS");
 
-		final List<AgencyAndId> CANARSIE = makeMtaStopList("L29", "303345"); 
+		final List<AgencyAndId> CANARSIE = makeMtaStopList("L29", "303345");
+
+		// List of NYC agencies to set fares for
+		final List<String> AGENCIES = new ArrayList<>();
+		AGENCIES.add("MTABC");
+		AGENCIES.add("MTA NYCT");
 
 		LinkedList<State> states = path.states;
 
@@ -119,6 +124,10 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				continue;
 			}
 			AgencyAndId routeId = state.getRoute();
+			String agencyId = state.getBackTrip().getRoute().getAgency().getId();
+			if (!AGENCIES.contains(agencyId)) {
+				continue;
+			}
 			if (routeId == null) {
 				newRide = null;
 			} else {

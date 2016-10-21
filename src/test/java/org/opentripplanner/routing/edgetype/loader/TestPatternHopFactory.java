@@ -386,7 +386,7 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
 
         RoutingRequest options = new RoutingRequest();
-        options.setModes(new TraverseModeSet("TRAINISH"));
+        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
         spt = aStar.getShortestPathTree(options );
@@ -394,7 +394,7 @@ public class TestPatternHopFactory extends TestCase {
         //a to b is bus only
         assertNull(spt.getPath(stop_b, false));
         
-        options.setModes(new TraverseModeSet("TRAINISH,BUSISH"));
+        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,CABLE_CAR,BUS"));
         spt = aStar.getShortestPathTree(options);
 
         assertNotNull(spt.getPath(stop_b, false));

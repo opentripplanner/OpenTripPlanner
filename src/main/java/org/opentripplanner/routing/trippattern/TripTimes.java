@@ -386,7 +386,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             }
 
             // Update the real-time state
-            realTimeState = RealTimeState.UDPATED;
+            realTimeState = RealTimeState.UPDATED;
         }
     }
 

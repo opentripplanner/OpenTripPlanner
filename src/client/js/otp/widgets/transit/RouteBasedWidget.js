@@ -19,7 +19,7 @@ otp.widgets.transit.RouteBasedWidget =
 
     module : null,
 
-    agency_id : null,
+    routeId : null,
 
     activeLeg : null,
     timeIndex : null,
@@ -27,7 +27,6 @@ otp.widgets.transit.RouteBasedWidget =
     routeLookup : [], // for retrieving route obj from numerical index in <select> element
 
     lastSize : null,
-    //variantIndexLookup : null,
 
     initialize : function(id, module, options) {
 
@@ -69,54 +68,51 @@ otp.widgets.transit.RouteBasedWidget =
     },
 
     newRouteSelected : function() {
-        this.agency_id = null;
         this.activeLeg = null;
         var route = this.routeLookup[this.routeSelect.prop("selectedIndex")]
-        this.agency_id = route.routeData.id;
+        console.log('new route sel', route);
+        this.routeId = route.routeData.id;
         this.variantSelect.empty();
-        this.clear() //stopList.empty();
+        this.clear();
         this.checkAndLoadVariants();
     },
 
     newVariantSelected : function() {
         this.activeLeg = null;
         var variantId = this.variantSelect.val();
-        //console.log("new variant selected: "+variantId);
-        this.clear() //stopList.empty();
-        this.setActiveVariant(this.module.webapp.indexApi.routes[this.agency_id].variants[variantId]);
+        this.clear()
+        this.setActiveVariant(this.module.webapp.indexApi.routes[this.routeId].variants[variantId]);
     },
 
     update : function(leg) {
-        //this.clearTimes();
         this.activeLeg = leg;
         this.activeTime = leg.startTime;
-        //this.times = times;
 
-        this.agency_id = leg.agencyId + ":" + leg.routeId;
+        this.routeId = leg.routeId;
 
-        var tiRouteInfo = this.module.webapp.indexApi.routes[this.agency_id];
+        console.log(this.module.webapp.indexApi.routes);
+        var tiRouteInfo = this.module.webapp.indexApi.routes[leg.routeId];
         $('#'+this.id+'-routeSelect option:eq('+tiRouteInfo.index+')').prop('selected', true);
 
         this.checkAndLoadVariants();
     },
 
     checkAndLoadVariants : function() {
-        var tiRouteInfo = this.module.webapp.indexApi.routes[this.agency_id];
+        var tiRouteInfo = this.module.webapp.indexApi.routes[this.routeId];
         if(tiRouteInfo.variants != null) {
-            //console.log("variants exist");
             this.updateVariants();
         }
         else {
-            this.module.webapp.indexApi.loadVariants(this.agency_id, this, this.updateVariants);
+            this.module.webapp.indexApi.loadVariants(this.routeId, this, this.updateVariants);
         }
     },
 
     updateVariants : function() {
         var this_ = this;
-        var route = this.module.webapp.indexApi.routes[this.agency_id];
+        var route = this.module.webapp.indexApi.routes[this.routeId];
 
         if(!route.variants) {
-            console.log("ERROR: indexApi.routes.["+this.agency_id+"].variants null in RouteBasedWidget.updateVariants()");
+            console.log("ERROR: indexApi.routes.["+this.routeId+"].variants null in RouteBasedWidget.updateVariants()");
             return;
         }
 
@@ -126,7 +122,7 @@ otp.widgets.transit.RouteBasedWidget =
         });
 
         if(this.activeLeg) {
-            this.module.webapp.indexApi.readVariantForTrip(this.activeLeg.agencyId,  this.activeLeg.routeId, this.activeLeg.tripId, this, this.setActiveVariant);
+            this.module.webapp.indexApi.readVariantForTrip(this.activeLeg.routeId, this.activeLeg.tripId, this, this.setActiveVariant);
         }
 
 
@@ -137,7 +133,7 @@ otp.widgets.transit.RouteBasedWidget =
 
     setActiveVariant : function(variantData) {
         var this_ = this;
-        var route = this.module.webapp.indexApi.routes[this.agency_id];
+        var route = this.module.webapp.indexApi.routes[this.routeId];
         this.activeVariant = route.variants[variantData.id];
         $('#'+this.id+'-variantSelect option:eq('+this.activeVariant.index+')').prop('selected', true);
 

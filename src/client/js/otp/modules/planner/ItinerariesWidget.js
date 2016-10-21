@@ -370,7 +370,7 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             else if(leg.agencyId !== null) {
-                headerHtml += ": "+leg.agencyId+", ";
+                headerHtml += ": "+leg.agencyName+", ";
                 if(leg.route !== leg.routeLongName) {
                     headerHtml += "("+leg.route+") ";
                 }
@@ -431,7 +431,8 @@ otp.widgets.ItinerariesWidget =
 
         // create an alert if this is a different day from the searched day
         var queryTime = itin.tripPlan.queryParams.date + ' ' + itin.tripPlan.queryParams.time;
-        if(itin.differentServiceDayFromQuery(itin.tripPlan.planData.date)) {
+        queryTime = moment(queryTime, 'MM-DD-YYYY HH:mma').unix()*1000
+        if(itin.differentServiceDayFromQuery(queryTime)) {
             //TRANSLATORS: Shown as alert text before showing itinerary.
             alerts = [ "This itinerary departs on a different day than the one searched for"];
         }

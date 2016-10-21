@@ -12,7 +12,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.resource;
 
+import org.glassfish.grizzly.http.server.Request;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -23,13 +26,20 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -42,7 +52,7 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
  * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
-public class    PlannerResource extends RoutingResource {
+public class PlannerResource extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
 
@@ -51,7 +61,7 @@ public class    PlannerResource extends RoutingResource {
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    public Response plan(@Context OTPServer otpServer, @Context UriInfo uriInfo) {
+    public Response plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -60,19 +70,21 @@ public class    PlannerResource extends RoutingResource {
          * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
          *       out so it's used here too...
          */
-        
+
         // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
         Response response = new Response(uriInfo);
         RoutingRequest request = null;
+        Router router = null;
+        List<GraphPath> paths = null;
         try {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
+            router = otpServer.getRouter(request.routerId);
 
             /* Find some good GraphPaths through the OTP Graph. */
-            Router router = otpServer.getRouter(request.routerId);
             GraphPathFinder gpFinder = new GraphPathFinder(router); // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
-            List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
+            paths = gpFinder.graphPathFinderEntryPoint(request);
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
             TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
@@ -89,7 +101,38 @@ public class    PlannerResource extends RoutingResource {
                     response.debugOutput = request.rctx.debugOutput;
                 }
                 request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
-            }       
+            }
+        }
+        /* Log this request if such logging is enabled. */
+        if (request != null && router != null && router.requestLogger != null) {
+            StringBuilder sb = new StringBuilder();
+            String clientIpAddress = grizzlyRequest.getRemoteAddr();
+            //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            sb.append(clientIpAddress);
+            sb.append(' ');
+            sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
+            sb.append(' ');
+            sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
+            sb.append(' ');
+            sb.append(request.modes.getAsStr());
+            sb.append(' ');
+            sb.append(request.from.lat);
+            sb.append(' ');
+            sb.append(request.from.lng);
+            sb.append(' ');
+            sb.append(request.to.lat);
+            sb.append(' ');
+            sb.append(request.to.lng);
+            sb.append(' ');
+            if (paths != null) {
+                for (GraphPath path : paths) {
+                    sb.append(path.getDuration());
+                    sb.append(' ');
+                    sb.append(path.getTrips().size());
+                    sb.append(' ');
+                }
+            }
+            router.requestLogger.info(sb.toString());
         }
         return response;
     }

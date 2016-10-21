@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
@@ -27,9 +28,12 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.HopEdge;
@@ -46,6 +50,8 @@ class Ride {
 
     AgencyAndId route;
 
+    AgencyAndId trip;
+    
     Set<String> zones;
 
     String startZone;
@@ -104,6 +110,43 @@ class Ride {
     }
 }
 
+/** Holds information for doing the graph search on fares */
+class FareSearch {
+    // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
+    float[][] resultTable;
+
+    // Cell [i,j] holds the index of the ride to pass through for the best cost
+    // This is used for reconstructing which rides are grouped together
+    int[][] next;
+
+    // Cell [i,j] holds the id of the fare that corresponds to the relevant cost
+    // we can't just use FareAndId for resultTable because you need to sum them
+    AgencyAndId[][] fareIds;
+
+    // Cell [i] holds the index of the last ride that ride[i] has a fare to
+    // If it's -1, the ride does not have fares to anywhere
+    int[] endOfComponent;
+
+    FareSearch(int size) {
+        resultTable = new float[size][size];
+        next = new int[size][size];
+        fareIds = new AgencyAndId[size][size];
+        endOfComponent = new int[size];
+        Arrays.fill(endOfComponent, -1);
+    }
+}
+
+/** Holds fare and corresponding fareId */
+class FareAndId {
+    float fare;
+    AgencyAndId fareId;
+
+    FareAndId(float fare, AgencyAndId fareId) {
+        this.fare = fare;
+        this.fareId = fareId;
+    }
+}
+
 /**
  * This fare service module handles the cases that GTFS handles within a single feed.
  * It cannot necessarily handle multi-feed graphs, because a rule-less fare attribute
@@ -147,6 +190,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.route = state.getRoute();
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
+                ride.trip = state.getTripId();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();
@@ -182,51 +226,126 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                         .getCurrencyType());
                 wrappedCurrency = new WrappedCurrency(currency);
             }
-
-            float lowestCost = getLowestCost(fareType, rides, fareRules);
-
-            if (lowestCost != Float.POSITIVE_INFINITY) {
-                int fractionDigits = 2;
-                if (currency != null)
-                    fractionDigits = currency.getDefaultFractionDigits();
-                int cents = (int) Math.round(lowestCost * Math.pow(10, fractionDigits));
-                fare.addFare(fareType, wrappedCurrency, cents);
-                hasFare = true;
-            }
+            hasFare = populateFare(fare, currency, fareType, rides, fareRules);
         }
         return hasFare ? fare : null;
     }
 
-    protected float getLowestCost(FareType fareType, List<Ride> rides,
-            Collection<FareRuleSet> fareRules) {
-        // Dynamic algorithm to calculate fare cost.
-        // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
-        float[][] resultTable = new float[rides.size()][rides.size()];
+    protected static Money getMoney(Currency currency, float cost) {
+        int fractionDigits = 2;
+        if (currency != null)
+            fractionDigits = currency.getDefaultFractionDigits();
+        int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
+        return new Money(new WrappedCurrency(currency), cents);
+    }
 
+    private FareSearch performSearch(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
+        FareSearch r = new FareSearch(rides.size());
+
+        // Dynamic algorithm to calculate fare cost.
+        // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
+        // rides are already edges, so when comparing "via" routes, i -> k is connected
+        // to k+1 -> j.
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                float cost = calculateCost(fareType, rides.subList(j, j + i + 1), fareRules);
+                FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
+                float cost = best.fare;
                 if (cost < 0) {
                     LOG.error("negative cost for a ride sequence");
                     cost = Float.POSITIVE_INFINITY;
                 }
-                resultTable[j][j + i] = cost;
+                if (cost < Float.POSITIVE_INFINITY) {
+                    r.endOfComponent[j] = j + i;
+                    r.next[j][j + i] = j + i;
+                }
+                r.resultTable[j][j + i] = cost;
+                r.fareIds[j][j + i] = best.fareId;
                 for (int k = 0; k < i; k++) {
-                    float via = resultTable[j][j + k] + resultTable[j + k + 1][j + i];
-                    if (resultTable[j][j + i] > via)
-                        resultTable[j][j + i] = via;
+                    float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+                    if (r.resultTable[j][j + i] > via) {
+                        r.resultTable[j][j + i] = via;
+                        r.endOfComponent[j] = j + i;
+                        r.next[j][j + i] = r.next[j][j + k];
+                    }
                 }
             }
         }
-        return resultTable[0][rides.size() - 1];
+        return r;
+    }
+
+    protected float getLowestCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
+        FareSearch r = performSearch(fareType, rides, fareRules);
+        return r.resultTable[0][rides.size()-1];
+    }
+
+    /**
+     * Builds the Fare object for the given currency, fareType and fareRules.
+     * <p>
+     * Besides calculating the lowest fare, we also break down the fare and which routes
+     * correspond to which components. Note that even if we cannot get a lowest fare
+     * (if some rides don't have fare rules), there will still be a breakdown for those
+     * parts which have fares.
+     * <p>
+     * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10
+     * each, 2 fare detail objects are added, one with fare 10 for A-B and one with fare 10
+     * for B-C.
+     * <p>
+     * If we add the rule for A-C with a fare of 15, we will get 1 fare detail object
+     * with fare 15, which lists both A-B and B-C as routes involved.
+     * <p>
+     * If our only rule were A-B with a fare of 10, we would have no lowest fare, but
+     * we will still have one fare detail with fare 10 for the route A-B. B-C will not
+     * just not be listed at all.
+     */
+    protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
+        FareSearch r = performSearch(fareType, rides, fareRules);
+
+        List<FareComponent> details = new ArrayList<FareComponent>();
+        int count = 0;
+        int start = 0;
+        int end = rides.size() - 1;
+        while(start <= end) {
+            // skip parts where no fare is present, we want to return something
+            // even if not all legs have fares
+            while(start <= end && r.endOfComponent[start] < 0) {
+                ++start;
+            }
+            if(start > end) {
+                break;
+            }
+
+            int via = r.next[start][r.endOfComponent[start]];
+            float cost = r.resultTable[start][via];
+            AgencyAndId fareId = r.fareIds[start][via];
+            FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
+            for(int i = start; i <= via; ++i) {
+                detail.addRoute(rides.get(i).route);
+            }
+            details.add(detail);
+            ++count;
+            start = via + 1;
+        }
+
+        fare.addFare(fareType, getMoney(currency, r.resultTable[0][rides.size()-1]));
+        fare.addFareDetails(fareType, details);
+        return count > 0;
     }
 
     protected float calculateCost(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
+        return getBestFareAndId(fareType, rides, fareRules).fare;
+    }
+
+    private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
         Set<String> agencies = new HashSet<String>();
+        Set<AgencyAndId> trips = new HashSet<AgencyAndId>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
@@ -240,7 +359,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (Ride ride : rides) {
             if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
-                return Float.POSITIVE_INFINITY;
+                return new FareAndId(Float.POSITIVE_INFINITY, null);
             }
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
@@ -248,6 +367,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             agencies.add(ride.agency);
             routes.add(ride.route);
             zones.addAll(ride.zones);
+            trips.add(ride.trip);
             transfersUsed += 1;
         }
         
@@ -255,6 +375,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         float bestFare = Float.POSITIVE_INFINITY;
         long tripTime = lastRideStartTime - startTime;
         long journeyTime = lastRideEndTime - startTime;
+        	
         // find the best fare that matches this set of rides
         for (FareRuleSet ruleSet : fareRules) {
             FareAttribute attribute = ruleSet.getFareAttribute();
@@ -262,7 +383,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             // check only if the fare is not mapped to an agency
             if (!ruleSet.hasAgencyDefined() && !attribute.getId().getAgencyId().equals(feedId))
                 continue;
-            if (ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
+            
+            if (ruleSet.matches(agencies, startZone, endZone, zones, routes, trips)) {
                 // TODO Maybe move the code below in FareRuleSet::matches() ?
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;
@@ -277,7 +399,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                     journeyTime > attribute.getJourneyDuration()) {
                     continue;
                 }
-                float newFare = attribute.getPrice();
+                float newFare = getFarePrice(attribute, fareType);
                 if (newFare < bestFare) {
                     bestAttribute = attribute;
                     bestFare = newFare;
@@ -288,8 +410,26 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         if (bestFare == Float.POSITIVE_INFINITY) {
             LOG.debug("No fare for a ride sequence: {}", rides);
         }
-        return bestFare;
-
+        return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
+    }
+    
+    private float getFarePrice(FareAttribute fare, FareType type) {
+    	switch(type) {
+		case senior:
+			if (fare.getSeniorPrice() >= 0) {
+				return fare.getSeniorPrice();
+			}
+			break;
+		case youth:
+			if (fare.getYouthPrice() >= 0) {
+				return fare.getYouthPrice();
+			}
+			break;
+		case regular:
+		default:
+			break;
+    	}
+    	return fare.getPrice();
     }
 
 }

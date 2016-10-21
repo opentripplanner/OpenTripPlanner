@@ -104,11 +104,14 @@ otp.widgets.transit.StopViewerWidget =
                 var parts = stopTime.pattern.id.split(":");
                 var routeId = parts[0] + ":" + parts[1];
                 _.each(stopTime.times,function(time){
+                    if (time.stopIndex === time.stopCount - 1) return;
                     var pushTime = {};
                     pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
                     pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                     pushTime.time = time.realtimeDeparture;
                     pushTime.serviceDay = time.serviceDay;
+                    pushTime.headsign = time.headsign;
+                    pushTime.blockId = time.blockId;
                     this_.times.push(pushTime);
                 });
             });

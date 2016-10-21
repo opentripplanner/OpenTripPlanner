@@ -3,17 +3,21 @@
 ## OpenTripPlanner
 _Note: this documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**opentripplanner.org**](http://www.opentripplanner.org)_
 
-**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license. The code is under active development with a variety of [deployments](Deployments) around the world, and we are working toward a 1.0 release for the end of 2015.
+**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license. The code is under active development with a variety of [deployments](Deployments) around the world.
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
 
 **Latest Project Updates**
 
+ * After seven years of hard work and almost 10,000 commits from over 100 contributors around the world, **version 1.0 was released on 9 September 2016**!
+ 
+ * The Helsinki Regional Transport Authority (HSL) [trip planner](https://digitransit.fi/en/) based on OpenTripPlanner is in public beta as of spring 2016. Source code for their new UI is [available on Github](https://github.com/HSLdevcom/digitransit-ui).
+
  * As of 2015, OTP powers the New York State department of transportation's [transit trip planner](http://511ny.org/tripplanner/default.aspx).
    It provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 
  * In November of 2014, Arlington, Virginia launched a new [commute planning site](http://mobilitylab.org/2014/11/07/the-who-what-when-where-whys-of-carfreeatoz/) for the Washington, DC metropolitan area.
- It depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of [profile routing](http://conveyal.com/blog/2015/02/24/what-is-profile-routing/).
+ It depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of [profile routing](http://conveyal.com/blog/2015/02/24/what-is-profile-routing).
 
  * OpenTripPlanner was a focal point in the Dutch Transport Ministry's MMRI (MultiModal Travel Information) project which encouraged investment in trip planning platforms and services. A consortium of five companies worked together to improve OpenTripPlanner performance in large regional transport networks and account for real-time service modifications and delays. The resulting [Plannerstack Foundation](http://www.plannerstack.org/)
  is now providing OpenTripPlanner and [Bliksem RRRR](https://github.com/bliksemlabs/rrrr) as hosted services including high quality open data integration for the Netherlands.
@@ -27,7 +31,7 @@ If you want to get started right away running your own OTP instance, the best pl
 
 [![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
-OpenTripPlanner is presently at **version 0.19.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
+**Version 1.0 was released on 9 September 2016**. OTP now:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors
@@ -48,11 +52,11 @@ At the core of OpenTripPlanner is a library of Java code that finds efficient pa
 
 The **OTP Routing API** is a [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) web service that responds to journey planning requests with itineraries in a JSON or XML representation. You can combine this API with OTP's standard Javascript front end to provide users with trip planning functionality in a familiar map interface, or write your own applications that talk directly to the API.
 
-The **OTP Transit Index API** is another [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) web service that provides information derived from the input GTFS feed(s). Examples include routes serving a particular stop, upcoming vehicles at a particular stop, upcoming stops on a given trip, etc.
+The **OTP Transit Index API** is another [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) web service that provides information derived from the input GTFS feed(s). Examples include routes serving a particular stop, upcoming vehicles at a particular stop, upcoming stops on a given trip, etc. More complex transit data requests can be formulated using a GraphQL API.
 
 The term "OTP Analyst" refers to parts of OTP that apply the routing engine to transportation network analysis rather than end-to-end trip planning. OTP Analyst includes:
 
-The **OTP Analyst Web Services** provide network analysis results such as travel time maps and isochrones as standard web Mercator tiles or GIS rasters via a [WMS](http://en.wikipedia.org/wiki/Web_Map_Service)-derived API. These web services are conceptually separate from the routing API, but are provided by the same servlet: once you have a working OTP trip planner you can also use it to produce travel time maps and other visualizations of transit service. See [this blog post](http://conveyal.com/blog/2012/07/02/analyst/) for discussion and examples.
+The **OTP Analyst Web Services** provide network analysis results such as travel time maps and isochrones as standard web Mercator tiles or GIS rasters via a [WMS](http://en.wikipedia.org/wiki/Web_Map_Service)-derived API. These web services are conceptually separate from the routing API, but are provided by the same servlet: once you have a working OTP trip planner you can also use it to produce travel time maps and other visualizations of transit service. See [this blog post](http://conveyal.com/blog/2012/07/02/analyst) for discussion and examples.
 
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
 
@@ -61,26 +65,25 @@ The **OTP Scripting API** allow the execution of routing requests from within sc
 ## Additional Documentation
 
  * [Basic Usage (get started quickly)](Basic-Usage)
- * [Internationalization and Translations](Translation)
+ * [Internationalization and Translations](https://github.com/opentripplanner/OpenTripPlanner/blob/master/README_LOCALIZATION.md)
  * [Developers Guide](Developers-Guide) (code conventions, how to submit patches, etc)
 
 Some other types of documentation are generated for OTP from its source code:
 
  * [Javadoc documentation for the entire project](http://dev.opentripplanner.org/javadoc/)
- * [Web service API documentation](http://dev.opentripplanner.org/apidoc) (automatically generated by [Enunciate](http://enunciate.codehaus.org/))
+ * [Web service API documentation](http://dev.opentripplanner.org/apidoc/) (automatically generated by [Enunciate](http://enunciate.codehaus.org/))
 
 
 ## Contact Info
 
 Send questions and comments to the [user mailing list](http://groups.google.com/group/opentripplanner-users).
 Discuss internal development details on the [dev mailing list](http://groups.google.com/group/opentripplanner-dev).
-Chat with us via IRC on Freenode channel `#opentripplanner` or [through the web](http://webchat.freenode.net/?channels=opentripplanner)
 File bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). Note that the issue tracker is not intended for support questions or discussions. Please post them to one of the mailing lists instead.
 
 
 ## Background
 
-The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of FivePoints, [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](Project-History) page.
+The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of FivePoints, [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](History) page.
 In November of 2013, OpenTripPlanner became the thirty-first member project of the <a href="http://sfconservancy.org/">Software Freedom Conservancy.</a>
 
 ## Financial Support

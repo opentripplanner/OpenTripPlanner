@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 class Area {
 
-    public class AreaConstructionException extends RuntimeException {
+    public static class AreaConstructionException extends RuntimeException {
         private static final long serialVersionUID = 1L;
     }
 

@@ -7,6 +7,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import com.beust.jcommander.internal.Lists;
@@ -15,6 +16,8 @@ public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
     public AgencyAndId stopId;
+    public int stopIndex;
+    public int stopCount;
     public int scheduledArrival = UNDEFINED ;
     public int scheduledDeparture = UNDEFINED ;
     public int realtimeArrival = UNDEFINED ;
@@ -23,14 +26,19 @@ public class TripTimeShort {
     public int departureDelay = UNDEFINED ;
     public boolean timepoint = false;
     public boolean realtime = false;
+    public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
     public long serviceDay;
     public AgencyAndId tripId;
+    public String blockId;
+    public String headsign;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId = stop.getId();
+        stopIndex          = i;
+        stopCount          = tt.getNumStops();
         scheduledArrival   = tt.getScheduledArrivalTime(i);
         realtimeArrival    = tt.getArrivalTime(i);
         arrivalDelay       = tt.getArrivalDelay(i);
@@ -39,6 +47,9 @@ public class TripTimeShort {
         departureDelay     = tt.getDepartureDelay(i);
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
+        realtimeState      = tt.getRealTimeState();
+        blockId            = tt.trip.getBlockId();
+        headsign           = tt.getHeadsign(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {

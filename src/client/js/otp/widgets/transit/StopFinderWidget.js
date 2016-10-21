@@ -19,8 +19,6 @@ otp.widgets.transit.StopFinderWidget =
 
     module : null,
 
-    agency_id : null,
-
     timeIndex : null,
 
 
@@ -44,8 +42,8 @@ otp.widgets.transit.StopFinderWidget =
         this.activeTime = moment();
 
         var translated_template = {
-            //TRANSLATORS: [Public transport] Agency: Selector for Public transport agencies
-            agency: _tr('Agency'),
+            //TRANSLATORS: [Public transport] : Selector for GTFS feed
+            feed: _tr('Feed'),
             //TRANSLATORS: Search for Stops by ID
             by_id: _tr('By ID'),
             //TRANSLATORS: Search for Stops by Name
@@ -56,29 +54,30 @@ otp.widgets.transit.StopFinderWidget =
 
         ich['otp-stopFinder'](translated_template).appendTo(this.mainDiv);
 
-        this.agencySelect = this.mainDiv.find('.otp-stopFinder-agencySelect');
-        this.module.webapp.indexApi.loadAgencies(this, function() {
-            for(var agencyId in this.module.webapp.indexApi.agencies) {
-                $("<option />").html(agencyId).appendTo(this_.agencySelect);
+        this.feedSelect = this.mainDiv.find('.otp-stopFinder-feedSelect');
+        this.module.webapp.indexApi.loadFeeds(this, function() {
+            var feeds = this.module.webapp.indexApi.feeds
+            for(var i = 0; i < feeds.length; i++) {
+                $("<option />").html(feeds[i]).appendTo(this_.feedSelect);
             }
         });
 
         this.stopList = this.mainDiv.find('.otp-stopFinder-stopList');
 
         this.mainDiv.find('.otp-stopFinder-idButton').click(function() {
-            var agencyId = this_.agencySelect.val();
+            var feedId = this_.feedSelect.val();
             var id = this_.mainDiv.find('.otp-stopFinder-idField').val();
             if(!id || id.length === 0) return;
-            this_.module.webapp.indexApi.loadStopById(agencyId, id, this, function(data) {
+            this_.module.webapp.indexApi.loadStopById(feedId, id, this, function(data) {
                 this_.updateStops(data === null ? [] : [data]);
             });
         });
 
         this.mainDiv.find('.otp-stopFinder-nameButton').click(function() {
-            var agencyId = this_.agencySelect.val();
+            var feedId = this_.feedSelect.val();
             var name = this_.mainDiv.find('.otp-stopFinder-nameField').val();
             if(!name || name.length === 0) return;
-            this_.module.webapp.indexApi.loadStopsByName(agencyId, name, this, function(data) {
+            this_.module.webapp.indexApi.loadStopsByName(feedId, name, this, function(data) {
                 this_.updateStops(data);
             });
         });

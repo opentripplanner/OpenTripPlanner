@@ -24,7 +24,7 @@
         </div>
     </div>
     <div class="notDraggable" style="position: absolute; height: 30px; bottom: 10px; left:10px; right:10px;">
-        
+
         <div style="position: absolute; right: 0px; text-align: right;">
             Daily Report for:
             <input type="text" class="reportDateInput" style="width: 75px; text-align: center;"></input>&nbsp;
@@ -33,7 +33,7 @@
 
         <button class="refreshButton">Refresh Requests</button>
     </div>
-    
+
 
 </script>
 
@@ -42,13 +42,13 @@
     <div class="otp-fieldTripRequests-listRow">
         <h5>{{schoolName}} Trip on {{formattedDate}} (#{{id}})</h5>
         Submitted by {{teacherName}} on {{timeStamp}}<br>
-        <b>Outbound Trip:</b> 
+        <b>Outbound Trip:</b>
             {{#outboundTripStatus}}{{outboundTripStatus}}{{/outboundTripStatus}}
             {{^outboundTripStatus}}Not Planned{{/outboundTripStatus}}<br>
         <b>Inbound Trip:</b>
             {{#inboundTripStatus}}{{inboundTripStatus}}{{/inboundTripStatus}}
             {{^inboundTripStatus}}Not Planned{{/inboundTripStatus}}
-    
+
     </div>
 </script>
 
@@ -65,8 +65,9 @@
             <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
             <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
             <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
-                {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) / 
-                <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+                {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
+                <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}
+                &nbsp;<span style="font-size: .8em">[<a href="#" class="changeGroupSizeLink">Change</a>]</span><br>
             <b>Start Address</b>: {{startLocation}}<br>
             <b>Time Arriving at Destination</b>: {{arriveDestinationTime}}<br>
             <b>Time Leaving at Destination</b>: {{leaveDestinationTime}}<br>
@@ -75,23 +76,23 @@
                 {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
             <b>Payment Preference</b>: {{paymentPreference}}<br>
             {{#requireInvoice}}<span style="color: white; background: #800;">&nbsp;{{/requireInvoice}}
-            <b>Invoice Required?</b>: 
+            <b>Invoice Required?</b>:
                 {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}
             {{#requireInvoice}}&nbsp;</span>{{/requireInvoice}}<br>
-            <b>Class Pass ID</b>: 
+            <b>Class Pass ID</b>:
                 {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
 
             <b>Teacher Notes:</b>
                 {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}&nbsp;<span style="font-size: .8em">[<a href="#" class="editTeacherNotesLink">Edit</a>]</span><br>
             <i>Request submitted: {{timeStamp}}</i>
-            
+
             <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">User Feedback</div>
             {{#feedback}}
                 <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
                     {{feedback}}
                     <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
                         Submitted {{timeStamp}}
-                    </div>                    
+                    </div>
                 </div>
             {{/feedback}}
             {{^feedback}}
@@ -99,7 +100,7 @@
                     No feedback submitted yet.
                 </div>
             {{/feedback}}
-            
+
             <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Internal Agent Notes</div>
             {{#internalNotes}}
                 <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
@@ -107,7 +108,7 @@
                     {{note}}
                     <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
                         Submitted by {{userName}} on {{timeStamp}}
-                    </div>                    
+                    </div>
                 </div>
             {{/internalNotes}}
             {{^internalNotes}}
@@ -123,7 +124,7 @@
                     {{note}}
                     <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
                         Submitted by {{userName}} on {{timeStamp}}
-                    </div>                    
+                    </div>
                 </div>
             {{/operationalNotes}}
             {{^operationalNotes}}
@@ -169,20 +170,20 @@
                 <button class="cancelRequestButton">Cancel Request</button>
                 <button class="setClasspassButton">Set Class Pass ID</button>
                 <button class="addNoteButton">Add Note</button>
-            </div>            
+            </div>
             <div style="text-align:center; margin-top: 6px;">
-                <a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> | 
-                <a href="{{dsUrl}}/fieldtrip/receipt?requestId={{id}}" target="blank_">Receipt Link</a> | 
-                <a href="#" class="printablePlanLink">Printable Trip Plan</a> | 
+                <a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> |
+                <a href="{{dsUrl}}/fieldtrip/receipt?requestId={{id}}" target="blank_">Receipt Link</a> |
+                <a href="#" class="printablePlanLink">Printable Trip Plan</a> |
                 <a href="{{dsUrl}}/fieldtrip/opsReport?month={{travelMonth}}&day={{travelDay}}&year={{travelYear}}" target="blank_">Daily Report</a>
-            </div>            
+            </div>
         </div>
     </div>
 </script>
 
 
 <script id="otp-fieldtrip-geocoder" type="text/html">
-    <div class="notDraggable" style="position: absolute; top: 35px; left: 10px; bottom: 10px; right: 10px;">       
+    <div class="notDraggable" style="position: absolute; top: 35px; left: 10px; bottom: 10px; right: 10px;">
         <div class="otp-fieldTrip-geocoder-endpointContainer" style="left:0px;">
             <div class="otp-fieldTrip-geocoder-endpointBox" style="margin-right:5px;">
                 <h6>Origin</h6>
@@ -216,10 +217,10 @@
                 <div class="otp-fieldTrip-geocoder-listContainer">
                     <select size=10 class="destinationSelect borderBox" style="width: 100%; height: 100%; background: white;" />
                 </div>
-            
+
             </div>
         </div>
-        
+
         <div class="otp-fieldTrip-geocoder-buttonRow">
             {{#showGeocoders}}
                 Geocoder:
@@ -231,9 +232,9 @@
             {{/showGeocoders}}
             <button class="useLocationsButton">Use Selected Locations</button>
             <button class="closeButton">Close</button>
-            
+
         </div>
-        
+
     </div>
 </script>
 
@@ -243,7 +244,7 @@
             <div style="font-size: 30px; font-weight: bold; border-bottom: 3px solid gray;">
                 Field Trip Plan: {{schoolName}} Trip to {{endLocation}}
             </div>
-            
+
             <div style="margin-top: 1em;">
                 <b>Teacher</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
                 <b>Teacher Address</b>: {{address}}, {{city}} {{state}} {{zip}}<br>
@@ -251,15 +252,15 @@
                 <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
                 <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
                 <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
-                    {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) / 
+                    {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
                     <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
                 {{#classpassId}}
                     <b>Class Pass ID</b>: {{classpassId}}<br>
                 {{/classpassId}}
 
-                <i>Request submitted: {{timeStamp}}</i>            
+                <i>Request submitted: {{timeStamp}}</i>
             </div>
-            
+
             <div class="otp-fieldtrip-printablePlan-tripContainer">
                 <div class="otp-fieldtrip-printablePlan-tripHeader">
                     Outbound Trip (to Destination)
@@ -400,6 +401,30 @@
         <div id="{{widgetId}}-resultsTab">
             <div class="resultsArea otp-fieldtrip-searchWidget-tabArea">
             </div>
+        </div>
+    </div>
+</script>
+
+<script id="otp-fieldtrip-groupSizeDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            <div style="margin-top: 6px;">
+                Number of Students:&nbsp;
+                <input class='numStudents' style='display: inline; width: 50px;' type="text" value="{{numStudents}}" />
+            </div>
+            <div style="margin-top: 6px;">
+                Student Age Range:&nbsp;
+                <input class='minimumAge' style='display: inline; width: 50px;' type="text" value="{{minimumAge}}" /> to
+                <input class='maximumAge' style='display: inline; width: 50px;' type="text" value="{{maximumAge}}" />
+            </div>
+            <div style="margin-top: 6px;">
+                Number of Chaperones:&nbsp;
+                <input class='numChaperones' style='display: inline; width: 50px;' type="text" value="{{numChaperones}}" />
+            </div>
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
         </div>
     </div>
 </script>
