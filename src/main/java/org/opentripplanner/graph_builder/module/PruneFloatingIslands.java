@@ -38,7 +38,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      * this field indicate the maximum size for island without stops
      * island under this size will be pruned.
      */
-    private int islandWithoutStopsMaxSize = 40;
+    private int islandWithoutStopsMaxSize = 5;
 
     /**
      * this field indicate the maximum size for island with stops
