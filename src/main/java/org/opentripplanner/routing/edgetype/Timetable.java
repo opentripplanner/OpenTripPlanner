@@ -560,6 +560,9 @@ public class Timetable implements Serializable {
             if (estimatedCall.getOrder() != null) {
                 // StopIndex is set in ET-data - first stop has order=1
                 stopPointIndex = estimatedCall.getOrder().intValue()-1;
+            } else if (estimatedCall.getVisitNumber() != null) {
+                // StopIndex is set in ET-data - first stop has order=1
+                stopPointIndex = estimatedCall.getVisitNumber().intValue()-1;
             } else {
                 // Find first stop with same reference
                 int stopsCounter = 0;
@@ -577,7 +580,7 @@ public class Timetable implements Serializable {
             }
             visitedStops.add(stopPointIndex);
 
-            if (stopPointIndex >= 0) {
+            if (stopPointIndex >= 0 && stopPointIndex < newTimes.getNumStops()) {
 
                 // Estimated Arrival
                 if (stopPointIndex == 0  && estimatedCall.getExpectedDepartureTime() != null){
