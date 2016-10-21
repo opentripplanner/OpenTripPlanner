@@ -454,6 +454,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.tripForId
                     .get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+            	.name("headsign")
+            	.type(Scalars.GraphQLString)
+            	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+            	.build())
             .build();
 
         tripType = GraphQLObjectType.newObject()
