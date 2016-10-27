@@ -361,6 +361,15 @@
             <name>bintray</name>
             <url>http://dl.bintray.com/andimarek/graphql-java</url>
         </repository>
+        <!-- Needed  for graphql-java fork-->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-macroz-graphql-java</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/macroz/graphql-java</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -690,7 +699,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>2016-07-27T16-49-23</version>
+            <version>execution-limits</version>
         </dependency>
 
         <!-- Support for OTP scripting -->
