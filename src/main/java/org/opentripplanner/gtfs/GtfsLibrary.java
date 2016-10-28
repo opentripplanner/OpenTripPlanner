@@ -124,7 +124,7 @@ public class GtfsLibrary {
         }else if (routeType >= 1400 && routeType < 1500){ //Funicalar Service
             return TraverseMode.FUNICULAR;
         }else if (routeType >= 1500 && routeType < 1600){ //Taxi Service
-            throw new IllegalArgumentException("Taxi service not supported" + routeType);
+            return TraverseMode.TAXI;
         }else if (routeType >= 1600 && routeType < 1700){ //Self drive
             return TraverseMode.CAR;
         }
