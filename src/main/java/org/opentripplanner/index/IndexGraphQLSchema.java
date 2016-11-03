@@ -154,7 +154,7 @@ public class IndexGraphQLSchema {
         .build();
 
     public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
-        .name("OptimizeTtpe")
+        .name("OptimizeType")
         .value("QUICK", OptimizeType.QUICK, "QUICK")
         .value("SAFE", OptimizeType.SAFE, "SAFE")
         .value("FLAT", OptimizeType.FLAT, "FLAT")
