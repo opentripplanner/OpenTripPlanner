@@ -245,7 +245,10 @@ public class GraphBuilder implements Runnable {
             osmModule.staticBikeParkAndRide = builderParams.staticBikeParkAndRide;
             osmModule.staticParkAndRide = builderParams.staticParkAndRide;
             graphBuilder.addModule(osmModule);
-            graphBuilder.addModule(new PruneFloatingIslands());
+            PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
+            pruneFloatingIslands.setislandWithoutStopsMaxSize(builderParams.islandWithoutStopsMaxSize);
+            pruneFloatingIslands.setIslandWithStopsMaxSize(builderParams.islandWithStopsMaxSize);
+            graphBuilder.addModule(pruneFloatingIslands);
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();

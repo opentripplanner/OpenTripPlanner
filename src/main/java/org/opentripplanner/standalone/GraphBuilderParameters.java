@@ -116,6 +116,18 @@ public class GraphBuilderParameters {
      * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
      */
     public int maxInterlineDistance = 200;
+    
+    /**
+     * this field indicate the maximum size for island without stops
+     * island under this size will be pruned.
+     */
+    public final int islandWithoutStopsMaxSize;
+    
+    /**
+     * this field indicate the maximum size for island with stops
+     * island under this size will be pruned.
+     */
+    public final int islandWithStopsMaxSize;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -144,6 +156,8 @@ public class GraphBuilderParameters {
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
         maxHtmlAnnotationsPerFile = config.path("maxHtmlAnnotationsPerFile").asInt(1000);
         maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
+        islandWithoutStopsMaxSize = config.path("islandWithoutStopsMaxSize").asInt(40);
+        islandWithStopsMaxSize = config.path("islandWithStopsMaxSize").asInt(5);
     }
 
 }

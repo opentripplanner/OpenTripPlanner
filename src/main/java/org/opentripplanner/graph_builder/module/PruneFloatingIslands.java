@@ -38,13 +38,13 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      * this field indicate the maximum size for island without stops
      * island under this size will be pruned.
      */
-    private int islandWithoutStopsMaxSize = 40;
+    private int islandWithoutStopsMaxSize;
 
     /**
      * this field indicate the maximum size for island with stops
      * island under this size will be pruned.
      */
-    private int islandWithStopsMaxSize = 5;
+    private int islandWithStopsMaxSize;
 
     /**
      * The name for output file for this process. The file will store information about the islands 
@@ -86,6 +86,12 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     @Override
     public void checkInputs() {
         //no inputs
+    }
+    public void setislandWithoutStopsMaxSize(int islandWithoutStopsMaxSize) {
+    	this.islandWithoutStopsMaxSize = islandWithoutStopsMaxSize;
+    }
+    public void setIslandWithStopsMaxSize(int islandWithStopsMaxSize) {
+    	this.islandWithStopsMaxSize = islandWithStopsMaxSize;
     }
 
 }
