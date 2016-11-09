@@ -560,38 +560,25 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-        int psIdx = 0; // unique index for next parent stop
-        LOG.info("Clustering stops by geographic proximity and name...");
-        // Each stop without a cluster will greedily claim other stops without clusters.
-        for (Stop s0 : stopForId.values()) {
-            if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
-            String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
-            StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
-            // LOG.info("stop {}", s0normalizedName);
-            // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
-            Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
-            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
-                    SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
-            for (TransitStop ts1 : stopSpatialIndex.query(env)) {
-                Stop s1 = ts1.getStop();
-                double geoDistance = SphericalDistanceLibrary.fastDistance(
-                        s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
-                if (geoDistance < CLUSTER_RADIUS) {
-                    String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
-                    // LOG.info("   --> {}", s1normalizedName);
-                    // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
-                    if (s1normalizedName.equals(s0normalizedName)) {
-                        // Create a bidirectional relationship between the stop and its cluster
-                        cluster.children.add(s1);
-                        stopClusterForStop.put(s1, cluster);
-                    }
-                }
-            }
-            cluster.computeCenter();
-            stopClusterForId.put(cluster.id, cluster);
-        }
+    	LOG.info("Clustering stops by parent station...");
+    	Map<String, StopCluster> parentStopsMap = new HashMap();
+    	for (Stop s0 : stopForId.values()) {
+    		String ps = s0.getParentStation();
+    		parentStopsMap.put(ps, new StopCluster(ps, s0.getName()));
+    		}
+    	for (Stop s0 : stopForId.values()) {
+    		String ps = s0.getParentStation();
+    		if(!parentStopsMap.containsKey(ps)) continue;
+    		StopCluster cluster = parentStopsMap.get(ps);
+    		cluster.children.add(s0);
+    		stopClusterForStop.put(s0, cluster);
+    	}
+    	for (Map.Entry<String, StopCluster> cluster : parentStopsMap.entrySet()) {
+    		cluster.getValue().computeCenter();
+    		stopClusterForId.put(cluster.getKey(), cluster.getValue());
+    	}
     }
-
+    
     public Response getGraphQLResponse(String query, Map<String, Object> variables) {
         ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
