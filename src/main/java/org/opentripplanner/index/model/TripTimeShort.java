@@ -17,13 +17,14 @@ public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
     public AgencyAndId stopId;
+    public int stopIndex;
+    public int stopCount;
     public int scheduledArrival = UNDEFINED ;
     public int scheduledDeparture = UNDEFINED ;
     public int realtimeArrival = UNDEFINED ;
     public int realtimeDeparture = UNDEFINED ;
     public int arrivalDelay = UNDEFINED ;
     public int departureDelay = UNDEFINED ;
-    public int stopIndex = UNDEFINED ;
     public boolean timepoint = false;
     public boolean realtime = false;
     public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
@@ -38,6 +39,7 @@ public class TripTimeShort {
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId = stop.getId();
         stopIndex          = i;
+        stopCount          = tt.getNumStops();
         scheduledArrival   = tt.getScheduledArrivalTime(i);
         realtimeArrival    = tt.getArrivalTime(i);
         arrivalDelay       = tt.getArrivalDelay(i);
