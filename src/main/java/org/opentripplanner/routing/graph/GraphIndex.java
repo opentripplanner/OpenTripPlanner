@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -177,9 +178,11 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-        ));
+        graphQL = new GraphQL(
+                new IndexGraphQLSchema(this).indexSchema,
+                new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
+                        new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+                )));
         LOG.info("Done indexing graph.");
     }
 
@@ -302,15 +305,15 @@ public class GraphIndex {
 
     /* TODO: an almost similar function exists in ProfileRouter, combine these.
     *  Should these live in a separate class? */
-    public List<StopAndDistance> findClosestStopsByWalking(float lat, float lon, int radius) {
+    public List<StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         // TODO make a function that builds normal routing requests from profile requests
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.from = new GenericLocation(lat, lon);
         // FIXME requires destination to be set, not necessary for analyst
         rr.to = new GenericLocation(lat, lon);
-        rr.setRoutingContext(graph);
         rr.batch = true;
+        rr.setRoutingContext(graph);
         rr.walkSpeed = 1;
         rr.dominanceFunction = new DominanceFunction.LeastWalk();
         // RR dateTime defaults to currentTime.
@@ -592,15 +595,15 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
-        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+    public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
+        ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
-        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+        if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
         }
         return res.entity(content).build();
