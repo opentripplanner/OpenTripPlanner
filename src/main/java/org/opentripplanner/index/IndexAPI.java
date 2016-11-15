@@ -15,6 +15,7 @@ package org.opentripplanner.index;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -65,6 +66,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,6 +95,7 @@ public class IndexAPI {
 
     private final GraphIndex index;
     private final StreetVertexIndexService streetIndex;
+    private final ObjectMapper deserializer = new ObjectMapper();
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         router = otpServer.getRouter(routerId);
@@ -590,16 +593,22 @@ public class IndexAPI {
         if (query.get("variables") instanceof Map) {
             variables = (Map) query.get("variables");
         } else {
-            variables = new HashMap<>();
+            try {
+                variables = deserializer.readValue((String) query.get("variables"), Map.class);
+            } catch (IOException e) {
+                LOG.error("Variables must be a valid json object");
+                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+            }
         }
-        return index.getGraphQLResponse((String) query.get("query"), router, variables, timeout, maxResolves);
+        String operationName = (String) query.getOrDefault("operationName", null);
+        return index.getGraphQLResponse((String) query.get("query"), router, variables, operationName, timeout, maxResolves);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
     public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        return index.getGraphQLResponse(query, router, new HashMap<>(), timeout, maxResolves);
+        return index.getGraphQLResponse(query, router, new HashMap<>(), null, timeout, maxResolves);
     }
 
 //    @GET
