@@ -113,8 +113,8 @@ public class GraphIndexTest extends GtfsTest {
             graph.index.indexSchema, new ExecutorServiceExecutionStrategy(graph.index.threadPool)
         ).execute(query);
         assertTrue(result.getErrors().isEmpty());
-        assertEquals("Fake Agency", ((Map) ((Map) result.getData()).get("agency")).get("name"));
-
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        assertEquals("Fake Agency", ((Map) data.get("agency")).get("name"));
     }
 
     public void testGraphQLNested() {
@@ -133,7 +133,8 @@ public class GraphIndexTest extends GtfsTest {
             graph.index.indexSchema, new ExecutorServiceExecutionStrategy(graph.index.threadPool)
         ).execute(query);
         assertTrue(result.getErrors().isEmpty());
-        assertEquals(18, ((List) ((Map) ((Map) ((Map) result.getData()).get("viewer")).get("agency")).get("routes")).size());
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        assertEquals(18, ((List) ((Map) ((Map) data.get("viewer")).get("agency")).get("routes")).size());
 
     }
 

@@ -26,6 +26,18 @@ import java.util.stream.Stream;
 import javax.ws.rs.core.Response;
 
 import graphql.schema.GraphQLSchema;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import graphql.ExecutionResult;
+import graphql.GraphQL;
+import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -81,16 +93,6 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -945,13 +947,13 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, int timeout, long maxResolves) {
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
         GraphQL graphQL = new GraphQL(
             indexSchema,
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         );
 
-        ExecutionResult executionResult = graphQL.execute(query, null, router, variables);
+        ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
@@ -959,7 +961,7 @@ public class GraphIndex {
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
-        if (executionResult.getData() != null ) {
+        if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
         }
         return res.entity(content).build();
