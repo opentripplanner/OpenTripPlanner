@@ -56,6 +56,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -1379,11 +1380,14 @@ public class IndexGraphQLSchema {
                         final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
                             index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
                         TimetableSnapshotSource timetableSnapshotSource = index.graph.timetableSnapshotSource;
-                        Timetable timetable;
+                        Timetable timetable = null;
                         if (timetableSnapshotSource != null) {
-                            timetable = timetableSnapshotSource.getTimetableSnapshot().resolve(
-                                index.patternForTrip.get(trip), serviceDate);
-                        } else {
+                            TimetableSnapshot timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+                            if (timetableSnapshot != null) {
+                                timetable = timetableSnapshot.resolve(index.patternForTrip.get(trip), serviceDate);
+                            }
+                        }
+                        if (timetable == null) {
                             timetable = index.patternForTrip.get(trip).scheduledTimetable;
                         }
                         return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
