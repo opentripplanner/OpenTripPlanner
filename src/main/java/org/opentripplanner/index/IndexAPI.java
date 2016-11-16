@@ -596,7 +596,7 @@ public class IndexAPI {
         Map<String, Object> variables = null;
         if (query.get("variables") instanceof Map) {
             variables = (Map) query.get("variables");
-        } else if (query.get("variables") != null) {
+        } else if (query.get("variables") instanceof String && ((String) query.get("variables")).length() > 0) {
             try {
                 variables = deserializer.readValue((String) query.get("variables"), Map.class);
             } catch (IOException e) {
@@ -633,7 +633,7 @@ public class IndexAPI {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
                 variables = (Map) query.get("variables");
-            } else if (query.get("variables") != null){
+            } else if (query.get("variables") instanceof String && ((String) query.get("variables")).length() > 0) {
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
