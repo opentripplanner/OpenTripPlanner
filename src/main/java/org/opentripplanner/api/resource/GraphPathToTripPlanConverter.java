@@ -82,7 +82,7 @@ public abstract class GraphPathToTripPlanConverter {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, requestedLocale);
+            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
             plan.addItinerary(itinerary);
         }
@@ -129,7 +129,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, Locale requestedLocale) {
+    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -150,7 +150,7 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, requestedLocale));
+            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
@@ -287,7 +287,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, Locale requestedLocale) {
+    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -320,7 +320,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states, requestedLocale);
+        addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
         if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
@@ -517,7 +517,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, Locale requestedLocale) {
+    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering, Locale requestedLocale) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -534,7 +534,7 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
-                if (alertPatch.displayDuring(state)) {
+                if (disableAlertFiltering || alertPatch.displayDuring(state)) {
                     if (alertPatch.hasTrip()) {
                         // If the alert patch contains a trip and that trip match this leg only add the alert for
                         // this leg.
