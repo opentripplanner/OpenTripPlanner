@@ -612,7 +612,7 @@ public class IndexAPI {
     @Path("/graphql")
     @Consumes("application/graphql")
     public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        return index.getGraphQLResponse(query, router, new HashMap<>(), null, timeout, maxResolves);
+        return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
     }
 
 //    @GET

@@ -961,6 +961,10 @@ public class GraphIndex {
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         );
 
+        if (variables == null) {
+            variables = new HashMap<>();
+        }
+
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
