@@ -593,10 +593,10 @@ public class IndexAPI {
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphQL (HashMap<String, Object> query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        Map<String, Object> variables;
+        Map<String, Object> variables = null;
         if (query.get("variables") instanceof Map) {
             variables = (Map) query.get("variables");
-        } else {
+        } else if (query.get("variables") != null) {
             try {
                 variables = deserializer.readValue((String) query.get("variables"), Map.class);
             } catch (IOException e) {
@@ -633,13 +633,15 @@ public class IndexAPI {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
                 variables = (Map) query.get("variables");
-            } else {
+            } else if (query.get("variables") != null){
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
                     LOG.error("Variables must be a valid json object");
                     return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
                 }
+            } else {
+                variables = null;
             }
             String operationName = (String) query.getOrDefault("operationName", null);
 
