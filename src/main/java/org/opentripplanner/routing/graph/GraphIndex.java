@@ -735,7 +735,7 @@ public class GraphIndex {
      *            Stop object to perform the search for
      * @param startTime
      *            Start time for the search. Seconds from UNIX epoch
-     * @param TripPattern
+     * @param pattern
      *            The selected pattern. If null an empty list is returned.
      * @param timeRange
      *            Searches forward for timeRange seconds from startTime
@@ -948,7 +948,7 @@ public class GraphIndex {
         HashMap<String, Object> content = getGraphQLExecutionResult(query, router, variables,
             operationName, timeout, maxResolves);
         if (content.get("errors") != null) {
-            // TODO: Put correct error code, eg. 400 for synax error
+            // TODO: Put correct error code, eg. 400 for syntax error
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
         }
         return res.entity(content).build();
