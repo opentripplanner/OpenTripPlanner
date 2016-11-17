@@ -164,6 +164,9 @@ public class LuceneIndex {
             for (String term : queryString.split(" ")) {
                 termQuery.add(new TermQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
                 termQuery.add(new PrefixQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
+                // This makes it possible to search for a stop code
+                termQuery.add(new TermQuery(new Term("code", term)),
+                    BooleanClause.Occur.SHOULD);
             }
         } else {
             List<String> list = new ArrayList<String>();
