@@ -37,7 +37,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -94,9 +93,6 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import graphql.ExecutionResult;
-import graphql.GraphQL;
-
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
  * serialized with the graph. Caching these maps is essentially an optimization, but a big one.
@@ -151,7 +147,7 @@ public class GraphIndex {
 
     final GraphQLSchema indexSchema;
 
-    final ExecutorService threadPool;
+    public final ExecutorService threadPool;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -739,7 +735,7 @@ public class GraphIndex {
      *            Stop object to perform the search for
      * @param startTime
      *            Start time for the search. Seconds from UNIX epoch
-     * @param TripPattern
+     * @param pattern
      *            The selected pattern. If null an empty list is returned.
      * @param timeRange
      *            Searches forward for timeRange seconds from startTime
@@ -948,23 +944,36 @@ public class GraphIndex {
     }
 
     public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
+        Response.ResponseBuilder res = Response.status(Response.Status.OK);
+        HashMap<String, Object> content = getGraphQLExecutionResult(query, router, variables,
+            operationName, timeout, maxResolves);
+        if (content.get("errors") != null) {
+            // TODO: Put correct error code, eg. 400 for syntax error
+            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return res.entity(content).build();
+    }
+
+    public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
+        Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
         GraphQL graphQL = new GraphQL(
             indexSchema,
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         );
 
+        if (variables == null) {
+            variables = new HashMap<>();
+        }
+
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
-        Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
-            // TODO: Put correct error code, eg. 400 for synax error
-            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
         if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
         }
-        return res.entity(content).build();
+        return content;
     }
 
     private Stream<AlertPatch> getAlertPatchStream() {
