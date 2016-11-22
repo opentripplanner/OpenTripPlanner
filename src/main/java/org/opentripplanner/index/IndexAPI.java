@@ -585,20 +585,24 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> query) {
+    public Response getGraphQL (HashMap<String, Object> queryParameters) {
+        String query = (String) queryParameters.get("query");
+        Object queryVariables = queryParameters.getOrDefault("variables", null);
+        String operationName = (String) queryParameters.getOrDefault("operationName", null);
         Map<String, Object> variables;
-        if (query.get("variables") instanceof Map) {
-            variables = (Map) query.get("variables");
-        } else {
+        if (queryVariables instanceof Map) {
+            variables = (Map) queryVariables;
+        } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
             try {
-                variables = deserializer.readValue((String) query.get("variables"), Map.class);
+                variables = deserializer.readValue((String) queryVariables, Map.class);
             } catch (IOException e) {
                 LOG.error("Variables must be a valid json object");
                 return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
             }
+        } else {
+            variables = new HashMap<>();
         }
-        String operationName = (String) query.getOrDefault("operationName", null);
-        return index.getGraphQLResponse((String) query.get("query"), variables, operationName);
+        return index.getGraphQLResponse(query, variables, operationName);
     }
 
     @POST
