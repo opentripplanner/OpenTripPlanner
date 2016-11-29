@@ -726,6 +726,20 @@ public abstract class GraphPathToTripPlanConverter {
 
         State onBikeRentalState = null, offBikeRentalState = null;
 
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
+        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
+            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
+            List<Edge> transferEdges = transferEdge.getEdges();
+            State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
+            ArrayList<State> transferStates = new ArrayList<>();
+            transferStates.add(s);
+            for (Edge e : transferEdges) {
+                s = e.traverse(s);
+                transferStates.add(s);
+            }
+            states = transferStates.toArray(new State[0]);
+        }
+
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
             State forwardState = states[i + 1];
