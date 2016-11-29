@@ -808,6 +808,10 @@ public class StreetEdge extends Edge implements Cloneable {
             e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
             e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
 
+            // copy the wayId to the split edges, so we can trace them back to their parent if need be
+            e1.wayId = this.wayId;
+            e2.wayId = this.wayId;
+
             // figure the lengths, ensuring that they sum to the length of this edge
             e1.calculateLengthFromGeometry();
             e2.calculateLengthFromGeometry();
@@ -827,6 +831,16 @@ public class StreetEdge extends Edge implements Cloneable {
                 double frac = (double) e2.length_mm / (e1.length_mm + e2.length_mm);
                 e2.length_mm = (int) (length_mm * frac);
                 e1.length_mm = length_mm - e2.length_mm;
+            }
+
+            // TODO: better handle this temporary fix to handle bad edge distance calculation
+            if (e1.length_mm < 0) {
+                LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
+                e1.length_mm = 1;
+            }
+            if (e2.length_mm < 0) {
+                LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
+                e2.length_mm = 1;
             }
 
             if (e1.length_mm < 0 || e2.length_mm < 0) {
