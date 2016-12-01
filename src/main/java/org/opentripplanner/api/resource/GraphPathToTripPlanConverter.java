@@ -730,14 +730,16 @@ public abstract class GraphPathToTripPlanConverter {
         if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
             SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
             List<Edge> transferEdges = transferEdge.getEdges();
-            State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
-            ArrayList<State> transferStates = new ArrayList<>();
-            transferStates.add(s);
-            for (Edge e : transferEdges) {
-                s = e.traverse(s);
+            if (transferEdges != null) {
+                State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
+                ArrayList<State> transferStates = new ArrayList<>();
                 transferStates.add(s);
+                for (Edge e : transferEdges) {
+                    s = e.traverse(s);
+                    transferStates.add(s);
+                }
+                states = transferStates.toArray(new State[transferStates.size()]);
             }
-            states = transferStates.toArray(new State[0]);
         }
 
         for (int i = 0; i < states.length - 1; i++) {
