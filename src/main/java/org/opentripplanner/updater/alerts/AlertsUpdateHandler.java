@@ -99,7 +99,7 @@ public class AlertsUpdateHandler {
         ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         if(situation.getValidityPeriods().size() > 0) {
             long bestStartTime = Long.MAX_VALUE;
-            for (PtSituationElement.ValidityPeriod activePeriod : situation.getValidityPeriods()) {
+            for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
 
                 final long realStart = activePeriod.getStartTime() != null ? activePeriod.getStartTime().toInstant().toEpochMilli() : 0;
                 final long start = activePeriod.getStartTime() != null? realStart - earlyStart : 0;
@@ -180,20 +180,18 @@ public class AlertsUpdateHandler {
                 if (affectedLines != null && !isListNullOrEmpty(affectedLines)) {
                     for (AffectedLineStructure line : affectedLines) {
 
-                        List<LineRef> lineReves = line.getLineReves();
-                        for (LineRef lineRef : lineReves) {
+                        LineRef lineRef = line.getLineRef();
 
-                            if (lineRef == null || lineRef.getValue() == null) {
-                                continue;
-                            }
-
-                            AgencyAndId lineId = siriFuzzyTripMatcher.getRoute(lineRef.getValue());
-
-                            AlertPatch alertPatch = new AlertPatch();
-                            alertPatch.setRoute(lineId);
-                            alertPatch.setId(situationNumber);
-                            patches.add(alertPatch);
+                        if (lineRef == null || lineRef.getValue() == null) {
+                            continue;
                         }
+
+                        AgencyAndId lineId = siriFuzzyTripMatcher.getRoute(lineRef.getValue());
+
+                        AlertPatch alertPatch = new AlertPatch();
+                        alertPatch.setRoute(lineId);
+                        alertPatch.setId(situationNumber);
+                        patches.add(alertPatch);
                     }
                 }
                 NetworkRefStructure networkRef = affectedNetwork.getNetworkRef();
