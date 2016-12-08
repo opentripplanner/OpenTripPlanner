@@ -567,6 +567,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.agencyId = agency.getId();
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
+            leg.agencyBrandingUrl = agency.getBrandingUrl();
             leg.headsign = states[1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
@@ -575,6 +576,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.routeShortName = route.getShortName();
             leg.routeTextColor = route.getTextColor();
             leg.routeType = route.getType();
+            leg.routeBrandingUrl = route.getBrandingUrl();
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
@@ -725,6 +727,22 @@ public abstract class GraphPathToTripPlanConverter {
         String roundaboutPreviousStreet = null;
 
         State onBikeRentalState = null, offBikeRentalState = null;
+
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
+        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
+            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
+            List<Edge> transferEdges = transferEdge.getEdges();
+            if (transferEdges != null) {
+                State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
+                ArrayList<State> transferStates = new ArrayList<>();
+                transferStates.add(s);
+                for (Edge e : transferEdges) {
+                    s = e.traverse(s);
+                    transferStates.add(s);
+                }
+                states = transferStates.toArray(new State[transferStates.size()]);
+            }
+        }
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
