@@ -21,6 +21,7 @@ import com.beust.jcommander.internal.Lists;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
@@ -28,6 +29,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -537,7 +539,8 @@ public class Timetable implements Serializable {
             LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
         }
 
-        TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
+        TripTimes oldTimes = new TripTimes(getTripTimes(tripIndex));
+        oldTimes.cancel();
 
         EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
 
@@ -549,7 +552,50 @@ public class Timetable implements Serializable {
 
         List<EstimatedCall> estimatedCalls = journeyCalls.getEstimatedCalls();
 
+        //Get all scheduled stops
         List<Stop> stops = pattern.getStops();
+
+        Map<String, Stop> idStopMap = new HashMap<>();
+        for (Stop stop : stops) {
+            idStopMap.put(stop.getId().getId(), stop);
+        }
+
+        //Setting scheduled arrivals/departures
+        List<StopTime> stopTimes = new ArrayList<>();
+        for (EstimatedCall estimatedCall : estimatedCalls) {
+
+            StopTime stopTime = new StopTime();
+            if (estimatedCall.getAimedArrivalTime() != null) {
+                stopTime.setArrivalTime(calculateSecondsSinceMidnight(estimatedCall.getAimedArrivalTime()));
+            } else if (estimatedCall.getExpectedArrivalTime() != null) {
+                stopTime.setArrivalTime(calculateSecondsSinceMidnight(estimatedCall.getExpectedArrivalTime()));
+            }
+            if (estimatedCall.getAimedDepartureTime() != null) {
+                stopTime.setDepartureTime(calculateSecondsSinceMidnight(estimatedCall.getAimedDepartureTime()));
+            } else if (estimatedCall.getExpectedDepartureTime() != null) {
+                stopTime.setDepartureTime(calculateSecondsSinceMidnight(estimatedCall.getExpectedDepartureTime()));
+            }
+            int stopNumber = -1;
+            if (estimatedCall.getVisitNumber() != null) {
+                stopNumber = estimatedCall.getVisitNumber().intValue();
+            } else if (estimatedCall.getOrder() != null) {
+                stopNumber = estimatedCall.getOrder().intValue();
+            }
+
+            if (stopNumber > 0) {
+                stopTime.setStopSequence(stopNumber);
+            }
+            Stop stop = idStopMap.get(estimatedCall.getStopPointRef().getValue());
+            if (stop != null) {
+                stopTime.setStop(stop);
+                stopTimes.add(stopTime);
+            } else {
+                LOG.info("Ignoring ET-update on unknown stop {} on line {}.", estimatedCall.getStopPointRef().getValue(), journey.getLineRef().getValue());
+            }
+        }
+
+        //Creating new TripTimes based on updated arrivals/departures
+        TripTimes newTimes = new TripTimes(oldTimes.trip, stopTimes, new Deduplicator());
 
         List<Integer> visitedStops = new ArrayList<>();
         for (EstimatedCall estimatedCall : estimatedCalls) {
@@ -648,7 +694,7 @@ public class Timetable implements Serializable {
 
         int tripIndex = getTripIndex(tripId);
         if (tripIndex == -1) {
-            LOG.info("tripId {} not found in pattern.", tripId);
+            LOG.trace("tripId {} not found in pattern.", tripId);
             return null;
         } else {
             LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
