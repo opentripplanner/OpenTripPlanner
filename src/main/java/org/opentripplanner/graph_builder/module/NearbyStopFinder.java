@@ -216,8 +216,8 @@ public class NearbyStopFinder {
                     }
                 }
                 distance += edge.getDistance();
-                edges.add(edge);
             }
+            edges.add(edge);
         }
         if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
             ArrayList<Coordinate> coordinateList = new ArrayList<Coordinate>(2);
