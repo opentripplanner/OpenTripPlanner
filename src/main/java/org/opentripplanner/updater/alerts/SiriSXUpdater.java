@@ -19,28 +19,17 @@ import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.updater.*;
 import org.opentripplanner.util.HttpUtils;
+import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri20.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-/**
- *
- * Usage example ('myalert' name is an example) in file 'Graph.properties':
- *
- * <pre>
- * myalert.type = real-time-alerts
- * myalert.frequencySec = 60
- * myalert.url = http://host.tld/path
- * myalert.earlyStartSec = 3600
- * myalert.feedId = TA
- * </pre>
- */
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
 
@@ -60,6 +49,10 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private AlertsUpdateHandler updateHandler = null;
 
+    private String requestorRef;
+
+    private int timeout;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -75,15 +68,20 @@ public class SiriSXUpdater extends PollingGraphUpdater {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
 
-        String uniquenessParameter = "?";
-        if (url.contains("?")) {
-            uniquenessParameter = "&";
+        this.requestorRef = config.path("requestorRef").asText();
+        if (requestorRef == null || requestorRef.isEmpty()) {
+            requestorRef = UUID.randomUUID().toString();
         }
-        uniquenessParameter += "requestorId="+ UUID.randomUUID().toString();
 
         this.url = url;// + uniquenessParameter;
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.feedId = config.path("feedId").asText();
+
+
+        int timeoutSec = config.path("timeoutSec").asInt();
+        if (timeoutSec > 0) {
+            this.timeout = 1000*timeoutSec;
+        }
 
         this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
 
@@ -111,9 +109,13 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() {
+        long t1 = System.currentTimeMillis();
         try {
-            long t1 = System.currentTimeMillis();
-            Siri siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(HttpUtils.getData(url));
+
+            InputStream is = HttpUtils.postData(url, SiriXml.toXml(createSXServiceRequest(requestorRef)), timeout);
+
+            Siri siri = (Siri)jaxbContext.createUnmarshaller().unmarshal(is);
+
             LOG.info("Fetching SX-data took {} ms", (System.currentTimeMillis()-t1));
             if (siri == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
@@ -139,10 +141,37 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
             lastTimestamp = responseTimestamp;
         } catch (Exception e) {
+            LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
             LOG.error("Error reading SIRI feed from " + url, e);
         }
     }
 
+
+    private Siri createSXServiceRequest(String requestorRefValue) {
+        Siri request = new Siri();
+        request.setVersion("2.0");
+
+        ServiceRequest serviceRequest = new ServiceRequest();
+        serviceRequest.setRequestTimestamp(ZonedDateTime.now());
+
+        RequestorRef requestorRef = new RequestorRef();
+        requestorRef.setValue(requestorRefValue);
+        serviceRequest.setRequestorRef(requestorRef);
+
+        SituationExchangeRequestStructure sxRequest = new SituationExchangeRequestStructure();
+        sxRequest.setRequestTimestamp(ZonedDateTime.now());
+        sxRequest.setVersion("2.0");
+
+        MessageQualifierStructure messageIdentifier = new MessageQualifierStructure();
+        messageIdentifier.setValue(UUID.randomUUID().toString());
+
+        sxRequest.setMessageIdentifier(messageIdentifier);
+        serviceRequest.getSituationExchangeRequests().add(sxRequest);
+
+        request.setServiceRequest(serviceRequest);
+
+        return request;
+    }
     @Override
     public void teardown() {
     }

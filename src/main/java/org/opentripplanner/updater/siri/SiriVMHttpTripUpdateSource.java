@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.HttpUtils;
+import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.*;
@@ -47,20 +48,27 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
+    private String requestorRef;
+    private int timeout;
+
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
+        this.url = url;
 
-        String uniquenessParameter = "?";
-        if (url.contains("?")) {
-            uniquenessParameter = "&";
+        this.requestorRef = config.path("requestorRef").asText();
+        if (requestorRef == null || requestorRef.isEmpty()) {
+            requestorRef = UUID.randomUUID().toString();
         }
-        uniquenessParameter += "requestorId="+ UUID.randomUUID().toString();
-        this.url = url + uniquenessParameter;
         this.feedId = config.path("feedId").asText();
+
+        int timeoutSec = config.path("timeoutSec").asInt();
+        if (timeoutSec > 0) {
+            this.timeout = 1000*timeoutSec;
+        }
 
         try {
             jaxbContext = JAXBContext.newInstance(Siri.class);
@@ -73,16 +81,15 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
 
     @Override
     public List getUpdates() {
-        Siri siri;
+        long t1 = System.currentTimeMillis();
         fullDataset = true;
         try {
-            long t1 = System.currentTimeMillis();
-            InputStream is = HttpUtils.getData(url);
+            InputStream is = HttpUtils.postData(url, SiriXml.toXml(createVMServiceRequest(requestorRef)), timeout);
             if (is != null) {
                 // Decode message
                 LOG.info("Fetching VM-data took {} ms", (System.currentTimeMillis()-t1));
                 t1 = System.currentTimeMillis();
-                siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(is);
+                Siri siri = (Siri) jaxbContext.createUnmarshaller().unmarshal(is);
                 LOG.info("Unmarshalling VM-data took {} ms", (System.currentTimeMillis()-t1));
 
                 if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
@@ -95,9 +102,37 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
 
             }
         } catch (Exception e) {
+            LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
             LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
         }
         return null;
+    }
+
+
+    private Siri createVMServiceRequest(String requestorRefValue) {
+        Siri request = new Siri();
+        request.setVersion("2.0");
+
+        ServiceRequest serviceRequest = new ServiceRequest();
+        serviceRequest.setRequestTimestamp(ZonedDateTime.now());
+
+        RequestorRef requestorRef = new RequestorRef();
+        requestorRef.setValue(requestorRefValue);
+        serviceRequest.setRequestorRef(requestorRef);
+
+        VehicleMonitoringRequestStructure vmRequest = new VehicleMonitoringRequestStructure();
+        vmRequest.setRequestTimestamp(ZonedDateTime.now());
+        vmRequest.setVersion("2.0");
+
+        MessageQualifierStructure messageIdentifier = new MessageQualifierStructure();
+        messageIdentifier.setValue(UUID.randomUUID().toString());
+
+        vmRequest.setMessageIdentifier(messageIdentifier);
+        serviceRequest.getVehicleMonitoringRequests().add(vmRequest);
+
+        request.setServiceRequest(serviceRequest);
+
+        return request;
     }
 
     @Override
