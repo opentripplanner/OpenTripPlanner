@@ -103,7 +103,7 @@ public class TestIntermediatePlaces {
     }
 
     @Test public void testThreeBusStopPlaces() {
-        GenericLocation fromLocation = new GenericLocation(39.9058, -83.1341);
+        GenericLocation fromLocation = new GenericLocation(39.9058, -83.1291);
         GenericLocation toLocation = new GenericLocation(39.9058, -82.8841);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.9058, -82.9841) };
 
