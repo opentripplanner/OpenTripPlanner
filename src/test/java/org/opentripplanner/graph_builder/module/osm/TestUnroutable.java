@@ -63,7 +63,7 @@ public class TestUnroutable extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
 
-        Vertex from = graph.getVertex("osm:node:2003617278");
+        Vertex from = graph.getVertex("osm:node:2003534141");
         Vertex to = graph.getVertex("osm:node:40446276");
         options.setRoutingContext(graph, from, to);
         options.setMode(TraverseMode.BICYCLE);
