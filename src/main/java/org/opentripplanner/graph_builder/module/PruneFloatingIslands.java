@@ -38,13 +38,13 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      * this field indicate the maximum size for island without stops
      * island under this size will be pruned.
      */
-    private int islandWithoutStopsMaxSize;
+    private int pruningThresholdIslandWithoutStops;
 
     /**
      * this field indicate the maximum size for island with stops
      * island under this size will be pruned.
      */
-    private int islandWithStopsMaxSize;
+    private int pruningThresholdIslandWithStops;
 
     /**
      * The name for output file for this process. The file will store information about the islands 
@@ -72,8 +72,8 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Pruning isolated islands in street network");
         
-        StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, 
-                islandWithStopsMaxSize, islandLogFile);
+        StreetUtils.pruneFloatingIslands(graph, pruningThresholdIslandWithoutStops, 
+        		pruningThresholdIslandWithStops, islandLogFile);
         if (transitToStreetNetwork == null) {
             LOG.debug("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
         } else {
@@ -87,11 +87,11 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     public void checkInputs() {
         //no inputs
     }
-    public void setislandWithoutStopsMaxSize(int islandWithoutStopsMaxSize) {
-    	this.islandWithoutStopsMaxSize = islandWithoutStopsMaxSize;
+    public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
+    	this.pruningThresholdIslandWithoutStops = pruningThresholdIslandWithoutStops;
     }
-    public void setIslandWithStopsMaxSize(int islandWithStopsMaxSize) {
-    	this.islandWithStopsMaxSize = islandWithStopsMaxSize;
+    public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
+    	this.pruningThresholdIslandWithStops = pruningThresholdIslandWithStops;
     }
 
 }

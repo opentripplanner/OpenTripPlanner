@@ -246,8 +246,8 @@ public class GraphBuilder implements Runnable {
             osmModule.staticParkAndRide = builderParams.staticParkAndRide;
             graphBuilder.addModule(osmModule);
             PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-            pruneFloatingIslands.setislandWithoutStopsMaxSize(builderParams.islandWithoutStopsMaxSize);
-            pruneFloatingIslands.setIslandWithStopsMaxSize(builderParams.islandWithStopsMaxSize);
+            pruneFloatingIslands.setPruningThresholdIslandWithoutStops(builderParams.pruningThresholdIslandWithoutStops);
+            pruneFloatingIslands.setPruningThresholdIslandWithStops(builderParams.pruningThresholdIslandWithStops);
             graphBuilder.addModule(pruneFloatingIslands);
         }
         if ( hasGTFS ) {
