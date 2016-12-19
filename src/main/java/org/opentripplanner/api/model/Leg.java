@@ -111,6 +111,10 @@ public class Leg {
 
     @XmlAttribute
     @JsonSerialize
+    public String agencyBrandingUrl;
+
+    @XmlAttribute
+    @JsonSerialize
     public int agencyTimeZoneOffset;
 
     /**
@@ -193,8 +197,15 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String serviceDate = null;
-    
-    /**
+
+     /**
+      * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String routeBrandingUrl = null;
+
+     /**
      * The Place where the leg originates.
      */
     public Place from = null;
