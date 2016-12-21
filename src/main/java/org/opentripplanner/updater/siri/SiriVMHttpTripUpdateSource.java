@@ -98,7 +98,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
                 }
                 lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
 
-                return siri.getServiceDelivery().getVehicleMonitoringDeliveries();
+                return rewriteIds(siri.getServiceDelivery().getVehicleMonitoringDeliveries());
 
             }
         } catch (Exception e) {
@@ -106,6 +106,51 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
             LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
         }
         return null;
+    }
+
+    private List rewriteIds(List<VehicleMonitoringDeliveryStructure> deliveries) {
+        for (VehicleMonitoringDeliveryStructure delivery : deliveries) {
+            for (VehicleActivityStructure activityStructure : delivery.getVehicleActivities()) {
+                VehicleActivityStructure.MonitoredVehicleJourney mvj = activityStructure.getMonitoredVehicleJourney();
+                if (mvj != null) {
+                    DestinationRef destRef = mvj.getDestinationRef();
+                    if (destRef != null && destRef.getValue().contains(":")) {
+                        String value = destRef.getValue();
+                        if (value.substring(value.indexOf(":")).length() > 2) {
+                            // 1234:56 -> 123456
+                            value = value.replaceAll(":", "");
+                        } else {
+                            // 1234:5  -> 123405
+                            value = value.replaceAll(":", "0");
+                        }
+                        destRef.setValue(value);
+                    }
+                    JourneyPlaceRefStructure originRef = mvj.getOriginRef();
+                    if (originRef != null && originRef.getValue().contains(":")) {
+                        String value = originRef.getValue();
+                        if (value.substring(value.indexOf(":")).length() > 2) {
+                            value = value.replaceAll(":", "");
+                        } else {
+                            value = value.replaceAll(":", "0");
+                        }
+                        originRef.setValue(value);
+                    }
+                    MonitoredCallStructure monitoredCall = mvj.getMonitoredCall();
+                    if (monitoredCall != null && monitoredCall.getStopPointRef() != null && monitoredCall.getStopPointRef().getValue().contains(":")) {
+                        String value = monitoredCall.getStopPointRef().getValue();
+                        if (value.substring(value.indexOf(":")).length() > 2) {
+                            value = value.replaceAll(":", "");
+                        } else {
+                            value = value.replaceAll(":", "0");
+                        }
+                        monitoredCall.getStopPointRef().setValue(value);
+                    }
+//                            mvj.getPreviousCalls();
+//                            mvj.getOnwardCalls();
+                }
+            }
+        }
+        return deliveries;
     }
 
 
