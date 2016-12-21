@@ -82,7 +82,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     @Override
     public List getUpdates() {
         long t1 = System.currentTimeMillis();
-        fullDataset = true;
+        fullDataset = false;
         try {
             InputStream is = HttpUtils.postData(url, SiriXml.toXml(createVMServiceRequest(requestorRef)), timeout);
             if (is != null) {
