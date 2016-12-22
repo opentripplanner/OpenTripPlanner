@@ -441,7 +441,8 @@ public class GraphIndex {
                 int sidx = 0;
                 for (Stop currStop : pattern.stopPattern.stops) {
                     if (currStop == stop) {
-                        for (TripTimes t : tt.tripTimes) {
+                    	if(pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
+                    	for (TripTimes t : tt.tripTimes) {
                             if (!sd.serviceRunning(t.serviceCode)) continue;
                             if (t.getDepartureTime(sidx) != -1 &&
                                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
