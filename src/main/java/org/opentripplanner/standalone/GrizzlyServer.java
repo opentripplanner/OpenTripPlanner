@@ -137,7 +137,8 @@ public class GrizzlyServer {
             LOG.info("Interrupted, shutting down.");
         }
 
-        // Clean up graceful shutdown hook.
+        // Clean up graceful shutdown hook before shutting down Grizzly.
         Runtime.getRuntime().removeShutdownHook(shutdownThread);
+        httpServer.shutdown();
     }
 }
