@@ -251,7 +251,7 @@ public class IndexAPI {
                                          @QueryParam("startTime") long startTime,
                                          @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
                                          @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
-    									 @QueryParam("omitNonPickups") boolean omitNonPickups) {
+                                         @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
