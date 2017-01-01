@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Calendar;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -78,9 +79,6 @@ public class GraphIndex {
 
     /** maximum distance to walk after leaving transit in Analyst */
     public static final int MAX_WALK_METERS = 3500;
-    
-    /** Should stop clusters be created by parent stations instead of by proximity?  */
-    public static final boolean CLUSTER_BY_PARENT_STATIONS = false;
 
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
@@ -565,8 +563,12 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-    	if (!CLUSTER_BY_PARENT_STATIONS) {
-	    int psIdx = 0; // unique index for next parent stop
+    	if (graph.clusterByParentStation) clusterByParentStation();
+    	else clusterByProximity();
+    }
+    
+    private void clusterByProximity() {	
+    	int psIdx = 0; // unique index for next parent stop
 	    LOG.info("Clustering stops by geographic proximity and name...");
 	    // Each stop without a cluster will greedily claim other stops without clusters.
 	    for (Stop s0 : stopForId.values()) {
@@ -596,28 +598,27 @@ public class GraphIndex {
 	        cluster.computeCenter();
 	        stopClusterForId.put(cluster.id, cluster);
 	    }
-    	}
-    	else {
-	        LOG.info("Clustering stops by parent station...");
-	    	Map<String, StopCluster> parentStopsMap = new HashMap();
-	    	for (Stop s0 : stopForId.values()) {
-	    		String ps = s0.getParentStation();
-	    		parentStopsMap.put(ps, new StopCluster(ps, s0.getName()));
-	    		}
-	    	for (Stop s0 : stopForId.values()) {
-	    		String ps = s0.getParentStation();
-	    		if(!parentStopsMap.containsKey(ps)) continue;
-	    		StopCluster cluster = parentStopsMap.get(ps);
-	    		cluster.children.add(s0);
-	    		stopClusterForStop.put(s0, cluster);
-	    	}
-	    	for (Map.Entry<String, StopCluster> cluster : parentStopsMap.entrySet()) {
-	    		cluster.getValue().computeCenter();
-	    		stopClusterForId.put(cluster.getKey(), cluster.getValue());
-	    	}
-    	}
     }
-
+    
+	private void clusterByParentStation() {
+		LOG.info("Clustering stops by parent station...");
+    	for (Stop s0 : stopForId.values()) {
+    		String ps = s0.getParentStation();
+    		stopClusterForId.put(ps, new StopCluster(ps, s0.getName()));
+    		}
+    	for (Stop s0 : stopForId.values()) {
+    		String ps = s0.getParentStation();
+    		if(!stopClusterForId.containsKey(ps)) continue;
+    		StopCluster cluster = stopClusterForId.get(ps);
+    		cluster.children.add(s0);
+    		stopClusterForStop.put(s0, cluster);
+    	}
+    	for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
+    		cluster.getValue().computeCenter();
+    		
+    	}
+	}
+    
     public Response getGraphQLResponse(String query, Map<String, Object> variables) {
         ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);

@@ -197,6 +197,9 @@ public class Graph implements Serializable {
 
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
+    
+    /** Whether stop clustering should be based on parent stations */
+    public boolean clusterByParentStation = false;
 
     public Graph(Graph basedOn) {
         this();
