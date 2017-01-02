@@ -25,13 +25,15 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response;
 
-import graphql.schema.GraphQLSchema;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import graphql.ExceptionWhileDataFetching;
+import graphql.schema.GraphQLSchema;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -968,7 +970,24 @@ public class GraphIndex {
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
-            content.put("errors", executionResult.getErrors());
+            content.put("errors",
+                executionResult
+                    .getErrors()
+                    .stream()
+                    .map(error -> {
+                        if (error instanceof ExceptionWhileDataFetching) {
+                            return ImmutableMap.<String, Object>builder()
+                                .put("message", error.getMessage())
+                                .put("locations", error.getLocations())
+                                .put("errorType", error.getErrorType())
+                                // Convert stack trace to propr format
+                                .put("stack", ((ExceptionWhileDataFetching) error).getException().getStackTrace())
+                                .build();
+                        } else {
+                            return error;
+                        }
+                    })
+                    .collect(Collectors.toList()));
         }
         if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
