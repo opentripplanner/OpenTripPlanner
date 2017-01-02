@@ -133,6 +133,7 @@ public class IndexGraphQLSchema {
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
+        index.clusterStopsAsNeeded();
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
