@@ -602,16 +602,18 @@ public class GraphIndex {
     
 	private void clusterByParentStation() {
 		LOG.info("Clustering stops by parent station...");
-    	for (Stop s0 : stopForId.values()) {
-    		String ps = s0.getParentStation();
-    		stopClusterForId.put(ps, new StopCluster(ps, s0.getName()));
+    	for (Stop stop : stopForId.values()) {
+    		String ps = stop.getParentStation();
+    		if (ps == null || ps.isEmpty()) continue;
+    		StopCluster cluster;
+    		if (stopClusterForId.containsKey(ps)) cluster = stopClusterForId.get(ps);		
+    		else {
+    			cluster = new StopCluster(ps, stop.getName());   
+    			stopClusterForId.put(ps, cluster); 
     		}
-    	for (Stop s0 : stopForId.values()) {
-    		String ps = s0.getParentStation();
-    		if(!stopClusterForId.containsKey(ps)) continue;
-    		StopCluster cluster = stopClusterForId.get(ps);
-    		cluster.children.add(s0);
-    		stopClusterForStop.put(s0, cluster);
+    		cluster.children.add(stop);
+    		stopClusterForStop.put(stop, cluster);
+    		   		
     	}
     	for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
     		cluster.getValue().computeCenter();
