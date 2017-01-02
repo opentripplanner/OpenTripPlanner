@@ -604,9 +604,13 @@ public class GraphIndex {
 		LOG.info("Clustering stops by parent station...");
     	for (Stop stop : stopForId.values()) {
     		String ps = stop.getParentStation();
-    		if (ps == null || ps.isEmpty()) continue;
+    		if (ps == null || ps.isEmpty()) {
+    			continue;
+    		}
     		StopCluster cluster;
-    		if (stopClusterForId.containsKey(ps)) cluster = stopClusterForId.get(ps);		
+    		if (stopClusterForId.containsKey(ps)) {
+    			cluster = stopClusterForId.get(ps);		
+    		}
     		else {
     			cluster = new StopCluster(ps, stop.getName());   
     			stopClusterForId.put(ps, cluster); 
