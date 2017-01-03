@@ -590,12 +590,14 @@ public class Timetable implements Serializable {
                 stopTime.setStop(stop);
                 stopTimes.add(stopTime);
             } else {
-                LOG.info("Ignoring ET-update on unknown stop {} on line {}.", estimatedCall.getStopPointRef().getValue(), journey.getLineRef().getValue());
+                LOG.warn("Got ET-update on unknown stop {} on line {}.", estimatedCall.getStopPointRef().getValue(), journey.getLineRef().getValue());
+                return null;
             }
         }
 
         //Creating new TripTimes based on updated arrivals/departures
         TripTimes newTimes = new TripTimes(oldTimes.trip, stopTimes, new Deduplicator());
+        newTimes.serviceCode = oldTimes.serviceCode;
 
         List<Integer> visitedStops = new ArrayList<>();
         for (EstimatedCall estimatedCall : estimatedCalls) {
