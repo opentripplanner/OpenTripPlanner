@@ -102,7 +102,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
 
                 //All subsequent requests will return changes since last request
                 fullDataset = false;
-                return siri.getServiceDelivery().getEstimatedTimetableDeliveries();
+                return rewriteIds(siri.getServiceDelivery().getEstimatedTimetableDeliveries());
 
             }
         } catch (Exception e) {
@@ -110,6 +110,57 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
             LOG.warn("Failed to parse SIRI-ET feed from " + url + ":", e);
         }
         return null;
+    }
+
+
+    private List rewriteIds(List<EstimatedTimetableDeliveryStructure> deliveries) {
+        for (EstimatedTimetableDeliveryStructure delivery : deliveries) {
+            for (EstimatedVersionFrameStructure versionFrameStructure : delivery.getEstimatedJourneyVersionFrames()) {
+                List<EstimatedVehicleJourney> et = versionFrameStructure.getEstimatedVehicleJourneies();
+                if (et != null) {
+                    for (EstimatedVehicleJourney journey : et) {
+                        DestinationRef destRef = journey.getDestinationRef();
+                        if (destRef != null && destRef.getValue().contains(":")) {
+                            String value = destRef.getValue();
+                            if (value.substring(value.indexOf(":")).length() > 2) {
+                                // 1234:56 -> 123456
+                                value = value.replaceAll(":", "");
+                            } else {
+                                // 1234:5  -> 123405
+                                value = value.replaceAll(":", "0");
+                            }
+                            destRef.setValue(value);
+                        }
+                        JourneyPlaceRefStructure originRef = journey.getOriginRef();
+                        if (originRef != null && originRef.getValue().contains(":")) {
+                            String value = originRef.getValue();
+                            if (value.substring(value.indexOf(":")).length() > 2) {
+                                value = value.replaceAll(":", "");
+                            } else {
+                                value = value.replaceAll(":", "0");
+                            }
+                            originRef.setValue(value);
+                        }
+
+                        EstimatedVehicleJourney.EstimatedCalls estimatedCalls = journey.getEstimatedCalls();
+                        if (estimatedCalls != null) {
+                            List<EstimatedCall> etList = estimatedCalls.getEstimatedCalls();
+                            for (EstimatedCall estimatedCall : etList) {
+                                StopPointRef stopPointRef = estimatedCall.getStopPointRef();
+                                String value = stopPointRef.getValue();
+                                if (value.substring(value.indexOf(":")).length() > 2) {
+                                    value = value.replaceAll(":", "");
+                                } else {
+                                    value = value.replaceAll(":", "0");
+                                }
+                                stopPointRef.setValue(value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return deliveries;
     }
 
     private Siri createETServiceRequest(String requestorRefValue) {
