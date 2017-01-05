@@ -44,7 +44,7 @@ public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
         setProperties(props, "highway=trunk;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
 
         // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
-        setProperties(props, "highway=*;motorroad=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
+        setProperties(props, "motorroad=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
 
         /*
          * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
