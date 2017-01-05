@@ -153,8 +153,13 @@ public class Router {
         }
         
         JsonNode clusterByParentStation = config.get("clusterByParentStation");
-        if (clusterByParentStation != null && clusterByParentStation.isBoolean()) 
-        	graph.clusterByParentStation = clusterByParentStation.asBoolean();
+        if (clusterByParentStation != null) {
+            if(clusterByParentStation.isBoolean()) {
+                graph.clusterByParentStation = clusterByParentStation.asBoolean();   
+            } else { 
+                LOG.info("The parameter clusterByParentStation must have a boolean value. Setting to false.");
+            }
+        }
         
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);

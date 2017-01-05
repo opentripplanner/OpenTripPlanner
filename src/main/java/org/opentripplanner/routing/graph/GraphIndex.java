@@ -563,8 +563,11 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-    	if (graph.clusterByParentStation) clusterByParentStation();
-    	else clusterByProximity();
+    	if (graph.clusterByParentStation) {
+    	    clusterByParentStation();
+    	} else {
+    	    clusterByProximity();
+    	}
     }
     
     private void clusterByProximity() {	
@@ -599,31 +602,27 @@ public class GraphIndex {
 	        stopClusterForId.put(cluster.id, cluster);
 	    }
     }
-    
-	private void clusterByParentStation() {
-		LOG.info("Clustering stops by parent station...");
+    private void clusterByParentStation() {
+        LOG.info("Clustering stops by parent station...");
     	for (Stop stop : stopForId.values()) {
-    		String ps = stop.getParentStation();
-    		if (ps == null || ps.isEmpty()) {
-    			continue;
-    		}
-    		StopCluster cluster;
-    		if (stopClusterForId.containsKey(ps)) {
-    			cluster = stopClusterForId.get(ps);		
-    		}
-    		else {
-    			cluster = new StopCluster(ps, stop.getName());   
-    			stopClusterForId.put(ps, cluster); 
-    		}
-    		cluster.children.add(stop);
-    		stopClusterForStop.put(stop, cluster);
-    		   		
+    	    String ps = stop.getParentStation();
+    	    if (ps == null || ps.isEmpty()) {
+    	        continue;
+    	    }
+    	    StopCluster cluster;
+    	    if (stopClusterForId.containsKey(ps)) {
+    	        cluster = stopClusterForId.get(ps);
+    	    } else {
+    	        cluster = new StopCluster(ps, stop.getName());
+    	        stopClusterForId.put(ps, cluster);
+	    }
+    	    cluster.children.add(stop);
+    	    stopClusterForStop.put(stop, cluster);    
     	}
     	for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
-    		cluster.getValue().computeCenter();
-    		
+    	    cluster.getValue().computeCenter();
     	}
-	}
+    }
     
     public Response getGraphQLResponse(String query, Map<String, Object> variables) {
         ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
