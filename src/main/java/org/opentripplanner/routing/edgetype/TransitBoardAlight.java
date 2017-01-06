@@ -294,6 +294,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // FIXME this should be done WHILE searching for a trip.
             if (options.tripIsBanned(trip)) return null;
 
+            /* check if route type matches (if requested). */
+            if(!options.tripRouteTypeMatches(trip)) return null;
+
             /* Check if route is preferred by the user. */
             long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
             

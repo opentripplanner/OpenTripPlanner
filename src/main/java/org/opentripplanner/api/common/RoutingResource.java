@@ -353,6 +353,12 @@ public abstract class RoutingResource {
     @QueryParam("disableAlertFiltering")
     private Boolean disableAlertFiltering;
 
+    /**
+     * The comma-separated list of allowed GTFS route types.
+     */
+    @QueryParam("routeTypes")
+    private String routeTypes;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -575,6 +581,9 @@ public abstract class RoutingResource {
 
         if (maxHours != null)
             request.maxHours = maxHours;
+
+        if(routeTypes != null)
+            request.setRouteTypes(routeTypes);
 
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;
