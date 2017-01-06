@@ -1162,7 +1162,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Check if trip route type matches for this plan.
      */
     public boolean tripRouteTypeMatches(Trip trip) {
-        return routeTypes == null || routeTypes.contains(trip.getRoute().getType());
+        return routeTypes == null || routeTypes.size() == 0 || routeTypes.contains(trip.getRoute().getType());
     }
 
     /** Check if route is preferred according to this request. */
