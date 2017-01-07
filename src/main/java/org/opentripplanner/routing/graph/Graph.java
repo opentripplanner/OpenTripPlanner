@@ -199,7 +199,7 @@ public class Graph implements Serializable {
     public transient StreetSpeedSnapshotSource streetSpeedSource;
     
     /** How should we cluster stops? */
-    public String stopClusterMode;
+    public String stopClusterMode = "proximity";
 
     public Graph(Graph basedOn) {
         this();
