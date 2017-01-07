@@ -563,10 +563,15 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-    	if (graph.clusterByParentStation) {
+    	switch (graph.stopClusterMode) {
+    	case "parentStation": 
     	    clusterByParentStation();
-    	} else {
+    	    break;   	    
+    	case "proximity":
     	    clusterByProximity();
+    	    break;    	    
+    	default:
+    	    clusterByProximity(); 
     	}
     }
     

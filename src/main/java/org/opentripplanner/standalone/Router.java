@@ -152,13 +152,11 @@ public class Router {
             }
         }
         
-        JsonNode clusterByParentStation = config.get("clusterByParentStation");
-        if (clusterByParentStation != null) {
-            if(clusterByParentStation.isBoolean()) {
-                graph.clusterByParentStation = clusterByParentStation.asBoolean();   
-            } else { 
-                LOG.info("The parameter clusterByParentStation must have a boolean value. Setting to false.");
-            }
+        JsonNode stopClusterMode = config.get("stopClusterMode");
+        if (stopClusterMode != null) {
+            graph.stopClusterMode = stopClusterMode.asText();    
+        } else {
+            graph.stopClusterMode = "proximity";
         }
         
         /* Create Graph updater modules from JSON config. */
