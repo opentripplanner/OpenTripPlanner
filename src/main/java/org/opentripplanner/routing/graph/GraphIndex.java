@@ -563,27 +563,6 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-<<<<<<< HEAD
-    	LOG.info("Clustering stops by parent station...");
-    	Map<String, StopCluster> parentStopsMap = new HashMap();
-    	for (Stop s0 : stopForId.values()) {
-    		String ps = s0.getParentStation();
-    		parentStopsMap.put(ps, new StopCluster(ps, s0.getName()));
-    		}
-    	for (Stop s0 : stopForId.values()) {
-    		String ps = s0.getParentStation();
-    		if(!parentStopsMap.containsKey(ps)) continue;
-    		StopCluster cluster = parentStopsMap.get(ps);
-    		cluster.children.add(s0);
-    		stopClusterForStop.put(s0, cluster);
-    	}
-    	for (Map.Entry<String, StopCluster> cluster : parentStopsMap.entrySet()) {
-    		cluster.getValue().computeCenter();
-    		stopClusterForId.put(cluster.getKey(), cluster.getValue());
-    	}
-    }
-    
-=======
     	switch (graph.stopClusterMode) {
     	case "parentStation": 
     	    clusterByParentStation();
@@ -649,8 +628,7 @@ public class GraphIndex {
     	    cluster.getValue().computeCenter();
     	}
     }
-    
->>>>>>> f142150c22b2b487501034ef09031d9c5bce46be
+
     public Response getGraphQLResponse(String query, Map<String, Object> variables) {
         ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
