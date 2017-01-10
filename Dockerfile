@@ -22,7 +22,7 @@ RUN mvn package \
 ADD run.sh ${OTP_ROOT}/run.sh
 
 RUN chown -R 9999:9999 ${OTP_ROOT}
-USER 9999
+#USER 9999
 
 ENV PORT=8080
 EXPOSE ${PORT}
