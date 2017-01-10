@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#workaround for azure DNS issue
-
 JAR=`ls target/*-shaded*`
 echo JAR=$JAR
 SLEEP_TIME=5
