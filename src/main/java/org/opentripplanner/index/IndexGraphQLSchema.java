@@ -2300,7 +2300,7 @@ public class IndexGraphQLSchema {
                                 GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
                             environment.getArgument("direction"),
                             environment.getArgument("time"),
-                            ServiceDate.parseString(environment.getArgument("date"))
+                            ServiceDate.parseString(((String) environment.getArgument("date")).replace("-", ""))
                         );
                     } catch (ParseException e) {
                         return null; // Invalid date format
