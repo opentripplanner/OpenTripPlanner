@@ -1399,16 +1399,15 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
                 .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
-                .dataFetcher(environment ->
-                    Arrays
-                        .asList(index.patternForTrip
+                .dataFetcher(environment -> {
+                    LineString geometry = index.patternForTrip
                             .get((Trip) environment.getSource())
-                            .geometry
-                            .getCoordinateSequence()
-                            .toCoordinateArray())
-                        .stream()
+                            .geometry;
+                    if (geometry == null) {return null;}
+                    return Arrays.stream(geometry.getCoordinateSequence().toCoordinateArray())
                         .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList());
+                    }
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
