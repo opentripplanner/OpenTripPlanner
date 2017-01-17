@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
@@ -976,13 +977,14 @@ public class GraphIndex {
                     .stream()
                     .map(error -> {
                         if (error instanceof ExceptionWhileDataFetching) {
-                            return ImmutableMap.<String, Object>builder()
-                                .put("message", error.getMessage())
-                                .put("locations", error.getLocations())
-                                .put("errorType", error.getErrorType())
-                                // Convert stack trace to propr format
-                                .put("stack", ((ExceptionWhileDataFetching) error).getException().getStackTrace())
-                                .build();
+                            HashMap<String, Object> response = new HashMap<String, Object>();
+                            response.put("message", error.getMessage());
+                            response.put("locations", error.getLocations());
+                            response.put("errorType", error.getErrorType());
+                            // Convert stack trace to propr format
+                            Stream<StackTraceElement> stack = Arrays.stream(((ExceptionWhileDataFetching) error).getException().getStackTrace());
+                            response.put("stack", stack.map(StackTraceElement::toString).collect(Collectors.toList()));
+                            return response;
                         } else {
                             return error;
                         }
