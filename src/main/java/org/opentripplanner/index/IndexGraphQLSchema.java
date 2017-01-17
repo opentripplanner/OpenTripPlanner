@@ -1092,8 +1092,8 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimesInPatternType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-                    .type(Scalars.GraphQLString) // No long exists in GraphQL
-                    .defaultValue("0") // Default value is current time
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
@@ -1114,7 +1114,7 @@ public class IndexGraphQLSchema {
                             .stream()
                             .flatMap(singleStop ->
                                 index.stopTimesForStop(singleStop,
-                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"))
                                 .stream()
@@ -1122,7 +1122,7 @@ public class IndexGraphQLSchema {
                             .collect(Collectors.toList());
                     }
                     return index.stopTimesForStop(stop,
-                        Long.parseLong(environment.getArgument("startTime")),
+                        environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
                         environment.getArgument("numberOfDepartures"));
 
@@ -1133,8 +1133,8 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-                    .type(Scalars.GraphQLString) // No long type exists in GraphQL specification
-                    .defaultValue("0") // Default value is current time
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
@@ -1155,7 +1155,7 @@ public class IndexGraphQLSchema {
                             .stream()
                             .flatMap(singleStop ->
                                 index.stopTimesForStop(singleStop,
-                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"))
                                     .stream()
@@ -1164,7 +1164,7 @@ public class IndexGraphQLSchema {
                     else {
                         stream = index.stopTimesForStop(
                             (Stop) environment.getSource(),
-                            Long.parseLong(environment.getArgument("startTime")),
+                            environment.getArgument("startTime"),
                             environment.getArgument("timeRange"),
                             environment.getArgument("numberOfDepartures")
                         ).stream();
