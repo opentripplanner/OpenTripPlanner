@@ -1092,8 +1092,8 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimesInPatternType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-                    .type(Scalars.GraphQLString) // No long exists in GraphQL
-                    .defaultValue("0") // Default value is current time
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
@@ -1114,7 +1114,7 @@ public class IndexGraphQLSchema {
                             .stream()
                             .flatMap(singleStop ->
                                 index.stopTimesForStop(singleStop,
-                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"))
                                 .stream()
@@ -1122,7 +1122,7 @@ public class IndexGraphQLSchema {
                             .collect(Collectors.toList());
                     }
                     return index.stopTimesForStop(stop,
-                        Long.parseLong(environment.getArgument("startTime")),
+                        environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
                         environment.getArgument("numberOfDepartures"));
 
@@ -1133,8 +1133,8 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-                    .type(Scalars.GraphQLString) // No long type exists in GraphQL specification
-                    .defaultValue("0") // Default value is current time
+                    .type(Scalars.GraphQLLong)
+                    .defaultValue(0) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
@@ -1155,7 +1155,7 @@ public class IndexGraphQLSchema {
                             .stream()
                             .flatMap(singleStop ->
                                 index.stopTimesForStop(singleStop,
-                                    Long.parseLong(environment.getArgument("startTime")),
+                                    environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"))
                                     .stream()
@@ -1164,7 +1164,7 @@ public class IndexGraphQLSchema {
                     else {
                         stream = index.stopTimesForStop(
                             (Stop) environment.getSource(),
-                            Long.parseLong(environment.getArgument("startTime")),
+                            environment.getArgument("startTime"),
                             environment.getArgument("timeRange"),
                             environment.getArgument("numberOfDepartures")
                         ).stream();
@@ -1399,16 +1399,15 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
                 .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
-                .dataFetcher(environment ->
-                    Arrays
-                        .asList(index.patternForTrip
+                .dataFetcher(environment -> {
+                    LineString geometry = index.patternForTrip
                             .get((Trip) environment.getSource())
-                            .geometry
-                            .getCoordinateSequence()
-                            .toCoordinateArray())
-                        .stream()
+                            .geometry;
+                    if (geometry == null) {return null;}
+                    return Arrays.stream(geometry.getCoordinateSequence().toCoordinateArray())
                         .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList());
+                    }
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2300,7 +2299,7 @@ public class IndexGraphQLSchema {
                                 GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
                             environment.getArgument("direction"),
                             environment.getArgument("time"),
-                            ServiceDate.parseString(environment.getArgument("date"))
+                            ServiceDate.parseString(((String) environment.getArgument("date")).replace("-", ""))
                         );
                     } catch (ParseException e) {
                         return null; // Invalid date format
