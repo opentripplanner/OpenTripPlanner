@@ -1093,7 +1093,7 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
                     .type(Scalars.GraphQLLong)
-                    .defaultValue(0) // Default value is current time
+                    .defaultValue(0L) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
@@ -1134,7 +1134,7 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
                     .type(Scalars.GraphQLLong)
-                    .defaultValue(0) // Default value is current time
+                    .defaultValue(0L) // Default value is current time
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("timeRange")
