@@ -28,7 +28,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         this.qmode = qmode;
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
-            stopCluster = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
+            stopCluster = state.getOptions().rctx.graph.index.getStopClusterForStop().get(tstop.getStop());
         }
     }
 

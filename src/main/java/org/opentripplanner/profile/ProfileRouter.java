@@ -180,7 +180,7 @@ public class ProfileRouter {
                 ride.accessStats.merge(sd.etime);
                 /* Loop over stop clusters in case stop cluster appears more than once in the pattern. */
                 STOP_INDEX: for (int i = 0; i < pattern.getStops().size(); ++i) {
-                    if (sd.stopCluster == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
+                    if (sd.stopCluster == graph.index.getStopClusterForStop().get(pattern.getStops().get(i))) {
                         PatternRide newPatternRide = new PatternRide(pattern, i);
                         /* Only add the PatternRide once per unique (pattern,stopIndex). */
                         // TODO this would be a !contains() call if PatternRides had semantic equality
@@ -216,7 +216,7 @@ public class ProfileRouter {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
-                    StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(s));
+                    StopCluster cluster = graph.index.getStopClusterForStop().get(stops.get(s));
                     /* Originally we only extended rides to destination stops considered useful in the search, i.e.
                      * those that had transfers leading out of them or were known to be near the destination.
                      * However, analyst needs to know the times we can reach every stop, and pruning is more effective
@@ -267,7 +267,7 @@ public class ProfileRouter {
                         if ( ! request.analyst && penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
                         TARGET_STOP : for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
-                            StopCluster cluster = graph.index.stopClusterForStop.get(tr.tp2.getStops().get(i));
+                            StopCluster cluster = graph.index.getStopClusterForStop().get(tr.tp2.getStops().get(i));
                             if (cluster == tr.sc2) {
                                 // Save transfer result in an unfinished ride for later exploration.
                                 Ride r2 = xferRides.get(tr.sc2);

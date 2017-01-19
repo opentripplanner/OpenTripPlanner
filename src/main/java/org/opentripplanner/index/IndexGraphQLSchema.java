@@ -133,7 +133,7 @@ public class IndexGraphQLSchema {
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
-        index.clusterStopsAsNeeded();
+
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -280,7 +280,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
                 .type(clusterType)
-                .dataFetcher(environment -> index.stopClusterForStop
+                .dataFetcher(environment -> index.getStopClusterForStop()
                     .get((Stop) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -811,7 +811,7 @@ public class IndexGraphQLSchema {
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
                 if (id.type.equals(clusterType.getName())) {
-                    return index.stopClusterForId.get(id.id);
+                    return index.getStopClusterForId().get(id.id);
                 }
                 if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
@@ -1053,7 +1053,7 @@ public class IndexGraphQLSchema {
                 .name("clusters")
                 .description("Get all clusters for the specified graph")
                 .type(new GraphQLList(clusterType))
-                .dataFetcher(environment -> new ArrayList<>(index.stopClusterForId.values()))
+                .dataFetcher(environment -> new ArrayList<>(index.getStopClusterForId().values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
@@ -1064,7 +1064,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(
-                    environment -> index.stopClusterForId.get(environment.getArgument("id")))
+                    environment -> index.getStopClusterForId().get(environment.getArgument("id")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")

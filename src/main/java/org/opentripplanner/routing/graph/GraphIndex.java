@@ -94,8 +94,8 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
-    public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
-    public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
+    private final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
+    private final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -680,6 +680,16 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
+    }
+
+    public Map<Stop, StopCluster> getStopClusterForStop() {
+        clusterStopsAsNeeded();
+        return stopClusterForStop;
+    }
+
+    public Map<String, StopCluster> getStopClusterForId() {
+        clusterStopsAsNeeded();
+        return stopClusterForId;
     }
 
 }
