@@ -560,7 +560,6 @@ public class IndexAPI {
     @GET
     @Path("/clusters")
     public Response getAllStopClusters () {
-        index.clusterStopsAsNeeded();
         // use 'detail' field common to all API methods in this class
         List<StopClusterDetail> scl = StopClusterDetail.list(index.getStopClusterForId().values(), detail);
         return Response.status(Status.OK).entity(scl).build();
@@ -570,7 +569,6 @@ public class IndexAPI {
     @GET
     @Path("/clusters/{clusterId}")
     public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
-        index.clusterStopsAsNeeded();
         StopCluster cluster = index.getStopClusterForId().get(clusterIdString);
         if (cluster != null) {
             return Response.status(Status.OK).entity(new StopClusterDetail(cluster, true)).build();
