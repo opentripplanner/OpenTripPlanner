@@ -322,9 +322,9 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> {
                     try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
                         return index.getStopTimesForStop(
-                                (Stop) environment.getSource(),
-                                ServiceDate.parseString(environment.getArgument("date")),
-                                (boolean) environment.getArgument("omitNonPickups"));
+                            (Stop) environment.getSource(),
+                            ServiceDate.parseString(environment.getArgument("date")),
+                            environment.getArgument("omitNonPickups"));
                     } catch (ParseException e) {
                         return null;
                     }
