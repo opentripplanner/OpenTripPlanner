@@ -23,10 +23,10 @@ otp.locale.Spanish = {
     {
         //Name of a language written in a language itself (Used in Frontend to
         //choose a language)
-        name: 'Spanish',
+        name: 'Español',
         //FALSE-imperial units are used
         //TRUE-Metric units are used
-        metric : false, 
+        metric : true, 
         //Name of localization file (*.po file) in src/client/i18n
         locale_short : "es",
         //Name of datepicker localization in
@@ -53,21 +53,21 @@ otp.locale.Spanish = {
      */
     infoWidgets : [
             {
-                title: 'About',
-                content: '<p>About this site</p>',
+                title: 'Acerca de',
+                content: '<p>Acerca de este sitio</p>',
                 //cssClass: 'otp-contactWidget',
             },
             {
-                title: 'Contact',
-                content: '<p>Comments? Contact us at...</p>'
+                title: 'Contacto',
+                content: '<p>¿Comentarios? Escríbenos a...</p>'
             },
     ],
 
 
     time:
     {
-        format         : "MMM Do YYYY, h:mma", //moment.js
-        date_format    : "MM/DD/YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
+        format         : "YYY Do MMM, h:mma", //moment.js
+        date_format    : "DD/MM/YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
         time_format    : "h:mma", //momentjs
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
     },
