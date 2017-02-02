@@ -83,7 +83,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
         long bestNonTransitTime = Long.MAX_VALUE;
-        Set<Itinerary> itineraries = new HashSet<>();
+        List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
