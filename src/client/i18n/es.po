@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-02-24 12:23+0100\n"
-"PO-Revision-Date: 2017-01-31 15:03+0100\n"
+"PO-Revision-Date: 2017-02-08 19:05+0100\n"
 "Language-Team: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
@@ -860,7 +860,7 @@ msgid ""
 "exit on <b>%(street_name)s</b>"
 msgstr ""
 "Toma la rotonda <b>sentido contrario a las agujas del reloj</b> hasta la <b>"
-"%(ordinal_exit_number)s</b> salida hacía <b>%(street_name)s</b>"
+"%(ordinal_exit_number)s</b> salida dirección <b>%(street_name)s</b>"
 
 #: src/client/js/otp/util/Itin.js:254
 #, python-format
@@ -878,7 +878,7 @@ msgid ""
 "<b>%(street_name)s</b>"
 msgstr ""
 "Toma la rotonda <b>sentido a las agujas del reloj</b> hasta la <b>"
-"%(ordinal_exit_number)s</b> salida hacía <b>%(street_name)s</b>"
+"%(ordinal_exit_number)s</b> salida dirección <b>%(street_name)s</b>"
 
 #: src/client/js/otp/util/Itin.js:260
 #, python-format
@@ -905,7 +905,7 @@ msgstr "hacia"
 
 #: src/client/js/otp/util/Itin.js:274
 msgid "on to"
-msgstr "hacía"
+msgstr "dirección"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
