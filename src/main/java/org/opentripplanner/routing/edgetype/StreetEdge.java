@@ -377,11 +377,6 @@ public class StreetEdge extends Edge implements Cloneable {
                 double elevationUtilsSpeed = 4.0 / 3.0;
                 weight = costs * (elevationUtilsSpeed / speed);
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
-
-                if (getPermission().allows(TraverseMode.CAR)) {
-                    weight *= 1.5; // Add 50% weight on edges allowed for cars, in order to prefer walkways
-                }
-
                 /*
                 // debug code
                 if(weight > 100){
