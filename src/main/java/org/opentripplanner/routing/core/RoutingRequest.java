@@ -1221,7 +1221,4 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     }
 
-    public boolean isFlexAllowed() {
-        return flexAllowed && modes.isTransit();
-    }
 }

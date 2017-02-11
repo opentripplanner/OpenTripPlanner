@@ -22,18 +22,19 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.temporary.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +171,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // Zero is always an underestimate.
             return 0;
         }
-        if (v instanceof StreetVertex && !s.isOnFlex()) {
+        if (v instanceof StreetVertex) {
             // The main search is on the streets, not on transit.
             if (s.isEverBoarded()) {
                 // If we have already ridden transit we must be near the destination. If not the map returns INF.
@@ -363,6 +364,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         for(State s : stateToTripPatternsMap.keySet()){
 
             Vertex v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+            System.out.println("creating temporary transit link at |" + v.getY() + "," + v.getX());
 
             Stop stop = new Stop();
             stop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
@@ -370,13 +372,45 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             stop.setLon(v.getLon());
             stop.setName(String.valueOf(Math.random()));
             TransitStop transitStop = new TemporaryFlexTransitStop(graph, stop);
-            TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink((StreetVertex)v, transitStop, true);
-            rr.rctx.temporaryEdges.add(streetTransitLink);
+
 
             if(fromTarget){
                 //reverse search
+
+                TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(transitStop, (StreetVertex)v, true);
+                rr.rctx.temporaryEdges.add(streetTransitLink);
+
+                TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transitStop);
+                TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, transitStop);
+                rr.rctx.temporaryEdges.add(preAlightEdge);
+
+                for(TripPattern tripPattern : stateToTripPatternsMap.get(s)){
+
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                            .stream()
+                            .filter(e -> e.getPattern() == tripPattern)
+                            .collect(Collectors.toList());
+
+                    for(PatternHop patternHop : patternHops){
+                        PatternArriveVertex patternArriveVertex =
+                                new PatternArriveVertex(graph, tripPattern, patternHop.getStopIndex());
+
+                        TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop((PatternStopVertex)patternHop.getFromVertex(),
+                                patternArriveVertex, patternHop.getBeginStop(), patternHop.getEndStop(), patternHop.getStopIndex());
+                        rr.rctx.temporaryEdges.add(temporaryPatternHop);
+
+                        /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
+                        TemporaryTransitBoardAlight transitBoardAlight =
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, patternHop.getStopIndex(), TraverseMode.BUS);
+                    }
+                }
+
             }else{
                 //forward search
+
+                TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink((StreetVertex)v, transitStop, true);
+                rr.rctx.temporaryEdges.add(streetTransitLink);
+
                 TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transitStop);
                 TemporaryPreBoardEdge preBoardEdge = new TemporaryPreBoardEdge(transitStop, transitStopDepart);
                 rr.rctx.temporaryEdges.add(preBoardEdge);
@@ -392,7 +426,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         PatternDepartVertex patternDepartVertex =
                                 new PatternDepartVertex(graph, tripPattern, patternHop.getStopIndex());
 
-                        //todo make a clone of the patternHop
                         TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(patternDepartVertex,
                                 (PatternStopVertex)patternHop.getToVertex(), patternHop.getBeginStop(), patternHop.getEndStop(), patternHop.getStopIndex());
                         rr.rctx.temporaryEdges.add(temporaryPatternHop);
