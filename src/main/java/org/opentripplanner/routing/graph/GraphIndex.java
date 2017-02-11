@@ -1,13 +1,9 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Calendar;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.*;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -16,6 +12,8 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
@@ -32,6 +30,8 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -45,10 +45,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TablePatternEdge;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -57,11 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +91,9 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
+    public final Multimap<Edge, TripPattern> patternsForEdge = ArrayListMultimap.create();
+    public final Multimap<Edge, PatternHop> hopsForEdge = ArrayListMultimap.create();
+    public final HashGridSpatialIndex<PatternHop> hopIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -158,6 +155,44 @@ public class GraphIndex {
             Envelope envelope = new Envelope(stopVertex.getCoordinate());
             stopSpatialIndex.insert(envelope, stopVertex);
         }
+
+        StreetMatcher matcher = new StreetMatcher(graph);
+        LOG.info("Finding corresponding street edges for trip patterns...");
+        for (TripPattern pattern : patternForId.values()) {
+            if (pattern.mode == TraverseMode.BUS) {
+                /* we can only match geometry to streets on bus routes */
+                LOG.debug("Matching {}", pattern);
+                //If there are no shapes in GTFS pattern geometry is generated
+                //generated geometry is useless for street matching
+                //that is why pattern.geometry is null in that case
+                if (pattern.geometry == null) {
+                    continue;
+                }
+
+                edges = matcher.match(pattern.geometry);
+                if (edges == null || edges.isEmpty()) {
+                    LOG.warn("Could not match to street network: {}", pattern);
+                    continue;
+                }
+                for (Edge e : edges) {
+                    patternsForEdge.put(e, pattern);
+                }
+                for(PatternHop patternHop : pattern.getPatternHops()){
+                    edges = matcher.match(patternHop.getGeometry());
+
+                    if (edges == null || edges.isEmpty()) {
+                        LOG.warn("Could not match to street network: {}", pattern);
+                        continue;
+                    }
+                    for (Edge e : edges) {
+                        hopsForEdge.put(e, patternHop);
+                    }
+                }
+            }
+        }
+
+        LOG.info("Finished processing street edges for trip patterns...");
+
         for (TripPattern pattern : patternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.route, pattern);
@@ -181,6 +216,10 @@ public class GraphIndex {
         graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
         ));
+
+        LOG.info("initializing edge map...");
+        initializeEdgeMap();
+
         LOG.info("Done indexing graph.");
     }
 
@@ -679,6 +718,24 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
+    }
+
+    private void initializeEdgeMap() {
+        for (TripPattern pattern : patternsForStop.values()) {
+            for (PatternHop hop : pattern.getPatternHops()) {
+                Geometry geometry = hop.getGeometry();
+                Envelope envelope = geometry.getEnvelopeInternal();
+                hopIndex.insert(envelope, hop);
+            }
+        }
+    }
+
+    public Collection<PatternHop> getHopsForEdge(Edge e, boolean arriveBy) {
+        return hopsForEdge.get(e);
+    }
+
+    public Collection<TripPattern> getPatternsForEdge(Edge e) {
+        return patternsForEdge.get(e);
     }
 
 }

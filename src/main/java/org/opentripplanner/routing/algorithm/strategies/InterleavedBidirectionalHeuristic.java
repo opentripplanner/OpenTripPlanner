@@ -13,12 +13,19 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -30,7 +37,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This the goal direction heuristic used for transit searches.
@@ -85,6 +93,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * include lower bounds on path weights for an increasing number of vertices on board transit.
      */
     TObjectDoubleMap<Vertex> postBoardingWeights;
+
+    /** Closest edge to the origin that lies along the associated tripPattern. */
+    BiMap<Edge, TripPattern> originFlexEdges = HashBiMap.create();
+
+    /** Closest edge to the destination that lies along the associated tripPattern. */
+    BiMap<Edge, TripPattern> destinationFlexEdges = HashBiMap.create();
 
     Graph graph;
 
@@ -156,7 +170,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // Zero is always an underestimate.
             return 0;
         }
-        if (v instanceof StreetVertex) {
+        if (v instanceof StreetVertex && !s.isOnFlex()) {
             // The main search is on the streets, not on transit.
             if (s.isEverBoarded()) {
                 // If we have already ridden transit we must be near the destination. If not the map returns INF.
@@ -278,12 +292,28 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);
         pq.insert(initState, 0);
+        Map<TripPattern, State> tripPatternStateMap = new HashMap<>();
         while ( ! pq.empty()) {
-            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+            /*if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 return null;
-            }
+            }*/
             State s = pq.extract_min();
             Vertex v = s.getVertex();
+            if(s.getBackEdge() != null
+                    && s.getBackEdge() instanceof StreetEdge
+                    && s.getBackEdge().getGeometry() != null){
+                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(s.getBackEdge());
+                for(TripPattern tripPattern : patterns){
+                    if(tripPatternStateMap.containsKey(tripPattern)){
+                        State oldState = tripPatternStateMap.get(tripPattern);
+                        if(oldState.getWeight() < s.getWeight()){
+                            continue;
+                        }
+                    }
+                    tripPatternStateMap.put(tripPattern, s);
+                }
+                //System.out.println(s.getBackMode() + " " + s.getBackEdge().getClass().getName() + " "  + v.getClass().getName());
+            }
             // At this point the vertex is closed (pulled off heap).
             // This is the lowest cost we will ever see for this vertex. We can record the cost to reach it.
             if (v instanceof TransitStop) {
@@ -316,6 +346,76 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         }
+
+        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
+            State s = tripPatternStateMap.get(tripPattern);
+        }
+
+        Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
+        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
+            State s = tripPatternStateMap.get(tripPattern);
+            if(!stateToTripPatternsMap.containsKey(s)){
+                stateToTripPatternsMap.put(s, new ArrayList<>());
+            }
+            stateToTripPatternsMap.get(s).add(tripPattern);
+        }
+
+        for(State s : stateToTripPatternsMap.keySet()){
+
+            Vertex v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+
+            Stop stop = new Stop();
+            stop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
+            stop.setLat(v.getLat());
+            stop.setLon(v.getLon());
+            stop.setName(String.valueOf(Math.random()));
+            TransitStop transitStop = new TemporaryFlexTransitStop(graph, stop);
+            TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink((StreetVertex)v, transitStop, true);
+            rr.rctx.temporaryEdges.add(streetTransitLink);
+
+            if(fromTarget){
+                //reverse search
+            }else{
+                //forward search
+                TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transitStop);
+                TemporaryPreBoardEdge preBoardEdge = new TemporaryPreBoardEdge(transitStop, transitStopDepart);
+                rr.rctx.temporaryEdges.add(preBoardEdge);
+
+                for(TripPattern tripPattern : stateToTripPatternsMap.get(s)){
+
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                            .stream()
+                            .filter(e -> e.getPattern() == tripPattern)
+                            .collect(Collectors.toList());
+
+                    for(PatternHop patternHop : patternHops){
+                        PatternDepartVertex patternDepartVertex =
+                                new PatternDepartVertex(graph, tripPattern, patternHop.getStopIndex());
+
+                        //todo make a clone of the patternHop
+                        TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(patternDepartVertex,
+                                (PatternStopVertex)patternHop.getToVertex(), patternHop.getBeginStop(), patternHop.getEndStop(), patternHop.getStopIndex());
+                        rr.rctx.temporaryEdges.add(temporaryPatternHop);
+
+                        /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
+                        TemporaryTransitBoardAlight transitBoardAlight =
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, patternHop.getStopIndex(), TraverseMode.BUS);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+        BiMap<Edge, TripPattern> tripPatternEdgeBiMap = fromTarget ? destinationFlexEdges : originFlexEdges;
+        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
+            State s = tripPatternStateMap.get(tripPattern);
+            tripPatternEdgeBiMap.put(s.getBackEdge(), tripPattern);
+        }
+
         LOG.debug("Heuristric street search hit {} vertices.", vertices.size());
         LOG.debug("Heuristric street search hit {} transit stops.", transitQueue.size());
         return vertices;
