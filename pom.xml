@@ -10,9 +10,9 @@
     <packaging>jar</packaging>
 
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
-        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+        <connection>scm:git:http://github.com/camsys/OpenTripPlanner.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/camsys/OpenTripPlanner.git</developerConnection>
+        <url>http://github.com/camsys/OpenTripPlanner</url>
     </scm>
 
     <properties>
@@ -24,11 +24,15 @@
 
     <distributionManagement>
         <repository>
-            <!-- Also used as snapshotRepository by default -->
-            <id>conveyal-maven-repo</id>
-            <name>Conveyal Maven Repository</name>
-            <url>s3://maven.conveyal.com/</url>
+            <id>releases-obaweb-repo</id>
+            <name>OneBusAway OBAWEB Release Repo</name>
+            <url>http://repo.obaweb.org:8080/archiva/repository/releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots-obaweb-repo</id>
+            <name>OneBusAway OBAWEB Snapshot Repo</name>
+            <url>http://repo.obaweb.org:8080/archiva/repository/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
@@ -361,6 +365,11 @@
             <name>bintray</name>
             <url>http://dl.bintray.com/andimarek/graphql-java</url>
         </repository>
+        <repository>
+            <id>snapshots-obaweb-repo</id>
+            <name>OneBusAway OBAWEB Snapshot Repo</name>
+            <url>http://repo.obaweb.org:8080/archiva/repository/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -573,7 +582,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.3.5-conveyal-SNAPSHOT-2</version>
+            <version>1.3.5-vt-SNAPSHOT</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>

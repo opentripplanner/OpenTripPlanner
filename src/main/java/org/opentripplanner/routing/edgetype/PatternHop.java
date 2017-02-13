@@ -37,16 +37,28 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private Stop begin, end;
 
+    private int continuousPickup, continuousDropoff;
+
     public int stopIndex;
 
     private LineString geometry = null;
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
-        getPattern().setPatternHop(stopIndex, this);
+        if (setInPattern)
+            getPattern().setPatternHop(stopIndex, this);
+        this.continuousPickup = continuousPickup;
+        this.continuousDropoff = continuousDropoff;
+    }
+
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff) {
+        this(from, to, begin, end, stopIndex, continuousPickup, continuousDropoff, true);
+    }
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
+        this(from, to, begin, end, stopIndex, 0, 0);
     }
 
     public double getDistance() {
@@ -78,7 +90,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             }
         }
         
-    	int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
+    	int runningTime = (int) timeLowerBound(options);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.setBackMode(getMode());
@@ -98,7 +110,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
-        
+
         // Ignore this edge if either of its stop is banned hard
         if (!options.bannedStopsHard.isEmpty()) {
             if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
@@ -107,8 +119,8 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             }
         }
         
-        TripTimes tripTimes = s0.getTripTimes();
-        int runningTime = tripTimes.getRunningTime(stopIndex);
+        int runningTime = getRunningTime(s0);
+
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().arriveBy)
@@ -119,6 +131,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
         return s1.makeState();
+    }
+
+    public int getRunningTime(State s0) {
+        TripTimes tripTimes = s0.getTripTimes();
+        return tripTimes.getRunningTime(stopIndex);
     }
 
     public void setGeometry(LineString geometry) {
@@ -154,4 +171,13 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     public int getStopIndex() {
         return stopIndex;
     }
+
+    public int getContinuousPickup() {
+        return continuousPickup;
+    }
+
+    public int getContinuousDropoff() {
+        return continuousDropoff;
+    }
+
 }
