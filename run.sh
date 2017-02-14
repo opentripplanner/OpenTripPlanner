@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fail fast if graph building fails
+set -e
+
 JAR=`ls target/*-shaded*`
 echo JAR=$JAR
 SLEEP_TIME=5
