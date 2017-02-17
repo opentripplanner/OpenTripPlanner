@@ -32,30 +32,30 @@ import org.opentripplanner.util.NonLocalizedString;
 public class VCubDataSource extends GenericXmlBikeRentalDataSource {
 
     public VCubDataSource() {
-        super("//*[name()='ms:CI_VCUB_P']");
+        super("//*[name()='bm:CI_VCUB_P']");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {
         BikeRentalStation brstation = new BikeRentalStation();
-        brstation.id = attributes.get("ms:GID").trim();
-        String[] coordinates = attributes.get("ms:msGeometry").trim().split(" ");
+        brstation.id = attributes.get("bm:GID").trim();
+        String[] coordinates = attributes.get("bm:geometry").trim().split(" ");
         if (coordinates.length >= 2) {
             brstation.x = Double.parseDouble(coordinates[1]);
             brstation.y = Double.parseDouble(coordinates[0]);
         }
         if (brstation.x == 0 || brstation.y == 0)
             return null;
-        brstation.name = new NonLocalizedString(attributes.get("ms:NOM"));
-        boolean connected = "CONNECTEE".equalsIgnoreCase(attributes.get("ms:ETAT"));
+        brstation.name = new NonLocalizedString(attributes.get("bm:NOM"));
+        boolean connected = "CONNECTEE".equalsIgnoreCase(attributes.get("bm:ETAT"));
         brstation.realTimeData = connected;
-        String nbPlaces = attributes.get("ms:NBPLACES");
+        String nbPlaces = attributes.get("bm:NBPLACES");
         if (nbPlaces != null)
             brstation.spacesAvailable = Integer.parseInt(nbPlaces);
-        String nbVelos = attributes.get("ms:NBVELOS");
+        String nbVelos = attributes.get("bm:NBVELOS");
         if (nbVelos != null)
             brstation.bikesAvailable = Integer.parseInt(nbVelos);
         @SuppressWarnings("unused")
-        String type = attributes.get("ms:TYPE");
+        String type = attributes.get("bm:TYPE");
         /*
          * Please see http://www.vcub.fr/stations-vcub-1 for more information on rules of VCUB vs
          * VCUB+. Apparently both network are compatible, VCUB+ only offer more renting options
