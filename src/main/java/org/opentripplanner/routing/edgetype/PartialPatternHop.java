@@ -49,7 +49,8 @@ public class PartialPatternHop extends PatternHop {
             this.startIndex = line.project(from.getCoordinate());
             this.endIndex = line.getEndIndex();
         }
-        this.setGeometryFromHop(matcher, factory, hop);
+        if (matcher != null && factory != null)
+            this.setGeometryFromHop(matcher, factory, hop);
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
     }
 
@@ -90,6 +91,9 @@ public class PartialPatternHop extends PatternHop {
         setGeometry(geometry);
     }
 
+    public double getPercentageOfHop() {
+        return percentageOfHop;
+    }
 
 }
 

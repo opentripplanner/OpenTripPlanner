@@ -41,6 +41,7 @@ import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TransitBoardAlightAtFlex;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -118,7 +119,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
                     // - it is a TransitStop and it is within 100m of either endpoint of the hop
                     // - it is a hop where either endpoint is within 100m of either endpoint of this hop.
 
-                    Collection<TransferPointAtDistance> pts =  findNearbyTransferPoints(graph, hop);
+                    Collection<TransferPointAtDistance> pts = findNearbyTransferPoints(graph, hop);
 
                     for (TransferPointAtDistance pt : pts) {
                         if (!shouldExclude(hop, pt)) {
@@ -211,7 +212,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
 
         for (Collection<TransferPointAtDistance> ptsForPattern : closestTransferPointForTripPattern.asMap().values()) {
             TransferPointAtDistance best = Collections.max(ptsForPattern, (x, y) -> y.betterThan(x, true) ? -1 : 1);
-            TransferPointAtDistance rev  = Collections.max(ptsForPattern, (x, y) -> y.betterThan(x, false) ? -1 : 1);
+            TransferPointAtDistance rev = Collections.max(ptsForPattern, (x, y) -> y.betterThan(x, false) ? -1 : 1);
             pts.add(best);
             pts.add(rev);
         }
@@ -220,7 +221,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         return pts;
     }
 
-    private void link(Graph graph, PatternHop hop, TransferPointAtDistance point) {
+    public void link(Graph graph, PatternHop hop, TransferPointAtDistance point) {
         if (point.isTransitStop()) {
             // linking from a hop to a transit stop
 
@@ -237,8 +238,8 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
             // hop -> stop transfer
             PatternArriveVertex patternArriveVertex = new PatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
             TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transferStop);
-            PartialPatternHop.startHop(hop, patternArriveVertex, stop, matcher, geometryFactory);
-            new TransitBoardAlight(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode);
+            PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop, matcher, geometryFactory);
+            new TransitBoardAlightAtFlex(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode, startHop.getPercentageOfHop());
             new PreAlightEdge(transitStopArrive, transferStop);
             new SimpleTransfer(transferStop, point.tstop, point.dist, point.geom, point.edges);
 
@@ -246,8 +247,8 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
             TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transferStop);
             PatternDepartVertex patternDepartVertex = new PatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
             new PreBoardEdge(transferStop, transitStopDepart);
-            new TransitBoardAlight(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode);
-            PartialPatternHop.endHop(hop, patternDepartVertex,stop, matcher, geometryFactory);
+            PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop, matcher, geometryFactory);
+            new TransitBoardAlightAtFlex(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode, endHop.getPercentageOfHop());
             TransferPointAtDistance rev = point.reverse();
             new SimpleTransfer(point.tstop, transferStop, rev.dist, rev.geom, rev.edges);
 
@@ -257,7 +258,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
     }
 
     private static boolean tooClose(Vertex v, Vertex w) {
-        return SphericalDistanceLibrary.fastDistance(v.getLat(), v.getLon(),  w.getLat(), w.getLon()) < TRANSIT_STOP_CUTOFF;
+        return SphericalDistanceLibrary.fastDistance(v.getLat(), v.getLon(), w.getLat(), w.getLon()) < TRANSIT_STOP_CUTOFF;
     }
 
     private static boolean shouldExclude(PatternHop hop, TransitStop stop) {
@@ -272,6 +273,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
     private static boolean shouldExclude(PatternHop hop, TransferPointAtDistance pt) {
         return pt.isTransitStop() ? shouldExclude(hop, pt.getTransitStop()) : shouldExclude(hop, pt.getHop());
     }
+
 }
 
 class TransferPointAtDistance {
@@ -281,7 +283,7 @@ class TransferPointAtDistance {
     TransitStop tstop;
     double dist; // distance TO original hop
     LineString geom;
-    List<Edge>  edges;
+    List<Edge> edges;
     PatternHop hop;
     Coordinate locationOnHop;
     Vertex from;
@@ -323,7 +325,7 @@ class TransferPointAtDistance {
         this.state = state;
         this.fromHop = fromHop;
         LengthIndexedLine line = new LengthIndexedLine(fromHop.getGeometry());
-        this.distanceAlongFromHop = (line.project(from.getCoordinate())/line.getEndIndex()) * fromHop.getDistance();
+        this.distanceAlongFromHop = (line.project(from.getCoordinate()) / line.getEndIndex()) * fromHop.getDistance();
     }
 
     // TODO: merge with NearbyStopFinder.stopAtDistanceForState() (where this code was taken from)
@@ -392,7 +394,7 @@ class TransferPointAtDistance {
     }
 
     public boolean betterThan(TransferPointAtDistance other, boolean preferEarlyTransfer) {
-        if (other==null)
+        if (other == null)
             return true;
         // prefer a transfer point that is at a real stop [unless the real stop is outside the cutoff away?]
         if (this.isTransitStop() && !other.isTransitStop())
