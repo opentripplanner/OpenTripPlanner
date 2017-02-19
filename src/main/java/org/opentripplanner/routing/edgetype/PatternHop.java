@@ -14,14 +14,15 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Locale;
+
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.edgetype.temporary.TemporaryPatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -49,9 +50,15 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         getPattern().setPatternHop(stopIndex, this);
     }
 
+    // made more accurate
     public double getDistance() {
-        return SphericalDistanceLibrary.distance(begin.getLat(), begin.getLon(), end.getLat(),
-                end.getLon());
+        double distance = 0;
+        LineString line = getGeometry();
+        for (int i = 0; i < line.getNumPoints() - 1; i++) {
+            Point p0 = line.getPointN(i), p1 = line.getPointN(i+1);
+            distance += SphericalDistanceLibrary.distance(p0.getCoordinate(), p1.getCoordinate());
+        }
+        return distance;
     }
 
     public TraverseMode getMode() {
@@ -97,6 +104,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
     
     public State traverse(State s0) {
+
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
@@ -109,6 +117,12 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         
         TripTimes tripTimes = s0.getTripTimes();
         int runningTime = tripTimes.getRunningTime(stopIndex);
+
+        if(this instanceof TemporaryPatternHop){
+            double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
+            runningTime = (int) (runningTime * distanceRatio);
+        }
+
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().arriveBy)
@@ -118,6 +132,16 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         //s1.setRoute(pattern.getExemplar().route.getId());
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
+        if(this.toString().indexOf("1:15:0:05_10_D lat,lng=39.739934,-104.977259")> -1){
+            State newState = s1.makeState();
+            if(this instanceof TemporaryPatternHop){
+                System.out.println("temporary running time: " + runningTime + " weight: " + newState.getWeight() + " for: " + this);
+            }else{
+                System.out.println("running time: " + runningTime + " weight: " + newState.getWeight() + " for: " + this);
+            }
+
+            return newState;
+        }
         return s1.makeState();
     }
 

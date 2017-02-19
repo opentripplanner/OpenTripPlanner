@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeight
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -45,13 +46,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -125,6 +120,8 @@ public class RoutingContext implements Cloneable {
 
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
+
+    public Collection<TemporaryEdge> temporaryEdges = new ArrayList<>();
 
     /* CONSTRUCTORS */
 
@@ -417,5 +414,11 @@ public class RoutingContext implements Cloneable {
     public void destroy() {
         if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
         if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
+        if(temporaryEdges != null){
+            for(TemporaryEdge temporaryEdge : temporaryEdges){
+                temporaryEdge.dispose();
+            }
+        }
+
     }
 }

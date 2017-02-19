@@ -35,7 +35,7 @@ public class StateData implements Cloneable {
     // which trip index inside a pattern
     protected TripTimes tripTimes;
 
-    protected AgencyAndId tripId;
+    public AgencyAndId tripId;
     
     protected Trip previousTrip;
 

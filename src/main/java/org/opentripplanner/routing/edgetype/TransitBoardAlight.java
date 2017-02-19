@@ -15,7 +15,10 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
+import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -123,6 +126,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     @Override
     public State traverse(State state0) {
+
         return traverse(state0, 0);
     }
     
@@ -327,6 +331,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (!s0.isEverBoarded() && !options.reverseOptimizing) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTimeSeconds(bestWait);
+                //System.out.println("bestWait " + bestWait + " " + trip.getId() + " " + this.getId() + " " + this.getFromVertex().getY() + "," +this.getFromVertex().getX());
             } else {
                 wait_cost *= options.waitReluctance;
             }
@@ -356,7 +361,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 if (optimized == null) LOG.error("Null optimized state. This shouldn't happen.");
                 return optimized;
             }
-            
+
+            /*if(this instanceof TemporaryEdge && !s0.isEverBoarded()){
+                State test = s1.makeState();
+                System.out.println("_________________________" + this.getId());
+                System.out.println(this.getFromVertex().getY() + "," + this.getFromVertex().getX());
+                System.out.println(this.getToVertex().getY() + "," + this.getToVertex().getX());
+                System.out.println("initial weight: " + String.valueOf(s0.getWeight()));
+                System.out.println("traverse weight: " + String.valueOf(test.getWeight() - s0.getWeight()));
+                System.out.println("total weight: " + test.getWeight());
+                System.out.println("waiting weight: " + (wait_cost + options.getBoardCost(s0.getNonTransitMode())));
+                System.out.println(new Date(test.getTimeInMillis()).toString());
+                return test;
+            }*/
+
             /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
         }

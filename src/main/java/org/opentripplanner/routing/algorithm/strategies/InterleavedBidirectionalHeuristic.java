@@ -13,24 +13,38 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.temporary.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This the goal direction heuristic used for transit searches.
@@ -85,6 +99,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * include lower bounds on path weights for an increasing number of vertices on board transit.
      */
     TObjectDoubleMap<Vertex> postBoardingWeights;
+
+    /** Closest edge to the origin that lies along the associated tripPattern. */
+    BiMap<Edge, TripPattern> originFlexEdges = HashBiMap.create();
+
+    /** Closest edge to the destination that lies along the associated tripPattern. */
+    BiMap<Edge, TripPattern> destinationFlexEdges = HashBiMap.create();
 
     Graph graph;
 
@@ -150,7 +170,16 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      */
     @Override
     public double estimateRemainingWeight (State s) {
+
         final Vertex v = s.getVertex();
+
+        if(s.isEverBoarded() && s.getBackEdge() instanceof PatternHop){
+            double h = postBoardingWeights.get(v);
+            if (h == Double.POSITIVE_INFINITY) {
+                h = maxWeightSeen;
+            }
+        }
+
         if (v instanceof StreetLocation) {
             // Temporary vertices (StreetLocations) might not be found in the street searches.
             // Zero is always an underestimate.
@@ -201,6 +230,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             int uWeight = (int) transitQueue.peek_min_key();
             Vertex u = transitQueue.extract_min();
+
             // The weight of the queue head is uniformly increasing.
             // This is the highest weight ever seen for a closed vertex.
             maxWeightSeen = uWeight;
@@ -218,6 +248,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // When the main search is arriveBy the heuristic search looks at OUTgoing edges.
             for (Edge e : routingRequest.arriveBy ? u.getOutgoing() : u.getIncoming()) {
                 // Do not enter streets in this phase, which should only touch transit.
+
                 if (e instanceof StreetTransitLink) {
                     continue;
                 }
@@ -278,12 +309,26 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);
         pq.insert(initState, 0);
+        Map<TripPattern, State> tripPatternStateMap = new HashMap<>();
         while ( ! pq.empty()) {
-            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+            /*if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 return null;
-            }
+            }*/
             State s = pq.extract_min();
             Vertex v = s.getVertex();
+            if(s.getBackEdge() != null
+                    && s.getBackEdge().getGeometry() != null){
+                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(s.getBackEdge());
+                for(TripPattern tripPattern : patterns){
+                    if(tripPatternStateMap.containsKey(tripPattern)){
+                        State oldState = tripPatternStateMap.get(tripPattern);
+                        if(oldState.getWeight() < s.getWeight()){
+                            continue;
+                        }
+                    }
+                    tripPatternStateMap.put(tripPattern, s);
+                }
+            }
             // At this point the vertex is closed (pulled off heap).
             // This is the lowest cost we will ever see for this vertex. We can record the cost to reach it.
             if (v instanceof TransitStop) {
@@ -316,9 +361,199 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         }
+
+        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
+            State s = tripPatternStateMap.get(tripPattern);
+        }
+
+        Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
+        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
+            State s = tripPatternStateMap.get(tripPattern);
+            if(!stateToTripPatternsMap.containsKey(s)){
+                stateToTripPatternsMap.put(s, new ArrayList<>());
+            }
+            stateToTripPatternsMap.get(s).add(tripPattern);
+        }
+
+        for(State s : stateToTripPatternsMap.keySet()){
+
+            Vertex v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+
+            Stop flagStop = new Stop();
+            flagStop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
+            flagStop.setLat(v.getLat());
+            flagStop.setLon(v.getLon());
+            //flagStop.setName(String.valueOf(Math.random()));
+            TransitStop flagTransitStop = new TransitStop(graph, flagStop);
+
+            if(fromTarget){
+                //reverse search
+                transitQueue.insert(flagTransitStop, s.getWeight());
+                TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop, (StreetVertex)v, true);
+                rr.rctx.temporaryEdges.add(streetTransitLink);
+
+                TransitStopArrive transitStopArrive = new TransitStopArrive(graph, flagStop, flagTransitStop);
+                TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, flagTransitStop);
+                rr.rctx.temporaryEdges.add(preAlightEdge);
+
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
+
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                            .stream()
+                            .filter(e -> e.getPattern() == originalTripPattern)
+                            .collect(Collectors.toList());
+
+                    for(PatternHop originalPatternHop : patternHops){
+
+
+                        //don't create a temporary flag stop if it is very close to one of the existing stops
+                        if(tooCloseToPatternHopStops(originalPatternHop, v))
+                            continue;
+
+                        int stopIndex = originalPatternHop.getStopIndex();
+
+                        TripPattern temporaryTripPattern = originalTripPattern.clone();
+                        temporaryTripPattern.code = String.valueOf(Math.random());
+
+                        PatternArriveVertex patternArriveVertex =
+                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex + 1);
+
+                        TemporaryPatternHop forwardSearchPatternHop = findShortenedPatternHops(originalPatternHop);
+                        if(forwardSearchPatternHop != null){
+                            //processed by forward search already, use the trimmed geometry
+                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(forwardSearchPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(forwardSearchPatternHop.originalPatternHop.getGeometry());
+                            double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
+                            double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
+                            forwardSearchPatternHop.distanceRatio = distanceRatio;
+                            forwardSearchPatternHop.setGeometry(preStopHopGeometry);
+                        }else{
+                            //haven't seen this patternHop, create a temporary one
+                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), false);
+                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
+                            double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
+                            double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
+                            TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(originalPatternHop, patternArriveVertex, flagStop, distanceRatio);
+                            temporaryPatternHop.setGeometry(preStopHopGeometry);
+                            rr.rctx.temporaryEdges.add(temporaryPatternHop);
+                        }
+
+                        /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
+                        TemporaryTransitBoardAlight transitBoardAlight =
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS);
+                        rr.rctx.temporaryEdges.add(transitBoardAlight);
+
+
+                    }
+                }
+
+            }else{
+                //forward search
+
+                TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink((StreetVertex)v, flagTransitStop, true);
+                rr.rctx.temporaryEdges.add(streetTransitLink);
+
+                TransitStopDepart transitStopDepart = new TransitStopDepart(graph, flagStop, flagTransitStop);
+                TemporaryPreBoardEdge temporaryPreBoardEdge = new TemporaryPreBoardEdge(flagTransitStop, transitStopDepart);
+                rr.rctx.temporaryEdges.add(temporaryPreBoardEdge);
+
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
+
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                            .stream()
+                            .filter(e -> e.getPattern() == originalTripPattern)
+                            .collect(Collectors.toList());
+
+                    for(PatternHop originalPatternHop : patternHops){
+
+                        //don't create a temporary flag stop if it is very close to one of the existing stops
+                        if(tooCloseToPatternHopStops(originalPatternHop, v))
+                            continue;
+
+                        TripPattern temporaryTripPattern = originalTripPattern.clone();
+                        temporaryTripPattern.code = String.valueOf(Math.random());
+
+                        PatternDepartVertex patternDepartVertex =
+                                new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex());
+
+                        LineString postStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                        double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
+                        double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(postStopHopGeometry);
+                        double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
+                        TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(originalPatternHop, patternDepartVertex, flagStop, distanceRatio);
+                        temporaryPatternHop.setGeometry(postStopHopGeometry);
+
+                        rr.rctx.temporaryEdges.add(temporaryPatternHop);
+
+
+
+                        /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
+                        TemporaryTransitBoardAlight transitBoardAlight =
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS);
+                        rr.rctx.temporaryEdges.add(transitBoardAlight);
+                    }
+                }
+            }
+        }
+
         LOG.debug("Heuristric street search hit {} vertices.", vertices.size());
         LOG.debug("Heuristric street search hit {} transit stops.", transitQueue.size());
         return vertices;
     }
  
+    /**
+     * Finds the closest coordinate along a line to the target, splices that point into the line, and returns
+     * a coordinate array containing either the partial array up to and including the target, or the target and all after
+     * @param lineCoordinates
+     * @param flexPoint
+     * @return coordinate of the flex point or null if a stop exists at that point already
+     */
+    private LineString getShortenedPatternHopGeometryForFlagStop(Coordinate[] lineCoordinates, Coordinate flexPoint, Boolean reverseSearch){
+
+        double lowestDistanceSum = Double.MAX_VALUE;
+        int lowestDistanceIndex = -1;
+        for(int i = 0; i < lineCoordinates.length; i++){
+            double distance = SphericalDistanceLibrary.fastDistance(flexPoint, lineCoordinates[i]);
+            if(distance < lowestDistanceSum){
+                lowestDistanceIndex = i;
+                lowestDistanceSum = distance;
+            }
+        }
+
+        //this hop is heading away from the destination, leave geometry unchanged
+        if(reverseSearch && lowestDistanceIndex == 0)
+            return GeometryUtils.getGeometryFactory().createLineString(lineCoordinates);
+
+        List<Coordinate> lineCoordinateList = new ArrayList<>();
+        Collections.addAll(lineCoordinateList, lineCoordinates);
+        lineCoordinateList.set(lowestDistanceIndex, flexPoint);
+        List<Coordinate> shortenedHopGeometry =  reverseSearch ? lineCoordinateList.subList(0, lowestDistanceIndex + 1) : lineCoordinateList.subList(lowestDistanceIndex, lineCoordinateList.size());
+
+        return GeometryUtils.getGeometryFactory().createLineString(shortenedHopGeometry.toArray(new Coordinate[shortenedHopGeometry.size()]));
+    }
+
+    /**
+     * When reverse search creates a shortened pattern hop, check whether the forward search shortened the start of
+     * the geometry already.  If so, use that geometry, then shorten the other end, then update both hops
+     * @param originalPatternHop
+     * @return
+     */
+    private TemporaryPatternHop findShortenedPatternHops(PatternHop originalPatternHop){
+        for(TemporaryEdge e : routingRequest.rctx.temporaryEdges){
+            if(e instanceof TemporaryPatternHop && ((TemporaryPatternHop)e).originalPatternHop.equals(originalPatternHop)){
+                return (TemporaryPatternHop)e;
+            }
+        }
+        return null;
+    }
+
+    private boolean tooCloseToPatternHopStops(PatternHop originalPatternHop, Vertex v){
+        //don't create a temporary flag stop if it is very close to one of the existing stops
+        Double startDistance = SphericalDistanceLibrary.fastDistance(originalPatternHop.getFromVertex().getCoordinate(), v.getCoordinate());
+        Double endDistance = SphericalDistanceLibrary.fastDistance(originalPatternHop.getToVertex().getCoordinate(), v.getCoordinate());
+        if(startDistance < 10 || endDistance < 10)
+            return true;
+        return false;
+    }
+
 }

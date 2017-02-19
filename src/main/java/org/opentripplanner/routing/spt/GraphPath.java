@@ -81,10 +81,10 @@ public class GraphPath {
         if (back) {
             lastState = optimize ? s.optimize() : s.reverse();
         } else {
-            lastState = optimize ? s.optimize().optimize() : s;
+            //lastState = optimize ? s.optimize().optimize() : s;
         }
         // DEBUG
-        // lastState = s;
+         lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse

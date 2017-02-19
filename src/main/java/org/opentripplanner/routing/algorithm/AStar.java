@@ -25,6 +25,10 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.temporary.TemporaryPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.*;
@@ -63,7 +67,7 @@ public class AStar {
 
         public State u;
         public ShortestPathTree spt;
-        BinHeap<State> pq;
+        public BinHeap<State> pq;
         RemainingWeightHeuristic heuristic;
         public RoutingContext rctx;
         public int nVisited;
@@ -81,7 +85,7 @@ public class AStar {
 
     }
     
-    private RunState runState;
+    public RunState runState;
     
     /**
      * Compute SPT using default timeout and termination strategy.
@@ -121,12 +125,12 @@ public class AStar {
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
         // the streets around the origin and destination.
         runState.heuristic.initialize(runState.options, abortTime);
-        if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+        /*if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
             runState = null; // Search timed out
             return;
-        }
+        }*/
 
         // Priority Queue.
         // The queue is self-resizing, so we initialize it to have size = O(sqrt(|V|)) << |V|.
@@ -157,7 +161,7 @@ public class AStar {
 
         // get the lowest-weight state in the queue
         runState.u = runState.pq.extract_min();
-        
+
         // check that this state has not been dominated
         // and mark vertex as visited
         if (!runState.spt.visit(runState.u)) {
@@ -176,10 +180,21 @@ public class AStar {
             System.out.println("   vertex " + runState.u_vertex);
 
         runState.nVisited += 1;
-        
-        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
-        for (Edge edge : edges) {
 
+        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+
+        if(edges.size() > 1){
+            for (Edge edge : edges) {
+                if (runState.u.stateData.tripId != null
+                        && runState.u.stateData.tripId.getId().equals("110695680")
+                        && edge instanceof TemporaryPatternHop) {
+                    String backEdge = runState.u.getBackEdge().toString();
+                    String edgeClass = runState.u.getBackEdge().getClass().getName();
+                }
+            }
+        }
+
+        for (Edge edge : edges) {
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.
             for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
@@ -239,7 +254,7 @@ public class AStar {
             /*
              * Terminate based on timeout?
              */
-            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+            /*if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
@@ -248,7 +263,7 @@ public class AStar {
                 runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
 
                 break;
-            }
+            }*/
             
             /*
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
@@ -367,5 +382,9 @@ public class AStar {
             }
         }
         return ret;
+    }
+
+    public BinHeap<State> getPq(){
+        return this.runState.pq;
     }
 }

@@ -19,8 +19,12 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.math.Line;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.GeodeticCalculator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
@@ -184,6 +188,24 @@ public class GeometryUtils {
         }
 
         throw new UnsupportedGeometryException(geoJsonGeom.getClass().toString());
+    }
+
+    public static double getLengthInMeters(LineString lineString) {
+        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
+        double length = 0d;
+        try {
+            for (int i = 0; i < lineString.getCoordinates().length - 1; i++) {
+                Coordinate fromCoord = lineString.getCoordinates()[i];
+                Coordinate toCoord = lineString.getCoordinates()[i + 1];
+                calculator.setStartingPosition(JTS.toDirectPosition(fromCoord, WGS84_XY));
+                calculator.setDestinationPosition(JTS.toDirectPosition(toCoord, WGS84_XY));
+                double incrementalDistance = calculator.getOrthodromicDistance();
+                length += incrementalDistance;
+            }
+        }catch (TransformException tfe){
+            throw new RuntimeException(tfe.getMessage());
+        }
+        return length;
     }
 
     private static Coordinate[] convertPath(List<LngLatAlt> path) {
