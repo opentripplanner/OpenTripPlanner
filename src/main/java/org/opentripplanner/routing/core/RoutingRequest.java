@@ -109,6 +109,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The maximum duration of a returned itinerary, in hours. */
     public double maxHours = Double.MAX_VALUE;
 
+    /** Set of allowed GTFS route types. */
+    public HashSet<Integer> routeTypes = new HashSet<Integer>();
+
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
@@ -786,6 +789,17 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
 
+    public void setRouteTypes(String s) {
+        if (s == null || s.equals(""))
+            return;
+        HashSet<String> types = new HashSet<String>(Arrays.asList(s.split(",")));
+        if (types.size() > 0) {
+            routeTypes = new HashSet<Integer>(types.size());
+            for (String type : types)
+                routeTypes.add(Integer.parseInt(type));
+        }
+    }
+
     public NamedPlace getFromPlace() {
         return this.from.getNamedPlace();
     }
@@ -1142,6 +1156,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Check if trip route type matches for this plan.
+     */
+    public boolean tripRouteTypeMatches(Trip trip) {
+        return routeTypes == null || routeTypes.size() == 0 || routeTypes.contains(trip.getRoute().getType());
     }
 
     /** Check if route is preferred according to this request. */
