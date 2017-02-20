@@ -145,16 +145,57 @@ public class SimpleStreetSplitter {
 
     /** Link this vertex into the graph */
     public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
-
+        // find nearby street edges
+        // TODO: we used to use an expanding-envelope search, which is more efficient in
+        // dense areas. but first let's see how inefficient this is. I suspect it's not too
+        // bad and the gains in simplicity are considerable.
         final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
-        double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
+
+        Envelope env = new Envelope(vertex.getCoordinate());
+
         // local equirectangular projection
         final double xscale = Math.cos(vertex.getLat() * Math.PI / 180);
-        final TIntDoubleMap distances = new TIntDoubleHashMap();
-        Envelope env = new Envelope(vertex.getCoordinate());
+
         env.expandBy(radiusDeg / xscale, radiusDeg);
 
-        List<StreetEdge> candidateEdges = findNearbyStreetEdges(vertex, traverseMode, distances, xscale, radiusDeg);
+        double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
+
+        final TraverseModeSet traverseModeSet;
+        if (traverseMode == TraverseMode.BICYCLE) {
+            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
+        } else {
+            traverseModeSet = new TraverseModeSet(traverseMode);
+        }
+        // We sort the list of candidate edges by distance to the stop
+        // This should remove any issues with things coming out of the spatial index in different orders
+        // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
+        // so that we capture back edges and duplicate ways.
+        List<StreetEdge> candidateEdges = idx.query(env).stream()
+            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
+            .map(edge -> (StreetEdge) edge)
+            // note: not filtering by radius here as distance calculation is expensive
+            // we do that below.
+            .filter(edge -> edge.canTraverse(traverseModeSet) &&
+                // only link to edges still in the graph.
+                edge.getToVertex().getIncoming().contains(edge))
+            .collect(Collectors.toList());
+
+        // make a map of distances
+        final TIntDoubleMap distances = new TIntDoubleHashMap();
+
+        for (StreetEdge e : candidateEdges) {
+            distances.put(e.getId(), distance(vertex, e, xscale));
+        }
+
+        // sort the list
+        Collections.sort(candidateEdges, (o1, o2) -> {
+            double diff = distances.get(o1.getId()) - distances.get(o2.getId());
+            if (diff < 0)
+                return -1;
+            if (diff > 0)
+                return 1;
+            return 0;
+        });
 
         // find the closest candidate edges
         if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg) {
@@ -166,7 +207,6 @@ public class SimpleStreetSplitter {
             //we search for closest stops (since this is only used in origin/destination linking if no edges were found)
             //in same way as closest edges are found
             List<TransitStop> candidateStops = new ArrayList<>();
-
             transitStopIndex.query(env).forEach(candidateStop ->
                 candidateStops.add((TransitStop) candidateStop)
             );
@@ -211,80 +251,27 @@ public class SimpleStreetSplitter {
                 return true;
             }
         } else {
-            List<StreetEdge> bestEdges = findBestEdges(duplicateDeg, distances, candidateEdges);
+
+            // find the best edges
+            List<StreetEdge> bestEdges = Lists.newArrayList();
+
+            // add edges until there is a break of epsilon meters.
+            // we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
+            // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
+            // fall just inside or beyond the cutoff depending on floating-point operations.
+            int i = 0;
+            do {
+                bestEdges.add(candidateEdges.get(i++));
+            } while (i < candidateEdges.size() &&
+                distances.get(candidateEdges.get(i).getId()) - distances
+                    .get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
+
             for (StreetEdge edge : bestEdges) {
                 link(vertex, edge, xscale, options);
             }
 
             return true;
         }
-    }
-
-    public List<StreetEdge> findNearbyStreetEdges(Vertex vertex, TraverseMode traverseMode, TIntDoubleMap distances,
-                                                  double xscale, double radiusDeg){
-        // find nearby street edges
-        // TODO: we used to use an expanding-envelope search, which is more efficient in
-        // dense areas. but first let's see how inefficient this is. I suspect it's not too
-        // bad and the gains in simplicity are considerable.
-
-        Envelope env = new Envelope(vertex.getCoordinate());
-
-        env.expandBy(radiusDeg / xscale, radiusDeg);
-
-        final TraverseModeSet traverseModeSet;
-        if (traverseMode == TraverseMode.BICYCLE) {
-            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
-        } else {
-            traverseModeSet = new TraverseModeSet(traverseMode);
-        }
-        // We sort the list of candidate edges by distance to the stop
-        // This should remove any issues with things coming out of the spatial index in different orders
-        // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
-        // so that we capture back edges and duplicate ways.
-        List<StreetEdge> candidateEdges = idx.query(env).stream()
-                .filter(streetEdge -> streetEdge instanceof  StreetEdge)
-                .map(edge -> (StreetEdge) edge)
-                // note: not filtering by radius here as distance calculation is expensive
-                // we do that below.
-                .filter(edge -> edge.canTraverse(traverseModeSet) &&
-                        // only link to edges still in the graph.
-                        edge.getToVertex().getIncoming().contains(edge))
-                .collect(Collectors.toList());
-
-        // make a map of distances
-        for (StreetEdge e : candidateEdges) {
-            distances.put(e.getId(), distance(vertex, e, xscale));
-        }
-
-        // sort the list
-        Collections.sort(candidateEdges, (o1, o2) -> {
-            double diff = distances.get(o1.getId()) - distances.get(o2.getId());
-            if (diff < 0)
-                return -1;
-            if (diff > 0)
-                return 1;
-            return 0;
-        });
-
-        return candidateEdges;
-
-    }
-
-    public List<StreetEdge> findBestEdges(double duplicateDeg, TIntDoubleMap distances, List<StreetEdge> candidateEdges) {
-
-        List<StreetEdge> bestEdges = Lists.newArrayList();
-
-        // add edges until there is a break of epsilon meters.
-        // we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
-        // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
-        // fall just inside or beyond the cutoff depending on floating-point operations.
-        int i = 0;
-        do {
-            bestEdges.add(candidateEdges.get(i++));
-        } while (i < candidateEdges.size() &&
-            distances.get(candidateEdges.get(i).getId()) - distances
-                .get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
-        return bestEdges;
     }
 
     /** split the edge and link in the transit stop */

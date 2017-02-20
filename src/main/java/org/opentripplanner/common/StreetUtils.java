@@ -66,7 +66,7 @@ public class StreetUtils {
             for (Edge e : gv.getOutgoing()) {
                 Vertex in = gv;
                 if (!(e instanceof StreetEdge || e instanceof StreetTransitLink || 
-                      e instanceof ElevatorEdge || e instanceof FreeEdge || e instanceof PathwayEdge)) {
+                      e instanceof ElevatorEdge || e instanceof FreeEdge)) {
                     continue;
                 }
                 State s1 = e.traverse(s0);

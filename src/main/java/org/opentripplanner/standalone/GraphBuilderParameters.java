@@ -75,7 +75,7 @@ public class GraphBuilderParameters {
     public final boolean areaVisibility;
 
     /**
-     *
+     * Link unconnected entries to public transport platforms.
      */
     public final boolean platformEntriesLinking;
 
