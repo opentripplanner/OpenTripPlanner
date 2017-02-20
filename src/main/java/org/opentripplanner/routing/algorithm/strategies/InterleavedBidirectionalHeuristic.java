@@ -15,12 +15,15 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.commons.lang3.SerializationUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -32,13 +35,15 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.temporary.*;
+import org.opentripplanner.routing.edgetype.flex.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -405,18 +410,17 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-
-                        //don't create a temporary flag stop if it is very close to one of the existing stops
+                        //don't create a flex flag stop if it is very close to one of the existing stops
                         if(tooCloseToPatternHopStops(originalPatternHop, v))
                             continue;
 
                         int stopIndex = originalPatternHop.getStopIndex();
 
-                        TripPattern temporaryTripPattern = originalTripPattern.clone();
+                        TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
                         temporaryTripPattern.code = String.valueOf(Math.random());
 
                         PatternArriveVertex patternArriveVertex =
-                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex + 1);
+                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex);
 
                         TemporaryPatternHop forwardSearchPatternHop = findShortenedPatternHops(originalPatternHop);
                         if(forwardSearchPatternHop != null){
@@ -428,8 +432,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                             forwardSearchPatternHop.distanceRatio = distanceRatio;
                             forwardSearchPatternHop.setGeometry(preStopHopGeometry);
                         }else{
-                            //haven't seen this patternHop, create a temporary one
-                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), false);
+                            //haven't seen this patternHop, create a flex one
+                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
                             double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
@@ -466,11 +470,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-                        //don't create a temporary flag stop if it is very close to one of the existing stops
+                        //don't create a flex flag stop if it is very close to one of the existing stops
                         if(tooCloseToPatternHopStops(originalPatternHop, v))
                             continue;
 
-                        TripPattern temporaryTripPattern = originalTripPattern.clone();
+                        TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
                         temporaryTripPattern.code = String.valueOf(Math.random());
 
                         PatternDepartVertex patternDepartVertex =
@@ -554,6 +558,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if(startDistance < 10 || endDistance < 10)
             return true;
         return false;
+    }
+
+    private TripPattern createTripPatternWithFlagStopPattern(TripPattern tripPattern, Stop flagStop, int stopIndex){
+        TripPattern clonedTripPattern = SerializationUtils.clone(tripPattern);
+        clonedTripPattern.stopPattern.stops[stopIndex] = flagStop;
+        return clonedTripPattern;
     }
 
 }

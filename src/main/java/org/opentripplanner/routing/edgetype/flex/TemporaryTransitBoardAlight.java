@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.temporary;
+package org.opentripplanner.routing.edgetype.flex;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;

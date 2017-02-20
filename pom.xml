@@ -734,6 +734,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- SerializationUtils used to deep clone TripPatterns for dynamic flag stops -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
     </dependencies>
 
 </project>
