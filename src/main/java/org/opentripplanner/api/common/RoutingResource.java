@@ -346,7 +346,13 @@ public abstract class RoutingResource {
      */
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
-    
+
+    @QueryParam("maxHours")
+    private Double maxHours;
+
+    @QueryParam("disableAlertFiltering")
+    private Boolean disableAlertFiltering;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -405,8 +411,10 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
-        if (maxWalkDistance != null)
+        if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
+            request.maxTransferWalkDistance = maxWalkDistance;
+        }
 
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
@@ -564,6 +572,12 @@ public abstract class RoutingResource {
 
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
+
+        if (maxHours != null)
+            request.maxHours = maxHours;
+
+        if (disableAlertFiltering != null)
+            request.disableAlertFiltering = disableAlertFiltering;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

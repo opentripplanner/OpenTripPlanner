@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -134,7 +135,7 @@ class AreaGroup {
         for (Set<Area> areaSet : groups.sets()) {
             try {
                 out.add(new AreaGroup(areaSet));
-            } catch (AreaGroup.RingConstructionException e) {
+            } catch (RingConstructionException e) {
                 for (Area area : areaSet) {
                     LOG.debug("Failed to create merged area for "
                             + area
@@ -144,10 +145,6 @@ class AreaGroup {
             }
         }
         return out;
-    }
-
-    public class RingConstructionException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
     }
 
     private Ring toRing(Polygon polygon, HashMap<Coordinate, OSMNode> nodeMap) {

@@ -2,13 +2,13 @@ package org.opentripplanner.graph_builder.module.linking;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import jersey.repackaged.com.google.common.collect.Iterables;
 import jersey.repackaged.com.google.common.collect.Maps;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -64,8 +64,8 @@ public class LinkingTest {
             SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
             SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
-            P2<StreetEdge> sp0 = s0.split(sv0);
-            P2<StreetEdge> sp1 = s1.split(sv1);
+            P2<StreetEdge> sp0 = s0.split(sv0, true);
+            P2<StreetEdge> sp1 = s1.split(sv1, true);
 
             // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
             // have the same values

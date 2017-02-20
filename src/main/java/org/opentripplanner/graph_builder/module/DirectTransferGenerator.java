@@ -97,7 +97,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
                 if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
-                new SimpleTransfer(ts0, sd.tstop, sd.dist, sd.geom);
+                new SimpleTransfer(ts0, sd.tstop, sd.dist, sd.geom, sd.edges);
                 n += 1;
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);

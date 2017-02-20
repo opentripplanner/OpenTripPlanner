@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.bike_park;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
@@ -61,5 +62,9 @@ public class BikePark implements Serializable {
 
     public int hashCode() {
         return id.hashCode() + 1;
+    }
+
+    public String toString () {
+        return String.format(Locale.US, "Bike park %s at %.6f, %.6f", name, y, x);
     }
 }

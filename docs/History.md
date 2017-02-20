@@ -14,6 +14,7 @@ In November of 2014, Arlington, Virginia launched a new [commute planning site](
 
 As of 2015, OTP now powers the New York State department of transportation's [transit trip planner](http://511ny.org/tripplanner/default.aspx). It provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 
+The Helsinki Regional Transport Authority (HSL) [trip planner](https://digitransit.fi/en/) based on OpenTripPlanner is in public beta as of spring 2016.
 
-
-
+After seven years and almost 10,000 commits from over 100 contributors around the world, version 1.0 was released on 9 September 2016.
+ 

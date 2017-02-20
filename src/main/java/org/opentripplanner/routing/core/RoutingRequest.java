@@ -21,6 +21,8 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -79,8 +81,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** An ordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
 
-    /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
+    /**
+     * The maximum distance (in meters) the user is willing to walk for access/egress legs.
+     * Defaults to unlimited.
+     */
     public double maxWalkDistance = Double.MAX_VALUE;
+
+    /**
+     * The maximum distance (in meters) the user is willing to walk for transfer legs.
+     * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.
+     */
+    public double maxTransferWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
@@ -94,6 +105,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** The worst possible weight that we will accept when planning a trip. */
     public double maxWeight = Double.MAX_VALUE;
+
+    /** The maximum duration of a returned itinerary, in hours. */
+    public double maxHours = Double.MAX_VALUE;
 
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
@@ -412,6 +426,15 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Accept only paths that use transit (no street-only paths). */
     public boolean onlyTransitTrips = false;
+
+    /** Option to disable the default filtering of GTFS-RT alerts by time. */
+    public boolean disableAlertFiltering = false;
+
+    /** Saves split edge which can be split on origin/destination search
+     *
+     * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
+     */
+    private StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -885,6 +908,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
+                && maxTransferWalkDistance == other.maxTransferWalkDistance
                 && maxPreTransitTime == other.maxPreTransitTime
                 && transferPenalty == other.transferPenalty
                 && maxSlope == other.maxSlope
@@ -924,7 +948,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
-                && useTraffic == other.useTraffic;
+                && useTraffic == other.useTraffic
+                && disableAlertFiltering == other.disableAlertFiltering;
     }
 
     /**
@@ -938,6 +963,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + (int) (worstTime & 0xffffffff) + modes.hashCode()
                 + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
+                + new Double(maxTransferWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + new Double(waitAtBeginningFactor).hashCode() * 15485863
@@ -1174,5 +1200,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
+    }
+
+    /**
+     * Does nothing if different edge is split in origin/destination search
+     *
+     * But throws TrivialPathException if same edge is split in origin/destination search.
+     *
+     * used in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
+     * @param edge
+     */
+    public void canSplitEdge(StreetEdge edge) {
+        if (splitEdge == null) {
+            splitEdge = edge;
+        } else {
+            if (splitEdge.equals(edge)) {
+                throw new TrivialPathException();
+            }
+        }
+
     }
 }

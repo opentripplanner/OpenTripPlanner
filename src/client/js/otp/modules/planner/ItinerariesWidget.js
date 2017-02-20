@@ -176,7 +176,8 @@ otp.widgets.ItinerariesWidget =
                 startTransitStopId :  stopId,
                 date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
-                arriveBy : false
+                arriveBy : false,
+                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
             });
             this_.refreshActiveOnly = true;
             this_.module.updateActiveOnly = true;
@@ -192,7 +193,8 @@ otp.widgets.ItinerariesWidget =
                 startTransitStopId :  stopId,
                 time : otp.util.Time.formatItinTime(newEndTime, "h:mma"),
                 date : otp.util.Time.formatItinTime(newEndTime, "MM-DD-YYYY"),
-                arriveBy : true
+                arriveBy : true,
+                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
             });
             this_.refreshActiveOnly = true;
             this_.module.updateActiveOnly = true;
@@ -208,7 +210,8 @@ otp.widgets.ItinerariesWidget =
                 startTransitStopId :  stopId,
                 time : otp.util.Time.formatItinTime(newStartTime, "h:mma"),
                 date : otp.util.Time.formatItinTime(newStartTime, "MM-DD-YYYY"),
-                arriveBy : false
+                arriveBy : false,
+                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
             });
             this_.refreshActiveOnly = true;
             this_.module.updateActiveOnly = true;
@@ -223,7 +226,8 @@ otp.widgets.ItinerariesWidget =
                 startTransitStopId :  stopId,
                 date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
-                arriveBy : true
+                arriveBy : true,
+                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
             });
             this_.refreshActiveOnly = true;
             this_.module.updateActiveOnly = true;
@@ -430,9 +434,8 @@ otp.widgets.ItinerariesWidget =
         alerts = alerts || [];
 
         // create an alert if this is a different day from the searched day
-        var queryTime = itin.tripPlan.queryParams.date + ' ' + itin.tripPlan.queryParams.time;
-        queryTime = moment(queryTime, 'MM-DD-YYYY HH:mma').unix()*1000
-        if(itin.differentServiceDayFromQuery(queryTime)) {
+        var queryTime = otp.util.Time.constructQueryTime(itin.tripPlan.queryParams);
+        if(itin.differentServiceDayFromQuery(itin.tripPlan.queryParams.originalQueryTime || queryTime)) {
             //TRANSLATORS: Shown as alert text before showing itinerary.
             alerts = [ "This itinerary departs on a different day than the one searched for"];
         }

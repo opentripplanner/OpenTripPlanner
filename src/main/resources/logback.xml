@@ -1,19 +1,31 @@
 <configuration>
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <!--
+    This suppresses the meta-log entries about Logback configuration (how Java).
+    This is a stopgap measure.
+    The right solution is to make sure there are not logback.xml files from our dependency libraries on the classpath.
+   -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+  <!-- This will push these level changes onto JUL. Otherwise, JUL defaults to a high threshold
+       for logging and debug log messages will never make it to slf4j. -->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
       <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
+  <!-- Change this to debug to let more messages through. -->
+  <root level="info">
+    <appender-ref ref="stdout" />
   </root>
-
-  <logger name="com.amazonaws" level="INFO"/>
-  <logger name="org.apache.http" level="INFO" />
-  <logger name="com.conveyal" level="INFO"/>
+  <logger name="ch.qos.logback" level="warn"/>
+  <logger name="com.amazonaws" level="info"/>
+  <logger name="org.apache.http" level="info" />
+  <logger name="com.conveyal" level="info"/>
 
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
@@ -29,6 +41,8 @@
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
   <!-- Avoid printing ugly warning message when unable to create websocket connection -->
   <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="error" />
-  <logger name="com.sun.jersey" level="debug" />
+  <logger name="com.sun.jersey" level="warn" />
+  <!-- Suppress an inconsequential IOException that is logged at debug level. -->
+  <logger name="org.glassfish.grizzly" level="info" />
 
 </configuration>

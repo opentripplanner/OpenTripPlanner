@@ -1,8 +1,70 @@
 # Changelog
 
-## 0.19.0-SNAPSHOT
 
-- next release, work in progress on master branch
+## 1.0 (2016-09-09)
+
+- Fix problem with missing embedded router-configs.
+- Check whether trips have been banned when applying in-seat transfers (interlining).
+- Load embedded config for existing graphs on disk.
+- Apply max walk distance to transfers, not just initial and final walk.
+- Remove Conveyal tiles from client (which was getting expensive), add free Carto/MapZen tiles.
+- Fixed headsigns: in itineraries, headsign for a leg used to always be the last stop.
+- Updated default map tile sets in the client because Mapquest is no longer gratis.
+- Fix problem with empty list ??? #1873
+- Rewrite of intermediate places handling in GraphPathFinder. Original request is cloned for each intermediate path.
+- Routes in GraphQL API Change "type" to "mode" and add "type" as route type to Route for GraphQL
+- Add effective end date to alerts (from HSL).
+- Rutebanken Citybike bike share.
+- Correct TPEG transport modes TPEG 401 and 402 to be "subway".
+- Ignore exceptions caused by errors in OSM linear rings.
+- Updated to version 2.18 of Jersey to fix hanging threads in Grizzly.
+- Removed confusing "Busish" and "Trainish" pseudo-modes.
+- FareService for Seattle: allow specifying fares in GTFS instead of hard-coding them in Java. Senior/youth fare prices are given in an extra column in fare attributes. Per-trip fares are taken into consideration when calculating fares in this region. 
+- Update new linker to link to transitStops if no streets are found.
+- Show the name supplied in the request for the origin/destination points in the response.
+- Throw a trivialPath exception if start/end point are on the same edge.
+- Switch to only use the new SimpleStreetLinker, even for search start and end points. Completely removed old linker classes. Changes for proper handling of wheelchairs and bicycles at start and end points.
+- Properly handle null timetableSnapshots when there is no real-time data.
+
+
+## 0.20 (2016-06-10)
+
+- Re-enabled Enunciate, which works properly with OTP now. This means we have auto-generated API docs.
+- Make headsign and block ID visible in the Stop Viewer.
+- NYC fare service: filter out non-NYC agencies.
+- Optionally log all requests to a file.
+- Make max distance for in-seat transfers (interlining) configurable. Previously it was hardcoded at 200m.
+- Polish translation for web client.
+- Introduced bikeShareId in trip plans (separate from stopIds).
+- Support for ShareBike bike rental system in Oslo, Drammen, Trondheim, Milan, Barcelona and Mexico City among others.
+- Changed default waitAtBeginningFactor and timeouts.
+- Show alert in client when itinerary departure date differs from search date.
+- Exposed realtimeState in GraphQL responses.
+- Fixed a routerConfig NullPointerException.
+- Support for San Francisco bike share from leoromanovsky.
+- GraphQL API for most transit data from hannesj.
+- Disallow shortcuts through multiple StationStopEdges.
+- Add support for airplanes (from HSL)
+- Major simplification and correction of the longDistance heuristic, removed obsolete runState.options.heuristicWeight.
+- Return default OSM level for ways that are not found.
+- Profile routing: use earliest arrival objective function on-street, properly handle TrivialPathExceptions.
+- Fixed ID matching when applying AlertPatches.
+- Fixed banning of agencies in multi agency feeds.
+- More coherent handling of feed IDs as scope for GTFS IDs.
+- Added transit service start and end timestamps to BuildInfo.
+- Handle embeded router configuration for POSTed graphs and zips for building.
+- Simplified router-config handling.
+- Properly lazy-initialize profile routing stopClusters. Added stop clusters to the Index API.
+- Completely removed the ill-advised path parser system, which was too clever for its own good.    
+- Sort itineraries by total travel time rather than in-transit time.
+- Rental bikes: allow loading generic KML.
+- Removed the experimental TransportNetwork classes, which shared no code with the rest of OTP and were duplicated in the R5 project. There are still some elements that can be cleaned out when only R5 is used by Conveyal's analysis system. The broker code in OTP is now able to start up R5 workers for Analyst.
+- Use the Conveyal fork of the OBA GTFS loader, so that we can add our own extensions to GTFS.
+- Updated docs to offer Conveyal Maven repo as a place to get prebuilt OTP.
+
+## 0.19.0 (2016-05-25)
+
+- TODO
 
 ## 0.18.0 (2015-05-29)
 

@@ -69,7 +69,7 @@ public class IndexGraphQLSchema {
         .name("RealtimeState")
         .value("SCHEDULED", RealTimeState.SCHEDULED, "The trip information comes from the GTFS feed, i.e. no real-time update has been applied.")
 
-        .value("UPDATED", RealTimeState.UDPATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
+        .value("UPDATED", RealTimeState.UPDATED, "The trip information has been updated, but the trip pattern stayed the same as the trip pattern of the scheduled trip.")
 
         .value("CANCELED", RealTimeState.CANCELED, "The trip has been canceled by a real-time update.")
 
@@ -133,6 +133,7 @@ public class IndexGraphQLSchema {
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
+        index.clusterStopsAsNeeded();
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -454,6 +455,11 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.tripForId
                     .get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+               	.name("headsign")
+              	.type(Scalars.GraphQLString)
+              	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+              	.build())
             .build();
 
         tripType = GraphQLObjectType.newObject()
@@ -679,10 +685,14 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("type")
+                .name("mode")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
                     (Route) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("type")
+                .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")

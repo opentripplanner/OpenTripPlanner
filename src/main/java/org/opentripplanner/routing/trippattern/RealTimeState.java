@@ -14,7 +14,7 @@ public enum RealTimeState {
      * The trip information has been updated, but the trip pattern stayed the same as the trip
      * pattern of the scheduled trip.
      */
-    UDPATED,
+    UPDATED,
 
     /**
      * The trip has been canceled by a real-time update.
