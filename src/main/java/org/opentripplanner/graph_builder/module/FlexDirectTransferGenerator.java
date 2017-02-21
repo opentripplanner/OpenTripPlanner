@@ -91,6 +91,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
 
     StreetMatcher matcher;
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    Multimap<TripPattern, TripPattern> flexPatternsToIgnore = ArrayListMultimap.create();
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
@@ -105,14 +106,20 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
 
         int nTransfersTotal = 0;
         int nLinkableHops = 0;
+        int nSkippedHops = 0;
 
         for (TripPattern tripPattern : graph.index.patternsForFeedId.values()) {
             for (PatternHop hop : tripPattern.getPatternHops()) {
 
+                if (hop.getDistance() < MAX_DISTANCE) {
+                    nSkippedHops++;
+                    continue;
+                }
+
                 // for each hop, find nearby stops and hops. create transfers.
                 if (hop.getContinuousDropoff() > 0 || hop.getContinuousPickup() > 0) {
                     if (++nLinkableHops % 1000 == 0) {
-                        LOG.info("Linked {} hops", nLinkableHops);
+                        LOG.info("Linked {} hops, skipped {} hops", nLinkableHops, nSkippedHops);
                     }
 
                     // Exclude a transfer point if the transfer from DirectTransferGenerator would be better:
@@ -124,6 +131,9 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
                     for (TransferPointAtDistance pt : pts) {
                         if (!shouldExclude(hop, pt)) {
                             link(graph, hop, pt);
+                            if (!pt.isTransitStop()) {
+                                flexPatternsToIgnore.put(pt.hop.getPattern(), tripPattern);
+                            }
                         }
                     }
                 }
@@ -181,9 +191,12 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
                 // get hops
                 if (state.backEdge instanceof StreetEdge) {
                     for (PatternHop h : graph.index.getHopsForEdge(state.backEdge, true)) {
+                        if (flexPatternsToIgnore.get(hop.getPattern()).contains(h.getPattern())) {
+                            continue;
+                        }
                         if (h.getContinuousPickup() > 0 || h.getContinuousDropoff() > 0) {
                             TripPattern pattern = h.getPattern();
-                            TransferPointAtDistance pt = new TransferPointAtDistance(hop, state, h, state.getVertex().getCoordinate());
+                            TransferPointAtDistance pt = new TransferPointAtDistance(hop, state, h, state.getVertex());
                             closestTransferPointForTripPattern.put(pattern, pt);
                         }
                     }
@@ -222,39 +235,56 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
     }
 
     public void link(Graph graph, PatternHop hop, TransferPointAtDistance point) {
+
         if (point.isTransitStop()) {
             // linking from a hop to a transit stop
 
-            Vertex v = point.getFrom();
-            Stop stop = new Stop();
-            stop.setId(new AgencyAndId(hop.getPattern().getFeedId(), String.valueOf(Math.random())));
-            stop.setLat(v.getLat());
-            stop.setLon(v.getLon());
-
-            String msg = String.format("Transfer from pattern=%s, stopIndex=%d, pos=%s to stop=%s, dist=%g, dafh=%g", hop.getPattern().code, hop.getStopIndex(), v.getCoordinate().toString(), point.tstop.toString(), point.dist, point.distanceAlongFromHop);
-            stop.setName(msg);
-            TransitStop transferStop = new TransitStop(graph, stop);
-
-            // hop -> stop transfer
-            PatternArriveVertex patternArriveVertex = new PatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
-            TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transferStop);
-            PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop, matcher, geometryFactory);
-            new TransitBoardAlightAtFlex(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode, startHop.getPercentageOfHop());
-            new PreAlightEdge(transitStopArrive, transferStop);
-            new SimpleTransfer(transferStop, point.tstop, point.dist, point.geom, point.edges);
-
-            // stop -> hop
-            TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transferStop);
-            PatternDepartVertex patternDepartVertex = new PatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
-            new PreBoardEdge(transferStop, transitStopDepart);
-            PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop, matcher, geometryFactory);
-            new TransitBoardAlightAtFlex(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode, endHop.getPercentageOfHop());
+            String msg = String.format("Transfer from pattern=%s, stopIndex=%d, pos=%s to stop=%s, dist=%g, dafh=%g", hop.getPattern().code, hop.getStopIndex(), point.getFrom().getCoordinate().toString(), point.tstop.toString(), point.dist, point.distanceAlongFromHop);
+            TransitStop transferStop = newStopOnPartialHop(graph, hop, point.getFrom(), msg);
             TransferPointAtDistance rev = point.reverse();
+
+            new SimpleTransfer(transferStop, point.tstop, point.dist, point.geom, point.edges);
             new SimpleTransfer(point.tstop, transferStop, rev.dist, rev.geom, rev.edges);
 
         } else {
-            // TODO
+            PatternHop toHop = point.hop;
+            String fromMsg = String.format("transfer FROM pattern=%s, stopIndex=%d, pos=%s", hop.getPattern().code, hop.getStopIndex(), point.getFrom().getCoordinate());
+            String toMsg = String.format("transfer TO pattern=%s, stopindex=%d, pos=%s", toHop.getPattern().code, toHop.getStopIndex(), point.hopTo.getCoordinate());
+
+            TransitStop fromStop = newStopOnPartialHop(graph, hop, point.getFrom(), fromMsg);
+            TransitStop toStop = newStopOnPartialHop(graph, toHop, point.hopTo, toMsg);
+            TransferPointAtDistance rev = point.reverse();
+
+            new SimpleTransfer(fromStop, toStop, point.dist, point.geom, point.edges);
+            new SimpleTransfer(toStop, fromStop, rev.dist, rev.geom, rev.edges);
+
         }
+    }
+
+    private TransitStop newStopOnPartialHop(Graph graph, PatternHop hop, Vertex vertex, String name) {
+        Stop stop = new Stop();
+        stop.setId(new AgencyAndId(hop.getPattern().getFeedId(), String.valueOf(Math.random())));
+        stop.setLat(vertex.getLat());
+        stop.setLon(vertex.getLon());
+        stop.setName(name);
+
+        TransitStop transferStop = new TransitStop(graph, stop);
+
+        // hop -> stop transfer
+        PatternArriveVertex patternArriveVertex = new PatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
+        TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transferStop);
+        PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop, matcher, geometryFactory);
+        new TransitBoardAlightAtFlex(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode, startHop.getPercentageOfHop());
+        new PreAlightEdge(transitStopArrive, transferStop);
+
+        // stop -> hop
+        TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transferStop);
+        PatternDepartVertex patternDepartVertex = new PatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
+        new PreBoardEdge(transferStop, transitStopDepart);
+        PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop, matcher, geometryFactory);
+        new TransitBoardAlightAtFlex(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode, endHop.getPercentageOfHop());
+
+        return transferStop;
     }
 
     private static boolean tooClose(Vertex v, Vertex w) {
@@ -285,9 +315,9 @@ class TransferPointAtDistance {
     LineString geom;
     List<Edge> edges;
     PatternHop hop;
-    Coordinate locationOnHop;
-    Vertex from;
+    Vertex hopTo; // if hop
 
+    Vertex from;
     PatternHop fromHop;
     double distanceAlongFromHop; // distance along original hop
 
@@ -298,10 +328,10 @@ class TransferPointAtDistance {
         this.tstop = tstop;
     }
 
-    public TransferPointAtDistance(PatternHop fromHop, State state, PatternHop hop, Coordinate coord) {
+    public TransferPointAtDistance(PatternHop fromHop, State state, PatternHop hop, Vertex vertex) {
         this(fromHop, state);
         this.hop = hop;
-        this.locationOnHop = coord;
+        this.hopTo = vertex;
     }
 
     public boolean isTransitStop() {
@@ -371,7 +401,7 @@ class TransferPointAtDistance {
         if (Double.compare(that.dist, dist) != 0) return false;
         if (tstop != null ? !tstop.equals(that.tstop) : that.tstop != null) return false;
         if (hop != null ? !hop.equals(that.hop) : that.hop != null) return false;
-        return locationOnHop != null ? locationOnHop.equals(that.locationOnHop) : that.locationOnHop == null;
+        return hopTo != null ? hopTo.equals(that.hopTo) : that.hopTo == null;
     }
 
     @Override
@@ -382,24 +412,24 @@ class TransferPointAtDistance {
         temp = Double.doubleToLongBits(dist);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (hop != null ? hop.hashCode() : 0);
-        result = 31 * result + (locationOnHop != null ? locationOnHop.hashCode() : 0);
+        result = 31 * result + (hopTo != null ? hopTo.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "TransferPointAtDistance[dist=" + dist + "," +
-                ((tstop != null) ? ("tstop=" + tstop.toString()) : ("hop=" + hop.toString() + ",coord=" + locationOnHop.toString()))
+                ((tstop != null) ? ("tstop=" + tstop.toString()) : ("hop=" + hop.toString() + ",coord=" + hopTo.toString()))
                 + "]";
     }
 
     public boolean betterThan(TransferPointAtDistance other, boolean preferEarlyTransfer) {
         if (other == null)
             return true;
-        // prefer a transfer point that is at a real stop [unless the real stop is outside the cutoff away?]
-        if (this.isTransitStop() && !other.isTransitStop())
+        // prefer a transfer point that is at a real stop [unless the real stop is outside some cutoff away?]
+        if (this.isTransitStop() && !other.isTransitStop() && this.dist < other.dist + 500)
             return true;
-        if (!this.isTransitStop() && other.isTransitStop())
+        if (!this.isTransitStop() && other.isTransitStop() && other.dist < this.dist + 500)
             return false;
 
         // prefer traveling a shorter distance as long as the difference is not trivial. (should this be "softer"? if your walk preferences are larger you might prefer to walk a "cutoff")
