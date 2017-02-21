@@ -367,10 +367,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
 
-        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
-            State s = tripPatternStateMap.get(tripPattern);
-        }
-
         Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
         for(TripPattern tripPattern : tripPatternStateMap.keySet()){
             State s = tripPatternStateMap.get(tripPattern);
@@ -388,7 +384,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             flagStop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
             flagStop.setLat(v.getLat());
             flagStop.setLon(v.getLon());
-            //flagStop.setName(String.valueOf(Math.random()));
+            flagStop.setName(s.getBackEdge().getName());
             TransitStop flagTransitStop = new TransitStop(graph, flagStop);
 
             if(fromTarget){
@@ -410,10 +406,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-                        //don't create a flex flag stop if it is very close to one of the existing stops
-                        if(tooCloseToPatternHopStops(originalPatternHop, v))
-                            continue;
-
                         int stopIndex = originalPatternHop.getStopIndex();
 
                         TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
@@ -434,6 +426,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         }else{
                             //haven't seen this patternHop, create a flex one
                             LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                            if(preStopHopGeometry == null)
+                                continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
                             double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
@@ -470,9 +464,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-                        //don't create a flex flag stop if it is very close to one of the existing stops
-                        if(tooCloseToPatternHopStops(originalPatternHop, v))
-                            continue;
+                        LineString postStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                        if(postStopHopGeometry == null)
+                            continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
+
 
                         TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
                         temporaryTripPattern.code = String.valueOf(Math.random());
@@ -480,7 +475,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         PatternDepartVertex patternDepartVertex =
                                 new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex());
 
-                        LineString postStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
                         double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                         double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(postStopHopGeometry);
                         double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
@@ -533,6 +527,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         lineCoordinateList.set(lowestDistanceIndex, flexPoint);
         List<Coordinate> shortenedHopGeometry =  reverseSearch ? lineCoordinateList.subList(0, lowestDistanceIndex + 1) : lineCoordinateList.subList(lowestDistanceIndex, lineCoordinateList.size());
 
+        if(shortenedHopGeometry.size() < 2){
+            return null;
+        }
+
         return GeometryUtils.getGeometryFactory().createLineString(shortenedHopGeometry.toArray(new Coordinate[shortenedHopGeometry.size()]));
     }
 
@@ -549,15 +547,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
         return null;
-    }
-
-    private boolean tooCloseToPatternHopStops(PatternHop originalPatternHop, Vertex v){
-        //don't create a temporary flag stop if it is very close to one of the existing stops
-        Double startDistance = SphericalDistanceLibrary.fastDistance(originalPatternHop.getFromVertex().getCoordinate(), v.getCoordinate());
-        Double endDistance = SphericalDistanceLibrary.fastDistance(originalPatternHop.getToVertex().getCoordinate(), v.getCoordinate());
-        if(startDistance < 10 || endDistance < 10)
-            return true;
-        return false;
     }
 
     private TripPattern createTripPatternWithFlagStopPattern(TripPattern tripPattern, Stop flagStop, int stopIndex){

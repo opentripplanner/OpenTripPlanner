@@ -13,20 +13,22 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.*;
-import org.opentripplanner.routing.edgetype.temporary.TemporaryPatternHop;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+
+import java.util.Locale;
 
 /**
  * A transit vehicle's journey between departure at one stop and arrival at the next.
@@ -86,6 +88,8 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         }
         
     	int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
+        if(this instanceof TemporaryPatternHop)
+            runningTime = (int) (runningTime * ((TemporaryPatternHop)this).distanceRatio);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.setBackMode(getMode());
@@ -95,7 +99,13 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
+        if(this instanceof TemporaryPatternHop){
+            int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
+            double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
+            return (int) runningTime * distanceRatio;
+        }else{
+            return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
+        }
     }
     
     @Override
@@ -132,16 +142,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         //s1.setRoute(pattern.getExemplar().route.getId());
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
-        if(this.toString().indexOf("1:15:0:05_10_D lat,lng=39.739934,-104.977259")> -1){
-            State newState = s1.makeState();
-            if(this instanceof TemporaryPatternHop){
-                System.out.println("temporary running time: " + runningTime + " weight: " + newState.getWeight() + " for: " + this);
-            }else{
-                System.out.println("running time: " + runningTime + " weight: " + newState.getWeight() + " for: " + this);
-            }
-
-            return newState;
-        }
         return s1.makeState();
     }
 
