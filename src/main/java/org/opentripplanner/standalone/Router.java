@@ -15,6 +15,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.util.ElevationUtils;
+import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +164,16 @@ public class Router {
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);
 
+        /* Compute ellipsoidToGeoidDifference for this Graph */
+        try {
+            WorldEnvelope env = graph.getEnvelope();
+            double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
+            double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
+            graph.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+            LOG.info("Computed ellipsoid/geoid offset at (" + lat + ", " + lon + ") as " + graph.ellipsoidToGeoidDifference);
+        } catch (Exception e) {
+            LOG.error("Error computing ellipsoid/geoid difference");
+        }
     }
 
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */

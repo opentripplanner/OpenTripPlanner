@@ -41,13 +41,13 @@ public class TripPlan {
     public List<Itinerary> itinerary = new ArrayList<Itinerary>();
 
     public TripPlan() { }
-    
+
     public TripPlan(Place from, Place to, Date date) {
         this.from = from;
         this.to = to;
         this.date = date;
     }
-    
+
     public void addItinerary(Itinerary itinerary) {
         this.itinerary.add(itinerary);
     }
