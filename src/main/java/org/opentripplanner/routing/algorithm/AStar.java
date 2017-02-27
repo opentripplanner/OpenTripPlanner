@@ -368,4 +368,11 @@ public class AStar {
         }
         return ret;
     }
+
+    public State getTragetAcceptedState(){
+        if(!runState.targetAcceptedStates.isEmpty() ){
+            return runState.targetAcceptedStates.get(0);
+        }
+        return null;
+    }
 }
