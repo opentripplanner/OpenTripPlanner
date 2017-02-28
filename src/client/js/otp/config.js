@@ -23,6 +23,7 @@ otp.config = {
         'sl': otp.locale.Slovenian,
         'fr': otp.locale.French,
         'it': otp.locale.Italian,
+        'es': otp.locale.Spanish,
         'ca_ES': otp.locale.Catalan
     },
 
