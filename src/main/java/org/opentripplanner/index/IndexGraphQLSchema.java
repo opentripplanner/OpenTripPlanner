@@ -170,6 +170,8 @@ public class IndexGraphQLSchema {
 
     public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
 
+    public GraphQLOutputType serviceTimeRangeType = new GraphQLTypeReference("ServiceTimeRange");
+
     public GraphQLOutputType bikeRentalStationType = new GraphQLTypeReference("BikeRentalStation");
 
     public GraphQLOutputType bikeParkType = new GraphQLTypeReference("BikePark");
@@ -742,6 +744,24 @@ public class IndexGraphQLSchema {
                     Alert alert = ((AlertPatch) environment.getSource()).getAlert();
                     return alert.effectiveEndDate != null ? alert.effectiveEndDate.getTime() / 1000 : null;
                 })
+                .build())
+            .build();
+
+
+        serviceTimeRangeType = GraphQLObjectType.newObject()
+            .name("serviceTimeRange")
+            .description("Time range covered by the routing graph")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("start")
+                .type(Scalars.GraphQLLong)
+                .description("Beginning of service time range")
+                .dataFetcher(environment -> index.graph.getTransitServiceStarts())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("end")
+                .type(Scalars.GraphQLLong)
+                .description("End of service time range")
+                .dataFetcher(environment -> index.graph.getTransitServiceEnds())
                 .build())
             .build();
 
@@ -2351,6 +2371,12 @@ public class IndexGraphQLSchema {
                 .description("Get all alerts active in the graph")
                 .type(new GraphQLList(alertType))
                 .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceTimeRange")
+                .description("Get start and end time for publict transit services present in the graph")
+                .type(serviceTimeRangeType)
+                .dataFetcher(environment -> index.graph)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStations")
