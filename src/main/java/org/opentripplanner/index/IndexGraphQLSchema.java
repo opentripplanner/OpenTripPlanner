@@ -1297,7 +1297,7 @@ public class IndexGraphQLSchema {
         tripType = GraphQLObjectType.newObject()
             .name("Trip")
             .withInterface(nodeInterface)
-            .field(GraphQLFieldDefinition.newFieldDefinqition()
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
