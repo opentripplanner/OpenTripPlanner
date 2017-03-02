@@ -350,7 +350,7 @@
         <repository>
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
-            <url>https://maven.conveyal.com/</url>
+            <url>http://maven.conveyal.com/</url>
         </repository>
         <repository>
             <snapshots>
@@ -358,7 +358,7 @@
             </snapshots>
             <id>bintray-macroz-graphql-java</id>
             <name>bintray</name>
-            <url>https://dl.bintray.com/macroz/graphql-java</url>
+            <url>http://dl.bintray.com/macroz/graphql-java</url>
         </repository>
     </repositories>
 
