@@ -37,6 +37,8 @@ public class Response {
     /** Debugging and profiling information */
     public DebugOutput debugOutput = null;
 
+    public ElevationMetadata elevationMetadata = null;
+
     /** This no-arg constructor exists to make JAX-RS happy. */ 
     @SuppressWarnings("unused")
     private Response() {};

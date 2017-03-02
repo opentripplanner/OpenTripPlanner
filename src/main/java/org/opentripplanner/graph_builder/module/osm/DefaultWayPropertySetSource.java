@@ -342,7 +342,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         /* bicycle=designated, but no bike infrastructure is present */
         setProperties(props, "highway=*;bicycle=designated",
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
+                StreetTraversalPermission.ALL, 0.97, 0.97);
         setProperties(props, "highway=service;bicycle=designated", StreetTraversalPermission.ALL,
                 0.84, 0.84);
         setProperties(props, "highway=residential;bicycle=designated",

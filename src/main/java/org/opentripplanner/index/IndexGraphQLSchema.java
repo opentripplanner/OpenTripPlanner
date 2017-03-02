@@ -626,6 +626,7 @@ public class IndexGraphQLSchema {
             .build();
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
+        index.clusterStopsAsNeeded();
 
         translatedStringType = GraphQLObjectType.newObject()
             .name("TranslatedString")
@@ -1264,13 +1265,19 @@ public class IndexGraphQLSchema {
                 .name("stopHeadsign")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+                .deprecate("Use headsign instead, will be removed in the future")
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("headsign")
+              	.type(Scalars.GraphQLString)
+              	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+              	.build())
             .build();
 
         tripType = GraphQLObjectType.newObject()
             .name("Trip")
             .withInterface(nodeInterface)
-            .field(GraphQLFieldDefinition.newFieldDefinition()
+            .field(GraphQLFieldDefinition.newFieldDefinqition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(

@@ -132,5 +132,10 @@ otp.util.Time = {
         return  h + ":" + m + space + am;
     },
 
+    constructQueryTime : function (queryParams) {
+      var queryTime = queryParams.date + ' ' + queryParams.time;
+      return moment(queryTime, 'MM-DD-YYYY HH:mma').unix()*1000
+    },
+
     CLASS_NAME: "otp.util.Time"
 };

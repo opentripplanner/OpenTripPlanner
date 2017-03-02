@@ -118,10 +118,15 @@ public class GrizzlyServer {
         // GraphService gs = (GraphService) iocFactory.getComponentProvider(GraphService.class).getInstance();
         // Graph graph = gs.getGraph();
         // httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*");
-        
+
+        // Add shutdown hook to gracefully shut down Grizzly.
+        // Signal handling (sun.misc.Signal) is potentially not available on all JVMs.
+        Thread shutdownThread = new Thread(httpServer::shutdown);
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
+
         /* RELINQUISH CONTROL TO THE SERVER THREAD */
         try {
-            httpServer.start(); 
+            httpServer.start();
             LOG.info("Grizzly server running.");
             Thread.currentThread().join();
         } catch (BindException be) {
@@ -131,7 +136,9 @@ public class GrizzlyServer {
         } catch (InterruptedException ie) {
             LOG.info("Interrupted, shutting down.");
         }
-        httpServer.shutdown();
 
+        // Clean up graceful shutdown hook before shutting down Grizzly.
+        Runtime.getRuntime().removeShutdownHook(shutdownThread);
+        httpServer.shutdown();
     }
 }
