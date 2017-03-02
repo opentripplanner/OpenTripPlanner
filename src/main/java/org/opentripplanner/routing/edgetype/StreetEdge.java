@@ -772,12 +772,12 @@ public class StreetEdge extends Edge implements Cloneable {
      * TODO change everything to clockwise from North
      */
 	public int getInAngle() {
-		return this.inAngle * 180 / 128;
+		return (int) Math.round(this.inAngle * 180 / 128.0);
 	}
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle * 180 / 128;
+		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
