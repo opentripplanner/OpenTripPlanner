@@ -348,17 +348,17 @@
             <url>https://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
-            <id>conveyal</id>
-            <name>Conveyal Maven Repository</name>
-            <url>http://maven.conveyal.com/</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
             <id>bintray-macroz-graphql-java</id>
             <name>bintray</name>
             <url>http://dl.bintray.com/macroz/graphql-java</url>
+        </repository>
+        <repository>
+            <id>conveyal</id>
+            <name>Conveyal Maven Repository</name>
+            <url>http://maven.conveyal.com/</url>
         </repository>
     </repositories>
 
