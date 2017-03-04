@@ -473,6 +473,17 @@ public abstract class GraphPathToTripPlanConverter {
                     legs.get(i).alightRule = alightRule;    // leg, don't alight now.
                 }
             }
+
+            if (legs.get(i).intermediatePlace) {
+                Leg leg = legs.get(i);
+                Leg nextLeg = legs.get(i + 1);
+                if (nextLeg != null && !nextLeg.intermediatePlace && nextLeg.isTransitLeg()) {
+                    long waitTime = nextLeg.startTime.getTimeInMillis() -
+                        leg.endTime.getTimeInMillis();
+                    leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + waitTime);
+                    leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + waitTime);
+                }
+            }
         }
     }
 
