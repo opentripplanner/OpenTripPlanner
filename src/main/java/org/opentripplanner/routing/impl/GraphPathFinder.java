@@ -282,7 +282,9 @@ public class GraphPathFinder {
 
                 GraphPath path = partialPaths.get(0);
                 paths.add(path);
-                time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
+                time = (request.arriveBy
+                    ? path.getStartTime() - request.transferSlack
+                    : path.getEndTime() + request.transferSlack);
                 placeIndex += (request.arriveBy ? -1 : +1);
             }
             request.setRoutingContext(router.graph);
