@@ -638,6 +638,10 @@ public abstract class GraphPathToTripPlanConverter {
         leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
         leg.to.departure = null;
 
+        if (states[0].getBackEdge() instanceof LegSwitchingEdge) {
+            leg.intermediatePlace = true;
+        }
+
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
 

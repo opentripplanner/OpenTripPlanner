@@ -2664,6 +2664,12 @@ public class IndexGraphQLSchema {
                         .collect(Collectors.toList());
                 })
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediatePlace")
+                .description("Do we continue from a specified intermediate place")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((Leg) environment.getSource()).intermediatePlace)
+                .build())
             .build();
 
         GraphQLObjectType fareType = GraphQLObjectType.newObject()

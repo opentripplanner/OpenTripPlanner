@@ -260,7 +260,11 @@ public class Leg {
     @JsonSerialize
     public Boolean rentedBike;
 
-    /**
+     @XmlAttribute
+     @JsonSerialize
+     public Boolean intermediatePlace = false;
+
+     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
      */
