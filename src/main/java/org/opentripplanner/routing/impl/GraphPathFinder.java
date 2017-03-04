@@ -319,7 +319,8 @@ public class GraphPathFinder {
             }
             lastVertex = path.getEndVertex();
         }
-        return newPath;
+        // Do a second round of reverse optimization over the whole Path
+        return new GraphPath(newPath.states.getLast(), true);
     }
 
 /*

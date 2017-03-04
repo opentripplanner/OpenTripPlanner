@@ -686,7 +686,9 @@ public class State implements Cloneable {
                 }
 
                 if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
-                        ret.getBackMode() != orig.getBackMode()) {
+                    ret.getBackMode() != orig.getBackMode() &&
+                    orig.getBackMode() != TraverseMode.LEG_SWITCH &&
+                    ret.getBackMode() != TraverseMode.LEG_SWITCH) {
                     ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
 
