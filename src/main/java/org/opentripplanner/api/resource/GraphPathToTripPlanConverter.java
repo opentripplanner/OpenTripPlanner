@@ -266,7 +266,12 @@ public abstract class GraphPathToTripPlanConverter {
                     if (legIndexPairs[1] != states.length - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
-                    legIndexPairs = new int[] {i, states.length - 1};
+                    if (states[i - 1].getBackEdge() instanceof LegSwitchingEdge) {
+                        // Include from from LegSwitchingEdge
+                        legIndexPairs = new int[] {i-1, states.length - 1};
+                    } else {
+                        legIndexPairs = new int[] {i, states.length - 1};
+                    }
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;

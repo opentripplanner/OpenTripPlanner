@@ -330,6 +330,11 @@ public class IndexGraphQLSchema {
                 .description("The longitude of the place.")
                 .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("address")
+                .description("The name of the place.")
+                .type(Scalars.GraphQLString)
+                .build())
             .build();
 
         GraphQLInputObjectType preferredInputType = GraphQLInputObjectType.newInputObject()
