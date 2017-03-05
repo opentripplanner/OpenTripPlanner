@@ -83,7 +83,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
         long bestNonTransitTime = Long.MAX_VALUE;
-        Set<Itinerary> itineraries = new HashSet<>();
+        List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
@@ -1011,7 +1011,8 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             } else {
                 if (!createdNewStep && step.elevation != null) {
-                    List<P2<Double>> s = encodeElevationProfile(edge, distance);
+                    List<P2<Double>> s = encodeElevationProfile(edge, distance,
+                            backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
                     if (step.elevation != null && step.elevation.size() > 0) {
                         step.elevation.addAll(s);
                     } else {
@@ -1066,7 +1067,8 @@ public abstract class GraphPathToTripPlanConverter {
         step.streetName = en.getName(wantedLocale);
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
-        step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
+        step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
+                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
         step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
@@ -1076,7 +1078,7 @@ public abstract class GraphPathToTripPlanConverter {
         return step;
     }
 
-    private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
+    private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
         if (!(edge instanceof StreetEdge)) {
             return new ArrayList<P2<Double>>();
         }
@@ -1087,7 +1089,7 @@ public abstract class GraphPathToTripPlanConverter {
         ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
         for (int i = 0; i < coordArr.length; i++) {
-            out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
+            out.add(new P2<Double>(coordArr[i].x + distanceOffset, coordArr[i].y + heightOffset));
         }
         return out;
     }
