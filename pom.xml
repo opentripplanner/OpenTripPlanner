@@ -385,6 +385,12 @@
             <artifactId>fst</artifactId>
             <version>2.34</version>
         </dependency>
+        <!-- XXX: temporary fox for the build that is currently broken because some transitive deps are not handled correctly -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
