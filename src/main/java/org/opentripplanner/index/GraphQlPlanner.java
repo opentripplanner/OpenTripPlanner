@@ -122,6 +122,10 @@ public class GraphQlPlanner {
     private GenericLocation toGenericLocation(Map<String, Object> m) {
         double lat = (double) m.get("lat");
         double lng = (double) m.get("lon");
+        String address = (String) m.get("address");
+        if (address != null) {
+            return new GenericLocation(address, Double.toString(lat) + "," + Double.toString(lng));
+        }
         return new GenericLocation(lat, lng);
     }
 

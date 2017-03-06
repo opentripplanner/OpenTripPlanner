@@ -330,6 +330,11 @@ public class IndexGraphQLSchema {
                 .description("The longitude of the place.")
                 .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("address")
+                .description("The name of the place.")
+                .type(Scalars.GraphQLString)
+                .build())
             .build();
 
         GraphQLInputObjectType preferredInputType = GraphQLInputObjectType.newInputObject()
@@ -2658,6 +2663,12 @@ public class IndexGraphQLSchema {
                         .filter(stop -> stop != null)
                         .collect(Collectors.toList());
                 })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediatePlace")
+                .description("Do we continue from a specified intermediate place")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher(environment -> ((Leg) environment.getSource()).intermediatePlace)
                 .build())
             .build();
 
