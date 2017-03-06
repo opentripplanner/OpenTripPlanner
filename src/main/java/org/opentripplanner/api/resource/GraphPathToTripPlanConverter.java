@@ -454,6 +454,19 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (i + 1 < legsStates.length) {
+                if (legs.get(i).intermediatePlace) {
+                    Leg leg = legs.get(i);
+                    Leg nextLeg = legs.get(i + 1);
+                    if (nextLeg != null && !nextLeg.intermediatePlace && nextLeg.isTransitLeg()) {
+                        long waitTime = nextLeg.startTime.getTimeInMillis() -
+                            leg.endTime.getTimeInMillis();
+                        leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + waitTime);
+                        leg.from.departure = leg.startTime;
+                        leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + waitTime);
+                        leg.to.arrival = leg.endTime;
+                    }
+                }
+
                 legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
                 legs.get(i).to.departure = legs.get(i + 1).from.departure;
 
@@ -474,16 +487,6 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             }
 
-            if (legs.get(i).intermediatePlace) {
-                Leg leg = legs.get(i);
-                Leg nextLeg = legs.get(i + 1);
-                if (nextLeg != null && !nextLeg.intermediatePlace && nextLeg.isTransitLeg()) {
-                    long waitTime = nextLeg.startTime.getTimeInMillis() -
-                        leg.endTime.getTimeInMillis();
-                    leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + waitTime);
-                    leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + waitTime);
-                }
-            }
         }
     }
 
