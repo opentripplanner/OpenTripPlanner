@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -97,10 +96,6 @@ public class StateData implements Cloneable {
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
-
-    public Map<String, Integer> flagStopDepartureOffsets;
-
-    public Map<String, Integer> flagStopArrivalOffsets;
 
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.modes;

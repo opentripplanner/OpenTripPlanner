@@ -15,10 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
-import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -128,7 +125,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     @Override
     public State traverse(State state0) {
-
         return traverse(state0, 0);
     }
     
@@ -297,7 +293,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                         (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
                         (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
                     /* A trip was found. The wait should be non-negative. */
-                    System.out.println("getNextTrip id: " + this.getId() + " wait: " + wait + " trip id: " + tripTimes.trip.getId().getId() + " state time: " + new Date(s0.getTimeInMillis()) + " stopIndex: " + stopIndex + " boarding: " + boarding);
                     if (wait < 0) LOG.error("Negative wait time when boarding.");
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
@@ -364,7 +359,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (!s0.isEverBoarded() && !options.reverseOptimizing) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTimeSeconds(bestWait);
-                //System.out.println("bestWait " + bestWait + " " + trip.getId() + " " + this.getId() + " " + this.getFromVertex().getY() + "," +this.getFromVertex().getX());
             } else {
                 wait_cost *= options.waitReluctance;
             }
@@ -395,18 +389,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return optimized;
             }
 
-            State ret = s1.makeState();
-            int interval = ret.getTimeDeltaSeconds();
-            if (s0.getOptions().reverseOptimizing) {
-                System.out.println("transit board reverse " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
-            }else{
-                System.out.println("transit board forward " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
-            }
-
-            return ret;
-
             /* If we didn't return an optimized path, return an unoptimized one. */
-            //return s1.makeState();
+            return s1.makeState();
         }
     }
 
