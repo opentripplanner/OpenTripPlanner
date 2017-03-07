@@ -376,15 +376,18 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             stateToTripPatternsMap.get(s).add(tripPattern);
         }
 
+        int i = 0;
         for(State s : stateToTripPatternsMap.keySet()){
 
             Vertex v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
 
             Stop flagStop = new Stop();
+            flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(i)));
             flagStop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
             flagStop.setLat(v.getLat());
             flagStop.setLon(v.getLon());
             flagStop.setName(s.getBackEdge().getName());
+            flagStop.setLocationType(99);
             TransitStop flagTransitStop = new TransitStop(graph, flagStop);
 
             if(fromTarget){
@@ -408,11 +411,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                         int stopIndex = originalPatternHop.getStopIndex();
 
-                        TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
-                        temporaryTripPattern.code = String.valueOf(Math.random());
+                        //TODO make deep copy of trip pattern
+                        TripPattern temporaryTripPattern = originalTripPattern;
 
                         PatternArriveVertex patternArriveVertex =
-                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex);
+                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex, flagStop);
+                        rr.rctx.temporaryVertices.add(patternArriveVertex);
 
                         TemporaryPatternHop forwardSearchPatternHop = findShortenedPatternHops(originalPatternHop);
                         if(forwardSearchPatternHop != null){
@@ -469,11 +473,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                             continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
 
 
-                        TripPattern temporaryTripPattern = createTripPatternWithFlagStopPattern(originalTripPattern, flagStop, originalPatternHop.getStopIndex());
-                        temporaryTripPattern.code = String.valueOf(Math.random());
+                        //TODO make deep copy of trip pattern
+                        TripPattern temporaryTripPattern = originalTripPattern;
 
                         PatternDepartVertex patternDepartVertex =
-                                new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex());
+                                new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex(), flagStop);
+                        rr.rctx.temporaryVertices.add(patternDepartVertex);
 
                         double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                         double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(postStopHopGeometry);
@@ -492,6 +497,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                     }
                 }
             }
+            i++;
         }
 
         LOG.debug("Heuristric street search hit {} vertices.", vertices.size());
@@ -547,12 +553,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
         return null;
-    }
-
-    private TripPattern createTripPatternWithFlagStopPattern(TripPattern tripPattern, Stop flagStop, int stopIndex){
-        TripPattern clonedTripPattern = SerializationUtils.clone(tripPattern);
-        clonedTripPattern.stopPattern.stops[stopIndex] = flagStop;
-        return clonedTripPattern;
     }
 
 }

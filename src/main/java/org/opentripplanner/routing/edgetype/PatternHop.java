@@ -28,6 +28,7 @@ import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -89,7 +90,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         
     	int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
         if(this instanceof TemporaryPatternHop)
-            runningTime = (int) (runningTime * ((TemporaryPatternHop)this).distanceRatio);
+            runningTime = (int)Math.round(runningTime * ((TemporaryPatternHop)this).distanceRatio);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.setBackMode(getMode());
@@ -107,7 +108,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
         }
     }
-    
+
     @Override
     public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options);
@@ -128,9 +129,23 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         TripTimes tripTimes = s0.getTripTimes();
         int runningTime = tripTimes.getRunningTime(stopIndex);
 
-        if(this instanceof TemporaryPatternHop){
+        //TODO handle cases where both stops on the hop are flag stops
+        if(this instanceof TemporaryPatternHop && !options.reverseOptimizing){
             double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
-            runningTime = (int) (runningTime * distanceRatio);
+            int originalRunningTime = runningTime;
+            runningTime = (int) Math.round(runningTime * distanceRatio);
+            int diff = originalRunningTime - runningTime;
+            if(s0.stateData.flagStopArrivalOffsets == null)
+                s0.stateData.flagStopArrivalOffsets = new HashMap<>();
+            if(s0.stateData.flagStopDepartureOffsets == null)
+                s0.stateData.flagStopDepartureOffsets = new HashMap<>();
+            if(this.getBeginStop().getLocationType() == 99
+                    && this.getEndStop().getLocationType() == 99)
+                throw new RuntimeException("how to handle this?");
+            if(this.getBeginStop().getLocationType() == 99)
+                s0.stateData.flagStopDepartureOffsets.put(this.getPattern().code + "|" + this.getStopIndex(), diff);
+            if(this.getEndStop().getLocationType() == 99)
+                s0.stateData.flagStopArrivalOffsets.put(this.getPattern().code + "|" + (this.getStopIndex() + 1), diff);
         }
 
         StateEditor s1 = s0.edit(this);

@@ -17,7 +17,6 @@ import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;

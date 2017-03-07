@@ -123,6 +123,8 @@ public class RoutingContext implements Cloneable {
 
     public Collection<TemporaryEdge> temporaryEdges = new ArrayList<>();
 
+    public Collection<Vertex> temporaryVertices = new ArrayList<>();
+
     /* CONSTRUCTORS */
 
     /**
@@ -414,11 +416,13 @@ public class RoutingContext implements Cloneable {
     public void destroy() {
         if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
         if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
-        if(temporaryEdges != null){
-            for(TemporaryEdge temporaryEdge : temporaryEdges){
-                temporaryEdge.dispose();
-            }
-        }
+
+        LOG.debug("ms Cleaning up {} temporary edges", temporaryEdges.size());
+        temporaryEdges.forEach(TemporaryEdge::dispose);
+        temporaryEdges.clear();
+
+        temporaryVertices.forEach(graph::remove);
+        temporaryVertices.clear();
 
     }
 }

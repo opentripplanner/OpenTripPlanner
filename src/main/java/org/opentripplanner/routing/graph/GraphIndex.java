@@ -1,37 +1,22 @@
 package org.opentripplanner.routing.graph;
 
-import com.google.common.collect.ArrayListMultimap;
-
-import java.util.*;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
@@ -55,11 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 /**
@@ -738,20 +719,5 @@ public class GraphIndex {
     public Collection<TripPattern> getPatternsForEdge(Edge e) {
         return patternsForEdge.get(e);
     }
-
-    public Collection<TransitStop> getStopsNearPoint(Vertex v, int radiusInMeters){
-        Envelope env = new Envelope(new Coordinate(v.getLon(), v.getLat()));
-        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(radiusInMeters, v.getLat()),
-                SphericalDistanceLibrary.metersToDegrees(radiusInMeters));
-        Collection<TransitStop> transitStops = graph.index.stopSpatialIndex.query(env);
-        List<TransitStop> results = new ArrayList<>();
-        for(TransitStop transitStop : transitStops){
-            if(radiusInMeters >= SphericalDistanceLibrary.fastDistance(transitStop.getCoordinate(), v.getCoordinate()))
-                results.add(transitStop);
-        }
-        return results;
-    }
-
-
 
 }

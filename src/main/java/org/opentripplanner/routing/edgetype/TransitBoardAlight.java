@@ -29,6 +29,8 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
+import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
@@ -231,7 +233,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }            
 
             s1.setBackMode(getMode());
-            return s1.makeState();
+
+            if (s0.getOptions().reverseOptimizing){
+                State ret = s1.makeState();
+                long interval = ret.getTimeDeltaSeconds();
+                System.out.println("transit alight reverse " + s0.getVertex() + " " + this.getId() + " " + interval + " seconds" );
+                return ret;
+            }else{
+                State ret = s1.makeState();
+                long interval = ret.getTimeDeltaSeconds();
+                System.out.println("transit alight forward " + s0.getVertex() + " " + this.getId() + " " + interval + " seconds");
+                return ret;
+            }
+
+            //return s1.makeState();
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
             
@@ -282,6 +297,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                         (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
                         (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
                     /* A trip was found. The wait should be non-negative. */
+                    System.out.println("getNextTrip id: " + this.getId() + " wait: " + wait + " trip id: " + tripTimes.trip.getId().getId() + " state time: " + new Date(s0.getTimeInMillis()) + " stopIndex: " + stopIndex + " boarding: " + boarding);
                     if (wait < 0) LOG.error("Negative wait time when boarding.");
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
@@ -293,7 +309,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             if (bestWait < 0) return null; // no appropriate trip was found
             Trip trip = bestTripTimes.trip;
-            
+
             /* check if route and/or Agency are banned for this plan */
             // FIXME this should be done WHILE searching for a trip.
             if (options.tripIsBanned(trip)) return null;
@@ -310,7 +326,24 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                                    getStop(), s0.getPreviousTrip(), trip, boarding);
                 transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
                                    options.nonpreferredTransferPenalty);
-            }            
+            }
+
+            //if this is a flag stop in between two regular stops,
+            double departureOffset = 0;
+            if(this instanceof TemporaryTransitBoardAlight){
+                if(this.boarding){
+                    TemporaryPatternHop temporaryPatternHop = (TemporaryPatternHop)this.getToVertex().getOutgoing().iterator().next();
+                    int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
+                    departureOffset = runningTime - Math.round(runningTime * temporaryPatternHop.distanceRatio);
+                    bestWait += departureOffset;
+                }else{
+                    TemporaryPatternHop temporaryPatternHop = (TemporaryPatternHop)this.getFromVertex().getIncoming().iterator().next();
+                    int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
+                    departureOffset = Math.round(runningTime * temporaryPatternHop.distanceRatio);
+                    bestWait += departureOffset;
+                }
+
+            }
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
@@ -362,21 +395,18 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return optimized;
             }
 
-            /*if(this instanceof TemporaryEdge && !s0.isEverBoarded()){
-                State test = s1.makeState();
-                System.out.println("_________________________" + this.getId());
-                System.out.println(this.getFromVertex().getY() + "," + this.getFromVertex().getX());
-                System.out.println(this.getToVertex().getY() + "," + this.getToVertex().getX());
-                System.out.println("initial weight: " + String.valueOf(s0.getWeight()));
-                System.out.println("traverse weight: " + String.valueOf(test.getWeight() - s0.getWeight()));
-                System.out.println("total weight: " + test.getWeight());
-                System.out.println("waiting weight: " + (wait_cost + options.getBoardCost(s0.getNonTransitMode())));
-                System.out.println(new Date(test.getTimeInMillis()).toString());
-                return test;
-            }*/
+            State ret = s1.makeState();
+            int interval = ret.getTimeDeltaSeconds();
+            if (s0.getOptions().reverseOptimizing) {
+                System.out.println("transit board reverse " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
+            }else{
+                System.out.println("transit board forward " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
+            }
+
+            return ret;
 
             /* If we didn't return an optimized path, return an unoptimized one. */
-            return s1.makeState();
+            //return s1.makeState();
         }
     }
 
