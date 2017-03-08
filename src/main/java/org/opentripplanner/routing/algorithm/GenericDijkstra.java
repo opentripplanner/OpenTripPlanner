@@ -64,7 +64,8 @@ public class GenericDijkstra {
         this.skipTraverseResultStrategy = skipTraverseResultStrategy;
     }
 
-    public ShortestPathTree getShortestPathTree(State initialState) {
+    public ShortestPathTree getShortestPathTree(State... initialStates) {
+        State initialState = initialStates[0];
         Vertex target = null;
         if (options.rctx != null) {
             target = initialState.getOptions().rctx.target;
@@ -72,8 +73,10 @@ public class GenericDijkstra {
         ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(options);
         BinHeap<State> queue = new BinHeap<State>(1000);
 
-        spt.add(initialState);
-        queue.insert(initialState, initialState.getWeight());
+        for (State state : initialStates) {
+            spt.add(state);
+            queue.insert(state, state.getWeight());
+        }
 
         while (!queue.empty()) { // Until the priority queue is empty:
             State u = queue.extract_min();

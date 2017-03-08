@@ -21,6 +21,12 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
+import org.opentripplanner.routing.edgetype.temporary.TemporaryPreAlightEdge;
+import org.opentripplanner.routing.edgetype.temporary.TemporaryStreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -31,9 +37,7 @@ import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Find the shortest path between graph vertices using A*.
@@ -174,10 +178,39 @@ public class AStar {
         if (verbose)
             System.out.println("   vertex " + runState.u_vertex);
 
+        /*State s = runState.u;
+        boolean temp = false;
+        while(s.getBackState() != null){
+            if(s.getBackEdge() instanceof TemporaryEdge && !(s.getBackEdge() instanceof TemporaryFreeEdge)  && !(s.getBackEdge() instanceof TemporaryPartialStreetEdge)){
+                temp = true;
+                break;
+            }
+            s = s.getBackState();
+        }
+
+        if(temp){
+            State s0 = runState.u;
+            List<State> states = new ArrayList<>();
+            while(s0.getBackState() != null){
+                states.add(s0);
+                s0 = s0.getBackState();
+            }
+            Collections.reverse(states);
+            System.out.println("State history:");
+            for(State s1 : states){
+                System.out.println(s1.getBackEdge().getClass().getName() + " " + s1.getBackMode() + " |" + s1.getBackEdge().getFromVertex().getY()+","+ s1.getBackEdge().getFromVertex().getX());
+            }
+            System.out.println("");
+        }*/
+
         runState.nVisited += 1;
 
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
+
+            if(edge.getClass().isAssignableFrom(StreetTransitLink.class) ){
+                continue;
+            }
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.

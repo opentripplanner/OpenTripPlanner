@@ -278,24 +278,14 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
              * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
              */
-            TripPattern tripPattern = this.getPattern();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
-                /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
-                Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
-                /* Skip this day/timetable if no trip in it could possibly be useful. */
-                // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
-                // However, experiments seem to show very little measurable improvement here (due to cache locality?)
-                // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
-                /* Find the next or prev departure depending on final boolean parameter. */
-                TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
+                TripTimes tripTimes = getNextTrip(s0, sd);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
-                    int wait = boarding ? 
-                        (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
-                        (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
+                    int wait = calculateWait(s0, sd, tripTimes);
                     /* A trip was found. The wait should be non-negative. */
                     System.out.println("getNextTrip id: " + this.getId() + " wait: " + wait + " trip id: " + tripTimes.trip.getId().getId() + " state time: " + new Date(s0.getTimeInMillis()) + " stopIndex: " + stopIndex + " boarding: " + boarding);
                     if (wait < 0) LOG.error("Negative wait time when boarding.");
@@ -408,6 +398,24 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             /* If we didn't return an optimized path, return an unoptimized one. */
             //return s1.makeState();
         }
+    }
+
+    public TripTimes getNextTrip(State s0, ServiceDay sd) {
+        RoutingRequest options = s0.getOptions();
+        Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
+                /* Skip this day/timetable if no trip in it could possibly be useful. */
+        // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
+        // However, experiments seem to show very little measurable improvement here (due to cache locality?)
+        // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
+                /* Find the next or prev departure depending on final boolean parameter. */
+        TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
+        return tripTimes;
+    }
+
+    public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
+        return boarding ?
+                (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
+                (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
     }
 
     /** @return the stop where this board/alight edge is located. */
