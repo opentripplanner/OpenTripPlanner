@@ -36,7 +36,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
@@ -714,7 +713,6 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
-        //new DirectTransferGenerator().buildGraph(this, null);
     }
     
     /**

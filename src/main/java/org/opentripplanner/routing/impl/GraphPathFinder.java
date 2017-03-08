@@ -183,6 +183,7 @@ public class GraphPathFinder {
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, new PathComparator(options.arriveBy));
+
         return paths;
     }
 
@@ -209,6 +210,8 @@ public class GraphPathFinder {
             LOG.info("Vertex not found: " + request.from + " : " + request.to);
             throw e;
         }
+
+
 
         // Detect and report that most obnoxious of bugs: path reversal asymmetry.
         // Removing paths might result in an empty list, so do this check before the empty list check.

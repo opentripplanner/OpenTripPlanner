@@ -15,15 +15,19 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.commons.lang3.SerializationUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,6 +42,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,6 +383,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
             Stop flagStop = new Stop();
             flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(i)));
+            flagStop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
             flagStop.setLat(v.getLat());
             flagStop.setLon(v.getLon());
             flagStop.setName(s.getBackEdge().getName());
@@ -393,11 +400,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, flagTransitStop);
                 rr.rctx.temporaryEdges.add(preAlightEdge);
 
-                for(TripPattern tripPattern : stateToTripPatternsMap.get(s)){
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
 
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
                             .stream()
-                            .filter(e -> e.getPattern() == tripPattern)
+                            .filter(e -> e.getPattern() == originalTripPattern)
                             .collect(Collectors.toList());
 
                     for(PatternHop originalPatternHop : patternHops){
@@ -405,9 +412,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         int stopIndex = originalPatternHop.getStopIndex();
 
                         //TODO make deep copy of trip pattern
+                        TripPattern temporaryTripPattern = originalTripPattern;
 
                         PatternArriveVertex patternArriveVertex =
-                                new PatternArriveVertex(graph, tripPattern, stopIndex, flagStop);
+                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex, flagStop);
                         rr.rctx.temporaryVertices.add(patternArriveVertex);
 
                         TemporaryPatternHop forwardSearchPatternHop = findShortenedPatternHops(originalPatternHop);
@@ -451,11 +459,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 TemporaryPreBoardEdge temporaryPreBoardEdge = new TemporaryPreBoardEdge(flagTransitStop, transitStopDepart);
                 rr.rctx.temporaryEdges.add(temporaryPreBoardEdge);
 
-                for(TripPattern tripPattern : stateToTripPatternsMap.get(s)){
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
 
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
                             .stream()
-                            .filter(e -> e.getPattern() == tripPattern)
+                            .filter(e -> e.getPattern() == originalTripPattern)
                             .collect(Collectors.toList());
 
                     for(PatternHop originalPatternHop : patternHops){
@@ -464,8 +472,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         if(postStopHopGeometry == null)
                             continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
 
+
+                        //TODO make deep copy of trip pattern
+                        TripPattern temporaryTripPattern = originalTripPattern;
+
                         PatternDepartVertex patternDepartVertex =
-                                new PatternDepartVertex(graph, tripPattern, originalPatternHop.getStopIndex(), flagStop);
+                                new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex(), flagStop);
                         rr.rctx.temporaryVertices.add(patternDepartVertex);
 
                         double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
@@ -473,7 +485,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
                         TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(originalPatternHop, patternDepartVertex, flagStop, distanceRatio);
                         temporaryPatternHop.setGeometry(postStopHopGeometry);
+
                         rr.rctx.temporaryEdges.add(temporaryPatternHop);
+
+
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
                         TemporaryTransitBoardAlight transitBoardAlight =
@@ -527,7 +542,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     /**
      * When reverse search creates a shortened pattern hop, check whether the forward search shortened the start of
-     * the geometry already.  If so, use that geometry, then shorten the other end.
+     * the geometry already.  If so, use that geometry, then shorten the other end, then update both hops
      * @param originalPatternHop
      * @return
      */

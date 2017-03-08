@@ -482,6 +482,8 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.flagStopDepartureOffsets = stateData.flagStopDepartureOffsets;
+        newState.stateData.flagStopArrivalOffsets = stateData.flagStopArrivalOffsets;
         return newState;
     }
 

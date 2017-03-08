@@ -27,6 +27,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
+
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -39,33 +41,27 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private Stop begin, end;
 
-    private int continuousPickup, continuousDropoff;
-
     public int stopIndex;
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, boolean setInPattern) {
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
         super(from, to);
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
-        if (setInPattern)
         getPattern().setPatternHop(stopIndex, this);
-        this.continuousPickup = continuousPickup;
-        this.continuousDropoff = continuousDropoff;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff) {
-        this(from, to, begin, end, stopIndex, continuousPickup, continuousDropoff, true);
-    }
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 0, 0);
-    }
-
+    // made more accurate
     public double getDistance() {
-        return SphericalDistanceLibrary.distance(begin.getLat(), begin.getLon(), end.getLat(),
-                end.getLon());
+        double distance = 0;
+        LineString line = getGeometry();
+        for (int i = 0; i < line.getNumPoints() - 1; i++) {
+            Point p0 = line.getPointN(i), p1 = line.getPointN(i+1);
+            distance += SphericalDistanceLibrary.distance(p0.getCoordinate(), p1.getCoordinate());
+        }
+        return distance;
     }
 
     public TraverseMode getMode() {
@@ -119,6 +115,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
     
     public State traverse(State s0) {
+
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
@@ -131,6 +128,26 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         
         TripTimes tripTimes = s0.getTripTimes();
         int runningTime = tripTimes.getRunningTime(stopIndex);
+
+        //TODO handle cases where both stops on the hop are flag stops
+        if(this instanceof TemporaryPatternHop && !options.reverseOptimizing){
+            double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
+            int originalRunningTime = runningTime;
+            runningTime = (int) Math.round(runningTime * distanceRatio);
+            int diff = originalRunningTime - runningTime;
+            if(s0.stateData.flagStopArrivalOffsets == null)
+                s0.stateData.flagStopArrivalOffsets = new HashMap<>();
+            if(s0.stateData.flagStopDepartureOffsets == null)
+                s0.stateData.flagStopDepartureOffsets = new HashMap<>();
+            if(this.getBeginStop().getLocationType() == 99
+                    && this.getEndStop().getLocationType() == 99)
+                throw new RuntimeException("how to handle this?");
+            if(this.getBeginStop().getLocationType() == 99)
+                s0.stateData.flagStopDepartureOffsets.put(this.getPattern().code + "|" + this.getStopIndex(), diff);
+            if(this.getEndStop().getLocationType() == 99)
+                s0.stateData.flagStopArrivalOffsets.put(this.getPattern().code + "|" + (this.getStopIndex() + 1), diff);
+        }
+
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().arriveBy)
@@ -141,11 +158,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
         return s1.makeState();
-    }
-
-    public int getRunningTime(State s0) {
-        TripTimes tripTimes = s0.getTripTimes();
-        return tripTimes.getRunningTime(stopIndex);
     }
 
     public void setGeometry(LineString geometry) {
@@ -181,14 +193,4 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     public int getStopIndex() {
         return stopIndex;
     }
-
-    public int getContinuousPickup() {
-        return continuousPickup;
 }
-
-    public int getContinuousDropoff() {
-        return continuousDropoff;
-    }
-
-}
-
