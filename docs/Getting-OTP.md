@@ -3,7 +3,7 @@
 ## Pre-built JARs
 
 OpenTripPlanner is now distributed as a single stand-alone runnable JAR file. The JAR files for each release are
-published to the [Conveyal Maven repository](http://maven.conveyal.com/org/opentripplanner/otp/). Most users will want to navigate into the directory with the highest-numbered non-snapshot version and download the file whose name ends with `shaded.jar`. The latest release is the [0.19.0 shaded JAR](http://maven.conveyal.com.s3.amazonaws.com/org/opentripplanner/otp/0.19.0/otp-0.19.0-shaded.jar).
+published to the Conveyal Maven repository at `https://maven.conveyal.com/org/opentripplanner/otp/`. Unfortunately, directory listings are currently disabled on this repository as a stopgap compatibility fix. When directory listings are re-enabled, most users will want to navigate into the directory with the highest-numbered non-snapshot version and download the file whose name ends with `shaded.jar`. Until listings are available, please use the following direct link to the [latest release 1.0.0 as a stand-alone JAR file](https://maven.conveyal.com/org/opentripplanner/otp/1.0.0/otp-1.0.0-shaded.jar).
 
 ## Building from Source
 
