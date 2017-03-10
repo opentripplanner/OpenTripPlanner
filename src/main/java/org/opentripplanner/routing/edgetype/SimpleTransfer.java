@@ -55,7 +55,6 @@ public class SimpleTransfer extends Edge {
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
         }
-        // FIXME major algorithmic error: Transfer results can dominate alighting from a vehicle.
         if (s0.backEdge instanceof StreetTransitLink) {
             return null;
         }

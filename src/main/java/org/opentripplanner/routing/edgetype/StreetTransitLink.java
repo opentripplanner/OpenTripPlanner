@@ -83,7 +83,6 @@ public class StreetTransitLink extends Edge {
 
     public State traverse(State s0) {
         // Do not re-enter the street network following a transfer.
-        // FIXME this is a serious problem: transfer result state can dominate arrivals at a stop on a vehicle and prune the tree!
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
         }
