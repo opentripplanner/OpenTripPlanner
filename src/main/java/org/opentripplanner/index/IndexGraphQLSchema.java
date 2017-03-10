@@ -133,7 +133,7 @@ public class IndexGraphQLSchema {
     public IndexGraphQLSchema(GraphIndex index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
-        index.clusterStopsAsNeeded();
+
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -280,7 +280,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
                 .type(clusterType)
-                .dataFetcher(environment -> index.stopClusterForStop
+                .dataFetcher(environment -> index.getStopClusterForStop()
                     .get((Stop) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -323,8 +323,9 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> {
                     try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
                         return index.getStopTimesForStop(
-                            (Stop) environment.getSource(),
-                            ServiceDate.parseString(environment.getArgument("date")));
+                                (Stop) environment.getSource(),
+                                ServiceDate.parseString(environment.getArgument("date")),
+                                (boolean) environment.getArgument("omitNonPickups"));
                     } catch (ParseException e) {
                         return null;
                     }
@@ -348,11 +349,17 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+            		.name("omitNonPickups")
+            		.type(Scalars.GraphQLBoolean)
+            		.defaultValue(false)
+            		.build())
                 .dataFetcher(environment ->
                     index.stopTimesForStop((Stop) environment.getSource(),
                         Long.parseLong(environment.getArgument("startTime")),
                         (int) environment.getArgument("timeRange"),
-                        (int) environment.getArgument("numberOfDepartures")))
+                        (int) environment.getArgument("numberOfDepartures"),
+                        (boolean) environment.getArgument("omitNonPickups")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesWithoutPatterns")
@@ -372,12 +379,18 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+            		.name("omitNonPickups")
+            		.type(Scalars.GraphQLBoolean)
+            		.defaultValue(false)
+            		.build())
                 .dataFetcher(environment ->
                     index.stopTimesForStop(
                         (Stop) environment.getSource(),
                         Long.parseLong(environment.getArgument("startTime")),
                         (int) environment.getArgument("timeRange"),
-                        (int) environment.getArgument("numberOfDepartures"))
+                        (int) environment.getArgument("numberOfDepartures"),
+                        (boolean) environment.getArgument("omitNonPickups"))
                     .stream()
                     .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
                     .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
@@ -456,10 +469,10 @@ public class IndexGraphQLSchema {
                     .get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-               	.name("headsign")
-              	.type(Scalars.GraphQLString)
-              	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
-              	.build())
+            	.name("headsign")
+            	.type(Scalars.GraphQLString)
+            	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+            	.build())
             .build();
 
         tripType = GraphQLObjectType.newObject()
@@ -799,7 +812,7 @@ public class IndexGraphQLSchema {
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
                 if (id.type.equals(clusterType.getName())) {
-                    return index.stopClusterForId.get(id.id);
+                    return index.getStopClusterForId().get(id.id);
                 }
                 if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
@@ -1041,7 +1054,7 @@ public class IndexGraphQLSchema {
                 .name("clusters")
                 .description("Get all clusters for the specified graph")
                 .type(new GraphQLList(clusterType))
-                .dataFetcher(environment -> new ArrayList<>(index.stopClusterForId.values()))
+                .dataFetcher(environment -> new ArrayList<>(index.getStopClusterForId().values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
@@ -1052,7 +1065,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(
-                    environment -> index.stopClusterForId.get(environment.getArgument("id")))
+                    environment -> index.getStopClusterForId().get(environment.getArgument("id")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")

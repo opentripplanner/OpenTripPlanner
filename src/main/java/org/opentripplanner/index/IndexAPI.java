@@ -250,10 +250,11 @@ public class IndexAPI {
     public Response getStoptimesForStop (@PathParam("stopId") String stopIdString,
                                          @QueryParam("startTime") long startTime,
                                          @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
-                                         @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures) {
+                                         @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
+                                         @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures)).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
     }
 
     /**
@@ -263,7 +264,8 @@ public class IndexAPI {
     @GET
     @Path("/stops/{stopId}/stoptimes/{date}")
     public Response getStoptimesForStopAndDate (@PathParam("stopId") String stopIdString,
-                                                @PathParam("date") String date) {
+                                                @PathParam("date") String date,
+                                                @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         ServiceDate sd;
@@ -274,7 +276,7 @@ public class IndexAPI {
             return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
         }
 
-        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd);
+        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups);
         return Response.status(Status.OK).entity(ret).build();
     }
     
@@ -560,9 +562,8 @@ public class IndexAPI {
     @GET
     @Path("/clusters")
     public Response getAllStopClusters () {
-        index.clusterStopsAsNeeded();
         // use 'detail' field common to all API methods in this class
-        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), detail);
+        List<StopClusterDetail> scl = StopClusterDetail.list(index.getStopClusterForId().values(), detail);
         return Response.status(Status.OK).entity(scl).build();
     }
 
@@ -570,8 +571,7 @@ public class IndexAPI {
     @GET
     @Path("/clusters/{clusterId}")
     public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
-        index.clusterStopsAsNeeded();
-        StopCluster cluster = index.stopClusterForId.get(clusterIdString);
+        StopCluster cluster = index.getStopClusterForId().get(clusterIdString);
         if (cluster != null) {
             return Response.status(Status.OK).entity(new StopClusterDetail(cluster, true)).build();
         } else {

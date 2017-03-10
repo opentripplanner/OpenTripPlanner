@@ -24,6 +24,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -55,6 +58,24 @@ public class HttpUtils {
         return entity.getContent();
     }
 
+    public static InputStream postData(String url, String xmlData, int timeout) throws ClientProtocolException, IOException {
+        HttpPost httppost = new HttpPost(url);
+        if (xmlData != null) {
+            httppost.setEntity(new StringEntity(xmlData, ContentType.APPLICATION_XML));
+        }
+        HttpClient httpclient = getClient(timeout, timeout);
+
+        HttpResponse response = httpclient.execute(httppost);
+        if(response.getStatusLine().getStatusCode() != 200)
+            return null;
+
+        HttpEntity entity = response.getEntity();
+        if (entity == null) {
+            return null;
+        }
+        return entity.getContent();
+    }
+
     public static void testUrl(String url) throws IOException {
         HttpHead head = new HttpHead(url);
         HttpClient httpclient = getClient();
@@ -72,10 +93,14 @@ public class HttpUtils {
     }
     
     private static HttpClient getClient() {
+        return getClient(TIMEOUT_CONNECTION, TIMEOUT_SOCKET);
+    }
+
+    private static HttpClient getClient(int connectionTimeout, int socketTimeout) {
         HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_CONNECTION);
-        HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_SOCKET);
-        
+        HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeout);
+        HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
+
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.setParams(httpParams);
         return httpclient;
