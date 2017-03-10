@@ -418,15 +418,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                                 new PatternArriveVertex(graph, temporaryTripPattern, stopIndex, flagStop);
                         rr.rctx.temporaryVertices.add(patternArriveVertex);
 
-                        TemporaryPatternHop forwardSearchPatternHop = findShortenedPatternHops(originalPatternHop);
-                        if(forwardSearchPatternHop != null){
+                        TemporaryPatternHop reverseSearchPatternHop = findShortenedPatternHops(originalPatternHop);
+                        if(reverseSearchPatternHop != null){
                             //processed by forward search already, use the trimmed geometry
-                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(forwardSearchPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
-                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(forwardSearchPatternHop.originalPatternHop.getGeometry());
+                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(reverseSearchPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(reverseSearchPatternHop.originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                            forwardSearchPatternHop.distanceRatio = distanceRatio;
-                            forwardSearchPatternHop.setGeometry(preStopHopGeometry);
+                            reverseSearchPatternHop.distanceRatio = distanceRatio;
+                            reverseSearchPatternHop.setGeometry(preStopHopGeometry);
                         }else{
                             //haven't seen this patternHop, create a flex one
                             LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
@@ -435,14 +435,14 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                             double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                            TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(originalPatternHop, patternArriveVertex, flagStop, distanceRatio);
-                            temporaryPatternHop.setGeometry(preStopHopGeometry);
-                            rr.rctx.temporaryEdges.add(temporaryPatternHop);
+                            reverseSearchPatternHop = new TemporaryPatternHop(originalPatternHop, patternArriveVertex, flagStop, distanceRatio);
+                            reverseSearchPatternHop.setGeometry(preStopHopGeometry);
+                            rr.rctx.temporaryEdges.add(reverseSearchPatternHop);
                         }
 
                         /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS);
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, reverseSearchPatternHop.distanceRatio);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
 
 
@@ -483,16 +483,16 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                         double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(postStopHopGeometry);
                         double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                        TemporaryPatternHop temporaryPatternHop = new TemporaryPatternHop(originalPatternHop, patternDepartVertex, flagStop, distanceRatio);
-                        temporaryPatternHop.setGeometry(postStopHopGeometry);
+                        TemporaryPatternHop forwardSearchPatternHop = new TemporaryPatternHop(originalPatternHop, patternDepartVertex, flagStop, distanceRatio);
+                        forwardSearchPatternHop.setGeometry(postStopHopGeometry);
 
-                        rr.rctx.temporaryEdges.add(temporaryPatternHop);
+                        rr.rctx.temporaryEdges.add(forwardSearchPatternHop);
 
 
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS);
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, forwardSearchPatternHop.distanceRatio);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
                     }
                 }
