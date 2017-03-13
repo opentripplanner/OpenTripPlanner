@@ -167,7 +167,9 @@ public class GraphPathFinder {
             }
 
             // Do a full reversed search to compact the legs
-            newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+            if(options.compactLegsByReversedSearch){
+                newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+            }
 
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
