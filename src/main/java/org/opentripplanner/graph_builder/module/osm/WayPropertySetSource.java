@@ -21,6 +21,5 @@ package org.opentripplanner.graph_builder.module.osm;
  */
 public interface WayPropertySetSource {
 
-    public WayPropertySet getWayPropertySet();
-
+    public void populateProperties(WayPropertySet wayPropertySet);
 }

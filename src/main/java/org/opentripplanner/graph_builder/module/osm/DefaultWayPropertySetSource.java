@@ -24,6 +24,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetHelper.*;
+
 /**
  * This factory class provides a default collection of {@link WayProperties} that determine how OSM streets can be
  * traversed in various modes.
@@ -57,17 +59,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     ResourceBundle resources;
 
-    /* properties and permissions for ways */
-    @Override
-    public WayPropertySet getWayPropertySet() {
-        WayPropertySet props = new WayPropertySet();
-        populateProperties(props);
-        return props;
-        
-    }
-    
     /* Populate properties on existing WayPropertySet. Makes it easer to override any properties by sub classes. */
-    protected void populateProperties(WayPropertySet props) {
+    public void populateProperties(WayPropertySet props) {
         /* no bicycle tags */
 
         /* NONE */
@@ -580,48 +573,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     }
 
-    protected void createNames(WayPropertySet propset, String spec, String patternKey) {
-        String pattern = patternKey;
-        CreativeNamer namer = new CreativeNamer(pattern);
-        propset.addCreativeNamer(new OSMSpecifier(spec), namer);
-    }
-
-    protected void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
-        String pattern = patternKey;
-        //TODO: notes aren't localized
-        NoteProperties properties = new NoteProperties(pattern, matcher);
-        propset.addNote(new OSMSpecifier(spec), properties);
-    }
-
-    private void setProperties(WayPropertySet propset, String spec,
-            StreetTraversalPermission permission) {
-        setProperties(propset, spec, permission, 1.0, 1.0);
-    }
-
-    /**
-     * Note that the safeties here will be adjusted such that the safest street has a safety value of 1, with all others scaled proportionately.
-     */
-    protected void setProperties(WayPropertySet propset, String spec,
-            StreetTraversalPermission permission, double safety, double safetyBack) {
-        setProperties(propset, spec, permission, safety, safetyBack, false);
-    }
-
-    protected void setProperties(WayPropertySet propset, String spec,
-            StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
-        WayProperties properties = new WayProperties();
-        properties.setPermission(permission);
-        properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
-        propset.addProperties(new OSMSpecifier(spec), properties, mixin);
-    }
-    
-    protected void setCarSpeed(WayPropertySet propset, String spec, float speed) {
-        SpeedPicker picker = new SpeedPicker();
-        picker.specifier = new OSMSpecifier(spec);
-        picker.speed = speed;
-        propset.addSpeedPicker(picker);
-    }
 
     public void setLocale(Locale locale) {
         this.locale = locale;
     }
+
 }

@@ -14,6 +14,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetHelper.*;
+
 
 /**
  * OSM way properties for Norwegian roads. 
@@ -27,14 +29,10 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * @see WayPropertySetSource
  * @see DefaultWayPropertySetSource
  */
-public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
+public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
-    @Override
-    public WayPropertySet getWayPropertySet() {
-        
-        // Override only the default values
-        WayPropertySet props = new WayPropertySet();
-        
+	@Override
+	public void populateProperties(WayPropertySet props) {
         // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
         setProperties(props, "highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
                 2.06);
@@ -56,12 +54,8 @@ public class NorwayWayPropertySetSource extends DefaultWayPropertySetSource {
         setCarSpeed(props, "highway=trunk_link", 15); // = 54kph
         setCarSpeed(props, "highway=primary", 22.22f); // 80kph
         setCarSpeed(props, "highway=primary_link", 15); // = 54kph
-
+		
         // Read the rest from the default set
-        super.populateProperties(props);
-        
-        return props;
-    }
-
-   
+		new DefaultWayPropertySetSource().populateProperties(props);
+	}
 }

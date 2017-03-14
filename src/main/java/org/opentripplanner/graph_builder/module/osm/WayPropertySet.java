@@ -81,16 +81,6 @@ public class WayPropertySet {
         maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]+?)(?:[ ]?(kmh|km/h|kmph|kph|mph|knots))?$");
     }
 
-    public void setBase(WayPropertySetSource base) {
-       this.base = base;
-       WayPropertySet props = base.getWayPropertySet();
-       creativeNamers = props.creativeNamers;
-       defaultProperties = props.defaultProperties;
-       notes = props.notes;
-       slopeOverrides = props.slopeOverrides;
-       wayProperties = props.wayProperties;
-    }
-
     /**
      * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
      * will have their safety values applied if they match at all.
