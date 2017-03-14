@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Calendar;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -17,6 +18,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -59,6 +61,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -177,9 +180,11 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-        ));
+        graphQL = new GraphQL(
+                new IndexGraphQLSchema(this).indexSchema,
+                new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
+                        new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+                )));
         LOG.info("Done indexing graph.");
     }
 
@@ -302,15 +307,15 @@ public class GraphIndex {
 
     /* TODO: an almost similar function exists in ProfileRouter, combine these.
     *  Should these live in a separate class? */
-    public List<StopAndDistance> findClosestStopsByWalking(float lat, float lon, int radius) {
+    public List<StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         // TODO make a function that builds normal routing requests from profile requests
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.from = new GenericLocation(lat, lon);
         // FIXME requires destination to be set, not necessary for analyst
         rr.to = new GenericLocation(lat, lon);
-        rr.setRoutingContext(graph);
         rr.batch = true;
+        rr.setRoutingContext(graph);
         rr.walkSpeed = 1;
         rr.dominanceFunction = new DominanceFunction.LeastWalk();
         // RR dateTime defaults to currentTime.
@@ -411,7 +416,8 @@ public class GraphIndex {
         if (graph.timetableSnapshotSource != null) {
             snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         }
-        ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
+        Date date = new Date(startTime * 1000);
+        ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
         for (TripPattern pattern : patternsForStop.get(stop)) {
 
@@ -547,11 +553,13 @@ public class GraphIndex {
     }
 
     /**
+     * Stop clusters can be built in one of two ways, either by geographical proximity, or 
+     * according to a parent/child station topology, if it exists.
+     * 
+     * Some challenges faced by DC and Trimet:
      * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
      * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
      * However Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
-     *
-     * Ideally in the future stop clusters will replicate and/or share implementation with GTFS parent stations.
      *
      * We can't use a similarity comparison, we need exact matches. This is because many street names differ by only
      * one letter or number, e.g. 34th and 35th or Avenue A and Avenue B.
@@ -560,47 +568,85 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-        int psIdx = 0; // unique index for next parent stop
-        LOG.info("Clustering stops by geographic proximity and name...");
-        // Each stop without a cluster will greedily claim other stops without clusters.
-        for (Stop s0 : stopForId.values()) {
-            if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
-            String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
-            StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
-            // LOG.info("stop {}", s0normalizedName);
-            // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
-            Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
-            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
-                    SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
-            for (TransitStop ts1 : stopSpatialIndex.query(env)) {
-                Stop s1 = ts1.getStop();
-                double geoDistance = SphericalDistanceLibrary.fastDistance(
-                        s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
-                if (geoDistance < CLUSTER_RADIUS) {
-                    String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
-                    // LOG.info("   --> {}", s1normalizedName);
-                    // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
-                    if (s1normalizedName.equals(s0normalizedName)) {
-                        // Create a bidirectional relationship between the stop and its cluster
-                        cluster.children.add(s1);
-                        stopClusterForStop.put(s1, cluster);
-                    }
-                }
+    	if (graph.stopClusterMode != null) {
+            switch (graph.stopClusterMode) {
+                case "parentStation":
+                    clusterByParentStation();
+                    break;
+                case "proximity":
+                    clusterByProximity();
+                    break;
+                default:
+                    clusterByProximity();
             }
-            cluster.computeCenter();
-            stopClusterForId.put(cluster.id, cluster);
+        } else {
+            clusterByProximity();
         }
     }
-
-    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
-        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+  
+    private void clusterByProximity() {	
+    	int psIdx = 0; // unique index for next parent stop
+	    LOG.info("Clustering stops by geographic proximity and name...");
+	    // Each stop without a cluster will greedily claim other stops without clusters.
+	    for (Stop s0 : stopForId.values()) {
+	        if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
+	        String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
+	        StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
+	        // LOG.info("stop {}", s0normalizedName);
+	        // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
+	        Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
+	        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
+	                SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
+	        for (TransitStop ts1 : stopSpatialIndex.query(env)) {
+	            Stop s1 = ts1.getStop();
+	            double geoDistance = SphericalDistanceLibrary.fastDistance(
+	                    s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
+	            if (geoDistance < CLUSTER_RADIUS) {
+	                String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
+	                // LOG.info("   --> {}", s1normalizedName);
+	                // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
+	                if (s1normalizedName.equals(s0normalizedName)) {
+	                    // Create a bidirectional relationship between the stop and its cluster
+	                    cluster.children.add(s1);
+	                    stopClusterForStop.put(s1, cluster);
+	                }
+	            }
+	        }
+	        cluster.computeCenter();
+	        stopClusterForId.put(cluster.id, cluster);
+	    }
+    }
+    private void clusterByParentStation() {
+        LOG.info("Clustering stops by parent station...");
+    	for (Stop stop : stopForId.values()) {
+    	    String ps = stop.getParentStation();
+    	    if (ps == null || ps.isEmpty()) {
+    	        continue;
+    	    }
+    	    StopCluster cluster;
+    	    if (stopClusterForId.containsKey(ps)) {
+    	        cluster = stopClusterForId.get(ps);
+    	    } else {
+    	        cluster = new StopCluster(ps, stop.getName());
+    	        stopClusterForId.put(ps, cluster);
+	    }
+    	    cluster.children.add(stop);
+    	    stopClusterForStop.put(stop, cluster);    
+    	}
+    	for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
+    	    cluster.getValue().computeCenter();
+    	}
+    }
+    
+    public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
+        ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
             content.put("errors", executionResult.getErrors());
         }
-        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+        if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
         }
         return res.entity(content).build();
