@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 /**
- * Factory interface for providing a {@link WayPropertySet} that determine how OSM
+ * Interface for populating a {@link WayPropertySet} that determine how OSM
  * streets can be traversed in various modes and named.
  *
  * @author bdferris, novalis, seime

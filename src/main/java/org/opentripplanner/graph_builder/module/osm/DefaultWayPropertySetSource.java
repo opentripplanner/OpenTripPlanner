@@ -13,18 +13,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetHelper.*;
+
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
  * This factory class provides a default collection of {@link WayProperties} that determine how OSM streets can be
@@ -53,13 +45,7 @@ import static org.opentripplanner.graph_builder.module.osm.WayPropertySetHelper.
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
-    private static Logger LOG = LoggerFactory.getLogger(DefaultWayPropertySetSource.class);
-
-    private Locale locale = Locale.getDefault();
-
-    ResourceBundle resources;
-
-    /* Populate properties on existing WayPropertySet. Makes it easer to override any properties by sub classes. */
+    /* Populate properties on existing WayPropertySet */
     public void populateProperties(WayPropertySet props) {
         /* no bicycle tags */
 
@@ -572,10 +558,4 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
     }
-
-
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-    }
-
 }
