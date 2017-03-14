@@ -61,6 +61,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -415,7 +416,8 @@ public class GraphIndex {
         if (graph.timetableSnapshotSource != null) {
             snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         }
-        ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
+        Date date = new Date(startTime * 1000);
+        ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
         for (TripPattern pattern : patternsForStop.get(stop)) {
 
