@@ -157,7 +157,7 @@ public class GraphBuilderParameters {
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
-        wayPropertySet = WayPropertySetSource.WayPropertySetSourceFactory.fromConfig(config.path("osmWayPropertySet"));
+        wayPropertySet = WayPropertySetSource.WayPropertySetSourceFactory.fromConfig(config.path("osmWayPropertySet").asText("default"));
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);

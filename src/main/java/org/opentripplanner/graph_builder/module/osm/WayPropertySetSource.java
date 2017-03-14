@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-
 /**
  * Factory interface for providing a {@link WayPropertySet} that determine how OSM
  * streets can be traversed in various modes and named.
@@ -29,33 +26,17 @@ public interface WayPropertySetSource {
     public class WayPropertySetSourceFactory {
 
         /**
-         * Return default way properties if not configured or if 
+         * Return the given WayPropertySetSource or throws IllegalArgumentException if an unkown type is specified
          */
-        public static WayPropertySetSource fromConfig(JsonNode config) {
-            String type = null;
-            if (config == null || config instanceof MissingNode) {
-                /* Empty block, fallback to default */
+        public static WayPropertySetSource fromConfig(String type) {
+            // type is set to "default" by GraphBuilderParameters if not provided in build-config.json
+        	if("default".equals(type)) {
                 return new DefaultWayPropertySetSource();
-            } else if (config.isTextual()) {
-                /* Simplest form: { wayPropertySet : "norway" } */
-                type = config.asText();
+            } else if("norway".equals(type)) {
+                return new NorwayWayPropertySetSource();
+            } else {
+                throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
             }
-
-            WayPropertySetSource retval;
-            switch (type) {
-            // Support "default" as well
-            case "default":
-                retval = new DefaultWayPropertySetSource();
-                break;
-            case "norway":
-                retval = new NorwayWayPropertySetSource();
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'",
-                        type));
-            }
-
-            return retval;
         }
     }
 
