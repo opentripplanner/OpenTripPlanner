@@ -5,7 +5,7 @@
 Following are known deployments of OTP in an agency-sponsored production capacity.
 
 * **New York State** Department of Transportation's 511 [transit trip planner](http://511ny.org/tripplanner/default.aspx) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
-* **Arlington, Virginia**'s [commute planning site](http://www.carfreea2z.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
+* **Arlington, Virginia**'s [commute planning site](http://www.carfreeatoz.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
 * **Portland, Oregon, USA** TriMet [Regional Trip Planner](http://ride.trimet.org), the agency originally behind OpenTripPlanner.
 * The **Helsinki** Regional Transport Authority (HSL) [trip planner](https://digitransit.fi/en/) based on OpenTripPlanner is in public beta as of spring 2016. Source code for their new UI is [available on Github](https://github.com/HSLdevcom/digitransit-ui).
 * [**Valencia, Spain**](http://www.emtvalencia.es/geoportal/?lang=en_otp) from the Municipal Transport Company of Valencia S.A.U.

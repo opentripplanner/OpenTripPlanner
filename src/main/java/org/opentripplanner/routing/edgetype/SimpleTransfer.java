@@ -21,6 +21,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.LineString;
+
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -34,11 +36,17 @@ public class SimpleTransfer extends Edge {
     private double distance;
     
     private LineString geometry;
+    private List<Edge> edges;
 
-    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
+    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
         super(from, to);
         this.distance = distance;
         this.geometry = geometry;
+        this.edges = edges;
+    }
+
+    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
+        this(from, to, distance, geometry, null);
     }
 
     @Override
@@ -47,7 +55,6 @@ public class SimpleTransfer extends Edge {
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
         }
-        // FIXME major algorithmic error: Transfer results can dominate alighting from a vehicle.
         if (s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
@@ -89,10 +96,12 @@ public class SimpleTransfer extends Edge {
     }
     
     
-   @Override
-   public LineString getGeometry(){
+    @Override
+    public LineString getGeometry(){
 	   return this.geometry;
    }
+
+    public List<Edge> getEdges() { return this.edges; }
 
     @Override
     public String toString() {

@@ -176,6 +176,7 @@ public class NearbyStopFinder {
         public TransitStop tstop;
         public double      dist;
         public LineString  geom;
+        public List<Edge>  edges;
 
         public StopAtDistance(TransitStop tstop, double dist) {
             this.tstop = tstop;
@@ -203,6 +204,7 @@ public class NearbyStopFinder {
         double distance = 0.0;
         GraphPath graphPath = new GraphPath(state, false);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+        List<Edge> edges = new ArrayList<>();
         for (Edge edge : graphPath.edges) {
             if (edge instanceof StreetEdge) {
                 LineString geometry = edge.getGeometry();
@@ -215,6 +217,7 @@ public class NearbyStopFinder {
                 }
                 distance += edge.getDistance();
             }
+            edges.add(edge);
         }
         if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
             ArrayList<Coordinate> coordinateList = new ArrayList<Coordinate>(2);
@@ -225,6 +228,7 @@ public class NearbyStopFinder {
         }
         StopAtDistance sd = new StopAtDistance((TransitStop) state.getVertex(), distance);
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
+        sd.edges = edges;
         return sd;
     }
 

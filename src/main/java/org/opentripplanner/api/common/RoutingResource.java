@@ -350,6 +350,15 @@ public abstract class RoutingResource {
     @QueryParam("maxHours")
     private Double maxHours;
 
+    @QueryParam("disableAlertFiltering")
+    private Boolean disableAlertFiltering;
+
+    /**
+     * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.
+     */
+    @QueryParam("geoidElevation")
+    private Boolean geoidElevation;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -572,6 +581,12 @@ public abstract class RoutingResource {
 
         if (maxHours != null)
             request.maxHours = maxHours;
+
+        if (disableAlertFiltering != null)
+            request.disableAlertFiltering = disableAlertFiltering;
+
+        if (geoidElevation != null)
+            request.geoidElevation = geoidElevation;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

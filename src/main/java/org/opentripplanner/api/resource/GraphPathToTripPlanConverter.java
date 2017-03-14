@@ -81,11 +81,27 @@ public abstract class GraphPathToTripPlanConverter {
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
+        // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
+        long bestNonTransitTime = Long.MAX_VALUE;
+        List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, requestedLocale);
+            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
+            if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
+                bestNonTransitTime = itinerary.walkTime;
+            }
+            itineraries.add(itinerary);
+        }
+
+        // Filter and add itineraries to plan
+        for (Itinerary itinerary : itineraries) {
+            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
+            // do not include in plan
+            if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
+
             plan.addItinerary(itinerary);
         }
+
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 /* Communicate the fact that the only way we were able to get a response was by removing a slope limit. */
@@ -129,7 +145,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, Locale requestedLocale) {
+    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -150,7 +166,7 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, requestedLocale));
+            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
@@ -287,7 +303,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, Locale requestedLocale) {
+    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -320,7 +336,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states, requestedLocale);
+        addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
         if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
@@ -517,7 +533,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, Locale requestedLocale) {
+    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering, Locale requestedLocale) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -534,7 +550,7 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
-                if (alertPatch.displayDuring(state)) {
+                if (disableAlertFiltering || alertPatch.displayDuring(state)) {
                     if (alertPatch.hasTrip()) {
                         // If the alert patch contains a trip and that trip match this leg only add the alert for
                         // this leg.
@@ -567,6 +583,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.agencyId = agency.getId();
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
+            leg.agencyBrandingUrl = agency.getBrandingUrl();
             leg.headsign = states[1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
@@ -575,6 +592,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.routeShortName = route.getShortName();
             leg.routeTextColor = route.getTextColor();
             leg.routeType = route.getType();
+            leg.routeBrandingUrl = route.getBrandingUrl();
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
@@ -725,6 +743,22 @@ public abstract class GraphPathToTripPlanConverter {
         String roundaboutPreviousStreet = null;
 
         State onBikeRentalState = null, offBikeRentalState = null;
+
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
+        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
+            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
+            List<Edge> transferEdges = transferEdge.getEdges();
+            if (transferEdges != null) {
+                State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
+                ArrayList<State> transferStates = new ArrayList<>();
+                transferStates.add(s);
+                for (Edge e : transferEdges) {
+                    s = e.traverse(s);
+                    transferStates.add(s);
+                }
+                states = transferStates.toArray(new State[transferStates.size()]);
+            }
+        }
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
@@ -977,7 +1011,8 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             } else {
                 if (!createdNewStep && step.elevation != null) {
-                    List<P2<Double>> s = encodeElevationProfile(edge, distance);
+                    List<P2<Double>> s = encodeElevationProfile(edge, distance,
+                            backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
                     if (step.elevation != null && step.elevation.size() > 0) {
                         step.elevation.addAll(s);
                     } else {
@@ -1032,7 +1067,8 @@ public abstract class GraphPathToTripPlanConverter {
         step.streetName = en.getName(wantedLocale);
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
-        step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
+        step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
+                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
         step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
@@ -1042,7 +1078,7 @@ public abstract class GraphPathToTripPlanConverter {
         return step;
     }
 
-    private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
+    private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
         if (!(edge instanceof StreetEdge)) {
             return new ArrayList<P2<Double>>();
         }
@@ -1053,7 +1089,7 @@ public abstract class GraphPathToTripPlanConverter {
         ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
         for (int i = 0; i < coordArr.length; i++) {
-            out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
+            out.add(new P2<Double>(coordArr[i].x + distanceOffset, coordArr[i].y + heightOffset));
         }
         return out;
     }

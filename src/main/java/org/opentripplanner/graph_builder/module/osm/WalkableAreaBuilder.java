@@ -454,7 +454,7 @@ public class WalkableAreaBuilder {
             }
 
             if (areaEntity.isTagFalse("wheelchair")) {
-                street.setWheelchairAccessible(false);
+                backStreet.setWheelchairAccessible(false);
             }
 
             backStreet.setStreetClass(cls);

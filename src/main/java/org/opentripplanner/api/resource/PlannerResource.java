@@ -103,6 +103,12 @@ public class PlannerResource extends RoutingResource {
                 request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
             }
         }
+
+        /* Populate up the elevation metadata */
+        response.elevationMetadata = new ElevationMetadata();
+        response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
+        response.elevationMetadata.geoidElevation = request.geoidElevation;
+
         /* Log this request if such logging is enabled. */
         if (request != null && router != null && router.requestLogger != null) {
             StringBuilder sb = new StringBuilder();
