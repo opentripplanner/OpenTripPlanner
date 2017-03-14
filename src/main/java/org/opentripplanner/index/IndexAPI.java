@@ -15,6 +15,7 @@ package org.opentripplanner.index;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -64,6 +65,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,6 +94,7 @@ public class IndexAPI {
 
     private final GraphIndex index;
     private final StreetVertexIndexService streetIndex;
+    private final ObjectMapper deserializer = new ObjectMapper();
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
@@ -582,21 +585,31 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> query) {
+    public Response getGraphQL (HashMap<String, Object> queryParameters) {
+        String query = (String) queryParameters.get("query");
+        Object queryVariables = queryParameters.getOrDefault("variables", null);
+        String operationName = (String) queryParameters.getOrDefault("operationName", null);
         Map<String, Object> variables;
-        if (query.get("variables") instanceof Map) {
-            variables = (Map) query.get("variables");
+        if (queryVariables instanceof Map) {
+            variables = (Map) queryVariables;
+        } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
+            try {
+                variables = deserializer.readValue((String) queryVariables, Map.class);
+            } catch (IOException e) {
+                LOG.error("Variables must be a valid json object");
+                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+            }
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse((String) query.get("query"), variables);
+        return index.getGraphQLResponse(query, variables, operationName);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
     public Response getGraphQL (String query) {
-        return index.getGraphQLResponse(query, new HashMap<>());
+        return index.getGraphQLResponse(query, new HashMap<>(), null);
     }
 
 //    @GET
