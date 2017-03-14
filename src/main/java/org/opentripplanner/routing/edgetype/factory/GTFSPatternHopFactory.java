@@ -307,8 +307,8 @@ public class GTFSPatternHopFactory {
     private GtfsStopContext context = new GtfsStopContext();
 
     // the location types for transfers.txt
-    public int STOP_LOCATION_TYPE = 0;
-    public int PARENT_STATION_LOCATION_TYPE = 1;
+    public static final int STOP_LOCATION_TYPE = 0;
+    public static final int PARENT_STATION_LOCATION_TYPE = 1;
 
     public int subwayAccessTime = 0;
 
