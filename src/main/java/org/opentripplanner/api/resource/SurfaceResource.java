@@ -112,7 +112,14 @@ public class SurfaceResource extends RoutingResource {
         // DEBUG return Response.ok().entity(surface).build();
     }
 
-    /** Evaluate a surface at all the points in a PointSet. */
+    /**
+     * Evaluate a surface at all the points in a PointSet.
+     * This sends back a ResultSet serialized as JSON.
+     * Normally we return historgrams with the number of points reached (in field 'counts') and the number of
+     * opportunities reached (i.e. the sum of the magnitudes of all points reached) in each one-minute bin of travel
+     * time.
+     * @param detail if true, include the travel time to every point in the pointset (which is in fact an ordered list)
+     */
     @GET @Path("/{surfaceId}/indicator")
     public Response getIndicator (@PathParam("surfaceId") Integer surfaceId,
                                   @QueryParam("targets")  String  targetPointSetId,
