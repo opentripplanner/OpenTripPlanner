@@ -2,8 +2,9 @@
 
 ## Pre-built JARs
 
-OpenTripPlanner is now distributed as a single stand-alone runnable JAR file. The JAR files for each release are
-published to the Conveyal Maven repository at `https://maven.conveyal.com/org/opentripplanner/otp/`. Unfortunately, directory listings are currently disabled on this repository as a stopgap compatibility fix. When directory listings are re-enabled, most users will want to navigate into the directory with the highest-numbered non-snapshot version and download the file whose name ends with `shaded.jar`. Until listings are available, please use the following direct link to the [latest release 1.0.0 as a stand-alone JAR file](https://maven.conveyal.com/org/opentripplanner/otp/1.0.0/otp-1.0.0-shaded.jar).
+OpenTripPlanner is distributed as a single stand-alone runnable JAR file. These JARs are deployed to the Sonatype OSSRH Maven repository, and release versions are synced to the Maven Central repository. Most people will want to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `.shaded.jar`.
+
+We use the [Travis continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner) to build OTP every time a change is made. You can find the JARs resulting from those builds in the [OSSRH staging repository](https://oss.sonatype.org/content/repositories/staging/org/opentripplanner/otp/). A directory named `x.y.z-SNAPSHOT` contain JARs for builds leading up to (preceding) the `x.y.z` release. Files within `SNAPSHOT` directories are named using the date and time that the build occurred.
 
 ## Building from Source
 
@@ -86,42 +87,38 @@ some other project, where we want the dependency management system to gather all
 
 OpenTripPlanner is a Maven project. Maven is a combined build and dependency management system: it fetches
 all the external libraries that OTP uses, runs all the commands to compile the OTP source code into runnable form,
-performs tests, and can then deploy the final "artifact" (the runnable JAR file) to our Maven repository, from which it
+performs tests, and can then deploy the final "artifact" (the runnable JAR file) to the Maven repository, from which it
 can be automatically included in other Java projects.
 
-This repository is machine-readable (by Maven or other build systems) and also provides decent human readable listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
-you want. For example, release 0.19.0 will be found at `http://maven.conveyal.com/org/opentripplanner/otp/0.19.0/otp-0.19.0-shaded.jar`.
+This repository is machine-readable (by Maven or other build systems) and also provides human readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
+you want. For example, release 1.1.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/1.1.0/otp-1.1.0-shaded.jar`.
 
-To make use of OTP in another project, you must first specify our Maven repository in the Project Object Model (POM):
-
-```XML
-<repositories>
-  <repository>
-    <id>Conveyal</id>
-    <name>Conveyal Maven Repository</name>
-    <url>http://maven.conveyal.com/</url> 
-  </repository>
-</repositories>
-```
-
-And then specify OpenTripPlanner as a dependency:
+To make use of OTP in another Maven project, you must specify it as a dependency:
 
 ```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.19.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
-After each successful build, our continuous integration (CI) server deploys the final OTP "artifact" (the runnable JAR) 
-to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can 
-always fetch the latest work in progress by specifying a snapshot artifact:
- 
+After each successful build, the [Travis continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner) deploys the final OTP "artifact" (the runnable JAR) to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can always fetch the latest work in progress by specifying a snapshot artifact:
+
+ ```XML
+ <repositories>
+   <repository>
+     <id>ossrh_snapshots</id>
+     <name>Sonatype OSSRH Shapshot Repository</name>
+     <url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
+   </repository>
+ </repositories>
+ ```
+
 ```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.19.0-SNAPSHOT</version>
+  <version>1.2.0-SNAPSHOT</version>
 </dependency>
 ```
