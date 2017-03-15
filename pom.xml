@@ -8,7 +8,7 @@
 
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -783,7 +783,6 @@
             <version>2.7.0</version>
         </dependency>
         -->
-
         <!-- support for OpenTraffic data -->
         <dependency>
             <groupId>io.opentraffic</groupId>
