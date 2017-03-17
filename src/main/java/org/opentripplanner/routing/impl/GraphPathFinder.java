@@ -195,15 +195,28 @@ public class GraphPathFinder {
         return paths;
     }
 
+    /**
+     * Do a full reversed search to compact the legs of the path.
+     *
+     * By doing a reversed search we are looking for later departures that will still be in time for transfer
+     * to the next trip, shortening the transfer wait time. Also considering other routes than the ones found
+     * in the original search.
+     *
+     * For arrive-by searches, we are looking to shorten transfer wait time and rather arrive earlier.
+     */
     private List<GraphPath> compactLegsByReversedSearch(AStar aStar, RoutingRequest originalReq, RoutingRequest options,
                                                         List<GraphPath> newPaths, double timeout,
                                                         RemainingWeightHeuristic remainingWeightHeuristic){
-        State targetAcceptedState = aStar.getTragetAcceptedState();
-        if(targetAcceptedState.stateData.getNumBooardings() > 1) {
+        List<GraphPath> reversedPaths = new ArrayList<>();
+        for(GraphPath newPath : newPaths){
+            State targetAcceptedState = options.arriveBy ? newPath.states.getLast().reverse() : newPath.states.getLast();
+            if(targetAcceptedState.stateData.getNumBooardings() < 2) {
+                reversedPaths.add(newPath);
+                continue;
+            }
             final long arrDepTime = targetAcceptedState.getTimeSeconds();
-
-            LOG.debug("Dep time: " + new Date(newPaths.get(0).getStartTime() * 1000));
-            LOG.debug("Arr time: " + new Date(newPaths.get(0).getEndTime() * 1000));
+            LOG.debug("Dep time: " + new Date(newPath.getStartTime() * 1000));
+            LOG.debug("Arr time: " + new Date(newPath.getEndTime() * 1000));
 
             // find first/last transit stop
             Vertex transitStop = null;
@@ -228,7 +241,11 @@ public class GraphPathFinder {
             reversedFromEndpoint.maxWalkDistance = CLAMP_MAX_WALK;
             aStar.getShortestPathTree(reversedFromEndpoint, timeout);
             List<GraphPath> pathsToTarget = aStar.getPathsToTarget();
-            List<GraphPath> walkPaths = Collections.singletonList(pathsToTarget.get(0));
+            if(pathsToTarget.isEmpty()){
+                reversedPaths.add(newPath);
+                continue;
+            }
+            GraphPath walkPath = pathsToTarget.get(0);
 
             // do the reversed search to/from transitStop
             Vertex fromTransVertex = options.arriveBy ? transitStop : options.rctx.fromVertex;
@@ -237,27 +254,34 @@ public class GraphPathFinder {
                     toTransVertex, transitStopTime, remainingWeightHeuristic);
             aStar.getShortestPathTree(reversedToEndpoint, timeout);
 
-            State revTargetAcceptedState = aStar.getTragetAcceptedState();
-            if(revTargetAcceptedState == null){
-                return newPaths;
-            }
-            if((!options.arriveBy && revTargetAcceptedState.getTimeInMillis() > options.dateTime * 1000) ||
-                    (options.arriveBy && revTargetAcceptedState.getTimeInMillis() < options.dateTime * 1000)){
-                List<GraphPath> newRevPaths = aStar.getPathsToTarget();
-                LOG.debug("REV Dep time: " + new Date(newRevPaths.get(0).getStartTime() * 1000));
-                LOG.debug("REV Arr time: " + new Date(newRevPaths.get(0).getEndTime() * 1000));
-                if (newRevPaths.isEmpty()) {
-                    return newPaths;
-                }else{
-                    newRevPaths.addAll(walkPaths);
+            List<GraphPath> newRevPaths = aStar.getPathsToTarget();
+            if (newRevPaths.isEmpty()) {
+                reversedPaths.add(newPath);
+            }else{
+                List<GraphPath> joinedPaths = new ArrayList<>();
+                for(GraphPath newRevPath : newRevPaths){
+                    LOG.debug("REV Dep time: " + new Date(newRevPath.getStartTime() * 1000));
+                    LOG.debug("REV Arr time: " + new Date(newRevPath.getEndTime() * 1000));
+                    List<GraphPath> concatenatedPaths = Arrays.asList(newRevPath, walkPath);
                     if(options.arriveBy){
-                        Collections.reverse(newRevPaths);
+                        Collections.reverse(concatenatedPaths);
                     }
-                    return Collections.singletonList(joinPaths(newRevPaths));
+                    GraphPath joinedPath = joinPaths(concatenatedPaths);
+
+                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
+                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
+                        joinedPaths.add(joinedPath);
+                        if(newPaths.size() > 1){
+                            for (AgencyAndId tripId : joinedPath.getTrips()) {
+                                options.banTrip(tripId);
+                            }
+                        }
+                    }
                 }
+                reversedPaths.addAll(joinedPaths);
             }
         }
-        return newPaths;
+        return reversedPaths.isEmpty() ? newPaths : reversedPaths;
     }
 
     private RoutingRequest createReversedRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
