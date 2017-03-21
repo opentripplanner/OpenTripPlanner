@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.1 (2017-03-16)
+
+- Deploy to Sonatype OSSRH and Maven Central
+- Documentation updates including repo links
+- New router-config stopClusterMode: clustering by parent station or geography (#2364)
+- Spanish and Portuguese UI Translations
+- In TimeSurface API, serialize travel times to every point when detail=true
+- Make OSM highway=corridor pedestrian routable
+- Fix GraphIndex.stopTimesForStop to search on the request day rather than now
+- Update GraphQL to latest version and improve support for complex arguments (#2367)
+- Add support for operationName to the graphql endpoint
+- Fix findClosestStopsByWalking, properly set RoutingContext
+- Fixed major routing problem where dead-end SimpleTransfers blocked walking paths (#2414)
+- Created Github issue template
+- Avoid negative elevation figures: Compute ellipsoid-geoid offset and optionally apply to elevation calculations (#2301)
+- Fix VCub bike share updater using new API variable names.
+- Fix spurious different-day warning (#2399)
+- Shutdown hook to gracefully shut down Grizzly (#2384)
+- Added headsign attribute for stoptimes in GraphQL (#2224)
+- Allow Cars on highway=*;bicycle=designated (#2374)
+- Expose PruneFloatingIslands parameters in build-config.json
+- Lazy initialization of stop clusters where needed
+- Include Agency/Route branding in responses
+- Include turn-by-turn walking directions for transfer legs (#1707)
+- Output error when edge lengths are negative, and set them to 1mm
+- Add disableAlertFiltering API flag (#2351)
+- Do not show arrival times at terminal stops in stop time viewer (#2357)
+- Index API now returns stop information URL, enabling hyperlinks in trip viewer (#2352)
+- Remove all unused model classes for index API (#1301)
+- Apply an interlining fix from 0.10 branch
+- Allow quoted search phrases in the Lucene search (#2279)
+- Re-implement maxHours filter (#2332)
+- Properly set wheelchairAccessible on area edges
+- Fixed file URL in test (#2339)
+- Add details field to fares, listing which legs each fare applies to (#1699)
 
 ## 1.0 (2016-09-09)
 
