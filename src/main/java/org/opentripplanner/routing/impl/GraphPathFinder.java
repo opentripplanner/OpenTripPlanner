@@ -108,19 +108,22 @@ public class GraphPathFinder {
 
         // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
+        RemainingWeightHeuristic reversedSearchHeuristic;
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
+            reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
             // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
             heuristic = new InterleavedBidirectionalHeuristic();
+            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
+            reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
-        RemainingWeightHeuristic reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
 
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see
          * itineraries with far more transfers. We do not expect transfer limiting to improve
@@ -190,7 +193,7 @@ public class GraphPathFinder {
 
             LOG.debug("we have {} paths", paths.size());
         }
-        LOG.info("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
+        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
     }
@@ -236,10 +239,9 @@ public class GraphPathFinder {
             // find the path from transitStop to origin/destination
             Vertex fromVertex = options.arriveBy ? options.rctx.fromVertex : transitStop;
             Vertex toVertex = options.arriveBy ? transitStop : options.rctx.toVertex;
-            RoutingRequest reversedFromEndpoint = createReversedRequest(originalReq, options, fromVertex, toVertex,
+            RoutingRequest reversedTransitRequest = createReversedTransitRequest(originalReq, options, fromVertex, toVertex,
                     arrDepTime, new EuclideanRemainingWeightHeuristic());
-            reversedFromEndpoint.maxWalkDistance = CLAMP_MAX_WALK;
-            aStar.getShortestPathTree(reversedFromEndpoint, timeout);
+            aStar.getShortestPathTree(reversedTransitRequest, timeout);
             List<GraphPath> pathsToTarget = aStar.getPathsToTarget();
             if(pathsToTarget.isEmpty()){
                 reversedPaths.add(newPath);
@@ -250,9 +252,9 @@ public class GraphPathFinder {
             // do the reversed search to/from transitStop
             Vertex fromTransVertex = options.arriveBy ? transitStop : options.rctx.fromVertex;
             Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
-            RoutingRequest reversedToEndpoint = createReversedRequest(originalReq, options, fromTransVertex,
+            RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
                     toTransVertex, transitStopTime, remainingWeightHeuristic);
-            aStar.getShortestPathTree(reversedToEndpoint, timeout);
+            aStar.getShortestPathTree(reversedMainRequest, timeout);
 
             List<GraphPath> newRevPaths = aStar.getPathsToTarget();
             if (newRevPaths.isEmpty()) {
@@ -282,6 +284,35 @@ public class GraphPathFinder {
             }
         }
         return reversedPaths.isEmpty() ? newPaths : reversedPaths;
+    }
+
+
+
+    private RoutingRequest createReversedTransitRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
+                                                 Vertex toVertex, long arrDepTime, RemainingWeightHeuristic remainingWeightHeuristic){
+
+        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex, toVertex,
+                arrDepTime, new EuclideanRemainingWeightHeuristic());
+        if((originalReq.parkAndRide || originalReq.kissAndRide) && !originalReq.arriveBy){
+            request.parkAndRide = false;
+            request.kissAndRide = false;
+            request.modes.setCar(false);
+        }
+        request.maxWalkDistance = CLAMP_MAX_WALK;
+        return request;
+    }
+
+    private RoutingRequest createReversedMainRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
+                                                        Vertex toVertex, long dateTime, RemainingWeightHeuristic remainingWeightHeuristic){
+        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex,
+                toVertex, dateTime, remainingWeightHeuristic);
+        if((originalReq.parkAndRide || originalReq.kissAndRide) && originalReq.arriveBy){
+            request.parkAndRide = false;
+            request.kissAndRide = false;
+            request.modes.setCar(false);
+        }
+        return request;
+
     }
 
     private RoutingRequest createReversedRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
