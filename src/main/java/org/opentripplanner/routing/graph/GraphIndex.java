@@ -399,7 +399,7 @@ public class GraphIndex {
      * @param startTime Start time for the search. Seconds from UNIX epoch
      * @param timeRange Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures Number of departures to fetch per pattern
-     * @param omitNonPickups If departures with pickup restrictions should be included or not
+     * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
      * @return
      */
     public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
