@@ -1596,7 +1596,7 @@ public class IndexGraphQLSchema {
                 .name("type")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((Route) environment.getSource()).getType())
-                .deprecate("The raw type integer form the GTFS source.")
+                .description("The raw type integer form the GTFS source.")
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
