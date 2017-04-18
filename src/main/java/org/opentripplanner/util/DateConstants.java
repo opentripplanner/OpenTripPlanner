@@ -41,6 +41,8 @@ public interface DateConstants {
 
     // from apache date utils
     public static final String ISO_DATETIME_TIME_ZONE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    public static final String ISO8601_DATETIME_TIME_ZONE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssssssZ";
+
 
     // milli second times
     public static final Long ONE_WEEK_MILLI = 604800000L;
@@ -82,6 +84,7 @@ public interface DateConstants {
     public static final String EFFECTIVE_DATE = "effectiveDate";
     public static final String TODAY = "today";
     public static final String TIME = "time";
+    public static final String DATE_TIME = "dateTime";
     public static final String HOUR = "Hour";
     public static final String MINUTE = "Minute";
     public static final String AM_PM = "AmPm";
