@@ -1,28 +1,17 @@
-FROM maven:3-jdk-8
+FROM openjdk:8-jre-alpine
 MAINTAINER Reittiopas version: 0.1
-RUN apt-get update && apt-get -y install curl
+
+RUN apk add --update curl bash && \
+    rm -rf /var/cache/apk/*
+VOLUME /opt/opentripplanner/graphs
 
 ENV OTP_ROOT="/opt/opentripplanner"
-ENV ROUTER_DATA_CONTAINER_URL="http://opentripplanner-data-container:8080"
+ENV ROUTER_DATA_CONTAINER_URL="https://api.digitransit.fi/routing-data/v1"
 
 WORKDIR ${OTP_ROOT}
 
-# Fetch maven dependencies
-RUN mkdir -p ${OTP_ROOT}/graphs/hsl
-
-ADD pom.xml ${OTP_ROOT}/pom.xml
-RUN mvn dependency:resolve
-
-ADD src ${OTP_ROOT}/src
-
-# Build OTP
-RUN mvn package \
-  && chmod -R a+rwX .
-
 ADD run.sh ${OTP_ROOT}/run.sh
-
-RUN chown -R 9999:9999 ${OTP_ROOT}
-#USER 9999
+ADD target/*-shaded.jar ${OTP_ROOT}
 
 ENV PORT=8080
 EXPOSE ${PORT}
@@ -30,7 +19,5 @@ ENV SECURE_PORT=8081
 EXPOSE ${SECURE_PORT}
 ENV ROUTER_NAME=finland
 ENV JAVA_OPTS="-Xms8G -Xmx8G"
-
-LABEL io.openshift.expose-services 8080:http
 
 ENTRYPOINT exec ./run.sh
