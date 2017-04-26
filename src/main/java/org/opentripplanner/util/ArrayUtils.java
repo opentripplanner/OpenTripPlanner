@@ -28,4 +28,14 @@ public class ArrayUtils {
         }
         return false;
     }
+    
+    public static int maxValue(int[] ints) {
+    	int max = ints[0];
+    	for (int ktr = 0; ktr < ints.length; ktr++) {
+    		if (ints[ktr] > max) {
+    			max = ints[ktr];
+    		}
+    	}
+    	return max;
+    }
 }
