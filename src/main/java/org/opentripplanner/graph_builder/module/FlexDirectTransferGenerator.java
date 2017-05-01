@@ -190,7 +190,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
 
                 // get hops
                 if (state.backEdge instanceof StreetEdge) {
-                    for (PatternHop h : graph.index.getHopsForEdge(state.backEdge, true)) {
+                    for (PatternHop h : graph.index.getHopsForEdge(state.backEdge)) {
                         if (flexPatternsToIgnore.get(hop.getPattern()).contains(h.getPattern())) {
                             continue;
                         }

@@ -15,39 +15,32 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.commons.lang3.SerializationUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.flex.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.FlagStopSplitterService;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -367,6 +360,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
 
+        findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap, fromTarget);
+
         Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
         for(TripPattern tripPattern : tripPatternStateMap.keySet()){
             State s = tripPatternStateMap.get(tripPattern);
@@ -379,11 +374,21 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         int i = 0;
         for(State s : stateToTripPatternsMap.keySet()){
 
-            Vertex v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+            Vertex v;
+
+            if(s.getVertex() == initVertex){
+                //the origin/destination lies along a flag stop route
+                v = initVertex;
+            }else{
+                v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+            }
+
+
+
+            //if nearby, wire stop to init vertex
 
             Stop flagStop = new Stop();
-            flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(i)));
-            flagStop.setId(new AgencyAndId("1", String.valueOf(Math.random())));
+            flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(Math.random())));
             flagStop.setLat(v.getLat());
             flagStop.setLon(v.getLon());
             flagStop.setName(s.getBackEdge().getName());
@@ -402,7 +407,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                 for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
 
-                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
                             .collect(Collectors.toList());
@@ -461,7 +466,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                 for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
 
-                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge(), fromTarget)
+                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
                             .collect(Collectors.toList());
@@ -516,11 +521,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
         double lowestDistanceSum = Double.MAX_VALUE;
         int lowestDistanceIndex = -1;
-        for(int i = 0; i < lineCoordinates.length; i++){
+        Coordinate closestPoint = null;
+        for(int i = 0; i < lineCoordinates.length - 1; i++){
+
+            Coordinate iterClosestPoint = closestPointToSegment(lineCoordinates[i], lineCoordinates[i+1], flexPoint);
             double distance = SphericalDistanceLibrary.fastDistance(flexPoint, lineCoordinates[i]);
             if(distance < lowestDistanceSum){
                 lowestDistanceIndex = i;
                 lowestDistanceSum = distance;
+                closestPoint = iterClosestPoint;
             }
         }
 
@@ -530,8 +539,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
         List<Coordinate> lineCoordinateList = new ArrayList<>();
         Collections.addAll(lineCoordinateList, lineCoordinates);
+
         lineCoordinateList.set(lowestDistanceIndex, flexPoint);
         List<Coordinate> shortenedHopGeometry =  reverseSearch ? lineCoordinateList.subList(0, lowestDistanceIndex + 1) : lineCoordinateList.subList(lowestDistanceIndex, lineCoordinateList.size());
+
+        if(reverseSearch){
+            shortenedHopGeometry.add(shortenedHopGeometry.size() - 1, closestPoint);
+        }else{
+            shortenedHopGeometry.add(1, closestPoint);
+        }
 
         if(shortenedHopGeometry.size() < 2){
             return null;
@@ -553,6 +569,67 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
         return null;
+    }
+
+    /**
+     * Find the street edges that were split at beginning of search by StreetSplitter, check whether they are served by flag stop routes.
+     * This is duplicating the work done earlier by StreetSplitter, but want to minimize the number of changes introduced by flag stops.
+     * @param
+     * @return
+     */
+    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map tripPatternStateMap, boolean fromTarget){
+        List<StreetEdge> flagStopOriginEdges = FlagStopSplitterService.getClosestStreetEdgesToOrigin(rr.rctx, graph);
+        List<StreetEdge> flagStopDestinationEdges = FlagStopSplitterService.getClosestStreetEdgesToDestination(rr.rctx, graph);
+
+        if(fromTarget){
+            for(StreetEdge streetEdge : flagStopDestinationEdges){
+                State nearbyState = new State(initVertex, rr);
+                nearbyState.backEdge = streetEdge;
+                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
+                //todo find trippatterns for flag stop routes only
+                for(TripPattern tripPattern : patterns){
+                    tripPatternStateMap.put(tripPattern, nearbyState);
+                }
+            }
+        } else {
+            for(StreetEdge streetEdge : flagStopOriginEdges){
+                State nearbyState = new State(initVertex, rr);
+                nearbyState.backEdge = streetEdge;
+                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
+                //todo find trippatterns for flag stop routes only
+                for(TripPattern tripPattern : patterns){
+                    tripPatternStateMap.put(tripPattern, nearbyState);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param start
+     *                First point of the segment
+     * @param end
+     *                Second point of the segment
+     * @param point
+     *                Point to which we want to know the distance of the segment
+     *                defined by p1,p2
+     * @return The closest coordinate along the given segment to the given point.
+     */
+    private Coordinate closestPointToSegment(Coordinate start, Coordinate end, Coordinate point) {
+
+        // first convert line to normalized unit vector
+        double dx = end.x - start.x;
+        double dy = end.y - start.y;
+        double mag = Math.sqrt(dx*dx + dy*dy);
+        dx /= mag;
+        dy /= mag;
+
+        // translate the point and get the dot product
+        double lambda = (dx * (point.x - start.x)) + (dy * (point.y - start.y));
+        double x4 = (dx * lambda) + start.x;
+        double y4 = (dy * lambda) + start.y;
+
+        return new Coordinate(x4, y4);
+
     }
 
 }

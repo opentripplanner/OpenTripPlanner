@@ -727,7 +727,7 @@ public class GraphIndex {
         }
     }
 
-    public Collection<PatternHop> getHopsForEdge(Edge e, boolean arriveBy) {
+    public Collection<PatternHop> getHopsForEdge(Edge e) {
         return hopsForEdge.get(e);
     }
 
