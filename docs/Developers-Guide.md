@@ -169,7 +169,7 @@ are not included in mainline OTP.
 ### Java
 
 OpenTripPlanner uses the same code formatting and style as the [GeoTools](http://www.geotools.org/) and 
-[GeoServer](htp://geoserver.org) projects. It's a minor variant of the 
+[GeoServer](http://geoserver.org) projects. It's a minor variant of the
 [Sun coding convention](http://www.oracle.com/technetwork/java/codeconv-138413.html). Notably, **we do not use tabs** 
 for indentation and we allow for lines up to 100 characters wide.
 
