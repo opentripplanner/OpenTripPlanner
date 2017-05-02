@@ -11,7 +11,7 @@ ENV ROUTER_DATA_CONTAINER_URL="https://api.digitransit.fi/routing-data/v1"
 WORKDIR ${OTP_ROOT}
 
 ADD run.sh ${OTP_ROOT}/run.sh
-ADD target/*-shaded.jar ${OTP_ROOT}
+ADD target/*-shaded.jar ${OTP_ROOT}/otp-shaded.jar
 
 ENV PORT=8080
 EXPOSE ${PORT}
