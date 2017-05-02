@@ -11,7 +11,7 @@ DOCKER_IMAGE=opentripplanner
 # Build image
 docker build --tag="$ORG/$DOCKER_IMAGE:builder" -f Dockerfile.builder .
 mkdir export
-docker run --rm --entrypoint tar "otp:builder" -c target|tar x -C ./
+docker run --rm --entrypoint tar "$ORG/$DOCKER_IMAGE:builder" -c target|tar x -C ./
 
 docker build --tag="$ORG/$DOCKER_IMAGE:$DOCKER_TAG" -f Dockerfile .
 docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_AUTH
