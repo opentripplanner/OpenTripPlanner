@@ -16,6 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
@@ -427,6 +428,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         if(reverseSearchPatternHop != null){
                             //processed by forward search already, use the trimmed geometry
                             LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(reverseSearchPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
+                            if(preStopHopGeometry == null)
+                                continue;  //flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
                             double originalHopGeometryLength = GeometryUtils.getLengthInMeters(reverseSearchPatternHop.originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
@@ -436,7 +439,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                             //haven't seen this patternHop, create a flex one
                             LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
                             if(preStopHopGeometry == null)
-                                continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
+                                continue;  //flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
                             double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
                             double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
                             double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
@@ -524,18 +527,27 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         Coordinate closestPoint = null;
         for(int i = 0; i < lineCoordinates.length - 1; i++){
 
-            Coordinate iterClosestPoint = closestPointToSegment(lineCoordinates[i], lineCoordinates[i+1], flexPoint);
-            double distance = SphericalDistanceLibrary.fastDistance(flexPoint, lineCoordinates[i]);
-            if(distance < lowestDistanceSum){
-                lowestDistanceIndex = i;
-                lowestDistanceSum = distance;
-                closestPoint = iterClosestPoint;
+            LineSegment lineSegment = new LineSegment(lineCoordinates[i], lineCoordinates[i+1]);
+            Coordinate iterClosestPoint = lineSegment.project(flexPoint);
+            boolean betweenPoints = isBetweenPoints(lineCoordinates[i], lineCoordinates[i+1], iterClosestPoint);
+            if(betweenPoints){
+                double distance = SphericalDistanceLibrary.fastDistance(flexPoint, lineCoordinates[i]);
+                if(distance < lowestDistanceSum){
+                    lowestDistanceIndex = i;
+                    lowestDistanceSum = distance;
+                    closestPoint = iterClosestPoint;
+                }
             }
         }
 
-        //this hop is heading away from the destination, leave geometry unchanged
-        if(reverseSearch && lowestDistanceIndex == 0)
+        if(lowestDistanceIndex == -1)
+            return null;
+
+        if(reverseSearch && lowestDistanceIndex == 0){
+            lineCoordinates[lineCoordinates.length - 1] = closestPoint;
             return GeometryUtils.getGeometryFactory().createLineString(lineCoordinates);
+        }
+
 
         List<Coordinate> lineCoordinateList = new ArrayList<>();
         Collections.addAll(lineCoordinateList, lineCoordinates);
@@ -605,31 +617,17 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     }
 
     /**
-     * @param start
-     *                First point of the segment
-     * @param end
-     *                Second point of the segment
-     * @param point
-     *                Point to which we want to know the distance of the segment
-     *                defined by p1,p2
-     * @return The closest coordinate along the given segment to the given point.
+     *
+     * @param start start point of the segment
+     * @param end end point of the segment
+     * @param point coordinate along the line defined by the segment, not necessarily in between the points
+     * @return
      */
-    private Coordinate closestPointToSegment(Coordinate start, Coordinate end, Coordinate point) {
-
-        // first convert line to normalized unit vector
-        double dx = end.x - start.x;
-        double dy = end.y - start.y;
-        double mag = Math.sqrt(dx*dx + dy*dy);
-        dx /= mag;
-        dy /= mag;
-
-        // translate the point and get the dot product
-        double lambda = (dx * (point.x - start.x)) + (dy * (point.y - start.y));
-        double x4 = (dx * lambda) + start.x;
-        double y4 = (dy * lambda) + start.y;
-
-        return new Coordinate(x4, y4);
-
+    private static boolean isBetweenPoints(Coordinate start, Coordinate end, Coordinate point) {
+        double distance1 = Math.round (SphericalDistanceLibrary.fastDistance(point, start) * 100) / 100;
+        double distance2 = Math.round (SphericalDistanceLibrary.fastDistance(point, end) * 100) / 100;
+        double totalDistance = Math.round (SphericalDistanceLibrary.fastDistance(start, end) * 100) / 100;
+        return distance1 + distance2 <= totalDistance;
     }
 
 }
