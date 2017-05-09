@@ -8,9 +8,9 @@ Java development are [Eclipse](http://eclipse.org), [IntelliJ IDEA](https://www.
 and any IDE with Maven build support should also work (ensure that you have the Maven plugins installed and enabled).
 Git integration is a plus since OTP is under Git version control.
 
-IntelliJ IDEA is a commercial product, but its authors give free licenses to open source projects and the OpenTripPlanner
-development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
-an excellent IDE, and in my experience is quicker and more stable than the competition.
+Many of the Core OTP developers use IntelliJ IDEA. It is an excellent IDE, and in my experience is quicker 
+and more stable than the competition. IntelliJ IDEA is a commercial product, but there is an open source "community edition"
+that is completely sufficient for working on OTP.
 
 Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP GitHub
 repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
