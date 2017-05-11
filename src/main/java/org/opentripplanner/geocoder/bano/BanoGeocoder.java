@@ -48,7 +48,7 @@ import java.util.List;
 public class BanoGeocoder implements Geocoder {
     private static final Logger LOG = LoggerFactory.getLogger(BanoGeocoder.class);
 
-    private static final String BANO_URL = "http://api.adresse.data.gouv.fr/search/";
+    private static final String BANO_URL = "http://api-adresse.data.gouv.fr/search/";
 
     private static final int CLAMP_RESULTS = 10;
 
