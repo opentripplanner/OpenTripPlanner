@@ -1075,6 +1075,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
+     * @return The weight (multiplier) for mode, the default weight is one. 
+     * Allows de-prioritizing modes.
+     */
+    public double getModeWeight(TraverseMode traverseMode) {
+        Double weight = this.rctx.graph.modeWeights.get(traverseMode);
+        return weight != null ? weight : 1d;
+    }
+
+    /**
      * @return The time it actually takes to alight a vehicle. Could be significant eg. on airplanes and ferries
      */
     public int getAlightTime(TraverseMode transitMode) {

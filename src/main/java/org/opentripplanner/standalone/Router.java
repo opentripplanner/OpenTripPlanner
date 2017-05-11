@@ -143,6 +143,16 @@ public class Router {
             }
         }
 
+        final JsonNode modeWeights = config.get("modeWeight");
+        if (modeWeights != null && modeWeights.isObject()) {
+            graph.modeWeights = new EnumMap<>(TraverseMode.class);
+            for (TraverseMode mode : TraverseMode.values()) {   
+                if(modeWeights.has(mode.name())) {
+                    graph.modeWeights.put(mode, modeWeights.get(mode.name()).asDouble(1d));
+                }
+            }
+        }
+  
         JsonNode alightTimes = config.get("alightTimes");
         if (alightTimes != null && alightTimes.isObject()) {
             graph.alightTimes = new EnumMap<>(TraverseMode.class);

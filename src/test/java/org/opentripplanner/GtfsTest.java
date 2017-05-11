@@ -64,7 +64,7 @@ public abstract class GtfsTest extends TestCase {
     private String agencyId;
 
     public Itinerary itinerary = null;
-
+    
     protected void setUp() {
         File gtfs = new File("src/test/resources/" + getFeedName());
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
