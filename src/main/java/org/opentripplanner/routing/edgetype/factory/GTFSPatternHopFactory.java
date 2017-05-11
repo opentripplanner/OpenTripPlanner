@@ -492,6 +492,14 @@ public class GTFSPatternHopFactory {
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
 
+        /* Store parent stops in graph, even if not linked. These are needed for clustering*/
+        for(TransitStationStop stop : context.stationStopNodes.values()){
+            if(stop instanceof TransitStation){
+                TransitStation parentStopVertex = (TransitStation) stop;
+                graph.parentStopById.put(parentStopVertex.getStopId(), parentStopVertex.getStop());
+            }
+        }
+
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TripPattern tableTripPattern : tripPatterns.values()) {
