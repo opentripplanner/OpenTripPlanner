@@ -50,7 +50,6 @@ public class ExternalGeocoderResource {
         return geocoder.geocode(address, env);
     }
     
-
     private void badRequest (String message) {
         throw new WebApplicationException(Response.status(Status.BAD_REQUEST)
                 .entity(message).type("text/plain").build());
