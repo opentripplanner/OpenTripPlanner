@@ -421,6 +421,14 @@ public class StateEditor {
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
+    public void setNonTransitOptionsFromState(State state){
+        cloneStateDataAsNeeded();
+        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.carParked = state.isCarParked();
+        child.stateData.bikeParked = state.isBikeParked();
+        child.stateData.usingRentedBike = state.isBikeRenting();
+    }
+
     /* PUBLIC GETTER METHODS */
 
     /*
