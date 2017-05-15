@@ -511,7 +511,7 @@ public class GraphIndex {
             ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
             int sidx = 0;
             for (Stop currStop : pattern.stopPattern.stops) {
-                if (currStop == stop) {
+                if (currStop.equals(stop)) {
                     for (TripTimes t : tt.tripTimes) {
                         if (!sd.serviceRunning(t.serviceCode)) continue;
                         stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
