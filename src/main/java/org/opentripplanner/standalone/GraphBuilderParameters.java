@@ -130,13 +130,29 @@ public class GraphBuilderParameters {
     public final int pruningThresholdIslandWithStops;
 
     /**
+     * This field indicates whether walking should be allowed on OSM ways
+     * tagged with "foot=discouraged".
+     */
+    public final boolean banDiscouragedWalking;
+
+    /**
+     * This field indicates whether bicycling should be allowed on OSM ways
+     * tagged with "bicycle=discouraged".
+     */
+    public final boolean banDiscouragedBiking;
+
+    /**
+     * Transfers up to this length in meters will be pre-calculated and included in the Graph.
+     */
+    public final double maxTransferDistance;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
     public GraphBuilderParameters(JsonNode config) {
-
         htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
@@ -158,6 +174,9 @@ public class GraphBuilderParameters {
         maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
         pruningThresholdIslandWithoutStops = config.path("islandWithoutStopsMaxSize").asInt(40);
         pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
+        banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
+        banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
+        maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
     }
 
 }

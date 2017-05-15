@@ -347,11 +347,11 @@ otp.modules.planner.Itinerary = otp.Class({
             if(otp.util.Itin.isTransit(leg.mode)) {
                 //TRANSLATORS: Board Public transit route name (agency name
                 //Stop ID ) start time
-                text += ' - ' + _tr('Board') + ': ' + leg.from.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.from.stopId.split(':')[0], 'stop_id': leg.from.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '\n';
+                text += ' - ' + _tr('Board') + ': ' + leg.from.name + ' ' + _tr("(%(agencyId)s Stop ID #%(id)s),", otp.util.Itin.getStopIdObj(leg.from.stopId)) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '\n';
                 text += ' - ' + _tr('Time in transit') + ': '+otp.util.Time.secsToHrMin(leg.duration) + '\n';
                 //TRANSLATORS: Alight Public transit route name (agency name
                 //Stop ID ) end time
-                text += ' - ' + _tr('Alight') + ': ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.split(':')[0], 'stop_id': leg.to.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '\n';
+                text += ' - ' + _tr('Alight') + ': ' + leg.to.name + ' ' + _tr("(%(agencyId)s Stop ID #%(id)s),", otp.util.Itin.getStopIdObj(leg.to.stopId)) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '\n';
             }
             else if (leg.steps) { // walk / bike / car
 

@@ -1168,7 +1168,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Check if route is preferred according to this request. */
     public long preferencesPenaltyForRoute(Route route) {
         long preferences_penalty = 0;
-        String agencyID = route.getId().getAgencyId();
+        String agencyID = route.getAgency().getId();
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
