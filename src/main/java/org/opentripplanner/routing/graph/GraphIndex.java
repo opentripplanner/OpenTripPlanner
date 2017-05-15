@@ -13,6 +13,7 @@ import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -767,9 +768,9 @@ public class GraphIndex {
 
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null)
             ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
-            
-        final ServiceDate[] serviceDates = { new ServiceDate().previous(), new ServiceDate(),
-                new ServiceDate().next() };
+
+        Date date = new Date(startTime * 1000);
+        final ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
         // Loop through all possible days
         for (final ServiceDate serviceDate : serviceDates) {
