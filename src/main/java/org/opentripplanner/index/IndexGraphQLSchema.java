@@ -9,6 +9,7 @@ import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingEnvironmentImpl;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
@@ -867,7 +868,7 @@ public class IndexGraphQLSchema {
                                 .getType(place)
                                 .getFieldDefinition("id")
                                 .getDataFetcher()
-                                .get(new DataFetchingEnvironment(place, null, null,
+                                .get(new DataFetchingEnvironmentImpl(place, null, null,
                                     null, null, placeAtDistanceType, null))
 
                     );
