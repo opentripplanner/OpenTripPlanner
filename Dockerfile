@@ -1,7 +1,7 @@
 FROM openjdk:8-jre-alpine
 MAINTAINER Reittiopas version: 0.1
 
-RUN apk add --update curl bash && \
+RUN apk add --update curl bash ttf-dejavu && \
     rm -rf /var/cache/apk/*
 VOLUME /opt/opentripplanner/graphs
 
