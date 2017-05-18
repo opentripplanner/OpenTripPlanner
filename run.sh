@@ -8,7 +8,7 @@ echo JAR=$JAR
 SLEEP_TIME=5
 
 function url {
-  echo $ROUTER_DATA_CONTAINER_URL/$1
+  echo $ROUTER_DATA_CONTAINER_URL/$ROUTER_NAME/$1
 }
 
 function build_graph {
