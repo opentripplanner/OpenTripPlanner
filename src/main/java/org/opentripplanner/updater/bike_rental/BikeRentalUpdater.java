@@ -36,8 +36,6 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource.
@@ -108,6 +106,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new GenericKmlBikeRentalDataSource();
             } else if (sourceType.equals("sf-bay-area")) {
                 source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("smoove")) {
+                source = new SmooveBikeRentalDataSource();
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
             }

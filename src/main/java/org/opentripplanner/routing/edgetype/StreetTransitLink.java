@@ -82,12 +82,6 @@ public class StreetTransitLink extends Edge {
     }
 
     public State traverse(State s0) {
-
-        // Forbid taking shortcuts composed of two street-transit links in a row. Also avoids spurious leg transitions.
-        if (s0.backEdge instanceof StreetTransitLink) {
-            return null;
-        }
-
         // Do not re-enter the street network following a transfer.
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;

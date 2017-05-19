@@ -36,10 +36,13 @@ public class BikeRentalStationVertex extends Vertex {
 
     private String id;
     
+    private BikeRentalStation station;
+
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.x, station.y,
                 station.name);
+        this.station = station;
         this.setId(station.id);
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
@@ -67,5 +70,9 @@ public class BikeRentalStationVertex extends Vertex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public BikeRentalStation getStation() {
+        return station;
     }
 }

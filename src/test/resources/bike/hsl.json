@@ -1,0 +1,876 @@
+
+{
+  "results":
+  [
+
+    {
+      "id": 170,
+      "name":
+      {
+        "fi": "Ainola",
+        "sv": "Ainola",
+        "en": "Ainola"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.100598,
+          60.455146,
+          25.101269,
+          60.455476
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.100598,
+              60.455471
+            ],
+
+            [
+              25.100695,
+              60.455146
+            ],
+
+            [
+              25.101269,
+              60.455158
+            ],
+
+            [
+              25.101192,
+              60.455476
+            ],
+
+            [
+              25.100598,
+              60.455471
+            ]
+          ]
+        ]
+      },
+      "operatorId": 5,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "CAR": 46
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 258,
+      "name":
+      {
+        "fi": "Ajurinaukio",
+        "sv": "Formansplatsen",
+        "en": "Ajurinaukio"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.034968,
+          60.27451,
+          25.035185,
+          60.274612
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.034968,
+              60.274529
+            ],
+
+            [
+              25.035142,
+              60.27451
+            ],
+
+            [
+              25.035185,
+              60.274595
+            ],
+
+            [
+              25.035047,
+              60.274612
+            ],
+
+            [
+              25.034968,
+              60.274529
+            ]
+          ]
+        ]
+      },
+      "operatorId": 16,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "CAR": 7
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 894,
+      "name":
+      {
+        "fi": "Alberganpromenadi (pyörä)",
+        "sv": "Albergapromenaden (cykel)",
+        "en": "Alberganpromenadi (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          24.814049,
+          60.218546,
+          24.814157,
+          60.2186
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              24.814049,
+              60.218546
+            ],
+
+            [
+              24.814157,
+              60.218546
+            ],
+
+            [
+              24.814157,
+              60.2186
+            ],
+
+            [
+              24.814049,
+              60.2186
+            ],
+
+            [
+              24.814049,
+              60.218546
+            ]
+          ]
+        ]
+      },
+      "operatorId": 2,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 80
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 132,
+      "name":
+      {
+        "fi": "Ankkapurontie",
+        "sv": "Ankkapurontie",
+        "en": "Ankkapurontie"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.050067,
+          60.499705,
+          25.050495,
+          60.499865
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.050176,
+              60.499705
+            ],
+
+            [
+              25.050067,
+              60.499779
+            ],
+
+            [
+              25.0504,
+              60.499865
+            ],
+
+            [
+              25.050495,
+              60.499763
+            ],
+
+            [
+              25.050176,
+              60.499705
+            ]
+          ]
+        ]
+      },
+      "operatorId": 5,
+      "status": "INACTIVE",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription":
+      {
+        "fi": "Ei junaliikennettä enää",
+        "sv": "-",
+        "en": "-"
+      },
+      "builtCapacity":
+      {
+        "CAR": 9
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 935,
+      "name":
+      {
+        "fi": "Asema-aukio (pyörä)",
+        "sv": "Stationsplatsen (cykel)",
+        "en": "Asema-aukio (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          24.940355,
+          60.170858,
+          24.940463,
+          60.170912
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              24.940355,
+              60.170858
+            ],
+
+            [
+              24.940463,
+              60.170858
+            ],
+
+            [
+              24.940463,
+              60.170912
+            ],
+
+            [
+              24.940355,
+              60.170912
+            ],
+
+            [
+              24.940355,
+              60.170858
+            ]
+          ]
+        ]
+      },
+      "operatorId": 19,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 50
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 791,
+      "name":
+      {
+        "fi": "Asemakatu eteläinen (pyörä)",
+        "sv": "Asemakatu södra (cykel)",
+        "en": "Asemakatu south (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.090533,
+          60.473223,
+          25.090642,
+          60.473277
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.090533,
+              60.473223
+            ],
+
+            [
+              25.090642,
+              60.473223
+            ],
+
+            [
+              25.090642,
+              60.473277
+            ],
+
+            [
+              25.090533,
+              60.473277
+            ],
+
+            [
+              25.090533,
+              60.473223
+            ]
+          ]
+        ]
+      },
+      "operatorId": 5,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 76
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 788,
+      "name":
+      {
+        "fi": "Asemakatu pohjoinen (pyörä)",
+        "sv": "Asemakatu norra (cykel)",
+        "en": "Asemakatu north (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.089599,
+          60.474081,
+          25.089708,
+          60.474135
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.089599,
+              60.474081
+            ],
+
+            [
+              25.089708,
+              60.474081
+            ],
+
+            [
+              25.089708,
+              60.474135
+            ],
+
+            [
+              25.089599,
+              60.474135
+            ],
+
+            [
+              25.089599,
+              60.474081
+            ]
+          ]
+        ]
+      },
+      "operatorId": 12,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 182
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 821,
+      "name":
+      {
+        "fi": "Asemakatu (pyörä)",
+        "sv": "Asemakatu (cykel)",
+        "en": "Asemakatu (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.306716,
+          60.647156,
+          25.306825,
+          60.647209
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.306716,
+              60.647156
+            ],
+
+            [
+              25.306825,
+              60.647156
+            ],
+
+            [
+              25.306825,
+              60.647209
+            ],
+
+            [
+              25.306716,
+              60.647209
+            ],
+
+            [
+              25.306716,
+              60.647156
+            ]
+          ]
+        ]
+      },
+      "operatorId": 31,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 70
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 406,
+      "name":
+      {
+        "fi": "Asemakuja itäinen",
+        "sv": "Stationsgränden östra",
+        "en": "Asemakuja east"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          24.657657,
+          60.204968,
+          24.658584,
+          60.205187
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              24.658584,
+              60.205144
+            ],
+
+            [
+              24.658542,
+              60.205187
+            ],
+
+            [
+              24.657657,
+              60.205012
+            ],
+
+            [
+              24.657685,
+              60.204968
+            ],
+
+            [
+              24.658584,
+              60.205144
+            ]
+          ]
+        ]
+      },
+      "operatorId": 2,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "DISABLED": 1,
+        "CAR": 18
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 401,
+      "name":
+      {
+        "fi": "Asemakuja läntinen",
+        "sv": "Stationsgränden västra",
+        "en": "Asemakuja west"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          24.658859,
+          60.205136,
+          24.659852,
+          60.20551
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              24.658859,
+              60.205343
+            ],
+
+            [
+              24.659013,
+              60.205136
+            ],
+
+            [
+              24.659852,
+              60.205299
+            ],
+
+            [
+              24.659693,
+              60.20551
+            ],
+
+            [
+              24.658859,
+              60.205343
+            ]
+          ]
+        ]
+      },
+      "operatorId": 2,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "CAR": 52
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 798,
+      "name":
+      {
+        "fi": "Asemanaukio eteläinen (pyörä)",
+        "sv": "Asemanaukio södra (cykel)",
+        "en": "Asemanaukio south (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.10541,
+          60.40386,
+          25.105519,
+          60.403914
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.10541,
+              60.40386
+            ],
+
+            [
+              25.105519,
+              60.40386
+            ],
+
+            [
+              25.105519,
+              60.403914
+            ],
+
+            [
+              25.10541,
+              60.403914
+            ],
+
+            [
+              25.10541,
+              60.40386
+            ]
+          ]
+        ]
+      },
+      "operatorId": 26,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 369
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    },
+
+    {
+      "id": 797,
+      "name":
+      {
+        "fi": "Asemanaukio pohjoinen (pyörä)",
+        "sv": "Asemanaukio norra (cykel)",
+        "en": "Asemanaukio north (bike)"
+      },
+      "location":
+      {
+        "crs":
+        {
+          "type": "name",
+          "properties":
+          {
+            "name": "EPSG:4326"
+          }
+        },
+        "bbox":
+        [
+          25.104757,
+          60.404745,
+          25.104866,
+          60.404798
+        ],
+        "type": "Polygon",
+        "coordinates":
+        [
+
+          [
+
+            [
+              25.104757,
+              60.404745
+            ],
+
+            [
+              25.104866,
+              60.404745
+            ],
+
+            [
+              25.104866,
+              60.404798
+            ],
+
+            [
+              25.104757,
+              60.404798
+            ],
+
+            [
+              25.104757,
+              60.404745
+            ]
+          ]
+        ]
+      },
+      "operatorId": 7,
+      "status": "IN_OPERATION",
+      "pricingMethod": "PARK_AND_RIDE_247_FREE",
+      "statusDescription": null,
+      "builtCapacity":
+      {
+        "BICYCLE": 44
+      },
+      "usages":
+      [
+        "PARK_AND_RIDE"
+      ]
+    }
+  ]
+}

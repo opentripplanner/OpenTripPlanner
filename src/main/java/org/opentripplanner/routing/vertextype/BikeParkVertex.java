@@ -40,9 +40,12 @@ public class BikeParkVertex extends Vertex {
 
     private String id;
 
+    private BikePark bikePark;
+
     public BikeParkVertex(Graph g, BikePark bikePark) {
         //TODO: localize bikepark
         super(g, "bike park " + bikePark.id, bikePark.x, bikePark.y, new NonLocalizedString(bikePark.name));
+        this.bikePark = bikePark;
         this.setId(bikePark.id);
         this.setSpacesAvailable(bikePark.spacesAvailable);
     }
@@ -61,5 +64,9 @@ public class BikeParkVertex extends Vertex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public BikePark getBikePark() {
+        return bikePark;
     }
 }

@@ -53,6 +53,7 @@ public class AStar {
     private boolean verbose = false;
 
     private TraverseVisitor traverseVisitor;
+    private ExtendedTraverseVisitor extendedTraverseVisitor;
 
     enum RunStatus {
         RUNNING, STOPPED
@@ -180,6 +181,9 @@ public class AStar {
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
+            if (extendedTraverseVisitor != null) {
+                extendedTraverseVisitor.preVisitEdge(edge, runState.u);
+            }
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.
             for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
@@ -357,13 +361,18 @@ public class AStar {
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
+        if (traverseVisitor instanceof ExtendedTraverseVisitor) {
+            this.extendedTraverseVisitor = (ExtendedTraverseVisitor)traverseVisitor;
+        }
     }
 
     public List<GraphPath> getPathsToTarget() {
-        List<GraphPath> ret = new LinkedList<>();
-        for (State s : runState.targetAcceptedStates) {
-            if (s.isFinal()) {
-                ret.add(new GraphPath(s, true));
+        final List<GraphPath> ret = new LinkedList<>();
+        if (runState != null && runState.targetAcceptedStates != null) {
+            for (final State s : runState.targetAcceptedStates) {
+                if (s.isFinal()) {
+                    ret.add(new GraphPath(s, true));
+                }
             }
         }
         return ret;

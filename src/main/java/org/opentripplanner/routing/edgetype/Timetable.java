@@ -428,7 +428,7 @@ public class Timetable implements Serializable {
                     } else {
                         long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
-                        if (update.hasArrival()) {
+                        if (update.hasArrival() && (update.getArrival().hasTime() || update.getArrival().hasDelay())) {
                             StopTimeEvent arrival = update.getArrival();
                             if (arrival.hasDelay()) {
                                 delay = arrival.getDelay();
@@ -454,7 +454,7 @@ public class Timetable implements Serializable {
                             }
                         }
 
-                        if (update.hasDeparture()) {
+                        if (update.hasDeparture() && (update.getDeparture().hasTime() || update.getDeparture().hasDelay())) {
                             StopTimeEvent departure = update.getDeparture();
                             if (departure.hasDelay()) {
                                 delay = departure.getDelay();

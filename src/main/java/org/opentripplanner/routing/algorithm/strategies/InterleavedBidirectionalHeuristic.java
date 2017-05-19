@@ -117,8 +117,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         long start = System.currentTimeMillis();
         this.target = target;
         this.routingRequest = request;
-        request.softWalkLimiting = false;
-        request.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
         // Forward street search first, mark street vertices around the origin so H evaluates to 0
         TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
@@ -270,6 +268,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (fromTarget) {
             rr.setArriveBy(!rr.arriveBy);
         }
+        boolean stopReached = false;
         // Create a map that returns Infinity when it does not contain a vertex.
         TObjectDoubleMap<Vertex> vertices = new TObjectDoubleHashMap<>(100, 0.5f, Double.POSITIVE_INFINITY);
         ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
@@ -294,6 +293,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                     transitQueue.insert(v, weight);
                     if (weight > maxWeightSeen) {
                         maxWeightSeen = weight;
+                    }
+                }
+                if (!stopReached) {
+                    stopReached = true;
+                    rr.softWalkLimiting = false;
+                    rr.softPreTransitLimiting = false;
+                    if (s.walkDistance > rr.maxWalkDistance) {
+                        // Add 300 meters in order to search for nearby stops
+                        rr.maxWalkDistance = s.walkDistance + 300;
                     }
                 }
                 continue;

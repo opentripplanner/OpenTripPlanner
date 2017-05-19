@@ -110,8 +110,8 @@ public class StopPattern implements Serializable {
          * dropoffs at the initial stop and pickups at the final merges similar patterns while
          * having no effect on routing.
          */
-        dropoffs[0] = 0;
-        pickups[size - 1] = 0;
+        //dropoffs[0] = 0;
+        //pickups[size - 1] = 0;
     }
 
     /**
