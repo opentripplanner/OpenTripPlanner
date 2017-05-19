@@ -8,7 +8,7 @@ echo JAR=$JAR
 SLEEP_TIME=5
 
 function url {
-  echo $ROUTER_DATA_CONTAINER_URL/$ROUTER_NAME/$1
+  echo $ROUTER_DATA_CONTAINER_URL/$1
 }
 
 function build_graph {
@@ -19,7 +19,7 @@ function build_graph {
   mkdir -p $DIR
   unzip -o -d $DIR $FILE
   mv $DIR/router-$GRAPHNAME $DIR/$GRAPHNAME
-  java $JAVA_OPTS -jar $JAR --build $DIR/$GRAPHNAME 
+  java $JAVA_OPTS -jar $JAR --build $DIR/$GRAPHNAME
 }
 
 function download_graph {
