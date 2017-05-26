@@ -1,5 +1,5 @@
 #!/bin/bash
-ORG=hsldevcom
+ORG=${ORG:-hsldevcom}
 DOCKER_IMAGE=opentripplanner
 
 # Set these environment variables
