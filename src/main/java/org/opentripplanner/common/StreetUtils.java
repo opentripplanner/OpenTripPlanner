@@ -25,7 +25,15 @@ public class StreetUtils {
     private static Logger LOG = LoggerFactory.getLogger(StreetUtils.class);
     private static int islandCounter = 0;
 
-    public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
+    /* Island pruning strategy:
+       - First extract islands without considering noThruTraffic edges
+       - Then extract expanded islands by accepting noThruTraffic edges, but - DO NOT JUMP ACROSS ORIGINAL ISLANDS!
+         Note: these expanded islands can overlap.
+       - Generate also pure noThruTraffic islands
+       - Prune small islands away
+     */
+
+    public static void pruneFloatingIslands(Graph graph, int maxIslandSize,
             int islandWithStopMaxSize, String islandLogName) {
         LOG.debug("pruning");
         PrintWriter islandLog = null;
@@ -40,67 +48,36 @@ public class StreetUtils {
             islandLog.printf("%s\t%s\t%s\t%s\t%s\n","id","stopCount", "streetCount","wkt" ,"hadRemoved");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
+        Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
 
-//        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
-
-        for (Vertex gv : graph.getVertices()) {
-            if (!(gv instanceof StreetVertex)) {
-                continue;
-            }
-            State s0 = new State(gv, options);
-            for (Edge e : gv.getOutgoing()) {
-                Vertex in = gv;
-                if (!(e instanceof StreetEdge || e instanceof StreetTransitLink || 
-                      e instanceof ElevatorEdge || e instanceof FreeEdge)) {
-                    continue;
-                }
-                State s1 = e.traverse(s0);
-                if (s1 == null) {
-                    continue;
-                }
-                Vertex out = s1.getVertex();
-
-                ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
-                if (vertexList == null) {
-                    vertexList = new ArrayList<Vertex>();
-                    neighborsForVertex.put(in, vertexList);
-                }
-                vertexList.add(out);
-
-                vertexList = neighborsForVertex.get(out);
-                if (vertexList == null) {
-                    vertexList = new ArrayList<Vertex>();
-                    neighborsForVertex.put(out, vertexList);
-                }
-                vertexList.add(in);
-            }
-        }
+        // Establish vertex neighbourhood without thruTrafficEdges
+        collectNeighbourVertices(graph, neighborsForVertex, false);
 
         ArrayList<Subgraph> islands = new ArrayList<Subgraph>();
-        /* associate each node with a subgraph */
-        for (Vertex gv : graph.getVertices()) {
-            if (!(gv instanceof StreetVertex)) {
-                continue;
-            }
-            Vertex vertex = gv;
-            if (subgraphs.containsKey(vertex)) {
-                continue;
-            }
-            if (!neighborsForVertex.containsKey(vertex)) {
-                continue;
-            }
-            Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, vertex);
-            if (subgraph != null){
-                for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
-                    Vertex subnode = vIter.next();
-                    subgraphs.put(subnode, subgraph);
-                }
-                islands.add(subgraph);
-            }
-        }
-        LOG.info(islands.size() + " sub graphs found");
+        int graphCount;
+
+        /* associate each connected node with a subgraph */
+        graphCount = collectSubGraphs(graph, neighborsForVertex, subgraphs, null, null);
+        LOG.info("Islands without noThruTraffic: " + graphCount);
+
+        // Expand vertex neighbourhood with noThruTrafficEdges
+        // Note that we can reuse the original neighbour map here
+        // and simply process a smaller set of noThruTrafficEdges
+        collectNeighbourVertices(graph, neighborsForVertex, true);
+
+        /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
+           However, expansion is not allowed to jump from an original island to another one
+         */
+        graphCount = collectSubGraphs(graph, neighborsForVertex, extgraphs, subgraphs, islands);
+        LOG.info("Extended island count: " + graphCount);
+
+        /* Final round: generate noThruTraffic islands if such ones exist */
+        graphCount = collectSubGraphs(graph, neighborsForVertex, extgraphs, null, islands);
+        LOG.info("noThruTraffic island count: " + graphCount);
+
+        LOG.info("Total " + islands.size() + " sub graphs found");
+
         /* remove all tiny subgraphs and large subgraphs without stops */
         for (Subgraph island : islands) {
             boolean hadRemoved = false;
@@ -124,6 +101,88 @@ public class StreetUtils {
         if (graph.removeEdgelessVertices() > 0) {
             LOG.warn("Removed edgeless vertices after pruning islands");
         }
+    }
+
+    private static void collectNeighbourVertices(
+        Graph graph, Map<Vertex, ArrayList<Vertex>> neighborsForVertex, boolean noThruTraffic) {
+
+        // RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
+
+        for (Vertex gv : graph.getVertices()) {
+            if (!(gv instanceof StreetVertex)) {
+                continue;
+            }
+            State s0 = new State(gv, options);
+            for (Edge e : gv.getOutgoing()) {
+                Vertex in = gv;
+                if (!(e instanceof StreetEdge || e instanceof StreetTransitLink ||
+                      e instanceof ElevatorEdge || e instanceof FreeEdge)) {
+                    continue;
+                }
+                if ((e instanceof StreetEdge && ((StreetEdge)e).isNoThruTraffic()) != noThruTraffic) {
+                    continue;
+                }
+                State s1 = e.traverse(s0);
+                if (s1 == null) {
+                    continue;
+                }
+                Vertex out = s1.getVertex();
+
+                ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
+                if (vertexList == null) {
+                    vertexList = new ArrayList<Vertex>();
+                    neighborsForVertex.put(in, vertexList);
+                }
+                vertexList.add(out);
+
+                vertexList = neighborsForVertex.get(out);
+                if (vertexList == null) {
+                    vertexList = new ArrayList<Vertex>();
+                    neighborsForVertex.put(out, vertexList);
+                }
+                vertexList.add(in);
+            }
+        }
+    }
+
+    private static int collectSubGraphs(
+        Graph graph,
+        Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+        Map<Vertex, Subgraph> newgraphs, // put new subgraphs here
+        Map<Vertex, Subgraph> subgraphs, // optional isolation map from a previous round
+        ArrayList<Subgraph> islands) {   // final list of islands or null
+
+        int count=0;
+        for (Vertex gv : graph.getVertices()) {
+            if (!(gv instanceof StreetVertex)) {
+                continue;
+            }
+            Vertex vertex = gv;
+
+            if (subgraphs != null && !subgraphs.containsKey(vertex)) {
+                // do not start new graph generation from non-classified vertex
+                continue;
+            }
+            if (newgraphs.containsKey(vertex)) { // already processed
+                continue;
+            }
+            if (!neighborsForVertex.containsKey(vertex)) {
+                continue;
+            }
+            Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, vertex, subgraphs);
+            if (subgraph != null){
+                for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
+                    Vertex subnode = vIter.next();
+                    newgraphs.put(subnode, subgraph);
+                }
+                if (islands != null) {
+                    islands.add(subgraph);
+                }
+                count++;
+            }
+        }
+        return count;
     }
 
     private static void depedestrianizeOrRemove(Graph graph, Subgraph island) {
@@ -167,14 +226,26 @@ public class StreetUtils {
     }
 
     private static Subgraph computeConnectedSubgraph(
-            Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex) {
+        Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex, Map<Vertex, Subgraph> isolated) {
         Subgraph subgraph = new Subgraph();
         Queue<Vertex> q = new LinkedList<Vertex>();
+        Subgraph anchor = null;
+
+        if (isolated != null) {
+            // anchor subgraph expansion to this subgraph
+            anchor = isolated.get(startVertex);
+        }
         q.add(startVertex);
         while (!q.isEmpty()) {
             Vertex vertex = q.poll();
             for (Vertex neighbor : neighborsForVertex.get(vertex)) {
                 if (!subgraph.contains(neighbor)) {
+                    if (anchor != null) {
+                        Subgraph compare = isolated.get(neighbor);
+                        if ( compare != null && compare != anchor) { // do not enter a new island
+                            continue;
+                        }
+                    }
                     subgraph.addVertex(neighbor);
                     q.add(neighbor);
                 }
