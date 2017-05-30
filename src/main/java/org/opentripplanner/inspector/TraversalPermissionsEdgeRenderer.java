@@ -51,13 +51,16 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
         if (e instanceof StreetEdge) {
-            StreetEdge pse = (StreetEdge) e;
+            StreetEdge pse = (StreetEdge) e;  
             if (pse.isStairs()) {
                 attrs.color = STAIRS_COLOR_EDGE;
                 attrs.label = "stairs";
             } else {
                 attrs.color = getColor(pse.getPermission());
                 attrs.label = getLabel(pse.getPermission());
+            }
+            if(pse.isNoThruTraffic()) {
+                attrs.label+=" NTT";
             }
         } else if (e instanceof StreetTransitLink) {
             attrs.color = LINK_COLOR_EDGE;

@@ -6,7 +6,7 @@ RUN apk add --update curl bash ttf-dejavu && \
 VOLUME /opt/opentripplanner/graphs
 
 ENV OTP_ROOT="/opt/opentripplanner"
-ENV ROUTER_DATA_CONTAINER_URL="https://api.digitransit.fi/routing-data/v1"
+ENV ROUTER_DATA_CONTAINER_URL="https://api.digitransit.fi/routing-data/v2/finland"
 
 WORKDIR ${OTP_ROOT}
 

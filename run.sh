@@ -19,7 +19,7 @@ function build_graph {
   mkdir -p $DIR
   unzip -o -d $DIR $FILE
   mv $DIR/router-$GRAPHNAME $DIR/$GRAPHNAME
-  java $JAVA_OPTS -jar $JAR --build $DIR/$GRAPHNAME 
+  java $JAVA_OPTS -jar $JAR --build $DIR/$GRAPHNAME
 }
 
 function download_graph {
