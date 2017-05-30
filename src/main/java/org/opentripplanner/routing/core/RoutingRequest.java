@@ -181,6 +181,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Multiplicative factor on expected turning time. */
     public double turnReluctance = 1.0;
 
+    /** How much more reluctant is the user to walk on streets with car traffic allowed **/
+    public double walkOnStreetReluctance = 1.0;
+
     /**
      * How long does it take to get an elevator, on average (actually, it probably should be a bit *more* than average, to prevent optimistic trips)?
      * Setting it to "seems like forever," while accurate, will probably prevent OTP from working correctly.
@@ -924,6 +927,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && transferPenalty == other.transferPenalty
                 && maxSlope == other.maxSlope
                 && walkReluctance == other.walkReluctance
+                && walkOnStreetReluctance == other.walkOnStreetReluctance
                 && waitReluctance == other.waitReluctance
                 && waitAtBeginningFactor == other.waitAtBeginningFactor
                 && walkBoardCost == other.walkBoardCost
@@ -978,6 +982,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(maxTransferWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+                + new Double(walkOnStreetReluctance).hashCode()
                 + new Double(waitAtBeginningFactor).hashCode() * 15485863
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
@@ -1122,6 +1127,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
             // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setWalkOnStreetReluctance(double walkOnStreetReluctance) {
+        if (walkOnStreetReluctance > 0) {
+            this.walkOnStreetReluctance = walkOnStreetReluctance;
         }
     }
 
