@@ -110,6 +110,10 @@ public abstract class RoutingResource {
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
 
+    /** How much more reluctant is the user to walk on streets with car traffic allowed **/
+    @QueryParam("walkOnStreetReluctance")
+    protected Double walkOnStreetReluctance;
+
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
@@ -408,6 +412,9 @@ public abstract class RoutingResource {
 
         if (waitReluctance != null)
             request.setWaitReluctance(waitReluctance);
+
+        if (walkOnStreetReluctance != null)
+            request.setWalkOnStreetReluctance(walkOnStreetReluctance);
 
         if (waitAtBeginningFactor != null)
             request.setWaitAtBeginningFactor(waitAtBeginningFactor);
