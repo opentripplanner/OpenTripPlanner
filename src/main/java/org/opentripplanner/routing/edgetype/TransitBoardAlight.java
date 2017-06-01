@@ -234,19 +234,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             s1.setBackMode(getMode());
 
-            if (s0.getOptions().reverseOptimizing){
-                State ret = s1.makeState();
-                long interval = ret.getTimeDeltaSeconds();
-                System.out.println("transit alight reverse " + s0.getVertex() + " " + this.getId() + " " + interval + " seconds" );
-                return ret;
-            }else{
-                State ret = s1.makeState();
-                long interval = ret.getTimeDeltaSeconds();
-                System.out.println("transit alight forward " + s0.getVertex() + " " + this.getId() + " " + interval + " seconds");
-                return ret;
-            }
-
-            //return s1.makeState();
+            return s1.makeState();
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
             
@@ -287,8 +275,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     /* Wait is relative to departures on board and arrivals on alight. */
                     int wait = calculateWait(s0, sd, tripTimes);
                     /* A trip was found. The wait should be non-negative. */
-                    System.out.println("getNextTrip id: " + this.getId() + " wait: " + wait + " trip id: " + tripTimes.trip.getId().getId() + " state time: " + new Date(s0.getTimeInMillis()) + " stopIndex: " + stopIndex + " boarding: " + boarding);
-                    if (wait < 0) LOG.error("Negative wait time when boarding.");
+                    if (wait < 0)
+                        LOG.error("Negative wait time when boarding.");
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
                         bestWait       = wait;
@@ -354,7 +342,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (!s0.isEverBoarded() && !options.reverseOptimizing) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTimeSeconds(bestWait);
-                //System.out.println("bestWait " + bestWait + " " + trip.getId() + " " + this.getId() + " " + this.getFromVertex().getY() + "," +this.getFromVertex().getX());
             } else {
                 wait_cost *= options.waitReluctance;
             }
@@ -385,18 +372,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return optimized;
             }
 
-            State ret = s1.makeState();
-            int interval = ret.getTimeDeltaSeconds();
-            if (s0.getOptions().reverseOptimizing) {
-                System.out.println("transit board reverse " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
-            }else{
-                System.out.println("transit board forward " + ret.getVertex() + " id: " + this.getId() + " time: " + new Date(ret.getTimeInMillis()) + " offset: " + departureOffset + " tripId: " + trip.getId().getId());
-            }
-
-            return ret;
-
             /* If we didn't return an optimized path, return an unoptimized one. */
-            //return s1.makeState();
+            return s1.makeState();
         }
     }
 

@@ -71,30 +71,25 @@ public class GraphPath {
         }
 
         if(s.isEverBoarded()){
-
-        LOG.info("NORMAL");
-        s.dumpPath();
-            LOG.info("OPTIMIZE");
+//            LOG.info("NORMAL");
+//            s.dumpPath();
+//            LOG.info("OPTIMIZE");
             State s1 = s.optimize();
-            s1.dumpPath();
-            LOG.info("OPTIMIZE AGAIN");
+//            s1.dumpPath();
+//            LOG.info("OPTIMIZE AGAIN");
             State s2 = s1.optimize();
-            s2.dumpPath();
+//            s2.dumpPath();
         }
 
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
         walkDistance = s.getWalkDistance();
-        LOG.info("IGNORE______________________________________________");
         if (back) {
             lastState = optimize ? s.optimize() : s.reverse();
         } else {
 
             lastState = optimize ? s.optimize().optimize() : s;
         }
-        LOG.info("DONE______________________________________________");
-        // DEBUG
-        // lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse
