@@ -17,6 +17,8 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
+import java.util.Random;
+
 public class PatternArriveVertex extends PatternStopVertex {
 
     private static final long serialVersionUID = 20140101;
@@ -39,7 +41,7 @@ public class PatternArriveVertex extends PatternStopVertex {
     }
 
     private static String makeTemporaryLabel(TripPattern pattern, int stop) {
-        return String.format("%s_%02d_A", pattern.code + "_temp", stop);
+        return String.format("%s_%02d_A_%d", pattern.code + "_temp", stop, new Random().nextInt());
     }
 
 }
