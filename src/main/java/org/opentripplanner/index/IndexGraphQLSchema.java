@@ -667,6 +667,11 @@ public class IndexGraphQLSchema {
                     alertType.getName(), ((AlertPatch) environment.getSource()).getId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("feed")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getFeedId())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
                 .type(agencyType)
                 .dataFetcher(environment -> getAgency(index, ((AlertPatch) environment.getSource()).getAgency()))
@@ -2172,7 +2177,7 @@ public class IndexGraphQLSchema {
 
                     List<GraphIndex.PlaceAndDistance> places;
                     try {
-                        places = index.findClosestPlacesByWalking(
+                        places = new ArrayList<>(index.findClosestPlacesByWalking(
                             environment.getArgument("lat"),
                             environment.getArgument("lon"),
                             environment.getArgument("maxDistance"),
@@ -2184,9 +2189,7 @@ public class IndexGraphQLSchema {
                             filterByBikeRentalStations,
                             filterByBikeParks,
                             filterByCarParks
-                            )
-                            .stream()
-                            .collect(Collectors.toList());
+                        ));
                     } catch (VertexNotFoundException e) {
                         places = Collections.emptyList();
                     }
@@ -2382,7 +2385,20 @@ public class IndexGraphQLSchema {
                 .name("alerts")
                 .description("Get all alerts active in the graph")
                 .type(new GraphQLList(alertType))
-                .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
+                    .build())
+                .dataFetcher(environment -> environment.getArgument("feeds") != null
+                    ? index.getAlerts()
+                        .stream()
+                        .filter(alertPatch ->
+                            ((List) environment.getArgument("feeds"))
+                                .contains(alertPatch.getFeedId())
+                        )
+                        .collect(Collectors.toList())
+                    : index.getAlerts()
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceTimeRange")
