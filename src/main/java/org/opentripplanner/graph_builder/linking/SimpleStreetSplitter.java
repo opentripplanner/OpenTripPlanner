@@ -517,7 +517,12 @@ public class SimpleStreetSplitter {
         if (options != null) {
             TraverseModeSet modes = options.modes;
             if (modes.getCar())
-                nonTransitMode = TraverseMode.CAR;
+                // for park and ride we will start in car mode and walk to the end vertex
+                if (endVertex && (options.parkAndRide || options.kissAndRide)) {
+                    nonTransitMode = TraverseMode.WALK;
+                } else {
+                    nonTransitMode = TraverseMode.CAR;
+                }
             else if (modes.getWalk())
                 nonTransitMode = TraverseMode.WALK;
             else if (modes.getBicycle())
