@@ -136,6 +136,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State s0, long arrivalTimeAtStop) {
         RoutingContext rctx    = s0.getContext();
         RoutingRequest options = s0.getOptions();
+        if(!s0.getOptions().getZoneIdSet().isAllowed(getStop().getZoneId())) {
+            return null;
+        }
 
         // Forbid taking shortcuts composed of two board-alight edges in a row. Also avoids spurious leg transitions.
         if (s0.backEdge instanceof TransitBoardAlight) {
@@ -155,7 +158,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         boolean leavingTransit = 
                 ( boarding &&  options.arriveBy) || 
                 (!boarding && !options.arriveBy); 
-
+         
         /* TODO pull on/off transit out into two functions. */
         if (leavingTransit) { 
             /* We are leaving transit, not as much to do. */
@@ -164,7 +167,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (s0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
+            
             StateEditor s1 = s0.edit(this);
+            
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -370,6 +375,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
+ 
+        if(!state0.getOptions().getZoneIdSet().isAllowed(getStop().getZoneId())) { 
+            return null;
+        }
         // no cost (see patternalight)
         s1.setBackMode(getMode());
         return s1.makeState();
