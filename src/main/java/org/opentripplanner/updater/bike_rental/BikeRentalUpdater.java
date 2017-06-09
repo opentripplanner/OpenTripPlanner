@@ -110,6 +110,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
+            } else if (sourceType.equals("opendata-bikes")) {
+               source = new OpenDataBikeRentalDataSource();
+            } else if (sourceType.equals("opendata-hubs")) {
+                source = new OpenDataBikeHubsDataSource();
             }
         }
 

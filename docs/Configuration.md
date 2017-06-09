@@ -478,6 +478,27 @@ connect to a network resource is the `url` field.
             frequencySec: -1
 		},
 
+        // OpenData/GBFS bike rental updater  (SocialBicycles, and others - see https://github.com/NABSA/gbfs)
+        
+        // Bikes 
+        // - Fetches /free_bike_status.json and adds working bikes as 1 available to rent, but 0 available to dropoff
+        {
+                type: "bike-rental",
+                frequencySec: 100,
+                sourceType: "opendata-bikes",
+                url: "http://usf.socialbicycles.com/opendata/"
+        },
+
+        // Hubs
+        // - Fetches /station_information.json, and /station_status.json and adds working hubs
+        //   num_bikes_available and num_docks_available fields are set from the data
+        {
+                type: "bike-rental",
+                frequencySec: 100,
+                sourceType: "opendata-hubs",
+                url: "http://usf.socialbicycles.com/opendata/"
+        }
+
         // Bike parking availability
         {
             type: "bike-park"
