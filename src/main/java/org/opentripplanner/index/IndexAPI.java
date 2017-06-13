@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -109,6 +110,17 @@ public class IndexAPI {
     @Path("/feeds")
     public Response getFeeds() {
         return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
+    }
+
+    @GET
+    @Path("/feeds/{feedId}")
+    public Response getFeedInfo(@PathParam("feedId") String feedId) {
+        FeedInfo feedInfo = index.feedInfoForId.get(feedId);
+        if (feedInfo == null) {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        } else {
+            return Response.status(Status.OK).entity(feedInfo).build();
+        }
     }
 
    /** Return a list of all agencies in the graph. */
