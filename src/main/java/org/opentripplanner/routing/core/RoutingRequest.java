@@ -152,7 +152,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double carSpeed;
 
-    private ZoneIdSet zones;
+    private ZoneIdSet zones = new ZoneIdSet(null);
 
     public Locale locale = new Locale("en", "US");
 
