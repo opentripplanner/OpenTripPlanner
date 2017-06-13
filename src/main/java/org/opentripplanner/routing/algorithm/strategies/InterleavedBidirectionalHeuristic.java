@@ -16,6 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
@@ -25,6 +26,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -417,40 +419,26 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                         int stopIndex = originalPatternHop.getStopIndex();
 
-                        //TODO make deep copy of trip pattern
-                        TripPattern temporaryTripPattern = originalTripPattern;
-
                         PatternArriveVertex patternArriveVertex =
-                                new PatternArriveVertex(graph, temporaryTripPattern, stopIndex, flagStop);
+                                new PatternArriveVertex(graph, originalTripPattern, stopIndex, flagStop);
                         rr.rctx.temporaryVertices.add(patternArriveVertex);
 
-                        TemporaryPatternHop reverseSearchPatternHop = findShortenedPatternHops(originalPatternHop);
-                        if(reverseSearchPatternHop != null){
-                            //processed by forward search already, use the trimmed geometry
-                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(reverseSearchPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
-                            if(preStopHopGeometry == null)
-                                continue;  //flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
-                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(reverseSearchPatternHop.originalPatternHop.getGeometry());
-                            double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
-                            double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                            reverseSearchPatternHop.distanceRatio = distanceRatio;
-                            reverseSearchPatternHop.setGeometry(preStopHopGeometry);
-                        }else{
-                            //haven't seen this patternHop, create a flex one
-                            LineString preStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
-                            if(preStopHopGeometry == null)
-                                continue;  //flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
-                            double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
-                            double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(preStopHopGeometry);
-                            double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                            reverseSearchPatternHop = new TemporaryPatternHop(originalPatternHop, patternArriveVertex, flagStop, distanceRatio);
-                            reverseSearchPatternHop.setGeometry(preStopHopGeometry);
-                            rr.rctx.temporaryEdges.add(reverseSearchPatternHop);
+                        Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
+                        for (TemporaryPartialPatternHop reverseHop : reverseHops) {
+                            // create new shortened hop
+                            reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
                         }
+
+                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(originalPatternHop, patternArriveVertex, flagStop, rr.rctx);
+
+
+                        // todo - david's code has this comment. why don't I need it?
+                        //  flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
+
 
                         /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, reverseSearchPatternHop.distanceRatio);
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop.getPercentageOfHop());
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
 
 
@@ -476,31 +464,16 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-                        LineString postStopHopGeometry = getShortenedPatternHopGeometryForFlagStop(originalPatternHop.getGeometry().getCoordinates(), v.getCoordinate(), fromTarget);
-                        if(postStopHopGeometry == null)
-                            continue;  //flex point is very close to the beginning or end of the hop.  Leave this hop unchanged;
-
-
-                        //TODO make deep copy of trip pattern
-                        TripPattern temporaryTripPattern = originalTripPattern;
-
                         PatternDepartVertex patternDepartVertex =
-                                new PatternDepartVertex(graph, temporaryTripPattern, originalPatternHop.getStopIndex(), flagStop);
+                                new PatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);
                         rr.rctx.temporaryVertices.add(patternDepartVertex);
 
-                        double originalHopGeometryLength = GeometryUtils.getLengthInMeters(originalPatternHop.getGeometry());
-                        double shortenedHopGeometryLength = GeometryUtils.getLengthInMeters(postStopHopGeometry);
-                        double distanceRatio = shortenedHopGeometryLength/originalHopGeometryLength;
-                        TemporaryPatternHop forwardSearchPatternHop = new TemporaryPatternHop(originalPatternHop, patternDepartVertex, flagStop, distanceRatio);
-                        forwardSearchPatternHop.setGeometry(postStopHopGeometry);
-
-                        rr.rctx.temporaryEdges.add(forwardSearchPatternHop);
-
+                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(originalPatternHop, patternDepartVertex, flagStop, rr.rctx);
 
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, forwardSearchPatternHop.distanceRatio);
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop.getPercentageOfHop());
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
                     }
                 }
@@ -581,6 +554,18 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
         return null;
+    }
+
+    private Collection<TemporaryPartialPatternHop> findTemporaryPatternHops(RoutingRequest options, PatternHop patternHop) {
+        Collection<TemporaryPartialPatternHop> ret = new ArrayList<TemporaryPartialPatternHop>();
+        for (TemporaryEdge e : options.rctx.temporaryEdges) {
+            if (e instanceof TemporaryPartialPatternHop) {
+                TemporaryPartialPatternHop hop = (TemporaryPartialPatternHop) e;
+                if (hop.isOriginalHop(patternHop))
+                    ret.add(hop);
+            }
+        }
+        return ret;
     }
 
     /**

@@ -114,6 +114,8 @@ public class GraphIndex {
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
+    public final StreetMatcher matcher;
+
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
 
@@ -153,7 +155,7 @@ public class GraphIndex {
             stopSpatialIndex.insert(envelope, stopVertex);
         }
 
-        StreetMatcher matcher = new StreetMatcher(graph);
+        matcher = new StreetMatcher(graph);
         LOG.info("Finding corresponding street edges for trip patterns...");
         for (TripPattern pattern : patternForId.values()) {
             if (pattern.mode == TraverseMode.BUS) {

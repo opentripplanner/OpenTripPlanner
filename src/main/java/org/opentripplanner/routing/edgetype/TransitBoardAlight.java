@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -310,14 +311,14 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             double departureOffset = 0;
             if(this instanceof TemporaryTransitBoardAlight){
                 if(this.boarding){
-                    TemporaryPatternHop temporaryPatternHop = (TemporaryPatternHop)this.getToVertex().getOutgoing().iterator().next();
+                    TemporaryPartialPatternHop temporaryPatternHop = (TemporaryPartialPatternHop) this.getToVertex().getOutgoing().iterator().next();
                     int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
-                    departureOffset = runningTime - Math.round(runningTime * temporaryPatternHop.distanceRatio);
+                    departureOffset = runningTime - Math.round(runningTime * temporaryPatternHop.getPercentageOfHop());
                     bestWait += departureOffset;
                 }else{
-                    TemporaryPatternHop temporaryPatternHop = (TemporaryPatternHop)this.getFromVertex().getIncoming().iterator().next();
+                    TemporaryPartialPatternHop temporaryPatternHop = (TemporaryPartialPatternHop) this.getFromVertex().getIncoming().iterator().next();
                     int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
-                    departureOffset = Math.round(runningTime * temporaryPatternHop.distanceRatio);
+                    departureOffset = Math.round(runningTime * temporaryPatternHop.getPercentageOfHop());
                     bestWait += departureOffset;
                 }
 

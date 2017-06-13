@@ -38,29 +38,36 @@ public class PartialPatternHop extends PatternHop {
     private double startIndex;
     private double endIndex;
     private double percentageOfHop;
+    private PatternHop originalHop;
 
-    private PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, StreetMatcher matcher, GeometryFactory factory, boolean start) {
+    public enum Type { START, END, BOTH_SIDES };
+
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, StreetMatcher matcher, GeometryFactory factory, Type type) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousPickup(), hop.getContinuousDropoff(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        if (start) {
+        if (type.equals(Type.START)) {
             this.startIndex = 0;
             this.endIndex = line.project(to.getCoordinate());
-        } else {
+        } else if (type.equals(Type.END)) {
             this.startIndex = line.project(from.getCoordinate());
             this.endIndex = line.getEndIndex();
+        } else {
+            this.startIndex = line.project(from.getCoordinate());
+            this.endIndex = line.project(to.getCoordinate());
         }
         if (matcher != null && factory != null)
             this.setGeometryFromHop(matcher, factory, hop);
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
+        this.originalHop = hop;
     }
 
     // given hop s0->s1 and a temporary position t, create a partial hop s0->t
     public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop, StreetMatcher matcher, GeometryFactory factory) {
-        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, matcher, factory, true);
+        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, matcher, factory, Type.START);
     }
 
     public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop, StreetMatcher matcher, GeometryFactory factory) {
-        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), matcher, factory, false);
+        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), matcher, factory, Type.END);
     }
 
     @Override
@@ -71,6 +78,14 @@ public class PartialPatternHop extends PatternHop {
     @Override
     public int getRunningTime(State s0) {
         return (int) (percentageOfHop * super.getRunningTime(s0));
+    }
+
+    public boolean isOriginalHop(PatternHop hop) {
+        return originalHop.getId() == hop.getId();
+    }
+
+    public PatternHop getOriginalHop() {
+        return originalHop;
     }
 
     private void setGeometryFromHop(StreetMatcher matcher, GeometryFactory factory, PatternHop hop) {
