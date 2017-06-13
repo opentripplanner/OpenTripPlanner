@@ -30,12 +30,6 @@ public class BikeRentalStationVertex extends Vertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    private int bikesAvailable;
-
-    private int spacesAvailable;
-
-    private String id;
-    
     private BikeRentalStation station;
 
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
@@ -43,33 +37,26 @@ public class BikeRentalStationVertex extends Vertex {
         super(g, "bike rental station " + station.id, station.x, station.y,
                 station.name);
         this.station = station;
-        this.setId(station.id);
-        this.setBikesAvailable(station.bikesAvailable);
-        this.setSpacesAvailable(station.spacesAvailable);
     }
 
     public int getBikesAvailable() {
-        return bikesAvailable;
+        return station.bikesAvailable;
     }
 
     public int getSpacesAvailable() {
-        return spacesAvailable;
+        return station.spacesAvailable;
     }
 
     public void setBikesAvailable(int bikes) {
-        this.bikesAvailable = bikes;
+        station.bikesAvailable = bikes;
     }
 
     public void setSpacesAvailable(int spaces) {
-        this.spacesAvailable = spaces;
+        station.spacesAvailable = spaces;
     }
 
     public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        return station.id;
     }
 
     public BikeRentalStation getStation() {
