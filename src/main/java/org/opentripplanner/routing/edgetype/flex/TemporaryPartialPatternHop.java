@@ -1,9 +1,6 @@
 package org.opentripplanner.routing.edgetype.flex;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -18,7 +15,7 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 // this may replace TemporaryPatternHop. the problem I want to solve is multiple possible hops.
 public class TemporaryPartialPatternHop extends PartialPatternHop implements TemporaryEdge {
     public TemporaryPartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, RoutingContext rctx, Type type) {
-        super(hop, from, to, fromStop, toStop, rctx.graph.index.matcher, GeometryUtils.getGeometryFactory(), type);
+        super(hop, from, to, fromStop, toStop, type);
         rctx.temporaryEdges.add(this);
     }
 

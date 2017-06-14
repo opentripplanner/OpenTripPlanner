@@ -13,23 +13,15 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class PartialPatternHop extends PatternHop {
 
@@ -42,7 +34,7 @@ public class PartialPatternHop extends PatternHop {
 
     public enum Type { START, END, BOTH_SIDES };
 
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, StreetMatcher matcher, GeometryFactory factory, Type type) {
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, Type type) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousPickup(), hop.getContinuousDropoff(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         if (type.equals(Type.START)) {
@@ -55,19 +47,22 @@ public class PartialPatternHop extends PatternHop {
             this.startIndex = line.project(from.getCoordinate());
             this.endIndex = line.project(to.getCoordinate());
         }
-        if (matcher != null && factory != null)
-            this.setGeometryFromHop(matcher, factory, hop);
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
         this.originalHop = hop;
+
+        Geometry geom = line.extractLine(startIndex, endIndex);
+        if (geom instanceof LineString) { // according to the javadocs, it is.
+            setGeometry((LineString) geom);
+        }
     }
 
     // given hop s0->s1 and a temporary position t, create a partial hop s0->t
-    public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop, StreetMatcher matcher, GeometryFactory factory) {
-        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, matcher, factory, Type.START);
+    public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop) {
+        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, Type.START);
     }
 
-    public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop, StreetMatcher matcher, GeometryFactory factory) {
-        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), matcher, factory, Type.END);
+    public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop) {
+        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), Type.END);
     }
 
     @Override
@@ -86,24 +81,6 @@ public class PartialPatternHop extends PatternHop {
 
     public PatternHop getOriginalHop() {
         return originalHop;
-    }
-
-    private void setGeometryFromHop(StreetMatcher matcher, GeometryFactory factory, PatternHop hop) {
-        List<Edge> edges = matcher.match(hop.getGeometry());
-        List<Coordinate> coords = new ArrayList<>();
-        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        for (Edge e : edges) {
-            double idx = line.project(e.getToVertex().getCoordinate());
-            if (idx >= endIndex)
-                break;
-            if (idx < startIndex)
-                continue;
-            for (Coordinate c : e.getGeometry().getCoordinates())
-                coords.add(c);
-        }
-        Coordinate[] arr = coords.toArray(new Coordinate[0]);
-        LineString geometry = factory.createLineString(arr);
-        setGeometry(geometry);
     }
 
     public double getPercentageOfHop() {

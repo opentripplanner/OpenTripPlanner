@@ -89,9 +89,9 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         return Arrays.asList("street to transit");
     }
 
-    StreetMatcher matcher;
-    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    Multimap<TripPattern, TripPattern> flexPatternsToIgnore = ArrayListMultimap.create();
+    private StreetMatcher matcher;
+    private GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private Multimap<TripPattern, TripPattern> flexPatternsToIgnore = ArrayListMultimap.create();
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
@@ -273,7 +273,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         // hop -> stop transfer
         PatternArriveVertex patternArriveVertex = new PatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
         TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transferStop);
-        PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop, matcher, geometryFactory);
+        PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop);
         new TransitBoardAlightAtFlex(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode, startHop.getPercentageOfHop());
         new PreAlightEdge(transitStopArrive, transferStop);
 
@@ -281,7 +281,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         TransitStopDepart transitStopDepart = new TransitStopDepart(graph, stop, transferStop);
         PatternDepartVertex patternDepartVertex = new PatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
         new PreBoardEdge(transferStop, transitStopDepart);
-        PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop, matcher, geometryFactory);
+        PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop);
         new TransitBoardAlightAtFlex(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode, endHop.getPercentageOfHop());
 
         return transferStop;
