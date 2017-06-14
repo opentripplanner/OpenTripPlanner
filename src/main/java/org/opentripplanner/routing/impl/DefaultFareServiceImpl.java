@@ -28,7 +28,6 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -164,6 +163,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     /** For each fare type (regular, student, etc...) the collection of rules that apply. */
     protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
+
+    public Map<FareType, Collection<FareRuleSet>> getFareRulesPerType() {
+        return fareRulesPerType;
+    }
 
     public DefaultFareServiceImpl() {
         fareRulesPerType = new HashMap<>();

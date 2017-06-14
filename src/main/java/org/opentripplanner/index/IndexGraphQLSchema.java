@@ -1,30 +1,23 @@
 package org.opentripplanner.index;
 
-import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import graphql.Scalars;
-import graphql.relay.Relay;
-import graphql.relay.SimpleListConnection;
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingEnvironmentImpl;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLType;
-import graphql.schema.GraphQLTypeReference;
-import graphql.schema.PropertyDataFetcher;
-import graphql.schema.TypeResolver;
+import static java.util.Collections.emptyList;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -55,6 +48,7 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -71,14 +65,38 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.collect.ImmutableMap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 
-import static java.util.Collections.emptyList;
+import graphql.Scalars;
+import graphql.relay.Relay;
+import graphql.relay.SimpleListConnection;
+import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingEnvironmentImpl;
+import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectField;
+import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLType;
+import graphql.schema.GraphQLTypeReference;
+import graphql.schema.PropertyDataFetcher;
+import graphql.schema.TypeResolver;
 
 public class IndexGraphQLSchema {
+    
+    public static String experimental(String message) {
+        return String.format("!!This api is experimental and might change without further notice!!\n %s", message); 
+    }
 
     public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
         .name("LocationType")
@@ -168,6 +186,8 @@ public class IndexGraphQLSchema {
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
+    
+    public GraphQLOutputType ticketType = new GraphQLTypeReference("TicketType");
 
     public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
 
@@ -303,16 +323,6 @@ public class IndexGraphQLSchema {
             }
         }
         return null;
-    }
-
-    private List<Agency> getAllAgencies(GraphIndex index) {
-        //xxx what if there are duplciate agency ids?
-        //now we return the first
-        ArrayList<Agency> agencies = new ArrayList<Agency>();
-        for (Map<String, Agency> feedAgencies : index.agenciesForFeedId.values()) {
-            agencies.addAll(feedAgencies.values());
-        }
-        return agencies;
     }
 
     @SuppressWarnings("unchecked")
@@ -635,6 +645,11 @@ public class IndexGraphQLSchema {
                 .description("Locale for returned text")
                 .type(Scalars.GraphQLString)
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                    .name("ticketTypes")
+                    .description("Allowed ticket types")
+                    .type(Scalars.GraphQLString)
+                    .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
             .build();
 
@@ -1822,6 +1837,30 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        ticketType = GraphQLObjectType.newObject()
+            .name("TicketType")
+            .description(experimental("Describes ticket type"))
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay
+                        .toGlobalId(ticketType.getName(), ((TicketType) environment.getSource()).getId()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("fareId")
+                    .type(new GraphQLNonNull(Scalars.GraphQLID))
+                    .dataFetcher(environment ->  ((TicketType) environment.getSource()).getId())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("price")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((TicketType) environment.getSource()).getPrice())
+                .build()
+            )
+            .build();
+            
+                
         carParkType = GraphQLObjectType.newObject()
             .name("CarPark")
             .withInterface(nodeInterface)
@@ -1979,6 +2018,13 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(agencyType))
                 .dataFetcher(environment -> new ArrayList<>(index.getAllAgencies()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("ticketTypes")
+                    .description(experimental("Return list of available ticket types."))
+                    .type(new GraphQLList(ticketType))
+                    .dataFetcher(environment -> new ArrayList<>(index.getAllTicketTypes()))
+                    .build()
+                    )
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
                 .description("Get a single agency based on agency ID")

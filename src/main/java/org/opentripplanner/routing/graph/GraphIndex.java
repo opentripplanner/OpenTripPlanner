@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,9 +72,12 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
@@ -81,7 +85,9 @@ import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -127,6 +133,7 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
+    public final Map<AgencyAndId, TicketType> ticketTypesForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -154,6 +161,21 @@ public class GraphIndex {
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
+        
+        
+        FareService fareService = graph.getService(FareService.class);
+        if(fareService instanceof DefaultFareServiceImpl) {
+            LOG.info("Collecting fare information...");
+            DefaultFareServiceImpl defaultFareServiceImpl = (DefaultFareServiceImpl) fareService;
+            Map<FareType, Collection<FareRuleSet>> data = defaultFareServiceImpl.getFareRulesPerType();
+            for(Entry<FareType, Collection<FareRuleSet>> kv:data.entrySet()) {
+                if(FareType.regular == kv.getKey()) {
+                    for(FareRuleSet rs: kv.getValue()) {
+                        ticketTypesForId.put(rs.getFareAttribute().getId(), new TicketType(rs));
+                    }
+                }
+            }                             
+        }
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {
@@ -1119,5 +1141,9 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
+    }
+
+    public Collection<TicketType> getAllTicketTypes() {
+        return ticketTypesForId.values();
     }
 }
