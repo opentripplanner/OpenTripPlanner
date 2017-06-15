@@ -385,9 +385,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }else{
                 v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
             }
-
-
-
+            
             //if nearby, wire stop to init vertex
 
             Stop flagStop = new Stop();
@@ -426,11 +424,16 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
                         for (TemporaryPartialPatternHop reverseHop : reverseHops) {
                             // create new shortened hop
-                            reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
+                            TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
+                            if (newHop.isTrivial())
+                                continue;
+                            rr.rctx.temporaryEdges.add(newHop);
                         }
 
                         TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(originalPatternHop, patternArriveVertex, flagStop, rr.rctx);
-
+                        if (hop.isTrivial())
+                            continue;
+                        rr.rctx.temporaryEdges.add(hop);
 
                         // todo - david's code has this comment. why don't I need it?
                         //  flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
@@ -438,7 +441,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                         /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop.getPercentageOfHop());
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
 
 
@@ -469,11 +472,13 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         rr.rctx.temporaryVertices.add(patternDepartVertex);
 
                         TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(originalPatternHop, patternDepartVertex, flagStop, rr.rctx);
-
+                        if (hop.isTrivial())
+                            continue;
+                        rr.rctx.temporaryEdges.add(hop);
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop.getPercentageOfHop());
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
                     }
                 }

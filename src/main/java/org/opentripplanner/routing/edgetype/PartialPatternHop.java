@@ -29,10 +29,16 @@ public class PartialPatternHop extends PatternHop {
 
     private double startIndex;
     private double endIndex;
+    private double originalHopLength;
     private double percentageOfHop;
     private PatternHop originalHop;
 
-    public enum Type { START, END, BOTH_SIDES };
+    // say initial hop goes from index a to b, and this hop goes from a' to b'. We have several types of partial hops:
+    public enum Type {
+        START,     // a' > a, b' = b
+        END,       // a' = a, b' < b
+        BOTH_SIDES // a' > a, b' < b
+    };
 
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, Type type) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousPickup(), hop.getContinuousDropoff(), false);
@@ -49,7 +55,7 @@ public class PartialPatternHop extends PatternHop {
         }
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
         this.originalHop = hop;
-
+        this.originalHopLength = line.getEndIndex();
         Geometry geom = line.extractLine(startIndex, endIndex);
         if (geom instanceof LineString) { // according to the javadocs, it is.
             setGeometry((LineString) geom);
@@ -86,6 +92,19 @@ public class PartialPatternHop extends PatternHop {
     public double getPercentageOfHop() {
         return percentageOfHop;
     }
+
+    public double getStartIndex() {
+        return startIndex;
+    }
+
+    public double getEndIndex() {
+        return endIndex;
+    }
+
+    public double getOriginalHopLength() {
+        return originalHopLength;
+    }
+
 
 }
 

@@ -307,23 +307,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                                    options.nonpreferredTransferPenalty);
             }
 
-            //if this is a flag stop in between two regular stops,
-            double departureOffset = 0;
-            if(this instanceof TemporaryTransitBoardAlight){
-                if(this.boarding){
-                    TemporaryPartialPatternHop temporaryPatternHop = (TemporaryPartialPatternHop) this.getToVertex().getOutgoing().iterator().next();
-                    int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
-                    departureOffset = runningTime - Math.round(runningTime * temporaryPatternHop.getPercentageOfHop());
-                    bestWait += departureOffset;
-                }else{
-                    TemporaryPartialPatternHop temporaryPatternHop = (TemporaryPartialPatternHop) this.getFromVertex().getIncoming().iterator().next();
-                    int runningTime  = bestTripTimes.getArrivalTime(stopIndex + 1) - bestTripTimes.getDepartureTime(stopIndex);
-                    departureOffset = Math.round(runningTime * temporaryPatternHop.getPercentageOfHop());
-                    bestWait += departureOffset;
-                }
-
-            }
-
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
             s1.setBackMode(getMode());

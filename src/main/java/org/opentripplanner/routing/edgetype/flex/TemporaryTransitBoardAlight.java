@@ -4,6 +4,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -17,18 +18,25 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
  */
 public class TemporaryTransitBoardAlight extends TransitBoardAlight implements TemporaryEdge {
 
-    double distanceRatio;
+    // normalized to [0, 1]
+    private double startIndex;
+    private double endIndex;
 
     public TemporaryTransitBoardAlight(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex,
-                                       int stopIndex, TraverseMode mode, double distanceRatio) {
+                                       int stopIndex, TraverseMode mode, PartialPatternHop hop) {
         super(fromStopVertex, toPatternVertex, stopIndex, mode);
-        this.distanceRatio = distanceRatio;
+        setIndices(hop);
     }
 
     public TemporaryTransitBoardAlight(PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
-                                       int stopIndex, TraverseMode mode, double distanceRatio) {
+                                       int stopIndex, TraverseMode mode, PartialPatternHop hop) {
         super(fromPatternStop, toStationVertex, stopIndex, mode);
-        this.distanceRatio = distanceRatio;
+        setIndices(hop);
+    }
+
+    private void setIndices(PartialPatternHop hop) {
+        this.startIndex = hop.getStartIndex() / hop.getOriginalHopLength();
+        this.endIndex = hop.getEndIndex() / hop.getOriginalHopLength();
     }
 
     @Override
@@ -42,17 +50,21 @@ public class TemporaryTransitBoardAlight extends TransitBoardAlight implements T
     public TripTimes getNextTrip(State s0, ServiceDay sd) {
         RoutingRequest options = s0.getOptions();
         Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, distanceRatio);
+        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, startIndex);
         return tripTimes;
     }
 
     @Override
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
         int stopIndex = getStopIndex();
-        int adjustment = (int) (distanceRatio * (tripTimes.getRunningTime(stopIndex)));
-        // we need to fudge this by two seconds so that we can optimize later on.
-        return boarding ?
-                (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + adjustment) - s0.getTimeSeconds()) + 2:
-                (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) + adjustment));
+        if (boarding) {
+            // we need to fudge this by two seconds so that we can optimize later on.
+            int adjustment = (int) (startIndex * (tripTimes.getRunningTime(stopIndex)));
+            return  (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + adjustment) - s0.getTimeSeconds()) + 2;
+        }
+        else {
+            int adjustment = (int) (startIndex * (tripTimes.getRunningTime(stopIndex)));
+            return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) + adjustment));
+        }
     }
 }

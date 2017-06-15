@@ -16,7 +16,6 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 public class TemporaryPartialPatternHop extends PartialPatternHop implements TemporaryEdge {
     public TemporaryPartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, RoutingContext rctx, Type type) {
         super(hop, from, to, fromStop, toStop, type);
-        rctx.temporaryEdges.add(this);
     }
 
     // todo can this be smarter
@@ -37,5 +36,13 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
     public void dispose() {
         fromv.removeOutgoing(this);
         tov.removeIncoming(this);
+    }
+
+    // is this hop too not-different to care about? for now lets say should be 2% different *shrugs*
+    public boolean isTrivial() {
+        return false;
+//        double length = getOriginalHopLength();
+//        double thisLength = getEndIndex() - getStartIndex();
+//        return (thisLength / length) > 0.99;
     }
 }
