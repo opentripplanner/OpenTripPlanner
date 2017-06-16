@@ -172,7 +172,8 @@ public class Timetable implements Serializable {
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getArrivalTime(stopIndex) + (int)(adjustment*tt.getRunningTime(stopIndex));
+                int arvTimeAdj = (adjustment != 0) ? (int)(adjustment*tt.getRunningTime(stopIndex)) : 0;
+                int arvTime = tt.getArrivalTime(stopIndex) + arvTimeAdj;
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;

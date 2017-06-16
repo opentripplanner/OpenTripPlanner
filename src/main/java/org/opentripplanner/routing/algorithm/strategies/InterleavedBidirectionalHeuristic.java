@@ -297,11 +297,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * TODO what if the egress segment is by bicycle or car mode? This is no longer admissible.
      */
     private TObjectDoubleMap<Vertex> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
-        LOG.debug("Heuristic street search around the {}.", fromTarget ? "target" : "origin");
+        LOG.info("Heuristic street search around the {}.", fromTarget ? "target" : "origin");
         rr = rr.clone();
         if (fromTarget) {
             rr.setArriveBy(!rr.arriveBy);
         }
+
         // Create a map that returns Infinity when it does not contain a vertex.
         TObjectDoubleMap<Vertex> vertices = new TObjectDoubleHashMap<>(100, 0.5f, Double.POSITIVE_INFINITY);
         ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
@@ -363,7 +364,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
 
-        findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap, fromTarget);
+        findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap);
 
         Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
         for(TripPattern tripPattern : tripPatternStateMap.keySet()){
@@ -381,6 +382,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
             if(s.getVertex() == initVertex){
                 //the origin/destination lies along a flag stop route
+                LOG.info("the origin/destination lies along a flag stop route. fromTarget={}, vertex={}", fromTarget, initVertex);
                 v = initVertex;
             }else{
                 v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
@@ -396,7 +398,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             flagStop.setLocationType(99);
             TransitStop flagTransitStop = new TransitStop(graph, flagStop);
 
-            if(fromTarget){
+            if(rr.arriveBy) {
                 //reverse search
                 transitQueue.insert(flagTransitStop, s.getWeight());
                 TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop, (StreetVertex)v, true);
@@ -578,11 +580,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * @param
      * @return
      */
-    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map tripPatternStateMap, boolean fromTarget){
+    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map tripPatternStateMap) {
         List<StreetEdge> flagStopOriginEdges = FlagStopSplitterService.getClosestStreetEdgesToOrigin(rr.rctx, graph);
         List<StreetEdge> flagStopDestinationEdges = FlagStopSplitterService.getClosestStreetEdgesToDestination(rr.rctx, graph);
 
-        if(fromTarget){
+        if(rr.arriveBy){
             for(StreetEdge streetEdge : flagStopDestinationEdges){
                 State nearbyState = new State(initVertex, rr);
                 nearbyState.backEdge = streetEdge;
