@@ -425,7 +425,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         for (TemporaryPartialPatternHop reverseHop : reverseHops) {
                             // create new shortened hop
                             TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
-                            if (newHop.isTrivial())
+                            if (newHop == null || newHop.isTrivial())
                                 continue;
                             rr.rctx.temporaryEdges.add(newHop);
                         }
@@ -437,7 +437,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                         // todo - david's code has this comment. why don't I need it?
                         //  flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
-
 
                         /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
                         TemporaryTransitBoardAlight transitBoardAlight =

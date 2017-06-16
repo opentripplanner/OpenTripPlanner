@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype.flex;
 
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.PartialPatternHop;
@@ -14,22 +15,28 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
  */
 // this may replace TemporaryPatternHop. the problem I want to solve is multiple possible hops.
 public class TemporaryPartialPatternHop extends PartialPatternHop implements TemporaryEdge {
-    public TemporaryPartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, RoutingContext rctx, Type type) {
-        super(hop, from, to, fromStop, toStop, type);
+    public TemporaryPartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, RoutingContext rctx, double startIndex, double endIndex) {
+        super(hop, from, to, fromStop, toStop, startIndex, endIndex);
     }
 
     // todo can this be smarter
     // start hop is a hop from the existing origin TO a new flag destination
     public static TemporaryPartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop, RoutingContext rctx) {
-        return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, rctx, Type.START);
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, rctx, line.getStartIndex(), line.project(to.getCoordinate()));
     }
 
     public static TemporaryPartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop, RoutingContext rctx) {
-        return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), rctx, Type.END);
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), rctx, line.project(from.getCoordinate()), line.getEndIndex());
     }
 
     public TemporaryPartialPatternHop shortenEnd(PatternStopVertex to, Stop toStop, RoutingContext rctx) {
-        return new TemporaryPartialPatternHop(getOriginalHop(), (PatternStopVertex) getFromVertex(), to, getBeginStop(), toStop, rctx, Type.BOTH_SIDES);
+        LengthIndexedLine line = new LengthIndexedLine(getOriginalHop().getGeometry());
+        double endIndex = line.project(to.getCoordinate());
+        if (endIndex < getStartIndex())
+            return null;
+        return new TemporaryPartialPatternHop(getOriginalHop(), (PatternStopVertex) getFromVertex(), to, getBeginStop(), toStop, rctx, getStartIndex(), endIndex);
     }
 
     @Override

@@ -33,26 +33,11 @@ public class PartialPatternHop extends PatternHop {
     private double percentageOfHop;
     private PatternHop originalHop;
 
-    // say initial hop goes from index a to b, and this hop goes from a' to b'. We have several types of partial hops:
-    public enum Type {
-        START,     // a' > a, b' = b
-        END,       // a' = a, b' < b
-        BOTH_SIDES // a' > a, b' < b
-    };
-
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, Type type) {
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousPickup(), hop.getContinuousDropoff(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        if (type.equals(Type.START)) {
-            this.startIndex = 0;
-            this.endIndex = line.project(to.getCoordinate());
-        } else if (type.equals(Type.END)) {
-            this.startIndex = line.project(from.getCoordinate());
-            this.endIndex = line.getEndIndex();
-        } else {
-            this.startIndex = line.project(from.getCoordinate());
-            this.endIndex = line.project(to.getCoordinate());
-        }
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
         this.originalHop = hop;
         this.originalHopLength = line.getEndIndex();
@@ -64,11 +49,13 @@ public class PartialPatternHop extends PatternHop {
 
     // given hop s0->s1 and a temporary position t, create a partial hop s0->t
     public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop) {
-        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, Type.START);
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()));
     }
 
     public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop) {
-        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), Type.END);
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex());
     }
 
     @Override

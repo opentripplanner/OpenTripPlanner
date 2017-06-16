@@ -114,8 +114,6 @@ public class GraphIndex {
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
-    public final StreetMatcher matcher;
-
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
 
@@ -155,40 +153,6 @@ public class GraphIndex {
             stopSpatialIndex.insert(envelope, stopVertex);
         }
 
-        matcher = new StreetMatcher(graph);
-        LOG.info("Finding corresponding street edges for trip patterns...");
-        for (TripPattern pattern : patternForId.values()) {
-            if (pattern.mode == TraverseMode.BUS) {
-                /* we can only match geometry to streets on bus routes */
-                LOG.debug("Matching {}", pattern);
-                //If there are no shapes in GTFS pattern geometry is generated
-                //generated geometry is useless for street matching
-                //that is why pattern.geometry is null in that case
-                if (pattern.geometry == null) {
-                    continue;
-                }
-
-                edges = matcher.match(pattern.geometry);
-                if (edges == null || edges.isEmpty()) {
-                    LOG.warn("Could not match to street network: {}", pattern);
-                    continue;
-                }
-                for (Edge e : edges) {
-                    patternsForEdge.put(e, pattern);
-                }
-                for(PatternHop patternHop : pattern.getPatternHops()){
-                    edges = matcher.match(patternHop.getGeometry());
-
-                    if (edges == null || edges.isEmpty()) {
-                        LOG.warn("Could not match to street network: {}", pattern);
-                        continue;
-                    }
-                    for (Edge e : edges) {
-                        hopsForEdge.put(e, patternHop);
-                    }
-                }
-            }
-        }
 
         LOG.info("Finished processing street edges for trip patterns...");
 
@@ -215,6 +179,9 @@ public class GraphIndex {
         graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
         ));
+
+        LOG.info("initializing hops-for-edge map...");
+        initializeHopsForEdgeMap();
 
         LOG.info("initializing edge map...");
         initializeEdgeMap();
@@ -725,6 +692,52 @@ public class GraphIndex {
                 Geometry geometry = hop.getGeometry();
                 Envelope envelope = geometry.getEnvelopeInternal();
                 hopIndex.insert(envelope, hop);
+            }
+        }
+    }
+
+    private void initializeHopsForEdgeMap() {
+        StreetMatcher matcher = new StreetMatcher(graph);
+        LOG.info("Finding corresponding street edges for trip patterns...");
+        for (TripPattern pattern : patternForId.values()) {
+            if (pattern.mode == TraverseMode.BUS) {
+                /* we can only match geometry to streets on bus routes */
+                LOG.debug("Matching {}", pattern);
+                //If there are no shapes in GTFS pattern geometry is generated
+                //generated geometry is useless for street matching
+                //that is why pattern.geometry is null in that case
+                if (pattern.geometry == null) {
+                    continue;
+                }
+
+                List<Edge> edges = matcher.match(pattern.geometry);
+                if (edges == null || edges.isEmpty()) {
+                    LOG.warn("Could not match to street network: {}", pattern);
+                    continue;
+                }
+                for (Edge e : edges) {
+                    patternsForEdge.put(e, pattern);
+                }
+                for(PatternHop patternHop : pattern.getPatternHops()) {
+                    edges = matcher.match(patternHop.getGeometry());
+
+                    if (edges == null || edges.isEmpty()) {
+                        LOG.warn("Could not match to street network: {}", pattern);
+                        continue;
+                    }
+                    for (Edge e : edges) {
+                        hopsForEdge.put(e, patternHop);
+                    }
+
+                    // do the reverse, since we are walking and can go the other way.
+                    edges = matcher.match(patternHop.getGeometry().reverse());
+                    if (edges == null || edges.isEmpty()) {
+                        continue;
+                    }
+                    for (Edge e : edges) {
+                        hopsForEdge.put(e, patternHop);
+                    }
+                }
             }
         }
     }
