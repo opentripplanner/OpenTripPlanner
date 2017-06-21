@@ -320,16 +320,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             Vertex v = s.getVertex();
             if(s.getBackEdge() != null
                     && s.getBackEdge().getGeometry() != null){
-                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(s.getBackEdge());
-                for(TripPattern tripPattern : patterns){
-                    if(tripPatternStateMap.containsKey(tripPattern)){
-                        State oldState = tripPatternStateMap.get(tripPattern);
-                        if(oldState.getWeight() < s.getWeight()){
-                            continue;
-                        }
-                    }
-                    tripPatternStateMap.put(tripPattern, s);
-                }
+                addStateToTripPatternStateMap(s, tripPatternStateMap);
             }
             // At this point the vertex is closed (pulled off heap).
             // This is the lowest cost we will ever see for this vertex. We can record the cost to reach it.
@@ -356,6 +347,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 // Walk cutoff will happen in the street edge traversal method.
                 State s1 = e.traverse(s);
                 if (s1 == null) {
+                    checkFlexAtLongStreetEdge(s, e, tripPatternStateMap);
                     continue;
                 }
                 if (spt.add(s1)) {
@@ -459,7 +451,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 TemporaryPreBoardEdge temporaryPreBoardEdge = new TemporaryPreBoardEdge(flagTransitStop, transitStopDepart);
                 rr.rctx.temporaryEdges.add(temporaryPreBoardEdge);
 
-                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)) {
 
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
@@ -604,6 +596,28 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                     tripPatternStateMap.put(tripPattern, nearbyState);
                 }
             }
+        }
+    }
+
+    // It's possible that the edge is a very long StreetEdge whose traversal will kill our walk budget, but it's
+    // a good candidate for flex edges.
+    private void checkFlexAtLongStreetEdge(State s0, Edge e, Map<TripPattern, State> tripPatternStateMap) {
+        if (s0.getWalkDistance() + e.getDistance() >= s0.getOptions().getMaxWalkDistance()) {
+            State s1 = s0.edit(e).makeState();
+            addStateToTripPatternStateMap(s1, tripPatternStateMap);
+        }
+    }
+
+    private void addStateToTripPatternStateMap(State s, Map<TripPattern, State> tripPatternStateMap) {
+        Collection<TripPattern> patterns = graph.index.getPatternsForEdge(s.getBackEdge());
+        for(TripPattern tripPattern : patterns){
+            if(tripPatternStateMap.containsKey(tripPattern)){
+                State oldState = tripPatternStateMap.get(tripPattern);
+                if(oldState.getWeight() < s.getWeight()){
+                    continue;
+                }
+            }
+            tripPatternStateMap.put(tripPattern, s);
         }
     }
 
