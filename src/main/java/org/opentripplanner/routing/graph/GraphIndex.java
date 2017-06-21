@@ -700,8 +700,7 @@ public class GraphIndex {
         StreetMatcher matcher = new StreetMatcher(graph);
         LOG.info("Finding corresponding street edges for trip patterns...");
         for (TripPattern pattern : patternForId.values()) {
-            if (pattern.mode == TraverseMode.BUS) {
-                /* we can only match geometry to streets on bus routes */
+            if (pattern.hasFlagStopService()) {
                 LOG.debug("Matching {}", pattern);
                 //If there are no shapes in GTFS pattern geometry is generated
                 //generated geometry is useless for street matching

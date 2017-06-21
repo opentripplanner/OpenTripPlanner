@@ -293,19 +293,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // FIXME this should be done WHILE searching for a trip.
             if (options.tripIsBanned(trip)) return null;
 
-            /* Check if route is preferred by the user. */
-            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
-            
-            /* Compute penalty for non-preferred transfers. */
-            int transferPenalty = 0;
-            /* If this is not the first boarding, then we are transferring. */
-            if (s0.isEverBoarded()) {
-                TransferTable transferTable = options.getRoutingContext().transferTable;
-                int transferTime = transferTable.getTransferTime(s0.getPreviousStop(), 
-                                   getStop(), s0.getPreviousTrip(), trip, boarding);
-                transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
-                                   options.nonpreferredTransferPenalty);
-            }
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
@@ -330,8 +317,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 wait_cost *= options.waitReluctance;
             }
             
-            s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(transferPenalty);
+            s1.incrementWeight(getPenaltyWeight(s0, options, trip));
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
@@ -359,6 +345,24 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
         }
+    }
+
+    public long getPenaltyWeight(State s0, RoutingRequest options, Trip trip) {
+        /* Check if route is preferred by the user. */
+        long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
+
+            /* Compute penalty for non-preferred transfers. */
+        int transferPenalty = 0;
+            /* If this is not the first boarding, then we are transferring. */
+        if (s0.isEverBoarded()) {
+            TransferTable transferTable = options.getRoutingContext().transferTable;
+            int transferTime = transferTable.getTransferTime(s0.getPreviousStop(),
+                    getStop(), s0.getPreviousTrip(), trip, boarding);
+            transferPenalty  = transferTable.determineTransferPenalty(transferTime,
+                    options.nonpreferredTransferPenalty);
+        }
+
+        return preferences_penalty + transferPenalty;
     }
 
     public TripTimes getNextTrip(State s0, ServiceDay sd) {

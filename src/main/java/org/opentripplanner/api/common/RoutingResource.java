@@ -347,6 +347,12 @@ public abstract class RoutingResource {
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
 
+    /**
+     * Extra penalty added for flag stop boarding/alighting.
+     */
+    @QueryParam("flagStopExtraPenalty")
+    protected Integer flagStopExtraPenalty;
+
     @QueryParam("maxHours")
     private Double maxHours;
 
@@ -572,6 +578,9 @@ public abstract class RoutingResource {
 
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
+
+        if (flagStopExtraPenalty != null)
+            request.flagStopExtraPenalty = flagStopExtraPenalty;
 
         if (maxHours != null)
             request.maxHours = maxHours;

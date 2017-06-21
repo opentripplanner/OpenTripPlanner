@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype.flex;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -66,5 +67,10 @@ public class TemporaryTransitBoardAlight extends TransitBoardAlight implements T
             int adjustment = (int) (startIndex * (tripTimes.getRunningTime(stopIndex)));
             return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) + adjustment));
         }
+    }
+
+    @Override
+    public long getPenaltyWeight(State s0, RoutingRequest options, Trip trip) {
+        return super.getPenaltyWeight(s0, options, trip) + options.flagStopExtraPenalty;
     }
 }

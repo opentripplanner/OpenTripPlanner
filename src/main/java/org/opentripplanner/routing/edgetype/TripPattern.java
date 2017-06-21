@@ -713,4 +713,8 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
+    public boolean hasFlagStopService() {
+        /* we can only match geometry to streets on bus routes */
+        return TraverseMode.BUS.equals(this.mode);
+    }
 }

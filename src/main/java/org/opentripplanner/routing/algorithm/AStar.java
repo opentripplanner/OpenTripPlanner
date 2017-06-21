@@ -21,7 +21,6 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -202,10 +201,6 @@ public class AStar {
 
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
-
-            if(edge.getClass().isAssignableFrom(StreetTransitLink.class) ){
-                continue;
-            }
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.
