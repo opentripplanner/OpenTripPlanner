@@ -16,7 +16,6 @@ package org.opentripplanner.routing.algorithm.strategies;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.map.TObjectDoubleMap;
@@ -26,7 +25,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -40,10 +38,15 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.flex.TemporaryPatternArriveVertex;
+import org.opentripplanner.routing.vertextype.flex.TemporaryPatternDepartVertex;
+import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStopArrive;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -297,7 +300,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * TODO what if the egress segment is by bicycle or car mode? This is no longer admissible.
      */
     private TObjectDoubleMap<Vertex> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
-        LOG.info("Heuristic street search around the {}.", fromTarget ? "target" : "origin");
+        LOG.debug("Heuristic street search around the {}.", fromTarget ? "target" : "origin");
         rr = rr.clone();
         if (fromTarget) {
             rr.setArriveBy(!rr.arriveBy);
@@ -377,7 +380,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 LOG.info("the origin/destination lies along a flag stop route. fromTarget={}, vertex={}", fromTarget, initVertex);
                 v = initVertex;
             }else{
-                v = fromTarget ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+                v = rr.arriveBy ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
             }
             
             //if nearby, wire stop to init vertex
@@ -388,7 +391,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             flagStop.setLon(v.getLon());
             flagStop.setName(s.getBackEdge().getName());
             flagStop.setLocationType(99);
-            TransitStop flagTransitStop = new TransitStop(graph, flagStop);
+            TemporaryTransitStop flagTransitStop = new TemporaryTransitStop(graph, flagStop);
+            rr.rctx.temporaryVertices.add(flagTransitStop);
 
             if(rr.arriveBy) {
                 //reverse search
@@ -396,7 +400,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop, (StreetVertex)v, true);
                 rr.rctx.temporaryEdges.add(streetTransitLink);
 
-                TransitStopArrive transitStopArrive = new TransitStopArrive(graph, flagStop, flagTransitStop);
+                TemporaryTransitStopArrive transitStopArrive = new TemporaryTransitStopArrive(graph, flagStop, flagTransitStop);
+                rr.rctx.temporaryVertices.add(transitStopArrive);
                 TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, flagTransitStop);
                 rr.rctx.temporaryEdges.add(preAlightEdge);
 
@@ -411,22 +416,27 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                         int stopIndex = originalPatternHop.getStopIndex();
 
-                        PatternArriveVertex patternArriveVertex =
-                                new PatternArriveVertex(graph, originalTripPattern, stopIndex, flagStop);
+                        TemporaryPatternArriveVertex patternArriveVertex =
+                                new TemporaryPatternArriveVertex(graph, originalTripPattern, stopIndex, flagStop);
                         rr.rctx.temporaryVertices.add(patternArriveVertex);
 
                         Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
                         for (TemporaryPartialPatternHop reverseHop : reverseHops) {
                             // create new shortened hop
                             TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
-                            if (newHop == null || newHop.isTrivial())
+                            if (newHop == null || newHop.isTrivial()) {
+                                if (newHop != null)
+                                    newHop.dispose();
                                 continue;
+                            }
                             rr.rctx.temporaryEdges.add(newHop);
                         }
 
                         TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(originalPatternHop, patternArriveVertex, flagStop, rr.rctx);
-                        if (hop.isTrivial())
+                        if (hop.isTrivial()) {
+                            hop.dispose();
                             continue;
+                        }
                         rr.rctx.temporaryEdges.add(hop);
 
                         // todo - david's code has this comment. why don't I need it?
@@ -447,7 +457,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink((StreetVertex)v, flagTransitStop, true);
                 rr.rctx.temporaryEdges.add(streetTransitLink);
 
-                TransitStopDepart transitStopDepart = new TransitStopDepart(graph, flagStop, flagTransitStop);
+                TemporaryTransitStopDepart transitStopDepart = new TemporaryTransitStopDepart(graph, flagStop, flagTransitStop);
+                rr.rctx.temporaryVertices.add(transitStopDepart);
                 TemporaryPreBoardEdge temporaryPreBoardEdge = new TemporaryPreBoardEdge(flagTransitStop, transitStopDepart);
                 rr.rctx.temporaryEdges.add(temporaryPreBoardEdge);
 
@@ -460,13 +471,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
                     for(PatternHop originalPatternHop : patternHops){
 
-                        PatternDepartVertex patternDepartVertex =
-                                new PatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);
+                        TemporaryPatternDepartVertex patternDepartVertex =
+                                new TemporaryPatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);
                         rr.rctx.temporaryVertices.add(patternDepartVertex);
 
                         TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(originalPatternHop, patternDepartVertex, flagStop, rr.rctx);
-                        if (hop.isTrivial())
+                        if (hop.isTrivial()) {
+                            hop.dispose();
                             continue;
+                        }
                         rr.rctx.temporaryEdges.add(hop);
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
