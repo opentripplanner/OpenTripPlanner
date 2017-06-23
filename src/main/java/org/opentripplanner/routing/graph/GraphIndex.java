@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
@@ -26,8 +25,6 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.module.map.StreetMatcher;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
@@ -88,8 +85,8 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
-    public final Multimap<Edge, TripPattern> patternsForEdge = ArrayListMultimap.create();
-    public final Multimap<Edge, PatternHop> hopsForEdge = ArrayListMultimap.create();
+    public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
+    public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
     public final HashGridSpatialIndex<PatternHop> hopIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
