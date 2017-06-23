@@ -13,8 +13,12 @@
 package org.opentripplanner.routing.flex;
 
 import com.beust.jcommander.internal.Maps;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -33,7 +37,6 @@ import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.FlagStopSplitterService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternArriveVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternDepartVertex;
@@ -48,18 +51,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
  * Add temporary vertices/edges for flag stops.
  */
-public class TemporaryFlagStopService {
+public class FlagStopCreationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TemporaryFlagStopService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FlagStopCreationService.class);
 
     private Graph graph;
 
-    public TemporaryFlagStopService(Graph graph) {
+    public FlagStopCreationService(Graph graph) {
         this.graph = graph;
     }
 
@@ -250,31 +254,18 @@ public class TemporaryFlagStopService {
      * @param
      * @return
      */
-    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map tripPatternStateMap) {
-        List<StreetEdge> flagStopOriginEdges = FlagStopSplitterService.getClosestStreetEdgesToOrigin(rr.rctx, graph);
-        List<StreetEdge> flagStopDestinationEdges = FlagStopSplitterService.getClosestStreetEdgesToDestination(rr.rctx, graph);
+    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<TripPattern, State> tripPatternStateMap) {
+        List<StreetEdge> flagStopEdges = getClosestStreetEdges(initVertex.getCoordinate());
 
-        if(rr.arriveBy){
-            for(StreetEdge streetEdge : flagStopDestinationEdges){
-                State nearbyState = new State(initVertex, rr);
-                nearbyState.backEdge = streetEdge;
-                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
-                //todo find trippatterns for flag stop routes only
-                for(TripPattern tripPattern : patterns){
-                    tripPatternStateMap.put(tripPattern, nearbyState);
-                }
-            }
-        } else {
-            for(StreetEdge streetEdge : flagStopOriginEdges){
-                State nearbyState = new State(initVertex, rr);
-                nearbyState.backEdge = streetEdge;
-                Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
-                //todo find trippatterns for flag stop routes only
-                for(TripPattern tripPattern : patterns){
-                    tripPatternStateMap.put(tripPattern, nearbyState);
-                }
-            }
-        }
+       for(StreetEdge streetEdge : flagStopEdges){
+           State nearbyState = new State(initVertex, rr);
+           nearbyState.backEdge = streetEdge;
+           Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
+           //todo find trippatterns for flag stop routes only
+           for(TripPattern tripPattern : patterns){
+               tripPatternStateMap.put(tripPattern, nearbyState);
+           }
+       }
     }
 
     // It's possible that the edge is a very long StreetEdge whose traversal will kill our walk budget, but it's
@@ -293,6 +284,49 @@ public class TemporaryFlagStopService {
                 TemporaryPartialPatternHop hop = (TemporaryPartialPatternHop) e;
                 if (hop.isOriginalHop(patternHop))
                     ret.add(hop);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Find the nearest street edges to the given point, check if they are served by flag stop routes.
+     */
+    private List<StreetEdge> getClosestStreetEdges(Coordinate pointLocation) {
+
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
+
+        Envelope env = new Envelope(pointLocation);
+
+        // local equirectangular projection
+        double lat = pointLocation.getOrdinate(1);
+        final double xscale = Math.cos(lat * Math.PI / 180);
+
+        env.expandBy(radiusDeg / xscale, radiusDeg);
+
+        Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(env);
+        Map<Double, List<StreetEdge>> edgeDistanceMap = new TreeMap<>();
+        for(Edge edge : edges){
+            if(edge instanceof StreetEdge){
+                LineString line = edge.getGeometry();
+                double dist = SphericalDistanceLibrary.fastDistance(pointLocation, line);
+                double roundOff = (double) Math.round(dist * 100) / 100;
+                if(!edgeDistanceMap.containsKey(roundOff))
+                    edgeDistanceMap.put(roundOff, new ArrayList<>());
+                edgeDistanceMap.get(roundOff).add((StreetEdge) edge);
+            }
+        }
+
+        List<StreetEdge> closestEdges = edgeDistanceMap.values().iterator().next();
+        List<StreetEdge> ret = new ArrayList<>();
+        for(StreetEdge closestEdge : closestEdges){
+            List<PatternHop> patternHops = graph.index.getHopsForEdge(closestEdge)
+                    .stream()
+                    //.filter(e -> e.getPattern() == originalTripPattern)
+                    //todo: check if these are flag stop hops
+                    .collect(Collectors.toList());
+            if(patternHops.size() > 0){
+                ret.add(closestEdge);
             }
         }
         return ret;

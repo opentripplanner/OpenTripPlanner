@@ -21,7 +21,7 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.flex.TemporaryFlagStopService;
+import org.opentripplanner.routing.flex.FlagStopCreationService;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -115,7 +115,7 @@ public class AStar {
                 new TrivialRemainingWeightHeuristic() :
                 runState.rctx.remainingWeightHeuristic;
 
-        new TemporaryFlagStopService(runState.options.rctx.graph).initialize(runState.options);
+        new FlagStopCreationService(runState.options.rctx.graph).initialize(runState.options);
 
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
