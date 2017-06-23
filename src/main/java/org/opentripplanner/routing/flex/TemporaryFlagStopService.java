@@ -18,7 +18,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -41,6 +40,8 @@ import org.opentripplanner.routing.vertextype.flex.TemporaryPatternDepartVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStopArrive;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStopDepart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +54,8 @@ import java.util.stream.Collectors;
  * Add temporary vertices/edges for flag stops.
  */
 public class TemporaryFlagStopService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TemporaryFlagStopService.class);
 
     private Graph graph;
 
@@ -91,7 +94,9 @@ public class TemporaryFlagStopService {
 
             }
         };
-        gd.getShortestPathTree(new State(rr));
+        Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
+        gd.getShortestPathTree(new State(initVertex, rr));
+        findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap);
 
         Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
         for(TripPattern tripPattern : tripPatternStateMap.keySet()){
@@ -107,13 +112,13 @@ public class TemporaryFlagStopService {
 
             Vertex v;
 
-//            if(s.getVertex() == initVertex){
-//                //the origin/destination lies along a flag stop route
-//                LOG.debug("the origin/destination lies along a flag stop route. fromTarget={}, vertex={}", fromTarget, initVertex);
-//                v = initVertex;
-//            }else{
-            v = rr.arriveBy ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
-            //}
+            if(s.getVertex() == initVertex){
+                //the origin/destination lies along a flag stop route
+                LOG.debug("the origin/destination lies along a flag stop route.");
+                v = initVertex;
+            }else{
+                v = rr.arriveBy ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
+            }
 
             //if nearby, wire stop to init vertex
 
