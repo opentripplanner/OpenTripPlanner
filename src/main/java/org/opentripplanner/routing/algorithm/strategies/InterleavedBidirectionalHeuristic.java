@@ -331,11 +331,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 // We don't want to continue into the transit network yet, but when searching around the target
                 // place vertices on the transit queue so we can explore the transit network backward later.
                 if (fromTarget) {
-                    double weight = s.getWeight();
-                    transitQueue.insert(v, weight);
-                    if (weight > maxWeightSeen) {
-                        maxWeightSeen = weight;
-                    }
+                   insertIntoTransitQueue(s, v);
                 }
                 continue;
             }
@@ -377,7 +373,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
             if(s.getVertex() == initVertex){
                 //the origin/destination lies along a flag stop route
-                LOG.info("the origin/destination lies along a flag stop route. fromTarget={}, vertex={}", fromTarget, initVertex);
+                LOG.debug("the origin/destination lies along a flag stop route. fromTarget={}, vertex={}", fromTarget, initVertex);
                 v = initVertex;
             }else{
                 v = rr.arriveBy ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
@@ -394,9 +390,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             TemporaryTransitStop flagTransitStop = new TemporaryTransitStop(graph, flagStop);
             rr.rctx.temporaryVertices.add(flagTransitStop);
 
+            if (fromTarget) {
+                insertIntoTransitQueue(s, flagTransitStop);
+            }
+
             if(rr.arriveBy) {
                 //reverse search
-                transitQueue.insert(flagTransitStop, s.getWeight());
                 TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop, (StreetVertex)v, true);
                 rr.rctx.temporaryEdges.add(streetTransitLink);
 
@@ -496,7 +495,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         LOG.debug("Heuristric street search hit {} transit stops.", transitQueue.size());
         return vertices;
     }
- 
+
+    private void insertIntoTransitQueue(State s, Vertex v) {
+       double weight = s.getWeight();
+       transitQueue.insert(v, weight);
+       if (weight > maxWeightSeen) {
+           maxWeightSeen = weight;
+       }
+    }
+
     /**
      * Finds the closest coordinate along a line to the target, splices that point into the line, and returns
      * a coordinate array containing either the partial array up to and including the target, or the target and all after
