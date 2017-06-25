@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype.flex;
 
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -45,11 +46,10 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
         tov.removeIncoming(this);
     }
 
-    // is this hop too not-different to care about? for now lets say should be 2% different *shrugs*
+    // is this hop too not-different to care about? for now lets say should be > 20 m shorter than original hop
     public boolean isTrivial() {
-        return false;
-//        double length = getOriginalHopLength();
-//        double thisLength = getEndIndex() - getStartIndex();
-//        return (thisLength / length) > 0.99;
+      double length = SphericalDistanceLibrary.fastLength(getGeometry());
+      double parentLength = SphericalDistanceLibrary.fastLength(getOriginalHop().getGeometry());
+      return length + 20 >= parentLength;
     }
 }

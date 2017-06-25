@@ -51,7 +51,7 @@ public class TemporaryTransitBoardAlight extends TransitBoardAlight implements T
     public TripTimes getNextTrip(State s0, ServiceDay sd) {
         RoutingRequest options = s0.getOptions();
         Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, startIndex);
+        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, startIndex, -2);
         return tripTimes;
     }
 

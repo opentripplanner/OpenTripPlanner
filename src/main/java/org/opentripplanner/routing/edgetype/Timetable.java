@@ -134,9 +134,9 @@ public class Timetable implements Serializable {
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
      */
-    public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, double adjustment) {
+    public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, double adjustment, int timeAdjustment) {
         /* Search at the state's time, but relative to midnight on the given service day. */
-        int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
+        int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds()) + timeAdjustment;
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
         // Adjust for possible boarding time TODO: This should be included in the trip and based on GTFS
         if (boarding) {
@@ -217,7 +217,7 @@ public class Timetable implements Serializable {
     }
 
     public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
-        return getNextTrip(s0, serviceDay, stopIndex, boarding, 0);
+        return getNextTrip(s0, serviceDay, stopIndex, boarding, 0, 0);
     }
 
     /**
