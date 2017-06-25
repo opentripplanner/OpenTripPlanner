@@ -186,8 +186,6 @@ public class FlagStopCreationService {
                         TemporaryTransitBoardAlight transitBoardAlight =
                                 new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
-
-
                     }
                 }
 
@@ -231,8 +229,6 @@ public class FlagStopCreationService {
             }
             i++;
         }
-
-
     }
 
     private void addStateToTripPatternStateMap(Edge edge, State s, Map<TripPattern, State> tripPatternStateMap) {
