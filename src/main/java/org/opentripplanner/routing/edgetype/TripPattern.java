@@ -714,7 +714,6 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public boolean hasFlagStopService() {
-        /* we can only match geometry to streets on bus routes */
-        return TraverseMode.BUS.equals(this.mode);
+        return Arrays.stream(patternHops).anyMatch(PatternHop::hasFlagStopService);
     }
 }

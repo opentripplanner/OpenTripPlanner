@@ -145,14 +145,15 @@ public class FlagStopCreationService {
                 TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, flagTransitStop);
                 rr.rctx.temporaryEdges.add(preAlightEdge);
 
-                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)){
+                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)) {
 
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
+                            .filter(e -> e.getContinuousDropoff() > 0)
                             .collect(Collectors.toList());
 
-                    for(PatternHop originalPatternHop : patternHops){
+                    for(PatternHop originalPatternHop : patternHops) {
 
                         int stopIndex = originalPatternHop.getStopIndex();
 
@@ -205,9 +206,10 @@ public class FlagStopCreationService {
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
+                            .filter(e -> e.getContinuousPickup() > 0)
                             .collect(Collectors.toList());
 
-                    for(PatternHop originalPatternHop : patternHops){
+                    for(PatternHop originalPatternHop : patternHops) {
 
                         TemporaryPatternDepartVertex patternDepartVertex =
                                 new TemporaryPatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);

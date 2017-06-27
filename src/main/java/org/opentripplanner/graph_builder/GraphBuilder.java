@@ -309,7 +309,7 @@ public class GraphBuilder implements Runnable {
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator());
-                if (hasOSM) {
+                if (hasOSM && builderParams.createFlexTransfers) {
                     graphBuilder.addModule(new FlexDirectTransferGenerator());
                 }
             }

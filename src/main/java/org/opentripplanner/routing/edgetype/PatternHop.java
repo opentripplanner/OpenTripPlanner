@@ -219,4 +219,8 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return continuousDropoff;
     }
 
+    public boolean hasFlagStopService() {
+        return continuousPickup > 0 || continuousDropoff > 0;
+    }
+
 }
