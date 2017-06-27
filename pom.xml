@@ -354,7 +354,7 @@
         <repository>
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
-            <url>http://maven.conveyal.com/</url>
+            <url>https://maven.conveyal.com/</url>
         </repository>
         <!-- Needed  for graphql-java-->
         <repository>
