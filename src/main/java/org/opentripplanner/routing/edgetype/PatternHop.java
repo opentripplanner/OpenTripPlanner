@@ -41,28 +41,27 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private Stop begin, end;
 
-    private int continuousPickup, continuousDropoff;
+    private int continuousStops;
 
     public int stopIndex;
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
         if (setInPattern)
             getPattern().setPatternHop(stopIndex, this);
-        this.continuousPickup = continuousPickup;
-        this.continuousDropoff = continuousDropoff;
+        this.continuousStops = continuousStops;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff) {
-        this(from, to, begin, end, stopIndex, continuousPickup, continuousDropoff, true);
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops) {
+        this(from, to, begin, end, stopIndex, continuousStops, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 0, 0);
+        this(from, to, begin, end, stopIndex, 0);
     }
 
     // made more accurate
@@ -211,16 +210,12 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return stopIndex;
     }
 
-    public int getContinuousPickup() {
-        return continuousPickup;
-    }
-
-    public int getContinuousDropoff() {
-        return continuousDropoff;
+    public int getContinuousStops() {
+        return continuousStops;
     }
 
     public boolean hasFlagStopService() {
-        return continuousPickup > 0 || continuousDropoff > 0;
+        return continuousStops > 0;
     }
 
 }

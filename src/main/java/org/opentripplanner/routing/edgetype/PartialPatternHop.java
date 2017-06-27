@@ -34,7 +34,7 @@ public class PartialPatternHop extends PatternHop {
     private PatternHop originalHop;
 
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousPickup(), hop.getContinuousDropoff(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;

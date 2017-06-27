@@ -117,7 +117,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
                 }
 
                 // for each hop, find nearby stops and hops. create transfers.
-                if (hop.getContinuousDropoff() > 0 || hop.getContinuousPickup() > 0) {
+                if (hop.hasFlagStopService()) {
                     if (++nLinkableHops % 1000 == 0) {
                         LOG.info("Linked {} hops, skipped {} hops", nLinkableHops, nSkippedHops);
                     }
@@ -194,7 +194,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
                         if (flexPatternsToIgnore.get(hop.getPattern()).contains(h.getPattern())) {
                             continue;
                         }
-                        if (h.getContinuousPickup() > 0 || h.getContinuousDropoff() > 0) {
+                        if (h.hasFlagStopService()) {
                             TripPattern pattern = h.getPattern();
                             TransferPointAtDistance pt = new TransferPointAtDistance(hop, state, h, state.getVertex());
                             closestTransferPointForTripPattern.put(pattern, pt);

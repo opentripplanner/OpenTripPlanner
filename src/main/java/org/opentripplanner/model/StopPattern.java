@@ -7,7 +7,6 @@ import java.util.List;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.slf4j.Logger;
@@ -52,8 +51,7 @@ public class StopPattern implements Serializable {
     public final Stop[] stops;
     public final int[]  pickups;
     public final int[]  dropoffs;
-    public final int[] continuousPickups;
-    public final int[] continuousDropoffs;
+    public final int[] continuousStops;
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
@@ -61,8 +59,7 @@ public class StopPattern implements Serializable {
             return Arrays.equals(this.stops,    that.stops) && 
                    Arrays.equals(this.pickups,  that.pickups) && 
                    Arrays.equals(this.dropoffs, that.dropoffs) &&
-                   Arrays.equals(this.continuousPickups, that.continuousPickups) &&
-                   Arrays.equals(this.continuousDropoffs, that.continuousDropoffs);
+                   Arrays.equals(this.continuousStops, that.continuousStops);
         } else {
             return false;
         }
@@ -76,9 +73,7 @@ public class StopPattern implements Serializable {
         hash *= 31;
         hash += Arrays.hashCode(this.dropoffs);
         hash *= 31;
-        hash += Arrays.hashCode(this.continuousPickups);
-        hash *= 31;
-        hash += Arrays.hashCode(this.continuousDropoffs);
+        hash += Arrays.hashCode(this.continuousStops);
         return hash;
     }
 
@@ -96,8 +91,7 @@ public class StopPattern implements Serializable {
         stops     = new Stop[size];
         pickups   = new int[size];
         dropoffs  = new int[size];
-        continuousPickups = new int[size];
-        continuousDropoffs = new int[size];
+        continuousStops = new int[size];
     }
 
     /** Assumes that stopTimes are already sorted by time. */
@@ -112,13 +106,11 @@ public class StopPattern implements Serializable {
             pickups[i] = stopTime.getPickupType();
             dropoffs[i] = stopTime.getDropOffType();
 
-            // continuous pickup/dropoff can be empty (-1), which means 0 for the first stoptime, and the previous value for subsequent stop times.
+            // continuous stops can be empty (-1), which means 0 for the first stoptime, and the previous value for subsequent stop times.
             if (i == 0) {
-                continuousPickups[i] = stopTime.getContinuousPickup() == -1 ? 0 : stopTime.getContinuousPickup();
-                continuousDropoffs[i] = stopTime.getContinuousDropOff() == -1 ? 0 : stopTime.getContinuousDropOff();
+                continuousStops[i] = stopTime.getContinuousStops() == -1 ? 0 : stopTime.getContinuousStops();
             } else {
-                continuousPickups[i] = stopTime.getContinuousPickup() == -1 ? continuousPickups[i-1] : stopTime.getContinuousPickup();
-                continuousDropoffs[i] = stopTime.getContinuousDropOff() == -1 ? continuousDropoffs[i-1] : stopTime.getContinuousDropOff();
+                continuousStops[i] = stopTime.getContinuousStops() == -1 ? continuousStops[i-1] : stopTime.getContinuousStops();
             }
         }
         /*
@@ -163,8 +155,7 @@ public class StopPattern implements Serializable {
         for (int hop = 0; hop < size - 1; hop++) {
             hasher.putInt(pickups[hop]);
             hasher.putInt(dropoffs[hop + 1]);
-            hasher.putInt(continuousPickups[hop]);
-            hasher.putInt(continuousDropoffs[hop + 1]);
+            hasher.putInt(continuousStops[hop]);
         }
         return hasher.hash();
     }

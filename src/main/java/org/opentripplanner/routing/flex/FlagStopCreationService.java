@@ -150,7 +150,7 @@ public class FlagStopCreationService {
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
-                            .filter(e -> e.getContinuousDropoff() > 0)
+                            .filter(PatternHop::hasFlagStopService)
                             .collect(Collectors.toList());
 
                     for(PatternHop originalPatternHop : patternHops) {
@@ -206,7 +206,7 @@ public class FlagStopCreationService {
                     List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
                             .stream()
                             .filter(e -> e.getPattern() == originalTripPattern)
-                            .filter(e -> e.getContinuousPickup() > 0)
+                            .filter(PatternHop::hasFlagStopService)
                             .collect(Collectors.toList());
 
                     for(PatternHop originalPatternHop : patternHops) {
