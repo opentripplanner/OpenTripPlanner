@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSourceFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -158,7 +157,7 @@ public class GraphBuilderParameters {
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
-        wayPropertySet = WayPropertySetSourceFactory.fromConfig(config.path("osmWayPropertySet").asText("default"));
+        wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
