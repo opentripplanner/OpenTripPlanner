@@ -75,6 +75,11 @@ public class GraphBuilderParameters {
     public final boolean areaVisibility;
 
     /**
+     * Link unconnected entries to public transport platforms.
+     */
+    public final boolean platformEntriesLinking;
+
+    /**
      * Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.
      */
     public final boolean matchBusRoutesToStreets;
@@ -162,6 +167,7 @@ public class GraphBuilderParameters {
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
+        platformEntriesLinking = config.path("platformEntriesLinking").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
