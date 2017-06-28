@@ -23,16 +23,16 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <id>releases-obaweb-repo</id>
-            <name>OneBusAway OBAWEB Release Repo</name>
-            <url>http://repo.obaweb.org:8080/archiva/repository/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots-obaweb-repo</id>
-            <name>OneBusAway OBAWEB Snapshot Repo</name>
-            <url>http://repo.obaweb.org:8080/archiva/repository/snapshots/</url>
-        </snapshotRepository>
+      <repository>
+        <id>nexus.onebusaway.org-releases</id>
+        <name>Nexus Release Repo</name>
+        <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+      </repository>
+      <snapshotRepository>
+        <id>nexus.onebusaway.org-snapshots</id>
+        <name>Nexus Snapshot Repo</name>
+        <url>http://nexus.onebusaway.org/content/repositories/snapshots/</url>
+      </snapshotRepository>
     </distributionManagement>
 
     <build>
@@ -366,9 +366,9 @@
             <url>http://dl.bintray.com/andimarek/graphql-java</url>
         </repository>
         <repository>
-            <id>snapshots-obaweb-repo</id>
-            <name>OneBusAway OBAWEB Snapshot Repo</name>
-            <url>http://repo.obaweb.org:8080/archiva/repository/snapshots/</url>
+            <id>snapshots-nexus-repo</id>
+            <name>Nexus Snapshots Repo</name>
+            <url>http://nexus.onebusaway.org/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
