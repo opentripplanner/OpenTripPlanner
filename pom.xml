@@ -165,7 +165,6 @@
                     <!-- The site generation step can fail. Run it in release:prepare to make sure it
                     works before tagging the release. -->
                     <preparationGoals>clean verify site</preparationGoals>
-                    <arguments>-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true</arguments>
                 </configuration>
             </plugin>
             <plugin>
