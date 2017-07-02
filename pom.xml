@@ -3,11 +3,73 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>OpenTripPlanner</name>
-    <url>http://opentripplanner.org/</url>
+    <description>The OpenTripPlanner multimodal journey planning system</description>
+    <url>http://opentripplanner.org</url>
+
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
+
+    <!-- Developer entries are provided only for Steering Committee members.
+       For other contributors, see https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors -->
+    <developers>
+        <developer>
+            <name>Andrew Byrd</name>
+            <email>andrew@fastmail.net</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>David Emory</name>
+            <email>david.emory@gmail.com</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Matt Conway</name>
+            <email>matt@indicatrix.org</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>David Novalis Turner</name>
+            <email>novalis@novalis.org</email>
+            <organization>Ex-OpenPlans</organization>
+            <organizationUrl>http://openplans.org/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Laurent Grégoire</name>
+            <email>laurent.gregoire@protonmail.ch</email>
+            <organization>Mecatran</organization>
+            <organizationUrl>http://www.mecatran.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Frank Purcell</name>
+            <email>fxpurcell@gmail.com</email>
+            <organization>Portland TriMet</organization>
+            <organizationUrl>https://trimet.org/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Tuukka Hastrup</name>
+            <email>tuukka.hastrup@hsl.fi</email>
+            <organization>Helsingin Seudun Liikenne</organization>
+            <organizationUrl>https://www.hsl.fi/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jasper Hartong</name>
+            <email>jasper@calendar42.com</email>
+            <organization>Calendar42</organization>
+            <organizationUrl>http://site.calendar42.com/</organizationUrl>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:http://github.com/camsys/OpenTripPlanner.git</connection>
@@ -36,22 +98,6 @@
     </distributionManagement>
 
     <build>
-
-        <!-- "Wagon" necessary for uploading/deploying artifacts to the Conveyal Maven repo on Amazon S3. -->
-        <extensions>
-            <!--
-              The Spring S3 Wagon throws ResourceDoesNotExistException when it is asked to put a directory.
-              The site contains a lot of subdirectories, so use the kuali s3 wagon which handles directories.
-              This is only important if you're deploying the OTP site to an S3 bucket as a static web site,
-              which is not a bad idea.
-            -->
-            <extension>
-                <groupId>org.kuali.maven.wagons</groupId>
-                <artifactId>maven-s3-wagon</artifactId>
-                <version>1.2.1</version>
-            </extension>
-        </extensions>
-
         <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
         <resources>
             <resource>
@@ -131,6 +177,18 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
                 <version>2.4.0</version>
@@ -157,15 +215,15 @@
                     <!-- Turn off Java 8 strict Javadoc checking -->
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <!-- The site generation step can fail. Run it in release:prepare to make sure it
-                    works before tagging the release. -->
-                    <preparationGoals>clean verify site</preparationGoals>
-                </configuration>
+                <executions>
+                    <!-- Compress Javadoc into JAR and include that JAR when deploying. -->
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,7 +231,24 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <goals><goal>jar</goal></goals>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <!-- We sign in the verify phase, which means it will happen for install and deploy but not package. -->
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -334,7 +409,7 @@
         <repository>
             <id>central2</id>
             <name>check central first to avoid a lot of not found warnings</name>
-            <url>http://repo1.maven.org/maven2</url>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>download.java.net</id>
@@ -349,21 +424,12 @@
         <repository>
             <id>axis</id>
             <name>axis</name>
-            <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
+            <url>https://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
             <url>https://maven.conveyal.com/</url>
-        </repository>
-        <!-- Needed  for graphql-java-->
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-andimarek-graphql-java</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/andimarek/graphql-java</url>
         </repository>
         <repository>
             <id>snapshots-nexus-repo</id>
@@ -437,6 +503,11 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-referencing3D</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <dependency>
@@ -695,13 +766,11 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>4.7.1</version>
         </dependency>
-
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>2015-09-06T17-27-38</version>
+            <version>2.2.0</version>
         </dependency>
-
         <!-- Support for OTP scripting -->
         <dependency>
             <groupId>bsf</groupId>
@@ -723,7 +792,6 @@
             <version>2.7.0</version>
         </dependency>
         -->
-
         <!-- support for OpenTraffic data -->
         <dependency>
             <groupId>io.opentraffic</groupId>
@@ -742,13 +810,6 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- SerializationUtils used to deep clone TripPatterns for dynamic flag stops -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
         </dependency>
     </dependencies>
 

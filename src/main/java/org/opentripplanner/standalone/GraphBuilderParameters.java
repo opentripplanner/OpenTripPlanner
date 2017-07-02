@@ -130,6 +130,18 @@ public class GraphBuilderParameters {
     public final int pruningThresholdIslandWithStops;
 
     /**
+     * This field indicates whether walking should be allowed on OSM ways
+     * tagged with "foot=discouraged".
+     */
+    public final boolean banDiscouragedWalking;
+
+    /**
+     * This field indicates whether bicycling should be allowed on OSM ways
+     * tagged with "bicycle=discouraged".
+     */
+    public final boolean banDiscouragedBiking;
+
+    /**
      * Whether to run FlexDirectTransferGenerator to create flex transfers. This can take a long
      * time and is only necessary if flex routing is used and there are not designated transfer
      * points.
@@ -142,6 +154,7 @@ public class GraphBuilderParameters {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
+
     public GraphBuilderParameters(JsonNode config) {
 
         htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
@@ -165,6 +178,8 @@ public class GraphBuilderParameters {
         maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
         pruningThresholdIslandWithoutStops = config.path("islandWithoutStopsMaxSize").asInt(40);
         pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
+        banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
+        banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         createFlexTransfers = config.path("createFlexTransfers").asBoolean(false);
     }
 

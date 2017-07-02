@@ -2,6 +2,7 @@ package org.opentripplanner.routing.spt;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import java.io.Serializable;
@@ -42,6 +43,12 @@ public abstract class DominanceFunction implements Serializable {
         // States before boarding transit and after riding transit are incomparable.
         // This allows returning transit options even when walking to the destination is the optimal strategy.
         if (a.isEverBoarded() != b.isEverBoarded()) {
+            return false;
+        }
+
+        // The result of a SimpleTransfer must not block alighting normally from transit. States that are results of
+        // SimpleTransfers are incomparable with states that are not the result of SimpleTransfers.
+        if ((a.backEdge instanceof SimpleTransfer) != (b.backEdge instanceof SimpleTransfer)) {
             return false;
         }
 

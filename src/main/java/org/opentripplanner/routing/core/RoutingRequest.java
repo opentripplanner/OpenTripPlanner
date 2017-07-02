@@ -435,6 +435,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Option to disable the default filtering of GTFS-RT alerts by time. */
     public boolean disableAlertFiltering = false;
 
+    /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
+    public boolean geoidElevation = false;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -954,7 +957,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
-                && disableAlertFiltering == other.disableAlertFiltering;
+                && disableAlertFiltering == other.disableAlertFiltering
+                && geoidElevation == other.geoidElevation;
     }
 
     /**
@@ -1152,7 +1156,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Check if route is preferred according to this request. */
     public long preferencesPenaltyForRoute(Route route) {
         long preferences_penalty = 0;
-        String agencyID = route.getId().getAgencyId();
+        String agencyID = route.getAgency().getId();
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
