@@ -19,7 +19,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
-import org.apache.commons.math3.util.Pair;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
@@ -40,8 +39,7 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.TransitBoardAlightAtFlex;
+import org.opentripplanner.routing.edgetype.flex.FlexTransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -50,7 +48,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -64,7 +61,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -274,7 +270,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         PatternArriveVertex patternArriveVertex = new PatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
         TransitStopArrive transitStopArrive = new TransitStopArrive(graph, stop, transferStop);
         PartialPatternHop startHop = PartialPatternHop.startHop(hop, patternArriveVertex, stop);
-        new TransitBoardAlightAtFlex(patternArriveVertex, transitStopArrive, hop.getStopIndex(), hop.getPattern().mode, startHop.getPercentageOfHop());
+        new FlexTransitBoardAlight(patternArriveVertex, transitStopArrive, hop.getStopIndex() + 1, startHop);
         new PreAlightEdge(transitStopArrive, transferStop);
 
         // stop -> hop
@@ -282,7 +278,7 @@ public class FlexDirectTransferGenerator implements GraphBuilderModule {
         PatternDepartVertex patternDepartVertex = new PatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
         new PreBoardEdge(transferStop, transitStopDepart);
         PartialPatternHop endHop = PartialPatternHop.endHop(hop, patternDepartVertex, stop);
-        new TransitBoardAlightAtFlex(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop.getPattern().mode, endHop.getPercentageOfHop());
+        new FlexTransitBoardAlight(transitStopDepart, patternDepartVertex, hop.getStopIndex(), endHop);
 
         return transferStop;
     }
