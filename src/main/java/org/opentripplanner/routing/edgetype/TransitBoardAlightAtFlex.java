@@ -34,7 +34,7 @@ public class TransitBoardAlightAtFlex extends TransitBoardAlight {
     public TripTimes getNextTrip(State s0, ServiceDay sd) {
         RoutingRequest options = s0.getOptions();
         Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, percentageOfHop, 0);
+        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, percentageOfHop);
         return tripTimes;
     }
 

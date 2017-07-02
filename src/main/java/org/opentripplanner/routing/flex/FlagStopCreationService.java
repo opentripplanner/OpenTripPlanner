@@ -155,7 +155,7 @@ public class FlagStopCreationService {
 
                     for(PatternHop originalPatternHop : patternHops) {
 
-                        int stopIndex = originalPatternHop.getStopIndex();
+                        int stopIndex = originalPatternHop.getStopIndex() + 1;
 
                         TemporaryPatternArriveVertex patternArriveVertex =
                                 new TemporaryPatternArriveVertex(graph, originalTripPattern, stopIndex, flagStop);
@@ -185,7 +185,7 @@ public class FlagStopCreationService {
 
                         /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop);
+                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, stopIndex, hop);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
                     }
                 }
@@ -224,7 +224,7 @@ public class FlagStopCreationService {
 
                         /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
                         TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), TraverseMode.BUS, hop);
+                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), hop);
                         rr.rctx.temporaryEdges.add(transitBoardAlight);
                     }
                 }

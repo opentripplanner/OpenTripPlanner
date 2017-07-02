@@ -65,7 +65,7 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public int getRunningTime(State s0) {
-        return (int) (percentageOfHop * super.getRunningTime(s0));
+        return (int) Math.round(percentageOfHop * super.getRunningTime(s0));
     }
 
     public boolean isOriginalHop(PatternHop hop) {
@@ -91,7 +91,6 @@ public class PartialPatternHop extends PatternHop {
     public double getOriginalHopLength() {
         return originalHopLength;
     }
-
 
 }
 
