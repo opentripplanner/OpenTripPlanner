@@ -8,7 +8,7 @@
 
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -358,6 +358,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -435,6 +443,11 @@
             <id>snapshots-nexus-repo</id>
             <name>Nexus Snapshots Repo</name>
             <url>http://nexus.onebusaway.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>releases-nexus-repo</id>
+            <name>Nexus Snapshots Repo</name>
+            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
         </repository>
     </repositories>
 
@@ -653,7 +666,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.3.5-vt-SNAPSHOT</version>
+            <version>1.3.5.2-vt</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -720,7 +733,7 @@
         <dependency>
             <groupId>crosby.binary</groupId>
             <artifactId>osmpbf</artifactId>
-            <version>1.3.4-SNAPSHOT</version>
+            <version>1.3.4</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
@@ -803,7 +816,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-simple</artifactId>
