@@ -697,6 +697,17 @@ public abstract class GraphPathToTripPlanConverter {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
             place.vertexType = VertexType.TRANSIT;
+            place.boardAlightType = BoardAlightType.DEFAULT;
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                if (hop.hasBoardArea()) {
+                    place.boardArea = PolylineEncoder.createEncodings(hop.getBoardArea());
+                }
+                if (hop.hasAlightArea()) {
+                    place.alightArea = PolylineEncoder.createEncodings(hop.getAlightArea());
+                }
+                place.boardAlightType = BoardAlightType.FLAG_STOP;
+            }
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);

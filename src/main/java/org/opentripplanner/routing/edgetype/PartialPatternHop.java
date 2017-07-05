@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
@@ -32,8 +33,10 @@ public class PartialPatternHop extends PatternHop {
     private double originalHopLength;
     private double percentageOfHop;
     private PatternHop originalHop;
+    private Geometry boardArea;
+    private Geometry alightArea;
 
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex) {
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
@@ -41,21 +44,35 @@ public class PartialPatternHop extends PatternHop {
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
         this.originalHop = hop;
         this.originalHopLength = line.getEndIndex();
-        Geometry geom = line.extractLine(startIndex, endIndex);
+        setGeometry(hop, line, buffer);
+    }
+
+    private void setGeometry(PatternHop hop, LengthIndexedLine line, double buffer) {
+        double pointsPerMeter =  (line.getEndIndex() - line.getStartIndex()) / SphericalDistanceLibrary.fastLength(hop.getGeometry());
+        double bufferPts = buffer * pointsPerMeter;
+        double start = Math.max(line.getStartIndex(), startIndex - bufferPts);
+        double end = Math.min(line.getEndIndex(), endIndex + bufferPts);
+        Geometry geom = line.extractLine(start, end);
         if (geom instanceof LineString) { // according to the javadocs, it is.
             setGeometry((LineString) geom);
+        }
+        if (startIndex > line.getStartIndex() && buffer > 0) {
+            boardArea = line.extractLine(start, Math.min(startIndex + bufferPts, end));
+        }
+        if (endIndex < line.getEndIndex() && buffer > 0) {
+            alightArea = line.extractLine(Math.max(endIndex - bufferPts, start), end);
         }
     }
 
     // given hop s0->s1 and a temporary position t, create a partial hop s0->t
     public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()));
+        return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()), 0);
     }
 
     public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex());
+        return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex(), 0);
     }
 
     @Override
@@ -92,5 +109,20 @@ public class PartialPatternHop extends PatternHop {
         return originalHopLength;
     }
 
+    public Geometry getBoardArea() {
+        return boardArea;
+    }
+
+    public Geometry getAlightArea() {
+        return alightArea;
+    }
+
+    public boolean hasBoardArea() {
+        return boardArea != null;
+    }
+
+    public boolean hasAlightArea() {
+        return alightArea != null;
+    }
 }
 

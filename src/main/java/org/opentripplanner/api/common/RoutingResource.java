@@ -353,6 +353,12 @@ public abstract class RoutingResource {
     @QueryParam("flagStopExtraPenalty")
     protected Integer flagStopExtraPenalty;
 
+    /*
+     * Size of flag stop buffer zone in UI
+     */
+    @QueryParam("flagStopBufferSize")
+    protected Double flagStopBufferSize;
+
     @QueryParam("maxHours")
     private Double maxHours;
 
@@ -587,6 +593,9 @@ public abstract class RoutingResource {
 
         if (flagStopExtraPenalty != null)
             request.flagStopExtraPenalty = flagStopExtraPenalty;
+
+        if (flagStopBufferSize != null)
+            request.flagStopBufferSize = flagStopBufferSize;
 
         if (maxHours != null)
             request.maxHours = maxHours;

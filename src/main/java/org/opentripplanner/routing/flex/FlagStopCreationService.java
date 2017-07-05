@@ -164,7 +164,7 @@ public class FlagStopCreationService {
                         Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
                         for (TemporaryPartialPatternHop reverseHop : reverseHops) {
                             // create new shortened hop
-                            TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(patternArriveVertex, flagStop, rr.rctx);
+                            TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(rr, patternArriveVertex, flagStop);
                             if (newHop == null || newHop.isTrivial()) {
                                 if (newHop != null)
                                     newHop.dispose();
@@ -173,7 +173,7 @@ public class FlagStopCreationService {
                             rr.rctx.temporaryEdges.add(newHop);
                         }
 
-                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(originalPatternHop, patternArriveVertex, flagStop, rr.rctx);
+                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(rr, originalPatternHop, patternArriveVertex, flagStop);
                         if (hop.isTrivial()) {
                             hop.dispose();
                             continue;
@@ -215,7 +215,7 @@ public class FlagStopCreationService {
                                 new TemporaryPatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);
                         rr.rctx.temporaryVertices.add(patternDepartVertex);
 
-                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(originalPatternHop, patternDepartVertex, flagStop, rr.rctx);
+                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(rr, originalPatternHop, patternDepartVertex, flagStop);
                         if (hop.isTrivial()) {
                             hop.dispose();
                             continue;

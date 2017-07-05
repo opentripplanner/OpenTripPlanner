@@ -21,6 +21,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.util.Constants; 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -103,6 +104,21 @@ public class Place {
      * In case the vertex is of type Bike sharing station.
      */
     public String bikeShareId;
+
+    /**
+     * Type of board or alight (to distinguish flexible transit modes).
+     */
+    public BoardAlightType boardAlightType;
+
+    /**
+     * Board area (for flag stops)
+     */
+    public EncodedPolylineBean boardArea;
+
+    /**
+     * Alight area (for flag stops)
+     */
+    public EncodedPolylineBean alightArea;
 
     /**
      * Returns the geometry in GeoJSON format
