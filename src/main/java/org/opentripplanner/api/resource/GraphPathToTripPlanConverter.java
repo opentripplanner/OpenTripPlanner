@@ -25,7 +25,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -700,11 +699,11 @@ public abstract class GraphPathToTripPlanConverter {
             place.boardAlightType = BoardAlightType.DEFAULT;
             if (edge instanceof PartialPatternHop) {
                 PartialPatternHop hop = (PartialPatternHop) edge;
-                if (hop.hasBoardArea()) {
-                    place.boardArea = PolylineEncoder.createEncodings(hop.getBoardArea());
+                if (hop.hasBoardArea() && !endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getBoardArea());
                 }
-                if (hop.hasAlightArea()) {
-                    place.alightArea = PolylineEncoder.createEncodings(hop.getAlightArea());
+                if (hop.hasAlightArea() && endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getAlightArea());
                 }
                 place.boardAlightType = BoardAlightType.FLAG_STOP;
             }

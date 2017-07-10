@@ -111,14 +111,9 @@ public class Place {
     public BoardAlightType boardAlightType;
 
     /**
-     * Board area (for flag stops)
+     * Board or alight area for flag stops
      */
-    public EncodedPolylineBean boardArea;
-
-    /**
-     * Alight area (for flag stops)
-     */
-    public EncodedPolylineBean alightArea;
+    public EncodedPolylineBean flagStopArea;
 
     /**
      * Returns the geometry in GeoJSON format
