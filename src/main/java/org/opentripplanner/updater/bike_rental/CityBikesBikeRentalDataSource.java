@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
 public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
-    private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
+    private static final Logger log = LoggerFactory.getLogger(CityBikesBikeRentalDataSource.class);
 
     private String url;
 
