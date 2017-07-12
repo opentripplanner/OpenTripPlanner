@@ -236,16 +236,15 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             s1.setBackMode(getMode());
             final State nextState = s1.makeState();
-            if(nextState.getRoute() != null) {
+            final ZoneIdSet zoneSet = options.getZoneIdSet();
+            if(zoneSet.getTicketIds()!=null && nextState.getRoute() != null) {
                 final GraphPath path = new GraphPath(nextState, false);
-                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);
-                
+                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);                
                 if (fareService != null) {
                     Fare fare = fareService.getCost(path);
-                    ZoneIdSet allowedZones = options.getZoneIdSet();
                     if(fare != null) {
                         for(FareComponent fc:fare.getDetails(FareType.regular)) {
-                            if(!allowedZones.isAllowed(fc.fareId.toString())) {
+                            if(!zoneSet.isAllowed(fc.fareId.toString())) {
                                 return null;
                             }              
                         }
