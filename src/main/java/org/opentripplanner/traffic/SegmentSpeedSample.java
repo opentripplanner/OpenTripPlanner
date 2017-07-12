@@ -128,10 +128,14 @@ public class SegmentSpeedSample implements Serializable {
     /** create a speed sample using a function */
     public SegmentSpeedSample(double averageSpeed, double[] hourBins) {
         this.average = encodeSpeed(averageSpeed);
-        this.hourBins = new short[hourBins.length];
-
-        for (int i = 0; i < hourBins.length; i++) {
-            this.hourBins[i] = Double.isNaN(hourBins[i]) ? this.average : encodeSpeed(hourBins[i]);
+        if (hourBins != null){
+	        this.hourBins = new short[hourBins.length];
+	
+	        for (int i = 0; i < hourBins.length; i++) {
+	            this.hourBins[i] = Double.isNaN(hourBins[i]) ? this.average : encodeSpeed(hourBins[i]);
+	        }
+        }else{
+           this.hourBins = null;
         }
     }
 }
