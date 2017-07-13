@@ -31,6 +31,7 @@ public class TripTimeShort {
     public AgencyAndId tripId;
     public String blockId;
     public String headsign;
+    public int continuousStops;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -50,6 +51,7 @@ public class TripTimeShort {
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);
+        continuousStops    = tt.getContinuousStops(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {

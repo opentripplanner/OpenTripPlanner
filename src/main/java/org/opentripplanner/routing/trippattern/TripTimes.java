@@ -108,6 +108,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     private final int[] stopSequences;
 
+    private final int[] continuousStops;
+
     /**
      * The real-time state of this TripTimes.
      */
@@ -126,6 +128,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
+        final int[] continuousStops = new int[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
@@ -135,6 +138,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             arrivals[s] = st.getArrivalTime() - timeShift;
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
+            continuousStops[s] = st.getContinuousStops();
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -146,6 +150,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+        this.continuousStops = deduplicator.deduplicateIntArray(continuousStops);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -161,6 +166,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
+        this.continuousStops = object.continuousStops;
     }
 
     /**
@@ -283,6 +289,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     public void setRealTimeState(final RealTimeState realTimeState) {
         this.realTimeState = realTimeState;
+    }
+
+    /** @return the difference between the scheduled and actual arrival times at this stop. */
+    public int getContinuousStops(final int stop) {
+        return continuousStops[stop];
     }
 
     /** Used in debugging / dumping times. */
