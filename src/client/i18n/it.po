@@ -771,7 +771,7 @@ msgstr "ovest"
 #: src/client/js/otp/util/Itin.js:118
 #, fuzzy
 msgid "northwest"
-msgstr "nod-ovest"
+msgstr "nord-ovest"
 
 #. depart at street name/corner of x y etc. (First instruction in
 #. itinerary)
@@ -823,11 +823,11 @@ msgstr "ascensore"
 
 #: src/client/js/otp/util/Itin.js:152
 msgid "U-turn left"
-msgstr "inversione di marcia"
+msgstr "inversione di marcia a sinistra"
 
 #: src/client/js/otp/util/Itin.js:153
 msgid "U-turn right"
-msgstr "inversione di marcia"
+msgstr "inversione di marcia a destra"
 
 #. Walk distance to place (itinerary header)
 #: src/client/js/otp/util/Itin.js:177
@@ -864,7 +864,7 @@ msgstr "treno"
 #: src/client/js/otp/util/Itin.js:187
 #, fuzzy
 msgid "Ferry"
-msgstr "Ferry"
+msgstr "Traghetto"
 
 #. Tram, Streetcar, Light rail. Any light rail or street
 #. level system within a metropolitan area.
@@ -894,12 +894,12 @@ msgstr "tram"
 #. WALK/CYCLE distance to [Bicycle rental station]
 #: src/client/js/otp/util/Itin.js:208
 msgid "Bicycle rental station"
-msgstr ""
+msgstr "Stazione di affitto bici"
 
 #. WALK/CYCLE distance to [Bicycle rental] {name}
 #: src/client/js/otp/util/Itin.js:210
 msgid "Bicycle rental"
-msgstr ""
+msgstr "Affitto bici"
 
 #: src/client/js/otp/util/Itin.js:252
 #, python-format
