@@ -14,15 +14,16 @@
 package org.opentripplanner.common.geometry;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.geometry.jts.JTS;
-import org.geotools.math.Line;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
@@ -215,5 +216,34 @@ public class GeometryUtils {
             coords[i++] = new Coordinate(p.getLatitude(), p.getLongitude());
         }
         return coords;
+    }
+
+    public static Geometry shiftLineByPerpendicularVector(LineString line, double distance) {
+        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
+        Coordinate[] coords = new Coordinate[line.getNumPoints()];
+        double angle = 0;
+        int coeffecient = distance < 0 ? -1 : 1;
+        distance = Math.abs(distance);
+        try {
+            for (int i = 0; i < line.getNumPoints(); i++) {
+                Coordinate p0 = line.getCoordinateN(i);
+                calculator.setStartingPosition(JTS.toDirectPosition(p0, WGS84_XY));
+                if (i < line.getNumPoints() - 1) {
+                    Coordinate p1 = line.getCoordinateN(i + 1);
+                    calculator.setDestinationPosition(JTS.toDirectPosition(p1, WGS84_XY));
+                    angle = calculator.getAzimuth() + (coeffecient) * 90d;
+                    while (angle >= 180d)
+                        angle -= 360d;
+                    while (angle <= -180d)
+                        angle += 360d;
+                }
+                calculator.setDirection(angle, distance);
+                DirectPosition pos = calculator.getDestinationPosition();
+                coords[i] = new Coordinate(pos.getOrdinate(0), pos.getOrdinate(1));
+            }
+        } catch (TransformException tfe) {
+            throw new RuntimeException(tfe.getMessage());
+        }
+        return new LineString(new CoordinateArraySequence(coords), getGeometryFactory());
     }
 }
