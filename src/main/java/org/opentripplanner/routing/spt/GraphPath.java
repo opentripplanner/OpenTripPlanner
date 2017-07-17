@@ -70,16 +70,10 @@ public class GraphPath {
             optimize = false;
         }
 
-        if(s.isEverBoarded()){
-//            LOG.info("NORMAL");
-//            s.dumpPath();
-//            LOG.info("OPTIMIZE");
-            State s1 = s.optimize();
-//            s1.dumpPath();
-//            LOG.info("OPTIMIZE AGAIN");
-            State s2 = s1.optimize();
-//            s2.dumpPath();
-        }
+//        LOG.info("NORMAL");
+//        s.dumpPath();
+//        LOG.info("OPTIMIZED");
+//        s.optimize().dumpPath();
 
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
@@ -87,9 +81,10 @@ public class GraphPath {
         if (back) {
             lastState = optimize ? s.optimize() : s.reverse();
         } else {
-
             lastState = optimize ? s.optimize().optimize() : s;
         }
+        // DEBUG
+        // lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse
