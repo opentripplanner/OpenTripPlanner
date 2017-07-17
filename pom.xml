@@ -427,6 +427,9 @@
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
             <url>https://maven.conveyal.com/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
         <repository>
             <id>snapshots-nexus-repo</id>
