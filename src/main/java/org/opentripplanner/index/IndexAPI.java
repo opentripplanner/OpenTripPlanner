@@ -29,6 +29,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.DemandResponseServiceBean;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
@@ -580,6 +581,13 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
+    }
+
+    /** Return all demand services. */
+    @GET
+    @Path("/demandResponseServices")
+    public Response getDemandResponseServices() {
+        return Response.status(Status.OK).entity(DemandResponseServiceBean.list(index.demandResponseServicesForId.values())).build();
     }
 
     @POST

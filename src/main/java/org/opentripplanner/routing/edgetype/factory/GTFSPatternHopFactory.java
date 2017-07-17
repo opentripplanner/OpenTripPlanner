@@ -31,6 +31,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Route;
@@ -57,7 +58,6 @@ import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
 import org.opentripplanner.graph_builder.annotation.RepeatedStops;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
-import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -75,6 +75,7 @@ import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -103,6 +104,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
@@ -385,6 +387,12 @@ public class GTFSPatternHopFactory {
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
             List<StopTime> stopTimes = new ArrayList<StopTime>(_dao.getStopTimesForTrip(trip));
+
+            if (hasDemandService(stopTimes)) {
+                String areaId = stopTimes.get(0).getStartServiceAreaId();
+                List<Area> areas = _dao.getAllAreas().stream().filter(a -> a.getAreaId().equals(areaId)).collect(Collectors.toList());
+                addDemandService(graph, trip, stopTimes.get(0), stopTimes.get(1), areas);
+            }
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
@@ -1459,14 +1467,24 @@ public class GTFSPatternHopFactory {
         this.context = context;
     }
 
-
     public double getMaxStopToShapeSnapDistance() {
         return maxStopToShapeSnapDistance;
     }
-
 
     public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
         this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
+    private boolean hasDemandService(List<StopTime> stopTimes) {
+        if (stopTimes.size() != 2)
+            return false;
+        StopTime st0 = stopTimes.get(0);
+        StopTime st1 = stopTimes.get(1);
+        return st0.getStartServiceAreaId() != null
+                && st0.getStartServiceAreaId().equals(st1.getEndServiceAreaId());
+    }
+
+    private void addDemandService(Graph graph, Trip trip, StopTime st0, StopTime st1, List<Area> areas) {
+        graph.demandResponseServices.add(new DemandResponseService(trip, st0, st1, areas));
+    }
 }

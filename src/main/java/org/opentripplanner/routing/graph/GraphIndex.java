@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
@@ -54,6 +53,7 @@ import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -99,7 +99,7 @@ public class GraphIndex {
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
     public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
     public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
-    public final HashGridSpatialIndex<PatternHop> hopIndex = new HashGridSpatialIndex<>();
+    public final Map<AgencyAndId, DemandResponseService> demandResponseServicesForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -194,6 +194,10 @@ public class GraphIndex {
         LOG.info("initializing hops-for-edge map...");
         initializeHopsForEdgeMap();
 
+        LOG.info("initializing demand services....");
+        for (DemandResponseService service : graph.demandResponseServices) {
+            demandResponseServicesForId.put(service.getRoute().getId(), service);
+        }
 
         LOG.info("Done indexing graph.");
     }

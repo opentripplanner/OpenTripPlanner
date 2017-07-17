@@ -36,7 +36,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
@@ -45,6 +44,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -207,6 +207,9 @@ public class Graph implements Serializable {
 
     /** Whether to use flex modes */
     public boolean useFlexService = false;
+
+    /** Available demand-based services */
+    public List<DemandResponseService> demandResponseServices = new ArrayList<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -1078,4 +1081,5 @@ public class Graph implements Serializable {
     public long getTransitServiceEnds() {
         return transitServiceEnds;
     }
+
 }
