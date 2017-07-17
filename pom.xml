@@ -424,14 +424,6 @@
             <url>https://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
-            <id>conveyal</id>
-            <name>Conveyal Maven Repository</name>
-            <url>https://maven.conveyal.com/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>snapshots-nexus-repo</id>
             <name>Nexus Snapshots Repo</name>
             <url>http://nexus.onebusaway.org/content/repositories/snapshots/</url>
