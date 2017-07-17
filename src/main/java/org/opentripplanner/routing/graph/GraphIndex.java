@@ -190,12 +190,10 @@ public class GraphIndex {
                 new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
                         new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
                 )));
-
+        
         LOG.info("initializing hops-for-edge map...");
         initializeHopsForEdgeMap();
 
-        LOG.info("initializing edge map...");
-        initializeEdgeMap();
 
         LOG.info("Done indexing graph.");
     }
@@ -696,16 +694,6 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
-    }
-
-    private void initializeEdgeMap() {
-        for (TripPattern pattern : patternsForStop.values()) {
-            for (PatternHop hop : pattern.getPatternHops()) {
-                Geometry geometry = hop.getGeometry();
-                Envelope envelope = geometry.getEnvelopeInternal();
-                hopIndex.insert(envelope, hop);
-            }
-        }
     }
 
     private void initializeHopsForEdgeMap() {

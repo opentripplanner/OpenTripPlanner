@@ -136,7 +136,7 @@ public class GraphPathFinder {
          * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
-        if (options.modes.isTransit()) {
+        if (options.modes.isTransit() && router.graph.useFlexService) {
             // create temporary flex stops (just once even if we run multiple searches)
             new FlagStopCreationService(router.graph).initialize(options);
         }

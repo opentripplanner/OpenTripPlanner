@@ -205,6 +205,9 @@ public class Graph implements Serializable {
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
     public Double ellipsoidToGeoidDifference = 0.0;
 
+    /** Whether to use flex modes */
+    public boolean useFlexService = false;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
