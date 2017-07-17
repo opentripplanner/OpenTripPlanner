@@ -1426,13 +1426,21 @@ public class IndexGraphQLSchema {
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
                     .defaultValue(null)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
                     try {
                         final Trip trip = environment.getSource();
-                        final String argServiceDay = environment.getArgument("serviceDay");
-                        final ServiceDate serviceDate = argServiceDay != null
-                            ? ServiceDate.parseString(argServiceDay) : new ServiceDate();
+                        final String argServiceDate =
+                            environment.containsArgument("serviceDate")
+                                ? environment.getArgument("serviceDate")
+                                : environment.getArgument("serviceDay");
+                        final ServiceDate serviceDate = argServiceDate != null
+                            ? ServiceDate.parseString(argServiceDate) : new ServiceDate();
                         final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
                             index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
                         TimetableSnapshotSource timetableSnapshotSource = index.graph.timetableSnapshotSource;
@@ -1534,12 +1542,21 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
                 .dataFetcher(environment -> {
                     try {
                         BitSet services = index.servicesRunning(
-                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                            ServiceDate.parseString(
+                                environment.containsArgument("serviceDate")
+                                    ? environment.getArgument("serviceDate")
+                                    : environment.getArgument("serviceDay")
+                            )
                         );
                         return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
                             .stream()
