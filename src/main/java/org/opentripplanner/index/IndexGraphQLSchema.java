@@ -1426,13 +1426,21 @@ public class IndexGraphQLSchema {
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
                     .defaultValue(null)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
                     try {
                         final Trip trip = environment.getSource();
-                        final String argServiceDay = environment.getArgument("serviceDay");
-                        final ServiceDate serviceDate = argServiceDay != null
-                            ? ServiceDate.parseString(argServiceDay) : new ServiceDate();
+                        final String argServiceDate =
+                            environment.containsArgument("serviceDate")
+                                ? environment.getArgument("serviceDate")
+                                : environment.getArgument("serviceDay");
+                        final ServiceDate serviceDate = argServiceDate != null
+                            ? ServiceDate.parseString(argServiceDate) : new ServiceDate();
                         final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
                             index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
                         TimetableSnapshotSource timetableSnapshotSource = index.graph.timetableSnapshotSource;
@@ -1534,12 +1542,21 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
                 .dataFetcher(environment -> {
                     try {
                         BitSet services = index.servicesRunning(
-                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                            ServiceDate.parseString(
+                                environment.containsArgument("serviceDate")
+                                    ? environment.getArgument("serviceDate")
+                                    : environment.getArgument("serviceDay")
+                            )
                         );
                         return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
                             .stream()
@@ -2589,6 +2606,18 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((Place)environment.getSource()).lon)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalTime")
+                .description("The time the rider will arrive at the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLLong))
+                .dataFetcher(environment -> ((Place)environment.getSource()).arrival.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureTime")
+                .description("The time the rider will depart the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLLong))
+                .dataFetcher(environment -> ((Place)environment.getSource()).departure.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .description("The stop related to the place.")
                 .type(stopType)
@@ -2648,6 +2677,18 @@ public class IndexGraphQLSchema {
                 .description("The date and time this leg ends.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).endTime.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureDelay")
+                .description("For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg. \"scheduled time of departure at boarding stop\" = startTime - departureDelay")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).departureDelay)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalDelay")
+                .description("For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg. \"scheduled time of arrival at alighting stop\" = endTime - arrivalDelay")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).arrivalDelay)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("mode")
@@ -2722,14 +2763,26 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.tripForId.get(((Leg)environment.getSource()).tripId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceDate")
+                .description("For transit legs, the serviceDate. For non-transit legs, null.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).serviceDate)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("intermediateStops")
-                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null.")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null. Returns Stop type")
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment -> ((Leg)environment.getSource()).stop.stream()
                     .filter(place -> place.stopId != null)
                     .map(placeWithStop -> index.stopForId.get(placeWithStop.stopId))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediatePlaces")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null. Returns Place type, which can be queried eg. for departure and arrival times")
+                .type(new GraphQLList(placeType))
+                .dataFetcher(environment -> ((Leg)environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("intermediatePlace")
