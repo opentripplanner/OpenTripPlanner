@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -303,6 +304,9 @@ public class FlagStopCreationService {
         env.expandBy(radiusDeg / xscale, radiusDeg);
 
         Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(env);
+        if (edges.isEmpty()) {
+            return Collections.emptyList();
+        }
         Map<Double, List<StreetEdge>> edgeDistanceMap = new TreeMap<>();
         for(Edge edge : edges){
             if(edge instanceof StreetEdge){
