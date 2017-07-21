@@ -22,22 +22,12 @@ import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +57,7 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
-    public static final int MAX_SEARCH_RADIUS_METERS = 1000;
+    private int maxSearchRadiusMeters = 1000;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
     public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
@@ -83,6 +73,10 @@ public class SimpleStreetSplitter {
     //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
     //If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
     private final boolean destructiveSplitting;
+
+    public void setMaxSearchRadiusMeters(int radius) {
+        this.maxSearchRadiusMeters = radius;
+    }
 
     /**
      * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
@@ -149,7 +143,7 @@ public class SimpleStreetSplitter {
         // TODO: we used to use an expanding-envelope search, which is more efficient in
         // dense areas. but first let's see how inefficient this is. I suspect it's not too
         // bad and the gains in simplicity are considerable.
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(maxSearchRadiusMeters);
 
         Envelope env = new Envelope(vertex.getCoordinate());
 
