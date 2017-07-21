@@ -81,6 +81,13 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     /* PUBLIC METHODS */
 
+    public void initEdges() {
+        if (incoming == null)
+            incoming = new Edge[0];
+        if (outgoing == null)
+            outgoing = new Edge[0];
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

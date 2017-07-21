@@ -1,11 +1,6 @@
 package org.opentripplanner.standalone;
 
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.analyst.request.*;
 import org.opentripplanner.analyst.scenario.ScenarioStore;
@@ -35,12 +30,6 @@ public class Router {
     public String id;
     public Graph graph;
     public double[] timeouts = {5, 4, 2};
-
-    /**
-     *  Separate logger for incoming requests. This should be handled with a Logback logger rather than something
-     *  simple like a PrintStream because requests come in multi-threaded.
-     */
-    public Logger requestLogger = null;
 
     /* TODO The fields for "components" are slowly disappearing... maybe at some point a router will be nothing but configuration values tied to a Graph. */
 
@@ -128,7 +117,6 @@ public class Router {
 
         JsonNode requestLogFile = config.get("requestLogFile");
         if (requestLogFile != null) {
-            this.requestLogger = createLogger(requestLogFile.asText());
             LOG.info("Logging incoming requests at '{}'", requestLogFile.asText());
         } else {
             LOG.info("Incoming requests will not be logged.");
@@ -180,27 +168,4 @@ public class Router {
     public void shutdown() {
         GraphUpdaterConfigurator.shutdownGraph(this.graph);
     }
-
-    /**
-     * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this router.
-     * http://stackoverflow.com/a/17215011/778449
-     */
-    private static Logger createLogger(String file) {
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        PatternLayoutEncoder ple = new PatternLayoutEncoder();
-        ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
-        ple.setContext(lc);
-        ple.start();
-        FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-        fileAppender.setFile(file);
-        fileAppender.setEncoder(ple);
-        fileAppender.setContext(lc);
-        fileAppender.start();
-        Logger logger = (Logger) LoggerFactory.getLogger("REQ_LOG");
-        logger.addAppender(fileAppender);
-        logger.setLevel(Level.INFO);
-        logger.setAdditive(false);
-        return logger;
-    }
-
 }
