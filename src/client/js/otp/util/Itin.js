@@ -312,9 +312,10 @@ otp.util.Itin = {
      */
     getStopIdObj : function (stopId) {
       if(stopId.agencyId && stopId.id) return stopId
+      var parts = stopId.split(':')
       return {
-        'agencyId': stopId.split(':')[0],
-        'id': stopId.split(':')[1]
+        'agencyId': parts.shift(),
+        'id': parts.join(':')
       }
     }
 
