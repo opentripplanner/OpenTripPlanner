@@ -7,3 +7,4 @@
 - PROD-457: adding initEdges method to Vertex which helps reconstruct the graph after kryo deserialization
 - PROD-457: removing both logback loggers in Router (clashes with log4j forced by spark)
 - PROD-457: exposing vertex map from Graph for graph reconstruction after deserialization
+- PROD-519: adding support to SimpleStreetSplitter to set max search radius, exposing splitter from street index
