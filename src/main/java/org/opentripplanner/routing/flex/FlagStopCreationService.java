@@ -99,6 +99,8 @@ public class FlagStopCreationService {
 
             }
         };
+        gd.setSearchTerminationStrategy((o, t, state, s, opt) -> state.getWalkDistance() > opt.maxWalkDistance);
+
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
         gd.getShortestPathTree(new State(initVertex, rr));
         findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap);
