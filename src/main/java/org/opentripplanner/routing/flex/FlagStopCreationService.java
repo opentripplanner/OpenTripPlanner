@@ -28,7 +28,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPreAlightEdge;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPreBoardEdge;
@@ -53,7 +52,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * Add temporary vertices/edges for flag stops.
@@ -80,13 +78,13 @@ public class FlagStopCreationService {
     }
 
     private void streetSearch(RoutingRequest rr) {
-        Map<TripPattern, State> tripPatternStateMap = Maps.newHashMap();
+        Map<PatternHop, State> patternHopStateMap = Maps.newHashMap();
         GenericDijkstra gd = new GenericDijkstra(rr);
         gd.setHeuristic(new TrivialRemainingWeightHeuristic());
         gd.traverseVisitor = new TraverseVisitor() {
             @Override
             public void visitEdge(Edge edge, State state) {
-                addStateToTripPatternStateMap(edge, state, tripPatternStateMap);
+                addStateToPatternHopStateMap(edge, state, patternHopStateMap);
             }
 
             @Override
@@ -103,19 +101,18 @@ public class FlagStopCreationService {
 
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
         gd.getShortestPathTree(new State(initVertex, rr));
-        findFlagStopEdgesNearby(rr, initVertex, tripPatternStateMap);
+        findFlagStopEdgesNearby(rr, initVertex, patternHopStateMap);
 
-        Map<State, List<TripPattern>> stateToTripPatternsMap = new HashMap<>();
-        for(TripPattern tripPattern : tripPatternStateMap.keySet()){
-            State s = tripPatternStateMap.get(tripPattern);
-            if(!stateToTripPatternsMap.containsKey(s)){
-                stateToTripPatternsMap.put(s, new ArrayList<>());
+        Map<State, List<PatternHop>> stateToPatternHopMap = new HashMap<>();
+        for(PatternHop patternHop : patternHopStateMap.keySet()){
+            State s = patternHopStateMap.get(patternHop);
+            if(!stateToPatternHopMap.containsKey(s)){
+                stateToPatternHopMap.put(s, new ArrayList<>());
             }
-            stateToTripPatternsMap.get(s).add(tripPattern);
+            stateToPatternHopMap.get(s).add(patternHop);
         }
 
-        int i = 0;
-        for(State s : stateToTripPatternsMap.keySet()){
+        for(State s : stateToPatternHopMap.keySet()){
 
             Vertex v;
 
@@ -128,7 +125,6 @@ public class FlagStopCreationService {
             }
 
             //if nearby, wire stop to init vertex
-
             Stop flagStop = new Stop();
             flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(Math.random())));
             flagStop.setLat(v.getLat());
@@ -148,49 +144,42 @@ public class FlagStopCreationService {
                 TemporaryPreAlightEdge preAlightEdge = new TemporaryPreAlightEdge(transitStopArrive, flagTransitStop);
                 rr.rctx.temporaryEdges.add(preAlightEdge);
 
-                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)) {
+                for(PatternHop originalPatternHop : stateToPatternHopMap.get(s)) {
 
-                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
-                            .stream()
-                            .filter(e -> e.getPattern() == originalTripPattern)
-                            .filter(PatternHop::hasFlagStopService)
-                            .collect(Collectors.toList());
 
-                    for(PatternHop originalPatternHop : patternHops) {
+                    int stopIndex = originalPatternHop.getStopIndex() + 1;
 
-                        int stopIndex = originalPatternHop.getStopIndex() + 1;
+                    TemporaryPatternArriveVertex patternArriveVertex =
+                            new TemporaryPatternArriveVertex(graph, originalPatternHop.getPattern(), stopIndex, flagStop);
+                    rr.rctx.temporaryVertices.add(patternArriveVertex);
 
-                        TemporaryPatternArriveVertex patternArriveVertex =
-                                new TemporaryPatternArriveVertex(graph, originalTripPattern, stopIndex, flagStop);
-                        rr.rctx.temporaryVertices.add(patternArriveVertex);
-
-                        Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
-                        for (TemporaryPartialPatternHop reverseHop : reverseHops) {
-                            // create new shortened hop
-                            TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(rr, patternArriveVertex, flagStop);
-                            if (newHop == null || newHop.isTrivial()) {
-                                if (newHop != null)
-                                    newHop.dispose();
-                                continue;
-                            }
-                            rr.rctx.temporaryEdges.add(newHop);
-                        }
-
-                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(rr, originalPatternHop, patternArriveVertex, flagStop);
-                        if (hop.isTrivial()) {
-                            hop.dispose();
+                    Collection<TemporaryPartialPatternHop> reverseHops = findTemporaryPatternHops(rr, originalPatternHop);
+                    for (TemporaryPartialPatternHop reverseHop : reverseHops) {
+                        // create new shortened hop
+                        TemporaryPartialPatternHop newHop = reverseHop.shortenEnd(rr, patternArriveVertex, flagStop);
+                        if (newHop == null || newHop.isTrivial()) {
+                            if (newHop != null)
+                                newHop.dispose();
                             continue;
                         }
-                        rr.rctx.temporaryEdges.add(hop);
-
-                        // todo - david's code has this comment. why don't I need it?
-                        //  flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
-
-                        /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
-                        TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, stopIndex, hop);
-                        rr.rctx.temporaryEdges.add(transitBoardAlight);
+                        rr.rctx.temporaryEdges.add(newHop);
                     }
+
+                    TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.startHop(rr, originalPatternHop, patternArriveVertex, flagStop);
+                    if (hop.isTrivial()) {
+                        hop.dispose();
+                        continue;
+                    }
+                    rr.rctx.temporaryEdges.add(hop);
+
+                    // todo - david's code has this comment. why don't I need it?
+                    //  flex point far away or is very close to the beginning or end of the hop.  Leave this hop unchanged;
+
+                    /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
+                    TemporaryTransitBoardAlight transitBoardAlight =
+                            new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, stopIndex, hop);
+                    rr.rctx.temporaryEdges.add(transitBoardAlight);
+
                 }
 
             }else{
@@ -204,78 +193,56 @@ public class FlagStopCreationService {
                 TemporaryPreBoardEdge temporaryPreBoardEdge = new TemporaryPreBoardEdge(flagTransitStop, transitStopDepart);
                 rr.rctx.temporaryEdges.add(temporaryPreBoardEdge);
 
-                for(TripPattern originalTripPattern : stateToTripPatternsMap.get(s)) {
+                for(PatternHop originalPatternHop : stateToPatternHopMap.get(s)) {
 
-                    List<PatternHop> patternHops = graph.index.getHopsForEdge(s.getBackEdge())
-                            .stream()
-                            .filter(e -> e.getPattern() == originalTripPattern)
-                            .filter(PatternHop::hasFlagStopService)
-                            .collect(Collectors.toList());
+                    TemporaryPatternDepartVertex patternDepartVertex =
+                            new TemporaryPatternDepartVertex(graph, originalPatternHop.getPattern(), originalPatternHop.getStopIndex(), flagStop);
+                    rr.rctx.temporaryVertices.add(patternDepartVertex);
 
-                    for(PatternHop originalPatternHop : patternHops) {
-
-                        TemporaryPatternDepartVertex patternDepartVertex =
-                                new TemporaryPatternDepartVertex(graph, originalTripPattern, originalPatternHop.getStopIndex(), flagStop);
-                        rr.rctx.temporaryVertices.add(patternDepartVertex);
-
-                        TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(rr, originalPatternHop, patternDepartVertex, flagStop);
-                        if (hop.isTrivial()) {
-                            hop.dispose();
-                            continue;
-                        }
-                        rr.rctx.temporaryEdges.add(hop);
-
-                        /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
-                        TemporaryTransitBoardAlight transitBoardAlight =
-                                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), hop);
-                        rr.rctx.temporaryEdges.add(transitBoardAlight);
+                    TemporaryPartialPatternHop hop = TemporaryPartialPatternHop.endHop(rr, originalPatternHop, patternDepartVertex, flagStop);
+                    if (hop.isTrivial()) {
+                        hop.dispose();
+                        continue;
                     }
+                    rr.rctx.temporaryEdges.add(hop);
+
+                    /** TransitBoardAlight: Boarding constructor (TransitStopDepart, PatternStopVertex) */
+                    TemporaryTransitBoardAlight transitBoardAlight =
+                            new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, originalPatternHop.getStopIndex(), hop);
+                    rr.rctx.temporaryEdges.add(transitBoardAlight);
                 }
             }
-            i++;
         }
     }
 
-    private void addStateToTripPatternStateMap(Edge edge, State s, Map<TripPattern, State> tripPatternStateMap) {
-        Collection<TripPattern> patterns = graph.index.getPatternsForEdge(edge);
-        for(TripPattern tripPattern : patterns){
-            if(tripPatternStateMap.containsKey(tripPattern)){
-                State oldState = tripPatternStateMap.get(tripPattern);
-                if(oldState.getWeight() < s.getWeight()){
+    private void addStateToPatternHopStateMap(Edge edge, State s, Map<PatternHop, State> patternHopStateMap) {
+        Collection<PatternHop> hops = graph.index.getHopsForEdge(edge);
+        for(PatternHop hop : hops){
+            if(patternHopStateMap.containsKey(hop)){
+                State oldState = patternHopStateMap.get(hop);
+                if(oldState.getBackState().getWeight() < s.getBackState().getWeight()) {
                     continue;
                 }
             }
-            tripPatternStateMap.put(tripPattern, s);
+            patternHopStateMap.put(hop, s);
         }
     }
 
     /**
      * Find the street edges that were split at beginning of search by StreetSplitter, check whether they are served by flag stop routes.
      * This is duplicating the work done earlier by StreetSplitter, but want to minimize the number of changes introduced by flag stops.
-     * @param
-     * @return
      */
-    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<TripPattern, State> tripPatternStateMap) {
+    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<PatternHop, State> patternHopStateMap) {
         List<StreetEdge> flagStopEdges = getClosestStreetEdges(initVertex.getCoordinate());
 
        for(StreetEdge streetEdge : flagStopEdges){
            State nearbyState = new State(initVertex, rr);
            nearbyState.backEdge = streetEdge;
-           Collection<TripPattern> patterns = graph.index.getPatternsForEdge(streetEdge);
-           //todo find trippatterns for flag stop routes only
-           for(TripPattern tripPattern : patterns){
-               tripPatternStateMap.put(tripPattern, nearbyState);
+           Collection<PatternHop> hops = graph.index.getHopsForEdge(streetEdge);
+           for(PatternHop hop : hops){
+               patternHopStateMap.put(hop, nearbyState);
            }
        }
-    }
-
-    // It's possible that the edge is a very long StreetEdge whose traversal will kill our walk budget, but it's
-    // a good candidate for flex edges.
-    private void checkFlexAtLongStreetEdge(State s0, Edge e, Map<TripPattern, State> tripPatternStateMap) {
-        if (s0.getWalkDistance() + e.getDistance() >= s0.getOptions().getMaxWalkDistance()) {
-            State s1 = s0.edit(e).makeState();
-            addStateToTripPatternStateMap(e, s1, tripPatternStateMap);
-        }
     }
 
     private Collection<TemporaryPartialPatternHop> findTemporaryPatternHops(RoutingRequest options, PatternHop patternHop) {
@@ -324,12 +291,8 @@ public class FlagStopCreationService {
         List<StreetEdge> closestEdges = edgeDistanceMap.values().iterator().next();
         List<StreetEdge> ret = new ArrayList<>();
         for(StreetEdge closestEdge : closestEdges){
-            List<PatternHop> patternHops = graph.index.getHopsForEdge(closestEdge)
-                    .stream()
-                    //.filter(e -> e.getPattern() == originalTripPattern)
-                    //todo: check if these are flag stop hops
-                    .collect(Collectors.toList());
-            if(patternHops.size() > 0){
+            Collection<PatternHop> patternHops = graph.index.getHopsForEdge(closestEdge);
+            if(patternHops.size() > 0) {
                 ret.add(closestEdge);
             }
         }
