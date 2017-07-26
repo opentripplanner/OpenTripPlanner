@@ -202,6 +202,12 @@ public abstract class Edge implements Serializable {
         return null;
     }
 
+    // Allow subclasses to provide a special geometry for display purposes. Required for flag stop
+    // partial PatternHops, which have a buffer area to display.
+    public LineString getDisplayGeometry() {
+        return getGeometry();
+    }
+
     /**
      * Returns the azimuth of this edge from head to tail.
      * 

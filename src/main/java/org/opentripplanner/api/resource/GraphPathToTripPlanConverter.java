@@ -56,7 +56,7 @@ public abstract class GraphPathToTripPlanConverter {
      * Number of meters to shift boarding/alighting areas for partial hops relative to PatternHop geometry
      * Needed for flag stops UI.
      */
-    private static final double PARTIAL_HOP_OFFSET = 8;
+    private static final double PARTIAL_HOP_OFFSET = 5;
 
     /**
      * Generates a TripPlan from a set of paths
@@ -214,7 +214,7 @@ public abstract class GraphPathToTripPlanConverter {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {
-            LineString geometry = edge.getGeometry();
+            LineString geometry = edge.getDisplayGeometry();
 
             if (geometry != null) {
                 if (coordinates.size() == 0) {
@@ -705,13 +705,13 @@ public abstract class GraphPathToTripPlanConverter {
             place.boardAlightType = BoardAlightType.DEFAULT;
             if (edge instanceof PartialPatternHop) {
                 PartialPatternHop hop = (PartialPatternHop) edge;
-                double distance = (state.getOptions().driveOnRight ? 1 : -1) * PARTIAL_HOP_OFFSET;
+                boolean reverse = !state.getOptions().driveOnRight;
                 if (hop.hasBoardArea() && !endOfLeg) {
-                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getBoardArea(), distance);
+                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getBoardArea(), PARTIAL_HOP_OFFSET, reverse);
                     place.flagStopArea = PolylineEncoder.createEncodings(geom);
                 }
                 if (hop.hasAlightArea() && endOfLeg) {
-                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getAlightArea(), distance);
+                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getAlightArea(), PARTIAL_HOP_OFFSET, reverse);
                     place.flagStopArea = PolylineEncoder.createEncodings(geom);
                 }
                 place.boardAlightType = BoardAlightType.FLAG_STOP;

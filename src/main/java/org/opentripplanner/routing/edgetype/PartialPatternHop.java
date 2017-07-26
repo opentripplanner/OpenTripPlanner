@@ -35,6 +35,7 @@ public class PartialPatternHop extends PatternHop {
     private PatternHop originalHop;
     private Geometry boardArea;
     private Geometry alightArea;
+    private LineString displayGeometry;
 
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), false);
@@ -52,7 +53,8 @@ public class PartialPatternHop extends PatternHop {
         double bufferPts = buffer * pointsPerMeter;
         double start = Math.max(line.getStartIndex(), startIndex - bufferPts);
         double end = Math.min(line.getEndIndex(), endIndex + bufferPts);
-        Geometry geom = line.extractLine(start, end);
+        displayGeometry = (LineString) line.extractLine(start, end);
+        Geometry geom = line.extractLine(startIndex, endIndex);
         if (geom instanceof LineString) { // according to the javadocs, it is.
             setGeometry((LineString) geom);
         }
@@ -123,6 +125,11 @@ public class PartialPatternHop extends PatternHop {
 
     public boolean hasAlightArea() {
         return alightArea != null;
+    }
+
+    @Override
+    public LineString getDisplayGeometry() {
+        return displayGeometry;
     }
 }
 

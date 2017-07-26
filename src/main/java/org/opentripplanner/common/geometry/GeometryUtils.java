@@ -13,7 +13,15 @@
 
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
@@ -218,32 +226,62 @@ public class GeometryUtils {
         return coords;
     }
 
-    public static Geometry shiftLineByPerpendicularVector(LineString line, double distance) {
-        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
-        Coordinate[] coords = new Coordinate[line.getNumPoints()];
-        double angle = 0;
-        int coeffecient = distance < 0 ? -1 : 1;
-        distance = Math.abs(distance);
+    public static Geometry shiftLineByPerpendicularVector(LineString line, double distance, boolean reverse) {
+        int nPoints = line.getNumPoints();
+        LineSegment[] segments = new LineSegment[nPoints + 1];
+        Coordinate[] p = line.getCoordinates();
+
         try {
-            for (int i = 0; i < line.getNumPoints(); i++) {
-                Coordinate p0 = line.getCoordinateN(i);
-                calculator.setStartingPosition(JTS.toDirectPosition(p0, WGS84_XY));
-                if (i < line.getNumPoints() - 1) {
-                    Coordinate p1 = line.getCoordinateN(i + 1);
-                    calculator.setDestinationPosition(JTS.toDirectPosition(p1, WGS84_XY));
-                    angle = calculator.getAzimuth() + (coeffecient) * 90d;
-                    while (angle >= 180d)
-                        angle -= 360d;
-                    while (angle <= -180d)
-                        angle += 360d;
-                }
-                calculator.setDirection(angle, distance);
-                DirectPosition pos = calculator.getDestinationPosition();
-                coords[i] = new Coordinate(pos.getOrdinate(0), pos.getOrdinate(1));
+            segments[0] = makeLineSegment(p[0], getComplementaryAngle(p[0], p[1], reverse), distance);
+            for (int i = 0; i < nPoints - 1; i++) {
+                segments[i + 1] = makeParallelLineSegment(p[i], p[i+1], distance, reverse);
             }
+            segments[nPoints] = makeLineSegment(p[nPoints-1], getComplementaryAngle(p[nPoints-2], p[nPoints-1], reverse), distance);
         } catch (TransformException tfe) {
+            tfe.printStackTrace();
             throw new RuntimeException(tfe.getMessage());
         }
+
+        Coordinate[] coords = new Coordinate[nPoints];
+        for (int i = 0; i < nPoints; i++) {
+            coords[i] = segments[i].lineIntersection(segments[i+1]);
+        }
+
         return new LineString(new CoordinateArraySequence(coords), getGeometryFactory());
     }
+
+    private static LineSegment makeParallelLineSegment(Coordinate p0, Coordinate p1, double distance, boolean reverse) throws TransformException {
+        double angle = getComplementaryAngle(p0, p1, reverse);
+        Coordinate s0 = shiftCoordinateByAngle(p0, angle, distance);
+        Coordinate s1 = shiftCoordinateByAngle(p1, angle, distance);
+        return new LineSegment(s0, s1);
+    }
+
+    private static Coordinate shiftCoordinateByAngle(Coordinate p0, double angle, double distance) throws TransformException {
+        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
+        calculator.setStartingPosition(JTS.toDirectPosition(p0, WGS84_XY));
+        calculator.setDirection(angle, distance);
+        DirectPosition pos = calculator.getDestinationPosition();
+        return JTS.toGeometry(pos).getCoordinate();
+    }
+
+    private static LineSegment makeLineSegment(Coordinate p0, double angle, double distance)
+            throws TransformException {
+        Coordinate p1 = shiftCoordinateByAngle(p0, angle, distance);
+        return new LineSegment(p0, p1);
+    }
+
+    private static double getComplementaryAngle(Coordinate p0, Coordinate p1, boolean reverse) throws TransformException {
+        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
+        calculator.setStartingPosition(JTS.toDirectPosition(p0, WGS84_XY));
+        calculator.setDestinationPosition(JTS.toDirectPosition(p1, WGS84_XY));
+        double angle = calculator.getAzimuth();
+        angle += (reverse ? -90 : 90);
+        while (angle >= 180d)
+            angle -= 360d;
+        while (angle <= -180d)
+            angle += 360d;
+        return angle;
+    }
+
 }
