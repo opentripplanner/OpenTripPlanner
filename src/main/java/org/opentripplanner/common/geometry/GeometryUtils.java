@@ -22,7 +22,6 @@ import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
@@ -39,7 +38,9 @@ import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
@@ -244,10 +245,17 @@ public class GeometryUtils {
 
         Coordinate[] coords = new Coordinate[nPoints];
         for (int i = 0; i < nPoints; i++) {
-            coords[i] = segments[i].lineIntersection(segments[i+1]);
+            double angleDiff = Math.abs(segments[i].angle() - segments[i + 1].angle());
+            // if segments are sufficiently parallel use an endpoint
+            if (angleDiff < 0.000001) {
+                coords[i] = segments[i].getCoordinate(1);
+            } else {
+                coords[i] = segments[i].lineIntersection(segments[i + 1]);
+            }
         }
-
-        return new LineString(new CoordinateArraySequence(coords), getGeometryFactory());
+        // for safety
+        coords = Arrays.stream(coords).filter(Objects::nonNull).toArray(Coordinate[]::new);
+        return getGeometryFactory().createLineString(coords);
     }
 
     private static LineSegment makeParallelLineSegment(Coordinate p0, Coordinate p1, double distance, boolean reverse) throws TransformException {
