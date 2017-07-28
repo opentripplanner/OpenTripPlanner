@@ -38,6 +38,7 @@ import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -228,9 +229,19 @@ public class GeometryUtils {
     }
 
     public static Geometry shiftLineByPerpendicularVector(LineString line, double distance, boolean reverse) {
-        int nPoints = line.getNumPoints();
+        // restrict coordinates to line segments that are sufficiently long
+        List<Coordinate> coordList = new ArrayList<>();
+        coordList.add(line.getCoordinateN(0));
+        for (int i = 1; i < line.getNumPoints(); i++) {
+            Coordinate coord = line.getCoordinateN(i);
+            if (SphericalDistanceLibrary.fastDistance(coordList.get(i - 1), coord) > 0.01) {
+                coordList.add(coord);
+            }
+        }
+
+        Coordinate[] p = coordList.toArray(new Coordinate[0]);
+        int nPoints = p.length;
         LineSegment[] segments = new LineSegment[nPoints + 1];
-        Coordinate[] p = line.getCoordinates();
 
         try {
             segments[0] = makeLineSegment(p[0], getComplementaryAngle(p[0], p[1], reverse), distance);
@@ -243,19 +254,24 @@ public class GeometryUtils {
             throw new RuntimeException(tfe.getMessage());
         }
 
-        Coordinate[] coords = new Coordinate[nPoints];
+        List<Coordinate> coords = new ArrayList<>();
         for (int i = 0; i < nPoints; i++) {
+            Coordinate coord;
             double angleDiff = Math.abs(segments[i].angle() - segments[i + 1].angle());
             // if segments are sufficiently parallel use an endpoint
             if (angleDiff < 0.000001) {
-                coords[i] = segments[i].getCoordinate(1);
+                coord = segments[i].getCoordinate(1);
             } else {
-                coords[i] = segments[i].lineIntersection(segments[i + 1]);
+                coord = segments[i].lineIntersection(segments[i + 1]);
+            }
+            // sanity check
+            if (coord != null && SphericalDistanceLibrary.fastDistance(coord, p[i]) < (10.0 * distance)) {
+                coords.add(coord);
+            } else {
+                LOG.error("Error shifting line segment {}", line);
             }
         }
-        // for safety
-        coords = Arrays.stream(coords).filter(Objects::nonNull).toArray(Coordinate[]::new);
-        return getGeometryFactory().createLineString(coords);
+        return getGeometryFactory().createLineString(coords.toArray(new Coordinate[0]));
     }
 
     private static LineSegment makeParallelLineSegment(Coordinate p0, Coordinate p1, double distance, boolean reverse) throws TransformException {
