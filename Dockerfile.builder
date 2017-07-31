@@ -12,4 +12,4 @@ ADD src ${OTP_ROOT}/src
 add .git ${OTP_ROOT}/.git
 
 # Build OTP
-RUN MAVEN_OPTS="-Xmx4G" mvn -q package
+RUN mvn -q package
