@@ -1,5 +1,5 @@
 #!/bin/bash
-set +e
+set -e
 
 # This is run at ci, created an image that contains all the tools needed in
 # databuild
