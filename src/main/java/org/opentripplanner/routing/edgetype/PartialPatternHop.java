@@ -38,7 +38,7 @@ public class PartialPatternHop extends PatternHop {
     private LineString displayGeometry;
 
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;

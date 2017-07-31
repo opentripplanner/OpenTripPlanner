@@ -84,7 +84,7 @@ public class FlagStopCreationService {
         gd.traverseVisitor = new TraverseVisitor() {
             @Override
             public void visitEdge(Edge edge, State state) {
-                addStateToPatternHopStateMap(edge, state, patternHopStateMap);
+                addStateToPatternHopStateMap(rr, edge, state, patternHopStateMap);
             }
 
             @Override
@@ -145,7 +145,6 @@ public class FlagStopCreationService {
                 rr.rctx.temporaryEdges.add(preAlightEdge);
 
                 for(PatternHop originalPatternHop : stateToPatternHopMap.get(s)) {
-
 
                     int stopIndex = originalPatternHop.getStopIndex() + 1;
 
@@ -215,16 +214,18 @@ public class FlagStopCreationService {
         }
     }
 
-    private void addStateToPatternHopStateMap(Edge edge, State s, Map<PatternHop, State> patternHopStateMap) {
+    private void addStateToPatternHopStateMap(RoutingRequest rr, Edge edge, State s, Map<PatternHop, State> patternHopStateMap) {
         Collection<PatternHop> hops = graph.index.getHopsForEdge(edge);
-        for(PatternHop hop : hops){
-            if(patternHopStateMap.containsKey(hop)){
+        for(PatternHop hop : hops) {
+            if (patternHopStateMap.containsKey(hop)) {
                 State oldState = patternHopStateMap.get(hop);
                 if(oldState.getBackState().getWeight() < s.getBackState().getWeight()) {
                     continue;
                 }
             }
-            patternHopStateMap.put(hop, s);
+            if (hop.canRequestService(!rr.arriveBy)) {
+                patternHopStateMap.put(hop, s);
+            }
         }
     }
 
@@ -235,13 +236,15 @@ public class FlagStopCreationService {
     private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<PatternHop, State> patternHopStateMap) {
         List<StreetEdge> flagStopEdges = getClosestStreetEdges(initVertex.getCoordinate());
 
-       for(StreetEdge streetEdge : flagStopEdges){
-           State nearbyState = new State(initVertex, rr);
-           nearbyState.backEdge = streetEdge;
-           Collection<PatternHop> hops = graph.index.getHopsForEdge(streetEdge);
-           for(PatternHop hop : hops){
-               patternHopStateMap.put(hop, nearbyState);
-           }
+        for(StreetEdge streetEdge : flagStopEdges){
+            State nearbyState = new State(initVertex, rr);
+            nearbyState.backEdge = streetEdge;
+            Collection<PatternHop> hops = graph.index.getHopsForEdge(streetEdge);
+            for(PatternHop hop : hops) {
+                if (hop.canRequestService(!rr.arriveBy)) {
+                    patternHopStateMap.put(hop, nearbyState);
+                }
+            }
        }
     }
 
