@@ -33,7 +33,7 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PartialPatternHop;
+import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;

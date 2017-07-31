@@ -27,6 +27,7 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -210,7 +211,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param edges The array of input edges
      * @return The coordinates of the points on the edges
      */
-    private static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
+    public static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {
@@ -715,6 +716,9 @@ public abstract class GraphPathToTripPlanConverter {
                     place.flagStopArea = PolylineEncoder.createEncodings(geom);
                 }
                 place.boardAlightType = BoardAlightType.FLAG_STOP;
+                if ((endOfLeg && hop.isDeviatedRouteAlight()) || (!endOfLeg && hop.isDeviatedRouteBoard())) {
+                    place.boardAlightType = BoardAlightType.DEVIATED;
+                }
             }
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();

@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.flex;
 
-import org.opentripplanner.routing.edgetype.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;

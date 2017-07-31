@@ -43,11 +43,13 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private int continuousStops;
 
+    private double serviceAreaRadius;
+
     public int stopIndex;
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, double serviceAreaRadius, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
@@ -55,13 +57,14 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         if (setInPattern)
             getPattern().setPatternHop(stopIndex, this);
         this.continuousStops = continuousStops;
+        this.serviceAreaRadius = serviceAreaRadius;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops) {
-        this(from, to, begin, end, stopIndex, continuousStops, true);
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, double serviceAreaRadius) {
+        this(from, to, begin, end, stopIndex, continuousStops, serviceAreaRadius, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 0);
+        this(from, to, begin, end, stopIndex, 0, 0d);
     }
 
     // made more accurate
@@ -218,4 +221,8 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return continuousStops > 0;
     }
 
+    // TODO fix hasFlagStopService usage
+    public double getServiceAreaRadius() {
+        return serviceAreaRadius;
+    }
 }

@@ -27,7 +27,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.flex.FlagStopCreationService;
+import org.opentripplanner.routing.flex.DeviatedRouteGraphModifier;
+import org.opentripplanner.routing.flex.FlagStopGraphModifier;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -137,8 +138,13 @@ public class GraphPathFinder {
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         if (options.modes.isTransit() && router.graph.useFlexService) {
-            // create temporary flex stops (just once even if we run multiple searches)
-            new FlagStopCreationService(router.graph).initialize(options);
+            // create temporary flex stops/hops (just once even if we run multiple searches)
+            FlagStopGraphModifier svc1 = new FlagStopGraphModifier(router.graph);
+            DeviatedRouteGraphModifier svc2 = new DeviatedRouteGraphModifier(router.graph);
+            svc1.createForwardHops(options);
+            svc2.createForwardHops(options);
+            svc1.createBackwardHops(options);
+            svc2.createBackwardHops(options);
         }
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");

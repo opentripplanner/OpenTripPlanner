@@ -17,7 +17,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -56,7 +55,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
         double adjustment = boarding ? startIndex : -1 * (1 - endIndex);
         RoutingRequest options = s0.getOptions();
         Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, adjustment);
+        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, adjustment, hop.getStartVehicleTime(), hop.getEndVehicleTime());
         return tripTimes;
     }
 
@@ -64,19 +63,19 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
         int stopIndex = getStopIndex();
         if (boarding) {
-            // we need to fudge this by two seconds so that we can optimize later on.
             int offset = (int) Math.round(startIndex * (tripTimes.getRunningTime(stopIndex)));
-            return  (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + offset) - s0.getTimeSeconds());
+            return  (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + offset) - s0.getTimeSeconds()) - hop.getStartVehicleTime();
         }
         else {
             int offset = (int) Math.round((1-endIndex) * (tripTimes.getRunningTime(stopIndex - 1)));
-            return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) - offset));
+            return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) - offset)) + hop.getEndVehicleTime();
         }
     }
 
     @Override
     public long getPenaltyWeight(State s0, RoutingRequest options, Trip trip) {
-        return super.getPenaltyWeight(s0, options, trip) + options.flagStopExtraPenalty;
+        boolean deviatedRoute = (boarding && hop.isDeviatedRouteBoard()) || (!boarding && hop.isDeviatedRouteAlight());
+        return super.getPenaltyWeight(s0, options, trip) + (deviatedRoute ? options.deviatedRouteExtraPenalty : options.flagStopExtraPenalty);
     }
 
     @Override

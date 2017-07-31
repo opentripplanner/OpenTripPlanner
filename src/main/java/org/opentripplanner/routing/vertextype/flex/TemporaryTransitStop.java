@@ -15,13 +15,21 @@ package org.opentripplanner.routing.vertextype.flex;
 import com.google.common.collect.Iterables;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 public class TemporaryTransitStop extends TransitStop implements TemporaryVertex {
-    public TemporaryTransitStop(Graph graph, Stop stop) {
+
+    // stop is *at* a street vertex
+    private StreetVertex streetVertex;
+
+    public TemporaryTransitStop(Graph graph, Stop stop, StreetVertex streetVertex) {
         super(graph, stop);
+        this.streetVertex = streetVertex;
     }
 
     @Override
@@ -35,4 +43,9 @@ public class TemporaryTransitStop extends TransitStop implements TemporaryVertex
             ((TemporaryEdge) temp).dispose();
         }
     }
+
+    public StreetVertex getStreetVertex() {
+        return streetVertex;
+    }
+
 }

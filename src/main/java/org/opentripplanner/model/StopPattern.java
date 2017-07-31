@@ -52,6 +52,7 @@ public class StopPattern implements Serializable {
     public final int[]  pickups;
     public final int[]  dropoffs;
     public final int[] continuousStops;
+    public final double[] serviceAreaRadius;
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
@@ -92,12 +93,14 @@ public class StopPattern implements Serializable {
         pickups   = new int[size];
         dropoffs  = new int[size];
         continuousStops = new int[size];
+        serviceAreaRadius = new double[size];
     }
 
     /** Assumes that stopTimes are already sorted by time. */
     public StopPattern (List<StopTime> stopTimes) {
         this (stopTimes.size());
         if (size == 0) return;
+        double lastServiceAreaRadius = 0;
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
@@ -111,6 +114,16 @@ public class StopPattern implements Serializable {
                 continuousStops[i] = stopTime.getContinuousStops() == -1 ? 0 : stopTime.getContinuousStops();
             } else {
                 continuousStops[i] = stopTime.getContinuousStops() == -1 ? continuousStops[i-1] : stopTime.getContinuousStops();
+            }
+
+            if (stopTime.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                lastServiceAreaRadius = stopTime.getStartServiceAreaRadius();
+            }
+
+            serviceAreaRadius[i] = lastServiceAreaRadius;
+
+            if (stopTime.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                lastServiceAreaRadius = 0;
             }
         }
         /*
@@ -156,6 +169,7 @@ public class StopPattern implements Serializable {
             hasher.putInt(pickups[hop]);
             hasher.putInt(dropoffs[hop + 1]);
             hasher.putInt(continuousStops[hop]);
+            hasher.putDouble(serviceAreaRadius[hop]);
         }
         return hasher.hash();
     }

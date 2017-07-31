@@ -11,15 +11,19 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.edgetype.flex;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -37,32 +41,86 @@ public class PartialPatternHop extends PatternHop {
     private Geometry alightArea;
     private LineString displayGeometry;
 
+    // if we have this, it's a deviated-route hop
+    private int startVehicleTime = 0;
+    private int endVehicleTime = 0;
+    private LineString startGeometry;
+    private LineString endGeometry;
+
+    // constructor for flag stops
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), hop.getServiceAreaRadius(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
         this.originalHop = hop;
         this.originalHopLength = line.getEndIndex();
-        setGeometry(hop, line, buffer);
+        setGeometry(hop, line, buffer, buffer);
     }
 
-    private void setGeometry(PatternHop hop, LengthIndexedLine line, double buffer) {
+    // constructor for deviated-route service
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
+                             LineString startGeometry, int startVehicleTime, LineString endGeometry, int endVehicleTime, double buffer) {
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), hop.getServiceAreaRadius(), false);
+
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.percentageOfHop = (this.endIndex - this.startIndex) / line.getEndIndex();
+        this.originalHop = hop;
+        this.originalHopLength = line.getEndIndex();
+        this.startVehicleTime = startVehicleTime;
+        this.endVehicleTime = endVehicleTime;
+        this.startGeometry = startGeometry;
+        this.endGeometry = endGeometry;
+
+        // Only area on the route will be part of display geometry.
+        boolean flagStopBoard = startIndex > 0 && startVehicleTime == 0;
+        boolean flagStopAlight = endIndex < line.getEndIndex() && endVehicleTime == 0;
+        setGeometry(hop, line, flagStopBoard ? buffer : 0, flagStopAlight ? buffer : 0);
+
+        LineString transitGeometry = (LineString) line.extractLine(startIndex, endIndex);
+        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+        if (startGeometry != null) {
+            coordinates.extend(startGeometry.getCoordinates());
+        }
+        coordinates.extend(transitGeometry.getCoordinates());
+        if (endGeometry != null) {
+            coordinates.extend(endGeometry.getCoordinates());
+        }
+        LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+        setGeometry(geometry);
+    }
+
+    public boolean isDeviatedRouteService() {
+        return startVehicleTime > 0 || endVehicleTime > 0;
+    }
+
+    public boolean isDeviatedRouteBoard() {
+        return startVehicleTime > 0;
+    }
+
+    public boolean isDeviatedRouteAlight() {
+        return endVehicleTime > 0;
+    }
+
+    private void setGeometry(PatternHop hop, LengthIndexedLine line, double boardBuffer, double alightBuffer) {
         double pointsPerMeter =  (line.getEndIndex() - line.getStartIndex()) / SphericalDistanceLibrary.fastLength(hop.getGeometry());
-        double bufferPts = buffer * pointsPerMeter;
-        double start = Math.max(line.getStartIndex(), startIndex - bufferPts);
-        double end = Math.min(line.getEndIndex(), endIndex + bufferPts);
+        double boardBufferPts = boardBuffer * pointsPerMeter;
+        double alightBufferPts = alightBuffer * pointsPerMeter;
+        double start = Math.max(line.getStartIndex(), startIndex - boardBufferPts);
+        double end = Math.min(line.getEndIndex(), endIndex + alightBufferPts);
         displayGeometry = (LineString) line.extractLine(start, end);
         Geometry geom = line.extractLine(startIndex, endIndex);
         if (geom instanceof LineString) { // according to the javadocs, it is.
             setGeometry((LineString) geom);
         }
-        if (startIndex > line.getStartIndex() && buffer > 0) {
-            boardArea = line.extractLine(start, Math.min(startIndex + bufferPts, end));
+        if (startIndex > line.getStartIndex() && boardBuffer > 0) {
+            boardArea = line.extractLine(start, Math.min(startIndex + boardBufferPts, end));
         }
-        if (endIndex < line.getEndIndex() && buffer > 0) {
-            alightArea = line.extractLine(Math.max(endIndex - bufferPts, start), end);
+        if (endIndex < line.getEndIndex() && alightBuffer > 0) {
+            alightArea = line.extractLine(Math.max(endIndex - alightBufferPts, start), end);
         }
     }
 
@@ -79,12 +137,12 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return percentageOfHop * super.timeLowerBound(options);
+        return (percentageOfHop * super.timeLowerBound(options)) + startVehicleTime + endVehicleTime;
     }
 
     @Override
     public int getRunningTime(State s0) {
-        return (int) Math.round(percentageOfHop * super.getRunningTime(s0));
+        return (int) Math.round(percentageOfHop * super.getRunningTime(s0)) + startVehicleTime + endVehicleTime;
     }
 
     public boolean isOriginalHop(PatternHop hop) {
@@ -125,6 +183,22 @@ public class PartialPatternHop extends PatternHop {
 
     public boolean hasAlightArea() {
         return alightArea != null;
+    }
+
+    public int getStartVehicleTime() {
+        return startVehicleTime;
+    }
+
+    public int getEndVehicleTime() {
+        return endVehicleTime;
+    }
+
+    public LineString getStartGeometry() {
+        return startGeometry;
+    }
+
+    public LineString getEndGeometry() {
+        return endGeometry;
     }
 
     @Override

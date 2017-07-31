@@ -379,6 +379,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int flagStopExtraPenalty = 90;
 
     /**
+     * Extra penalty added for deviated-route boarding/alighting
+     */
+    public int deviatedRouteExtraPenalty = 180;
+
+    /**
      * Size of flag stop buffer in UI
      */
     public double flagStopBufferSize;
