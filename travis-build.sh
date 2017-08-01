@@ -15,7 +15,7 @@ DOCKER_IMAGE_COMMIT=$DOCKER_IMAGE:$DOCKER_TAG
 DOCKER_IMAGE_LATEST=$DOCKER_IMAGE:latest
 DOCKER_IMAGE_PROD=$DOCKER_IMAGE:prod
 
-if [ -z $TRAVIS_TAG ]
+if [ -z $TRAVIS_TAG ]; then
   # Build image
   echo Building OTP 
   docker build --tag="$ORG/$DOCKER_IMAGE:builder" -f Dockerfile.builder .
@@ -26,7 +26,7 @@ fi
 
 if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
   docker login -u $DOCKER_USER -p $DOCKER_AUTH
-  if [[ -n $TRAVIS_TAG ]]
+  if [[ -n $TRAVIS_TAG ]]; then
     echo "Pushing prod image"
     docker pull $DOCKER_IMAGE_COMMIT
     docker tag $DOCKER_IMAGE_COMMIT $DOCKER_IMAGE_PROD
