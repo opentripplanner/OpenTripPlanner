@@ -1437,6 +1437,7 @@ public class IndexGraphQLSchema {
                         final Trip trip = environment.getSource();
                         final String argServiceDate =
                             environment.containsArgument("serviceDate")
+                                && environment.getArgument("serviceDate") != null
                                 ? environment.getArgument("serviceDate")
                                 : environment.getArgument("serviceDay");
                         final ServiceDate serviceDate = argServiceDate != null
@@ -1554,6 +1555,7 @@ public class IndexGraphQLSchema {
                         BitSet services = index.servicesRunning(
                             ServiceDate.parseString(
                                 environment.containsArgument("serviceDate")
+                                    && environment.getArgument("serviceDate") != null
                                     ? environment.getArgument("serviceDate")
                                     : environment.getArgument("serviceDay")
                             )
