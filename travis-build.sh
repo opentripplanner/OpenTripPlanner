@@ -9,24 +9,34 @@ set -e
 #DOCKER_AUTH
 
 ORG=${ORG:-hsldevcom}
-DOCKER_TAG=${TRAVIS_BUILD_ID:-latest}
+DOCKER_TAG=${TRAVIS_COMMIT:-latest}
 DOCKER_IMAGE=$ORG/opentripplanner
-DOCKER_IMAGE_LATEST=$ORG/opentripplanner:latest
+DOCKER_IMAGE_COMMIT=$DOCKER_IMAGE:$DOCKER_TAG
+DOCKER_IMAGE_LATEST=$DOCKER_IMAGE:latest
+DOCKER_IMAGE_PROD=$DOCKER_IMAGE:prod
 
-echo Building otp: $DOCKER_IMAGE
-
-# Build image
-docker build --tag="$ORG/$DOCKER_IMAGE:builder" -f Dockerfile.builder .
-mkdir export
-docker run --rm --entrypoint tar "$ORG/$DOCKER_IMAGE:builder" -c target|tar x -C ./
-
-docker build --tag="$ORG/$DOCKER_IMAGE:$DOCKER_TAG" -f Dockerfile .
+if [ -z $TRAVIS_TAG ]
+  # Build image
+  echo Building OTP 
+  docker build --tag="$ORG/$DOCKER_IMAGE:builder" -f Dockerfile.builder .
+  mkdir export
+  docker run --rm --entrypoint tar "$ORG/$DOCKER_IMAGE:builder" -c target|tar x -C ./
+  docker build --tag="$DOCKER_IMAGE_COMMIT" -f Dockerfile .
+fi
 
 if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
   docker login -u $DOCKER_USER -p $DOCKER_AUTH
-  docker push $DOCKER_IMAGE:$DOCKER_TAG
-  docker tag $DOCKER_IMAGE $DOCKER_IMAGE_LATEST
-  docker push $DOCKER_IMAGE_LATEST
+  if [[ -n $TRAVIS_TAG ]]
+    echo "Pushing prod image"
+    docker pull $DOCKER_IMAGE_COMMIT
+    docker tag $DOCKER_IMAGE_COMMIT $DOCKER_IMAGE_PROD
+    # remove safety first! docker push $DOCKER_IMAGE_PRODT
+  else 
+    echo "Pushing latest image"
+    docker push $DOCKER_IMAGE_COMMIT
+    docker tag $DOCKER_IMAGE_COMMIT $DOCKER_IMAGE_LATEST
+    docker push $DOCKER_IMAGE_LATEST
+  fi
 fi
 
 echo Build completed
