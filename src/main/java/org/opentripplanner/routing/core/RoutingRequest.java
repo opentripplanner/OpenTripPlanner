@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -150,6 +151,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double bikeSpeed;
 
     public double carSpeed;
+
+    private ZoneIdSet zones = new ZoneIdSet();
 
     public Locale locale = new Locale("en", "US");
 
@@ -1298,5 +1301,17 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    /**
+     * Set allowed fare zones
+     * @param split
+     */
+    public void setZoneIdSet(ZoneIdSet zones) {
+        this.zones = zones; 
+    }
+    
+    public ZoneIdSet getZoneIdSet() {
+        return zones;
     }
 }

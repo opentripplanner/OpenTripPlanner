@@ -1,30 +1,23 @@
 package org.opentripplanner.index;
 
-import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import graphql.Scalars;
-import graphql.relay.Relay;
-import graphql.relay.SimpleListConnection;
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingEnvironmentImpl;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLType;
-import graphql.schema.GraphQLTypeReference;
-import graphql.schema.PropertyDataFetcher;
-import graphql.schema.TypeResolver;
+import static java.util.Collections.emptyList;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -55,6 +48,7 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -71,14 +65,38 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.collect.ImmutableMap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 
-import static java.util.Collections.emptyList;
+import graphql.Scalars;
+import graphql.relay.Relay;
+import graphql.relay.SimpleListConnection;
+import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingEnvironmentImpl;
+import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectField;
+import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLType;
+import graphql.schema.GraphQLTypeReference;
+import graphql.schema.PropertyDataFetcher;
+import graphql.schema.TypeResolver;
 
 public class IndexGraphQLSchema {
+    
+    public static String experimental(String message) {
+        return String.format("!!This api is experimental and might change without further notice!!\n %s", message); 
+    }
 
     public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
         .name("LocationType")
@@ -168,6 +186,8 @@ public class IndexGraphQLSchema {
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
+    
+    public GraphQLOutputType ticketType = new GraphQLTypeReference("TicketType");
 
     public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
 
@@ -303,16 +323,6 @@ public class IndexGraphQLSchema {
             }
         }
         return null;
-    }
-
-    private List<Agency> getAllAgencies(GraphIndex index) {
-        //xxx what if there are duplciate agency ids?
-        //now we return the first
-        ArrayList<Agency> agencies = new ArrayList<Agency>();
-        for (Map<String, Agency> feedAgencies : index.agenciesForFeedId.values()) {
-            agencies.addAll(feedAgencies.values());
-        }
-        return agencies;
     }
 
     @SuppressWarnings("unchecked")
@@ -451,68 +461,68 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("wheelchair")
-                .description("Whether the trip must be wheelchair accessible.")
+                .description("Whether the trip must be wheelchair accessible. Default value: false")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("numItineraries")
-                .description("The maximum number of itineraries to return.")
+                .description("The maximum number of itineraries to return. Default value: 3.")
                 .defaultValue(3)
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("maxWalkDistance")
-                .description("The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.")
+                .description("The maximum distance (in meters) the user is willing to walk. Defaults  to unlimited (Double.MAX_VALUE)")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("maxPreTransitTime")
-                .description("The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride). Defaults to unlimited.")
+                .description("The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride). Default value: 1800.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("walkReluctance")
-                .description("A multiplier for how bad walking is, compared to being in transit for equal lengths of time. Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept of not wanting to walk too much without asking for totally ridiculous itineraries, but this observation should in no way be taken as scientific or definitive. Your mileage may vary.")
+                .description("A multiplier for how bad walking is, compared to being in transit for equal lengths of time.Empirically, values between 10 and 20 seem to correspond well to the concept of not wanting to walk too much without asking for totally ridiculous itineraries, but this observation should in no way be taken as scientific or definitive. Your mileage may vary. Default value: 2.0 ")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("walkOnStreetReluctance")
-                .description("How much more reluctant is the user to walk on streets with car traffic allowed")
+                .description("How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("waitReluctance")
-                .description("How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle time as the same. It may be tempting to set this higher than walkReluctance (as studies often find this kind of preferences among riders) but the planner will take this literally and walk down a transit line to avoid waiting at a stop. This used to be set less than 1 (0.95) which would make waiting offboard preferable to waiting onboard in an interlined trip. That is also undesirable. If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.")
+                .description("How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle time as the same. It may be tempting to set this higher than walkReluctance (as studies often find this kind of preferences among riders) but the planner will take this literally and walk down a transit line to avoid waiting at a stop. This used to be set less than 1 (0.95) which would make waiting offboard preferable to waiting onboard in an interlined trip. That is also undesirable. If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear. Default value: 1.0.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("waitAtBeginningFactor")
-                .description("How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)")
+                .description("How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding). Default value: 0.4.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("walkSpeed")
-                .description("max walk speed along streets, in meters per second")
+                .description("Max walk speed along streets, in meters per second Default value: 1.33.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("bikeSpeed")
-                .description("max bike speed along streets, in meters per second")
+                .description("Max bike speed along streets, in meters per second. default value: 5.0.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("bikeSwitchTime")
-                .description("Time to get on and off your own bike")
+                .description("Time to get on and off your own bike, in seconds. Default Value: 0")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("bikeSwitchCost")
-                .description("Cost of getting on and off your own bike")
+                .description("Cost of getting on and off your own bike. Default value: 0")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("optimize")
-                .description("The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time.")
+                .description("The set of characteristics ( QUICK, SAFE, FLAT, GREENWAYS, TRIANGLE, TRANSFERS) that the user wants to optimize for . Default value: QUICK")
                 .type(optimizeTypeEnum)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -522,7 +532,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("arriveBy")
-                .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
+                .description("Whether the trip should depart at dateTime (false), or arrive at dateTime (true). Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -542,12 +552,12 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("walkBoardCost")
-                .description("This prevents unnecessary transfers by adding a cost for boarding a vehicle.")
+                .description("This prevents unnecessary transfers by adding a cost for boarding a vehicle. Default value: 600.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("bikeBoardCost")
-                .description("Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.")
+                .description("Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. Default value: 600.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -557,47 +567,47 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("transferPenalty")
-                .description("An extra penalty added on transfers (i.e. all boardings except the first one). Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived cost of using a transit vehicle, and the transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimize for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to wait until midnight, when the 4 train runs local the whole way. The actual fastest route is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.")
+                .description("An extra penalty added on transfers (i.e. all boardings except the first one). Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived cost of using a transit vehicle, and the transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimize for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to wait until midnight, when the 4 train runs local the whole way. The actual fastest route is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than optimize_transfer_penalty seconds, then that's what we'll return. Default value: 0.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("batch")
-                .description("when true, do not use goal direction or stop at the target, build a full SPT")
+                .description("When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modes")
-                .description("The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.")
+                .description("The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("allowBikeRental")
-                .description("Is bike rental allowed?")
+                .description("Is bike rental allowed? Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("boardSlack")
-                .description("Invariant: boardSlack + alightSlack <= transferSlack.")
+                .description("Invariant: boardSlack + alightSlack <= transferSlack. Default value: 0.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("alightSlack")
-                .description("Invariant: boardSlack + alightSlack <= transferSlack.")
+                .description("Invariant: boardSlack + alightSlack <= transferSlack. Default value: 0.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("minTransferTime")
-                .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another. This time is in addition to time it might take to walk between transit stops. This time should also be overridden by specific transfer timing information in transfers.txt")
+                .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another. This time is in addition to time it might take to walk between transit stops. This time should also be overridden by specific transfer timing information in transfers.txt. Default value: 0")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("nonpreferredTransferPenalty")
-                .description("Penalty for using a non-preferred transfer")
+                .description("Penalty for using a non-preferred transfer. Default value: 180.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("maxTransfers")
-                .description("Maximum number of transfers")
+                .description("Maximum number of transfers. Default value: 2.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -617,17 +627,17 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("reverseOptimizeOnTheFly")
-                .description("When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.")
+                .description("When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done. Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("ignoreRealtimeUpdates")
-                .description("When true, realtime updates are ignored during this search.")
+                .description("When true, realtime updates are ignored during this search. Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("disableRemainingWeightHeuristic")
-                .description("If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service.")
+                .description("If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service. Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -635,6 +645,11 @@ public class IndexGraphQLSchema {
                 .description("Locale for returned text")
                 .type(Scalars.GraphQLString)
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                 .name("ticketTypes")
+                 .description("Allowed ticket types")
+                 .type(Scalars.GraphQLString)
+                 .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
             .build();
 
@@ -665,6 +680,11 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     alertType.getName(), ((AlertPatch) environment.getSource()).getId()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("feed")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getFeedId())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
@@ -1406,13 +1426,22 @@ public class IndexGraphQLSchema {
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
                     .defaultValue(null)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
                     try {
                         final Trip trip = environment.getSource();
-                        final String argServiceDay = environment.getArgument("serviceDay");
-                        final ServiceDate serviceDate = argServiceDay != null
-                            ? ServiceDate.parseString(argServiceDay) : new ServiceDate();
+                        final String argServiceDate =
+                            environment.containsArgument("serviceDate")
+                                && environment.getArgument("serviceDate") != null
+                                ? environment.getArgument("serviceDate")
+                                : environment.getArgument("serviceDay");
+                        final ServiceDate serviceDate = argServiceDate != null
+                            ? ServiceDate.parseString(argServiceDate) : new ServiceDate();
                         final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
                             index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
                         TimetableSnapshotSource timetableSnapshotSource = index.graph.timetableSnapshotSource;
@@ -1514,12 +1543,22 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDay")
                     .type(Scalars.GraphQLString)
+                    .description("Deprecated, please switch to serviceDate instead")
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .type(Scalars.GraphQLString)
                     .build())
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
                 .dataFetcher(environment -> {
                     try {
                         BitSet services = index.servicesRunning(
-                            ServiceDate.parseString(environment.getArgument("serviceDay"))
+                            ServiceDate.parseString(
+                                environment.containsArgument("serviceDate")
+                                    && environment.getArgument("serviceDate") != null
+                                    ? environment.getArgument("serviceDate")
+                                    : environment.getArgument("serviceDay")
+                            )
                         );
                         return ((TripPattern) environment.getSource()).scheduledTimetable.tripTimes
                             .stream()
@@ -1817,6 +1856,30 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        ticketType = GraphQLObjectType.newObject()
+            .name("TicketType")
+            .description(experimental("Describes ticket type"))
+            .withInterface(nodeInterface)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLID))
+                .dataFetcher(environment -> relay
+                        .toGlobalId(ticketType.getName(), ((TicketType) environment.getSource()).getId()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("fareId")
+                    .type(new GraphQLNonNull(Scalars.GraphQLID))
+                    .dataFetcher(environment ->  ((TicketType) environment.getSource()).getId())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("price")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(environment -> ((TicketType) environment.getSource()).getPrice())
+                .build()
+            )
+            .build();
+            
+                
         carParkType = GraphQLObjectType.newObject()
             .name("CarPark")
             .withInterface(nodeInterface)
@@ -1974,6 +2037,13 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(agencyType))
                 .dataFetcher(environment -> new ArrayList<>(index.getAllAgencies()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("ticketTypes")
+                    .description(experimental("Return list of available ticket types."))
+                    .type(new GraphQLList(ticketType))
+                    .dataFetcher(environment -> new ArrayList<>(index.getAllTicketTypes()))
+                    .build()
+                    )
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
                 .description("Get a single agency based on agency ID")
@@ -2172,7 +2242,7 @@ public class IndexGraphQLSchema {
 
                     List<GraphIndex.PlaceAndDistance> places;
                     try {
-                        places = index.findClosestPlacesByWalking(
+                        places = new ArrayList<>(index.findClosestPlacesByWalking(
                             environment.getArgument("lat"),
                             environment.getArgument("lon"),
                             environment.getArgument("maxDistance"),
@@ -2184,9 +2254,7 @@ public class IndexGraphQLSchema {
                             filterByBikeRentalStations,
                             filterByBikeParks,
                             filterByCarParks
-                            )
-                            .stream()
-                            .collect(Collectors.toList());
+                        ));
                     } catch (VertexNotFoundException e) {
                         places = Collections.emptyList();
                     }
@@ -2382,7 +2450,20 @@ public class IndexGraphQLSchema {
                 .name("alerts")
                 .description("Get all alerts active in the graph")
                 .type(new GraphQLList(alertType))
-                .dataFetcher(dataFetchingEnvironment -> index.getAlerts())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
+                    .build())
+                .dataFetcher(environment -> environment.getArgument("feeds") != null
+                    ? index.getAlerts()
+                        .stream()
+                        .filter(alertPatch ->
+                            ((List) environment.getArgument("feeds"))
+                                .contains(alertPatch.getFeedId())
+                        )
+                        .collect(Collectors.toList())
+                    : index.getAlerts()
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceTimeRange")
@@ -2527,6 +2608,18 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((Place)environment.getSource()).lon)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalTime")
+                .description("The time the rider will arrive at the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLLong))
+                .dataFetcher(environment -> ((Place)environment.getSource()).arrival.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureTime")
+                .description("The time the rider will depart the place.")
+                .type(new GraphQLNonNull(Scalars.GraphQLLong))
+                .dataFetcher(environment -> ((Place)environment.getSource()).departure.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .description("The stop related to the place.")
                 .type(stopType)
@@ -2586,6 +2679,18 @@ public class IndexGraphQLSchema {
                 .description("The date and time this leg ends.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).endTime.getTime().getTime())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureDelay")
+                .description("For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg. \"scheduled time of departure at boarding stop\" = startTime - departureDelay")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).departureDelay)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalDelay")
+                .description("For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg. \"scheduled time of arrival at alighting stop\" = endTime - arrivalDelay")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).arrivalDelay)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("mode")
@@ -2660,14 +2765,26 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.tripForId.get(((Leg)environment.getSource()).tripId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceDate")
+                .description("For transit legs, the serviceDate. For non-transit legs, null.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((Leg)environment.getSource()).serviceDate)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("intermediateStops")
-                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null.")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null. Returns Stop type")
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment -> ((Leg)environment.getSource()).stop.stream()
                     .filter(place -> place.stopId != null)
                     .map(placeWithStop -> index.stopForId.get(placeWithStop.stopId))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("intermediatePlaces")
+                .description("For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends. For non-transit legs, null. Returns Place type, which can be queried eg. for departure and arrival times")
+                .type(new GraphQLList(placeType))
+                .dataFetcher(environment -> ((Leg)environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("intermediatePlace")

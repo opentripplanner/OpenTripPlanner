@@ -14,10 +14,11 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
-
 import java.util.Locale;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -26,13 +27,16 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.ZoneIdSet;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.vividsolutions.jts.geom.LineString;
 
 
@@ -136,7 +140,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State s0, long arrivalTimeAtStop) {
         RoutingContext rctx    = s0.getContext();
         RoutingRequest options = s0.getOptions();
-
+        
         // Forbid taking shortcuts composed of two board-alight edges in a row. Also avoids spurious leg transitions.
         if (s0.backEdge instanceof TransitBoardAlight) {
             return null;
@@ -155,16 +159,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         boolean leavingTransit = 
                 ( boarding &&  options.arriveBy) || 
                 (!boarding && !options.arriveBy); 
-
+         
         /* TODO pull on/off transit out into two functions. */
         if (leavingTransit) { 
+            
+            
             /* We are leaving transit, not as much to do. */
             // When a dwell edge has been eliminated, do not alight immediately after boarding.
             // Perhaps this should be handled by PathParser.
             if (s0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
+            
             StateEditor s1 = s0.edit(this);
+            
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -227,7 +235,26 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }            
 
             s1.setBackMode(getMode());
-            return s1.makeState();
+            final State nextState = s1.makeState();
+            final ZoneIdSet zoneSet = options.getZoneIdSet();
+            if(zoneSet.getTicketIds()!=null && nextState.getRoute() != null) {
+                final GraphPath path = new GraphPath(nextState, false);
+                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);                
+                if (fareService != null) {
+                    Fare fare = fareService.getCost(path);
+                    if(fare != null) {
+                        for(FareComponent fc:fare.getDetails(FareType.regular)) {
+                            if(!zoneSet.isAllowed(fc.fareId.toString())) {
+                                return null;
+                            }              
+                        }
+                    } else {
+                        return null;
+                    }
+                }        
+            }
+            
+            return nextState;
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
             
@@ -370,6 +397,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
+ 
         // no cost (see patternalight)
         s1.setBackMode(getMode());
         return s1.makeState();
