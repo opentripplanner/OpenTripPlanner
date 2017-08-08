@@ -202,7 +202,7 @@ public abstract class GtfsFlexGraphModifier {
         Stop flagStop = flagTransitStop.getStop();
 
         TransitStopArrive transitStopArrive;
-        if (flagTransitStop.getDegreeOut() == 0) {
+        if (flagTransitStop.arriveVertex == null) {
             TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop, flagTransitStop.getStreetVertex(), true);
             rr.rctx.temporaryEdges.add(streetTransitLink);
 
@@ -263,7 +263,7 @@ public abstract class GtfsFlexGraphModifier {
         Stop flagStop = flagTransitStop.getStop();
 
         TransitStopDepart transitStopDepart;
-        if (flagTransitStop.getDegreeIn() == 0) {
+        if (flagTransitStop.departVertex == null) {
             TemporaryStreetTransitLink streetTransitLink = new TemporaryStreetTransitLink(flagTransitStop.getStreetVertex(), flagTransitStop, true);
             rr.rctx.temporaryEdges.add(streetTransitLink);
 

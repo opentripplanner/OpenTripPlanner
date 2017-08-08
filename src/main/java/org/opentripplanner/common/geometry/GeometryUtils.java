@@ -234,7 +234,7 @@ public class GeometryUtils {
         coordList.add(line.getCoordinateN(0));
         for (int i = 1; i < line.getNumPoints(); i++) {
             Coordinate coord = line.getCoordinateN(i);
-            if (SphericalDistanceLibrary.fastDistance(coordList.get(i - 1), coord) > 0.01) {
+            if (SphericalDistanceLibrary.fastDistance(coordList.get(coordList.size() - 1), coord) > 0.01) {
                 coordList.add(coord);
             }
         }

@@ -24,11 +24,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.flex.TemporaryPatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -37,6 +35,8 @@ import java.util.Locale;
  */
 public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge {
 
+    private static final long serialVersionUID = 2L;
+
     private enum RequestStops {
         NONE, PICKUP, DROPOFF, BOTH;
         private static RequestStops fromGtfs(int continuousPickup, int continuousDropoff) {
@@ -44,7 +44,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
                 return BOTH;
             else if (continuousDropoff > 0)
                 return DROPOFF;
-            else if (continuousDropoff > 0)
+            else if (continuousPickup > 0)
                 return PICKUP;
             return NONE;
         }
@@ -55,8 +55,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             return this.equals(DROPOFF) || this.equals(BOTH);
         }
     }
-
-    private static final long serialVersionUID = 1L;
 
     private Stop begin, end;
 
@@ -79,7 +77,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         this.serviceAreaRadius = serviceAreaRadius;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, int serviceAreaRadius) {
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, double serviceAreaRadius) {
         this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup, continuousDropoff), serviceAreaRadius, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
@@ -122,8 +120,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         }
 
         int runningTime = (int) timeLowerBound(options);
-        if(this instanceof TemporaryPatternHop)
-            runningTime = (int)Math.round(runningTime * ((TemporaryPatternHop)this).distanceRatio);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.setBackMode(getMode());
@@ -133,13 +129,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        if(this instanceof TemporaryPatternHop){
-            int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
-            double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
-            return (int) runningTime * distanceRatio;
-        }else{
-            return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
-        }
+        return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
     }
 
     @Override
@@ -160,26 +150,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         }
 
         int runningTime = getRunningTime(s0);
-
-        //TODO handle cases where both stops on the hop are flag stops
-        if(this instanceof TemporaryPatternHop && !options.reverseOptimizing){
-            double distanceRatio = ((TemporaryPatternHop)this).distanceRatio;
-            int originalRunningTime = runningTime;
-            runningTime = (int) Math.round(runningTime * distanceRatio);
-            int diff = originalRunningTime - runningTime;
-            if(s0.stateData.flagStopArrivalOffsets == null)
-                s0.stateData.flagStopArrivalOffsets = new HashMap<>();
-            if(s0.stateData.flagStopDepartureOffsets == null)
-                s0.stateData.flagStopDepartureOffsets = new HashMap<>();
-            if(this.getBeginStop().getLocationType() == 99
-                    && this.getEndStop().getLocationType() == 99)
-                throw new RuntimeException("how to handle this?");
-            if(this.getBeginStop().getLocationType() == 99)
-                s0.stateData.flagStopDepartureOffsets.put(this.getPattern().code + "|" + this.getStopIndex(), diff);
-            if(this.getEndStop().getLocationType() == 99)
-                s0.stateData.flagStopArrivalOffsets.put(this.getPattern().code + "|" + (this.getStopIndex() + 1), diff);
-        }
-
 
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
@@ -240,11 +210,14 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return !requestStops.equals(RequestStops.NONE);
     }
 
+    public boolean hasFlexService() {
+        return hasFlagStopService() || getServiceAreaRadius() > 0;
+    }
+
     public boolean canRequestService(boolean boarding) {
         return boarding ? requestStops.pickUp() : requestStops.dropOff();
     }
 
-    // TODO fix hasFlagStopService usage
     public double getServiceAreaRadius() {
         return serviceAreaRadius;
     }

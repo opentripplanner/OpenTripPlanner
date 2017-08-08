@@ -713,7 +713,7 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
-    public boolean hasFlagStopService() {
-        return Arrays.stream(patternHops).anyMatch(PatternHop::hasFlagStopService);
+    public boolean hasFlexService() {
+        return Arrays.stream(patternHops).anyMatch(PatternHop::hasFlexService);
     }
 }

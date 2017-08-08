@@ -110,10 +110,9 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
         return (StreetVertex) v;
     }
 
-    // TODO change when f0e2960e035a7 is merged
     @Override
     public boolean checkHopAllowsBoardAlight(State state, PatternHop hop, boolean boarding) {
-        return true;
+        return hop.canRequestService(boarding);
     }
 
     /**

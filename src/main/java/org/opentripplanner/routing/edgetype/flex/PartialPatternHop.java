@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.flex;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
@@ -62,7 +61,7 @@ public class PartialPatternHop extends PatternHop {
     // constructor for deviated-route service
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
                              LineString startGeometry, int startVehicleTime, LineString endGeometry, int endVehicleTime, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), hop.getServiceAreaRadius(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), false);
 
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
@@ -103,6 +102,14 @@ public class PartialPatternHop extends PatternHop {
 
     public boolean isDeviatedRouteAlight() {
         return endVehicleTime > 0;
+    }
+
+    public boolean isFlagStopBoard() {
+        return startIndex > 0 && startVehicleTime == 0;
+    }
+
+    public boolean isFlagStopAlight() {
+        return endIndex < originalHopLength && endVehicleTime == 0;
     }
 
     private void setGeometry(PatternHop hop, LengthIndexedLine line, double boardBuffer, double alightBuffer) {

@@ -715,7 +715,9 @@ public abstract class GraphPathToTripPlanConverter {
                     Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getAlightArea(), PARTIAL_HOP_OFFSET, reverse);
                     place.flagStopArea = PolylineEncoder.createEncodings(geom);
                 }
-                place.boardAlightType = BoardAlightType.FLAG_STOP;
+                if ((endOfLeg && hop.isFlagStopAlight()) || (!endOfLeg && hop.isFlagStopBoard())) {
+                    place.boardAlightType = BoardAlightType.FLAG_STOP;
+                }
                 if ((endOfLeg && hop.isDeviatedRouteAlight()) || (!endOfLeg && hop.isDeviatedRouteBoard())) {
                     place.boardAlightType = BoardAlightType.DEVIATED;
                 }
