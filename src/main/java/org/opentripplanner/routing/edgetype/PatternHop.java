@@ -37,11 +37,30 @@ import java.util.Locale;
  */
 public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge {
 
+    private enum RequestStops {
+        NONE, PICKUP, DROPOFF, BOTH;
+        private static RequestStops fromGtfs(int continuousPickup, int continuousDropoff) {
+            if (continuousDropoff > 0 && continuousPickup > 0)
+                return BOTH;
+            else if (continuousDropoff > 0)
+                return DROPOFF;
+            else if (continuousDropoff > 0)
+                return PICKUP;
+            return NONE;
+        }
+        private boolean pickUp() {
+            return this.equals(PICKUP) || this.equals(BOTH);
+        }
+        private boolean dropOff() {
+            return this.equals(DROPOFF) || this.equals(BOTH);
+        }
+    }
+
     private static final long serialVersionUID = 1L;
 
     private Stop begin, end;
 
-    private int continuousStops;
+    private RequestStops requestStops;
 
     private double serviceAreaRadius;
 
@@ -49,22 +68,22 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, double serviceAreaRadius, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestStops, double serviceAreaRadius, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
         if (setInPattern)
             getPattern().setPatternHop(stopIndex, this);
-        this.continuousStops = continuousStops;
+        this.requestStops = requestStops;
         this.serviceAreaRadius = serviceAreaRadius;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousStops, double serviceAreaRadius) {
-        this(from, to, begin, end, stopIndex, continuousStops, serviceAreaRadius, true);
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, int serviceAreaRadius) {
+        this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup, continuousDropoff), serviceAreaRadius, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 0, 0d);
+        this(from, to, begin, end, stopIndex, 0, 0, 0d);
     }
 
     // made more accurate
@@ -213,12 +232,16 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return stopIndex;
     }
 
-    public int getContinuousStops() {
-        return continuousStops;
+    public RequestStops getRequestStops() {
+        return requestStops;
     }
 
     public boolean hasFlagStopService() {
-        return continuousStops > 0;
+        return !requestStops.equals(RequestStops.NONE);
+    }
+
+    public boolean canRequestService(boolean boarding) {
+        return boarding ? requestStops.pickUp() : requestStops.dropOff();
     }
 
     // TODO fix hasFlagStopService usage

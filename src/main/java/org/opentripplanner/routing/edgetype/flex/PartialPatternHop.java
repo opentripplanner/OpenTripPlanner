@@ -49,7 +49,7 @@ public class PartialPatternHop extends PatternHop {
 
     // constructor for flag stops
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getContinuousStops(), hop.getServiceAreaRadius(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;
