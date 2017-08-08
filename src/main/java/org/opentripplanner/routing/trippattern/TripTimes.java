@@ -110,6 +110,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     private final int[] continuousStops;
 
+    private final double[] serviceAreaRadius;
+
     /**
      * The real-time state of this TripTimes.
      */
@@ -129,9 +131,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
         final int[] continuousStops = new int[nStops];
+        final double[] serviceAreaRadius = new double[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
+        double radius = 0;
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -139,6 +143,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
             continuousStops[s] = st.getContinuousStops();
+            if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                radius = st.getStartServiceAreaRadius();
+            }
+            serviceAreaRadius[s] = radius;
+            if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                radius = 0;
+            }
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -151,6 +162,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.departureTimes = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         this.continuousStops = deduplicator.deduplicateIntArray(continuousStops);
+        this.serviceAreaRadius = deduplicator.deduplicateDoubleArray(serviceAreaRadius);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -167,6 +179,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
         this.continuousStops = object.continuousStops;
+        this.serviceAreaRadius = object.serviceAreaRadius;
     }
 
     /**
@@ -291,9 +304,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.realTimeState = realTimeState;
     }
 
-    /** @return the difference between the scheduled and actual arrival times at this stop. */
+    /** Returns whether this stop allows continuous dropoff/pickup */
     public int getContinuousStops(final int stop) {
         return continuousStops[stop];
+    }
+
+    /** Returns associated dropoff/pickup radius for this stop*/
+    public double getServiceAreaRadius(final int stop) {
+        return serviceAreaRadius[stop];
     }
 
     /** Used in debugging / dumping times. */
