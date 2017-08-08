@@ -26,11 +26,11 @@ fi
 
 if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
   docker login -u $DOCKER_USER -p $DOCKER_AUTH
-  if [[ -n $TRAVIS_TAG ]]; then
-    echo "Pushing prod image"
+  if [ "$TRAVIS_TAG" ];then
+    echo "processing release $TRAVIS_TAG"
     docker pull $DOCKER_IMAGE_COMMIT
     docker tag $DOCKER_IMAGE_COMMIT $DOCKER_IMAGE_PROD
-    # remove safety first! docker push $DOCKER_IMAGE_PRODT
+    docker push $DOCKER_IMAGE_PROD
   else 
     echo "Pushing latest image"
     docker push $DOCKER_IMAGE_COMMIT
