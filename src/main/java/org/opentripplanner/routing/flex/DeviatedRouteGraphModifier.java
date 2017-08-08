@@ -36,6 +36,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
 
+/**
+ * Add temporary vertices/edges for deviated-route service.
+ */
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     private static final int MAX_DRS_SEARCH_DIST = 1600; // could be set by data
@@ -97,7 +100,6 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         return distance < hop.getServiceAreaRadius();
     }
 
-    // For deviated-route, we're going to have one temporary stop for the origin, and one for the destination.
     @Override
     public StreetVertex getLocationForTemporaryStop(State s, PatternHop hop) {
         return findFirstStreetVertex(s);

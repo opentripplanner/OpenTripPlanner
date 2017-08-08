@@ -59,7 +59,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Factor out shared code for flex stops
+ * Create temporary vertices and edges for GTFS-flex service.
  */
 public abstract class GtfsFlexGraphModifier {
 
@@ -67,43 +67,112 @@ public abstract class GtfsFlexGraphModifier {
 
     protected Graph graph;
 
+    private Map<StreetVertex, TemporaryTransitStop> temporaryTransitStopsForLocation = Maps.newHashMap();
+
     protected GtfsFlexGraphModifier(Graph graph) {
         this.graph = graph;
     }
 
     /*
-     * overall pattern - do a search according to some parameters. based on the result of that search, make stops
-     *
+     * Overall pattern - do a graph search from the origin and destination according to some
+     * parameters, in order to find nearby PatternHops and the States where they were found.
+     * Based on those PatternHops/States, make new board and alight temporary edges/vertices.
+     * Note: this was originally factored out of flag stop creation code.
      */
 
+    /**
+     * Return the mode that the graph search should be in.
+     */
     public abstract TraverseMode getMode();
 
+    /**
+     * Return the termination strategy which should be used during the graph search.
+     */
     public abstract SearchTerminationStrategy getSearchTerminationStrategy();
 
     // this the core of what's different: how the hops are created
 
-    // Given an existing pattern hop (s, t), let's say a new hop (s', t) is a START hop and a new hop (s, t') is an END hop
-
-    // start hop is a hop from the existing origin TO a new flag destination
+    /**
+     * Create a new {@link PatternHop} with a new "to" location (from the route to a new destination).
+     *
+     * @param opt Options for the graph search
+     * @param state State at which the original PatternHop was found during the graph search
+     * @param hop Original pattern hop to modify
+     * @param to New "to" location
+     * @param toStop Stop for new "to" location
+     * @return new pattern hop
+     */
     public abstract TemporaryPartialPatternHop makeHopNewTo(RoutingRequest opt, State state, PatternHop hop, PatternArriveVertex to, Stop toStop);
 
+    /**
+     * Create a new {@link PatternHop} with a new "from" location (from a new destination to the route).
+     *
+     * @param opt Options for the graph search
+     * @param state Options for the graph search
+     * @param hop Original pattern hop to modify
+     * @param from New "from" location
+     * @param fromStop Stop for new "from" location
+     * @return new pattern hop
+     */
     public abstract TemporaryPartialPatternHop makeHopNewFrom(RoutingRequest opt, State state, PatternHop hop, PatternDepartVertex from, Stop fromStop);
 
+    /**
+     * From an existing TemporaryPartialPatternHop which has a new "from" location, create a new
+     * TemporaryPartialPatternHop with the same "from" location and a new "to" location. The
+     * existence of this method implies that searches from the origin should take place prior
+     * to searches from the destination.
+     *
+     * @param opt Options for the graph search
+     * @param state ptions for the graph search
+     * @param hop Temporary pattern hop to modify
+     * @param to New "to" location
+     * @param toStop Stop for new "to" location
+     * @return new pattern hop
+     */
     public abstract TemporaryPartialPatternHop shortenEnd(RoutingRequest opt, State state, TemporaryPartialPatternHop hop, PatternStopVertex to, Stop toStop);
 
-    // true if we can add an extra stop on this hop, false otherwise
+    /**
+     * Returns true if the given hop can be boarded/alighted.
+     */
     public abstract boolean checkHopAllowsBoardAlight(State state, PatternHop hop, boolean boarding);
 
+    /**
+     * Subclasses can specify where the new temporary stop should be created, given a nearby
+     * PatternHop.
+     *
+     * @param s State at which PatternHop was found
+     * @param hop PatternHop found during graph search
+     * @return location for new stop
+     */
     public abstract StreetVertex getLocationForTemporaryStop(State s, PatternHop hop);
 
-    private Map<StreetVertex, TemporaryTransitStop> temporaryTransitStopsForLocation = Maps.newHashMap();
+    /**
+     * Subclasses can override this method to provide extra hops (not found in graph search)
+     * at which to create new vertices/edges, e.g. for flag stops where start/end vertices can be
+     * ON hop.
+     * 
+     * @param rr request for graph search
+     * @param patternHopStateMap map to insert new PatternHop/State pairs into
+     */
+    public void findExtraHops(RoutingRequest rr, Map<PatternHop, State> patternHopStateMap) {
+    }
 
+    /**
+     * Create temporary edges and vertices from the origin into the transit network.
+     *
+     * @param request request for graph search
+     */
     public void createForwardHops(RoutingRequest request) {
         RoutingRequest forward = request.clone();
         forward.setMode(getMode());
         streetSearch(forward);
     }
 
+    /**
+     * Create temporary edges and vertices from the transit network to the destination.
+     *
+     * @param request request for graph search
+     */
     public void createBackwardHops(RoutingRequest request) {
         RoutingRequest backward = request.clone();
         backward.setMode(getMode());
@@ -135,6 +204,7 @@ public abstract class GtfsFlexGraphModifier {
         return temporaryTransitStopsForLocation.get(streetVertex);
     }
 
+    // Return a reasonable name for a vertex.
     private String findName(State state, StreetVertex vertex, Locale locale) {
         I18NString unnamed = new LocalizedString("unnamedStreet", (String[]) null);
         I18NString name = vertex.getIntersectionName(locale);
@@ -146,7 +216,7 @@ public abstract class GtfsFlexGraphModifier {
                 return e.getName(locale);
             }
         }
-        if (state.backEdge instanceof StreetEdge) {
+        if (state.backEdge instanceof StreetEdge) { // this really assumes flag stops
             return state.backEdge.getName(locale);
         }
         return unnamed.toString();
@@ -180,10 +250,6 @@ public abstract class GtfsFlexGraphModifier {
                 .stream()
                 .map(e -> new Pair<>(e.getValue(), e.getKey()))
                 .collect(Collectors.toList());
-    }
-
-    // optional hook to get extra hops in there, e.g. for flag stops where start/end vertices can be ON hop.
-    public void findExtraHops(RoutingRequest rr, Map<PatternHop, State> patternHopStateMap) {
     }
 
     private TemporaryTransitStop createTemporaryTransitStop(String name, StreetVertex v, RoutingContext rctx) {
@@ -309,7 +375,6 @@ public abstract class GtfsFlexGraphModifier {
         }
     }
 
-
     private Collection<TemporaryPartialPatternHop> findTemporaryPatternHops(RoutingRequest options, PatternHop patternHop) {
         Collection<TemporaryPartialPatternHop> ret = new ArrayList<TemporaryPartialPatternHop>();
         for (TemporaryEdge e : options.rctx.temporaryEdges) {
@@ -321,6 +386,4 @@ public abstract class GtfsFlexGraphModifier {
         }
         return ret;
     }
-
-
 }

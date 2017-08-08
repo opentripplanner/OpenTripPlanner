@@ -116,6 +116,16 @@ public class Place {
     public EncodedPolylineBean flagStopArea;
 
     /**
+     * The longitude of the route geometry endpoint for a deviated-route place.
+     */
+    public Double deviatedRouteLon = null;
+
+    /**
+     * The latitude of the route geometry endpoint for a deviated-route place.
+     */
+    public Double deviatedRouteLat = null;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */

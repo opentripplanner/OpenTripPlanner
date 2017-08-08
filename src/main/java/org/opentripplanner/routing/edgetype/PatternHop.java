@@ -37,25 +37,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private static final long serialVersionUID = 2L;
 
-    private enum RequestStops {
-        NONE, PICKUP, DROPOFF, BOTH;
-        private static RequestStops fromGtfs(int continuousPickup, int continuousDropoff) {
-            if (continuousDropoff > 0 && continuousPickup > 0)
-                return BOTH;
-            else if (continuousDropoff > 0)
-                return DROPOFF;
-            else if (continuousPickup > 0)
-                return PICKUP;
-            return NONE;
-        }
-        private boolean pickUp() {
-            return this.equals(PICKUP) || this.equals(BOTH);
-        }
-        private boolean dropOff() {
-            return this.equals(DROPOFF) || this.equals(BOTH);
-        }
-    }
-
     private Stop begin, end;
 
     private RequestStops requestStops;
@@ -220,5 +201,24 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     public double getServiceAreaRadius() {
         return serviceAreaRadius;
+    }
+
+    private enum RequestStops {
+        NONE, PICKUP, DROPOFF, BOTH;
+        private static RequestStops fromGtfs(int continuousPickup, int continuousDropoff) {
+            if (continuousDropoff > 0 && continuousPickup > 0)
+                return BOTH;
+            else if (continuousDropoff > 0)
+                return DROPOFF;
+            else if (continuousPickup > 0)
+                return PICKUP;
+            return NONE;
+        }
+        private boolean pickUp() {
+            return this.equals(PICKUP) || this.equals(BOTH);
+        }
+        private boolean dropOff() {
+            return this.equals(DROPOFF) || this.equals(BOTH);
+        }
     }
 }

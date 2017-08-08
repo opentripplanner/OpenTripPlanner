@@ -47,6 +47,7 @@ public class PartialPatternHop extends PatternHop {
     private LineString endGeometry;
 
     // constructor for flag stops
+    // this could be merged into deviated-route service constructor
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
@@ -92,26 +93,6 @@ public class PartialPatternHop extends PatternHop {
         setGeometry(geometry);
     }
 
-    public boolean isDeviatedRouteService() {
-        return startVehicleTime > 0 || endVehicleTime > 0;
-    }
-
-    public boolean isDeviatedRouteBoard() {
-        return startVehicleTime > 0;
-    }
-
-    public boolean isDeviatedRouteAlight() {
-        return endVehicleTime > 0;
-    }
-
-    public boolean isFlagStopBoard() {
-        return startIndex > 0 && startVehicleTime == 0;
-    }
-
-    public boolean isFlagStopAlight() {
-        return endIndex < originalHopLength && endVehicleTime == 0;
-    }
-
     private void setGeometry(PatternHop hop, LengthIndexedLine line, double boardBuffer, double alightBuffer) {
         double pointsPerMeter =  (line.getEndIndex() - line.getStartIndex()) / SphericalDistanceLibrary.fastLength(hop.getGeometry());
         double boardBufferPts = boardBuffer * pointsPerMeter;
@@ -152,8 +133,41 @@ public class PartialPatternHop extends PatternHop {
         return (int) Math.round(percentageOfHop * super.getRunningTime(s0)) + startVehicleTime + endVehicleTime;
     }
 
+    @Override
+    public LineString getDisplayGeometry() {
+        return displayGeometry;
+    }
+
+    public boolean isDeviatedRouteService() {
+        return startVehicleTime > 0 || endVehicleTime > 0;
+    }
+
+    public boolean isDeviatedRouteBoard() {
+        return startVehicleTime > 0;
+    }
+
+    public boolean isDeviatedRouteAlight() {
+        return endVehicleTime > 0;
+    }
+
+    public boolean isFlagStopBoard() {
+        return startIndex > 0 && startVehicleTime == 0;
+    }
+
+    public boolean isFlagStopAlight() {
+        return endIndex < originalHopLength && endVehicleTime == 0;
+    }
+
     public boolean isOriginalHop(PatternHop hop) {
         return originalHop.getId() == hop.getId();
+    }
+
+    public boolean hasBoardArea() {
+        return boardArea != null;
+    }
+
+    public boolean hasAlightArea() {
+        return alightArea != null;
     }
 
     public PatternHop getOriginalHop() {
@@ -184,14 +198,6 @@ public class PartialPatternHop extends PatternHop {
         return alightArea;
     }
 
-    public boolean hasBoardArea() {
-        return boardArea != null;
-    }
-
-    public boolean hasAlightArea() {
-        return alightArea != null;
-    }
-
     public int getStartVehicleTime() {
         return startVehicleTime;
     }
@@ -208,9 +214,5 @@ public class PartialPatternHop extends PatternHop {
         return endGeometry;
     }
 
-    @Override
-    public LineString getDisplayGeometry() {
-        return displayGeometry;
-    }
 }
 
