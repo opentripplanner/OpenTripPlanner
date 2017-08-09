@@ -242,7 +242,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);                
                 if (fareService != null) {
                     Fare fare = fareService.getCost(path);
+
                     if(fare != null) {
+                        if (fare.getFare(FareType.regular).getCents() == -1) {
+                            return null;
+                        }
                         for(FareComponent fc:fare.getDetails(FareType.regular)) {
                             if(!zoneSet.isAllowed(fc.fareId.toString())) {
                                 return null;
