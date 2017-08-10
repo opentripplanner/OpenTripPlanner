@@ -176,7 +176,14 @@ public class GraphPathFinder {
             }
 
             paths.addAll(newPaths.stream()
-                    .filter(path -> path.getDuration() < options.maxHours * 60 * 60)
+                    .filter(path -> {
+                        double duration = options.useRequestedDateTimeInMaxHours
+                            ? options.arriveBy
+                                ? options.dateTime - path.getStartTime()
+                                : path.getEndTime() - options.dateTime
+                            : path.getDuration();
+                        return duration < options.maxHours * 60 * 60;
+                    })
                     .collect(Collectors.toList()));
 
             LOG.debug("we have {} paths", paths.size());

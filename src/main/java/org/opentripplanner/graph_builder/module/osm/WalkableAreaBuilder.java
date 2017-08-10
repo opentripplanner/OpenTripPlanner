@@ -126,6 +126,7 @@ public class WalkableAreaBuilder {
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
             for (Area area : group.areas) {
+
                 if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
                     continue;
                 }
@@ -147,7 +148,7 @@ public class WalkableAreaBuilder {
         }
     }
 
-    public void buildWithVisibility(AreaGroup group) {
+    public void buildWithVisibility(AreaGroup group, boolean platformEntriesLinking) {
         Set<OSMNode> startingNodes = new HashSet<OSMNode>();
         Set<Vertex> startingVertices = new HashSet<Vertex>();
         Set<Edge> edges = new HashSet<Edge>();
@@ -168,6 +169,14 @@ public class WalkableAreaBuilder {
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
             for (Area area : group.areas) {
+
+                // public transform platforms will be handled separately if platformEntriesLinking
+                // parameter is true
+                if(platformEntriesLinking
+                        && "platform".equals(area.parent.getTag("public_transport"))) {
+                    continue;
+                }
+
                 if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
                     continue;
                 }

@@ -33,9 +33,9 @@ A sample traversal permissions layer looks like the following
 * Grey dots vertices where edges are connected. If two edges are crossing w/o a vertice at the intersection point, users will not be able to go from one street to the other. But this can be valid in case of over/under pass for 
 example. If it's an error, it's usually caused by improperly connected OSM data (a shared OSM node is required). 
 
-## OpenStreetMap tagging
+## OpenStreetMap Data
 
-### Basic Permissions 
+### Tags Affecting Permissions
 
 Access tags (such as bicycle/foot = yes/no/designated) can be used to override default graph-building parameters. 
 
@@ -46,6 +46,10 @@ Both *are* allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=foo
 Finally, bicycles are *not*allowed on *highway=footway* when any of the following tags appear on a footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
+
+### Railway Platforms
+
+OTP users in Helsinki have documented their best practices for coding railway platforms in OpenStreetMap. These guidelines are available [in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
 
 ### Further information
 * [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
