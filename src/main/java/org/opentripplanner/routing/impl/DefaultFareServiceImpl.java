@@ -28,7 +28,6 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -147,6 +146,14 @@ class FareAndId {
     }
 }
 
+/** Allow a FareService to override the default mode of adding fares together for subsets of rides */
+interface FareAdditiveStrategy {
+    /**
+     * Given sets of rides and associated costs, add the costs together.
+     */
+    float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1);
+}
+
 /**
  * This fare service module handles the cases that GTFS handles within a single feed.
  * It cannot necessarily handle multi-feed graphs, because a rule-less fare attribute
@@ -162,6 +169,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
+    private FareAdditiveStrategy fareAdditiveStrategy;
+
     /** For each fare type (regular, student, etc...) the collection of rules that apply. */
     protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
@@ -171,6 +180,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     public void addFareRules(FareType fareType, Collection<FareRuleSet> fareRules) {
         fareRulesPerType.put(fareType, new ArrayList<>(fareRules));
+    }
+
+    public void setFareAdditiveStrategy(FareAdditiveStrategy fareAdditiveStrategy) {
+        this.fareAdditiveStrategy = fareAdditiveStrategy;
     }
 
     protected List<Ride> createRides(GraphPath path) {
@@ -263,7 +276,14 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 r.resultTable[j][j + i] = cost;
                 r.fareIds[j][j + i] = best.fareId;
                 for (int k = 0; k < i; k++) {
-                    float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+                    float via;
+                    if (fareAdditiveStrategy == null) {
+                        via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+                    }
+                    else {
+                        via = fareAdditiveStrategy.addFares(rides.subList(j, j + k + 1), rides.subList(j + k + 1, j + i + 1),
+                                r.resultTable[j][j + k], r.resultTable[j + k + 1][j + i]);
+                    }
                     if (r.resultTable[j][j + i] > via) {
                         r.resultTable[j][j + i] = via;
                         r.endOfComponent[j] = j + i;
