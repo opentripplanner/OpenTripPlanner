@@ -42,7 +42,7 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
             return true;
         double length = SphericalDistanceLibrary.fastLength(getGeometry());
         double parentLength = SphericalDistanceLibrary.fastLength(getOriginalHop().getGeometry());
-        return length + 50 >= parentLength;
+        return length == 0 || length + 50 >= parentLength;
     }
 
 }
