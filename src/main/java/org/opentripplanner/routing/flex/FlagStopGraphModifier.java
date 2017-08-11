@@ -106,7 +106,13 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
             v = rr.arriveBy ? s.getBackEdge().getToVertex() : s.getBackEdge().getFromVertex();
         }
 
-        // wire stop to init vertex
+        // Ensure on line
+        LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
+        double i = line.project(v.getCoordinate());
+        if (i <= line.getStartIndex() || i >= line.getEndIndex()) {
+            return null;
+        }
+
         return (StreetVertex) v;
     }
 

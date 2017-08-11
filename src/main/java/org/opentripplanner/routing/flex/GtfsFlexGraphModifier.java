@@ -185,6 +185,9 @@ public abstract class GtfsFlexGraphModifier {
             State s = p.getKey();
             PatternHop hop = p.getValue();
             TemporaryTransitStop flagTransitStop = getTemporaryStop(s, hop);
+            if (flagTransitStop == null) {
+                continue;
+            }
             if (rr.arriveBy) {
                 createHopsToTemporaryStop(rr, s, flagTransitStop, hop);
             } else {
@@ -195,6 +198,9 @@ public abstract class GtfsFlexGraphModifier {
 
     private TemporaryTransitStop getTemporaryStop(State s, PatternHop hop) {
         StreetVertex streetVertex = getLocationForTemporaryStop(s, hop);
+        if (streetVertex == null) {
+            return null;
+        }
         if (temporaryTransitStopsForLocation.get(streetVertex) == null) {
             String name = findName(s, streetVertex, s.getOptions().locale);
             TemporaryTransitStop stop = createTemporaryTransitStop(name, streetVertex, s.getContext());
