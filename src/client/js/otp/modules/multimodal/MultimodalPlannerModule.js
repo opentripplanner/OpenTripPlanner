@@ -78,6 +78,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }
         modeSelector.refreshModeControls();
 
+        this.optionsWidget.addVerticalSpace(12, true);
+        this.optionsWidget.addControl("router", new otp.widgets.tripoptions.RouterSelector(this.optionsWidget), true);
+
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
 

@@ -537,6 +537,66 @@ otp.widgets.tripoptions.ModeSelector =
 
 });
 
+//** ModeSelector **//
+
+otp.widgets.tripoptions.RouterSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+    label: 'Router',
+
+    initialize : function(tripWidget) {
+
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+
+        this.id = tripWidget.id;
+
+
+        ich['otp-tripOptions-router']({
+            label : this.label,
+            routers: this.routers,
+            widgetId : this.id
+        }).appendTo(this.$());
+
+        this.refreshRouters()
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $("#"+this.id+"-routers").change(function() {
+            console.log('hi', _this)
+            var indexApi = this_.tripWidget.module.webapp.indexApi;
+            this_.handleRouterChange(otp.config.routers[this.selectedIndex-1]);
+        });
+
+        $("#"+this.id+"-refresh-routers").click(function() {
+          this_.refreshRouters()
+        })
+    },
+
+    handleRouterChange: function (router) {
+      otp.config.restService = 'otp/routers/' + router.routerId;
+      var webapp = this.tripWidget.module.webapp;
+      webapp.map.getBoundsFromRouter()
+      webapp.indexApi.loadRoutes()
+    },
+
+    refreshRouters: function () {
+      var indexApi = this.tripWidget.module.webapp.indexApi;
+      var this_ = this;
+
+      indexApi.loadRouters(this, function() {
+        var html = ''
+        otp.config.routers.forEach((router) => {
+          html += '<option>'+router.routerId+'</option>'
+        })
+        $("#"+this.id+"-routers").html(html)
+        this_.handleRouterChange(otp.config.routers[0])
+      })
+    }
+});
+
 
 //** MaxWalkSelector **//
 

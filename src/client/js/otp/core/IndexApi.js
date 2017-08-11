@@ -41,12 +41,18 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
+    loadRouters : function (callbackTarget, callback) {
+      var this_ = this
+      $.ajax(otp.config.hostname + '/otp/routers', {
+        success: function (data) {
+          otp.config.routers = data.routerInfo
+          if(callback) callback.call(callbackTarget)
+        }
+      })
+    },
+
     loadRoutes : function(callbackTarget, callback) {
         var this_ = this;
-        if(this.routes) {
-            if(callback) callback.call(callbackTarget);
-            return;
-        }
 
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/routes';
         $.ajax(url, {
