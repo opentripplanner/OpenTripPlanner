@@ -73,9 +73,9 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     }
 
     @Override
-    public long getPenaltyWeight(State s0, RoutingRequest options, Trip trip) {
+    public long getExtraWeight(RoutingRequest options) {
         boolean deviatedRoute = (boarding && hop.isDeviatedRouteBoard()) || (!boarding && hop.isDeviatedRouteAlight());
-        return super.getPenaltyWeight(s0, options, trip) + (deviatedRoute ? options.deviatedRouteExtraPenalty : options.flagStopExtraPenalty);
+        return (deviatedRoute ? options.deviatedRouteExtraPenalty : options.flagStopExtraPenalty);
     }
 
     @Override
