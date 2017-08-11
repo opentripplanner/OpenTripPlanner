@@ -21,6 +21,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -29,6 +30,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.AreaShort;
 import org.opentripplanner.index.model.DemandResponseServiceBean;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
@@ -588,6 +590,26 @@ public class IndexAPI {
     @Path("/demandResponseServices")
     public Response getDemandResponseServices() {
         return Response.status(Status.OK).entity(DemandResponseServiceBean.list(index.demandResponseServicesForId.values())).build();
+    }
+
+    /** Return all area IDs. */
+    @GET
+    @Path("/areas")
+    public Response getAllAreas() {
+        List<AgencyAndId> ids = new ArrayList<>(index.areasById.keySet());
+        return Response.status(Status.OK).entity(ids).build();
+    }
+
+    /** Return all area IDs. */
+    @GET
+    @Path("/areas/{id}")
+    public Response getAreaIdByFeedId(@PathParam("id") String areaIdString) {
+        AgencyAndId id = GtfsLibrary.convertIdFromString(areaIdString);
+        Polygon area = index.areasById.get(id);
+        if (area == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        return Response.status(Status.OK).entity(new AreaShort(id, area)).build();
     }
 
     @POST

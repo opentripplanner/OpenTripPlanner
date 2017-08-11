@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,8 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
@@ -49,6 +52,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -65,7 +69,9 @@ import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -100,6 +106,7 @@ public class GraphIndex {
     public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
     public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
     public final Map<AgencyAndId, DemandResponseService> demandResponseServicesForId = Maps.newHashMap();
+    public final Map<AgencyAndId, Polygon> areasById = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -198,6 +205,13 @@ public class GraphIndex {
             LOG.info("initializing demand services....");
             for (DemandResponseService service : graph.demandResponseServices) {
                 demandResponseServicesForId.put(service.getRoute().getId(), service);
+            }
+        }
+
+        LOG.info("Initializing areas....");
+        if (graph.areasById != null) {
+            for (AgencyAndId id : graph.areasById.keySet()) {
+                areasById.put(id, graph.areasById.get(id));
             }
         }
 
@@ -724,7 +738,14 @@ public class GraphIndex {
                     patternsForEdge.put(e, pattern);
                 }
                 for(PatternHop patternHop : pattern.getPatternHops()) {
-                    edges = matcher.match(patternHop.getGeometry());
+
+                    if (isSinglePoint(patternHop.getGeometry())) {
+                        Coordinate pt = patternHop.getGeometry().getCoordinate();
+                        edges = findClosestEdges(pt);
+                    }
+                    else {
+                        edges = matcher.match(patternHop.getGeometry());
+                    }
 
                     if (edges == null || edges.isEmpty()) {
                         LOG.warn("Could not match to street network: {}", pattern);
@@ -755,4 +776,49 @@ public class GraphIndex {
         return patternsForEdge.get(e);
     }
 
+    // TODO: move this
+    private List<Edge> findClosestEdges(Coordinate pointLocation) {
+        if (graph.streetIndex == null)
+            return Collections.emptyList();
+
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
+
+        Envelope env = new Envelope(pointLocation);
+
+        // local equirectangular projection
+        double lat = pointLocation.getOrdinate(1);
+        final double xscale = Math.cos(lat * Math.PI / 180);
+
+        env.expandBy(radiusDeg / xscale, radiusDeg);
+
+        Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(env);
+        if (edges.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<Double, List<StreetEdge>> edgeDistanceMap = new TreeMap<>();
+        for(Edge edge : edges){
+            if(edge instanceof StreetEdge){
+                LineString line = edge.getGeometry();
+                double dist = SphericalDistanceLibrary.fastDistance(pointLocation, line);
+                double roundOff = (double) Math.round(dist * 100) / 100;
+                if(!edgeDistanceMap.containsKey(roundOff))
+                    edgeDistanceMap.put(roundOff, new ArrayList<>());
+                edgeDistanceMap.get(roundOff).add((StreetEdge) edge);
+            }
+        }
+
+        List<Edge> closestEdges = edgeDistanceMap.values().iterator().next()
+                .stream().map(e -> (Edge) e).collect(Collectors.toList());
+        return closestEdges;
+    }
+
+    private boolean isSinglePoint(LineString line) {
+        Coordinate coord = line.getCoordinate();
+        for (int i = 0; i < line.getNumPoints(); i++) {
+            if (!coord.equals(line.getCoordinateN(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -3,10 +3,12 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.slf4j.Logger;
@@ -53,6 +55,7 @@ public class StopPattern implements Serializable {
     public final int[]  dropoffs;
     public final int[] continuousStops;
     public final double[] serviceAreaRadius;
+    public final Polygon[] serviceAreas; // likely at most one distinct object will be in this array
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
@@ -60,7 +63,8 @@ public class StopPattern implements Serializable {
             return Arrays.equals(this.stops,    that.stops) && 
                    Arrays.equals(this.pickups,  that.pickups) && 
                    Arrays.equals(this.dropoffs, that.dropoffs) &&
-                   Arrays.equals(this.continuousStops, that.continuousStops);
+                   Arrays.equals(this.continuousStops, that.continuousStops) &&
+                   Arrays.equals(this.serviceAreas, that.serviceAreas);
         } else {
             return false;
         }
@@ -75,6 +79,8 @@ public class StopPattern implements Serializable {
         hash += Arrays.hashCode(this.dropoffs);
         hash *= 31;
         hash += Arrays.hashCode(this.continuousStops);
+        hash *= 31;
+        hash += Arrays.hashCode(this.serviceAreas);
         return hash;
     }
 
@@ -94,13 +100,19 @@ public class StopPattern implements Serializable {
         dropoffs  = new int[size];
         continuousStops = new int[size];
         serviceAreaRadius = new double[size];
+        serviceAreas = new Polygon[size];
+    }
+
+    public StopPattern (List<StopTime> stopTimes) {
+        this(stopTimes, null);
     }
 
     /** Assumes that stopTimes are already sorted by time. */
-    public StopPattern (List<StopTime> stopTimes) {
+    public StopPattern (List<StopTime> stopTimes, Function<String, Polygon> polygonById) {
         this (stopTimes.size());
         if (size == 0) return;
         double lastServiceAreaRadius = 0;
+        Polygon lastPolygon = null;
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
@@ -119,11 +131,19 @@ public class StopPattern implements Serializable {
             if (stopTime.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 lastServiceAreaRadius = stopTime.getStartServiceAreaRadius();
             }
-
             serviceAreaRadius[i] = lastServiceAreaRadius;
-
             if (stopTime.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 lastServiceAreaRadius = 0;
+            }
+
+            if (polygonById != null) {
+                if (stopTime.getStartServiceAreaId() != null) {
+                    lastPolygon = polygonById.apply(stopTime.getStartServiceAreaId());
+                }
+                serviceAreas[i] = lastPolygon;
+                if (stopTime.getEndServiceAreaId() != null) {
+                    lastPolygon = null;
+                }
             }
         }
         /*
@@ -170,6 +190,7 @@ public class StopPattern implements Serializable {
             hasher.putInt(dropoffs[hop + 1]);
             hasher.putInt(continuousStops[hop]);
             hasher.putDouble(serviceAreaRadius[hop]);
+            hasher.putInt(serviceAreas[hop].hashCode());
         }
         return hasher.hash();
     }

@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.flex;
 
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
@@ -96,6 +97,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public boolean checkHopAllowsBoardAlight(State s, PatternHop hop, boolean boarding) {
         StreetVertex sv = findFirstStreetVertex(s);
+        if (hop.hasServiceArea()) {
+            Point orig = GeometryUtils.getGeometryFactory().createPoint(sv.getCoordinate());
+            Point dest = GeometryUtils.getGeometryFactory().createPoint(s.getVertex().getCoordinate());
+            if (hop.getServiceArea().contains(orig) && hop.getServiceArea().contains(dest)) {
+                return true;
+            }
+        }
         double distance = SphericalDistanceLibrary.distance(s.getVertex().getCoordinate(), sv.getCoordinate());
         return distance < hop.getServiceAreaRadius();
     }
@@ -119,5 +127,6 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         CoordinateArrayListSequence coordinates = makeCoordinates(path.edges.toArray(new Edge[0]));
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
+
 
 }

@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import gnu.trove.list.TIntList;
@@ -104,6 +105,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
@@ -301,7 +303,9 @@ public class GTFSPatternHopFactory {
     private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
-    
+
+    private Map<String, Polygon> _areasById = new HashMap<String, Polygon>();
+
     private FareServiceFactory fareServiceFactory;
 
     private Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
@@ -340,6 +344,9 @@ public class GTFSPatternHopFactory {
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
         // Perhaps it is to allow name collisions with previously loaded feeds.
         clearCachedData(); 
+
+        loadAreaMap();
+        loadAreasIntoGraph(graph);
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (AgencyAndId serviceId : _dao.getAllServiceIds()) {
@@ -418,7 +425,7 @@ public class GTFSPatternHopFactory {
             }
 
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
-            StopPattern stopPattern = new StopPattern(stopTimes);
+            StopPattern stopPattern = new StopPattern(stopTimes, _areasById::get);
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
@@ -1050,6 +1057,7 @@ public class GTFSPatternHopFactory {
         _geometriesByShapeId.clear();
         _distancesByShapeId.clear();
         _geometriesByShapeSegmentKey.clear();
+        _areasById.clear();
     }
 
     private void loadTransfers(Graph graph) {
@@ -1321,10 +1329,18 @@ public class GTFSPatternHopFactory {
         StopTime prev = null;
         Iterator<StopTime> it = stopTimes.iterator();
         TIntList stopSequencesRemoved = new TIntArrayList();
+        double serviceAreaRadius = 0.0d;
+        String serviceArea = null;
         while (it.hasNext()) {
             StopTime st = it.next();
+            if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                serviceAreaRadius = st.getStartServiceAreaRadius();
+            }
+            if (st.getStartServiceAreaId() != null) {
+                serviceArea = st.getStartServiceAreaId();
+            }
             if (prev != null) {
-                if (prev.getStop().equals(st.getStop())) {
+                if (prev.getStop().equals(st.getStop()) && serviceAreaRadius == 0.0d && serviceArea == null) {
                     // OBA gives us unmodifiable lists, but we have copied them.
 
                     // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
@@ -1342,6 +1358,12 @@ public class GTFSPatternHopFactory {
                 }
             }
             prev = st;
+            if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                serviceAreaRadius = 0.0d;
+            }
+            if (st.getEndServiceAreaId() != null) {
+                serviceArea = null;
+            }
         }
         return stopSequencesRemoved;
     }
@@ -1473,6 +1495,33 @@ public class GTFSPatternHopFactory {
 
     public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
         this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    }
+
+    private void loadAreaMap() {
+        _dao.getAllAreas()
+                .stream()
+                .collect(Collectors.groupingBy(Area::getAreaId, Collectors.toList()))
+                .forEach(this::loadArea);
+    }
+
+    private void loadArea(String name, List<Area> areas) {
+        areas.sort(Comparator.comparingInt(Area::getSequence));
+        double[] coordinates = new double[areas.size() * 2];
+        int i = 0;
+        for (Area area : areas) {
+            coordinates[i++] = area.getLon();
+            coordinates[i++] = area.getLat();
+        }
+        CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
+        Polygon polygon = _geometryFactory.createPolygon(sequence);
+        _areasById.put(name, polygon);
+    }
+
+    private void loadAreasIntoGraph(Graph graph) {
+        for (Map.Entry<String, Polygon> entry : _areasById.entrySet()) {
+            AgencyAndId id = new AgencyAndId(_feedId.getId(), entry.getKey());
+            graph.areasById.put(id, entry.getValue());
+        }
     }
 
     private boolean hasDemandService(List<StopTime> stopTimes) {

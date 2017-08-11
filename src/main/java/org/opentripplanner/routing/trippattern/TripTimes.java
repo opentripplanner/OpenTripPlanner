@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
+import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -112,6 +113,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     private final double[] serviceAreaRadius;
 
+    private final String[] serviceArea;
+
     /**
      * The real-time state of this TripTimes.
      */
@@ -132,10 +135,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] sequences  = new int[nStops];
         final int[] continuousStops = new int[nStops];
         final double[] serviceAreaRadius = new double[nStops];
+        final String[] serviceArea = new String[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
         double radius = 0;
+        String area = null;
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -143,13 +148,33 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
             continuousStops[s] = st.getContinuousStops();
+
             if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 radius = st.getStartServiceAreaRadius();
             }
             serviceAreaRadius[s] = radius;
             if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                if (st.getEndServiceAreaRadius() != radius) {
+                    String message = String.format("Trip %s: start service area radius %g does not match end radius %g",
+                            st.getTrip().getId(), radius, st.getEndServiceAreaRadius());
+                    throw new IllegalArgumentException(message);
+                }
                 radius = 0;
             }
+
+            if (st.getStartServiceAreaId() != null) {
+                area = st.getStartServiceAreaId();
+            }
+            serviceArea[s] = area;
+            if (st.getEndServiceAreaId() != null) {
+                if (!st.getEndServiceAreaId().equals(area)) {
+                    String message = String.format("Trip %s: start service area %s does not match end area %s",
+                            st.getTrip().getId(), area, st.getEndServiceAreaId());
+                    throw new IllegalArgumentException(message);
+                }
+                area = null;
+            }
+
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -163,6 +188,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         this.continuousStops = deduplicator.deduplicateIntArray(continuousStops);
         this.serviceAreaRadius = deduplicator.deduplicateDoubleArray(serviceAreaRadius);
+        this.serviceArea = deduplicator.deduplicateStringArray(serviceArea);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -180,6 +206,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.timepoints = object.timepoints;
         this.continuousStops = object.continuousStops;
         this.serviceAreaRadius = object.serviceAreaRadius;
+        this.serviceArea = object.serviceArea;
     }
 
     /**
@@ -312,6 +339,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** Returns associated dropoff/pickup radius for this stop*/
     public double getServiceAreaRadius(final int stop) {
         return serviceAreaRadius[stop];
+    }
+
+    public String getServiceArea(final int stop) {
+        return serviceArea[stop];
     }
 
     /** Used in debugging / dumping times. */

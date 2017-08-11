@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.flex;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
@@ -49,7 +50,7 @@ public class PartialPatternHop extends PatternHop {
     // constructor for flag stops
     // this could be merged into deviated-route service constructor
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;
@@ -62,7 +63,7 @@ public class PartialPatternHop extends PatternHop {
     // constructor for deviated-route service
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
                              LineString startGeometry, int startVehicleTime, LineString endGeometry, int endVehicleTime, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
 
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
@@ -78,7 +79,14 @@ public class PartialPatternHop extends PatternHop {
         // Only area on the route will be part of display geometry.
         boolean flagStopBoard = startIndex > 0 && startVehicleTime == 0;
         boolean flagStopAlight = endIndex < line.getEndIndex() && endVehicleTime == 0;
-        setGeometry(hop, line, flagStopBoard ? buffer : 0, flagStopAlight ? buffer : 0);
+        if (!hop.getBeginStop().equals(hop.getEndStop())) {
+            setGeometry(hop, line, flagStopBoard ? buffer : 0, flagStopAlight ? buffer : 0);
+        } else {
+            // If this hop has no geometry (entirely flexible deviated-route):
+            Coordinate c = hop.getFromVertex().getCoordinate();
+            displayGeometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[]{c, c});
+            percentageOfHop = 0;
+        }
 
         LineString transitGeometry = (LineString) line.extractLine(startIndex, endIndex);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();

@@ -19,6 +19,7 @@ import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -210,6 +211,9 @@ public class Graph implements Serializable {
 
     /** Available demand-based services */
     public List<DemandResponseService> demandResponseServices = new ArrayList<>();
+
+    /** Areas for flex service */
+    public Map<AgencyAndId, Polygon> areasById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -915,6 +919,10 @@ public class Graph implements Serializable {
         agencies.add(agency);
         this.agenciesForFeedId.put(feedId, agencies);
         this.feedIds.add(feedId);
+    }
+
+    public void addArea(String feedId, String areaId, Polygon area) {
+        this.areasById.put(new AgencyAndId(feedId, areaId), area);
     }
 
     /**
