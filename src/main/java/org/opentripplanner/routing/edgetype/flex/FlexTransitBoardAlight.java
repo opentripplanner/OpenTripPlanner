@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.flex;
 
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -44,8 +43,14 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     }
 
     private void setIndices(PartialPatternHop hop) {
-        this.startIndex = hop.getStartIndex() / hop.getOriginalHopLength();
-        this.endIndex = hop.getEndIndex() / hop.getOriginalHopLength();
+        if (hop.getOriginalHopLength() > 0) {
+            this.startIndex = hop.getStartIndex() / hop.getOriginalHopLength();
+            this.endIndex = hop.getEndIndex() / hop.getOriginalHopLength();
+        } else {
+            // entirely-deviated area hop. Never add entire path time.
+            this.startIndex = 0.0d;
+            this.endIndex = 0.0d;
+        }
         this.hop = hop;
     }
 

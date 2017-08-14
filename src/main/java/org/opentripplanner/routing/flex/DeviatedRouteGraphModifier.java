@@ -42,7 +42,7 @@ import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.make
  */
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
-    private static final int MAX_DRS_SEARCH_DIST = 1600; // could be set by data
+    private static final int MAX_DRS_SEARCH_DIST = 1600 * 10; // approx 5 mile limit. Could be set by data.
 
     public DeviatedRouteGraphModifier(Graph graph) {
         super(graph);
