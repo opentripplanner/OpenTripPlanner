@@ -165,6 +165,7 @@ public abstract class GtfsFlexGraphModifier {
     public void createForwardHops(RoutingRequest request) {
         RoutingRequest forward = request.clone();
         forward.setMode(getMode());
+        forward.setArriveBy(false);
         streetSearch(forward);
     }
 
@@ -176,7 +177,7 @@ public abstract class GtfsFlexGraphModifier {
     public void createBackwardHops(RoutingRequest request) {
         RoutingRequest backward = request.clone();
         backward.setMode(getMode());
-        backward.setArriveBy(!request.arriveBy);
+        backward.setArriveBy(true);
         streetSearch(backward);
     }
 
@@ -247,6 +248,7 @@ public abstract class GtfsFlexGraphModifier {
             }
         };
         gd.setSearchTerminationStrategy(getSearchTerminationStrategy());
+
 
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
         gd.getShortestPathTree(new State(initVertex, rr));

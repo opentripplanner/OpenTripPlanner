@@ -24,6 +24,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -133,12 +134,18 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return (percentageOfHop * super.timeLowerBound(options)) + startVehicleTime + endVehicleTime;
+        return Math.floor(percentageOfHop * super.timeLowerBound(options)) + startVehicleTime + endVehicleTime;
     }
 
     @Override
     public int getRunningTime(State s0) {
-        return (int) Math.round(percentageOfHop * super.getRunningTime(s0)) + startVehicleTime + endVehicleTime;
+        double startPct = startIndex / originalHopLength;
+        double endPct = endIndex / originalHopLength;
+        TripTimes tt = s0.getTripTimes();
+        // necessary so rounding happens using the same coefficients as in FlexTransitBoardAlight
+        int arr = tt.getArrivalTime(stopIndex + 1) - (int) Math.round((1 - endPct) * (tt.getRunningTime(stopIndex)));
+        int dep = tt.getDepartureTime(stopIndex) + (int) Math.round(startPct * (tt.getRunningTime(stopIndex)));
+        return (arr - dep) + startVehicleTime + endVehicleTime;
     }
 
     @Override
