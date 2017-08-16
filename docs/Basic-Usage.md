@@ -4,7 +4,7 @@ This page will get you up and running with your own OTP server. If all goes well
 
 ## Get OTP
 
-OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are published on the Conveyal Maven repository. Here is a link to the latest released version 1.0.0 as a [stand-alone JAR file](https://maven.conveyal.com/org/opentripplanner/otp/1.0.0/otp-1.0.0-shaded.jar).
+OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are deployed to the Maven Central repository. Go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `.shaded.jar`.
 You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP), especially if you plan to do some development yourself.
 
 ## Get some data

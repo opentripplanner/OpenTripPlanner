@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.1 (2017-03-16)
+
+- Deploy to Sonatype OSSRH and Maven Central
+- Documentation updates including repo links
+- New router-config stopClusterMode: clustering by parent station or geography [#2364](https://github.com/opentripplanner/OpenTripPlanner/issues/2364)
+- Spanish and Portuguese UI Translations
+- In TimeSurface API, serialize travel times to every point when detail=true
+- Make OSM highway=corridor pedestrian routable
+- Fix GraphIndex.stopTimesForStop to search on the request day rather than now
+- Update GraphQL to latest version and improve support for complex arguments [#2367](https://github.com/opentripplanner/OpenTripPlanner/issues/2367)
+- Add support for operationName to the graphql endpoint
+- Fix findClosestStopsByWalking, properly set RoutingContext
+- Fixed major routing problem where dead-end SimpleTransfers blocked walking paths [#2414](https://github.com/opentripplanner/OpenTripPlanner/issues/2414)
+- Created Github issue template
+- Avoid negative elevation figures: Compute ellipsoid-geoid offset and optionally apply to elevation calculations [#2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301)
+- Fix VCub bike share updater using new API variable names.
+- Fix spurious different-day warning [#2399](https://github.com/opentripplanner/OpenTripPlanner/issues/2399)
+- Shutdown hook to gracefully shut down Grizzly [#2384](https://github.com/opentripplanner/OpenTripPlanner/issues/2384)
+- Added headsign attribute for stoptimes in GraphQL [#2224](https://github.com/opentripplanner/OpenTripPlanner/issues/2224)
+- Allow Cars on highway=*;bicycle=designated [#2374](https://github.com/opentripplanner/OpenTripPlanner/issues/2374)
+- Expose PruneFloatingIslands parameters in build-config.json
+- Lazy initialization of stop clusters where needed
+- Include Agency/Route branding in responses
+- Include turn-by-turn walking directions for transfer legs [#1707](https://github.com/opentripplanner/OpenTripPlanner/issues/1707)
+- Output error when edge lengths are negative, and set them to 1mm
+- Add disableAlertFiltering API flag [#2351](https://github.com/opentripplanner/OpenTripPlanner/issues/2351)
+- Do not show arrival times at terminal stops in stop time viewer [#2357](https://github.com/opentripplanner/OpenTripPlanner/issues/2357)
+- Index API now returns stop information URL, enabling hyperlinks in trip viewer [#2352](https://github.com/opentripplanner/OpenTripPlanner/issues/2352)
+- Remove all unused model classes for index API [#1301](https://github.com/opentripplanner/OpenTripPlanner/issues/1301)
+- Apply an interlining fix from 0.10 branch
+- Allow quoted search phrases in the Lucene search [#2279](https://github.com/opentripplanner/OpenTripPlanner/issues/2279)
+- Re-implement maxHours filter [#2332](https://github.com/opentripplanner/OpenTripPlanner/issues/2332)
+- Properly set wheelchairAccessible on area edges
+- Fixed file URL in test [#2339](https://github.com/opentripplanner/OpenTripPlanner/issues/2339)
+- Add details field to fares, listing which legs each fare applies to [#1699](https://github.com/opentripplanner/OpenTripPlanner/issues/1699)
 
 ## 1.0 (2016-09-09)
 
@@ -10,7 +45,7 @@
 - Remove Conveyal tiles from client (which was getting expensive), add free Carto/MapZen tiles.
 - Fixed headsigns: in itineraries, headsign for a leg used to always be the last stop.
 - Updated default map tile sets in the client because Mapquest is no longer gratis.
-- Fix problem with empty list ??? #1873
+- Fix problem with empty list ??? [#1873](https://github.com/opentripplanner/OpenTripPlanner/issues/1873)
 - Rewrite of intermediate places handling in GraphPathFinder. Original request is cloned for each intermediate path.
 - Routes in GraphQL API Change "type" to "mode" and add "type" as route type to Route for GraphQL
 - Add effective end date to alerts (from HSL).
@@ -163,8 +198,8 @@
 - Handle park and ride lots that have roads running through them, but don't share nodes with those roads.
 
 ## 0.12.1 (2014-11-17)
-- Fixed threading problem caused by graph visualization instrumentation (#1611)
-- Fixed 'unconnected areas' infinite loop (#1605) 
+- Fixed threading problem caused by graph visualization instrumentation [#1611](https://github.com/opentripplanner/OpenTripPlanner/issues/1611)
+- Fixed 'unconnected areas' infinite loop [#1605](https://github.com/opentripplanner/OpenTripPlanner/issues/1605)
 
 ## 0.12.0 (2014-11-11)
 - Graph building from zipball of data sent over the wire

@@ -8,9 +8,9 @@ Java development are [Eclipse](http://eclipse.org), [IntelliJ IDEA](https://www.
 and any IDE with Maven build support should also work (ensure that you have the Maven plugins installed and enabled).
 Git integration is a plus since OTP is under Git version control.
 
-IntelliJ IDEA is a commercial product, but its authors give free licenses to open source projects and the OpenTripPlanner
-development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
-an excellent IDE, and in my experience is quicker and more stable than the competition.
+Many of the Core OTP developers use IntelliJ IDEA. It is an excellent IDE, and in my experience is quicker 
+and more stable than the competition. IntelliJ IDEA is a commercial product, but there is an open source "community edition"
+that is completely sufficient for working on OTP.
 
 Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP GitHub
 repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
@@ -169,7 +169,7 @@ are not included in mainline OTP.
 ### Java
 
 OpenTripPlanner uses the same code formatting and style as the [GeoTools](http://www.geotools.org/) and 
-[GeoServer](htp://geoserver.org) projects. It's a minor variant of the 
+[GeoServer](http://geoserver.org) projects. It's a minor variant of the
 [Sun coding convention](http://www.oracle.com/technetwork/java/codeconv-138413.html). Notably, **we do not use tabs** 
 for indentation and we allow for lines up to 100 characters wide.
 
@@ -222,38 +222,23 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
 
 ## Continuous Integration
 
-The OpenTripPlanner project has a [continuous integration (CI) server](http://ci.opentripplanner.org). Any time a change
-is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing
-feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
-improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
+The OpenTripPlanner project uses the [Travis CI continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner). Any time a change
+is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing feedback on the stability of the build.
 
 ## Release Process
 
-This section is intended as a checklist for the person within the OTP development community who is responsible for
-performing releases (currently Andrew Byrd). Releases should be performed on the CI server because documentation and
-release JARs must be published after a release. The CI server serves as the OTP project web server, and also has a
-very fast network connection which makes uploading Maven artifacts to the repository on Amazon S3 less painful.
-Carrying out a release requires CI server login credentials as well as Amazon AWS credentials for deployment to our
-Maven repository.
+This section is intended as a checklist for the person within the OTP development community who is responsible for performing releases (currently Andrew Byrd). This documentation is currently out of date because deployment to the Maven Central repository is now handled automatically, and all of our documentation resources are served up by AWS S3.
 
 Release checklist:
 
 - update docs/Changelog.md, check in changes, and push
-- ssh into ci.opentripplanner.org
-- change to the ~/git/OpenTripPlanner directory
 - check that you are on the master branch with no uncommitted changes (git status; git clean -df)
 - pull down the latest master code
 - verify that git push succeeds without prompting for a password (i.e. ~/.ssh/id_rsa.pub is known to Github)
 - run a test build: mvn clean package site
-- check that `~/.m2/settings.xml` contains AWS credentials for the repo
-- mvn release:prepare (use the default release version and SCM release tag, bump the minor development version number)
-- cp -R target/site/apidocs /usr/share/nginx/html/javadoc/x.y.0
-- cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
-- check that all docs in /usr/share/nginx/html/javadoc/ have o+r permissions (they should be by default)
-- mvn release:perform
-- cp target/checkout/target/otp-x.y.0-shaded.jar /usr/share/nginx/html/jars/
-- rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
+- aws s3 cp -R target/site/apidocs ......./javadoc/x.y.0
+- aws s3 cp -R target/site/enunciate ......./apidoc/x.y.0
+- TODO insert list of steps to bump to a release version
 - check http://dev.opentripplanner.org/jars/ and http://dev.opentripplanner.org/javadoc/ in a browser
-- update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in
+- update any version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in
 - email the OTP dev and users mailing lists, and send a message on Slack
-

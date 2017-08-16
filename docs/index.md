@@ -31,7 +31,7 @@ If you want to get started right away running your own OTP instance, the best pl
 
 [![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
-**Version 1.0 was released on 9 September 2016**. OTP now:
+**Version 1.1 was released on 16 March 2017**. OTP now:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors

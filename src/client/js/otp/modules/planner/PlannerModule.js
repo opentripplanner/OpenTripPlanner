@@ -98,7 +98,7 @@ otp.modules.planner.PlannerModule =
         500 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
         503 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
         400 : _tr("Trip is not possible.  You might be trying to plan a trip outside the map data boundary."),
-        404 : _tr("Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway)."),
+        404 : _tr("No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible."),
         406 : _tr("No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose."),
         408 : _tr("The trip planner is taking way too long to process your request. Please try again later."),
         413 : _tr("The request has errors that the server is not willing or able to process."),

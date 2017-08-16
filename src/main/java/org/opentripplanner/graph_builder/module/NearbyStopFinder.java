@@ -43,7 +43,7 @@ public class NearbyStopFinder {
 
     public  final boolean useStreets;
     private Graph graph;
-    private double radius;
+    private double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
     private EarliestArrivalSearch earliestArrivalSearch;
@@ -55,23 +55,27 @@ public class NearbyStopFinder {
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
      * network or straight line distance based on the presence of OSM street data in the graph.
      */
-    public NearbyStopFinder(Graph graph, double radius) {
-        this (graph, radius, graph.hasStreets);
+    public NearbyStopFinder(Graph graph, double radiusMeters) {
+        this (graph, radiusMeters, graph.hasStreets);
     }
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius.
      * @param useStreets if true, search via the street network instead of using straight-line distance.
      */
-    public NearbyStopFinder(Graph graph, double radius, boolean useStreets) {
+    public NearbyStopFinder(Graph graph, double radiusMeters, boolean useStreets) {
         this.graph = graph;
         this.useStreets = useStreets;
-        this.radius = radius;
+        this.radiusMeters = radiusMeters;
         if (useStreets) {
             earliestArrivalSearch = new EarliestArrivalSearch();
-            earliestArrivalSearch.maxDuration = (int) radius; // FIXME assuming 1 m/sec, use hard distance limiting to match straight-line mode
+            // We need to accommodate straight line distance (in meters) but when streets are present we use an
+            // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
+            // but we don't have much of a choice here. Use the default walking speed to convert.
+            earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
-            streetIndex = new StreetVertexIndexServiceImpl(graph); // FIXME use the one already in the graph if it exists
+            // FIXME use the vertex index already in the graph if it exists.
+            streetIndex = new StreetVertexIndexServiceImpl(graph);
         }
     }
 
@@ -156,9 +160,9 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsEuclidean (Vertex originVertex) {
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         Coordinate c0 = originVertex.getCoordinate();
-        for (TransitStop ts1 : streetIndex.getNearbyTransitStops(c0, radius)) {
+        for (TransitStop ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
             double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
-            if (distance < radius) {
+            if (distance < radiusMeters) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
                 StopAtDistance sd = new StopAtDistance(ts1, distance);
                 sd.geom = geometryFactory.createLineString(coordinates);

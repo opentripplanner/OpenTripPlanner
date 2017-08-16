@@ -272,7 +272,6 @@ otp.widgets.tripoptions.LocationsSelector =
             var fromLatLng = otp.util.Itin.getLocationLatLng(data.queryParams.fromPlace);
 
             if(fromName) {
-                this.tripWidget.module.setStartPoint(fromLatLng,true,fromName);
                 $("#"+this.id+"-start").val(fromName);
                 this.tripWidget.module.startName = fromName;
             }
