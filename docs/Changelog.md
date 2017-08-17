@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.2 (2017-09-18)
+
+- Add support for consuming GBFS bike-rental availability feeds. #2458
+- Add GBFS configuration example
+- Add flag for including requested start/end time in maxHours in planner API. #2457
+- Add maxTransferDistance graph builder parameter
+- Add option for filtering non-pickup stops in TransitIndex stop times functions. #2377
+- Support foot/bicycle=discouraged OSM tag. #2415
+- Improve linking of transit platforms to connecting access ways. #2422 / #2428
+- Fix bug when building graph with parent station transfers. #2404 / #2410
+- Fix bugs in park and ride search. #2424
+- Support different stop ID formats in field trip module
+- Update URL in BANO geocoding module. #2438 / #2439
+- Add more debug information related to trips matching using GTFS-RT feed. #2432
+- Update default PATH_NOT_FOUND message to new wording developed w/ TriMet. #2355
+- Update Travis build configuration to not attempt GPG operations. #2441
+- Fix javadoc URL in scripting documentation. #2437
+- Automatically link to GitHub issues in Changelog. #2426
+- Expose FeedInfo objects in the Index API #2456
+- Changes to Puget Sound region fare calculation #2484
+- Fix coordinatates when clustering by parent station #2447
+- Allow setting OSM Way Properties from build-config.json #2389
+- Optionally compact ("reverse-optimize") results with complete reverse search #2449
+- Add updater for urbaninfrastructure city bikes #2448
+- Miscellaneous documentation updates
+
 ## 1.1 (2017-03-16)
 
 - Deploy to Sonatype OSSRH and Maven Central
