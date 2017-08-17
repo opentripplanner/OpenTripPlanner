@@ -634,13 +634,13 @@ public class GraphIndex {
     	        cluster = stopClusterForId.get(ps);
     	    } else {
     	        cluster = new StopCluster(ps, stop.getName());
-    	        stopClusterForId.put(ps, cluster);
-	    }
+    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
+                cluster.setCoordinates(parent.getLat(), parent.getLon());
+                stopClusterForId.put(ps, cluster);
+
+	        }
     	    cluster.children.add(stop);
     	    stopClusterForStop.put(stop, cluster);    
-    	}
-    	for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
-    	    cluster.getValue().computeCenter();
     	}
     }
     
