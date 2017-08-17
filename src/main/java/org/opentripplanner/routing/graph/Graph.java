@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -131,6 +132,8 @@ public class Graph implements Serializable {
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
     private Collection<String> feedIds = new HashSet<>();
+
+    private Map<String, FeedInfo> feedInfoForId = new HashMap<>();
 
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
@@ -907,11 +910,19 @@ public class Graph implements Serializable {
         return agenciesForFeedId.get(feedId);
     }
 
+    public FeedInfo getFeedInfo(String feedId) {
+        return feedInfoForId.get(feedId);
+    }
+
     public void addAgency(String feedId, Agency agency) {
         Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
         this.agenciesForFeedId.put(feedId, agencies);
         this.feedIds.add(feedId);
+    }
+
+    public void addFeedInfo(FeedInfo info) {
+        this.feedInfoForId.put(info.getId().toString(), info);
     }
 
     /**

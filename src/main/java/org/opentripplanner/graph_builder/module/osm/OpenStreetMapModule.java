@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -69,6 +70,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
     public boolean skipVisibility = false;
+
+    public boolean platformEntriesLinking = false;
 
     // Members that can be set by clients.
 
@@ -86,7 +89,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * Allows for arbitrary custom naming of edges.
      */
     public CustomNamer customNamer;
-    
+
     /**
      * Ignore wheelchair accessibility information.
      */
@@ -242,7 +245,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             initIntersectionNodes();
 
             buildBasicGraph();
-            buildWalkableAreas(skipVisibility);
+            buildWalkableAreas(skipVisibility, platformEntriesLinking);
+
+            if(platformEntriesLinking){
+                linkPlatformEntries(edgeFactory, customNamer);
+            }
 
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
@@ -367,7 +374,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * linked to the street network (they are most of the time buildings). We just create a bike
          * P+R in the middle of the area envelope and rely on the same linking mechanism as for
          * nodes to connect them to the nearest streets.
-         * 
+         *
          * @param area
          */
         private void buildBikeParkAndRideForArea(Area area) {
@@ -393,7 +400,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
         }
 
-        private void buildWalkableAreas(boolean skipVisibility) {
+        private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
             if (skipVisibility) {
                 LOG.info("Skipping visibility graph construction for walkable areas and using just area rings for edges.");
             } else {
@@ -408,9 +415,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
             } else {
                 for (AreaGroup group : areaGroups) {
-                    walkableAreaBuilder.buildWithVisibility(group);
+                    walkableAreaBuilder.buildWithVisibility(group, platformEntriesLinking);
+                }
+
+                if(platformEntriesLinking){
+                    List<Area> platforms = osmdb.getWalkableAreas().stream().
+                            filter(area -> "platform".equals(area.parent.getTag("public_transport"))).
+                            collect(Collectors.toList());
+                    List<AreaGroup> platformGroups = groupAreas(platforms);
+                    for (AreaGroup group : platformGroups) {
+                        walkableAreaBuilder.buildWithoutVisibility(group);
+                    }
                 }
             }
+
             // running a request caches the timezone; we need to clear it now so that when agencies are loaded
             // the graph time zone is set to the agency time zone.
             graph.clearTimeZone();
@@ -708,6 +726,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
         }
 
+        private void linkPlatformEntries(StreetEdgeFactory factory, CustomNamer customNamer) {
+            PlatformLinker platformLinker = new PlatformLinker(graph, osmdb, factory, customNamer);
+            platformLinker.linkEntriesToPlatforms();
+
+        }
+
         private void buildElevatorEdges(Graph graph) {
             /* build elevator edges */
             for (Long nodeId : multiLevelNodes.keySet()) {
@@ -925,7 +949,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         /**
          * The safest bike lane should have a safety weight no lower than the time weight of a flat street. This method divides the safety lengths by
          * the length ratio of the safest street, ensuring this property.
-         * 
+         *
          * TODO Move this away, this is common to all street builders.
          *
          * @param graph

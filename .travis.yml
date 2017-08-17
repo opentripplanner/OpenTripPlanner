@@ -15,7 +15,7 @@ script: |
     mvn clean deploy --settings maven-settings.xml
   else
     # otherwise, just run test suite
-    mvn clean verify --settings maven-settings.xml
+    mvn clean verify --settings maven-settings.xml -B -V -Dgpg.skip
   fi
 
 # Secure envs are OSSRH_JIRA_USERNAME, OSSRH_JIRA_PASSWORD, GPG_KEY_NAME, GPG_PASSPHRASE
@@ -40,5 +40,4 @@ notifications:
 
 # Decrypt and import the artifact signing certificate before running the build
 before_install:
-  - openssl aes-256-cbc -K $encrypted_9918733fe303_key -iv $encrypted_9918733fe303_iv -in maven-artifact-signing-key.asc.enc -out maven-artifact-signing-key.asc -d
-  - gpg --import --batch maven-artifact-signing-key.asc
+  - if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then openssl aes-256-cbc -K $encrypted_9918733fe303_key -iv $encrypted_9918733fe303_iv -in maven-artifact-signing-key.asc.enc -out maven-artifact-signing-key.asc -d && gpg --import --batch maven-artifact-signing-key.asc; fi

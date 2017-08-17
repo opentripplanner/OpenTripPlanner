@@ -28,7 +28,6 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -263,7 +262,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 r.resultTable[j][j + i] = cost;
                 r.fareIds[j][j + i] = best.fareId;
                 for (int k = 0; k < i; k++) {
-                    float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+                    float via = addFares(rides.subList(j, j + k + 1), rides.subList(j + k + 1, j + i + 1),
+                            r.resultTable[j][j + k], r.resultTable[j + k + 1][j + i]);
                     if (r.resultTable[j][j + i] > via) {
                         r.resultTable[j][j + i] = via;
                         r.endOfComponent[j] = j + i;
@@ -273,6 +273,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             }
         }
         return r;
+    }
+
+    protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
+        return cost0 + cost1;
     }
 
     protected float getLowestCost(FareType fareType, List<Ride> rides,

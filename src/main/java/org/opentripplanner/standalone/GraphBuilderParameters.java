@@ -75,6 +75,11 @@ public class GraphBuilderParameters {
     public final boolean areaVisibility;
 
     /**
+     * Link unconnected entries to public transport platforms.
+     */
+    public final boolean platformEntriesLinking;
+
+    /**
      * Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.
      */
     public final boolean matchBusRoutesToStreets;
@@ -142,14 +147,17 @@ public class GraphBuilderParameters {
     public final boolean banDiscouragedBiking;
 
     /**
+     * Transfers up to this length in meters will be pre-calculated and included in the Graph.
+     */
+    public final double maxTransferDistance;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-
     public GraphBuilderParameters(JsonNode config) {
-
         htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
@@ -159,6 +167,7 @@ public class GraphBuilderParameters {
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
+        platformEntriesLinking = config.path("platformEntriesLinking").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
@@ -173,6 +182,7 @@ public class GraphBuilderParameters {
         pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
+        maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
     }
 
 }

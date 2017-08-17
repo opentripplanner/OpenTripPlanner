@@ -48,6 +48,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonSerialize
     public boolean allowDropoff = true;
 
+    @XmlAttribute
+    @JsonSerialize
+    public boolean isFloatingBike = false;
+
     /**
      * List of compatible network names. Null (default) to be compatible with all.
      */
