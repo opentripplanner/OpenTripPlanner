@@ -348,6 +348,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
+     * When true, do a full reversed search to compact the legs of the GraphPath.
+     */
+    public boolean compactLegsByReversedSearch = false;
+
+    /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
      * driving occurs on the left.
      */
