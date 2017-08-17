@@ -238,8 +238,7 @@ public class GraphBuilder implements Runnable {
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
             osmModule.edgeFactory = streetEdgeFactory;
             osmModule.customNamer = builderParams.customNamer;
-            DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
-            osmModule.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
+            osmModule.setDefaultWayPropertySetSource(builderParams.wayPropertySet);
             osmModule.skipVisibility = !builderParams.areaVisibility;
             osmModule.platformEntriesLinking = builderParams.platformEntriesLinking;
             osmModule.staticBikeRental = builderParams.staticBikeRental;

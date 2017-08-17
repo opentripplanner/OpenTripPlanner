@@ -146,7 +146,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * @param source the way properties source
      */
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
-        wayPropertySet = source.getWayPropertySet();
+        wayPropertySet = new WayPropertySet();
+        source.populateProperties(wayPropertySet);
     }
 
     /**
