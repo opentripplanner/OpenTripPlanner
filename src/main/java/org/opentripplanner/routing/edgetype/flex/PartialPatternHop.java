@@ -139,6 +139,9 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public int getRunningTime(State s0) {
+        if (originalHopLength == 0) {
+            return startVehicleTime + endVehicleTime;
+        }
         double startPct = startIndex / originalHopLength;
         double endPct = endIndex / originalHopLength;
         TripTimes tt = s0.getTripTimes();
