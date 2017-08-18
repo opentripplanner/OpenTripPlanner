@@ -362,6 +362,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
+    
+    /** 
+     * @see {@link org.opentripplanner.routing.core.RoutingRequest#carParkCarLegWeight} 
+     */
+    @QueryParam("carParkCarLegWeight")
+    private Double carParkCarLegWeight;
 
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -407,6 +413,10 @@ public abstract class RoutingResource {
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
 
+        if(carParkCarLegWeight != null) {
+            request.setCarParkCarLegWeight(carParkCarLegWeight);
+        }
+        
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 

@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -457,6 +456,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
     private StreetEdge splitEdge = null;
+
+    /**
+     * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter. 
+     */
+    public double carParkCarLegWeight = 1;
 
     /* CONSTRUCTORS */
 
@@ -973,7 +977,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && this.carParkCarLegWeight == other.carParkCarLegWeight;
     }
 
     /**
@@ -1004,7 +1009,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(useTraffic).hashCode() * 10169
+                + new Double(carParkCarLegWeight).hashCode();
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1104,19 +1110,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         return i == null ? 0 : i;
     }
 
-    private String getRouteOrAgencyStr(HashSet<String> strings) {
-        StringBuilder builder = new StringBuilder();
-        for (String agency : strings) {
-            builder.append(agency);
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            // trim trailing comma
-            builder.setLength(builder.length() - 1);
-        }
-        return builder.toString();
-    }
-
     public void setMaxWalkDistance(double maxWalkDistance) {
         if (maxWalkDistance > 0) {
             this.maxWalkDistance = maxWalkDistance;
@@ -1128,6 +1121,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (maxPreTransitTime > 0) {
             this.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
+        }
+    }
+    
+    public void setCarParkCarLegWeight(double carParkCarLegWeight) {
+        if(carParkCarLegWeight>0) {
+            this.carParkCarLegWeight = carParkCarLegWeight;
         }
     }
 
@@ -1267,9 +1266,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
             throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
         }
-        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-        }
+
         // FIXME couldn't this be simplified by only specifying TWO of the values?
         if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
             throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);

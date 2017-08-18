@@ -80,8 +80,11 @@ public class ParkAndRideEdge extends Edge {
                 throw new IllegalStateException("Can't drive 2 cars");
             }
             StateEditor s1 = s0.edit(this);
+                 
             int time = request.carDropoffTime;
             s1.incrementWeight(time);
+            final double multiplier = (request.carParkCarLegWeight - 1);
+            s1.incrementWeight(s0.getWeight() * multiplier);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(true);
             s1.setBackMode(TraverseMode.LEG_SWITCH);
