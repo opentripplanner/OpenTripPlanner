@@ -108,11 +108,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      * large graphs the search becomes very slow.
      */
     public int maxPreTransitTime = 30 * 60;
-    
-    /**
-     * Multiplier for the car leg
-     */
-    public double parkAndRidePretransitMultiplier = 2.5;
 
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
     public long worstTime = Long.MAX_VALUE;
