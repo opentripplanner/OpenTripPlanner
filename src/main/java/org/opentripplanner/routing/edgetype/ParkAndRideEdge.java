@@ -83,7 +83,7 @@ public class ParkAndRideEdge extends Edge {
                  
             int time = request.carDropoffTime;
             s1.incrementWeight(time);
-            final double multiplier = (1 - request.carParkCarWeight);
+            final double multiplier = (1 - request.carParkCarLegWeight);
             s1.incrementWeight(s0.getWeight() * multiplier);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(true);

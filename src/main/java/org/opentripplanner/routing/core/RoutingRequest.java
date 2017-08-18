@@ -461,9 +461,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter. 
      */
-    public double carParkCarWeight = 1;
+    public double carParkCarLegWeight = 1;
 
     /* CONSTRUCTORS */
+
 
     /** Constructor for options; modes defaults to walk and transit */
     public RoutingRequest() {
@@ -978,7 +979,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && this.carParkCarLegWeight == other.carParkCarLegWeight;
     }
 
     /**
