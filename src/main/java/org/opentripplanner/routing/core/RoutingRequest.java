@@ -458,6 +458,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     private StreetEdge splitEdge = null;
 
+    /**
+     * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter. 
+     */
+    public double carParkCarWeight = 1;
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
