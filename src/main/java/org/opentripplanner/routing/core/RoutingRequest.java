@@ -464,7 +464,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /* CONSTRUCTORS */
 
-
     /** Constructor for options; modes defaults to walk and transit */
     public RoutingRequest() {
         // http://en.wikipedia.org/wiki/Walking
@@ -1122,6 +1121,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (maxPreTransitTime > 0) {
             this.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
+        }
+    }
+    
+    public void setCarParkCarLegWeight(double carParkCarLegWeight) {
+        if(carParkCarLegWeight>0) {
+            this.carParkCarLegWeight = carParkCarLegWeight;
         }
     }
 
