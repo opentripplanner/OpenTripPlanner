@@ -1261,9 +1261,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
             throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
         }
-        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-        }
+
         // FIXME couldn't this be simplified by only specifying TWO of the values?
         if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
             throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
