@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -1011,7 +1010,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(useTraffic).hashCode() * 10169
+                + new Double(carParkCarLegWeight).hashCode();
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1109,19 +1109,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int getAlightTime(TraverseMode transitMode) {
         Integer i = this.rctx.graph.alightTimes.get(transitMode);
         return i == null ? 0 : i;
-    }
-
-    private String getRouteOrAgencyStr(HashSet<String> strings) {
-        StringBuilder builder = new StringBuilder();
-        for (String agency : strings) {
-            builder.append(agency);
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            // trim trailing comma
-            builder.setLength(builder.length() - 1);
-        }
-        return builder.toString();
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
