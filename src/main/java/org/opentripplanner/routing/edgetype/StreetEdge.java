@@ -493,10 +493,19 @@ public class StreetEdge extends Edge implements Cloneable {
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
         if (options.kissAndRide || options.parkAndRide) {
+
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {
-                if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
+                if(options.parkAndRide) {
+                    //make the initial drive more expensive to shorten it
+                    if (!s0.isEverBoarded())  {
+                        System.out.println("multiplier:" + options.parkAndRidePretransitMultiplier);
+                        s1.incrementPreTransitTime((int)(roundedTime*options.parkAndRidePretransitMultiplier));
+                    }
+                } else {
+                    if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);                
+                }
             }
             if (s1.isMaxPreTransitTimeExceeded(options)) {
                 if (options.softPreTransitLimiting) {
