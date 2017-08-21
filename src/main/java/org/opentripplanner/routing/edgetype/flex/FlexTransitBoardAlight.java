@@ -54,9 +54,15 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
         this.hop = hop;
     }
 
-
     @Override
     public TripTimes getNextTrip(State s0, ServiceDay sd) {
+        if (hop.isUnscheduled()) {
+            RoutingRequest options = s0.getOptions();
+            Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
+            int stopIndex = boarding ? getStopIndex() : getStopIndex() - 1;
+            int time = hop.getRunningTime(s0);
+            return timetable.getNextTrip(s0, sd, stopIndex, boarding, 0, 0, time);
+        }
         double adjustment = boarding ? startIndex : -1 * (1 - endIndex);
         RoutingRequest options = s0.getOptions();
         Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
@@ -66,6 +72,13 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
 
     @Override
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
+        if (hop.isUnscheduled()) {
+            if (boarding) {
+                return (int) (sd.time(tripTimes.getDepartureTime(getStopIndex())) - s0.getTimeSeconds());
+            } else {
+                return (int) (s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(getStopIndex() - 1))) + hop.getRunningTime(s0);
+            }
+        }
         int stopIndex = getStopIndex();
         if (boarding) {
             int offset = (int) Math.round(startIndex * (tripTimes.getRunningTime(stopIndex)));

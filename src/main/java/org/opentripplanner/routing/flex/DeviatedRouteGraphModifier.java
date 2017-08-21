@@ -87,11 +87,24 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         PatternHop originalHop = hop.getOriginalHop();
         GraphPath path = new GraphPath(state, false);
         LengthIndexedLine line = new LengthIndexedLine(originalHop.getGeometry());
+        double startIndex = hop.getStartIndex();
         double endIndex = line.project(state.getBackEdge().getToVertex().getCoordinate());
-        if (endIndex < hop.getStartIndex())
+        if (endIndex < startIndex)
             return null;
-        return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
-                hop.getStartIndex(), endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), geometry(path), path.getDuration(), opt.flagStopBufferSize);
+        // we may want to create a ~direct~ hop.
+        // let's say, create a direct hop if the distance we would travel on the route is < 100m todo
+        if (tooLittleOnRoute(originalHop, line, startIndex, endIndex)) {
+            createDirectHop(opt, originalHop);
+            return null;
+        } else {
+            return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
+                    startIndex, endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), geometry(path), path.getDuration(), opt.flagStopBufferSize);
+        }
+    }
+
+    private boolean tooLittleOnRoute(PatternHop originalHop, LengthIndexedLine line, double startIndex, double endIndex) {
+        double onRouteDistance = SphericalDistanceLibrary.fastLength((LineString) line.extractLine(startIndex, endIndex));
+        return onRouteDistance <= Math.min(100, originalHop.getDistance());
     }
 
     @Override

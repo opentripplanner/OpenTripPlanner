@@ -102,6 +102,12 @@ public class PartialPatternHop extends PatternHop {
         setGeometry(geometry);
     }
 
+    // pass-thru for TemporaryDirectPatternHop
+    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
+        this.originalHop = hop;
+    }
+
     private void setGeometry(PatternHop hop, LengthIndexedLine line, double boardBuffer, double alightBuffer) {
         double pointsPerMeter =  (line.getEndIndex() - line.getStartIndex()) / SphericalDistanceLibrary.fastLength(hop.getGeometry());
         double boardBufferPts = boardBuffer * pointsPerMeter;
@@ -153,7 +159,17 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public LineString getDisplayGeometry() {
-        return displayGeometry;
+        if (displayGeometry != null) {
+            return displayGeometry;
+        }
+        return getGeometry();
+    }
+
+    /**
+     * Return true if "unscheduled" ie call-n-ride
+     */
+    public boolean isUnscheduled() {
+        return false;
     }
 
     public boolean isDeviatedRouteService() {

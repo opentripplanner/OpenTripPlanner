@@ -30,6 +30,11 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
         super(hop, from, to, fromStop, toStop, startIndex, endIndex, startGeometry, startVehicleTime, endGeometry, endVehicleTime, buffer);
     }
 
+    // pass-thru for TemporaryDirectPatternHop
+    public TemporaryPartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
+        super(hop, from, to, fromStop, toStop);
+    }
+
     @Override
     public void dispose() {
         fromv.removeOutgoing(this);
