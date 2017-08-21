@@ -28,6 +28,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
+import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -609,6 +610,11 @@ public abstract class GraphPathToTripPlanConverter {
 
             if (leg.headsign == null) {
                 leg.headsign = trip.getTripHeadsign();
+            }
+
+            Edge edge = states[states.length - 1].backEdge;
+            if (edge instanceof TemporaryDirectPatternHop) {
+                leg.callAndRide = true;
             }
         }
     }

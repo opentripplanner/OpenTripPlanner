@@ -62,6 +62,16 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     }
 
     @Override
+    public boolean isDeviatedRouteBoard() {
+        return true;
+    }
+
+    @Override
+    public boolean isDeviatedRouteAlight() {
+        return true;
+    }
+
+    @Override
     public void dispose() {
         fromv.removeOutgoing(this);
         tov.removeIncoming(this);

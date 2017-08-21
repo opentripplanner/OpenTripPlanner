@@ -30,7 +30,7 @@ public class PatternDepartVertex extends PatternStopVertex {
 
     /** constructor for temporary trip patterns */
     public PatternDepartVertex(Graph g, TripPattern pattern, int stopIndex, Stop stop) {
-        super(g, makeTemporaryLabel(pattern, stopIndex, stop), pattern, stop);
+        super(g, makeTemporaryLabel(pattern, stopIndex), pattern, stop);
     }
 
     // constructor for single-trip hops with no trip pattern (frequency patterns) is now missing
@@ -40,8 +40,8 @@ public class PatternDepartVertex extends PatternStopVertex {
         return String.format("%s_%02d_D", pattern.code, stop);
     }
 
-    private static String makeTemporaryLabel(TripPattern pattern, int stop, Stop origin) {
-        return String.format("%s_%02d_D_%s", pattern.code + "_temp", stop, origin.toString());
+    private static String makeTemporaryLabel(TripPattern pattern, int stop) {
+        return String.format("%s_%02d_D_%d", pattern.code + "_temp", stop, new Random().nextInt());
     }
 
 }
