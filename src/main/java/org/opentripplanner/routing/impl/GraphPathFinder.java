@@ -270,8 +270,9 @@ public class GraphPathFinder {
                     }
                     GraphPath joinedPath = joinPaths(concatenatedPaths, false);
 
-                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
-                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
+                    if( (joinedPath != null) &&
+                        ((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
+                         (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000))) {
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
                             for (AgencyAndId tripId : joinedPath.getTrips()) {
@@ -461,11 +462,12 @@ public class GraphPathFinder {
                     Collections.reverse(paths);
                 }
                 GraphPath joinedPath = joinPaths(paths, true);
-                time = (request.arriveBy
-                    ? joinedPath.getEndTime() - 60
-                    : joinedPath.getStartTime() + 60);
-                completePaths.add(joinedPath);
-
+                if (joinedPath != null) {
+                    time = (request.arriveBy
+                            ? joinedPath.getEndTime() - 60
+                            : joinedPath.getStartTime() + 60);
+                    completePaths.add(joinedPath);
+                }
             }
             request.setRoutingContext(router.graph);
             request.rctx.debugOutput = debugOutput;
@@ -489,12 +491,16 @@ public class GraphPathFinder {
                 // add a leg-switching state
                 LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
                 lastState = legSwitchingEdge.traverse(lastState);
+                if (lastState == null)
+                    return null;
                 newPath.edges.add(legSwitchingEdge);
                 newPath.states.add(lastState);
             }
             // add the next subpath
             for (Edge e : path.edges) {
                 lastState = e.traverse(lastState);
+                if (lastState == null)
+                    return null;
                 newPath.edges.add(e);
                 newPath.states.add(lastState);
             }
