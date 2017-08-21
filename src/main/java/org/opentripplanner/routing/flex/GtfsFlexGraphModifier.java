@@ -12,14 +12,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.flex;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.vividsolutions.jts.geom.LineString;
 import org.apache.commons.math3.util.Pair;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
@@ -62,12 +58,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
-
-import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
 
 /**
  * Create temporary vertices and edges for GTFS-flex service.
@@ -218,7 +214,7 @@ public abstract class GtfsFlexGraphModifier {
 
     private TemporaryTransitStop getTemporaryStop(StreetVertex streetVertex, State s, RoutingContext rctx, RoutingRequest options) {
         if (temporaryTransitStopsForLocation.get(streetVertex) == null) {
-            String name = findName(s, streetVertex, options.locale);
+            String name = findName(s, streetVertex, options.locale, !options.arriveBy);
             TemporaryTransitStop stop = createTemporaryTransitStop(name, streetVertex, rctx);
             temporaryTransitStopsForLocation.put(streetVertex, stop);
             return stop;
@@ -227,16 +223,26 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     // Return a reasonable name for a vertex.
-    private String findName(State state, StreetVertex vertex, Locale locale) {
+    private String findName(State state, StreetVertex vertex, Locale locale, boolean forwards) {
         I18NString unnamed = new LocalizedString("unnamedStreet", (String[]) null);
         I18NString name = vertex.getIntersectionName(locale);
         if (!name.equals(unnamed)) {
             return name.toString();
         }
-        for (Edge e : Iterables.concat(vertex.getIncoming(), vertex.getOutgoing())) {
-            if (e instanceof StreetEdge) {
-                return e.getName(locale);
+        // search for street edges but don't look too far away
+        Queue<Vertex> queue = new LinkedList<>();
+        queue.add(vertex);
+        int n = 0;
+        while (!queue.isEmpty() && n < 3) {
+            Vertex v = queue.poll();
+            for (Edge e : (forwards ? v.getOutgoing() : v.getIncoming())) {
+                if (e instanceof StreetEdge) {
+                    return e.getName(locale);
+                } else {
+                    queue.add(forwards ? e.getToVertex() : e.getFromVertex());
+                }
             }
+            n++;
         }
         if (state != null && state.backEdge instanceof StreetEdge) { // this really assumes flag stops
             return state.backEdge.getName(locale);
@@ -368,7 +374,7 @@ public abstract class GtfsFlexGraphModifier {
 
         // direct hop
         TemporaryDirectPatternHop newHop = new TemporaryDirectPatternHop(originalPatternHop, patternDepartVertex, patternArriveVertex, fromStop.getStop(), toStop.getStop(),
-                geometry(path), path.getDuration());
+                path.getGeometry(), path.getDuration());
         rr.rctx.temporaryEdges.add(newHop);
 
         createBoardEdge(rr, transitStopDepart, patternDepartVertex, newHop);
@@ -465,11 +471,5 @@ public abstract class GtfsFlexGraphModifier {
             }
         }
         return ret;
-    }
-
-
-    private static LineString geometry(GraphPath path) {
-        CoordinateArrayListSequence coordinates = makeCoordinates(path.edges.toArray(new Edge[0]));
-        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 }
