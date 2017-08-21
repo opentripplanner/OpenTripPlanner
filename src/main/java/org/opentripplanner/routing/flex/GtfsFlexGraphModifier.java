@@ -43,7 +43,6 @@ import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
@@ -63,11 +62,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Queue;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
@@ -347,7 +344,7 @@ public abstract class GtfsFlexGraphModifier {
         createBoardEdge(rr, transitStopDepart, patternDepartVertex, hop);
     }
 
-    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop) {
+    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop, StreetVertex fromVertex, StreetVertex toVertex) {
         AStar astar = new AStar();
         RoutingRequest request = rr.clone();
         request.setArriveBy(false);
@@ -361,8 +358,8 @@ public abstract class GtfsFlexGraphModifier {
             throw new RuntimeException("No path to target");
         }
         GraphPath path = paths.iterator().next();
-        TemporaryTransitStop fromStop = getTemporaryStop(getStreetVertex(rr.getRoutingContext().origin, true), null, rr.rctx, rr);
-        TemporaryTransitStop toStop = getTemporaryStop(getStreetVertex(rr.getRoutingContext().target, false), null, rr.rctx, rr);
+        TemporaryTransitStop fromStop = getTemporaryStop(fromVertex, null, rr.rctx, rr);
+        TemporaryTransitStop toStop = getTemporaryStop(toVertex, null, rr.rctx, rr);
 
         TransitStopDepart transitStopDepart = createTransitStopDepart(rr, fromStop);
         TransitStopArrive transitStopArrive = createTransitStopArrive(rr, toStop);
@@ -456,23 +453,6 @@ public abstract class GtfsFlexGraphModifier {
                 new TemporaryPatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex() + 1, stop);
         rr.rctx.temporaryVertices.add(patternArriveVertex);
         return patternArriveVertex;
-    }
-
-
-    private StreetVertex getStreetVertex(Vertex vertex, boolean forwards) {
-        Queue<Vertex> queue = new LinkedList<>();
-        queue.add(vertex);
-        while (!queue.isEmpty()) {
-            Vertex v = queue.poll();
-            if (v instanceof StreetVertex && !(v instanceof TemporaryStreetLocation)) {
-                return (StreetVertex) v;
-            }
-            for (Edge e : (forwards ? v.getOutgoing() : v.getIncoming())) {
-                Vertex w = forwards ? e.getToVertex() : e.getFromVertex();
-                queue.add(w);
-            }
-        }
-        return null;
     }
 
     private Collection<TemporaryPartialPatternHop> findTemporaryPatternHops(RoutingRequest options, PatternHop patternHop) {

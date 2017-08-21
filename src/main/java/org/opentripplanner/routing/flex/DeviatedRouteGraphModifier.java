@@ -17,25 +17,22 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
 
 /**
  * Add temporary vertices/edges for deviated-route service.
@@ -68,7 +65,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         double startIndex = line.getStartIndex();
         double endIndex = line.project(state.getBackEdge().getToVertex().getCoordinate());
         return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
-                startIndex, endIndex, null, 0, geometry(path), path.getDuration(), opt.flagStopBufferSize);
+                startIndex, endIndex, null, 0, path.getGeometry(), path.getDuration(), opt.flagStopBufferSize);
     }
 
     @Override
@@ -79,7 +76,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         double startIndex = line.project(state.getBackEdge().getFromVertex().getCoordinate());
         double endIndex = line.getEndIndex();
         return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(),
-                startIndex, endIndex, geometry(path), path.getDuration(), null, 0, opt.flagStopBufferSize);
+                startIndex, endIndex, path.getGeometry(), path.getDuration(), null, 0, opt.flagStopBufferSize);
     }
 
     @Override
@@ -94,11 +91,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         // we may want to create a ~direct~ hop.
         // let's say, create a direct hop if the distance we would travel on the route is < 100m todo
         if (tooLittleOnRoute(originalHop, line, startIndex, endIndex)) {
-            createDirectHop(opt, originalHop);
+            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
+            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+            createDirectHop(opt, originalHop, fromVertex, toVertex);
             return null;
         } else {
             return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
-                    startIndex, endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), geometry(path), path.getDuration(), opt.flagStopBufferSize);
+                    startIndex, endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), path.getGeometry(), path.getDuration(), opt.flagStopBufferSize);
         }
     }
 
@@ -126,20 +125,15 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         return findFirstStreetVertex(s);
     }
 
-    private StreetVertex findFirstStreetVertex(State state) {
-        StreetVertex v = null;
-        for (State s = state; s != null; s = s.getBackState()) {
-            if (s.getVertex() instanceof StreetVertex && ! (s.getVertex() instanceof TemporaryStreetLocation)) {
-                v = (StreetVertex) s.getVertex();
-            }
+    private StreetVertex findFirstStreetVertex(State s) {
+        return findFirstStreetVertex(s.getOptions().rctx, s.getOptions().arriveBy);
+    }
+
+    private StreetVertex findFirstStreetVertex(RoutingContext rctx, boolean reverse) {
+        Vertex v = reverse ? rctx.toVertex : rctx.fromVertex;
+        if (!(v instanceof StreetVertex)) {
+            throw new RuntimeException("Not implemented: GTFS-flex from or to a stop.");
         }
-        return v;
+        return (StreetVertex) v;
     }
-
-    private static LineString geometry(GraphPath path) {
-        CoordinateArrayListSequence coordinates = makeCoordinates(path.edges.toArray(new Edge[0]));
-        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
-    }
-
-
 }
