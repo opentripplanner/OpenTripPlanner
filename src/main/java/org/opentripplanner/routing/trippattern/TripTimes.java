@@ -123,6 +123,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
 
+    /* DRT service parameters */
+    private DrtTravelTime maxTravelTime;
+
+    private DrtTravelTime avgTravelTime;
+
+    private int advanceBookMin = 0;
+
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
@@ -189,6 +196,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.continuousStops = deduplicator.deduplicateIntArray(continuousStops);
         this.serviceAreaRadius = deduplicator.deduplicateDoubleArray(serviceAreaRadius);
         this.serviceArea = deduplicator.deduplicateStringArray(serviceArea);
+        if (trip.getDrtMaxTravelTime() != null) {
+            this.maxTravelTime = DrtTravelTime.fromSpec(trip.getDrtMaxTravelTime());
+        }
+        if (trip.getDrtAvgTravelTime() != null) {
+            this.avgTravelTime = DrtTravelTime.fromSpec(trip.getDrtAvgTravelTime());
+        }
+        this.advanceBookMin = trip.getDrtAdvanceBookMin();
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -207,6 +221,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.continuousStops = object.continuousStops;
         this.serviceAreaRadius = object.serviceAreaRadius;
         this.serviceArea = object.serviceArea;
+        this.maxTravelTime = object.maxTravelTime;
+        this.avgTravelTime = object.avgTravelTime;
+        this.advanceBookMin = object.advanceBookMin;
     }
 
     /**
@@ -495,6 +512,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public boolean isTimepoint(final int stopIndex) {
         return timepoints.get(stopIndex);
     }
+
+
+
 
     /**
      * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.

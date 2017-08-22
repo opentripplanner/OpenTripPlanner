@@ -15,6 +15,9 @@ public class TripShort {
     public AgencyAndId serviceId;
     public String shapeId;
     public Integer direction;
+    public String drtMaxTravelTime;
+    public String drtAvgTravelTime;
+    public Integer drtAdvanceBookMin;
 
     // INCLUDE start and end time, pattern and route in detail version
     
@@ -26,6 +29,9 @@ public class TripShort {
         shapeId = shape == null ? null : shape.getId();
         String directionId = trip.getDirectionId();
         direction = directionId == null ? null : Integer.parseInt(directionId);
+        drtMaxTravelTime = trip.getDrtMaxTravelTime();
+        drtAvgTravelTime = trip.getDrtAvgTravelTime();
+        drtAdvanceBookMin = trip.getDrtAdvanceBookMin();
     }
 
     public static List<TripShort> list (Collection<Trip> in) {
