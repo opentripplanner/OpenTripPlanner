@@ -76,7 +76,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
             if (boarding) {
                 return (int) (sd.time(tripTimes.getDepartureTime(getStopIndex())) - s0.getTimeSeconds());
             } else {
-                return (int) (s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(getStopIndex() - 1))) + hop.getRunningTime(s0);
+                return (int) (s0.getTimeSeconds() - (sd.time(tripTimes.getArrivalTime(getStopIndex() - 1)) + hop.getRunningTime(s0)));
             }
         }
         int stopIndex = getStopIndex();
