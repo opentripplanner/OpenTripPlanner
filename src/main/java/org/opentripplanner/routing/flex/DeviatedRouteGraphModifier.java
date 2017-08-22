@@ -91,9 +91,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         // we may want to create a ~direct~ hop.
         // let's say, create a direct hop if the distance we would travel on the route is < 100m todo
         if (tooLittleOnRoute(originalHop, line, startIndex, endIndex)) {
-            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
-            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
-            createDirectHop(opt, originalHop, fromVertex, toVertex);
+            createDirectHop(opt, originalHop);
             return null;
         } else {
             return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
