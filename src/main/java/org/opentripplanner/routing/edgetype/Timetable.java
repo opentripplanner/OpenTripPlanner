@@ -228,6 +228,46 @@ public class Timetable implements Serializable {
         return getNextTrip(s0, serviceDay, stopIndex, boarding, 0, 0, 0);
     }
 
+    // could integrate with getNextTrip
+    public TripTimes getNextCallNRideTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, int travelTime) {
+        /* Search at the state's time, but relative to midnight on the given service day. */
+        int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
+        // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
+        // Adjust for possible boarding time TODO: This should be included in the trip and based on GTFS
+        if (boarding) {
+            time += s0.getOptions().getBoardTime(this.pattern.mode);
+        } else {
+            time -= s0.getOptions().getAlightTime(this.pattern.mode);
+        }
+        TripTimes bestTrip = null;
+        Stop currentStop = pattern.getStop(stopIndex);
+        int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        for (TripTimes tt : tripTimes) {
+            if (tt.isCanceled()) continue;
+            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
+            if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
+            int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
+            if (adjustedTime == -1) continue;
+            if (boarding) {
+                int depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime);
+                if (depTime >= adjustedTime && depTime < bestTime) {
+                    bestTrip = tt;
+                    bestTime = depTime;
+                }
+            } else {
+                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, travelTime);
+                if (arvTime < 0) continue;
+                if (arvTime <= adjustedTime && arvTime > bestTime) {
+                    bestTrip = tt;
+                    bestTime = arvTime;
+                }
+            }
+        }
+
+        return bestTrip;
+    }
+
+
     /**
      * Check transfer table rules. Given the last alight time from the State,
      * return the boarding time t0 adjusted for this particular trip's minimum transfer time,

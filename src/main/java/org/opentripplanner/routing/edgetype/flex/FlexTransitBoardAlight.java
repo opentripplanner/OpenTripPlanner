@@ -59,9 +59,8 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
         if (hop.isUnscheduled()) {
             RoutingRequest options = s0.getOptions();
             Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-            int stopIndex = boarding ? getStopIndex() : getStopIndex() - 1;
             int time = hop.getRunningTime(s0);
-            return timetable.getNextTrip(s0, sd, stopIndex, boarding, 0, 0, time);
+            return timetable.getNextCallNRideTrip(s0, sd, getStopIndex(), boarding, time);
         }
         double adjustment = boarding ? startIndex : -1 * (1 - endIndex);
         RoutingRequest options = s0.getOptions();
@@ -73,10 +72,13 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     @Override
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
         if (hop.isUnscheduled()) {
+            int currTime = sd.secondsSinceMidnight(s0.getTimeSeconds());
             if (boarding) {
-                return (int) (sd.time(tripTimes.getDepartureTime(getStopIndex())) - s0.getTimeSeconds());
+                int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime);
+                return (int) (sd.time(scheduledTime) - s0.getTimeSeconds());
             } else {
-                return (int) (s0.getTimeSeconds() - (sd.time(tripTimes.getArrivalTime(getStopIndex() - 1)) + hop.getRunningTime(s0)));
+                int scheduledTime = tripTimes.getCallAndRideAlightTime(getStopIndex(), currTime, hop.getRunningTime(s0));
+                return (int) (s0.getTimeSeconds() - (sd.time(scheduledTime)));
             }
         }
         int stopIndex = getStopIndex();

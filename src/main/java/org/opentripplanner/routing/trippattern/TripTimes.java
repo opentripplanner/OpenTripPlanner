@@ -319,6 +319,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
     }
 
+    public int getCallAndRideBoardTime(int stop, long currTime) {
+        return (int) Math.min(Math.max(currTime, getDepartureTime(stop)), getArrivalTime(stop + 1));
+    }
+
+    public int getCallAndRideAlightTime(int stop, long currTime, int travelTime) {
+        currTime -= travelTime;
+        int startOfService = (int) Math.min(Math.max(currTime, getDepartureTime(stop - 1)), getArrivalTime(stop));
+        return startOfService + travelTime;
+    }
+
     /**
      * @return true if this TripTimes represents an unmodified, scheduled trip from a published
      *         timetable or false if it is a updated, cancelled, or otherwise modified one. This
