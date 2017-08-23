@@ -722,23 +722,23 @@ public class GraphIndex {
         for (TripPattern pattern : patternForId.values()) {
             if (pattern.hasFlexService()) {
                 LOG.debug("Matching {}", pattern);
-                //If there are no shapes in GTFS pattern geometry is generated
-                //generated geometry is useless for street matching
-                //that is why pattern.geometry is null in that case
-                if (pattern.geometry == null) {
-                    continue;
+
+                if (pattern.geometry != null) {
+                    List<Edge> edges = matcher.match(pattern.geometry);
+                    if (edges == null || edges.isEmpty()) {
+                        LOG.warn("Could not match to street network: {}", pattern);
+                        continue;
+                    }
+                    for (Edge e : edges) {
+                        patternsForEdge.put(e, pattern);
+                    }
                 }
 
-                List<Edge> edges = matcher.match(pattern.geometry);
-                if (edges == null || edges.isEmpty()) {
-                    LOG.warn("Could not match to street network: {}", pattern);
-                    continue;
-                }
-                for (Edge e : edges) {
-                    patternsForEdge.put(e, pattern);
-                }
                 for(PatternHop patternHop : pattern.getPatternHops()) {
-
+                    List<Edge> edges;
+                    if (patternHop.getGeometry() == null) {
+                        continue;
+                    }
                     if (isSinglePoint(patternHop.getGeometry())) {
                         Coordinate pt = patternHop.getGeometry().getCoordinate();
                         edges = findClosestEdges(pt);

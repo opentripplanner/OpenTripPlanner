@@ -164,7 +164,11 @@ public class Timetable implements Serializable {
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
             if (boarding) {
-                int depTime = tt.getDepartureTime(stopIndex) + (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex)) - preBoardVehicleTime;
+                int adjustment = 0;
+                if (stopIndex + 1 < tt.getNumStops() && flexOffsetScale != 0.0) {
+                    adjustment = (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex));
+                }
+                int depTime = tt.getDepartureTime(stopIndex) + adjustment - preBoardVehicleTime;
                 if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
                                            // now its not sure if this check should be still in place because there is a boolean field
                                            // for canceled trips
@@ -173,7 +177,11 @@ public class Timetable implements Serializable {
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getArrivalTime(stopIndex) + (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex - 1)) + postAlightVehicleTime;
+                int adjustment = 0;
+                if (stopIndex - 1 >= 0 && flexOffsetScale != 0.0) {
+                    adjustment = (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex - 1));
+                }
+                int arvTime = tt.getArrivalTime(stopIndex) + adjustment + postAlightVehicleTime;
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;
