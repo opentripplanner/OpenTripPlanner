@@ -1,5 +1,4 @@
 package org.opentripplanner.index;
-
 import static java.util.Collections.emptyList;
 
 import java.text.ParseException;
@@ -2479,7 +2478,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStations")
                 .type(new GraphQLList(bikeRentalStationType))
-                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
+                          : Collections.EMPTY_LIST))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStation")
@@ -2488,8 +2490,10 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.graph.getService(BikeRentalStationService.class)
-                    .getBikeRentalStations()
+                .dataFetcher(environment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
+                          : Collections.EMPTY_LIST)
                     .stream()
                     .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument("id")))
                     .findFirst()
@@ -2498,7 +2502,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeParks")
                 .type(new GraphQLList(bikeParkType))
-                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(BikeRentalStationService.class).getBikeParks()))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
+                          : Collections.EMPTY_LIST))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikePark")
@@ -2507,8 +2514,10 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.graph.getService(BikeRentalStationService.class)
-                    .getBikeParks()
+                .dataFetcher(environment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
+                          : Collections.EMPTY_LIST)
                     .stream()
                     .filter(bikePark -> bikePark.id.equals(environment.getArgument("id")))
                     .findFirst()
