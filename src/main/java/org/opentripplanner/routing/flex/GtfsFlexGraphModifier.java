@@ -45,7 +45,7 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternArriveVertex;
@@ -217,7 +217,7 @@ public abstract class GtfsFlexGraphModifier {
         return getTemporaryStop(streetVertex, s, s.getContext(), s.getOptions());
     }
 
-    private TemporaryTransitStop getTemporaryStop(StreetVertex streetVertex, State s, RoutingContext rctx, RoutingRequest options) {
+    protected TemporaryTransitStop getTemporaryStop(StreetVertex streetVertex, State s, RoutingContext rctx, RoutingRequest options) {
         if (temporaryTransitStopsForLocation.get(streetVertex) == null) {
             String name = findName(s, streetVertex, options.locale, !options.arriveBy);
             TemporaryTransitStop stop = createTemporaryTransitStop(name, streetVertex, rctx);
@@ -355,7 +355,7 @@ public abstract class GtfsFlexGraphModifier {
         createBoardEdge(rr, transitStopDepart, patternDepartVertex, hop);
     }
 
-    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop) {
+    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop, TransitStop fromStop, TransitStop toStop) {
         RoutingRequest request = rr.clone();
         request.setMode(TraverseMode.CAR);
         request.setArriveBy(mainSearchArriveBy);
@@ -371,14 +371,17 @@ public abstract class GtfsFlexGraphModifier {
         }
         GraphPath path = paths.iterator().next();
 
-        StreetVertex fromVertex = findFirstStreetVertex(request, true);
-        StreetVertex toVertex = findFirstStreetVertex(request, false);
+        createDirectHop(rr, originalPatternHop, fromStop, toStop, path);
+    }
 
-        TemporaryTransitStop fromStop = getTemporaryStop(fromVertex, null, rr.rctx, rr);
-        TemporaryTransitStop toStop = getTemporaryStop(toVertex, null, rr.rctx, rr);
+    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop, TransitStop fromStop, TransitStop toStop, GraphPath path) {
+        if (fromStop instanceof TemporaryTransitStop && fromStop.departVertex == null) {
+            createTransitStopDepart(rr, (TemporaryTransitStop) fromStop);
+        }
+        if (toStop instanceof TemporaryTransitStop && toStop.arriveVertex == null) {
+            createTransitStopArrive(rr, (TemporaryTransitStop) toStop);
+        }
 
-        TransitStopDepart transitStopDepart = createTransitStopDepart(rr, fromStop);
-        TransitStopArrive transitStopArrive = createTransitStopArrive(rr, toStop);
         TemporaryPatternDepartVertex patternDepartVertex = createPatternDepartVertex(rr, originalPatternHop, fromStop.getStop());
         TemporaryPatternArriveVertex patternArriveVertex = createPatternArriveVertex(rr, originalPatternHop, toStop.getStop());
 
@@ -387,18 +390,9 @@ public abstract class GtfsFlexGraphModifier {
                 path.getGeometry(), path.getDuration());
         rr.rctx.temporaryEdges.add(newHop);
 
-        createBoardEdge(rr, transitStopDepart, patternDepartVertex, newHop);
-        createAlightEdge(rr, transitStopArrive, patternArriveVertex, newHop);
+        createBoardEdge(rr, fromStop.departVertex, patternDepartVertex, newHop);
+        createAlightEdge(rr, toStop.arriveVertex, patternArriveVertex, newHop);
     }
-
-    private StreetVertex findFirstStreetVertex(RoutingRequest rr, boolean outbound) {
-        Vertex v = outbound ? rr.rctx.fromVertex : rr.rctx.toVertex;
-        if (!(v instanceof StreetVertex)) {
-            throw new RuntimeException("Not implemented: GTFS-flex from or to a stop.");
-        }
-        return (StreetVertex) v;
-    }
-
 
     private void addStateToPatternHopStateMap(Edge edge, State s, Map<PatternHop, State> patternHopStateMap) {
         Collection<PatternHop> hops = graph.index.getHopsForEdge(edge);

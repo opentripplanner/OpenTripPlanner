@@ -33,6 +33,8 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 
 /**
  * Add temporary vertices/edges for deviated-route service.
@@ -64,6 +66,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         double startIndex = line.getStartIndex();
         double endIndex = line.project(state.getBackEdge().getToVertex().getCoordinate());
+        if (hop.getStopIndex() == 0 && tooLittleOnRoute(hop, line, startIndex, endIndex)) {
+            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+            TemporaryTransitStop toTempStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
+            TransitStop fromStop = graph.index.stopVertexForStop.get(hop.getBeginStop());
+            createDirectHop(opt, hop, fromStop, toTempStop, path);
+            return null;
+        }
         return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
                 startIndex, endIndex, null, 0, path.getGeometry(), path.getDuration(), opt.flagStopBufferSize);
     }
@@ -75,6 +84,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         // state is place where we meet line
         double startIndex = line.project(state.getBackEdge().getFromVertex().getCoordinate());
         double endIndex = line.getEndIndex();
+        if (hop.getStopIndex() + 1 == hop.getPattern().getPatternHops().size() && tooLittleOnRoute(hop, line, startIndex, endIndex)) {
+            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
+            TemporaryTransitStop fromTempStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+            TransitStop toStop = graph.index.stopVertexForStop.get(hop.getEndStop());
+            createDirectHop(opt, hop, fromTempStop, toStop, path);
+            return null;
+        }
         return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(),
                 startIndex, endIndex, path.getGeometry(), path.getDuration(), null, 0, opt.flagStopBufferSize);
     }
@@ -91,7 +107,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         // we may want to create a ~direct~ hop.
         // let's say, create a direct hop if the distance we would travel on the route is < 100m todo
         if (tooLittleOnRoute(originalHop, line, startIndex, endIndex)) {
-            createDirectHop(opt, originalHop);
+            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
+            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+
+            TemporaryTransitStop fromTempStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+            TemporaryTransitStop toTempStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
+
+            createDirectHop(opt, originalHop, fromTempStop, toTempStop);
             return null;
         } else {
             return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
