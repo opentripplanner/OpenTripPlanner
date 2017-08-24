@@ -264,6 +264,20 @@ public class Leg {
     @JsonSerialize
     public Boolean callAndRide;
 
+    /* For call-n-ride leg, supply max start time / min end time */
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar maxStartTime = null;
+
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar minEndTime = null;
+
+    /* advanced book min if this is a DRT leg */
+    @XmlAttribute
+    @JsonSerialize
+    public int drtAdvanceBookMin;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg

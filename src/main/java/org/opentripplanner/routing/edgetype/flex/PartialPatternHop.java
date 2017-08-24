@@ -253,5 +253,9 @@ public class PartialPatternHop extends PatternHop {
         return endGeometry;
     }
 
+    public int getDirectVehicleTime() {
+        return startVehicleTime + endVehicleTime;
+    }
+
 }
 

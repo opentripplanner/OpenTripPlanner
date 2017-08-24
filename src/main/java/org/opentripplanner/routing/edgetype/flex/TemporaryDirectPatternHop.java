@@ -83,7 +83,8 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
         tov.removeIncoming(this);
     }
 
-    public int getDirectTime() {
+    @Override
+    public int getDirectVehicleTime() {
         return directTime;
     }
 }

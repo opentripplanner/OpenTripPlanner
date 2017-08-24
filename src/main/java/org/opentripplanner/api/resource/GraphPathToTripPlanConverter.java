@@ -200,9 +200,13 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone(); 
+        TimeZone timeZone = rctx.graph.getTimeZone();
+        return makeCalendar(timeZone, state.getTimeInMillis());
+    }
+
+    private static Calendar makeCalendar(TimeZone timeZone, long time) {
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(state.getTimeInMillis());
+        calendar.setTimeInMillis(time);
         return calendar;
     }
 
@@ -603,6 +607,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
+            leg.drtAdvanceBookMin = trip.getDrtAdvanceBookMin();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -616,6 +621,25 @@ public abstract class GraphPathToTripPlanConverter {
             if (edge instanceof TemporaryDirectPatternHop) {
                 leg.callAndRide = true;
             }
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                int directTime = hop.getDirectVehicleTime();
+                TripTimes tt = states[states.length - 1].getTripTimes();
+                int maxTime = tt.getDemandResponseMaxTime(directTime);
+                int avgTime = tt.getDemandResponseAvgTime(directTime);
+                int delta = maxTime - avgTime;
+                if (directTime != 0 && delta > 0) {
+                    if (hop.isDeviatedRouteBoard()) {
+                        long maxStartTime = leg.startTime.getTimeInMillis() + (delta * 1000);
+                        leg.maxStartTime = makeCalendar(leg.startTime.getTimeZone(), maxStartTime);
+                    }
+                    if (hop.isDeviatedRouteAlight()) {
+                        long minEndTime = leg.endTime.getTimeInMillis() - (delta * 1000);
+                        leg.minEndTime = makeCalendar(leg.endTime.getTimeZone(), minEndTime);
+                    }
+                }
+            }
+
         }
     }
 
