@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 /**
@@ -28,12 +29,16 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implements TemporaryEdge {
     private static final long serialVersionUID = 1L;
 
-    private int time;
+    /*
+     * This is the direct time a car would take to do this hop. Based on DRT service parameters,
+     * it actually may take a different amount of time.
+     */
+    private int directTime;
 
     public TemporaryDirectPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, LineString geometry, int time) {
         super(hop, from, to, fromStop, toStop);
         setGeometry(geometry);
-        this.time = time;
+        this.directTime = time;
     }
 
     @Override
@@ -53,12 +58,13 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return time;
+        return directTime;
     }
 
     @Override
     public int getRunningTime(State s0) {
-        return time;
+        TripTimes tt = s0.getTripTimes();
+        return tt.getDemandResponseMaxTime(directTime);
     }
 
     @Override
@@ -75,5 +81,9 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     public void dispose() {
         fromv.removeOutgoing(this);
         tov.removeIncoming(this);
+    }
+
+    public int getDirectTime() {
+        return directTime;
     }
 }

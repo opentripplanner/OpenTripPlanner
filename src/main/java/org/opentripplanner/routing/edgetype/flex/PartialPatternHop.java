@@ -43,6 +43,7 @@ public class PartialPatternHop extends PatternHop {
     private LineString displayGeometry;
 
     // if we have this, it's a deviated-route hop
+    // these are "direct" times, ie drive times without DRT service parameteers applied
     private int startVehicleTime = 0;
     private int endVehicleTime = 0;
     private LineString startGeometry;
@@ -145,16 +146,20 @@ public class PartialPatternHop extends PatternHop {
 
     @Override
     public int getRunningTime(State s0) {
+        TripTimes tt = s0.getTripTimes();
+        int vehicleTime = startVehicleTime + endVehicleTime;
+        if (vehicleTime > 0) {
+            vehicleTime = tt.getDemandResponseMaxTime(vehicleTime);
+        }
         if (originalHopLength == 0) {
-            return startVehicleTime + endVehicleTime;
+            return vehicleTime;
         }
         double startPct = startIndex / originalHopLength;
         double endPct = endIndex / originalHopLength;
-        TripTimes tt = s0.getTripTimes();
         // necessary so rounding happens using the same coefficients as in FlexTransitBoardAlight
         int arr = tt.getArrivalTime(stopIndex + 1) - (int) Math.round((1 - endPct) * (tt.getRunningTime(stopIndex)));
         int dep = tt.getDepartureTime(stopIndex) + (int) Math.round(startPct * (tt.getRunningTime(stopIndex)));
-        return (arr - dep) + startVehicleTime + endVehicleTime;
+        return (arr - dep) + vehicleTime;
     }
 
     @Override

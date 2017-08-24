@@ -135,7 +135,7 @@ public class Timetable implements Serializable {
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
      */
-    public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, double flexOffsetScale, int preBoardVehicleTime, int postAlightVehicleTime) {
+    public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, double flexOffsetScale, int preBoardDirectTime, int postAlightDirectTime) {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
@@ -168,7 +168,8 @@ public class Timetable implements Serializable {
                 if (stopIndex + 1 < tt.getNumStops() && flexOffsetScale != 0.0) {
                     adjustment = (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex));
                 }
-                int depTime = tt.getDepartureTime(stopIndex) + adjustment - preBoardVehicleTime;
+                int vehicleTime = (preBoardDirectTime == 0) ? 0 : tt.getDemandResponseMaxTime(preBoardDirectTime);
+                int depTime = tt.getDepartureTime(stopIndex) + adjustment - vehicleTime;
                 if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
                                            // now its not sure if this check should be still in place because there is a boolean field
                                            // for canceled trips
@@ -181,7 +182,8 @@ public class Timetable implements Serializable {
                 if (stopIndex - 1 >= 0 && flexOffsetScale != 0.0) {
                     adjustment = (int) Math.round(flexOffsetScale*tt.getRunningTime(stopIndex - 1));
                 }
-                int arvTime = tt.getArrivalTime(stopIndex) + adjustment + postAlightVehicleTime;
+                int vehicleTime = (postAlightDirectTime == 0) ? 0 : tt.getDemandResponseMaxTime(postAlightDirectTime);
+                int arvTime = tt.getArrivalTime(stopIndex) + adjustment + vehicleTime;
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;
@@ -229,7 +231,7 @@ public class Timetable implements Serializable {
     }
 
     // could integrate with getNextTrip
-    public TripTimes getNextCallNRideTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, int travelTime) {
+    public TripTimes getNextCallNRideTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding, int directTime) {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
@@ -255,7 +257,7 @@ public class Timetable implements Serializable {
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, travelTime);
+                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, directTime);
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;

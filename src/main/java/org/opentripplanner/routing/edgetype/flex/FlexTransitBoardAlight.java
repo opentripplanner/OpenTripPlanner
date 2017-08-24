@@ -59,7 +59,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
         if (hop.isUnscheduled()) {
             RoutingRequest options = s0.getOptions();
             Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-            int time = hop.getRunningTime(s0);
+            int time = (int) Math.round(hop.timeLowerBound(options));
             return timetable.getNextCallNRideTrip(s0, sd, getStopIndex(), boarding, time);
         }
         double adjustment = boarding ? startIndex : -1 * (1 - endIndex);
@@ -77,18 +77,26 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
                 int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime);
                 return (int) (sd.time(scheduledTime) - s0.getTimeSeconds());
             } else {
-                int scheduledTime = tripTimes.getCallAndRideAlightTime(getStopIndex(), currTime, hop.getRunningTime(s0));
+                int scheduledTime = tripTimes.getCallAndRideAlightTime(getStopIndex(), currTime, (int) hop.timeLowerBound(s0.getOptions()));
                 return (int) (s0.getTimeSeconds() - (sd.time(scheduledTime)));
             }
         }
         int stopIndex = getStopIndex();
         if (boarding) {
+            int startVehicleTime = hop.getStartVehicleTime();
+            if (startVehicleTime != 0) {
+                startVehicleTime = tripTimes.getDemandResponseMaxTime(startVehicleTime);
+            }
             int offset = (int) Math.round(startIndex * (tripTimes.getRunningTime(stopIndex)));
-            return  (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + offset) - s0.getTimeSeconds()) - hop.getStartVehicleTime();
+            return  (int)(sd.time(tripTimes.getDepartureTime(stopIndex) + offset - startVehicleTime) - s0.getTimeSeconds());
         }
         else {
+            int endVehicleTime = hop.getEndVehicleTime();
+            if (endVehicleTime != 0) {
+                endVehicleTime = tripTimes.getDemandResponseMaxTime(endVehicleTime);
+            }
             int offset = (int) Math.round((1-endIndex) * (tripTimes.getRunningTime(stopIndex - 1)));
-            return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) - offset)) + hop.getEndVehicleTime();
+            return (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex) - offset + endVehicleTime));
         }
     }
 

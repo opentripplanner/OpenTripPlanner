@@ -323,10 +323,25 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return (int) Math.min(Math.max(currTime, getDepartureTime(stop)), getArrivalTime(stop + 1));
     }
 
-    public int getCallAndRideAlightTime(int stop, long currTime, int travelTime) {
+    public int getCallAndRideAlightTime(int stop, long currTime, int directTime) {
+        int travelTime = getDemandResponseMaxTime(directTime);
         currTime -= travelTime;
         int startOfService = (int) Math.min(Math.max(currTime, getDepartureTime(stop - 1)), getArrivalTime(stop));
         return startOfService + travelTime;
+    }
+
+    public int getDemandResponseMaxTime(int directTime) {
+        if (maxTravelTime != null) {
+            return (int) Math.round(maxTravelTime.process(directTime));
+        }
+        return directTime;
+    }
+
+    public int getDemandResponseAvgTime(int directTime) {
+        if (avgTravelTime != null) {
+            return (int) Math.round(avgTravelTime.process(directTime));
+        }
+        return directTime;
     }
 
     /**
