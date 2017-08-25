@@ -448,6 +448,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
+    public boolean enterStationsWithCar = false;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge

@@ -167,6 +167,8 @@ public abstract class GtfsFlexGraphModifier {
     public void findExtraHops(RoutingRequest rr, Map<PatternHop, State> patternHopStateMap) {
     }
 
+    public void vertexVisitor(State state) {}
+
     /**
      * Create temporary edges and vertices from the origin into the transit network.
      *
@@ -177,6 +179,8 @@ public abstract class GtfsFlexGraphModifier {
         RoutingRequest forward = request.clone();
         forward.setMode(getMode());
         forward.setArriveBy(false);
+        // allow discovery of stations even with car mode
+        forward.enterStationsWithCar = true;
         streetSearch(forward);
     }
 
@@ -190,10 +194,11 @@ public abstract class GtfsFlexGraphModifier {
         RoutingRequest backward = request.clone();
         backward.setMode(getMode());
         backward.setArriveBy(true);
+        backward.enterStationsWithCar = true;
         streetSearch(backward);
     }
 
-    private void streetSearch(RoutingRequest rr) {
+    protected void streetSearch(RoutingRequest rr) {
         for(Pair<State, PatternHop> p : getClosestPatternHops(rr)) {
             State s = p.getKey();
             PatternHop hop = p.getValue();
@@ -267,6 +272,7 @@ public abstract class GtfsFlexGraphModifier {
 
             @Override
             public void visitVertex(State state) {
+                vertexVisitor(state);
             }
 
             @Override

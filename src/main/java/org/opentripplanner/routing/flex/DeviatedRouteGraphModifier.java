@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.flex;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
@@ -25,6 +27,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -33,8 +36,13 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Add temporary vertices/edges for deviated-route service.
@@ -42,6 +50,10 @@ import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     private static final int MAX_DRS_SEARCH_DIST = 1600 * 10; // approx 5 mile limit. Could be set by data.
+
+    // want to ensure we only keep one pattern hop per trip pattern
+    private Map<TripPattern, PatternHop> directServices = Maps.newHashMap();
+    private Set<State> transitStopStates = Sets.newHashSet();
 
     public DeviatedRouteGraphModifier(Graph graph) {
         super(graph);
@@ -129,15 +141,58 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public boolean checkHopAllowsBoardAlight(State s, PatternHop hop, boolean boarding) {
         StreetVertex sv = findFirstStreetVertex(s);
+        Point orig = GeometryUtils.getGeometryFactory().createPoint(sv.getCoordinate());
+        Point dest = GeometryUtils.getGeometryFactory().createPoint(s.getVertex().getCoordinate());
+        boolean ret = false;
         if (hop.hasServiceArea()) {
-            Point orig = GeometryUtils.getGeometryFactory().createPoint(sv.getCoordinate());
-            Point dest = GeometryUtils.getGeometryFactory().createPoint(s.getVertex().getCoordinate());
             if (hop.getServiceArea().contains(orig) && hop.getServiceArea().contains(dest)) {
-                return true;
+                ret = true;
             }
         }
-        double distance = SphericalDistanceLibrary.distance(s.getVertex().getCoordinate(), sv.getCoordinate());
-        return distance < hop.getServiceAreaRadius();
+        if (!ret && hop.getServiceAreaRadius() > 0) {
+            double distance = SphericalDistanceLibrary.distance(s.getVertex().getCoordinate(), sv.getCoordinate());
+            ret = distance < hop.getServiceAreaRadius();
+        }
+        if (hop.hasServiceArea() && hop.getServiceArea().contains(orig) && directServices.get(hop.getPattern()) == null) {
+            directServices.put(hop.getPattern(), hop);
+        }
+        return ret;
+    }
+
+    @Override
+    public void vertexVisitor(State state) {
+        if (state.getVertex() instanceof TransitStop && !(state.getVertex() instanceof TemporaryVertex)) {
+            transitStopStates.add(state);
+        }
+    }
+
+    protected void streetSearch(RoutingRequest rr) {
+        transitStopStates.clear();
+        super.streetSearch(rr);
+        createDirectHopsToStops(rr);
+    }
+
+    private void createDirectHopsToStops(RoutingRequest opt) {
+        Collection<PatternHop> services = directServices.values();
+        for (State state : transitStopStates) {
+            Vertex v = state.getVertex();
+            Point dest = GeometryUtils.getGeometryFactory().createPoint(v.getCoordinate());
+            for (PatternHop hop : services) {
+                if (hop.getServiceArea().contains(dest)) {
+                    TransitStop fromStop, toStop;
+                    if (opt.arriveBy) {
+                        StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+                        toStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
+                        fromStop = (TransitStop) v;
+                    } else {
+                        StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
+                        fromStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+                        toStop = (TransitStop) v;
+                    }
+                    createDirectHop(opt, hop, fromStop, toStop, new GraphPath(state, true));
+                }
+            }
+        }
     }
 
     @Override
