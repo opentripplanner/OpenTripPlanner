@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -41,8 +40,9 @@ public class GTFSPatternHopFactoryTest {
                 "t0,09:00:00,17:00:00,300");
 
         GtfsFeedId feedId = new GtfsFeedId.Builder().id("FEED").build();
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(GtfsLibrary.createContext(feedId, gtfs
-                .read()));
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(
+                GtfsLibrary.createContext(feedId, gtfs.read())
+        );
         Graph graph = new Graph();
         factory.run(graph);
 

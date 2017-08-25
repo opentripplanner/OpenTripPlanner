@@ -47,7 +47,6 @@ public final class Agency extends IdentityBean<String> {
   private String brandingUrl;
 
   public Agency() {
-
   }
 
   public Agency(Agency a) {

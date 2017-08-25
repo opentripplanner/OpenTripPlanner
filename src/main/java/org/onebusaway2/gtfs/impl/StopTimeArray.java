@@ -156,7 +156,8 @@ public class StopTimeArray extends AbstractList<StopTime> {
     }
   }
 
-  private class StopTimeProxyImpl implements StopTimeProxy {
+  private class StopTimeProxyImpl implements
+          StopTimeProxy {
 
     private final int index;
 

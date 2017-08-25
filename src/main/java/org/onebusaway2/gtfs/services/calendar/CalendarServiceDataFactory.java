@@ -18,5 +18,5 @@ package org.onebusaway2.gtfs.services.calendar;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 
 public interface CalendarServiceDataFactory {
-  public CalendarServiceData createData();
+  CalendarServiceData createData();
 }

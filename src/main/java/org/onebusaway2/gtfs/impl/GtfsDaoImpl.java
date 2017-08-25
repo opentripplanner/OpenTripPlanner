@@ -49,21 +49,24 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
 
   private boolean packShapePoints = false;
 
+
   public boolean isPackStopTimes() {
     return packStopTimes;
   }
 
-  public void setPackStopTimes(boolean packStopTimes) {
-    this.packStopTimes = packStopTimes;
-  }
+  // TODO TGR - The mapping from GTFS to OTP model do not support this - ok?
+//  public void setPackStopTimes(boolean packStopTimes) {
+//    this.packStopTimes = packStopTimes;
+//  }
 
   public boolean isPackShapePoints() {
     return packShapePoints;
   }
 
-  public void setPackShapePoints(boolean packShapePoints) {
-    this.packShapePoints = packShapePoints;
-  }
+  // TODO TGR - The mapping from GTFS to OTP model do not support this - ok?
+//  public void setPackShapePoints(boolean packShapePoints) {
+//    this.packShapePoints = packShapePoints;
+//  }
 
   /***
    * {@link GtfsDao} Interface

@@ -98,4 +98,60 @@ public enum BikeAccess {
             break;
         }
     }
+
+    /**
+     * @Improvment This method could be removed, if the logic was not part of the GTFS import,
+     * but rader applyed after the GTFS model is mapped into OTP.
+     */
+    @SuppressWarnings("deprecation")
+    public static BikeAccess fromTrip(org.onebusaway.gtfs.model.Trip gtfsTrip) {
+        switch (gtfsTrip.getBikesAllowed()) {
+        case 1:
+            return ALLOWED;
+        case 2:
+            return NOT_ALLOWED;
+        }
+        switch (gtfsTrip.getTripBikesAllowed()) {
+        case 1:
+            return NOT_ALLOWED;
+        case 2:
+            return ALLOWED;
+        }
+        org.onebusaway.gtfs.model.Route route = gtfsTrip.getRoute();
+        switch (route.getBikesAllowed()) {
+        case 1:
+            return ALLOWED;
+        case 2:
+            return NOT_ALLOWED;
+        }
+        switch (route.getRouteBikesAllowed()) {
+        case 1:
+            return NOT_ALLOWED;
+        case 2:
+            return ALLOWED;
+        }
+        return UNKNOWN;
+    }
+
+    /**
+     * @Improvment This method could be removed, if the logic was not part of the GTFS import,
+     * but rader applyed after the GTFS model is mapped into OTP.
+     */
+    @SuppressWarnings("deprecation")
+    public static void setForTrip(org.onebusaway.gtfs.model.Trip gtfsTrip, BikeAccess access) {
+        switch (access) {
+        case ALLOWED:
+            gtfsTrip.setBikesAllowed(1);
+            gtfsTrip.setTripBikesAllowed(2);
+            break;
+        case NOT_ALLOWED:
+            gtfsTrip.setBikesAllowed(2);
+            gtfsTrip.setTripBikesAllowed(1);
+            break;
+        case UNKNOWN:
+            gtfsTrip.setBikesAllowed(0);
+            gtfsTrip.setTripBikesAllowed(0);
+            break;
+        }
+    }
 }

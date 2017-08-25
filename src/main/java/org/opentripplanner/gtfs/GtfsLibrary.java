@@ -17,16 +17,16 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 
-import org.onebusaway2.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway2.gtfs.serialization.GtfsReader;
+import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
 import org.onebusaway2.gtfs.services.GtfsRelationalDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.gtfs.mapping.ModelMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 
 public class GtfsLibrary {
@@ -43,21 +43,13 @@ public class GtfsLibrary {
     }
 
     public static GtfsContext readGtfs(File path) throws IOException {
-        GtfsRelationalDaoImpl dao = new GtfsRelationalDaoImpl();
+        GtfsImport gtfsImport = new GtfsImport(path);
 
-        GtfsReader reader = new GtfsReader();
-        reader.setInputLocation(path);
-        reader.setEntityStore(dao);
+        GtfsFeedId feedId = gtfsImport.getFeedId();
+        GtfsMutableRelationalDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
+        CalendarService calendarService = createCalendarService(otpDao);
 
-        GtfsFeedId feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
-
-        reader.setDefaultAgencyId(feedId.getId());
-
-        reader.run();
-
-        CalendarService calendarService = createCalendarService(dao);
-
-        return new GtfsContextImpl(feedId, dao, calendarService);
+        return new GtfsContextImpl(feedId, otpDao, calendarService);
     }
 
     public static CalendarService createCalendarService(GtfsRelationalDao dao) {
@@ -158,7 +150,7 @@ public class GtfsLibrary {
         private GtfsRelationalDao _dao;
 
         private CalendarService _calendar;
-        
+
         public GtfsContextImpl(GtfsFeedId feedId, GtfsRelationalDao dao, CalendarService calendar) {
             _feedId = feedId;
             _dao = dao;

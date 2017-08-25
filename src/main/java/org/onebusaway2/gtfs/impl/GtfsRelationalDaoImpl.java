@@ -29,18 +29,7 @@ import java.util.Set;
 import org.onebusaway.csv_entities.exceptions.EntityInstantiationException;
 import org.onebusaway.csv_entities.schema.BeanWrapper;
 import org.onebusaway.csv_entities.schema.BeanWrapperFactory;
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.FareAttribute;
-import org.onebusaway2.gtfs.model.FareRule;
-import org.onebusaway2.gtfs.model.Frequency;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.ServiceCalendar;
-import org.onebusaway2.gtfs.model.ServiceCalendarDate;
-import org.onebusaway2.gtfs.model.ShapePoint;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.StopTime;
-import org.onebusaway2.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
 
 /**
@@ -82,7 +71,45 @@ public class GtfsRelationalDaoImpl extends GtfsDaoImpl implements
 
   private Map<FareAttribute, List<FareRule>> _fareRulesByFareAttribute = null;
 
-  public void clearAllCaches() {
+    public GtfsRelationalDaoImpl(
+            Collection<Agency> agencies,
+            Collection<ServiceCalendarDate> calendarDates,
+            Collection<ServiceCalendar> calendars,
+            Collection<FareAttribute> fareAttributes,
+            Collection<FareRule> fareRules,
+            Collection<FeedInfo> feedInfos,
+            Collection<Frequency> frequencies,
+            Collection<Pathway> pathways,
+            Collection<Route> routes,
+            Collection<ShapePoint> shapePoints,
+            Collection<Stop> stops,
+            Collection<StopTime> stopTimes,
+            Collection<Transfer> transfers,
+            Collection<Trip> trips
+    ) {
+        saveAll(agencies);
+        saveAll(calendarDates);
+        saveAll(calendars);
+        saveAll(fareAttributes);
+        saveAll(fareRules);
+        saveAll(feedInfos);
+        saveAll(frequencies);
+        saveAll(pathways);
+        saveAll(routes);
+        saveAll(shapePoints);
+        saveAll(stops);
+        saveAll(stopTimes);
+        saveAll(transfers);
+        saveAll(trips);
+    }
+
+    private void saveAll(Collection<?> entities) {
+      for (Object it : entities) {
+        saveEntity(it);
+      }
+    }
+
+    public void clearAllCaches() {
     _tripAgencyIdsByServiceId = clearMap(_tripAgencyIdsByServiceId);
     _routesByAgency = clearMap(_routesByAgency);
     _stopsByStation = clearMap(_stopsByStation);

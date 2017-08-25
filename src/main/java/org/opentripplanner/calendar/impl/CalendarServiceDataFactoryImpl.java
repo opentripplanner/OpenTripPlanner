@@ -50,8 +50,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author bdferris
  */
-public class CalendarServiceDataFactoryImpl implements
-    CalendarServiceDataFactory {
+public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactory {
 
   private final Logger _log = LoggerFactory.getLogger(CalendarServiceDataFactoryImpl.class);
 
