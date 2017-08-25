@@ -1,5 +1,4 @@
 package org.opentripplanner.index;
-
 import static java.util.Collections.emptyList;
 
 import java.text.ParseException;
@@ -2000,8 +1999,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(bikeRentalStationType.getName())) {
                     // No index exists for bikeshare station ids
-                    return index.graph.getService(BikeRentalStationService.class)
-                        .getBikeRentalStations()
+                    BikeRentalStationService service = index.graph.getService(BikeRentalStationService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getBikeRentalStations()
                         .stream()
                         .filter(bikeRentalStation -> bikeRentalStation.id.equals(id.id))
                         .findFirst()
@@ -2009,8 +2011,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(bikeParkType.getName())) {
                     // No index exists for bike parking ids
-                    return index.graph.getService(BikeRentalStationService.class)
-                        .getBikeParks()
+                    BikeRentalStationService service = index.graph.getService(BikeRentalStationService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getBikeParks()
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(id.id))
                         .findFirst()
@@ -2018,8 +2023,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(carParkType.getName())) {
                     // No index exists for car parking ids
-                    return index.graph.getService(CarParkService.class)
-                        .getCarParks()
+                    CarParkService service = index.graph.getService(CarParkService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getCarParks()
                         .stream()
                         .filter(carPark -> carPark.id.equals(id.id))
                         .findFirst()
@@ -2479,7 +2487,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStations")
                 .type(new GraphQLList(bikeRentalStationType))
-                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
+                          : Collections.EMPTY_LIST))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStation")
@@ -2488,8 +2499,10 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.graph.getService(BikeRentalStationService.class)
-                    .getBikeRentalStations()
+                .dataFetcher(environment -> new ArrayList<BikeRentalStation>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
+                          : Collections.EMPTY_LIST)
                     .stream()
                     .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument("id")))
                     .findFirst()
@@ -2498,7 +2511,10 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeParks")
                 .type(new GraphQLList(bikeParkType))
-                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(index.graph.getService(BikeRentalStationService.class).getBikeParks()))
+                .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
+                          : Collections.EMPTY_LIST))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikePark")
@@ -2507,8 +2523,10 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.graph.getService(BikeRentalStationService.class)
-                    .getBikeParks()
+                .dataFetcher(environment -> new ArrayList<BikePark>(
+                        index.graph.getService(BikeRentalStationService.class) != null
+                          ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
+                          : Collections.EMPTY_LIST)
                     .stream()
                     .filter(bikePark -> bikePark.id.equals(environment.getArgument("id")))
                     .findFirst()
@@ -2523,13 +2541,17 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> {
                     if ((environment.getArgument("ids") instanceof List)) {
-                        Map<String, CarPark> carParks = index.graph.getService(CarParkService.class).getCarParkById();
+                        Map<String, CarPark> carParks = index.graph.getService(CarParkService.class) != null
+                                ? index.graph.getService(CarParkService.class).getCarParkById()
+                                : Collections.EMPTY_MAP;
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(carParks::get)
                             .collect(Collectors.toList());
                     }
-                    return new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks());
+                    return new ArrayList<>(index.graph.getService(CarParkService.class) != null
+                      ? index.graph.getService(CarParkService.class).getCarParks()
+                      : Collections.EMPTY_LIST);
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2539,8 +2561,10 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.graph.getService(CarParkService.class)
-                    .getCarParks()
+                .dataFetcher(environment -> new ArrayList<CarPark>(
+                        index.graph.getService(CarParkService.class) != null
+                          ? index.graph.getService(CarParkService.class).getCarParks()
+                          : Collections.EMPTY_LIST)
                     .stream()
                     .filter(carPark -> carPark.id.equals(environment.getArgument("id")))
                     .findFirst()
@@ -2635,8 +2659,10 @@ public class IndexGraphQLSchema {
                 .type(bikeRentalStationType)
                 .description("The bike rental station related to the place")
                 .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE) ?
-                    index.graph.getService(BikeRentalStationService.class)
-                        .getBikeRentalStations()
+                    new ArrayList<>(
+                            index.graph.getService(BikeRentalStationService.class) != null
+                              ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
+                              : Collections.emptyList())
                         .stream()
                         .filter(bikeRentalStation -> bikeRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
                         .findFirst()
@@ -2648,8 +2674,10 @@ public class IndexGraphQLSchema {
                 .type(bikeParkType)
                 .description("The bike parking related to the place")
                 .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
-                    index.graph.getService(BikeRentalStationService.class)
-                        .getBikeParks()
+                    new ArrayList<>(
+                            index.graph.getService(BikeRentalStationService.class) != null
+                              ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
+                              : Collections.emptyList())
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
                         .findFirst()
@@ -2661,8 +2689,10 @@ public class IndexGraphQLSchema {
                 .type(carParkType)
                 .description("The car parking related to the place")
                 .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
-                    index.graph.getService(CarParkService.class)
-                        .getCarParks()
+                    new ArrayList<>(
+                            index.graph.getService(CarParkService.class) != null
+                              ? index.graph.getService(CarParkService.class).getCarParks()
+                              : Collections.emptyList())
                         .stream()
                         .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
                         .findFirst()
