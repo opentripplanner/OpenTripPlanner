@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.services;
+package org.onebusaway2.gtfs.services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
+import org.onebusaway2.gtfs.impl.GtfsRelationalDaoImpl;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.serialization.GtfsReader;
+import org.onebusaway2.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 
 public class MockGtfs {
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.api.param;
 
 import org.joda.time.LocalDate;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 
 public class YearMonthDay extends QueryParameter {
 

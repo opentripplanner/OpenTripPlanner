@@ -2,9 +2,9 @@ package org.opentripplanner.routing.trippattern;
 
 import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 
-import org.onebusaway.gtfs.model.Frequency;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Frequency;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -14,8 +14,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;

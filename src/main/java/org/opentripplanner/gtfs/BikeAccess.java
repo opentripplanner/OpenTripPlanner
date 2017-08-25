@@ -13,8 +13,8 @@
 
 package org.opentripplanner.gtfs;
 
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Trip;
 
 /**
  * Model bike access for GTFS trips.

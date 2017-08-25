@@ -16,8 +16,8 @@ package org.opentripplanner.gtfs;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Trip;
 
 public class BikeAccessTest {
 

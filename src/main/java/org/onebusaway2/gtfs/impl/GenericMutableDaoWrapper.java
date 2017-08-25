@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl;
+package org.onebusaway2.gtfs.impl;
 
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.onebusaway.gtfs.model.IdentityBean;
-import org.onebusaway.gtfs.services.GenericMutableDao;
+import org.onebusaway2.gtfs.model.IdentityBean;
+import org.onebusaway2.gtfs.services.GenericMutableDao;
 
 /**
  * Support class that provides an implementation of {@link GenericMutableDao}

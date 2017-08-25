@@ -22,7 +22,7 @@ import com.google.common.collect.Collections2;
 
 import org.geotools.xml.xsi.XSISimpleTypes.Int;
 import org.mapdb.Fun.Tuple2;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.TimeSurface.RangeSet;
 import org.opentripplanner.api.parameter.QualifiedModeSet;

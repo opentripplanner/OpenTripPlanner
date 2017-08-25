@@ -2,7 +2,7 @@ package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.AgencyAndId;
 
 import java.io.IOException;
 

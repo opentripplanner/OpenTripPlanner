@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model;
+package org.onebusaway2.gtfs.model;
 
 import org.onebusaway.csv_entities.schema.annotations.CsvField;
 import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
-import org.onebusaway.gtfs.serialization.mappings.EntityFieldMappingFactory;
-import org.onebusaway.gtfs.serialization.mappings.TripAgencyIdFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.TripAgencyIdFieldMappingFactory;
 
 @CsvFields(filename = "trips.txt")
 public final class Trip extends IdentityBean<AgencyAndId> {

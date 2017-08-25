@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model;
+package org.onebusaway2.gtfs.model;
 
 import org.onebusaway.csv_entities.schema.annotations.CsvField;
 import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway.gtfs.serialization.mappings.EntityFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
 
 @CsvFields(filename = "transfers.txt", required = false)
 public final class Transfer extends IdentityBean<Integer> {

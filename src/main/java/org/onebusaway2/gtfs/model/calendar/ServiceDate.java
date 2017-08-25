@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model.calendar;
+package org.onebusaway2.gtfs.model.calendar;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -26,9 +26,9 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.ServiceCalendarDate;
+import org.onebusaway2.gtfs.model.StopTime;
 
 /**
  * A general representation of a year-month-day tuple not tied to any locale and

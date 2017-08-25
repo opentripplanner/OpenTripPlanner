@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.services.calendar;
+package org.onebusaway2.gtfs.services.calendar;
 
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 
 public interface CalendarServiceDataFactory {
   public CalendarServiceData createData();

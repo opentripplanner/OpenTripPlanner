@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.serialization.comparators;
+package org.onebusaway2.gtfs.serialization.comparators;
 
 import java.util.Comparator;
 
-import org.onebusaway.gtfs.model.ShapePoint;
+import org.onebusaway2.gtfs.model.ShapePoint;
 
 public class ShapePointComparator implements Comparator<ShapePoint> {
 

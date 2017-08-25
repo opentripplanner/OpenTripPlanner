@@ -14,8 +14,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.Route;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.RoutingRequest;

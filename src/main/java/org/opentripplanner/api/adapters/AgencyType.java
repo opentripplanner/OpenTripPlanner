@@ -16,7 +16,7 @@ package org.opentripplanner.api.adapters;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.Agency;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

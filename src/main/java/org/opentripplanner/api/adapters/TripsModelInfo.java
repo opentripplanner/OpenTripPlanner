@@ -18,7 +18,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.AgencyAndId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

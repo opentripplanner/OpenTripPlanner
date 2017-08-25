@@ -5,7 +5,7 @@ import java.util.Map;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
-import org.onebusaway.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Route;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;

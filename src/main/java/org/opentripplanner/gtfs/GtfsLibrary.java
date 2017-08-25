@@ -17,15 +17,15 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 
-import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.onebusaway2.gtfs.impl.GtfsRelationalDaoImpl;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.serialization.GtfsReader;
+import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.routing.core.TraverseMode;
 

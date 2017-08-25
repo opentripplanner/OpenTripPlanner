@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Trip;
 
 /**
  * StopTransfer class used by TransferTable. Represents a transfer between two stops.

@@ -2,7 +2,7 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Sets;
-import org.onebusaway.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Route;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;

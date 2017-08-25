@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl;
+package org.onebusaway2.gtfs.impl;
 
 import org.onebusaway.csv_entities.exceptions.CsvEntityException;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
 
 /**
  * Indicates that multiple {@link ServiceCalendar} entities, as loaded from

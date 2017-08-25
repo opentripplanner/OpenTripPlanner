@@ -2,8 +2,8 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Lists;
 
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Stop;
 import org.opentripplanner.profile.fares.FareTable;
 
 import java.awt.geom.Rectangle2D;

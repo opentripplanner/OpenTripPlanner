@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Locale;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;

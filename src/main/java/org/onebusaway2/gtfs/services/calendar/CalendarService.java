@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.services.calendar;
+package org.onebusaway2.gtfs.services.calendar;
 
 import java.util.Date;
 import java.util.List;
@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.LocalizedServiceId;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.model.calendar.ServiceIdIntervals;
-import org.onebusaway.gtfs.model.calendar.ServiceInterval;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.ServiceCalendarDate;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.model.calendar.ServiceIdIntervals;
+import org.onebusaway2.gtfs.model.calendar.ServiceInterval;
 
 /**
  * While the set of {@link ServiceCalendar} and {@link ServiceCalendarDate}

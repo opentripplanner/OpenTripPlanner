@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl;
+package org.onebusaway2.gtfs.impl;
 
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.StopTimeProxy;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.StopTimeProxy;
+import org.onebusaway2.gtfs.model.Trip;
 
 public class StopTimeArray extends AbstractList<StopTime> {
 

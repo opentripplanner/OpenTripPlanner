@@ -16,12 +16,12 @@
 /**
  * 
  */
-package org.onebusaway.gtfs.serialization.comparators;
+package org.onebusaway2.gtfs.serialization.comparators;
 
 import java.util.Comparator;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
 
 public class ServiceCalendarComparator implements Comparator<ServiceCalendar> {
 

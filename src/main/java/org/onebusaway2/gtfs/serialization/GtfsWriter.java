@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.serialization;
+package org.onebusaway2.gtfs.serialization;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.onebusaway.csv_entities.CsvEntityWriter;
 import org.onebusaway.csv_entities.schema.DefaultEntitySchemaFactory;
-import org.onebusaway.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

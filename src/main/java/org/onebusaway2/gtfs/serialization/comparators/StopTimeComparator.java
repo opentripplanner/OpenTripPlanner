@@ -16,12 +16,12 @@
 /**
  * 
  */
-package org.onebusaway.gtfs.serialization.comparators;
+package org.onebusaway2.gtfs.serialization.comparators;
 
 import java.util.Comparator;
 
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.Trip;
 
 public class StopTimeComparator implements Comparator<StopTime>{
 

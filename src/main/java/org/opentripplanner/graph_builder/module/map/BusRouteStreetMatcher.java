@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.module.map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.Route;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;

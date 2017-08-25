@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model;
+package org.onebusaway2.gtfs.model;
 
 import org.onebusaway.csv_entities.schema.annotations.CsvField;
 import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway.gtfs.serialization.mappings.EntityFieldMappingFactory;
-import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 
 @CsvFields(filename = "frequencies.txt", required = false)
 public final class Frequency extends IdentityBean<Integer> {

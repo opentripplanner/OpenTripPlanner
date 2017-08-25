@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Trip;
 
 public class TripOvertakingException extends RuntimeException {
 

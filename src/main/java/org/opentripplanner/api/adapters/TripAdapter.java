@@ -15,7 +15,7 @@ package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Trip;
 
 public class TripAdapter extends XmlAdapter<TripType, Trip> {
 

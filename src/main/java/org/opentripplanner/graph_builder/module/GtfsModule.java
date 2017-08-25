@@ -26,12 +26,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
-import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.*;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.services.GenericMutableDao;
-import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.onebusaway2.gtfs.impl.GtfsRelationalDaoImpl;
+import org.onebusaway2.gtfs.model.*;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.serialization.GtfsReader;
+import org.onebusaway2.gtfs.services.GenericMutableDao;
+import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;

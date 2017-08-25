@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model.calendar;
+package org.onebusaway2.gtfs.model.calendar;
 
 import java.io.Serializable;
 import java.util.TimeZone;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.services.calendar.CalendarService;
 
 /**
  * Combines a serviceId (represented by {@link AgencyAndId}) and a

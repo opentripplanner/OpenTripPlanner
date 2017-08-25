@@ -2,7 +2,7 @@ package org.opentripplanner.index.model;
 
 import java.util.Collection;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.beust.jcommander.internal.Lists;

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.services;
 
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsRelationalDao;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

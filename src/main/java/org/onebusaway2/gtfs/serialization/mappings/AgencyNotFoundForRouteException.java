@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.serialization.mappings;
+package org.onebusaway2.gtfs.serialization.mappings;
 
 import org.onebusaway.csv_entities.exceptions.CsvEntityException;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.serialization.GtfsReaderContext;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.serialization.GtfsReaderContext;
 
 /**
  * Error indicating that there was a problem finding the appropriate

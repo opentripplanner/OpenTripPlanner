@@ -13,12 +13,12 @@
 
 package org.opentripplanner.calendar.impl;
 
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.LocalizedServiceId;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
+import org.onebusaway2.gtfs.services.GtfsRelationalDao;
 
 /**
  * This is actually kind of a hack, and assumes that there is only one copy of CalendarServiceData

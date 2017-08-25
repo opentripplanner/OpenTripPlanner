@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl.calendar;
+package org.onebusaway2.gtfs.impl.calendar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.LocalizedServiceId;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.model.calendar.ServiceIdIntervals;
-import org.onebusaway.gtfs.model.calendar.ServiceInterval;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.onebusaway.gtfs.services.calendar.CalendarServiceDataFactory;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.model.calendar.ServiceIdIntervals;
+import org.onebusaway2.gtfs.model.calendar.ServiceInterval;
+import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.onebusaway2.gtfs.services.calendar.CalendarServiceDataFactory;
 
 /**
  * An implementation of {@link CalendarService}. Requires a pre-computed

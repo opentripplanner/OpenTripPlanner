@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.serialization.mappings;
+package org.onebusaway2.gtfs.serialization.mappings;
 
 import org.apache.commons.beanutils.Converter;
 import org.onebusaway.csv_entities.CsvEntityContext;

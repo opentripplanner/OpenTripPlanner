@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.AgencyAndId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -31,7 +31,7 @@ public class StopType {
     public StopType() {
     }
 
-    public StopType(org.onebusaway.gtfs.model.Stop stop) {
+    public StopType(org.onebusaway2.gtfs.model.Stop stop) {
         this.id = stop.getId();
         this.stopLat = stop.getLat();
         this.stopLon = stop.getLon();
@@ -47,7 +47,7 @@ public class StopType {
         this.direction = stop.getDirection();
     }
 
-    public StopType(org.onebusaway.gtfs.model.Stop stop, Boolean extended) {
+    public StopType(org.onebusaway2.gtfs.model.Stop stop, Boolean extended) {
         this.id = stop.getId();
         this.stopLat = stop.getLat();
         this.stopLon = stop.getLon();

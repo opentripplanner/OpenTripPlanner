@@ -15,8 +15,8 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.Stop;
 
 public class TestStopMatcher extends TestCase {
 

@@ -2,7 +2,7 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
 

@@ -14,9 +14,9 @@
 package org.opentripplanner.routing.core;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 

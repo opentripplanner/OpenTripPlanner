@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.serialization.mappings;
+package org.onebusaway2.gtfs.serialization.mappings;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -28,7 +28,7 @@ import org.onebusaway.csv_entities.schema.BeanWrapper;
 import org.onebusaway.csv_entities.schema.EntitySchemaFactory;
 import org.onebusaway.csv_entities.schema.FieldMapping;
 import org.onebusaway.csv_entities.schema.FieldMappingFactory;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 
 public class ServiceDateFieldMappingFactory implements FieldMappingFactory {
 

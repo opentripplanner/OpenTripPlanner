@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 

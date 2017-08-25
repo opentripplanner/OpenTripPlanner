@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model;
+package org.onebusaway2.gtfs.model;
 
 import org.onebusaway.csv_entities.schema.annotations.CsvField;
 import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
-import org.onebusaway.gtfs.serialization.mappings.LatLonFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
+import org.onebusaway2.gtfs.serialization.mappings.LatLonFieldMappingFactory;
 
 @CsvFields(filename = "stops.txt", prefix = "stop_")
 public final class Stop extends IdentityBean<AgencyAndId> {

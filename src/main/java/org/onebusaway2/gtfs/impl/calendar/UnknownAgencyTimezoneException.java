@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl.calendar;
+package org.onebusaway2.gtfs.impl.calendar;
 
 import java.util.TimeZone;
 
 import org.onebusaway.csv_entities.exceptions.CsvEntityException;
-import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.Agency;
 
 /**
  * Indicates that the {@link Agency#getTimezone()} string does not evaluate to a

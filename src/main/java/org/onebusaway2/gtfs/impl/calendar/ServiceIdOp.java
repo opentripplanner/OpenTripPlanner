@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl.calendar;
+package org.onebusaway2.gtfs.impl.calendar;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.calendar.ServiceInterval;
+import org.onebusaway2.gtfs.model.calendar.ServiceInterval;
 
 public abstract class ServiceIdOp implements Comparator<Date> {
 

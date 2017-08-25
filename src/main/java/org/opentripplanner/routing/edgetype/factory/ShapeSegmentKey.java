@@ -16,7 +16,7 @@
  */
 package org.opentripplanner.routing.edgetype.factory;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.AgencyAndId;
 
 class ShapeSegmentKey {
     private AgencyAndId shapeId;

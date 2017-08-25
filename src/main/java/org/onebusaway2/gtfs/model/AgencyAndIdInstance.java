@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.model;
+package org.onebusaway2.gtfs.model;
 
 import java.io.Serializable;
 
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 
 /**
  * An identifier class that combines a {@link AgencyAndId} id with a service

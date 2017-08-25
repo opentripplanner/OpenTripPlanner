@@ -26,7 +26,7 @@ import java.util.Set;
 
 import com.google.common.collect.Iterables;
 import org.geotools.referencing.GeodeticCalculator;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway2.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl;
+package org.onebusaway2.gtfs.impl;
 
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -21,9 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.model.ShapePointProxy;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.ShapePoint;
+import org.onebusaway2.gtfs.model.ShapePointProxy;
 
 public class ShapePointArray extends AbstractList<ShapePoint> {
 

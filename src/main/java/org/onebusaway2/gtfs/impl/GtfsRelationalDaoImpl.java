@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway.gtfs.impl;
+package org.onebusaway2.gtfs.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,19 +29,19 @@ import java.util.Set;
 import org.onebusaway.csv_entities.exceptions.EntityInstantiationException;
 import org.onebusaway.csv_entities.schema.BeanWrapper;
 import org.onebusaway.csv_entities.schema.BeanWrapperFactory;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.FareRule;
-import org.onebusaway.gtfs.model.Frequency;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.FareAttribute;
+import org.onebusaway2.gtfs.model.FareRule;
+import org.onebusaway2.gtfs.model.Frequency;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.ServiceCalendarDate;
+import org.onebusaway2.gtfs.model.ShapePoint;
+import org.onebusaway2.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.Trip;
+import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
 
 /**
  * A in-memory implementation of GtfsRelationalDaoImpl. It's super fast for most
