@@ -1999,10 +1999,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(bikeRentalStationType.getName())) {
                     // No index exists for bikeshare station ids
-                    return new ArrayList<>(
-                            index.graph.getService(BikeRentalStationService.class) != null
-                              ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
-                              : Collections.EMPTY_LIST)
+                    BikeRentalStationService service = index.graph.getService(BikeRentalStationService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getBikeRentalStations()
                         .stream()
                         .filter(bikeRentalStation -> bikeRentalStation.id.equals(id.id))
                         .findFirst()
@@ -2010,10 +2011,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(bikeParkType.getName())) {
                     // No index exists for bike parking ids
-                    return new ArrayList<>(
-                            index.graph.getService(BikeRentalStationService.class) != null
-                              ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
-                              : Collections.EMPTY_LIST)
+                    BikeRentalStationService service = index.graph.getService(BikeRentalStationService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getBikeParks()
                         .stream()
                         .filter(bikePark -> bikePark.id.equals(id.id))
                         .findFirst()
@@ -2021,10 +2023,11 @@ public class IndexGraphQLSchema {
                 }
                 if (id.type.equals(carParkType.getName())) {
                     // No index exists for car parking ids
-                    return new ArrayList<>(
-                            index.graph.getService(CarParkService.class) != null
-                            ? index.graph.getService(CarParkService.class).getCarParks()
-                            : Collections.EMPTY_LIST)
+                    CarParkService service = index.graph.getService(CarParkService.class);
+                    if (service==null)
+                        return null;
+
+                    return service.getCarParks()
                         .stream()
                         .filter(carPark -> carPark.id.equals(id.id))
                         .findFirst()
@@ -2496,7 +2499,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> new ArrayList<>(
+                .dataFetcher(environment -> new ArrayList<BikeRentalStation>(
                         index.graph.getService(BikeRentalStationService.class) != null
                           ? index.graph.getService(BikeRentalStationService.class).getBikeRentalStations()
                           : Collections.EMPTY_LIST)
@@ -2520,7 +2523,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> new ArrayList<>(
+                .dataFetcher(environment -> new ArrayList<BikePark>(
                         index.graph.getService(BikeRentalStationService.class) != null
                           ? index.graph.getService(BikeRentalStationService.class).getBikeParks()
                           : Collections.EMPTY_LIST)
@@ -2558,7 +2561,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> new ArrayList<>(
+                .dataFetcher(environment -> new ArrayList<CarPark>(
                         index.graph.getService(CarParkService.class) != null
                           ? index.graph.getService(CarParkService.class).getCarParks()
                           : Collections.EMPTY_LIST)
