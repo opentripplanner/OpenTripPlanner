@@ -143,7 +143,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         else
             s1.setZone(getEndStop().getZoneId());
         //s1.setRoute(pattern.getExemplar().route.getId());
-        s1.incrementWeight(runningTime);
+        s1.incrementWeight(getWeight(s0, runningTime));
         s1.setBackMode(getMode());
         return s1.makeState();
     }
@@ -151,6 +151,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     public int getRunningTime(State s0) {
         TripTimes tripTimes = s0.getTripTimes();
         return tripTimes.getRunningTime(stopIndex);
+    }
+
+    // allow subclasses to add a weight
+    public int getWeight(State s0, int runningTime) {
+        return runningTime;
     }
 
     public void setGeometry(LineString geometry) {

@@ -42,11 +42,6 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     }
 
     @Override
-    public State traverse(State s0) {
-        return super.traverse(s0);
-    }
-
-    @Override
     public boolean isUnscheduled() {
         return true;
     }
@@ -65,6 +60,11 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     public int getRunningTime(State s0) {
         TripTimes tt = s0.getTripTimes();
         return tt.getDemandResponseMaxTime(directTime);
+    }
+
+    @Override
+    public int getWeight(State s0, int runningTime) {
+        return (int) Math.round(s0.getOptions().callAndRideReluctance * runningTime);
     }
 
     @Override

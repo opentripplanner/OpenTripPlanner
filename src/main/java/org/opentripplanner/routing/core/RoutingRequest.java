@@ -384,6 +384,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int deviatedRouteExtraPenalty = 180;
 
     /**
+     * Reluctance for call-n-ride
+     */
+    public double callAndRideReluctance = 2.0;
+
+    /**
      * Size of flag stop buffer in UI
      */
     public double flagStopBufferSize;

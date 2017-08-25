@@ -353,6 +353,18 @@ public abstract class RoutingResource {
     @QueryParam("flagStopExtraPenalty")
     protected Integer flagStopExtraPenalty;
 
+    /**
+     * Extra penalty added for deviated-route boarding/alighting.
+     */
+    @QueryParam("deviatedRouteExtraPenalty")
+    protected Integer deviatedRouteExtraPenalty;
+
+    /**
+     * How much worse is call-n-ride than regular transit (multiplier for weight)
+     */
+    @QueryParam("callAndRideReluctance")
+    protected Double callAndRideReluctance;
+
     /*
      * Size of flag stop buffer zone in UI
      */
@@ -593,6 +605,12 @@ public abstract class RoutingResource {
 
         if (flagStopExtraPenalty != null)
             request.flagStopExtraPenalty = flagStopExtraPenalty;
+
+        if (deviatedRouteExtraPenalty != null)
+            request.deviatedRouteExtraPenalty = deviatedRouteExtraPenalty;
+
+        if (callAndRideReluctance != null)
+            request.callAndRideReluctance = callAndRideReluctance;
 
         if (flagStopBufferSize != null)
             request.flagStopBufferSize = flagStopBufferSize;
