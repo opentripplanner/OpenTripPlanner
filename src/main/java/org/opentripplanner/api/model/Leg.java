@@ -278,6 +278,15 @@ public class Leg {
     @JsonSerialize
     public int drtAdvanceBookMin;
 
+     /* include DRT pickup/dropoff messages if applicable */
+     @XmlAttribute
+     @JsonSerialize
+     public String drtPickupMessage;
+
+     @XmlAttribute
+     @JsonSerialize
+     public String drtDropOffMessage;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg

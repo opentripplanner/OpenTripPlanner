@@ -608,6 +608,8 @@ public abstract class GraphPathToTripPlanConverter {
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
             leg.drtAdvanceBookMin = trip.getDrtAdvanceBookMin();
+            leg.drtPickupMessage = trip.getDrtPickupMessage();
+            leg.drtDropOffMessage = trip.getDrtDropOffMessage();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();

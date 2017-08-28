@@ -53,7 +53,8 @@ public class StopPattern implements Serializable {
     public final Stop[] stops;
     public final int[]  pickups;
     public final int[]  dropoffs;
-    public final int[] continuousStops;
+    public final int[] continuousPickup;
+    public final int[] continuousDropOff;
     public final double[] serviceAreaRadius;
     public final Polygon[] serviceAreas; // likely at most one distinct object will be in this array
 
@@ -63,7 +64,8 @@ public class StopPattern implements Serializable {
             return Arrays.equals(this.stops,    that.stops) && 
                    Arrays.equals(this.pickups,  that.pickups) && 
                    Arrays.equals(this.dropoffs, that.dropoffs) &&
-                   Arrays.equals(this.continuousStops, that.continuousStops) &&
+                   Arrays.equals(this.continuousPickup, that.continuousPickup) &&
+                    Arrays.equals(this.continuousDropOff, that.continuousDropOff) &&
                    Arrays.equals(this.serviceAreas, that.serviceAreas);
         } else {
             return false;
@@ -78,7 +80,9 @@ public class StopPattern implements Serializable {
         hash *= 31;
         hash += Arrays.hashCode(this.dropoffs);
         hash *= 31;
-        hash += Arrays.hashCode(this.continuousStops);
+        hash += Arrays.hashCode(this.continuousPickup);
+        hash *= 31;
+        hash += Arrays.hashCode(this.continuousDropOff);
         hash *= 31;
         hash += Arrays.hashCode(this.serviceAreas);
         return hash;
@@ -98,7 +102,8 @@ public class StopPattern implements Serializable {
         stops     = new Stop[size];
         pickups   = new int[size];
         dropoffs  = new int[size];
-        continuousStops = new int[size];
+        continuousPickup = new int[size];
+        continuousDropOff = new int[size];
         serviceAreaRadius = new double[size];
         serviceAreas = new Polygon[size];
     }
@@ -123,9 +128,11 @@ public class StopPattern implements Serializable {
 
             // continuous stops can be empty (-1), which means 0 for the first stoptime, and the previous value for subsequent stop times.
             if (i == 0) {
-                continuousStops[i] = stopTime.getContinuousStops() == -1 ? 0 : stopTime.getContinuousStops();
+                continuousPickup[i] = stopTime.getContinuousPickup() == -1 ? 0 : stopTime.getContinuousPickup();
+                continuousDropOff[i] = stopTime.getContinuousDropOff() == -1 ? 0 : stopTime.getContinuousDropOff();
             } else {
-                continuousStops[i] = stopTime.getContinuousStops() == -1 ? continuousStops[i-1] : stopTime.getContinuousStops();
+                continuousPickup[i] = stopTime.getContinuousPickup() == -1 ? continuousPickup[i-1] : stopTime.getContinuousPickup();
+                continuousDropOff[i] = stopTime.getContinuousDropOff() == -1 ? continuousDropOff[i-1] : stopTime.getContinuousDropOff();
             }
 
             if (stopTime.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
@@ -188,7 +195,8 @@ public class StopPattern implements Serializable {
         for (int hop = 0; hop < size - 1; hop++) {
             hasher.putInt(pickups[hop]);
             hasher.putInt(dropoffs[hop + 1]);
-            hasher.putInt(continuousStops[hop]);
+            hasher.putInt(continuousPickup[hop]);
+            hasher.putInt(continuousDropOff[hop]);
             hasher.putDouble(serviceAreaRadius[hop]);
             hasher.putInt(serviceAreas[hop].hashCode());
         }
