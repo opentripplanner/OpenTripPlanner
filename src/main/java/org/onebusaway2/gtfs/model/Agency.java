@@ -16,34 +16,18 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.AgencyIdTranslationFieldMappingFactory;
 
-@CsvFields(filename = "agency.txt", prefix = "agency_")
 public final class Agency extends IdentityBean<String> {
 
   private static final long serialVersionUID = 1L;
 
-  @CsvField(optional = true, mapping = AgencyIdTranslationFieldMappingFactory.class)
   private String id;
-
   private String name;
-
   private String url;
-
   private String timezone;
-
-  @CsvField(optional = true)
   private String lang;
-
-  @CsvField(optional = true)
   private String phone;
-
-  @CsvField(optional = true)
   private String fareUrl;
-
-  @CsvField(optional = true)
   private String brandingUrl;
 
   public Agency() {

@@ -15,46 +15,30 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
 
-@CsvFields(filename = "fare_attributes.txt", required = false)
 public final class FareAttribute extends IdentityBean<AgencyAndId> {
 
   private static final long serialVersionUID = 1L;
 
   private static final int MISSING_VALUE = -999;
 
-  @CsvField(name = "fare_id", mapping = DefaultAgencyIdFieldMappingFactory.class)
   private AgencyAndId id;
-
   private float price;
-
   private String currencyType;
-
   private int paymentMethod;
-
-  @CsvField(optional = true, alwaysIncludeInOutput = true)
   private int transfers = MISSING_VALUE;
-
-  @CsvField(optional = true)
   private int transferDuration = MISSING_VALUE;
 
   /** youthPrice is an extension to the GTFS spec to support Seattle fare types. */
-  @CsvField(optional = true)
   private float youthPrice;
 
   /** seniorPrice is an extension to the GTFS spec to support Seattle fare types. */
-  @CsvField(optional = true)
   private float seniorPrice;
   
   /** This is a proposed extension to the GTFS spec */
-  @CsvField(optional = true)
   private int journeyDuration = MISSING_VALUE;
   
   public FareAttribute() {
-
   }
 
   public FareAttribute(FareAttribute fa) {

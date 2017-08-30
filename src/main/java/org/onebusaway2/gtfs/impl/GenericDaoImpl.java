@@ -61,7 +61,6 @@ public class GenericDaoImpl implements GenericMutableDao {
    ****/
 
   @SuppressWarnings("unchecked")
-  @Override
   public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
     Map<Object, Object> entitiesById = _entitiesByClassAndId.get(type);
     if (entitiesById == null)
@@ -70,7 +69,6 @@ public class GenericDaoImpl implements GenericMutableDao {
   }
 
   @SuppressWarnings("unchecked")
-  @Override
   public <T> T getEntityForId(Class<T> type, Serializable id) {
     Map<Object, Object> byId = _entitiesByClassAndId.get(type);
 
@@ -110,26 +108,6 @@ public class GenericDaoImpl implements GenericMutableDao {
   }
 
   @Override
-  public void updateEntity(Object entity) {
-    // No-op required, since entity already resides in memory
-  }
-
-  @Override
-  public void saveOrUpdateEntity(Object entity) {
-
-    @SuppressWarnings("unchecked")
-    IdentityBean<Serializable> bean = ((IdentityBean<Serializable>) entity);
-
-    Object existing = getEntityForId(entity.getClass(), bean.getId());
-
-    // If the entity has already been inserted into storage, then we don't need
-    // to save it
-    if (existing == entity)
-      return;
-    saveEntity(entity);
-  }
-
-  @Override
   public <T> void clearAllEntitiesForType(Class<T> type) {
     _entitiesByClassAndId.remove(type);
   }
@@ -152,21 +130,6 @@ public class GenericDaoImpl implements GenericMutableDao {
 
     if (found == null)
       _log.warn("no stored entity with type " + type + " and id " + id);
-  }
-
-  @Override
-  public void open() {
-
-  }
-
-  @Override
-  public void flush() {
-
-  }
-
-  @Override
-  public void close() {
-
   }
 
   /****

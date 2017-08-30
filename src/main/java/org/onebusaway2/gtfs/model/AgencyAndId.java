@@ -25,7 +25,6 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
   private static final long serialVersionUID = 1L;
 
   private String agencyId;
-
   private String id;
 
   public AgencyAndId() {

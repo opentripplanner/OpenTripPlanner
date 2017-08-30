@@ -15,63 +15,34 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
-import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
-import org.onebusaway2.gtfs.serialization.mappings.TripAgencyIdFieldMappingFactory;
 
-@CsvFields(filename = "trips.txt")
 public final class Trip extends IdentityBean<AgencyAndId> {
 
   private static final long serialVersionUID = 1L;
 
-  @CsvField(name = "trip_id", mapping = TripAgencyIdFieldMappingFactory.class)
   private AgencyAndId id;
-
-  @CsvField(name = "route_id", mapping = EntityFieldMappingFactory.class, order = -1)
   private Route route;
-
-  @CsvField(mapping = DefaultAgencyIdFieldMappingFactory.class)
   private AgencyAndId serviceId;
-
-  @CsvField(optional = true)
   private String tripShortName;
-
-  @CsvField(optional = true)
   private String tripHeadsign;
-
-  @CsvField(optional = true)
   private String routeShortName;
-
-  @CsvField(optional = true)
   private String directionId;
-
-  @CsvField(optional = true)
   private String blockId;
-
-  @CsvField(optional = true, mapping = DefaultAgencyIdFieldMappingFactory.class)
   private AgencyAndId shapeId;
-
-  @CsvField(optional = true, defaultValue = "0")
   private int wheelchairAccessible = 0;
 
   @Deprecated
-  @CsvField(optional = true, defaultValue = "0")
   private int tripBikesAllowed = 0;
 
   /**
    * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
    */
-  @CsvField(optional = true, defaultValue = "0")
   private int bikesAllowed = 0;
 
-  // Custom extension for KCM to specify a fare per-trip
-  @CsvField(optional = true)
+  /** Custom extension for KCM to specify a fare per-trip */
   private String fareId;
   
   public Trip() {
-
   }
 
   public Trip(Trip obj) {
@@ -188,8 +159,7 @@ public final class Trip extends IdentityBean<AgencyAndId> {
   }
 
   /**
-   * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes
-   *          NOT allowed
+   * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
    */
   public void setBikesAllowed(int bikesAllowed) {
     this.bikesAllowed = bikesAllowed;

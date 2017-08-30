@@ -16,45 +16,23 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
-
-@CsvFields(filename = "transfers.txt", required = false)
 public final class Transfer extends IdentityBean<Integer> {
 
   private static final long serialVersionUID = 1L;
 
   private static final int MISSING_VALUE = -999;
 
-  @CsvField(ignore = true)
   private int id;
-
-  @CsvField(name = "from_stop_id", mapping = EntityFieldMappingFactory.class)
   private Stop fromStop;
-
-  @CsvField(name = "from_route_id", mapping = EntityFieldMappingFactory.class, optional = true)
   private Route fromRoute;
-
-  @CsvField(name = "from_trip_id", mapping = EntityFieldMappingFactory.class, optional = true)
   private Trip fromTrip;
-
-  @CsvField(name = "to_stop_id", mapping = EntityFieldMappingFactory.class)
   private Stop toStop;
-
-  @CsvField(name = "to_route_id", mapping = EntityFieldMappingFactory.class, optional = true)
   private Route toRoute;
-
-  @CsvField(name = "to_trip_id", mapping = EntityFieldMappingFactory.class, optional = true)
   private Trip toTrip;
-
   private int transferType;
-
-  @CsvField(optional = true)
   private int minTransferTime = MISSING_VALUE;
 
   public Transfer() {
-
   }
 
   public Transfer(Transfer obj) {

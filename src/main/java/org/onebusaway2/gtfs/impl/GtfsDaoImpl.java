@@ -266,17 +266,6 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
     super.removeEntity(entity);
   }
 
-  @Override
-  public void close() {
-    if (packStopTimes) {
-      stopTimes.trimToSize();
-    }
-    if (packShapePoints) {
-      shapePoints.trimToSize();
-    }
-    super.close();
-  }
-
   /****
    * Private Methods
    ****/

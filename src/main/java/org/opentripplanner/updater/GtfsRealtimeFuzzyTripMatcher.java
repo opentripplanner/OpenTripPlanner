@@ -3,9 +3,9 @@ package org.opentripplanner.updater;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -41,7 +41,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         }
 
         AgencyAndId routeId = new AgencyAndId(feedId, trip.getRouteId());
-        int time = StopTimeFieldMappingFactory.getStringAsSeconds(trip.getStartTime());
+        int time = TimeToStringConverter.parseHH_MM_SS(trip.getStartTime());
         ServiceDate date;
         try {
             date = ServiceDate.parseString(trip.getStartDate());
@@ -69,11 +69,9 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
         // If everything succeeds, build a new TripDescriptor with the matched trip_id
         return trip.toBuilder().setTripId(matchedTrip.getId().getId()).build();
-
     }
 
-    public Trip getTrip (Route route, int direction,
-                          int startTime, ServiceDate date) {
+    public Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
         BitSet services = index.servicesRunning(date);
         for (TripPattern pattern : index.patternsForRoute.get(route)) {
             if (pattern.directionId != direction) continue;

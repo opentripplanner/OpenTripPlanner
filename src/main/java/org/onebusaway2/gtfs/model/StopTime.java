@@ -16,12 +16,8 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
-import org.onebusaway2.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
+import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
 
-@CsvFields(filename = "stop_times.txt")
 public final class StopTime extends IdentityBean<Integer> implements
     Comparable<StopTime>, StopTimeProxy {
 
@@ -29,46 +25,21 @@ public final class StopTime extends IdentityBean<Integer> implements
 
   public static final int MISSING_VALUE = -999;
 
-  @CsvField(ignore = true)
   private int id;
-
-  @CsvField(name = "trip_id", mapping = EntityFieldMappingFactory.class)
   private Trip trip;
-
-  @CsvField(name = "stop_id", mapping = EntityFieldMappingFactory.class)
   private Stop stop;
-
-  @CsvField(optional = true, mapping = StopTimeFieldMappingFactory.class)
   private int arrivalTime = MISSING_VALUE;
-
-  @CsvField(optional = true, mapping = StopTimeFieldMappingFactory.class)
   private int departureTime = MISSING_VALUE;
-  
-  @CsvField(optional = true)
   private int timepoint = MISSING_VALUE;
-
   private int stopSequence;
-
-  @CsvField(optional = true)
   private String stopHeadsign;
-
-  @CsvField(optional = true)
   private String routeShortName;
-
-  @CsvField(optional = true, defaultValue = "0")
   private int pickupType;
-
-  @CsvField(optional = true, defaultValue = "0")
   private int dropOffType;
-
-  @CsvField(optional = true)
   private double shapeDistTraveled = MISSING_VALUE;
-
-  @CsvField(ignore = true)
   private transient StopTimeProxy proxy = null;
 
   /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
-  @CsvField(optional = true)
   private String farePeriodId;
 
   public StopTime() {
@@ -370,11 +341,11 @@ public final class StopTime extends IdentityBean<Integer> implements
 
   @Override
   public String toString() {
-    return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId()
+      return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId()
         + " trip=" + getTrip().getId() + " times="
-        + StopTimeFieldMappingFactory.getSecondsAsString(getArrivalTime())
+        + TimeToStringConverter.toHH_MM_SS(getArrivalTime())
         + "-"
-        + StopTimeFieldMappingFactory.getSecondsAsString(getDepartureTime())
+        + TimeToStringConverter.toHH_MM_SS(getDepartureTime())
         + ")";
   }
 }

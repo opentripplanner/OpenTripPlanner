@@ -15,45 +15,18 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.EntityFieldMappingFactory;
 
-@CsvFields(filename = "fare_rules.txt", required = false)
 public final class FareRule extends IdentityBean<Integer> {
 
   private static final long serialVersionUID = 1L;
 
-  @CsvField(ignore = true)
   private int id;
-
-  @CsvField(name = "fare_id", mapping = EntityFieldMappingFactory.class)
   private FareAttribute fare;
-
-  @CsvField(name = "route_id", optional = true, mapping = EntityFieldMappingFactory.class)
   private Route route;
-
-  @CsvField(optional = true)
   private String originId;
-
-  @CsvField(optional = true)
   private String destinationId;
-
-  @CsvField(optional = true)
   private String containsId;
 
-  public FareRule() {
-
-  }
-
-  public FareRule(FareRule fr) {
-    this.id = fr.id;
-    this.fare = fr.fare;
-    this.route = fr.route;
-    this.originId = fr.originId;
-    this.destinationId = fr.destinationId;
-    this.containsId = fr.containsId;
-  }
 
   @Override
   public Integer getId() {

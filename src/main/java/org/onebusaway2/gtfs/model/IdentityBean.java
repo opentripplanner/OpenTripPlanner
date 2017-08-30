@@ -16,56 +16,24 @@
 package org.onebusaway2.gtfs.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.onebusaway.csv_entities.HasExtensions;
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
+public abstract class IdentityBean<T extends Serializable> implements Serializable {
 
-public abstract class IdentityBean<T extends Serializable> implements
-    Serializable, HasExtensions {
+    private static final long serialVersionUID = 1L;
 
-  private static final long serialVersionUID = 1L;
+    public abstract T getId();
 
-  @CsvField(ignore = true)
-  private Map<Class<?>, Object> _extensionsByType = null;
+    public abstract void setId(T id);
 
-  public abstract T getId();
-
-  public abstract void setId(T id);
-
-  @Override
-  public void putExtension(Class<?> type, Object extension) {
-    if (_extensionsByType == null) {
-      _extensionsByType = new HashMap<Class<?>, Object>();
+    @Override public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof IdentityBean<?>) || getClass() != obj.getClass()) {
+            return false;
+        }
+        IdentityBean<?> entity = (IdentityBean<?>) obj;
+        return getId().equals(entity.getId());
     }
-    _extensionsByType.put(type, extension);
-  }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <X> X getExtension(Class<X> type) {
-    if (_extensionsByType == null) {
-      return null;
+    @Override public int hashCode() {
+        return getId().hashCode();
     }
-    return (X) _extensionsByType.get(type);
-  }
-
-  /***************************************************************************
-   * {@link Object}
-   **************************************************************************/
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof IdentityBean<?>)
-        || getClass() != obj.getClass())
-      return false;
-    IdentityBean<?> entity = (IdentityBean<?>) obj;
-    return getId().equals(entity.getId());
-  }
-
-  @Override
-  public int hashCode() {
-    return getId().hashCode();
-  }
 }

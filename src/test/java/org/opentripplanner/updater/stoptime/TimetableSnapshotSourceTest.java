@@ -74,28 +74,28 @@ public class TimetableSnapshotSourceTest {
 
         feedId = context.getFeedId().getId();
 
-        for (ShapePoint shapePoint : dao.getAllEntitiesForType(ShapePoint.class)) {
+        for (ShapePoint shapePoint : dao.getAllShapePoints()) {
             shapePoint.getShapeId().setAgencyId(feedId);
         }
-        for (Route route : dao.getAllEntitiesForType(Route.class)) {
+        for (Route route : dao.getAllRoutes()) {
             route.getId().setAgencyId(feedId);
         }
-        for (Stop stop : dao.getAllEntitiesForType(Stop.class)) {
+        for (Stop stop : dao.getAllStops()) {
             stop.getId().setAgencyId(feedId);
         }
-        for (Trip trip : dao.getAllEntitiesForType(Trip.class)) {
+        for (Trip trip : dao.getAllTrips()) {
             trip.getId().setAgencyId(feedId);
         }
-        for (ServiceCalendar serviceCalendar : dao.getAllEntitiesForType(ServiceCalendar.class)) {
+        for (ServiceCalendar serviceCalendar : dao.getAllCalendars()) {
             serviceCalendar.getServiceId().setAgencyId(feedId);
         }
-        for (ServiceCalendarDate serviceCalendarDate : dao.getAllEntitiesForType(ServiceCalendarDate.class)) {
+        for (ServiceCalendarDate serviceCalendarDate : dao.getAllCalendarDates()) {
             serviceCalendarDate.getServiceId().setAgencyId(feedId);
         }
-        for (FareAttribute fareAttribute : dao.getAllEntitiesForType(FareAttribute.class)) {
+        for (FareAttribute fareAttribute : dao.getAllFareAttributes()) {
             fareAttribute.getId().setAgencyId(feedId);
         }
-        for (Pathway pathway : dao.getAllEntitiesForType(Pathway.class)) {
+        for (Pathway pathway : dao.getAllPathways()) {
             pathway.getId().setAgencyId(feedId);
         }
 

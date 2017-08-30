@@ -38,7 +38,7 @@ import org.onebusaway2.gtfs.model.Trip;
  * 
  * @author bdferris
  */
-public interface GtfsDao extends GenericDao {
+public interface GtfsDao {
 
   /****
    * Agency Methods

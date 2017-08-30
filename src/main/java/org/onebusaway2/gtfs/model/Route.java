@@ -15,58 +15,31 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.RouteAgencyIdFieldMappingFactory;
-import org.onebusaway2.gtfs.serialization.mappings.RouteAgencyFieldMappingFactory;
 
-@CsvFields(filename = "routes.txt", prefix = "route_")
 public final class Route extends IdentityBean<AgencyAndId> {
 
   private static final long serialVersionUID = 1L;
 
   private static final int MISSING_VALUE = -999;
 
-  @CsvField(mapping = RouteAgencyIdFieldMappingFactory.class)
   private AgencyAndId id;
-
-  @CsvField(name = "agency_id", optional = true, mapping = RouteAgencyFieldMappingFactory.class, order = -1)
   private Agency agency;
-
-  @CsvField(optional = true, alwaysIncludeInOutput = true)
   private String shortName;
-
-  @CsvField(optional = true, alwaysIncludeInOutput = true)
   private String longName;
-
   private int type;
-
-  @CsvField(optional = true)
   private String desc;
-
-  @CsvField(optional = true)
   private String url;
-
-  @CsvField(optional = true)
   private String color;
-
-  @CsvField(optional = true)
   private String textColor;
   
   @Deprecated
-  @CsvField(name="route_bikes_allowed", optional = true, defaultValue = "0")
   private int routeBikesAllowed = 0;
 
   /**
    * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
    */
-  @CsvField(name="bikes_allowed", optional = true, defaultValue = "0")
   private int bikesAllowed = 0;
-
-  @CsvField(optional = true)
   private int sortOrder = MISSING_VALUE;
-
-  @CsvField(optional = true)
   private String brandingUrl;
 
   public Route() {

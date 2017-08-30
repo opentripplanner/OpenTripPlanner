@@ -15,12 +15,7 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway.csv_entities.schema.annotations.CsvField;
-import org.onebusaway.csv_entities.schema.annotations.CsvFields;
-import org.onebusaway2.gtfs.serialization.mappings.DefaultAgencyIdFieldMappingFactory;
-import org.onebusaway2.gtfs.serialization.mappings.LatLonFieldMappingFactory;
 
-@CsvFields(filename = "shapes.txt", required = false)
 public final class ShapePoint extends IdentityBean<Integer> implements
     Comparable<ShapePoint> {
 
@@ -28,29 +23,15 @@ public final class ShapePoint extends IdentityBean<Integer> implements
 
   public static final double MISSING_VALUE = -999;
 
-  @CsvField(ignore = true)
   private int id;
-
-  @CsvField(mapping = DefaultAgencyIdFieldMappingFactory.class)
   private AgencyAndId shapeId;
-
-  @CsvField(name = "shape_pt_sequence")
   private int sequence;
-
-  @CsvField(name = "shape_pt_lat", mapping = LatLonFieldMappingFactory.class)
   private double lat;
-
-  @CsvField(name = "shape_pt_lon", mapping = LatLonFieldMappingFactory.class)
   private double lon;
-
-  @CsvField(optional = true, name = "shape_dist_traveled")
   private double distTraveled = MISSING_VALUE;
-
-  @CsvField(ignore = true)
   private transient ShapePointProxy proxy;
 
   public ShapePoint() {
-
   }
 
   public ShapePoint(ShapePoint shapePoint) {
