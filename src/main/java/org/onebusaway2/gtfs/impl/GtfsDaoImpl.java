@@ -15,9 +15,7 @@
  */
 package org.onebusaway2.gtfs.impl;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Map;
 
 import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
@@ -25,7 +23,6 @@ import org.onebusaway2.gtfs.model.FareAttribute;
 import org.onebusaway2.gtfs.model.FareRule;
 import org.onebusaway2.gtfs.model.FeedInfo;
 import org.onebusaway2.gtfs.model.Frequency;
-import org.onebusaway2.gtfs.model.IdentityBean;
 import org.onebusaway2.gtfs.model.Pathway;
 import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.model.ServiceCalendar;
@@ -35,38 +32,10 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.GenericMutableDao;
 import org.onebusaway2.gtfs.services.GtfsDao;
 import org.onebusaway2.gtfs.services.GtfsMutableDao;
 
 public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
-
-  private StopTimeArray stopTimes = new StopTimeArray();
-
-  private ShapePointArray shapePoints = new ShapePointArray();
-
-  private boolean packStopTimes = false;
-
-  private boolean packShapePoints = false;
-
-
-  public boolean isPackStopTimes() {
-    return packStopTimes;
-  }
-
-  // TODO TGR - The mapping from GTFS to OTP model do not support this - ok?
-//  public void setPackStopTimes(boolean packStopTimes) {
-//    this.packStopTimes = packStopTimes;
-//  }
-
-  public boolean isPackShapePoints() {
-    return packShapePoints;
-  }
-
-  // TODO TGR - The mapping from GTFS to OTP model do not support this - ok?
-//  public void setPackShapePoints(boolean packShapePoints) {
-//    this.packShapePoints = packShapePoints;
-//  }
 
   /***
    * {@link GtfsDao} Interface
@@ -110,17 +79,11 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
   }
 
   public Collection<ShapePoint> getAllShapePoints() {
-    if (packShapePoints) {
-      return shapePoints;
-    }
     return getAllEntitiesForType(ShapePoint.class);
   }
 
   public Collection<StopTime> getAllStopTimes() {
-    if (packStopTimes) {
-      return stopTimes;
-    }
-    return getAllEntitiesForType(StopTime.class);
+    return super.getAllEntitiesForType(StopTime.class);
   }
 
   public Collection<Stop> getAllStops() {
@@ -173,9 +136,6 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
   }
 
   public ShapePoint getShapePointForId(int id) {
-    if (packShapePoints) {
-      return shapePoints.get(id);
-    }
     return getEntityForId(ShapePoint.class, id);
   }
 
@@ -184,9 +144,6 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
   }
 
   public StopTime getStopTimeForId(int id) {
-    if (packStopTimes) {
-      return stopTimes.get(id);
-    }
     return getEntityForId(StopTime.class, id);
   }
 
@@ -197,86 +154,4 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsMutableDao {
   public Trip getTripForId(AgencyAndId id) {
     return getEntityForId(Trip.class, id);
   }
-
-  /****
-   * {@link GenericMutableDao} Interface
-   ****/
-
-  @Override
-  public <K, V> Map<K, V> getEntitiesByIdForEntityType(Class<K> keyType,
-      Class<V> entityType) {
-    noKeyCheck(keyType);
-    return super.getEntitiesByIdForEntityType(keyType, entityType);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
-    if (packStopTimes && type.equals(StopTime.class)) {
-      return (Collection<T>) stopTimes;
-    } else if (packShapePoints && type.equals(ShapePoint.class)) {
-      return (Collection<T>) shapePoints;
-    }
-    return super.getAllEntitiesForType(type);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T getEntityForId(Class<T> type, Serializable id) {
-    if (packStopTimes && type.equals(StopTime.class)) {
-      return (T) stopTimes.get((Integer) id);
-    } else if (packShapePoints && type.equals(ShapePoint.class)) {
-      return (T) shapePoints.get((Integer) id);
-    }
-    return super.getEntityForId(type, id);
-  }
-
-  @Override
-  public void saveEntity(Object entity) {
-    if (packStopTimes && entity.getClass().equals(StopTime.class)) {
-      stopTimes.add((StopTime) entity);
-      return;
-    } else if (packShapePoints && entity.getClass().equals(ShapePoint.class)) {
-      shapePoints.add((ShapePoint) entity);
-      return;
-    }
-    super.saveEntity(entity);
-  }
-
-  @Override
-  public <T> void clearAllEntitiesForType(Class<T> type) {
-    if (packStopTimes && type.equals(StopTime.class)) {
-      stopTimes.clear();
-      return;
-    } else if (packShapePoints && type.equals(ShapePoint.class)) {
-      shapePoints.clear();
-      return;
-    }
-    super.clearAllEntitiesForType(type);
-  }
-
-  @Override
-  public <K extends Serializable, T extends IdentityBean<K>> void removeEntity(
-      T entity) {
-    if (packStopTimes && entity.getClass().equals(StopTime.class)) {
-      throw new UnsupportedOperationException();
-    } else if (packShapePoints && entity.getClass().equals(ShapePoint.class)) {
-      throw new UnsupportedOperationException();
-    }
-    super.removeEntity(entity);
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private <K> void noKeyCheck(Class<K> keyType) {
-    if (packStopTimes && keyType.equals(StopTime.class)) {
-      throw new UnsupportedOperationException();
-    }
-    if (packShapePoints && keyType.equals(ShapePoint.class)) {
-      throw new UnsupportedOperationException();
-    }
-  }
-
 }
