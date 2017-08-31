@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype.flex;
 
 import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -39,21 +38,6 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
     public void dispose() {
         fromv.removeOutgoing(this);
         tov.removeIncoming(this);
-    }
-
-    // is this hop too not-different to care about? for now lets say should be > 50 m shorter than original hop
-    public boolean isTrivial() {
-        if ((isDeviatedRouteBoard() && getStartVehicleTime() < 5) || (isDeviatedRouteAlight() && getEndVehicleTime() < 5))
-            return true;
-        double length = SphericalDistanceLibrary.fastLength(getGeometry());
-        double parentLength = SphericalDistanceLibrary.fastLength(getOriginalHop().getGeometry());
-        if (length == 0) {
-            return true;
-        }
-        if (parentLength == 0) {
-            return length < 5d; // deviated route
-        }
-        return length + 50 >= parentLength;
     }
 
 }

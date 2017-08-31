@@ -28,10 +28,14 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PartialPatternHop extends PatternHop {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(PartialPatternHop.class);
 
     private double startIndex;
     private double endIndex;
@@ -168,6 +172,32 @@ public class PartialPatternHop extends PatternHop {
             return displayGeometry;
         }
         return getGeometry();
+    }
+
+    // is this hop too not-different to care about? for now lets say should be > 50 m shorter than original hop
+    public boolean isTrivial() {
+        if ((isDeviatedRouteBoard() && getStartVehicleTime() < 5) || (isDeviatedRouteAlight() && getEndVehicleTime() < 5))
+            return true;
+        double length = SphericalDistanceLibrary.fastLength(getGeometry());
+        double parentLength = SphericalDistanceLibrary.fastLength(getOriginalHop().getGeometry());
+        if (length == 0) {
+            return true;
+        }
+        if (parentLength == 0) {
+            return length < 5d; // deviated route
+        }
+        // Test for bad transit edges.
+        double fromDist = SphericalDistanceLibrary.distance(getFromVertex().getCoordinate(),
+                getGeometry().getStartPoint().getCoordinate());
+        double toDist = SphericalDistanceLibrary.distance(getToVertex().getCoordinate(),
+                getGeometry().getEndPoint().getCoordinate());
+        if (fromDist > 400.0 || toDist > 400.0) {
+            LOG.info("Discarding edge: mismatch between endpoints and street geometry. This "
+                            + "indicates bad transit stop linking at {} or {}",
+                    getOriginalHop().getBeginStop(), getOriginalHop().getEndStop());
+            return true;
+        }
+        return length + 50 >= parentLength;
     }
 
     /**
