@@ -19,14 +19,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (24.08.2017)
- */
-public class RouteMapper {
+class RouteMapper {
     private final AgencyMapper agencyMapper;
     private final Map<org.onebusaway.gtfs.model.Route, Route> mappedRoutes = new HashMap<>();
 
-    public RouteMapper(AgencyMapper agencyMapper) {
+    RouteMapper(AgencyMapper agencyMapper) {
         this.agencyMapper = agencyMapper;
     }
 

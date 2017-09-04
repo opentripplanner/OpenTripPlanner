@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class FrequencyMapper {
+class FrequencyMapper {
     private final TripMapper tripMapper;
 
     private Map<org.onebusaway.gtfs.model.Frequency, Frequency> mappedFrequencys = new HashMap<>();
 
-    public FrequencyMapper(TripMapper tripMapper) {
+    FrequencyMapper(TripMapper tripMapper) {
         this.tripMapper = tripMapper;
     }
 

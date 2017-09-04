@@ -28,7 +28,7 @@ class AgencyMapper {
     }
 
     Agency map(org.onebusaway.gtfs.model.Agency orginal) {
-        return mappedAgencies.computeIfAbsent(orginal, this::doMap);
+        return orginal == null ? null : mappedAgencies.computeIfAbsent(orginal, this::doMap);
     }
 
     private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {

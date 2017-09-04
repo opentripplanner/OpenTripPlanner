@@ -19,18 +19,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 
-public class FeedInfoMapper {
+class FeedInfoMapper {
     private Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
 
 
     Collection<FeedInfo> map(Collection<org.onebusaway.gtfs.model.FeedInfo> feedInfos) {
-        return MapCollection.mapCollection(feedInfos, this::map);
+        return feedInfos == null ? null : mapCollection(feedInfos, this::map);
     }
 
     FeedInfo map(org.onebusaway.gtfs.model.FeedInfo orginal) {
-        return  orginal == null ? null : mappedFeedInfos.computeIfAbsent(orginal, this::doMap);
+        return orginal == null ? null : mappedFeedInfos.computeIfAbsent(orginal, this::doMap);
     }
 
     private FeedInfo doMap(org.onebusaway.gtfs.model.FeedInfo rhs) {

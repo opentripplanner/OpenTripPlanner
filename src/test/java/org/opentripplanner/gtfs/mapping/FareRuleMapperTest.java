@@ -1,0 +1,90 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+package org.opentripplanner.gtfs.mapping;
+
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareRule;
+import org.onebusaway.gtfs.model.Route;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
+
+public class FareRuleMapperTest {
+    private static final org.onebusaway.gtfs.model.FareRule FARE_RULE = new org.onebusaway.gtfs.model.FareRule();
+
+    private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
+    private static final Integer ID = 45;
+    private static final String CONTAINS_ID = "Contains Id";
+    private static final String DESTINATION_ID = "Destination Id";
+    private static final FareAttribute FARE_ATTRIBUTE = new FareAttribute();
+    private static final String ORIGIN_ID = "Origin Id";
+    private static final Route ROUTE = new Route();
+
+    static {
+        FARE_ATTRIBUTE.setId(AGENCY_AND_ID);
+        ROUTE.setId(AGENCY_AND_ID);
+
+        FARE_RULE.setId(ID);
+        FARE_RULE.setContainsId(CONTAINS_ID);
+        FARE_RULE.setDestinationId(DESTINATION_ID);
+        FARE_RULE.setFare(FARE_ATTRIBUTE);
+        FARE_RULE.setOriginId(ORIGIN_ID);
+        FARE_RULE.setRoute(ROUTE);
+    }
+
+    private FareRuleMapper subject = new FareRuleMapper(new RouteMapper(new AgencyMapper()),
+            new FareAttributeMapper());
+
+    @Test public void testMapCollection() throws Exception {
+        assertNull(subject.map((Collection<FareRule>) null));
+        assertTrue(subject.map(Collections.emptyList()).isEmpty());
+        assertEquals(1, subject.map(Collections.singleton(FARE_RULE)).size());
+    }
+
+    @Test public void testMap() throws Exception {
+        org.onebusaway2.gtfs.model.FareRule result = subject.map(FARE_RULE);
+
+        assertEquals(ID, result.getId());
+        assertEquals(CONTAINS_ID, result.getContainsId());
+        assertEquals(DESTINATION_ID, result.getDestinationId());
+        assertEquals(ORIGIN_ID, result.getOriginId());
+        assertNotNull(result.getFare());
+        assertNotNull(result.getRoute());
+    }
+
+    @Test public void testMapWithNulls() throws Exception {
+        org.onebusaway2.gtfs.model.FareRule result = subject.map(new FareRule());
+
+        assertNotNull(result.getId());
+        assertNull(result.getContainsId());
+        assertNull(result.getDestinationId());
+        assertNull(result.getOriginId());
+        assertNull(result.getFare());
+        assertNull(result.getRoute());
+    }
+
+
+    /** Mapping the same object twice, should return the the same instance. */
+    @Test public void testMapCache() throws Exception {
+        org.onebusaway2.gtfs.model.FareRule result1 = subject.map(FARE_RULE);
+        org.onebusaway2.gtfs.model.FareRule result2 = subject.map(FARE_RULE);
+
+        assertTrue(result1 == result2);
+    }
+}

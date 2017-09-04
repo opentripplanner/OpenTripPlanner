@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
-public class FareAttributeMapper {
+class FareAttributeMapper {
     private Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
     Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
@@ -29,7 +29,7 @@ public class FareAttributeMapper {
     }
 
     FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {
-        return mappedStops.computeIfAbsent(orginal, this::doMap);
+        return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
     }
 
     private FareAttribute doMap(org.onebusaway.gtfs.model.FareAttribute rhs) {

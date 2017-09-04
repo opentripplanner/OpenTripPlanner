@@ -19,9 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (24.08.2017)
- */
 class StopTimeMapper {
     private final StopMapper stopMapper;
 

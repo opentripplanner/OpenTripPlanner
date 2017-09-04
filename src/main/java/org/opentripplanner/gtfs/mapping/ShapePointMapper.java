@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 
-public class ShapePointMapper {
+class ShapePointMapper {
     private Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints = new HashMap<>();
 
     Collection<ShapePoint> map(

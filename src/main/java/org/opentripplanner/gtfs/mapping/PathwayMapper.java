@@ -19,13 +19,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PathwayMapper {
+class PathwayMapper {
 
     private final StopMapper stopMapper;
 
     private Map<org.onebusaway.gtfs.model.Pathway, Pathway> mappedPathways = new HashMap<>();
 
-    public PathwayMapper(StopMapper stopMapper) {
+    PathwayMapper(StopMapper stopMapper) {
         this.stopMapper = stopMapper;
     }
 

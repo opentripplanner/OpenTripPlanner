@@ -17,10 +17,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (24.08.2017)
- */
-public class MapCollection {
+class MapCollection {
     static <S,T> Collection<T> mapCollection(Collection<S> entites, Function<S,T> mapper) {
         return  entites == null ? null : entites.stream().map(mapper).collect(Collectors.toList());
     }

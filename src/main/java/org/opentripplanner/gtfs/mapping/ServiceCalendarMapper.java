@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
-public class ServiceCalendarMapper {
+class ServiceCalendarMapper {
     private Map<org.onebusaway.gtfs.model.ServiceCalendar, ServiceCalendar> mappedCalendars = new HashMap<>();
 
     Collection<ServiceCalendar> map(

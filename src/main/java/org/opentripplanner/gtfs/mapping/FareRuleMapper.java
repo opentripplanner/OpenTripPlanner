@@ -19,14 +19,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FareRuleMapper {
+class FareRuleMapper {
 
     private final RouteMapper routeMapper;
     private final FareAttributeMapper fareAttributeMapper;
 
     private Map<org.onebusaway.gtfs.model.FareRule, FareRule> mappedFareRules = new HashMap<>();
 
-    public FareRuleMapper(RouteMapper routeMapper, FareAttributeMapper fareAttributeMapper) {
+    FareRuleMapper(RouteMapper routeMapper, FareAttributeMapper fareAttributeMapper) {
         this.routeMapper = routeMapper;
         this.fareAttributeMapper = fareAttributeMapper;
     }
