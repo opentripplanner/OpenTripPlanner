@@ -33,9 +33,8 @@ import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.ServiceCalendar;
 import org.onebusaway2.gtfs.model.ServiceCalendarDate;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.onebusaway2.gtfs.services.calendar.CalendarServiceDataFactory;
 import org.slf4j.Logger;
@@ -54,11 +53,11 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
 
   private final Logger _log = LoggerFactory.getLogger(CalendarServiceDataFactoryImpl.class);
 
-  private GtfsRelationalDao _dao;
+  private GtfsDao _dao;
 
   private int _excludeFutureServiceDatesInDays;
 
-  public static CalendarService createService(GtfsRelationalDao dao) {
+  public static CalendarService createService(GtfsDao dao) {
     CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl(
         dao);
     return new CalendarServiceImpl(factory.createData());
@@ -68,11 +67,11 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
 
   }
 
-  public CalendarServiceDataFactoryImpl(GtfsRelationalDao dao) {
+  public CalendarServiceDataFactoryImpl(GtfsDao dao) {
     _dao = dao;
   }
 
-  public void setGtfsDao(GtfsRelationalDao dao) {
+  public void setGtfsDao(GtfsDao dao) {
     _dao = dao;
   }
 

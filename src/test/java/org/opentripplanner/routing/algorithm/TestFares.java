@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
@@ -46,7 +47,10 @@ public class TestFares extends TestCase {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
@@ -123,7 +127,10 @@ public class TestFares extends TestCase {
         factory.setFareServiceFactory(new SeattleFareServiceFactory());
         
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
        
@@ -159,7 +166,10 @@ public class TestFares extends TestCase {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FARE_COMPONENT_GTFS));
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);

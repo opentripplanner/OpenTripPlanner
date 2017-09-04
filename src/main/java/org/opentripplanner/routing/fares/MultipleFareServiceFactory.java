@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
@@ -46,7 +46,7 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
     protected abstract FareService makeMultipleFareService(List<FareService> subServices);
 
     @Override
-    public void processGtfs(GtfsRelationalDao dao) {
+    public void processGtfs(GtfsDao dao) {
         for (FareServiceFactory subFactory : subFactories)
             subFactory.processGtfs(dao);
     }

@@ -33,7 +33,6 @@ import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 import org.onebusaway2.gtfs.model.calendar.ServiceIdIntervals;
 import org.onebusaway2.gtfs.model.calendar.ServiceInterval;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
-import org.onebusaway2.gtfs.services.calendar.CalendarServiceDataFactory;
 
 /**
  * An implementation of {@link CalendarService}. Requires a pre-computed
@@ -44,33 +43,11 @@ import org.onebusaway2.gtfs.services.calendar.CalendarServiceDataFactory;
  */
 public class CalendarServiceImpl implements CalendarService {
 
-  private CalendarServiceDataFactory _factory;
-
-  private volatile CalendarServiceData _data;
-
-  public CalendarServiceImpl() {
-
-  }
-
-  public CalendarServiceImpl(CalendarServiceDataFactory factory) {
-    _factory = factory;
-  }
+  private final CalendarServiceData data;
 
   public CalendarServiceImpl(CalendarServiceData data) {
-    _data = data;
+    this.data = data;
   }
-
-  public void setDataFactory(CalendarServiceDataFactory factory) {
-    _factory = factory;
-  }
-
-  public void setData(CalendarServiceData data) {
-    _data = data;
-  }
-
-  /****
-   * {@link CalendarService} Interface
-   ****/
 
   @Override
   public Set<AgencyAndId> getServiceIds() {
@@ -199,19 +176,11 @@ public class CalendarServiceImpl implements CalendarService {
         target, true);
   }
 
-  /****
-   * Private Methods
-   ****/
+
+  /* Private Methods */
 
   protected CalendarServiceData getData() {
-    if (_data == null) {
-      synchronized (this) {
-        if (_data == null) {
-          _data = _factory.createData();
-        }
-      }
-    }
-    return _data;
+    return data;
   }
 
   private Map<LocalizedServiceId, List<Date>> getServiceDates(
@@ -263,7 +232,7 @@ public class CalendarServiceImpl implements CalendarService {
         nextDate = serviceDate;
       } else if (rc == 0) {
         resultsForServiceId.add(serviceDate);
-      } else if (rc < 0) {
+      } else {
         break;
       }
       index--;
@@ -297,7 +266,7 @@ public class CalendarServiceImpl implements CalendarService {
       return search(serviceDates, op, index + 1, indexTo, key);
   }
 
-  private static final <T> List<T> list(List<T> values) {
+  private static <T> List<T> list(List<T> values) {
     if (values == null)
       return Collections.emptyList();
     return values;

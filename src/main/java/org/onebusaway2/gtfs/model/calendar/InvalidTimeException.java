@@ -1,4 +1,3 @@
-
 package org.onebusaway2.gtfs.model.calendar;
 
 

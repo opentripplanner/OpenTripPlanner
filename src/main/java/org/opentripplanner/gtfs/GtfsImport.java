@@ -21,32 +21,40 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import java.io.File;
 import java.io.IOException;
 
-class GtfsImport {
+public class GtfsImport {
 
-    private final GtfsReader reader;
+
     private GtfsFeedId feedId = null;
+
     private GtfsRelationalDaoImpl dao = null;
 
-    GtfsImport(File path) throws IOException {
-        this.reader = new GtfsReader();
+    public GtfsImport(File path) throws IOException {
+        GtfsReader reader = new GtfsReader();
         reader.setInputLocation(path);
+        readFeedId(reader);
+        readDao(reader);
     }
 
-    /** TODO TGR - This does not need to be mutable? */
-    GtfsMutableRelationalDao getDao() throws IOException {
-        if(dao == null) {
-            dao = new GtfsRelationalDaoImpl();
-            reader.setEntityStore(dao);
-            reader.setDefaultAgencyId(getFeedId().getId());
-            reader.run();
-        }
+    public GtfsMutableRelationalDao getDao() {
         return dao;
     }
 
-    GtfsFeedId getFeedId() {
-        if(feedId == null) {
-            feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
-        }
+    public GtfsFeedId getFeedId() {
         return feedId;
     }
+
+
+    /* private methods */
+
+    private void readDao(GtfsReader reader) throws IOException {
+        dao = new GtfsRelationalDaoImpl();
+        reader.setEntityStore(dao);
+        reader.setDefaultAgencyId(getFeedId().getId());
+        reader.run();
+    }
+
+    private void readFeedId(GtfsReader reader) {
+        feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
+    }
+
 }

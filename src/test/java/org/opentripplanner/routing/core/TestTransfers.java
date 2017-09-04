@@ -28,6 +28,7 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.Trip;
@@ -89,8 +90,10 @@ class Context {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
-        graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
 
         feedId = context.getFeedId().getId();
         // Add simple transfer to make transfer possible between N-K and F-H

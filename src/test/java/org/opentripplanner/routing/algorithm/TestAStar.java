@@ -17,6 +17,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -40,7 +41,10 @@ public class TestAStar extends TestCase {
         Graph gg = new Graph();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         RoutingRequest options = new RoutingRequest();
 
         ShortestPathTree spt;

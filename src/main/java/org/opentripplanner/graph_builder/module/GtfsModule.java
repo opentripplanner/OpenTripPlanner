@@ -94,11 +94,11 @@ public class GtfsModule implements GraphBuilderModule {
         // because the time zone from the first agency is cached
         graph.clearTimeZone();
 
-        MultiCalendarServiceImpl service = new MultiCalendarServiceImpl();         // OTP
-        GtfsStopContext stopContext = new GtfsStopContext();                       // OTP
+        MultiCalendarServiceImpl service = new MultiCalendarServiceImpl();
+        GtfsStopContext stopContext = new GtfsStopContext();
         
         try {
-            for (GtfsBundle gtfsBundle : gtfsBundles) {                                // GTFS
+            for (GtfsBundle gtfsBundle : gtfsBundles) {
                 // apply global defaults to individual GTFSBundles (if globals have been set)
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
                     gtfsBundle.cacheDirectory = cacheDirectory;
@@ -106,10 +106,9 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
 
 
-                org.onebusaway2.gtfs.services.GtfsMutableRelationalDao dao = mapDao(loadBundle(gtfsBundle));                // OTP
+                org.onebusaway2.gtfs.services.GtfsDao dao = mapDao(loadBundle(gtfsBundle));
 
-                // Map from gtfs to OTP model here
-                GtfsContext context = GtfsLibrary.createContext(gtfsBundle.getFeedId(), dao, service); // OTP?
+                GtfsContext context = GtfsLibrary.createContext(gtfsBundle.getFeedId(), dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
 
                 hf.setStopContext(stopContext);
@@ -117,12 +116,11 @@ public class GtfsModule implements GraphBuilderModule {
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
 
 
-                CalendarServiceDataFactoryImpl csfactory = new CalendarServiceDataFactoryImpl(); //OTP
+                CalendarServiceDataFactoryImpl csfactory = new CalendarServiceDataFactoryImpl();
                 csfactory.setGtfsDao(dao);
                 org.onebusaway2.gtfs.model.calendar.CalendarServiceData data = csfactory.createData();
 
-                // Map CalendarServiceData here
-                service.addData(data, context.getDao()); // OTP
+                service.addData(data, context.getDao());
 
                 hf.subwayAccessTime = gtfsBundle.subwayAccessTime;
                 hf.maxInterlineDistance = gtfsBundle.maxInterlineDistance;

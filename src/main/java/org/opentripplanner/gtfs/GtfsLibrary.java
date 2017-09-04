@@ -18,12 +18,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
-import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.mapping.ModelMapper;
@@ -33,12 +30,12 @@ public class GtfsLibrary {
 
     public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
-    public static GtfsContext createContext(GtfsFeedId feedId, GtfsRelationalDao dao) {
-        CalendarService calendarService = createCalendarService(dao);
+    public static GtfsContext createContext(GtfsFeedId feedId, GtfsDao dao) {
+        CalendarService calendarService = CalendarServiceDataFactoryImpl.createCalendarService(dao);
         return createContext(feedId, dao, calendarService);
     }
 
-    public static GtfsContext createContext(GtfsFeedId feedId, GtfsRelationalDao dao, CalendarService calendarService) {
+    public static GtfsContext createContext(GtfsFeedId feedId, GtfsDao dao, CalendarService calendarService) {
         return new GtfsContextImpl(feedId, dao, calendarService);
     }
 
@@ -46,24 +43,10 @@ public class GtfsLibrary {
         GtfsImport gtfsImport = new GtfsImport(path);
 
         GtfsFeedId feedId = gtfsImport.getFeedId();
-        GtfsMutableRelationalDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
-        CalendarService calendarService = createCalendarService(otpDao);
+        GtfsDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
+        CalendarService calendarService = CalendarServiceDataFactoryImpl.createCalendarService(otpDao);
 
         return new GtfsContextImpl(feedId, otpDao, calendarService);
-    }
-
-    public static CalendarService createCalendarService(GtfsRelationalDao dao) {
-        CalendarServiceData data = createCalendarServiceData(dao);
-        CalendarServiceImpl service = new CalendarServiceImpl();
-        service.setData(data);
-        return service;
-    }
-
-    public static CalendarServiceData createCalendarServiceData(GtfsRelationalDao dao) {
-        CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
-        factory.setGtfsDao(dao);
-        CalendarServiceData data = factory.createData();
-        return data;
     }
 
     /* Using in index since we can't modify OBA libs and the colon in the expected separator in the 1.0 API. */
@@ -147,11 +130,11 @@ public class GtfsLibrary {
 
         private GtfsFeedId _feedId;
 
-        private GtfsRelationalDao _dao;
+        private GtfsDao _dao;
 
         private CalendarService _calendar;
 
-        public GtfsContextImpl(GtfsFeedId feedId, GtfsRelationalDao dao, CalendarService calendar) {
+        public GtfsContextImpl(GtfsFeedId feedId, GtfsDao dao, CalendarService calendar) {
             _feedId = feedId;
             _dao = dao;
             _calendar = calendar;
@@ -163,7 +146,7 @@ public class GtfsLibrary {
         }
 
         @Override
-        public GtfsRelationalDao getDao() {
+        public GtfsDao getDao() {
             return _dao;
         }
 

@@ -879,9 +879,7 @@ public class Graph implements Serializable {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
             if (data != null) {
-                CalendarServiceImpl calendarService = new CalendarServiceImpl();
-                calendarService.setData(data);
-                this.calendarService = calendarService;
+                this.calendarService = new CalendarServiceImpl(data);
             }
         }
         return this.calendarService;

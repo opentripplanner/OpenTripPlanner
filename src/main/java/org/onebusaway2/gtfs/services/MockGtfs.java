@@ -39,11 +39,11 @@ public class MockGtfs {
         gtfsDelegate.putLines(fileName, rows);
     }
 
-    public GtfsMutableRelationalDao read() throws IOException {
+    public GtfsDao read() throws IOException {
         return ModelMapper.mapDao(gtfsDelegate.read());
     }
 
-    public GtfsMutableRelationalDao read(org.onebusaway.gtfs.serialization.GtfsReader reader)
+    public GtfsDao read(org.onebusaway.gtfs.serialization.GtfsReader reader)
             throws IOException {
         return ModelMapper.mapDao(gtfsDelegate.read(reader));
     }

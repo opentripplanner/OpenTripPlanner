@@ -29,10 +29,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -53,7 +54,6 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 public class TimetableSnapshotSourceTest {
 
@@ -70,7 +70,7 @@ public class TimetableSnapshotSourceTest {
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
-        GtfsRelationalDao dao = context.getDao();
+        GtfsDao dao = context.getDao();
 
         feedId = context.getFeedId().getId();
 
@@ -117,8 +117,10 @@ public class TimetableSnapshotSourceTest {
 
     @Before
     public void setUp() {
-        graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         updater = new TimetableSnapshotSource(graph);
     }
 

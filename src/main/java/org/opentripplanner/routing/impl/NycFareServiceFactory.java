@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.onebusaway2.gtfs.services.GtfsRelationalDao;
+import org.onebusaway2.gtfs.services.GtfsDao;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
@@ -26,7 +26,7 @@ public class NycFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void processGtfs(GtfsRelationalDao dao) {
+    public void processGtfs(GtfsDao dao) {
     }
 
     @Override

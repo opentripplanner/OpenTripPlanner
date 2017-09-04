@@ -86,4 +86,9 @@ public final class FeedInfo extends IdentityBean<Integer> {
   public void setId(Integer id) {
     this.id = id;
   }
+
+  public String toString() {
+    return "<FeedInfo " + getId() + ">";
+  }
+
 }

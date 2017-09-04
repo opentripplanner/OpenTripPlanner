@@ -13,8 +13,8 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway2.gtfs.services.GtfsMutableRelationalDao;
+import org.onebusaway2.gtfs.impl.GtfsDaoImpl;
+import org.onebusaway2.gtfs.services.GtfsDao;
 
 public class ModelMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
@@ -35,27 +35,16 @@ public class ModelMapper {
 
     private final FareRuleMapper fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
 
-    public static GtfsMutableRelationalDao mapDao(
-            org.onebusaway.gtfs.services.GtfsMutableRelationalDao data
+    public static GtfsDao mapDao(
+            org.onebusaway.gtfs.services.GtfsRelationalDao data
     ) {
         return new ModelMapper().map(data);
     }
 
-    private GtfsMutableRelationalDao map(
-            org.onebusaway.gtfs.services.GtfsMutableRelationalDao data
+    private GtfsDao map(
+            org.onebusaway.gtfs.services.GtfsRelationalDao data
     ) {
-
-        // TODO TGR - Remove this if it works
-        if(
-                ((org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl)data).isPackShapePoints() ||
-        ((org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl)data).isPackStopTimes()
-                ) {
-            System.err.println("!!! ------------------------------------------------------");
-            System.err.println("!!! -->  Data is packed, not expected: " + data);
-            System.err.println("!!! ------------------------------------------------------");
-        }
-
-        return new GtfsRelationalDaoImpl(
+        return new GtfsDaoImpl(
                 agencyMapper.map(data.getAllAgencies()),
                 serviceCalendarDateMapper.map(data.getAllCalendarDates()),
                 serviceCalendarMapper.map(data.getAllCalendars()),

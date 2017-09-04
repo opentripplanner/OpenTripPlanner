@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,164 +15,102 @@
  */
 package org.onebusaway2.gtfs.impl;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.onebusaway2.gtfs.model.IdentityBean;
-import org.onebusaway2.gtfs.services.GenericMutableDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericDaoImpl implements GenericMutableDao {
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.*;
 
-  private final Logger _log = LoggerFactory.getLogger(GenericDaoImpl.class);
+public class GenericDaoImpl {
 
-  private Map<Class<?>, Map<Object, Object>> _entitiesByClassAndId = new HashMap<Class<?>, Map<Object, Object>>();
+    private final static Logger LOG = LoggerFactory.getLogger(GenericDaoImpl.class);
 
-  private Map<Class<?>, EntityHandler<Serializable>> _handlers = new HashMap<Class<?>, EntityHandler<Serializable>>();
+    private Map<Class<?>, Map<Object, Object>> entitiesByClassAndId = new HashMap<>();
 
-  private boolean _generateIds = true;
+    private Map<Class<?>, EntityHandler<Serializable>> handlers = new HashMap<Class<?>, EntityHandler<Serializable>>();
 
-  public void setGenerateIds(boolean generateIds) {
-    _generateIds = generateIds;
-  }
-
-  public Set<Class<?>> getEntityClasses() {
-    return _entitiesByClassAndId.keySet();
-  }
-
-  public void clear() {
-    _entitiesByClassAndId.clear();
-  }
-
-  @SuppressWarnings("unchecked")
-  public <K, V> Map<K, V> getEntitiesByIdForEntityType(Class<K> keyType,
-      Class<V> entityType) {
-    return (Map<K, V>) _entitiesByClassAndId.get(entityType);
-  }
-
-  /****
-   * {@link GenericMutableDao} Interface
-   ****/
-
-  @SuppressWarnings("unchecked")
-  public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
-    Map<Object, Object> entitiesById = _entitiesByClassAndId.get(type);
-    if (entitiesById == null)
-      return new ArrayList<T>();
-    return (Collection<T>) entitiesById.values();
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T getEntityForId(Class<T> type, Serializable id) {
-    Map<Object, Object> byId = _entitiesByClassAndId.get(type);
-
-    if (byId == null) {
-      _log.debug("no stored entities type {}", type);
-      return null;
+    public void clear() {
+        entitiesByClassAndId.clear();
     }
 
-    return (T) byId.get(id);
-  }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void saveEntity(Object entity) {
-
-    Class<?> c = entity.getClass();
-
-    EntityHandler<Serializable> handler = _handlers.get(c);
-    if (handler == null) {
-      handler = (EntityHandler<Serializable>) createEntityHandler(c);
-      _handlers.put(c, handler);
+    @SuppressWarnings("unchecked") <T> Collection<T> getAllEntitiesForType(Class<T> type) {
+        Map<Object, Object> entitiesById = entitiesByClassAndId.get(type);
+        if (entitiesById == null)
+            return new ArrayList<T>();
+        return (Collection<T>) entitiesById.values();
     }
 
-    IdentityBean<Serializable> bean = ((IdentityBean<Serializable>) entity);
-    handler.handle(bean);
+    @SuppressWarnings("unchecked") <T> T getEntityForId(Class<T> type, Serializable id) {
+        Map<Object, Object> byId = entitiesByClassAndId.get(type);
 
-    Map<Object, Object> byId = _entitiesByClassAndId.get(c);
-    if (byId == null) {
-      byId = new HashMap<Object, Object>();
-      _entitiesByClassAndId.put(c, byId);
-    }
-    Object id = bean.getId();
-    Object prev = byId.put(id, entity);
-    if (prev != null)
-      _log.warn("entity with id already exists: class=" + c + " id=" + id
-          + " prev=" + prev + " new=" + entity);
-  }
-
-  @Override
-  public <T> void clearAllEntitiesForType(Class<T> type) {
-    _entitiesByClassAndId.remove(type);
-  }
-
-  @Override
-  public <K extends Serializable, T extends IdentityBean<K>> void removeEntity(
-      T entity) {
-
-    Class<?> type = entity.getClass();
-    K id = entity.getId();
-
-    Map<Object, Object> byId = _entitiesByClassAndId.get(type);
-
-    if (byId == null) {
-      _log.warn("no stored entities type " + type);
-      return;
-    }
-
-    Object found = byId.remove(id);
-
-    if (found == null)
-      _log.warn("no stored entity with type " + type + " and id " + id);
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private EntityHandler<?> createEntityHandler(Class<?> entityType) {
-
-    if (_generateIds) {
-      try {
-        Field field = entityType.getDeclaredField("id");
-        if (field != null) {
-          Class<?> type = field.getType();
-          if (type.equals(Integer.class) || type.equals(Integer.TYPE))
-            return new GeneratedIdHandler();
+        if (byId == null) {
+            LOG.debug("no stored entities type {}", type);
+            return null;
         }
-      } catch (Exception ex) {
 
-      }
+        return (T) byId.get(id);
     }
 
-    return new EntityHandler<Serializable>() {
-      public void handle(IdentityBean<Serializable> entity) {
-      }
-    };
-  }
+    @SuppressWarnings("unchecked") void saveEntity(Object entity) {
 
-  private interface EntityHandler<T extends Serializable> {
-    public void handle(IdentityBean<T> entity);
-  }
+        Class<?> c = entity.getClass();
 
-  private static class GeneratedIdHandler implements EntityHandler<Integer> {
+        EntityHandler<Serializable> handler = handlers.get(c);
+        if (handler == null) {
+            handler = (EntityHandler<Serializable>) createEntityHandler(c);
+            handlers.put(c, handler);
+        }
 
-    private int _maxId = 0;
+        IdentityBean<Serializable> bean = ((IdentityBean<Serializable>) entity);
+        handler.handle(bean);
 
-    public void handle(IdentityBean<Integer> entity) {
-      Integer value = (Integer) entity.getId();
-      if (value == null || value.intValue() == 0) {
-        value = _maxId + 1;
-        entity.setId(value);
-      }
-      _maxId = Math.max(_maxId, value.intValue());
+        Map<Object, Object> byId = entitiesByClassAndId.computeIfAbsent(c, k -> new HashMap<>());
+
+        Object id = bean.getId();
+        Object prev = byId.put(id, entity);
+        if (prev != null)
+            LOG.warn("entity with id already exists: class=" + c + " id=" + id + " prev=" + prev
+                    + " new=" + entity);
     }
-  }
+
+
+    /* Private Methods */
+
+    private EntityHandler<?> createEntityHandler(Class<?> entityType) {
+        try {
+            Field field = entityType.getDeclaredField("id");
+            if (field != null) {
+                Class<?> type = field.getType();
+                if (type.equals(Integer.class) || type.equals(Integer.TYPE))
+                    return new GeneratedIdHandler();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return (EntityHandler<Serializable>) entity -> {
+        };
+    }
+
+    private interface EntityHandler<T extends Serializable> {
+        void handle(IdentityBean<T> entity);
+    }
+
+    private static class GeneratedIdHandler implements EntityHandler<Integer> {
+
+        private int maxId = 0;
+
+        public void handle(IdentityBean<Integer> entity) {
+            Integer value = entity.getId();
+            if (value == null || value == 0) {
+                value = maxId + 1;
+                entity.setId(value);
+            }
+            maxId = Math.max(maxId, value);
+        }
+    }
 
 }

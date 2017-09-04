@@ -1,155 +1,61 @@
-/**
- * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.onebusaway2.gtfs.services;
 
-import java.util.Collection;
+import org.onebusaway2.gtfs.model.*;
 
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.FareAttribute;
-import org.onebusaway2.gtfs.model.FareRule;
-import org.onebusaway2.gtfs.model.FeedInfo;
-import org.onebusaway2.gtfs.model.Frequency;
-import org.onebusaway2.gtfs.model.Pathway;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.ServiceCalendar;
-import org.onebusaway2.gtfs.model.ServiceCalendarDate;
-import org.onebusaway2.gtfs.model.ShapePoint;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.StopTime;
-import org.onebusaway2.gtfs.model.Transfer;
-import org.onebusaway2.gtfs.model.Trip;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * Basic methods for accessing GTFS entities in bulk or by id.
- * 
- * @author bdferris
+ * Methods for accessing imported entities.
  */
 public interface GtfsDao {
 
-  /****
-   * Agency Methods
-   ****/
+    Collection<Agency> getAllAgencies();
 
-  public Collection<Agency> getAllAgencies();
+    Collection<ServiceCalendar> getAllCalendars();
 
-  public Agency getAgencyForId(String id);
+    ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId);
 
-  /****
-   * {@link ServiceCalendar} Methods
-   ****/
+    Collection<ServiceCalendarDate> getAllCalendarDates();
 
-  public Collection<ServiceCalendar> getAllCalendars();
+    List<ServiceCalendarDate> getCalendarDatesForServiceId(AgencyAndId serviceId);
 
-  public ServiceCalendar getCalendarForId(int id);
+    /** @return all ids for both Calendars and CalendarDates merged into on list without duplicates */
+    List<AgencyAndId> getAllServiceIds();
 
-  /****
-   * {@link ServiceCalendarDate} Methods
-   ****/
+    Collection<FareAttribute> getAllFareAttributes();
 
-  public Collection<ServiceCalendarDate> getAllCalendarDates();
+    Collection<FareRule> getAllFareRules();
 
-  public ServiceCalendarDate getCalendarDateForId(int id);
+    Collection<FeedInfo> getAllFeedInfos();
 
-  /****
-   * {@link FareAttribute} Methods
-   ****/
+    Collection<Frequency> getAllFrequencies();
 
-  public Collection<FareAttribute> getAllFareAttributes();
+    Collection<Pathway> getAllPathways();
 
-  public FareAttribute getFareAttributeForId(AgencyAndId id);
+    Collection<Route> getAllRoutes();
 
-  /****
-   * {@link FareRule} Methods
-   ***/
+    Collection<ShapePoint> getAllShapePoints();
 
-  public Collection<FareRule> getAllFareRules();
+    List<ShapePoint> getShapePointsForShapeId(AgencyAndId shapeId);
 
-  public FareRule getFareRuleForId(int id);
+    Collection<Stop> getAllStops();
 
-  /****
-   * {@link FeedInfo} Methods
-   ****/
+    Stop getStopForId(AgencyAndId id);
 
-  public Collection<FeedInfo> getAllFeedInfos();
+    Collection<StopTime> getAllStopTimes();
 
-  public FeedInfo getFeedInfoForId(int id);
+    /**
+     * @return the list of {@link StopTime} objects associated with the trip,
+     * sorted by {@link StopTime#getStopSequence()}
+     */
+    List<StopTime> getStopTimesForTrip(Trip trip);
 
-  /****
-   * {@link Frequency} Methods
-   ****/
+    Collection<Transfer> getAllTransfers();
 
-  public Collection<Frequency> getAllFrequencies();
+    Collection<Trip> getAllTrips();
 
-  public Frequency getFrequencyForId(int id);
+    List<String> getTripAgencyIdsReferencingServiceId(AgencyAndId serviceId);
 
-  /****
-   * {@link Pathway} Methods
-   ****/
-
-  public Collection<Pathway> getAllPathways();
-
-  public Pathway getPathwayForId(AgencyAndId id);
-
-  /****
-   * {@link Route} Methods
-   ****/
-
-  public Collection<Route> getAllRoutes();
-
-  public Route getRouteForId(AgencyAndId id);
-
-  /****
-   * {@link ShapePoint} Methods
-   ****/
-
-  public Collection<ShapePoint> getAllShapePoints();
-
-  public ShapePoint getShapePointForId(int id);
-
-  /****
-   * {@link Stop} Methods
-   ****/
-
-  public Collection<Stop> getAllStops();
-
-  public Stop getStopForId(AgencyAndId id);
-
-  /****
-   * {@link StopTime} Methods
-   ****/
-
-  public Collection<StopTime> getAllStopTimes();
-
-  public StopTime getStopTimeForId(int id);
-
-  /****
-   * {@link Transfer} Methods
-   ****/
-
-  public Collection<Transfer> getAllTransfers();
-
-  public Transfer getTransferForId(int id);
-
-  /****
-   * {@link Trip} Methods
-   ****/
-
-  public Collection<Trip> getAllTrips();
-
-  public Trip getTripForId(AgencyAndId id);
-
+    List<Stop> getStopsForStation(Stop station);
 }

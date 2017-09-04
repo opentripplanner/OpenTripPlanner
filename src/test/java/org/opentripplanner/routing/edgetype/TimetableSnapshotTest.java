@@ -30,6 +30,7 @@ import com.google.common.collect.Iterables;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
@@ -60,7 +61,7 @@ public class TimetableSnapshotTest {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao()));
 
         patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {

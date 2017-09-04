@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -78,8 +79,10 @@ public class ConstantsForTests {
             linker.run();
             // TODO: eliminate GTFSContext
             // this is now making a duplicate calendarservicedata but it's oh so practical
-            portlandGraph.putService(CalendarServiceData.class, 
-                    GtfsLibrary.createCalendarServiceData(portlandContext.getDao()));
+            portlandGraph.putService(
+                    CalendarServiceData.class,
+                    CalendarServiceDataFactoryImpl.createCalendarServiceData(portlandContext.getDao())
+            );
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -100,7 +103,10 @@ public class ConstantsForTests {
         Graph graph = new Graph();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+        );
         return graph;
     }
 

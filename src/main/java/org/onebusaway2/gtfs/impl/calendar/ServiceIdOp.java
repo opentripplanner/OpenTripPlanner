@@ -29,10 +29,10 @@ public abstract class ServiceIdOp implements Comparator<Date> {
 
   public static final ServiceIdOp BOTH_OP = new MaxRangeServiceDateTimeOp();
 
-  private boolean _reverse;
+  private boolean reverse;
 
   protected ServiceIdOp(boolean reverse) {
-    _reverse = reverse;
+    this.reverse = reverse;
   }
 
   public abstract int getFromTime(ServiceInterval interval);
@@ -43,7 +43,7 @@ public abstract class ServiceIdOp implements Comparator<Date> {
 
   public int compare(Date a, Date b) {
     int rc = a.compareTo(b);
-    if (_reverse)
+    if (reverse)
       rc = -rc;
     return rc;
   }
@@ -60,18 +60,13 @@ public abstract class ServiceIdOp implements Comparator<Date> {
    * 
    * Returns 1 if the service interval comes after the from-to interval
    * 
-   * @param interval
-   * @param serviceDate
-   * @param from
-   * @param to
-   * @return
    */
   public int compareInterval(ServiceInterval interval, Date serviceDate,
       Date from, Date to) {
     long serviceFrom = serviceDate.getTime() + getFromTime(interval) * 1000;
     long serviceTo = serviceDate.getTime() + getToTime(interval) * 1000;
 
-    if (_reverse) {
+    if (reverse) {
       if (serviceTo >= from.getTime())
         return -1;
       if (to.getTime() >= serviceFrom)
