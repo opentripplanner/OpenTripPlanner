@@ -1,3 +1,18 @@
+/*
+ This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package org.onebusaway2.gtfs.impl;
 
 import org.junit.BeforeClass;
@@ -5,7 +20,6 @@ import org.junit.Test;
 import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.GtfsImport;
 import org.opentripplanner.gtfs.mapping.ModelMapper;
 
 import java.io.File;
@@ -13,16 +27,15 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 public class GtfsDaoImplTest {
-
-    private static final AgencyAndId SERVICE_ALLDAYS_ID = new AgencyAndId("1", "alldays");
-
-    private static final AgencyAndId SERVICE_WEEKDAYS_ID = new AgencyAndId("1", "weekdays");
-
-    private static final AgencyAndId STATION_ID = new AgencyAndId("1", "station");
+    private static final String FEED_ID = "Z";
+    private static final AgencyAndId SERVICE_ALLDAYS_ID = new AgencyAndId(FEED_ID, "alldays");
+    private static final AgencyAndId SERVICE_WEEKDAYS_ID = new AgencyAndId(FEED_ID, "weekdays");
+    private static final AgencyAndId STATION_ID = new AgencyAndId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
     private static GtfsDaoImpl subject;
@@ -30,18 +43,25 @@ public class GtfsDaoImplTest {
     private static Agency agency;
 
     @BeforeClass public static void setup() throws IOException {
-        GtfsImport gtfsImport = new GtfsImport(new File(ConstantsForTests.FAKE_GTFS));
+        org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl dao =
+                new org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl();
 
-        subject = (GtfsDaoImpl) ModelMapper.mapDao(gtfsImport.getDao());
+        org.onebusaway.gtfs.serialization.GtfsReader reader
+                = new org.onebusaway.gtfs.serialization.GtfsReader();
+
+        reader.setInputLocation(new File(ConstantsForTests.FAKE_GTFS));
+        reader.setEntityStore(dao);
+        reader.setDefaultAgencyId(FEED_ID);
+        reader.run();
+
+        subject = (GtfsDaoImpl) ModelMapper.mapDao(dao);
         agency = first(subject.getAllAgencies());
 
         // Supplement test data with at least one entity in all collections
-        subject.saveEntity(createServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID, 2017, 8, 31));
-        subject.saveEntity(createFareAttribute());
-        subject.saveEntity(new FareRule());
-        subject.saveEntity(new FeedInfo());
-
-        //        subject.clearAllCachedIndexes();
+        subject.getAllCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
+        subject.getAllFareAttributes().add(createFareAttribute());
+        subject.getAllFareRules().add(new FareRule());
+        subject.getAllFeedInfos().add(new FeedInfo());
     }
 
     @Test public void testGetAllAgencies() {
@@ -58,7 +78,7 @@ public class GtfsDaoImplTest {
 
         assertEquals(1, calendarDates.size());
         assertEquals(
-                "<CalendarDate serviceId=1_weekdays date=ServiceIdDate(2017-8-31) exception=2>",
+                "<CalendarDate serviceId=Z_weekdays date=ServiceIdDate(2017-8-31) exception=2>",
                 first(calendarDates).toString());
     }
 
@@ -66,7 +86,7 @@ public class GtfsDaoImplTest {
         Collection<ServiceCalendar> calendars = subject.getAllCalendars();
 
         assertEquals(2, calendars.size());
-        assertEquals("<ServiceCalendar 1_alldays [1111111]>", first(calendars).toString());
+        assertEquals("<ServiceCalendar Z_alldays [1111111]>", first(calendars).toString());
     }
 
     @Test public void testGetAllFareAttributes() {
@@ -101,14 +121,14 @@ public class GtfsDaoImplTest {
         Collection<Pathway> pathways = subject.getAllPathways();
 
         assertEquals(4, pathways.size());
-        assertEquals("<Pathway 1_pathways_1_2>", first(pathways).toString());
+        assertEquals("<Pathway Z_pathways_1_1>", first(pathways).toString());
     }
 
     @Test public void testGetAllRoutes() {
         Collection<Route> routes = subject.getAllRoutes();
 
         assertEquals(18, routes.size());
-        assertEquals("<Route agency_15 15>", first(routes).toString());
+        assertEquals("<Route agency_1 1>", first(routes).toString());
     }
 
     @Test public void testGetAllTransfers() {
@@ -122,21 +142,21 @@ public class GtfsDaoImplTest {
         Collection<ShapePoint> shapePoints = subject.getAllShapePoints();
 
         assertEquals(9, shapePoints.size());
-        assertEquals("<ShapePoint 1_4 #1 (41.0,-75.0)>", first(shapePoints).toString());
+        assertEquals("<ShapePoint Z_4 #1 (41.0,-75.0)>", first(shapePoints).toString());
     }
 
     @Test public void testGetAllStops() {
         Collection<Stop> stops = subject.getAllStops();
 
         assertEquals(25, stops.size());
-        assertEquals("<Stop 1_entrance_b>", first(stops).toString());
+        assertEquals("<Stop Z_A>", first(stops).toString());
     }
 
     @Test public void testGetAllStopTimes() {
         Collection<StopTime> stopTimes = subject.getAllStopTimes();
 
         assertEquals(80, stopTimes.size());
-        assertEquals("StopTime(seq=1 stop=1_A trip=agency_1.1 times=00:00:00-00:00:00)",
+        assertEquals("StopTime(seq=1 stop=Z_A trip=agency_1.1 times=00:00:00-00:00:00)",
                 first(stopTimes).toString());
     }
 
@@ -148,8 +168,8 @@ public class GtfsDaoImplTest {
     }
 
     @Test public void testGetStopForId() {
-        Stop stop = subject.getStopForId(new AgencyAndId("1", "P"));
-        assertEquals("<Stop 1_P>", stop.toString());
+        Stop stop = subject.getStopForId(new AgencyAndId("Z", "P"));
+        assertEquals("<Stop Z_P>", stop.toString());
     }
 
     @Test public void testGetTripAgencyIdsReferencingServiceId() {
@@ -164,18 +184,18 @@ public class GtfsDaoImplTest {
 
     @Test public void testGetStopsForStation() {
         List<Stop> stops = subject.getStopsForStation(subject.getStopForId(STATION_ID));
-        assertEquals("[<Stop 1_A>]", stops.toString());
+        assertEquals("[<Stop Z_A>]", stops.toString());
     }
 
     @Test public void testGetShapePointsForShapeId() {
-        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new AgencyAndId("1", "5"));
+        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new AgencyAndId("Z", "5"));
         assertEquals("[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
                 shapePoints.stream().map(GtfsDaoImplTest::toString).collect(toList()).toString());
     }
 
     @Test public void testGetStopTimesForTrip() {
         List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
-        assertEquals("[<Stop 1_A>, <Stop 1_B>, <Stop 1_C>]",
+        assertEquals("[<Stop Z_A>, <Stop Z_B>, <Stop Z_C>]",
                 stopTimes.stream().map(StopTime::getStop).collect(toList()).toString());
     }
 
@@ -183,47 +203,41 @@ public class GtfsDaoImplTest {
         List<AgencyAndId> serviceIds = subject.getAllServiceIds();
 
         assertEquals(2, serviceIds.size());
-        assertEquals("1_alldays", first(serviceIds).toString());
+        assertEquals("Z_alldays", first(serviceIds).toString());
     }
 
     @Test public void testGetCalendarDatesForServiceId() {
         List<ServiceCalendarDate> dates = subject.getCalendarDatesForServiceId(SERVICE_WEEKDAYS_ID);
         assertEquals(
-                "[<CalendarDate serviceId=1_weekdays date=ServiceIdDate(2017-8-31) exception=2>]",
+                "[<CalendarDate serviceId=Z_weekdays date=ServiceIdDate(2017-8-31) exception=2>]",
                 dates.toString());
     }
 
     @Test public void testGetCalendarForServiceId() {
         ServiceCalendar calendar = subject.getCalendarForServiceId(SERVICE_ALLDAYS_ID);
-        assertEquals("<ServiceCalendar 1_alldays [1111111]>", calendar.toString());
+        assertEquals("<ServiceCalendar Z_alldays [1111111]>", calendar.toString());
     }
 
     private static FareAttribute createFareAttribute() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(createAgencyAndId("FA"));
+        fa.setId(new AgencyAndId(agency.getId(), "FA"));
         return fa;
     }
 
-    private static ServiceCalendarDate createServiceCalendarDateExclution(AgencyAndId serviceId,
-            int year, int month, int day) {
+    private static ServiceCalendarDate createAServiceCalendarDateExclution(AgencyAndId serviceId) {
         ServiceCalendarDate date = new ServiceCalendarDate();
         date.setServiceId(serviceId);
-        date.setDate(new ServiceDate(year, month, day));
+        date.setDate(new ServiceDate(2017, 8, 31));
         date.setExceptionType(2);
         return date;
     }
 
-    private static <T> T first(Collection<? extends T> collection) {
+    private static <T> T first(Collection<? extends T> c) {
         //noinspection ConstantConditions
-        return collection.stream().findFirst().get();
-    }
-
-    private static AgencyAndId createAgencyAndId(String id) {
-        return new AgencyAndId(agency.getId(), id);
+        return c.stream().sorted(comparing(T::toString)).findFirst().get();
     }
 
     private static String toString(ShapePoint sp) {
-        return "#" + sp.getSequence() + " (" + ((int) sp.getLat()) + "," + ((int) sp.getLon())
-                + ")";
+        return "#" + sp.getSequence() + " (" + ((int)sp.getLat()) + "," + ((int)sp.getLon()) + ")";
     }
 }

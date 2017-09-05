@@ -35,19 +35,19 @@ public class ServiceIdIntervals implements Serializable,
 
   private static final long serialVersionUID = 1L;
 
-  private Map<LocalizedServiceId, ServiceInterval> _intervals = new HashMap<LocalizedServiceId, ServiceInterval>();
+  private Map<LocalizedServiceId, ServiceInterval> intervals = new HashMap<LocalizedServiceId, ServiceInterval>();
 
   public void addStopTime(LocalizedServiceId serviceId, int arrivalTime,
       int departureTime) {
 
-    ServiceInterval interval = _intervals.get(serviceId);
+    ServiceInterval interval = intervals.get(serviceId);
 
     if (interval == null)
       interval = new ServiceInterval(arrivalTime, departureTime);
     else
       interval = interval.extend(arrivalTime, departureTime);
 
-    _intervals.put(serviceId, interval);
+    intervals.put(serviceId, interval);
   }
 
   public void addIntervals(ServiceIdIntervals intervals) {
@@ -62,16 +62,16 @@ public class ServiceIdIntervals implements Serializable,
   }
 
   public Set<LocalizedServiceId> getServiceIds() {
-    return _intervals.keySet();
+    return intervals.keySet();
   }
 
   public ServiceInterval getIntervalForServiceId(LocalizedServiceId serviceId) {
-    return _intervals.get(serviceId);
+    return intervals.get(serviceId);
   }
 
   @Override
   public Iterator<Entry<LocalizedServiceId, ServiceInterval>> iterator() {
-    return _intervals.entrySet().iterator();
+    return intervals.entrySet().iterator();
   }
 
 }

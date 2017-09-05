@@ -32,13 +32,13 @@ public class CalendarServiceData implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private Map<String, TimeZone> _timeZonesByAgencyId = new HashMap<String, TimeZone>();
+  private Map<String, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
-  private Map<AgencyAndId, List<ServiceDate>> _serviceDatesByServiceId = new HashMap<AgencyAndId, List<ServiceDate>>();
+  private Map<AgencyAndId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
 
-  private Map<LocalizedServiceId, List<Date>> _datesByLocalizedServiceId = new HashMap<LocalizedServiceId, List<Date>>();
+  private Map<LocalizedServiceId, List<Date>> datesByLocalizedServiceId = new HashMap<>();
 
-  private Map<ServiceDate, Set<AgencyAndId>> _serviceIdsByDate = new HashMap<ServiceDate, Set<AgencyAndId>>();
+  private Map<ServiceDate, Set<AgencyAndId>> serviceIdsByDate = new HashMap<>();
 
   /**
    * @param agencyId
@@ -46,62 +46,55 @@ public class CalendarServiceData implements Serializable {
    *         not found
    */
   public TimeZone getTimeZoneForAgencyId(String agencyId) {
-    return _timeZonesByAgencyId.get(agencyId);
+    return timeZonesByAgencyId.get(agencyId);
   }
 
   public void putTimeZoneForAgencyId(String agencyId, TimeZone timeZone) {
-    _timeZonesByAgencyId.put(agencyId, timeZone);
+    timeZonesByAgencyId.put(agencyId, timeZone);
   }
 
   public Set<AgencyAndId> getServiceIds() {
-    return Collections.unmodifiableSet(_serviceDatesByServiceId.keySet());
+    return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
   }
 
   public Set<LocalizedServiceId> getLocalizedServiceIds() {
-    return Collections.unmodifiableSet(_datesByLocalizedServiceId.keySet());
+    return Collections.unmodifiableSet(datesByLocalizedServiceId.keySet());
   }
 
   public List<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId) {
-    return _serviceDatesByServiceId.get(serviceId);
+    return serviceDatesByServiceId.get(serviceId);
   }
 
   public Set<AgencyAndId> getServiceIdsForDate(ServiceDate date) {
-    Set<AgencyAndId> serviceIds = _serviceIdsByDate.get(date);
+    Set<AgencyAndId> serviceIds = serviceIdsByDate.get(date);
     if (serviceIds == null)
-      serviceIds = new HashSet<AgencyAndId>();
+      serviceIds = new HashSet<>();
     return serviceIds;
   }
 
   public void putServiceDatesForServiceId(AgencyAndId serviceId,
       List<ServiceDate> serviceDates) {
-    serviceDates = new ArrayList<ServiceDate>(serviceDates);
+    serviceDates = new ArrayList<>(serviceDates);
     Collections.sort(serviceDates);
     serviceDates = Collections.unmodifiableList(serviceDates);
-    _serviceDatesByServiceId.put(serviceId, serviceDates);
+    serviceDatesByServiceId.put(serviceId, serviceDates);
     for (ServiceDate serviceDate : serviceDates) {
-      Set<AgencyAndId> serviceIds = _serviceIdsByDate.get(serviceDate);
+      Set<AgencyAndId> serviceIds = serviceIdsByDate.get(serviceDate);
       if (serviceIds == null) {
-        serviceIds = new HashSet<AgencyAndId>();
-        _serviceIdsByDate.put(serviceDate, serviceIds);
+        serviceIds = new HashSet<>();
+        serviceIdsByDate.put(serviceDate, serviceIds);
       }
       serviceIds.add(serviceId);
     }
   }
 
   public List<Date> getDatesForLocalizedServiceId(LocalizedServiceId serviceId) {
-    return _datesByLocalizedServiceId.get(serviceId);
+    return datesByLocalizedServiceId.get(serviceId);
   }
 
   public void putDatesForLocalizedServiceId(LocalizedServiceId serviceId,
       List<Date> dates) {
-    dates = Collections.unmodifiableList(new ArrayList<Date>(dates));
-    _datesByLocalizedServiceId.put(serviceId, dates);
-  }
-
-  public void makeReadOnly() {
-    _timeZonesByAgencyId = Collections.unmodifiableMap(_timeZonesByAgencyId);
-    _serviceDatesByServiceId = Collections.unmodifiableMap(_serviceDatesByServiceId);
-    _datesByLocalizedServiceId = Collections.unmodifiableMap(_datesByLocalizedServiceId);
-    _serviceIdsByDate = Collections.unmodifiableMap(_serviceIdsByDate);
+    dates = Collections.unmodifiableList(new ArrayList<>(dates));
+    datesByLocalizedServiceId.put(serviceId, dates);
   }
 }

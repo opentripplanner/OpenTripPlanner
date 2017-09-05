@@ -21,7 +21,10 @@ import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.services.GtfsDao;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * A in-memory implementation of GtfsDao. It's super fast for most
@@ -30,16 +33,31 @@ import java.util.stream.Collectors;
  *
  * @author bdferris
  */
-public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
+public class GtfsDaoImpl implements GtfsDao {
 
+    private Collection<Agency> agencies;
+    private Collection<ServiceCalendarDate> calendarDates;
+    private Collection<ServiceCalendar> calendars;
+    private Collection<FareAttribute> fareAttributes;
+    private Collection<FareRule> fareRules;
+    private Collection<FeedInfo> feedInfos;
+    private Collection<Frequency> frequencies;
+    private Collection<Pathway> pathways;
+    private Collection<Route> routes;
+    private Collection<ShapePoint> shapePoints;
+    private Map<AgencyAndId, Stop> stops;
+    private Collection<StopTime> stopTimes;
+    private Collection<Transfer> transfers;
+    private Collection<Trip> trips;
+
+
+    // Indexes
     private Map<AgencyAndId, List<String>> tripAgencyIdsByServiceId = null;
     private Map<Stop, List<Stop>> stopsByStation = null;
     private Map<Trip, List<StopTime>> stopTimesByTrip = null;
     private Map<AgencyAndId, List<ShapePoint>> shapePointsByShapeId = null;
     private Map<AgencyAndId, List<ServiceCalendarDate>> calendarDatesByServiceId = null;
     private Map<AgencyAndId, List<ServiceCalendar>> calendarsByServiceId = null;
-
-
 
     public GtfsDaoImpl(
             Collection<Agency> agencies,
@@ -57,80 +75,80 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
             Collection<Transfer> transfers,
             Collection<Trip> trips
     ) {
-        saveAll(agencies);
-        saveAll(calendarDates);
-        saveAll(calendars);
-        saveAll(fareAttributes);
-        saveAll(fareRules);
-        saveAll(feedInfos);
-        saveAll(frequencies);
-        saveAll(pathways);
-        saveAll(routes);
-        saveAll(shapePoints);
-        saveAll(stops);
-        saveAll(stopTimes);
-        saveAll(transfers);
-        saveAll(trips);
+        this.agencies = agencies;
+        this.calendarDates = insertIds(calendarDates);
+        this.calendars = insertIds(calendars);
+        this.fareAttributes = fareAttributes;
+        this.fareRules = insertIds(fareRules);
+        this.feedInfos = insertIds(feedInfos);
+        this.frequencies = insertIds(frequencies);
+        this.pathways = pathways;
+        this.routes = routes;
+        this.shapePoints = shapePoints;
+        this.stops =  stops.stream().collect(toMap(Stop::getId, identity()));
+        this.stopTimes = insertIds(stopTimes);
+        this.transfers = insertIds(transfers);
+        this.trips = trips;
     }
 
     @Override public Collection<Agency> getAllAgencies() {
-        return getAllEntitiesForType(Agency.class);
+        return agencies;
     }
 
     @Override public Collection<ServiceCalendarDate> getAllCalendarDates() {
-        return getAllEntitiesForType(ServiceCalendarDate.class);
+        return calendarDates;
     }
 
     @Override public Collection<ServiceCalendar> getAllCalendars() {
-        return getAllEntitiesForType(ServiceCalendar.class);
+        return calendars;
     }
 
     @Override public Collection<FareAttribute> getAllFareAttributes() {
-        return getAllEntitiesForType(FareAttribute.class);
+        return fareAttributes;
     }
 
     @Override public Collection<FareRule> getAllFareRules() {
-        return getAllEntitiesForType(FareRule.class);
+        return fareRules;
     }
 
     @Override public Collection<FeedInfo> getAllFeedInfos() {
-        return getAllEntitiesForType(FeedInfo.class);
+        return feedInfos;
     }
 
     @Override public Collection<Frequency> getAllFrequencies() {
-        return getAllEntitiesForType(Frequency.class);
+        return frequencies;
     }
 
     @Override public Collection<Route> getAllRoutes() {
-        return getAllEntitiesForType(Route.class);
+        return routes;
     }
 
     @Override public Collection<ShapePoint> getAllShapePoints() {
-        return getAllEntitiesForType(ShapePoint.class);
+        return shapePoints;
     }
 
     @Override public Collection<StopTime> getAllStopTimes() {
-        return super.getAllEntitiesForType(StopTime.class);
+        return stopTimes;
     }
 
     @Override public Collection<Stop> getAllStops() {
-        return getAllEntitiesForType(Stop.class);
+        return stops.values();
     }
 
     @Override public Collection<Transfer> getAllTransfers() {
-        return getAllEntitiesForType(Transfer.class);
+        return transfers;
     }
 
     @Override public Collection<Trip> getAllTrips() {
-        return getAllEntitiesForType(Trip.class);
+        return trips;
     }
 
     @Override public Collection<Pathway> getAllPathways() {
-        return getAllEntitiesForType(Pathway.class);
+        return pathways;
     }
 
     @Override public Stop getStopForId(AgencyAndId id) {
-        return getEntityForId(Stop.class, id);
+        return stops.get(id);
     }
 
     @Override public List<String> getTripAgencyIdsReferencingServiceId(AgencyAndId serviceId) {
@@ -189,7 +207,7 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
     @Override public List<StopTime> getStopTimesForTrip(Trip trip) {
 
         if (stopTimesByTrip == null) {
-            stopTimesByTrip = getAllStopTimes().stream().collect(Collectors.groupingBy(StopTime::getTrip));
+            stopTimesByTrip = getAllStopTimes().stream().collect(groupingBy(StopTime::getTrip));
 
             for (List<StopTime> stopTimes : stopTimesByTrip.values()) {
                 Collections.sort(stopTimes);
@@ -228,16 +246,10 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
 
     /*  Private Methods */
 
-    private void saveAll(Collection<?> entities) {
-        for (Object it : entities) {
-            saveEntity(it);
-        }
-    }
-
     private void ensureCalendarDatesByServiceIdRelation() {
         if (calendarDatesByServiceId == null) {
             calendarDatesByServiceId = getAllCalendarDates().stream().collect(
-                    Collectors.groupingBy(ServiceCalendarDate::getServiceId)
+                    groupingBy(ServiceCalendarDate::getServiceId)
             );
         }
     }
@@ -245,7 +257,7 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
     private void ensureCalendarsByServiceIdRelation() {
         if (calendarsByServiceId == null) {
             calendarsByServiceId =  getAllCalendars().stream().collect(
-                    Collectors.groupingBy(ServiceCalendar::getServiceId)
+                    groupingBy(ServiceCalendar::getServiceId)
             );
         }
     }
@@ -253,7 +265,7 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
     private void ensureShapePointRelation() {
         if (shapePointsByShapeId == null) {
             shapePointsByShapeId = getAllShapePoints().stream().collect(
-                    Collectors.groupingBy(ShapePoint::getShapeId)
+                    groupingBy(ShapePoint::getShapeId)
             );
             for(List<ShapePoint> list : shapePointsByShapeId.values()) {
                 Collections.sort(list);
@@ -263,5 +275,9 @@ public class GtfsDaoImpl extends GenericDaoImpl implements GtfsDao {
 
     private static <T> List<T> list(List<T> list) {
         return list == null ? Collections.emptyList() : Collections.unmodifiableList(list);
+    }
+
+    private static <T extends IdentityBean<Integer>> Collection<T> insertIds(Collection<T> dates) {
+        return new ArrayListWithIdGeneration<>(dates);
     }
 }

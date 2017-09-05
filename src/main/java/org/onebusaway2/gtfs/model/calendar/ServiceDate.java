@@ -43,18 +43,13 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Pattern _pattern = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
-
-  private static final NumberFormat _yearFormat = new DecimalFormat("0000");
-
-  private static final NumberFormat _monthAndDayFormat = new DecimalFormat("00");
-
-  private static final TimeZone _utcTimeZone = TimeZone.getTimeZone("UTC");
+  private static final Pattern PATTERN = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
+  private static final NumberFormat YEAR_FORMAT = new DecimalFormat("0000");
+  private static final NumberFormat MONTH_AND_DAY_FORMAT = new DecimalFormat("00");
+  private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
   private final int year;
-
   private final int month;
-
   private final int day;
 
   /**
@@ -102,7 +97,7 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
    */
   public static ServiceDate parseString(String value) throws ParseException {
 
-    Matcher matcher = _pattern.matcher(value);
+    Matcher matcher = PATTERN.matcher(value);
 
     if (!matcher.matches())
       throw new ParseException("error parsing date: " + value, 0);
@@ -176,9 +171,9 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
    * @return a string in "YYYYMMDD" format
    */
   public String getAsString() {
-    String year = _yearFormat.format(this.year);
-    String month = _monthAndDayFormat.format(this.month);
-    String day = _monthAndDayFormat.format(this.day);
+    String year = YEAR_FORMAT.format(this.year);
+    String month = MONTH_AND_DAY_FORMAT.format(this.month);
+    String day = MONTH_AND_DAY_FORMAT.format(this.day);
     return year + month + day;
   }
 
@@ -206,7 +201,7 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
    *         is specified
    */
   public ServiceDate shift(int numberOfDays) {
-    Calendar c = getAsCalendar(_utcTimeZone);
+    Calendar c = getAsCalendar(UTC_TIME_ZONE);
     c.add(Calendar.DAY_OF_YEAR, numberOfDays);
     return new ServiceDate(c);
   }
@@ -217,8 +212,7 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
    *         argument service date
    */
   public long difference(ServiceDate serviceDate) {
-    return (serviceDate.getAsDate(_utcTimeZone).getTime() - getAsDate(
-        _utcTimeZone).getTime())
+    return (serviceDate.getAsDate(UTC_TIME_ZONE).getTime() - getAsDate(UTC_TIME_ZONE).getTime())
         / (24 * 60 * 60 * 1000);
   }
 
