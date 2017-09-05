@@ -18,8 +18,7 @@ package org.onebusaway2.gtfs.model;
 
 import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
 
-public final class StopTime extends IdentityBean<Integer> implements
-    Comparable<StopTime>, StopTimeProxy {
+public final class StopTime extends IdentityBean<Integer> implements Comparable<StopTime> {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,7 +36,6 @@ public final class StopTime extends IdentityBean<Integer> implements
   private int pickupType;
   private int dropOffType;
   private double shapeDistTraveled = MISSING_VALUE;
-  private transient StopTimeProxy proxy = null;
 
   /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
   private String farePeriodId;
@@ -62,69 +60,38 @@ public final class StopTime extends IdentityBean<Integer> implements
   }
 
   public Integer getId() {
-    if (proxy != null) {
-      return proxy.getId();
-    }
     return id;
   }
 
   public void setId(Integer id) {
-    if (proxy != null) {
-      proxy.setId(id);
-      return;
-    }
     this.id = id;
   }
 
   public Trip getTrip() {
-    if (proxy != null) {
-      return proxy.getTrip();
-    }
     return trip;
   }
 
   public void setTrip(Trip trip) {
-    if (proxy != null) {
-      proxy.setTrip(trip);
-      return;
-    }
     this.trip = trip;
   }
 
   public int getStopSequence() {
-    if (proxy != null) {
-      return proxy.getStopSequence();
-    }
     return stopSequence;
   }
 
   public void setStopSequence(int stopSequence) {
-    if (proxy != null) {
-      proxy.setStopSequence(stopSequence);
-      return;
-    }
     this.stopSequence = stopSequence;
   }
 
   public Stop getStop() {
-    if (proxy != null) {
-      return proxy.getStop();
-    }
     return stop;
   }
 
   public void setStop(Stop stop) {
-    if (proxy != null) {
-      proxy.setStop(stop);
-      return;
-    }
     this.stop = stop;
   }
 
   public boolean isArrivalTimeSet() {
-    if (proxy != null) {
-      return proxy.isArrivalTimeSet();
-    }
     return arrivalTime != MISSING_VALUE;
   }
 
@@ -132,32 +99,18 @@ public final class StopTime extends IdentityBean<Integer> implements
    * @return arrival time, in seconds since midnight
    */
   public int getArrivalTime() {
-    if (proxy != null) {
-      return proxy.getArrivalTime();
-    }
     return arrivalTime;
   }
 
   public void setArrivalTime(int arrivalTime) {
-    if (proxy != null) {
-      proxy.setArrivalTime(arrivalTime);
-      return;
-    }
     this.arrivalTime = arrivalTime;
   }
 
   public void clearArrivalTime() {
-    if (proxy != null) {
-      proxy.clearArrivalTime();
-      return;
-    }
     this.arrivalTime = MISSING_VALUE;
   }
 
   public boolean isDepartureTimeSet() {
-    if (proxy != null) {
-      return proxy.isDepartureTimeSet();
-    }
     return departureTime != MISSING_VALUE;
   }
 
@@ -165,151 +118,81 @@ public final class StopTime extends IdentityBean<Integer> implements
    * @return departure time, in seconds since midnight
    */
   public int getDepartureTime() {
-    if (proxy != null) {
-      return proxy.getDepartureTime();
-    }
     return departureTime;
   }
 
   public void setDepartureTime(int departureTime) {
-    if (proxy != null) {
-      proxy.setDepartureTime(departureTime);
-      return;
-    }
     this.departureTime = departureTime;
   }
 
   public void clearDepartureTime() {
-    if (proxy != null) {
-      proxy.clearDepartureTime();
-      return;
-    }
     this.departureTime = MISSING_VALUE;
   }
   
-  @Override
   public boolean isTimepointSet() {
-    if (proxy != null) {
-      return proxy.isTimepointSet();
-    }
     return timepoint != MISSING_VALUE;
   }
   
   /**
    * @return 1 if the stop-time is a timepoint location
    */
-  @Override
   public int getTimepoint() {
-    if (proxy != null) {
-      return proxy.getTimepoint();
-    }
     return timepoint;
   }
 
-  @Override
   public void setTimepoint(int timepoint) {
-    if (proxy != null) {
-      proxy.setTimepoint(timepoint);
-      return;
-    }  
     this.timepoint = timepoint;
   }
   
-  @Override
   public void clearTimepoint() {
-    if (proxy != null) {
-      proxy.clearTimepoint();
-      return;
-    }
     this.timepoint = MISSING_VALUE;
   }
 
   public String getStopHeadsign() {
-    if (proxy != null) {
-      return proxy.getStopHeadsign();
-    }
     return stopHeadsign;
   }
 
   public void setStopHeadsign(String headSign) {
-    if (proxy != null) {
-      proxy.setStopHeadsign(headSign);
-      return;
-    }
     this.stopHeadsign = headSign;
   }
 
   public String getRouteShortName() {
-    if (proxy != null) {
-      return proxy.getRouteShortName();
-    }
     return routeShortName;
   }
 
   public void setRouteShortName(String routeShortName) {
-    if (proxy != null) {
-      proxy.setRouteShortName(routeShortName);
-      return;
-    }
     this.routeShortName = routeShortName;
   }
 
   public int getPickupType() {
-    if (proxy != null) {
-      return proxy.getPickupType();
-    }
     return pickupType;
   }
 
   public void setPickupType(int pickupType) {
-    if (proxy != null) {
-      proxy.setPickupType(pickupType);
-    }
     this.pickupType = pickupType;
   }
 
   public int getDropOffType() {
-    if (proxy != null) {
-      return proxy.getDropOffType();
-    }
     return dropOffType;
   }
 
   public void setDropOffType(int dropOffType) {
-    if (proxy != null) {
-      proxy.setDropOffType(dropOffType);
-      return;
-    }
     this.dropOffType = dropOffType;
   }
 
   public boolean isShapeDistTraveledSet() {
-    if (proxy != null) {
-      return proxy.isShapeDistTraveledSet();
-    }
     return shapeDistTraveled != MISSING_VALUE;
   }
 
   public double getShapeDistTraveled() {
-    if (proxy != null) {
-      return proxy.getShapeDistTraveled();
-    }
     return shapeDistTraveled;
   }
 
   public void setShapeDistTraveled(double shapeDistTraveled) {
-    if (proxy != null) {
-      proxy.setShapeDistTraveled(shapeDistTraveled);
-      return;
-    }
     this.shapeDistTraveled = shapeDistTraveled;
   }
 
   public void clearShapeDistTraveled() {
-    if (proxy != null) {
-      proxy.clearShapeDistTraveled();
-      return;
-    }
     this.shapeDistTraveled = MISSING_VALUE;
   }
 
@@ -325,19 +208,6 @@ public final class StopTime extends IdentityBean<Integer> implements
     return this.getStopSequence() - o.getStopSequence();
   }
 
-  /**
-   * When set, all interactions with this stop time will be redirected through
-   * this proxy.
-   * 
-   * @param proxy
-   */
-  public void setProxy(StopTimeProxy proxy) {
-    this.proxy = proxy;
-  }
-
-  public StopTimeProxy getProxy() {
-    return proxy;
-  }
 
   @Override
   public String toString() {

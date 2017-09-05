@@ -41,23 +41,6 @@ public final class ServiceCalendar extends IdentityBean<Integer> {
   private ServiceDate startDate;
   private ServiceDate endDate;
 
-  public ServiceCalendar() {
-
-  }
-
-  public ServiceCalendar(ServiceCalendar sc) {
-    this.id = sc.id;
-    this.serviceId = sc.serviceId;
-    this.monday = sc.monday;
-    this.tuesday = sc.tuesday;
-    this.wednesday = sc.wednesday;
-    this.thursday = sc.thursday;
-    this.friday = sc.friday;
-    this.saturday = sc.saturday;
-    this.sunday = sc.sunday;
-    this.startDate = sc.startDate;
-    this.endDate = sc.endDate;
-  }
 
   public Integer getId() {
     return id;

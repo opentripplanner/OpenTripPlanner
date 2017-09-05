@@ -16,12 +16,11 @@
 package org.onebusaway2.gtfs.model;
 
 
-public final class ShapePoint extends IdentityBean<Integer> implements
-    Comparable<ShapePoint> {
+public final class ShapePoint extends IdentityBean<Integer> implements Comparable<ShapePoint> {
 
   private static final long serialVersionUID = 1L;
 
-  public static final double MISSING_VALUE = -999;
+  private static final double MISSING_VALUE = -999;
 
   private int id;
   private AgencyAndId shapeId;
@@ -29,69 +28,35 @@ public final class ShapePoint extends IdentityBean<Integer> implements
   private double lat;
   private double lon;
   private double distTraveled = MISSING_VALUE;
-  private transient ShapePointProxy proxy;
 
   public ShapePoint() {
   }
 
-  public ShapePoint(ShapePoint shapePoint) {
-    this.id = shapePoint.id;
-    this.shapeId = shapePoint.shapeId;
-    this.sequence = shapePoint.sequence;
-    this.distTraveled = shapePoint.distTraveled;
-    this.lat = shapePoint.lat;
-    this.lon = shapePoint.lon;
-  }
-
   public Integer getId() {
-    if (proxy != null) {
-      return proxy.getId();
-    }
     return id;
   }
 
   public void setId(Integer id) {
-    if (proxy != null) {
-      proxy.setId(id);
-      return;
-    }
     this.id = id;
   }
 
   public AgencyAndId getShapeId() {
-    if (proxy != null) {
-      return proxy.getShapeId();
-    }
     return shapeId;
   }
 
   public void setShapeId(AgencyAndId shapeId) {
-    if (proxy != null) {
-      proxy.setShapeId(shapeId);
-      return;
-    }
     this.shapeId = shapeId;
   }
 
   public int getSequence() {
-    if (proxy != null) {
-      return proxy.getSequence();
-    }
     return sequence;
   }
 
   public void setSequence(int sequence) {
-    if (proxy != null) {
-      proxy.setSequence(sequence);
-      return;
-    }
     this.sequence = sequence;
   }
 
   public boolean isDistTraveledSet() {
-    if (proxy != null) {
-      return proxy.isDistTraveledSet();
-    }
     return distTraveled != MISSING_VALUE;
   }
 
@@ -101,70 +66,31 @@ public final class ShapePoint extends IdentityBean<Integer> implements
    *         {@link #isDistTraveledSet()}
    */
   public double getDistTraveled() {
-    if (proxy != null) {
-      return proxy.getDistTraveled();
-    }
     return distTraveled;
   }
 
   public void setDistTraveled(double distTraveled) {
-    if (proxy != null) {
-      proxy.setDistTraveled(distTraveled);
-      return;
-    }
     this.distTraveled = distTraveled;
   }
 
   public void clearDistTraveled() {
-    if (proxy != null) {
-      proxy.clearDistTraveled();
-      return;
-    }
     this.distTraveled = MISSING_VALUE;
   }
 
   public double getLat() {
-    if (proxy != null) {
-      return proxy.getLat();
-    }
     return lat;
   }
 
   public void setLat(double lat) {
-    if (proxy != null) {
-      proxy.setLat(lat);
-      return;
-    }
     this.lat = lat;
   }
 
   public double getLon() {
-    if (proxy != null) {
-      return proxy.getLon();
-    }
     return lon;
   }
 
   public void setLon(double lon) {
-    if (proxy != null) {
-      proxy.setLon(lon);
-      return;
-    }
     this.lon = lon;
-  }
-
-  /**
-   * When set, all interactions with the shape point will be redirected through
-   * this proxy.
-   * 
-   * @param proxy
-   */
-  public void setProxy(ShapePointProxy proxy) {
-    this.proxy = proxy;
-  }
-
-  public ShapePointProxy getProxy() {
-    return proxy;
   }
 
   @Override

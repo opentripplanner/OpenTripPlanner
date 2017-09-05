@@ -42,24 +42,6 @@ public final class Route extends IdentityBean<AgencyAndId> {
   private int sortOrder = MISSING_VALUE;
   private String brandingUrl;
 
-  public Route() {
-
-  }
-
-  public Route(Route r) {
-    this.id = r.id;
-    this.agency = r.agency;
-    this.shortName = r.shortName;
-    this.longName = r.longName;
-    this.desc = r.desc;
-    this.type = r.type;
-    this.url = r.url;
-    this.color = r.color;
-    this.textColor = r.textColor;
-    this.bikesAllowed = r.bikesAllowed;
-    this.sortOrder = r.sortOrder;
-    this.brandingUrl = r.brandingUrl;
-  }
 
   public AgencyAndId getId() {
     return id;

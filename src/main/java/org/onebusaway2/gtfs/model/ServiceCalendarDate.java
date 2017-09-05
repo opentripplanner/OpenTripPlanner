@@ -33,16 +33,6 @@ public final class ServiceCalendarDate extends IdentityBean<Integer> {
   private ServiceDate date;
   private int exceptionType;
 
-  public ServiceCalendarDate() {
-
-  }
-
-  public ServiceCalendarDate(ServiceCalendarDate obj) {
-    this.id = obj.id;
-    this.serviceId = obj.serviceId;
-    this.date = obj.date;
-    this.exceptionType = obj.exceptionType;
-  }
 
   public Integer getId() {
     return id;

@@ -105,8 +105,6 @@ public class MockGtfs {
     }
 
     /**
-     *
-     * @param id
      * @return a full id with the default agency id ("a0") for the feed.
      */
     public AgencyAndId id(String id) {

@@ -30,19 +30,6 @@ public final class Frequency extends IdentityBean<Integer> {
   private int exactTimes = 0;
   private int labelOnly = 0;
 
-  public Frequency() {
-
-  }
-
-  public Frequency(Frequency f) {
-    this.id = f.id;
-    this.trip = f.trip;
-    this.startTime = f.startTime;
-    this.endTime = f.endTime;
-    this.headwaySecs = f.headwaySecs;
-    this.exactTimes = f.exactTimes;
-  }
-
   @Override
   public Integer getId() {
     return id;
