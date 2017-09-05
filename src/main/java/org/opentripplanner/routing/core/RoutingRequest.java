@@ -295,8 +295,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int transferSlack = 0;
 
     /** Invariant: boardSlack + alightSlack <= transferSlack. */
+    /**
+     * Minimum time it takes to board a vehicle (default is 0).
+     */
     public int boardSlack = 0;
 
+    /**
+     * Minimum time it takes to alight a vehicle (default is 0).
+     */
     public int alightSlack = 0;
 
     public int maxTransfers = 2;

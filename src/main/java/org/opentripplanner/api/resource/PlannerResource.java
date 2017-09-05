@@ -45,11 +45,7 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 /**
  * This is the primary entry point for the trip planning web service.
- * All parameters are passed in the query string. These parameters are defined as fields in the abstract
- * RoutingResource superclass, which also has methods for building routing requests from query
- * parameters. This allows multiple web services to have the same set of query parameters.
- * In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
- * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
+ * All parameters are passed in the query string. All parameters are optional except for fromPlace and toPlace.
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class PlannerResource extends RoutingResource {

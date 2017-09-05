@@ -101,18 +101,30 @@ public class Leg {
     @JsonSerialize
     public String route = "";
 
+    /**
+     * For transit legs, the name of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyName;
 
+    /**
+     * For transit legs, the URL of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyUrl;
 
+    /**
+     * For transit legs, the branding URL of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyBrandingUrl;
 
+    /**
+     * For transit legs, offset from GMT of the timezone of the agency being used, in milliseconds.
+     */
     @XmlAttribute
     @JsonSerialize
     public int agencyTimeZoneOffset;
@@ -236,26 +248,44 @@ public class Leg {
     @JsonProperty(value="steps")
     public List<WalkStep> walkSteps;
 
+    /**
+     * A list of alerts relevant to this leg.
+     */
     @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
+     /**
+      * For transit legs, the short name of the route being used.
+      */
     @XmlAttribute
     @JsonSerialize
     public String routeShortName;
 
+     /**
+      * For transit legs, the long name of the route being used.
+      */
     @XmlAttribute
     @JsonSerialize
     public String routeLongName;
 
+     /**
+      * For transit legs, the boarding restriction given in GTFS, if applicable. Allowable values: mustPhone, coordinateWithDriver
+      */
     @XmlAttribute
     @JsonSerialize
     public String boardRule;
 
+     /**
+      * For transit legs, the alight restriction given in GTFS, if applicable. Allowable values: mustPhone, coordinateWithDriver
+      */
     @XmlAttribute
     @JsonSerialize
     public String alightRule;
 
+     /**
+      * True if this leg is a bicycle leg in which the bicycle has been rented.
+      */
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
