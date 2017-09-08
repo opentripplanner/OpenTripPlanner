@@ -49,7 +49,7 @@ import java.util.Set;
  */
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
-    private static final int MAX_DRS_SEARCH_DIST = 1600 * 10; // approx 5 mile limit. Could be set by data.
+    private static final int MAX_DRS_SEARCH_DIST = 1600 * 50; // approx 50 mile limit. Could be set by data.
 
     // want to ensure we only keep one pattern hop per trip pattern
     private Map<TripPattern, PatternHop> directServices = Maps.newHashMap();
@@ -66,6 +66,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     @Override
     public SearchTerminationStrategy getSearchTerminationStrategy() {
+        // TODO: It's possible we need to have NO termination strategy under some conditions.
         return (origin, target, state, s, opt) -> {
             double distance = SphericalDistanceLibrary.distance(origin.getCoordinate(), state.getVertex().getCoordinate());
             return distance > MAX_DRS_SEARCH_DIST;
@@ -117,15 +118,8 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         if (endIndex < startIndex)
             return null;
         // we may want to create a ~direct~ hop.
-        // let's say, create a direct hop if the distance we would travel on the route is < 100m todo
+        // let's say, create a direct hop if the distance we would travel on the route is < 100m. We'll do this in vertexVisitor later.
         if (tooLittleOnRoute(originalHop, line, startIndex, endIndex)) {
-            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
-            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
-
-            TemporaryTransitStop fromTempStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
-            TemporaryTransitStop toTempStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
-
-            createDirectHop(opt, originalHop, fromTempStop, toTempStop);
             return null;
         } else {
             return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
@@ -164,6 +158,11 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         if (state.getVertex() instanceof TransitStop && !(state.getVertex() instanceof TemporaryVertex)) {
             transitStopStates.add(state);
         }
+        // Direct hop to destination if found
+        boolean foundTarget = state.getVertex() == state.getOptions().rctx.toVertex;
+        if (!state.getOptions().arriveBy && foundTarget) {
+            transitStopStates.add(state);
+        }
     }
 
     protected void streetSearch(RoutingRequest rr) {
@@ -183,11 +182,24 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
                     if (opt.arriveBy) {
                         StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
                         toStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
-                        fromStop = (TransitStop) v;
+                        if (!(v instanceof TransitStop)) {
+                            throw new RuntimeException("Unexpected error! Only non-transit stop should be destination");
+                        } else {
+                            fromStop = (TransitStop) v;
+                        }
                     } else {
                         StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
                         fromStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
-                        toStop = (TransitStop) v;
+                        if (!(v instanceof TransitStop)) {
+                            if (v == state.getOptions().rctx.toVertex) {
+                                StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+                                toStop = getTemporaryStop(toVertex, null, opt.rctx, opt, false);
+                            } else {
+                                throw new RuntimeException("Unexpected error! Only non-transit stop should be destination");
+                            }
+                        } else {
+                            toStop = (TransitStop) v;
+                        }
                     }
                     createDirectHop(opt, hop, fromStop, toStop, new GraphPath(state, true));
                 }

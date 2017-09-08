@@ -222,8 +222,12 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     protected TemporaryTransitStop getTemporaryStop(StreetVertex streetVertex, State s, RoutingContext rctx, RoutingRequest options) {
+        return getTemporaryStop(streetVertex, s, rctx, options, !options.arriveBy);
+    }
+
+    protected TemporaryTransitStop getTemporaryStop(StreetVertex streetVertex, State s, RoutingContext rctx, RoutingRequest options, boolean forwards) {
         if (temporaryTransitStopsForLocation.get(streetVertex) == null) {
-            String name = findName(s, streetVertex, options.locale, !options.arriveBy);
+            String name = findName(s, streetVertex, options.locale, forwards);
             TemporaryTransitStop stop = createTemporaryTransitStop(name, streetVertex, rctx);
             temporaryTransitStopsForLocation.put(streetVertex, stop);
             return stop;
@@ -283,6 +287,7 @@ public abstract class GtfsFlexGraphModifier {
 
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
         gd.getShortestPathTree(new State(initVertex, rr));
+
         findExtraHops(rr, patternHopStateMap);
 
         return patternHopStateMap.entrySet()
