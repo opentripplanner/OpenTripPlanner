@@ -11,14 +11,11 @@ public class SamplingLoggingFilter extends Filter<ILoggingEvent> {
     public FilterReply decide(ILoggingEvent event) {
         if(event.getLevel()==Level.ERROR || event.getLevel()==Level.WARN || event.getLevel()==Level.INFO) {
             if(c++%10==0) {
-                System.out.println("accepting");
                 return FilterReply.ACCEPT;
-            } else {
-                System.out.println("dropping");                
+            } else {        
                 return FilterReply.DENY;                
             }
         } 
-        System.out.println("dropping"); 
         return FilterReply.DENY;
     }
 
