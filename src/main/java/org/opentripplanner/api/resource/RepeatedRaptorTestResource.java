@@ -1,5 +1,6 @@
 package org.opentripplanner.api.resource;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -32,6 +33,7 @@ import java.util.Collection;
 /**
  * For debugging
  */
+@Ignore
 @Path("routers/{routerId}/rrtr")
 public class RepeatedRaptorTestResource {
 

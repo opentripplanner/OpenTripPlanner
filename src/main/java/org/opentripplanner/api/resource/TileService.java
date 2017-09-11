@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.RenderRequest;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * The basic idea is to create a surface for a "batch" or one-to-many OTP search, then using the returned ID
  * fetch the tiles from a URL under that surface ID.
  */
+@Ignore
 @Path("/routers/{routerId}/analyst/tile/{z}/{x}/{y}.png")
 public class TileService extends RoutingResource {
     

@@ -1,5 +1,6 @@
 package org.opentripplanner.api.resource;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.GraphUpdater;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.Response;
 /**
  * Report the status of the graph updaters via a web service.
  */
+@Ignore
 @Path("/routers/{routerId}/updaters")
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {

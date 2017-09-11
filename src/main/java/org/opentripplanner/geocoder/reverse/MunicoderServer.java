@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.geocoder.reverse;
 
+import com.webcohesion.enunciate.metadata.Ignore;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,7 +26,7 @@ import javax.ws.rs.core.Response;
 /*import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;*/
 
-
+@Ignore
 @Path("/municoder")
 public class MunicoderServer {
 

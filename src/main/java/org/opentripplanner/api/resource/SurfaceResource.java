@@ -1,6 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import com.google.common.collect.Maps;
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.Envelope2D;
@@ -52,6 +53,7 @@ import java.util.Map;
  * Surfaces cannot be isolated per-router because sometimes you want to compare two surfaces from different router IDs.
  * Though one could question whether that really makes sense (perhaps alternative scenarios should be "within" the same router)
  */
+@Ignore
 @Path("/surfaces")
 @Produces({ MediaType.APPLICATION_JSON })
 public class SurfaceResource extends RoutingResource {
