@@ -22,6 +22,9 @@
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
     </filter>
+    <filter class="fi.hsl.logging.SamplingLoggingFilter">
+      <level>WARN</level>
+    </filter>
   </appender>
   <!-- Change this to debug to let more messages through. -->
   <root level="info">
@@ -37,7 +40,7 @@
   <logger name="org.opentripplanner" level="info" />
   <logger name="org.opentripplanner.analyst" level="info" />
   <logger name="org.opentripplanner.routing" level="info" />
-  <logger name="com.getsentry" level="error"/>
+  <logger name="com.getsentry" level="off"/>
   <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="info" />
   <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="info" />
   <!-- Avoid printing debug messages about free-flowing vertices -->
