@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.FieldErrorInstrumentation;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.ResourceConstrainedExecutorServiceExecutionStrategy;
 import org.opentripplanner.index.model.StopTimesInPattern;
@@ -101,6 +104,7 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -161,7 +165,6 @@ public class GraphIndex {
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
-        
         
         FareService fareService = graph.getService(FareService.class);
         if(fareService instanceof DefaultFareServiceImpl) {
@@ -265,14 +268,6 @@ public class GraphIndex {
                 stopClusterSpatialIndex.insert(envelope, cluster);
             }
         }
-    }
-
-    private void analyzeServices() {
-        // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
-        // TODO catalog days of the week and exceptions for each service day.
-        // Make a table of which services are running on each calendar day.
-        // Really the calendarService should be entirely replaced with a set
-        // of simple indexes in GraphIndex.
     }
 
     /** Get all trip patterns running through any stop in the given stop cluster. */
@@ -538,7 +533,6 @@ public class GraphIndex {
     private class PlaceFinderTraverseVisitor implements ExtendedTraverseVisitor {
         public List<PlaceAndDistance> placesFound = new ArrayList<>();
         private Set<TraverseMode> filterByModes;
-        private Set<PlaceType> filterByPlaceTypes;
         private Set<AgencyAndId> filterByStops;
         private Set<AgencyAndId> filterByRoutes;
         private Set<String> filterByBikeRentalStation;
@@ -564,7 +558,6 @@ public class GraphIndex {
                 List<String> filterByBikeParks,
                 List<String> filterByCarParks) {
             this.filterByModes = toSet(filterByModes);
-            this.filterByPlaceTypes = toSet(filterByPlaceTypes);
             this.filterByStops = toSet(filterByStops);
             this.filterByRoutes = toSet(filterByRoutes);
             this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
@@ -1022,10 +1015,20 @@ public class GraphIndex {
 
     public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
         Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
-        GraphQL graphQL = new GraphQL(
-            indexSchema,
+        
+        {
+            //additional logging context
+            MDC.put("query", query);
+            MDC.put("router", router.id);
+            MDC.put("queryVariables", variables.toString());
+            MDC.put("operationName", operationName);
+            MDC.put("OTPTimeout", Integer.toString(timeout));
+            MDC.put("OTPMaxResolves", Long.toString(maxResolves));
+        }
+        
+        GraphQL graphQL = GraphQL.newGraphQL(indexSchema).queryExecutionStrategy(
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
-        );
+        ).instrumentation(FieldErrorInstrumentation.INSTANCE).build();
 
         if (variables == null) {
             variables = new HashMap<>();
@@ -1033,6 +1036,16 @@ public class GraphIndex {
 
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         HashMap<String, Object> content = new HashMap<>();
+        
+        
+        if(!executionResult
+            .getErrors().isEmpty()) {
+            List<String> errors = executionResult.getErrors().stream().map(
+              error -> error.getErrorType().toString() + ":" + error.getMessage() + "\n"
+            ).collect(Collectors.toList());
+            
+            MDC.put("errors", String.join(", ",  errors));
+        }
         if (!executionResult.getErrors().isEmpty()) {
             content.put("errors",
                 executionResult
@@ -1040,13 +1053,14 @@ public class GraphIndex {
                     .stream()
                     .map(error -> {
                         if (error instanceof ExceptionWhileDataFetching) {
+                            StringWriter sw = new StringWriter();
+                            PrintWriter pw = new PrintWriter(sw);
+                            ((ExceptionWhileDataFetching) error).getException().printStackTrace(pw);
                             HashMap<String, Object> response = new HashMap<String, Object>();
                             response.put("message", error.getMessage());
                             response.put("locations", error.getLocations());
                             response.put("errorType", error.getErrorType());
-                            // Convert stack trace to propr format
-                            Stream<StackTraceElement> stack = Arrays.stream(((ExceptionWhileDataFetching) error).getException().getStackTrace());
-                            response.put("stack", stack.map(StackTraceElement::toString).collect(Collectors.toList()));
+                            response.put("stack", sw.toString());
                             return response;
                         } else {
                             return error;

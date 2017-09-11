@@ -621,11 +621,7 @@ public class IndexAPI {
     public Response getGraphQL (String query, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
         {
             //additional logging context
-            MDC.put("query", query);
             MDC.put("userAgent", userAgent);
-            MDC.put("OTPTimeout", Integer.toString(timeout));
-            MDC.put("OTPMaxResolves", Long.toString(maxResolves));
-            MDC.put("router",  router.id);
         }
        return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
     }
