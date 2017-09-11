@@ -51,6 +51,7 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -592,10 +593,12 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> queryParameters, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+    public Response getGraphQL (HashMap<String, Object> queryParameters, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+        MDC.put("userAgent", userAgent);
         String query = (String) queryParameters.get("query");
         Object queryVariables = queryParameters.getOrDefault("variables", null);
         String operationName = (String) queryParameters.getOrDefault("operationName", null);
+
         Map<String, Object> variables;
         if (queryVariables instanceof Map) {
             variables = (Map) queryVariables;
@@ -615,24 +618,27 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
+    public Response getGraphQL (String query, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+        {
+            //additional logging context
+            MDC.put("userAgent", userAgent);
+        }
+       return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
     }
-
-//    @GET
-//    @Path("/graphql")
-//    public Response getGraphQL (@QueryParam("query") String query,
-//                                @QueryParam("variables") HashMap<String, Object> variables) {
-//        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
-//    }
 
     @POST
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQLBatch (List<HashMap<String, Object>> queries, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+    public Response getGraphQLBatch (List<HashMap<String, Object>> queries, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
         List<Map<String, Object>> responses = new ArrayList<>();
         List<Callable<Map>> futures = new ArrayList();
 
+        {
+            //additional logging context
+            MDC.put("userAgent", userAgent);
+            MDC.put("batchSize", Integer.toString(queries.size()));
+        }
+  
         for (HashMap<String, Object> query : queries) {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
@@ -641,7 +647,7 @@ public class IndexAPI {
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
-                    LOG.error("Variables must be a valid json object");
+                    LOG.error("Variables must be a valid json object: '{}'", query.get("variables"));
                     return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
                 }
             } else {
@@ -662,7 +668,8 @@ public class IndexAPI {
                 response.put("payload", results.get(i).get());
                 responses.add(response);
             }
-        } catch (CancellationException | ExecutionException |InterruptedException e) {
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
+            LOG.warn("Returning error 500, {}:{}", e.getClass(), e.getMessage());
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
         return Response.status(Status.OK).entity(responses).build();
