@@ -360,7 +360,7 @@ public class AStar {
     }
 
     public List<GraphPath> getPathsToTarget() {
-        if(runState == null) {
+        if (runState == null) {
             return Collections.emptyList();
         }
 
