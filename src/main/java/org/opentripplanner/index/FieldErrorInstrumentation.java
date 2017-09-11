@@ -47,6 +47,9 @@ public final class FieldErrorInstrumentation implements Instrumentation {
 
     @Override
     public InstrumentationContext<ExecutionResult> beginExecution(ExecutionParameters parameters) {
+        MDC.put("query", parameters.getQuery());
+        MDC.put("arguments", parameters.getArguments() == null ? null: parameters.getArguments().toString());
+        MDC.put("operation",  parameters.getOperation());
         return eric;
     }
 

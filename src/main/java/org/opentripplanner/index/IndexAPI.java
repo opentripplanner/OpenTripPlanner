@@ -637,6 +637,7 @@ public class IndexAPI {
             //additional logging context
             MDC.put("userAgent", userAgent);
             MDC.put("batchSize", Integer.toString(queries.size()));
+            MDC.put("router", router.id);
         }
   
         for (HashMap<String, Object> query : queries) {
@@ -655,8 +656,7 @@ public class IndexAPI {
             }
             String operationName = (String) query.getOrDefault("operationName", null);
 
-            futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,
-                variables, operationName, timeout, maxResolves));
+            futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,variables, operationName, timeout, maxResolves));
         }
 
         try {

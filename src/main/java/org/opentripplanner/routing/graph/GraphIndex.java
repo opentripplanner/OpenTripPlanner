@@ -1018,9 +1018,6 @@ public class GraphIndex {
         
         {
             //additional logging context
-            MDC.put("query", query);
-            MDC.put("router", router.id);
-            MDC.put("queryVariables", variables.toString());
             MDC.put("operationName", operationName);
             MDC.put("OTPTimeout", Integer.toString(timeout));
             MDC.put("OTPMaxResolves", Long.toString(maxResolves));
