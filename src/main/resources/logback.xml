@@ -17,12 +17,8 @@
       <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
-
-  <appender name="Sentry" class="com.getsentry.raven.logback.SentryAppender">
+  <appender name="Sentry" class="io.sentry.logback.SentryAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>WARN</level>
-    </filter>
-    <filter class="fi.hsl.logging.SamplingLoggingFilter">
       <level>WARN</level>
     </filter>
   </appender>
