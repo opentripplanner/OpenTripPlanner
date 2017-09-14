@@ -21,6 +21,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+
+import jersey.repackaged.com.google.common.collect.Maps;
+
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -51,7 +54,6 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -63,6 +65,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -593,8 +596,8 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> queryParameters, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        MDC.put("userAgent", userAgent);
+    public Response getGraphQL (HashMap<String, Object> queryParameters, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {        
+        
         String query = (String) queryParameters.get("query");
         Object queryVariables = queryParameters.getOrDefault("variables", null);
         String operationName = (String) queryParameters.getOrDefault("operationName", null);
@@ -612,33 +615,25 @@ public class IndexAPI {
         } else {
             variables = new HashMap<>();
         }
+        //make additional info available 
+        
+        variables.put("headers", httpHeaders.getRequestHeaders());
         return index.getGraphQLResponse(query, router, variables, operationName, timeout, maxResolves);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-        {
-            //additional logging context
-            MDC.put("userAgent", userAgent);
-        }
+    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
        return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
     }
 
     @POST
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQLBatch (List<HashMap<String, Object>> queries, @HeaderParam("user-agent") String userAgent, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+    public Response getGraphQLBatch (List<HashMap<String, Object>> queries, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
         List<Map<String, Object>> responses = new ArrayList<>();
-        List<Callable<Map>> futures = new ArrayList();
-
-        {
-            //additional logging context
-            MDC.put("userAgent", userAgent);
-            MDC.put("batchSize", Integer.toString(queries.size()));
-            MDC.put("router", router.id);
-        }
+        List<Callable<Map>> futures = new ArrayList<>();
   
         for (HashMap<String, Object> query : queries) {
             Map<String, Object> variables;
@@ -652,9 +647,11 @@ public class IndexAPI {
                     return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
                 }
             } else {
-                variables = null;
+                variables = Maps.newHashMap();
             }
+            
             String operationName = (String) query.getOrDefault("operationName", null);
+            variables.put("headers", httpHeaders.getRequestHeaders());
 
             futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,variables, operationName, timeout, maxResolves));
         }

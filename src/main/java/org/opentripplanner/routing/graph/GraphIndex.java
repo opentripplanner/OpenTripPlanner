@@ -10,7 +10,6 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
@@ -38,6 +37,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import graphql.ExceptionWhileDataFetching;
 import graphql.schema.GraphQLSchema;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -104,7 +104,6 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -1016,13 +1015,6 @@ public class GraphIndex {
     public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
         Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
         
-        {
-            //additional logging context
-            MDC.put("operationName", operationName);
-            MDC.put("OTPTimeout", Integer.toString(timeout));
-            MDC.put("OTPMaxResolves", Long.toString(maxResolves));
-        }
-        
         GraphQL graphQL = GraphQL.newGraphQL(indexSchema).queryExecutionStrategy(
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         ).instrumentation(FieldErrorInstrumentation.INSTANCE).build();
@@ -1030,19 +1022,10 @@ public class GraphIndex {
         if (variables == null) {
             variables = new HashMap<>();
         }
-
+        
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         HashMap<String, Object> content = new HashMap<>();
         
-        
-        if(!executionResult
-            .getErrors().isEmpty()) {
-            List<String> errors = executionResult.getErrors().stream().map(
-              error -> error.getErrorType().toString() + ":" + error.getMessage() + "\n"
-            ).collect(Collectors.toList());
-            
-            MDC.put("errors", String.join(", ",  errors));
-        }
         if (!executionResult.getErrors().isEmpty()) {
             content.put("errors",
                 executionResult
