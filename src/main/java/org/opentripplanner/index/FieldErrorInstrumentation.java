@@ -117,7 +117,7 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                 if(plan != null) {
                     @SuppressWarnings("rawtypes")
                     List itineraries = (List) plan.get("itineraries");
-                    if(itineraries.isEmpty()) {           
+                    if(itineraries !=null && itineraries.isEmpty()) {           
                         setMetadata();
                         LOG.warn("Zero routes found");
                         logged=true;
