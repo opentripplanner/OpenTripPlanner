@@ -105,11 +105,15 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                       
                 Map<String, Object> plan=null;
                 if(data.get("viewer")!=null) {
-                    Map<String, Object> viewer = (Map<String, Object>) data.get("viewer");
-                    plan = (Map<String, Object>) viewer.values().iterator().next();    
+                    if(data.get("viewer") instanceof Map) {
+                        Map<String, Object> viewer = (Map<String, Object>) data.get("viewer");
+                        if(viewer.values().iterator().next() instanceof Map) {
+                            plan = (Map<String, Object>) viewer.values().iterator().next();
+                        }
+                    }
                 }
                 
-                if(data.get("plan")!=null) {                    
+                if(data.get("plan")!=null && data.get("plan") instanceof Map) {                    
                     plan = (Map<String, Object>) data.get("plan");
                 }
                 
@@ -117,7 +121,7 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                 if(plan != null) {
                     @SuppressWarnings("rawtypes")
                     List itineraries = (List) plan.get("itineraries");
-                    if(itineraries.isEmpty()) {           
+                    if(itineraries !=null && itineraries.isEmpty()) {           
                         setMetadata();
                         LOG.warn("Zero routes found");
                         logged=true;
