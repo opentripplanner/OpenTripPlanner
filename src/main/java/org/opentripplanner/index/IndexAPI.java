@@ -615,17 +615,14 @@ public class IndexAPI {
         } else {
             variables = new HashMap<>();
         }
-        //make additional info available 
-        
-        variables.put("headers", httpHeaders.getRequestHeaders());
-        return index.getGraphQLResponse(query, router, variables, operationName, timeout, maxResolves);
+        return index.getGraphQLResponse(query, router, variables, operationName, timeout, maxResolves, httpHeaders.getRequestHeaders());
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
-       return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves);
+    public Response getGraphQL (String query, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+       return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves, httpHeaders.getRequestHeaders());
     }
 
     @POST
@@ -651,9 +648,8 @@ public class IndexAPI {
             }
             
             String operationName = (String) query.getOrDefault("operationName", null);
-            variables.put("headers", httpHeaders.getRequestHeaders());
 
-            futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,variables, operationName, timeout, maxResolves));
+            futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,variables, operationName, timeout, maxResolves, httpHeaders.getRequestHeaders()));
         }
 
         try {

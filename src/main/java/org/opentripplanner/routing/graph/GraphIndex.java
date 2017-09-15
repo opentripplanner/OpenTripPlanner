@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -1001,10 +1002,10 @@ public class GraphIndex {
         }
     }
 
-    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = getGraphQLExecutionResult(query, router, variables,
-            operationName, timeout, maxResolves);
+            operationName, timeout, maxResolves, headers);
         if (content.get("errors") != null) {
             // TODO: Put correct error code, eg. 400 for syntax error
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
@@ -1013,11 +1014,11 @@ public class GraphIndex {
     }
 
     public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
-        Map<String, Object> variables, String operationName, int timeout, long maxResolves) {
+        Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
         
         GraphQL graphQL = GraphQL.newGraphQL(indexSchema).queryExecutionStrategy(
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
-        ).instrumentation(FieldErrorInstrumentation.INSTANCE).build();
+        ).instrumentation(FieldErrorInstrumentation.get(query, router, variables, headers)).build();
 
         if (variables == null) {
             variables = new HashMap<>();

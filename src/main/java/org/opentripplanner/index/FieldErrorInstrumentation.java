@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.opentripplanner.standalone.Router;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -35,8 +36,11 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(FieldErrorInstrumentation.class);
 
-    public static FieldErrorInstrumentation INSTANCE = new FieldErrorInstrumentation();
    
+    
+    public static FieldErrorInstrumentation get(String query, Router router, Map<String, Object> variables, MultivaluedMap<String, String> headers) {
+        return new FieldErrorInstrumentation(query, router, variables, headers);
+    }
     
     private static class InstrumentationContextBase<T>  implements InstrumentationContext<T> {
         public void onEnd(T result) {     
@@ -47,24 +51,37 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     
     private static final InstrumentationContextBase<Document> dic = new InstrumentationContextBase<Document>();
     private static final InstrumentationContextBase<List<ValidationError>> veic = new InstrumentationContextBase<List<ValidationError>>();
+    private final MultivaluedMap<String, String> headers;
+    private final Map<String, Object> variables;
+    private final Object router;
+    private final String query;
 
-    private FieldErrorInstrumentation() {
+
+
+    public FieldErrorInstrumentation(String query, Router router, Map<String, Object> variables,
+            MultivaluedMap<String, String> headers) {
+        this.query = query;
+        this.router = router;
+        this.variables = variables;
+        this.headers = headers;
     }
 
+    private void setMetadata() {
+        MDC.put("query", query);
+        MDC.put("arguments", variables.toString());   
+        if(headers!=null) {
+            MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
+            MDC.put("referer", headers.getFirst("referer"));
+            Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
+        }
+    }
+    
     @Override
     public InstrumentationContext<ExecutionResult> beginExecution(ExecutionParameters parameters) {
         return new InstrumentationContextBase<ExecutionResult>(){
             @Override
             public void onEnd(Exception e) {
-                MDC.put("query", parameters.getQuery());
-                MDC.put("arguments", parameters.getArguments().toString());   
-                @SuppressWarnings("unchecked")
-                final MultivaluedMap<String, String> headers = (MultivaluedMap<String, String>) parameters.getArguments().get("headers");
-                if(headers!=null) {
-                    MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
-                    MDC.put("referer", headers.getFirst("referer"));
-                    Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
-                }
+                setMetadata();
                 LOG.warn("Error executing query", e);
                 MDC.clear();
                 super.onEnd(e);
@@ -98,34 +115,20 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                     @SuppressWarnings("rawtypes")
                     List itineraries = (List) plan.get("itineraries");
                     if(itineraries.isEmpty()) {           
-                        populateContext(parameters);
+                        setMetadata();
                         LOG.warn("Zero routes found");
                         logged=true;
                         MDC.clear();
                     }
                 } 
                 if(!logged && result.getErrors().size() > 0) {
-                    populateContext(parameters);
+                    setMetadata();
                     LOG.warn("Errors executing query");
                     MDC.clear();
                 } 
                 super.onEnd(result);
             }            
         };
-    }
-    
-    private void populateContext(ExecutionParameters parameters) {
-        MDC.put("query", parameters.getQuery());
-        final Map<String, Object> realArgs = Maps.newHashMap(parameters.getArguments());
-        realArgs.remove("headers");
-        MDC.put("arguments", realArgs.toString());   
-        @SuppressWarnings("unchecked")
-        final MultivaluedMap<String, String> headers = (MultivaluedMap<String, String>) parameters.getArguments().get("headers");
-        if(headers!=null) {
-            MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
-            MDC.put("referer", headers.getFirst("referer"));
-            Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
-        }
     }
 
     @Override
@@ -157,7 +160,11 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                 final PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 MDC.put("trace",  sw.toString());
-                LOG.error("Exception while fetching field {}#{}, {}:{}",parameters.getEnvironment().getParentType().getName(), parameters.getField().getName(), e.getClass(), e.getMessage());                
+                MDC.put("parent", parameters.getEnvironment().getParentType().getName());
+                MDC.put("field", parameters.getField().getName());
+                setMetadata();
+                LOG.warn("Exception while fetching field", e);      
+                MDC.clear();
             }
         };
     }
