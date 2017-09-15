@@ -53,8 +53,9 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     private static final InstrumentationContextBase<List<ValidationError>> veic = new InstrumentationContextBase<List<ValidationError>>();
     private final MultivaluedMap<String, String> headers;
     private final Map<String, Object> variables;
-    private final Object router;
+    private final Router router;
     private final String query;
+    private final long time = System.currentTimeMillis();
 
 
 
@@ -67,6 +68,8 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     }
 
     private void setMetadata() {
+        MDC.put("router", router.id);
+        MDC.put("time", Long.toString(System.currentTimeMillis() - time));
         MDC.put("query", query);
         MDC.put("arguments", variables.toString());   
         if(headers!=null) {
@@ -78,6 +81,7 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     
     @Override
     public InstrumentationContext<ExecutionResult> beginExecution(ExecutionParameters parameters) {
+  
         return new InstrumentationContextBase<ExecutionResult>(){
             @Override
             public void onEnd(Exception e) {
@@ -89,7 +93,6 @@ public final class FieldErrorInstrumentation implements Instrumentation {
             
             @Override
             public void onEnd(ExecutionResult result) {
-                
                 if(result.getErrors().size() > 0) {
                     StringBuilder errors = new StringBuilder();
                     for(GraphQLError e: result.getErrors()){
@@ -118,14 +121,14 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                         setMetadata();
                         LOG.warn("Zero routes found");
                         logged=true;
-                        MDC.clear();
                     }
                 } 
                 if(!logged && result.getErrors().size() > 0) {
                     setMetadata();
                     LOG.warn("Errors executing query");
-                    MDC.clear();
                 } 
+                
+                MDC.clear();
                 super.onEnd(result);
             }            
         };
