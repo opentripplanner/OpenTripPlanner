@@ -29,7 +29,6 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -46,8 +45,9 @@ public class GraphQlPlanner {
     }
 
     public Map<String, Object> plan(DataFetchingEnvironment environment) {
-        long time = System.currentTimeMillis();
+
         Router router = (Router)environment.getContext();
+
         RoutingRequest request = createRequest(environment);
         GraphPathFinder gpFinder = new GraphPathFinder(router);
 
@@ -57,29 +57,29 @@ public class GraphQlPlanner {
             request.getDateTime());
         List<Message> messages = new ArrayList<>();
         DebugOutput debugOutput = new DebugOutput();
-
+        
         try {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
             plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
+        
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass()))
-                LOG.warn("Error while planning path: ", e);
-            messages.add(error.message);
-        } finally {
+            if(!PlannerError.isPlanningError(e.getClass())) {
+                messages.add(error.message);
+            }
+        } catch (Throwable t) {
+            LOG.warn("Unchecked error while planning path: ", t);
+        }
+        finally {
             if (request != null) {
                 if (request.rctx != null) {
                     debugOutput = request.rctx.debugOutput;
+     
                 }
                 request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
             }
         }
-        
-        MDC.put("time", Long.toString((System.currentTimeMillis()-time)));
-        
-        if(plan.itinerary.size()==0) {
-            LOG.warn("Zero routes found");
-        }
+
 
         return ImmutableMap.<String, Object>builder()
             .put("plan", plan)

@@ -1,6 +1,7 @@
 package org.opentripplanner.index;
 
 import graphql.ExecutionResult;
+import graphql.GraphQLError;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.instrumentation.InstrumentationContext;
 import graphql.execution.instrumentation.parameters.DataFetchParameters;
@@ -10,13 +11,22 @@ import graphql.execution.instrumentation.parameters.FieldParameters;
 import graphql.execution.instrumentation.parameters.ValidationParameters;
 import graphql.language.Document;
 import graphql.validation.ValidationError;
+import io.sentry.Sentry;
+import io.sentry.event.UserBuilder;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.opentripplanner.standalone.Router;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import com.google.common.collect.Maps;
 
 
 /**
@@ -26,8 +36,11 @@ public final class FieldErrorInstrumentation implements Instrumentation {
     
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(FieldErrorInstrumentation.class);
 
-    public static FieldErrorInstrumentation INSTANCE = new FieldErrorInstrumentation();
    
+    
+    public static FieldErrorInstrumentation get(String query, Router router, Map<String, Object> variables, MultivaluedMap<String, String> headers) {
+        return new FieldErrorInstrumentation(query, router, variables, headers);
+    }
     
     private static class InstrumentationContextBase<T>  implements InstrumentationContext<T> {
         public void onEnd(T result) {     
@@ -36,21 +49,89 @@ public final class FieldErrorInstrumentation implements Instrumentation {
         }  
     }
     
-    private static final InstrumentationContextBase<ExecutionResult> eric = new InstrumentationContextBase<ExecutionResult>();
     private static final InstrumentationContextBase<Document> dic = new InstrumentationContextBase<Document>();
     private static final InstrumentationContextBase<List<ValidationError>> veic = new InstrumentationContextBase<List<ValidationError>>();
-    private static final InstrumentationContextBase<Object> oic = new InstrumentationContextBase<Object>();
+    private final MultivaluedMap<String, String> headers;
+    private final Map<String, Object> variables;
+    private final Router router;
+    private final String query;
+    private final long time = System.currentTimeMillis();
 
 
-    private FieldErrorInstrumentation() {
+
+    public FieldErrorInstrumentation(String query, Router router, Map<String, Object> variables,
+            MultivaluedMap<String, String> headers) {
+        this.query = query;
+        this.router = router;
+        this.variables = variables;
+        this.headers = headers;
     }
 
+    private void setMetadata() {
+        MDC.put("router", router.id);
+        MDC.put("time", Long.toString(System.currentTimeMillis() - time));
+        MDC.put("query", query);
+        MDC.put("arguments", variables.toString());   
+        if(headers!=null) {
+            MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
+            MDC.put("referer", headers.getFirst("referer"));
+            Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
+        }
+    }
+    
     @Override
     public InstrumentationContext<ExecutionResult> beginExecution(ExecutionParameters parameters) {
-        MDC.put("query", parameters.getQuery());
-        MDC.put("arguments", parameters.getArguments() == null ? null: parameters.getArguments().toString());
-        MDC.put("operation",  parameters.getOperation());
-        return eric;
+  
+        return new InstrumentationContextBase<ExecutionResult>(){
+            @Override
+            public void onEnd(Exception e) {
+                setMetadata();
+                LOG.warn("Error executing query", e);
+                MDC.clear();
+                super.onEnd(e);
+            }
+            
+            @Override
+            public void onEnd(ExecutionResult result) {
+                if(result.getErrors().size() > 0) {
+                    StringBuilder errors = new StringBuilder();
+                    for(GraphQLError e: result.getErrors()){
+                        errors.append(e.getMessage()).append("\n");
+                    }
+                    MDC.put("errors", errors.toString());
+                }
+
+                Map<String,Object> data = result.getData();
+                      
+                Map<String, Object> plan=null;
+                if(data.get("viewer")!=null) {
+                    Map<String, Object> viewer = (Map<String, Object>) data.get("viewer");
+                    plan = (Map<String, Object>) viewer.values().iterator().next();    
+                }
+                
+                if(data.get("plan")!=null) {                    
+                    plan = (Map<String, Object>) data.get("plan");
+                }
+                
+                boolean logged=false;
+                if(plan != null) {
+                    @SuppressWarnings("rawtypes")
+                    List itineraries = (List) plan.get("itineraries");
+                    if(itineraries.isEmpty()) {           
+                        setMetadata();
+                        LOG.warn("Zero routes found");
+                        logged=true;
+                    }
+                } 
+                if(!logged && result.getErrors().size() > 0) {
+                    setMetadata();
+                    LOG.warn("Errors executing query");
+                } 
+                
+                MDC.clear();
+                super.onEnd(result);
+            }            
+        };
     }
 
     @Override
@@ -65,12 +146,12 @@ public final class FieldErrorInstrumentation implements Instrumentation {
 
     @Override
     public InstrumentationContext<ExecutionResult> beginDataFetch(DataFetchParameters parameters) {
-        return eric;
+        return new InstrumentationContextBase<ExecutionResult>();
     }
 
     @Override
     public InstrumentationContext<ExecutionResult> beginField(FieldParameters parameters) {
-        return eric;
+        return new InstrumentationContextBase<ExecutionResult>();
     }
 
     @Override
@@ -82,7 +163,11 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                 final PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 MDC.put("trace",  sw.toString());
-                LOG.error("Exception while fetching field {}#{}, {}:{}",parameters.getEnvironment().getParentType().getName(), parameters.getField().getName(), e.getClass(), e.getMessage());                
+                MDC.put("parent", parameters.getEnvironment().getParentType().getName());
+                MDC.put("field", parameters.getField().getName());
+                setMetadata();
+                LOG.warn("Exception while fetching field", e);      
+                MDC.clear();
             }
         };
     }
