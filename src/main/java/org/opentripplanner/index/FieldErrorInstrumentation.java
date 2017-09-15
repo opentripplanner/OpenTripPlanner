@@ -25,6 +25,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.google.common.collect.Maps;
+
 
 /**
  * Log field errors
@@ -70,11 +72,13 @@ public final class FieldErrorInstrumentation implements Instrumentation {
             
             @Override
             public void onEnd(ExecutionResult result) {
-                StringBuilder errors = new StringBuilder();
+                
                 if(result.getErrors().size() > 0) {
+                    StringBuilder errors = new StringBuilder();
                     for(GraphQLError e: result.getErrors()){
                         errors.append(e.getMessage()).append("\n");
                     }
+                    MDC.put("errors", errors.toString());
                 }
 
                 Map<String,Object> data = result.getData();
@@ -89,44 +93,39 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                     plan = (Map<String, Object>) data.get("plan");
                 }
                 
+                boolean logged=false;
                 if(plan != null) {
                     @SuppressWarnings("rawtypes")
                     List itineraries = (List) plan.get("itineraries");
-                    if(itineraries.isEmpty()) {
-                        if(result.getErrors().size() > 0) {
-                            MDC.put("errors", errors.toString());
-                        }
-                        
-                        MDC.put("query", parameters.getQuery());
-                        MDC.put("arguments", parameters.getArguments().toString());   
-                        @SuppressWarnings("unchecked")
-                        final MultivaluedMap<String, String> headers = (MultivaluedMap<String, String>) parameters.getArguments().get("headers");
-                        if(headers!=null) {
-                            MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
-                            MDC.put("referer", headers.getFirst("referer"));
-                            Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
-                        }
+                    if(itineraries.isEmpty()) {           
+                        populateContext(parameters);
                         LOG.warn("Zero routes found");
+                        logged=true;
                         MDC.clear();
                     }
-                } else if(result.getErrors().size() > 0) {
-                    MDC.put("errors", errors.toString());
-                    MDC.put("query", parameters.getQuery());
-                    MDC.put("arguments", parameters.getArguments().toString()); 
-                    final MultivaluedMap<String, String> headers = (MultivaluedMap<String, String>) parameters.getArguments().get("headers");
-                    if(headers!=null) {
-                        MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
-                        MDC.put("referer", headers.getFirst("referer"));
-                        Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
-                    }
+                } 
+                if(!logged && result.getErrors().size() > 0) {
+                    populateContext(parameters);
                     LOG.warn("Errors executing query");
                     MDC.clear();
-                }
-             
+                } 
                 super.onEnd(result);
-            }
-            
+            }            
         };
+    }
+    
+    private void populateContext(ExecutionParameters parameters) {
+        MDC.put("query", parameters.getQuery());
+        final Map<String, Object> realArgs = Maps.newHashMap(parameters.getArguments());
+        realArgs.remove("headers");
+        MDC.put("arguments", realArgs.toString());   
+        @SuppressWarnings("unchecked")
+        final MultivaluedMap<String, String> headers = (MultivaluedMap<String, String>) parameters.getArguments().get("headers");
+        if(headers!=null) {
+            MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
+            MDC.put("referer", headers.getFirst("referer"));
+            Sentry.getContext().setUser(new UserBuilder().setId(headers.getFirst("id")).build());
+        }
     }
 
     @Override
