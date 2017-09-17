@@ -261,14 +261,20 @@ otp.modules.planner.Itinerary = otp.Class({
 
             // main content
             if(otp.util.Itin.isTransit(leg.mode)) { // transit
+                var fromStopIdParts = leg.from.stopId.split(':');
+                var fromAgencyId = fromStopIdParts.shift();
+                var fromStopId = fromStopIdParts.join(':');
+                var toStopIdParts = leg.to.stopId.split(':');
+                var toAgencyId = toStopIdParts.shift();
+                var toStopId = toStopIdParts.join(':');
                 html += '<ul>';
                 //TRANSLATORS: Board Public transit route name (agency name
                 //Stop ID ) start time
-                html += '<li><b>' + _tr('Board') + '</b>: ' + leg.from.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.from.stopId.split(':')[0], 'stop_id': leg.from.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '</li>';
+                html += '<li><b>' + _tr('Board') + '</b>: ' + leg.from.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': fromAgencyId, 'stop_id': fromStopId }) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '</li>';
                 html += '<li><i>' + _tr('Time in transit') +': '+otp.util.Time.secsToHrMin(leg.duration)+'</i></li>';
                 //TRANSLATORS: Alight Public transit route name (agency name
                 //Stop ID ) end time
-                html += '<li><b>' + _tr('Alight') + '</b>: ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.split(':')[0], 'stop_id': leg.to.stopId.split(':')[1] }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '</li>';
+                html += '<li><b>' + _tr('Alight') + '</b>: ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': toAgencyId, 'stop_id': toStopId }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '</li>';
 
                 html += '</ul>';
             }
