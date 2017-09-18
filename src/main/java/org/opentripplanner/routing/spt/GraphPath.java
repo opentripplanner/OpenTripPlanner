@@ -23,6 +23,7 @@ import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -221,6 +222,17 @@ public class GraphPath {
     public LineString getGeometry() {
         CoordinateArrayListSequence coordinates = makeCoordinates(edges.toArray(new Edge[0]));
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
+
+    public int getCallAndRideDuration() {
+        int duration = 0;
+        for (State s : states) {
+            if (s.getBackEdge() != null && s.getBackEdge() instanceof TemporaryDirectPatternHop) {
+                TemporaryDirectPatternHop hop = (TemporaryDirectPatternHop) s.getBackEdge();
+                duration += hop.getDirectVehicleTime();
+            }
+        }
+        return duration;
     }
 
 }

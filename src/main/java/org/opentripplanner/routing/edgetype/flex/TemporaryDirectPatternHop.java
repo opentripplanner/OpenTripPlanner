@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -86,5 +87,15 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     @Override
     public int getDirectVehicleTime() {
         return directTime;
+    }
+
+    @Override
+    public State traverse(State s0) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementCallAndRideTime(directTime);
+        if (s1.getCallAndRideTime() >= s0.getOptions().maxCallAndRideSeconds) {
+            return null;
+        }
+        return super.traverse(s0, s1);
     }
 }

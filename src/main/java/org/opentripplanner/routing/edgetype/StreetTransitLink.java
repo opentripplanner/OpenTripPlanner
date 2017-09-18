@@ -26,6 +26,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
+
 import java.util.Locale;
 
 /** 
@@ -90,6 +92,11 @@ public class StreetTransitLink extends Edge {
 
         // Do not re-enter the street network following a transfer.
         if (s0.backEdge instanceof SimpleTransfer) {
+            return null;
+        }
+
+        // Do not get off at a real stop when on call-n-ride (force a transfer instead).
+        if (!(transitStop instanceof TemporaryTransitStop) && lastTripIsCallAndRide(s0)) {
             return null;
         }
 
@@ -161,5 +168,8 @@ public class StreetTransitLink extends Edge {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
 
+    private boolean lastTripIsCallAndRide(State s0) {
+        return s0.getLastPattern() != null && s0.getLastPattern().geometry == null;
+    }
 
 }

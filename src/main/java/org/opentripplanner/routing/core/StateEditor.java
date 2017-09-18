@@ -240,6 +240,15 @@ public class StateEditor {
         child.preTransitTime += seconds;
     }
 
+    public void incrementCallAndRideTime(int seconds) {
+        if (seconds < 0) {
+            LOG.warn("A state's call-n-ride time is being incremented by a negative amount.");
+            defectiveTraversal = true;
+            return;
+        }
+        child.callAndRideTime += seconds;
+    }
+
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
@@ -478,6 +487,10 @@ public class StateEditor {
 
     public int getPreTransitTime() {
         return child.getPreTransitTime();
+    }
+
+    public int getCallAndRideTime() {
+        return child.getCallAndRideTime();
     }
 
     public Vertex getVertex() {

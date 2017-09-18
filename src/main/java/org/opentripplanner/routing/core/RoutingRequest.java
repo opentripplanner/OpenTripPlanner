@@ -389,6 +389,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double callAndRideReluctance = 2.0;
 
     /**
+     * Total time we can spend on call-n-ride legs
+     */
+    public int maxCallAndRideSeconds = Integer.MAX_VALUE;
+
+    /**
      * Size of flag stop buffer in UI
      */
     public double flagStopBufferSize;

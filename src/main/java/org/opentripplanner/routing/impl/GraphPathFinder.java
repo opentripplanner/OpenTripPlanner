@@ -178,11 +178,17 @@ public class GraphPathFinder {
                 // path.dump();
                 List<AgencyAndId> tripIds = path.getTrips();
                 for (AgencyAndId tripId : tripIds) {
-                    options.banTrip(tripId);
+                    if (!router.graph.index.tripIsCallAndRide(tripId)) {
+                        options.banTrip(tripId);
+                    }
                 }
                 if (tripIds.isEmpty()) {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
+                }
+                // for direct-hop trip banning, limit the allowable call-n-ride time to what it is currently
+                if (tripIds.size() < 2) {
+                    options.maxCallAndRideSeconds = Math.min(options.maxCallAndRideSeconds, path.getCallAndRideDuration());
                 }
             }
 

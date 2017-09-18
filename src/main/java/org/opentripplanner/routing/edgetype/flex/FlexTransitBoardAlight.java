@@ -22,6 +22,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 
 public class FlexTransitBoardAlight extends TransitBoardAlight {
 
@@ -52,6 +53,24 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
             this.endIndex = 0.0d;
         }
         this.hop = hop;
+    }
+
+    @Override
+    public State traverse(State s0) {
+        // do not board call-n-ride if it is not a temporary stop and we have NOT been on transit yet
+        if (!s0.getOptions().arriveBy && boarding && hop.isDeviatedRouteBoard()
+            && !(((TransitStopDepart) getFromVertex()).getStopVertex() instanceof TemporaryTransitStop)
+            && !s0.isEverBoarded()) {
+            return null;
+        }
+
+        if (s0.getOptions().arriveBy && !boarding && hop.isDeviatedRouteAlight()
+            && !(((TransitStopArrive) getToVertex()).getStopVertex() instanceof TemporaryTransitStop)
+            && !s0.isEverBoarded()) {
+            return null;
+        }
+
+        return super.traverse(s0);
     }
 
     @Override

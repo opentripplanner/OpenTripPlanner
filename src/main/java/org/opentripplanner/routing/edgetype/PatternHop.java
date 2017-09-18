@@ -121,8 +121,13 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options);
     }
-    
+
+    @Override
     public State traverse(State s0) {
+        return traverse(s0, s0.edit(this));
+    }
+
+    public State traverse(State s0, StateEditor s1) {
 
         RoutingRequest options = s0.getOptions();
 
@@ -136,7 +141,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
         int runningTime = getRunningTime(s0);
 
-        StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().arriveBy)
             s1.setZone(getBeginStop().getZoneId());
