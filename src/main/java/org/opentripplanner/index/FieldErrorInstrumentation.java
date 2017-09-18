@@ -71,7 +71,7 @@ public final class FieldErrorInstrumentation implements Instrumentation {
         MDC.put("router", router.id);
         MDC.put("time", Long.toString(System.currentTimeMillis() - time));
         MDC.put("query", query);
-        MDC.put("arguments", variables.toString());   
+        MDC.put("arguments", variables!=null ? variables.toString() : "");   
         if(headers!=null) {
             MDC.put("userAgent", headers.getFirst(HttpHeaders.USER_AGENT));
             MDC.put("referer", headers.getFirst("referer"));
@@ -96,7 +96,9 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                 if(result.getErrors().size() > 0) {
                     StringBuilder errors = new StringBuilder();
                     for(GraphQLError e: result.getErrors()){
-                        errors.append(e.getMessage()).append("\n");
+                        if(e != null) {
+                            errors.append(e.getLocations()).append(e.getErrorType()).append(e.getMessage()).append("\n");
+                        }
                     }
                     MDC.put("errors", errors.toString());
                 }
