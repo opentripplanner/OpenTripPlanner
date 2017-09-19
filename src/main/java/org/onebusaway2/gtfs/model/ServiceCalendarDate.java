@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,56 +19,59 @@ import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 
 /**
  * @author bdferris
- * 
+ *
  */
 public final class ServiceCalendarDate extends IdentityBean<Integer> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public static final int EXCEPTION_TYPE_ADD = 1;
-  public static final int EXCEPTION_TYPE_REMOVE = 2;
+    public static final int EXCEPTION_TYPE_ADD = 1;
 
-  private int id;
-  private AgencyAndId serviceId;
-  private ServiceDate date;
-  private int exceptionType;
+    public static final int EXCEPTION_TYPE_REMOVE = 2;
 
+    private int id;
 
-  public Integer getId() {
-    return id;
-  }
+    private AgencyAndId serviceId;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private ServiceDate date;
 
-  public AgencyAndId getServiceId() {
-    return serviceId;
-  }
+    private int exceptionType;
 
-  public void setServiceId(AgencyAndId serviceId) {
-    this.serviceId = serviceId;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public ServiceDate getDate() {
-    return date;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setDate(ServiceDate date) {
-    this.date = date;
-  }
+    public AgencyAndId getServiceId() {
+        return serviceId;
+    }
 
-  public int getExceptionType() {
-    return exceptionType;
-  }
+    public void setServiceId(AgencyAndId serviceId) {
+        this.serviceId = serviceId;
+    }
 
-  public void setExceptionType(int exceptionType) {
-    this.exceptionType = exceptionType;
-  }
+    public ServiceDate getDate() {
+        return date;
+    }
 
-  @Override
-  public String toString() {
-    return "<CalendarDate serviceId=" + this.serviceId + " date=" + this.date
-        + " exception=" + this.exceptionType + ">";
-  }
+    public void setDate(ServiceDate date) {
+        this.date = date;
+    }
+
+    public int getExceptionType() {
+        return exceptionType;
+    }
+
+    public void setExceptionType(int exceptionType) {
+        this.exceptionType = exceptionType;
+    }
+
+    @Override
+    public String toString() {
+        return "<CalendarDate serviceId=" + this.serviceId + " date=" + this.date + " exception="
+                + this.exceptionType + ">";
+    }
 }

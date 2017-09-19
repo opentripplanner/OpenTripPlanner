@@ -21,21 +21,35 @@ import org.onebusaway.gtfs.model.Trip;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TripMapperTest {
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final int BIKES_ALLOWED = 1;
+
     private static final String BLOCK_ID = "Block Id";
+
     private static final String DIRECTION_ID = "Direction Id";
+
     private static final String FARE_ID = "Fare Id";
+
     private static final Route ROUTE = new Route();
+
     private static final String ROUTE_SHORT_NAME = "Route Short Name";
+
     private static final String TRIP_HEADSIGN = "Trip Headsign";
+
     private static final String TRIP_SHORT_NAME = "Trip Short Name";
+
     private static final int WHEELCHAIR_ACCESSIBLE = 2;
+
     private static final int TRIP_BIKES_ALLOWED = 2;
+
     private static final Trip TRIP = new Trip();
 
     static {
@@ -58,13 +72,15 @@ public class TripMapperTest {
 
     private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper()));
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(subject.map((Collection<Trip>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(TRIP)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.Trip result = subject.map(TRIP);
 
         assertEquals("A_1", result.getId().toString());
@@ -82,7 +98,8 @@ public class TripMapperTest {
         assertEquals(TRIP_BIKES_ALLOWED, result.getTripBikesAllowed());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         Trip input = new Trip();
         input.setId(AGENCY_AND_ID);
 
@@ -103,9 +120,9 @@ public class TripMapperTest {
         assertEquals(0, result.getTripBikesAllowed());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.Trip result1 = subject.map(TRIP);
         org.onebusaway2.gtfs.model.Trip result2 = subject.map(TRIP);
 

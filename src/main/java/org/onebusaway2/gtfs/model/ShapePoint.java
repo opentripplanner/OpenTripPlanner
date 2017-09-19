@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,92 +15,96 @@
  */
 package org.onebusaway2.gtfs.model;
 
-
 public final class ShapePoint extends IdentityBean<Integer> implements Comparable<ShapePoint> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final double MISSING_VALUE = -999;
+    private static final double MISSING_VALUE = -999;
 
-  private int id;
-  private AgencyAndId shapeId;
-  private int sequence;
-  private double lat;
-  private double lon;
-  private double distTraveled = MISSING_VALUE;
+    private int id;
 
-  public ShapePoint() {
-  }
+    private AgencyAndId shapeId;
 
-  public Integer getId() {
-    return id;
-  }
+    private int sequence;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private double lat;
 
-  public AgencyAndId getShapeId() {
-    return shapeId;
-  }
+    private double lon;
 
-  public void setShapeId(AgencyAndId shapeId) {
-    this.shapeId = shapeId;
-  }
+    private double distTraveled = MISSING_VALUE;
 
-  public int getSequence() {
-    return sequence;
-  }
+    public ShapePoint() {
+    }
 
-  public void setSequence(int sequence) {
-    this.sequence = sequence;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public boolean isDistTraveledSet() {
-    return distTraveled != MISSING_VALUE;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  /**
-   * @return the distance traveled along the shape path. If no distance was
-   *         specified, the value is undefined. Check first with
-   *         {@link #isDistTraveledSet()}
-   */
-  public double getDistTraveled() {
-    return distTraveled;
-  }
+    public AgencyAndId getShapeId() {
+        return shapeId;
+    }
 
-  public void setDistTraveled(double distTraveled) {
-    this.distTraveled = distTraveled;
-  }
+    public void setShapeId(AgencyAndId shapeId) {
+        this.shapeId = shapeId;
+    }
 
-  public void clearDistTraveled() {
-    this.distTraveled = MISSING_VALUE;
-  }
+    public int getSequence() {
+        return sequence;
+    }
 
-  public double getLat() {
-    return lat;
-  }
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
 
-  public void setLat(double lat) {
-    this.lat = lat;
-  }
+    public boolean isDistTraveledSet() {
+        return distTraveled != MISSING_VALUE;
+    }
 
-  public double getLon() {
-    return lon;
-  }
+    /**
+     * @return the distance traveled along the shape path. If no distance was
+     *         specified, the value is undefined. Check first with
+     *         {@link #isDistTraveledSet()}
+     */
+    public double getDistTraveled() {
+        return distTraveled;
+    }
 
-  public void setLon(double lon) {
-    this.lon = lon;
-  }
+    public void setDistTraveled(double distTraveled) {
+        this.distTraveled = distTraveled;
+    }
 
-  @Override
-  public String toString() {
-    return "<ShapePoint " + getShapeId() + " #" + getSequence() + " ("
-        + getLat() + "," + getLon() + ")>";
-  }
+    public void clearDistTraveled() {
+        this.distTraveled = MISSING_VALUE;
+    }
 
-  @Override
-  public int compareTo(ShapePoint o) {
-    return this.getSequence() - o.getSequence();
-  }
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
+    @Override
+    public String toString() {
+        return "<ShapePoint " + getShapeId() + " #" + getSequence() + " (" + getLat() + ","
+                + getLon() + ")>";
+    }
+
+    @Override
+    public int compareTo(ShapePoint o) {
+        return this.getSequence() - o.getSequence();
+    }
 }

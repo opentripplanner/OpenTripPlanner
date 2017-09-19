@@ -34,7 +34,7 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 public class GtfsGraphBuilderModuleTest {
 
-    private static final HashMap<Class<?>, Object> _extra = new HashMap<Class<?>, Object>();
+    private static final HashMap<Class<?>, Object> _extra = new HashMap<>();
 
     private GtfsModule _builder;
 

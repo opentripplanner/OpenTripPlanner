@@ -24,8 +24,7 @@ import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 class ShapePointMapper {
     private Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints = new HashMap<>();
 
-    Collection<ShapePoint> map(
-            Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints) {
+    Collection<ShapePoint> map(Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints) {
         return mapCollection(allShapePoints, this::map);
     }
 

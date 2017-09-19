@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class MapCollection {
-    static <S,T> Collection<T> mapCollection(Collection<S> entites, Function<S,T> mapper) {
-        return  entites == null ? null : entites.stream().map(mapper).collect(Collectors.toList());
+    static <S, T> Collection<T> mapCollection(Collection<S> entities, Function<S, T> mapper) {
+        return entities == null ? null : entities.stream().map(mapper).collect(Collectors.toList());
     }
 }

@@ -25,7 +25,6 @@ import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 class FeedInfoMapper {
     private Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
 
-
     Collection<FeedInfo> map(Collection<org.onebusaway.gtfs.model.FeedInfo> feedInfos) {
         return feedInfos == null ? null : mapCollection(feedInfos, this::map);
     }

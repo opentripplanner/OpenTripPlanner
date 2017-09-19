@@ -21,13 +21,19 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceCalendarDateMapperTest {
     private static final ServiceCalendarDate SERVICE_DATE = new ServiceCalendarDate();
+
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final Integer ID = 45;
+
     private static final ServiceDate DATE = new ServiceDate(2017, 10, 15);
+
     private static final int EXCEPTION_TYPE = 2;
 
     static {
@@ -39,13 +45,15 @@ public class ServiceCalendarDateMapperTest {
 
     private ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<ServiceCalendarDate>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(SERVICE_DATE)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.ServiceCalendarDate result = subject.map(SERVICE_DATE);
 
         assertEquals(ID, result.getId());
@@ -55,7 +63,8 @@ public class ServiceCalendarDateMapperTest {
 
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         ServiceCalendarDate input = new ServiceCalendarDate();
         org.onebusaway2.gtfs.model.ServiceCalendarDate result = subject.map(input);
 
@@ -65,9 +74,9 @@ public class ServiceCalendarDateMapperTest {
         assertNull(result.getServiceId());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.ServiceCalendarDate result1 = subject.map(SERVICE_DATE);
         org.onebusaway2.gtfs.model.ServiceCalendarDate result2 = subject.map(SERVICE_DATE);
 

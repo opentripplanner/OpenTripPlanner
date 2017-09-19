@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2012 Google, Inc.
  * Copyright (C) 2013 Codemass, Inc. <aaron@codemass.com>

@@ -26,7 +26,8 @@ import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 
 public class MapCollectionTest {
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(mapCollection(null, identity()));
         assertTrue(mapCollection(Collections.emptyList(), identity()).isEmpty());
         assertEquals(singletonList(5), mapCollection(singleton(5), identity()));

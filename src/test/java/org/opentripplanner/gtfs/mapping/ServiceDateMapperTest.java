@@ -22,7 +22,8 @@ import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 
 public class ServiceDateMapperTest {
 
-    @Test public void testMapServiceDate() throws Exception {
+    @Test
+    public void testMapServiceDate() throws Exception {
         ServiceDate input = new ServiceDate(2017, 10, 3);
 
         org.onebusaway2.gtfs.model.calendar.ServiceDate result = mapServiceDate(input);
@@ -32,7 +33,8 @@ public class ServiceDateMapperTest {
         assertEquals(3, result.getDay());
     }
 
-    @Test public void testMapServiceDateNullRef() throws Exception {
+    @Test
+    public void testMapServiceDateNullRef() throws Exception {
         assertNull(mapServiceDate(null));
     }
 }

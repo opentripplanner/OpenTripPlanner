@@ -25,29 +25,34 @@ import java.util.Collection;
 class ArrayListWithIdGeneration<T extends IdentityBean<Integer>> extends ArrayList<T> {
     private int maxId = 0;
 
-    ArrayListWithIdGeneration() { }
+    ArrayListWithIdGeneration() {
+    }
 
     ArrayListWithIdGeneration(Collection<? extends T> c) {
         super(c);
         decorateWithIds(this);
     }
 
-    @Override public boolean add(T t) {
+    @Override
+    public boolean add(T t) {
         decorateWithId(t);
         return super.add(t);
     }
 
-    @Override public void add(int index, T element) {
+    @Override
+    public void add(int index, T element) {
         decorateWithId(element);
         super.add(index, element);
     }
 
-    @Override public boolean addAll(Collection<? extends T> c) {
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
         decorateWithIds(c);
         return super.addAll(c);
     }
 
-    @Override public boolean addAll(int index, Collection<? extends T> c) {
+    @Override
+    public boolean addAll(int index, Collection<? extends T> c) {
         decorateWithIds(c);
         return super.addAll(index, c);
     }

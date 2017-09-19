@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2012 Google, Inc.
  * Copyright (C) 2013 Codemass, Inc. <aaron@codemass.com>
@@ -30,7 +30,14 @@ import org.onebusaway2.gtfs.services.calendar.CalendarServiceDataFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * We perform initial date calculations in the timezone of the host jvm, which
@@ -47,7 +54,6 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
 
     private GtfsDao dao;
 
-
     public static CalendarService createCalendarService(GtfsDao dao) {
         return new CalendarServiceImpl(createCalendarServiceData(dao));
     }
@@ -60,7 +66,8 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
         this.dao = dao;
     }
 
-    @Override public CalendarServiceData createData() {
+    @Override
+    public CalendarServiceData createData() {
 
         CalendarServiceData data = new CalendarServiceData();
 
@@ -84,14 +91,14 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
             Set<ServiceDate> activeDates = getServiceDatesForServiceId(serviceId,
                     serviceIdTimeZone);
 
-            List<ServiceDate> serviceDates = new ArrayList<ServiceDate>(activeDates);
+            List<ServiceDate> serviceDates = new ArrayList<>(activeDates);
             Collections.sort(serviceDates);
 
             data.putServiceDatesForServiceId(serviceId, serviceDates);
 
             List<String> tripAgencyIds = dao.getTripAgencyIdsReferencingServiceId(serviceId);
 
-            Set<TimeZone> timeZones = new HashSet<TimeZone>();
+            Set<TimeZone> timeZones = new HashSet<>();
             for (String tripAgencyId : tripAgencyIds) {
                 TimeZone timeZone = data.getTimeZoneForAgencyId(tripAgencyId);
                 timeZones.add(timeZone);
@@ -99,7 +106,7 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
 
             for (TimeZone timeZone : timeZones) {
 
-                List<Date> dates = new ArrayList<Date>(serviceDates.size());
+                List<Date> dates = new ArrayList<>(serviceDates.size());
                 for (ServiceDate serviceDate : serviceDates)
                     dates.add(serviceDate.getAsDate(timeZone));
 
@@ -111,9 +118,9 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
         return data;
     }
 
-    public Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId,
+    private Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId,
             TimeZone serviceIdTimeZone) {
-        Set<ServiceDate> activeDates = new HashSet<ServiceDate>();
+        Set<ServiceDate> activeDates = new HashSet<>();
         ServiceCalendar c = dao.getCalendarForServiceId(serviceId);
 
         if (c != null) {
@@ -136,13 +143,11 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
         }
     }
 
-    private void addDatesFromCalendar(ServiceCalendar calendar,
-            TimeZone timeZone, Set<ServiceDate> activeDates) {
+    private void addDatesFromCalendar(ServiceCalendar calendar, TimeZone timeZone,
+            Set<ServiceDate> activeDates) {
 
-        /**
-         * We calculate service dates relative to noon so as to avoid any weirdness
-         * relative to DST.
-         */
+        // We calculate service dates relative to noon so as to avoid any weirdness
+        // relative to DST.
         Date startDate = getServiceDateAsNoon(calendar.getStartDate(), timeZone);
         Date endDate = getServiceDateAsNoon(calendar.getEndDate(), timeZone);
 
@@ -189,10 +194,8 @@ public class CalendarServiceDataFactoryImpl implements CalendarServiceDataFactor
         }
     }
 
-    private void addAndRemoveDatesFromCalendarDate(
-            ServiceCalendarDate calendarDate,
-            Set<ServiceDate> activeDates
-    ) {
+    private void addAndRemoveDatesFromCalendarDate(ServiceCalendarDate calendarDate,
+            Set<ServiceDate> activeDates) {
         ServiceDate serviceDate = calendarDate.getDate();
         Date targetDate = calendarDate.getDate().getAsDate();
         Calendar c = Calendar.getInstance();

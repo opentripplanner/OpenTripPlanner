@@ -14,19 +14,16 @@
 */
 package org.onebusaway2.gtfs.impl;
 
-import org.geotools.xml.xsi.XSISimpleTypes;
 import org.junit.Test;
 import org.onebusaway2.gtfs.model.IdentityBean;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ArrayListWithIdGenerationTest {
-    @Test public void add() throws Exception {
+    @Test
+    public void add() throws Exception {
         ArrayListWithIdGeneration<AClass> list = new ArrayListWithIdGeneration<>();
 
         list.add(new AClass());
@@ -38,17 +35,18 @@ public class ArrayListWithIdGenerationTest {
         assertEquals(list.get(2).id, 8);
     }
 
-    @Test public void addIndex() throws Exception {
+    @Test
+    public void addIndex() throws Exception {
         ArrayListWithIdGeneration<AClass> list = new ArrayListWithIdGeneration<>(
-                singletonList(new AClass(3))
-        );
+                singletonList(new AClass(3)));
 
         list.add(0, new AClass());
         assertEquals(4, list.get(0).id);
         assertEquals(3, list.get(1).id);
     }
 
-    @Test public void addAll() throws Exception {
+    @Test
+    public void addAll() throws Exception {
         ArrayListWithIdGeneration<AClass> list = new ArrayListWithIdGeneration<>();
 
         list.addAll(asList(new AClass(), new AClass(3), new AClass()));
@@ -58,10 +56,10 @@ public class ArrayListWithIdGenerationTest {
         assertEquals(4, list.get(2).id);
     }
 
-    @Test public void addAllIndex() throws Exception {
+    @Test
+    public void addAllIndex() throws Exception {
         ArrayListWithIdGeneration<AClass> list = new ArrayListWithIdGeneration<>(
-                asList(new AClass(2), new AClass(4))
-        );
+                asList(new AClass(2), new AClass(4)));
 
         list.addAll(1, asList(new AClass(), new AClass(3)));
 
@@ -71,21 +69,23 @@ public class ArrayListWithIdGenerationTest {
         assertEquals(4, list.get(3).id);
     }
 
-
-    static class AClass extends IdentityBean<Integer>{
+    static class AClass extends IdentityBean<Integer> {
         private int id;
 
-        AClass() { }
+        AClass() {
+        }
 
         AClass(int id) {
             this.id = id;
         }
 
-        @Override public Integer getId() {
+        @Override
+        public Integer getId() {
             return id;
         }
 
-        @Override public void setId(Integer id) {
+        @Override
+        public void setId(Integer id) {
             this.id = id;
         }
     }

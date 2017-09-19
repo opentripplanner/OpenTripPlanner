@@ -22,23 +22,41 @@ import org.onebusaway.gtfs.model.Trip;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class StopTimeMapperTest {
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final Integer ID = 45;
+
     private static final int ARRIVAL_TIME = 1000;
+
     private static final int DEPARTURE_TIME = 2000;
+
     private static final int DROP_OFF_TYPE = 2;
+
     private static final String FARE_PERIOD_ID = "Fare Period Id";
+
     private static final int PICKUP_TYPE = 3;
+
     private static final String ROUTE_SHORT_NAME = "Route Short Name";
+
     private static final double SHAPE_DIST_TRAVELED = 2.5d;
+
     private static final Stop STOP = new Stop();
+
     private static final String HEAD_SIGN = "Head Sign";
+
     private static final int STOP_SEQUENCE = 4;
+
     private static final int TIMEPOINT = 50;
+
     private static final Trip TRIP = new Trip();
+
     private static final StopTime STOP_TIME = new StopTime();
 
     static {
@@ -64,13 +82,15 @@ public class StopTimeMapperTest {
             new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper()))
     );
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<StopTime>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(STOP_TIME)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.StopTime result = subject.map(STOP_TIME);
 
         assertEquals(ID, result.getId());
@@ -88,7 +108,8 @@ public class StopTimeMapperTest {
         assertNotNull(result.getTrip());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         org.onebusaway2.gtfs.model.StopTime result = subject.map(new StopTime());
 
         assertNotNull(result.getId());
@@ -105,9 +126,9 @@ public class StopTimeMapperTest {
         assertFalse(result.isTimepointSet());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.StopTime result1 = subject.map(STOP_TIME);
         org.onebusaway2.gtfs.model.StopTime result2 = subject.map(STOP_TIME);
 

@@ -21,23 +21,40 @@ import org.onebusaway.gtfs.model.Route;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class RouteMapperTest {
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final String SHORT_NAME = "Short Name";
+
     private static final String LONG_NAME = "Long Name";
+
     private static final String DESC = "Desc";
+
     private static final int TYPE = 2;
+
     private static final String URL = "www.url.me";
+
     private static final String COLOR = "green";
+
     private static final String TEXT_COLOR = "red";
+
     private static final int BIKES_ALLOWED = 2;
+
     private static final int SORT_ORDER = 1;
+
     private static final String BRANDING_URL = "www.url.me/brand";
+
     private static final int ROUTE_BIKES_ALLOWED = 2;
+
     private static final Agency AGENCY = new Agency();
+
     private static final Route ROUTE = new Route();
 
     static {
@@ -60,13 +77,15 @@ public class RouteMapperTest {
 
     private RouteMapper subject = new RouteMapper(new AgencyMapper());
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<Route>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(ROUTE)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.Route result = subject.map(ROUTE);
 
         assertEquals("A_1", result.getId().toString());
@@ -84,7 +103,8 @@ public class RouteMapperTest {
         assertEquals(BIKES_ALLOWED, result.getRouteBikesAllowed());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         Route input = new Route();
         input.setId(AGENCY_AND_ID);
 
@@ -108,7 +128,8 @@ public class RouteMapperTest {
     /**
      * Mapping the same object twice, should return the the same instance.
      */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.Route result1 = subject.map(ROUTE);
         org.onebusaway2.gtfs.model.Route result2 = subject.map(ROUTE);
 

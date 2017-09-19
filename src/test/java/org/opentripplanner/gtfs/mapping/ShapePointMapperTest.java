@@ -20,15 +20,25 @@ import org.onebusaway.gtfs.model.ShapePoint;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ShapePointMapperTest {
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final Integer ID = 45;
+
     private static final double DIST_TRAVELED = 2.0d;
+
     private static final double LAT = 60.0d;
+
     private static final double LON = 45.0d;
+
     private static final int SEQUENCE = 3;
+
     private static final ShapePoint SHAPE_POINT = new ShapePoint();
 
     static {
@@ -42,13 +52,15 @@ public class ShapePointMapperTest {
 
     private ShapePointMapper subject = new ShapePointMapper();
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(subject.map((Collection<ShapePoint>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(SHAPE_POINT)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.ShapePoint result = subject.map(SHAPE_POINT);
 
         assertEquals(ID, result.getId());
@@ -59,7 +71,8 @@ public class ShapePointMapperTest {
         assertEquals("A_1", result.getShapeId().toString());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         org.onebusaway2.gtfs.model.ShapePoint result = subject.map(new ShapePoint());
 
         assertNotNull(result.getId());
@@ -70,9 +83,9 @@ public class ShapePointMapperTest {
         assertNull(result.getShapeId());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.ShapePoint result1 = subject.map(SHAPE_POINT);
         org.onebusaway2.gtfs.model.ShapePoint result2 = subject.map(SHAPE_POINT);
 

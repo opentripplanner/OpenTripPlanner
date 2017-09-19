@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2012 Google, Inc.
  *
@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,118 +18,126 @@ package org.onebusaway2.gtfs.model;
 
 public final class Transfer extends IdentityBean<Integer> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final int MISSING_VALUE = -999;
+    private static final int MISSING_VALUE = -999;
 
-  private int id;
-  private Stop fromStop;
-  private Route fromRoute;
-  private Trip fromTrip;
-  private Stop toStop;
-  private Route toRoute;
-  private Trip toTrip;
-  private int transferType;
-  private int minTransferTime = MISSING_VALUE;
+    private int id;
 
-  public Transfer() {
-  }
+    private Stop fromStop;
 
-  public Transfer(Transfer obj) {
-    this.id = obj.id;
-    this.fromStop = obj.fromStop;
-    this.fromRoute = obj.fromRoute;
-    this.fromTrip = obj.fromTrip;
-    this.toStop = obj.toStop;
-    this.toRoute = obj.toRoute;
-    this.toTrip = obj.toTrip;
-    this.transferType = obj.transferType;
-    this.minTransferTime = obj.minTransferTime;
-  }
+    private Route fromRoute;
 
-  @Override
-  public Integer getId() {
-    return id;
-  }
+    private Trip fromTrip;
 
-  @Override
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private Stop toStop;
 
-  public Stop getFromStop() {
-    return fromStop;
-  }
+    private Route toRoute;
 
-  public void setFromStop(Stop fromStop) {
-    this.fromStop = fromStop;
-  }
+    private Trip toTrip;
 
-  public Route getFromRoute() {
-    return fromRoute;
-  }
+    private int transferType;
 
-  public void setFromRoute(Route fromRoute) {
-    this.fromRoute = fromRoute;
-  }
+    private int minTransferTime = MISSING_VALUE;
 
-  public Trip getFromTrip() {
-    return fromTrip;
-  }
+    public Transfer() {
+    }
 
-  public void setFromTrip(Trip fromTrip) {
-    this.fromTrip = fromTrip;
-  }
+    public Transfer(Transfer obj) {
+        this.id = obj.id;
+        this.fromStop = obj.fromStop;
+        this.fromRoute = obj.fromRoute;
+        this.fromTrip = obj.fromTrip;
+        this.toStop = obj.toStop;
+        this.toRoute = obj.toRoute;
+        this.toTrip = obj.toTrip;
+        this.transferType = obj.transferType;
+        this.minTransferTime = obj.minTransferTime;
+    }
 
-  public Stop getToStop() {
-    return toStop;
-  }
+    @Override
+    public Integer getId() {
+        return id;
+    }
 
-  public void setToStop(Stop toStop) {
-    this.toStop = toStop;
-  }
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public Route getToRoute() {
-    return toRoute;
-  }
+    public Stop getFromStop() {
+        return fromStop;
+    }
 
-  public void setToRoute(Route toRoute) {
-    this.toRoute = toRoute;
-  }
+    public void setFromStop(Stop fromStop) {
+        this.fromStop = fromStop;
+    }
 
-  public Trip getToTrip() {
-    return toTrip;
-  }
+    public Route getFromRoute() {
+        return fromRoute;
+    }
 
-  public void setToTrip(Trip toTrip) {
-    this.toTrip = toTrip;
-  }
+    public void setFromRoute(Route fromRoute) {
+        this.fromRoute = fromRoute;
+    }
 
-  public int getTransferType() {
-    return transferType;
-  }
+    public Trip getFromTrip() {
+        return fromTrip;
+    }
 
-  public void setTransferType(int transferType) {
-    this.transferType = transferType;
-  }
+    public void setFromTrip(Trip fromTrip) {
+        this.fromTrip = fromTrip;
+    }
 
-  public boolean isMinTransferTimeSet() {
-    return minTransferTime != MISSING_VALUE;
-  }
+    public Stop getToStop() {
+        return toStop;
+    }
 
-  public int getMinTransferTime() {
-    return minTransferTime;
-  }
+    public void setToStop(Stop toStop) {
+        this.toStop = toStop;
+    }
 
-  public void setMinTransferTime(int minTransferTime) {
-    this.minTransferTime = minTransferTime;
-  }
+    public Route getToRoute() {
+        return toRoute;
+    }
 
-  public void clearMinTransferTime() {
-    this.minTransferTime = MISSING_VALUE;
-  }
+    public void setToRoute(Route toRoute) {
+        this.toRoute = toRoute;
+    }
 
-  public String toString() {
-    return "<Transfer " + getId() + ">";
-  }
+    public Trip getToTrip() {
+        return toTrip;
+    }
+
+    public void setToTrip(Trip toTrip) {
+        this.toTrip = toTrip;
+    }
+
+    public int getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(int transferType) {
+        this.transferType = transferType;
+    }
+
+    public boolean isMinTransferTimeSet() {
+        return minTransferTime != MISSING_VALUE;
+    }
+
+    public int getMinTransferTime() {
+        return minTransferTime;
+    }
+
+    public void setMinTransferTime(int minTransferTime) {
+        this.minTransferTime = minTransferTime;
+    }
+
+    public void clearMinTransferTime() {
+        this.minTransferTime = MISSING_VALUE;
+    }
+
+    public String toString() {
+        return "<Transfer " + getId() + ">";
+    }
 }

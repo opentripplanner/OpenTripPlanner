@@ -14,28 +14,48 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.*;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Transfer;
+import org.onebusaway.gtfs.model.Trip;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TransferMapperTest {
     private static final RouteMapper ROUTE_MAPPER = new RouteMapper(new AgencyMapper());
+
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
+
     private static final StopMapper STOP_MAPPER = new StopMapper();
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final Integer ID = 45;
+
     private static final Route FROM_ROUTE = new Route();
-    private static final Stop  FROM_STOP = new Stop();
-    private static final Trip  FROM_TRIP = new Trip();
+
+    private static final Stop FROM_STOP = new Stop();
+
+    private static final Trip FROM_TRIP = new Trip();
+
     private static final Route TO_ROUTE = new Route();
-    private static final Stop  TO_STOP = new Stop();
-    private static final Trip  TO_TRIP = new Trip();
+
+    private static final Stop TO_STOP = new Stop();
+
+    private static final Trip TO_TRIP = new Trip();
+
     private static final int MIN_TRANSFER_TIME = 200;
+
     private static final int TRANSFER_TYPE = 3;
+
     private static final Transfer TRANSFER = new Transfer();
 
     static {
@@ -59,13 +79,15 @@ public class TransferMapperTest {
 
     private TransferMapper subject = new TransferMapper(ROUTE_MAPPER, STOP_MAPPER, TRIP_MAPPER);
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<Transfer>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(TRANSFER)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.Transfer result = subject.map(TRANSFER);
 
         assertEquals(ID, result.getId());
@@ -79,7 +101,8 @@ public class TransferMapperTest {
         assertEquals(TRANSFER_TYPE, result.getTransferType());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         org.onebusaway2.gtfs.model.Transfer result = subject.map(new Transfer());
 
         assertNotNull(result.getId());
@@ -93,9 +116,9 @@ public class TransferMapperTest {
         assertEquals(0, result.getTransferType());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.Transfer result1 = subject.map(TRANSFER);
         org.onebusaway2.gtfs.model.Transfer result2 = subject.map(TRANSFER);
 

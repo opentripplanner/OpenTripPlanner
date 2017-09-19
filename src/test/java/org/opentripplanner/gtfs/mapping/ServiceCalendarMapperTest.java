@@ -21,20 +21,33 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceCalendarMapperTest {
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
     private static final Integer ID = 45;
+
     private static final int MONDAY = 1;
+
     private static final int TUESDAY = 2;
+
     private static final int WEDNESDAY = 3;
+
     private static final int THURSDAY = 4;
+
     private static final int FRIDAY = 5;
+
     private static final int SATURDAY = 6;
+
     private static final int SUNDAY = 7;
+
     private static final ServiceDate START_DATE = new ServiceDate(2017, 10, 17);
+
     private static final ServiceDate END_DATE = new ServiceDate(2018, 1, 2);
+
     private static final ServiceCalendar CALENDAR = new ServiceCalendar();
 
     static {
@@ -53,13 +66,15 @@ public class ServiceCalendarMapperTest {
 
     private ServiceCalendarMapper subject = new ServiceCalendarMapper();
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<ServiceCalendar>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(CALENDAR)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.ServiceCalendar result = subject.map(CALENDAR);
 
         assertEquals(ID, result.getId());
@@ -75,7 +90,8 @@ public class ServiceCalendarMapperTest {
         assertEquals(END_DATE.getAsString(), result.getEndDate().getAsString());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         ServiceCalendar input = new ServiceCalendar();
         org.onebusaway2.gtfs.model.ServiceCalendar result = subject.map(input);
 
@@ -91,9 +107,9 @@ public class ServiceCalendarMapperTest {
         assertNull(result.getEndDate());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.ServiceCalendar result1 = subject.map(CALENDAR);
         org.onebusaway2.gtfs.model.ServiceCalendar result2 = subject.map(CALENDAR);
 

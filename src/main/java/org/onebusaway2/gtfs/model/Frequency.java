@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2011 Google, Inc.
  *
@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,79 +18,88 @@ package org.onebusaway2.gtfs.model;
 
 import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
 
+import static org.onebusaway2.gtfs.model.calendar.TimeToStringConverter.toHH_MM_SS;
+
 public final class Frequency extends IdentityBean<Integer> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private int id;
-  private Trip trip;
-  private int startTime;
-  private int endTime;
-  private int headwaySecs;
-  private int exactTimes = 0;
-  private int labelOnly = 0;
+    private int id;
 
-  @Override
-  public Integer getId() {
-    return id;
-  }
+    private Trip trip;
 
-  @Override
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private int startTime;
 
-  public Trip getTrip() {
-    return trip;
-  }
+    private int endTime;
 
-  public void setTrip(Trip trip) {
-    this.trip = trip;
-  }
+    private int headwaySecs;
 
-  public int getStartTime() {
-    return startTime;
-  }
+    private int exactTimes = 0;
 
-  public void setStartTime(int startTime) {
-    this.startTime = startTime;
-  }
+    private int labelOnly = 0;
 
-  public int getEndTime() {
-    return endTime;
-  }
+    @Override
+    public Integer getId() {
+        return id;
+    }
 
-  public void setEndTime(int endTime) {
-    this.endTime = endTime;
-  }
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public int getHeadwaySecs() {
-    return headwaySecs;
-  }
+    public Trip getTrip() {
+        return trip;
+    }
 
-  public void setHeadwaySecs(int headwaySecs) {
-    this.headwaySecs = headwaySecs;
-  }
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
 
-  public int getExactTimes() {
-    return exactTimes;
-  }
+    public int getStartTime() {
+        return startTime;
+    }
 
-  public void setExactTimes(int exactTimes) {
-    this.exactTimes = exactTimes;
-  }
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
 
-  public int getLabelOnly() {
-    return labelOnly;
-  }
+    public int getEndTime() {
+        return endTime;
+    }
 
-  public void setLabelOnly(int labelOnly) {
-    this.labelOnly = labelOnly;
-  }
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+    }
 
-  public String toString() {
-    return "<Frequency " + getId() + " start="
-        + TimeToStringConverter.toHH_MM_SS(startTime) + " end="
-        + TimeToStringConverter.toHH_MM_SS(endTime) + ">";
-  }
+    public int getHeadwaySecs() {
+        return headwaySecs;
+    }
+
+    public void setHeadwaySecs(int headwaySecs) {
+        this.headwaySecs = headwaySecs;
+    }
+
+    public int getExactTimes() {
+        return exactTimes;
+    }
+
+    public void setExactTimes(int exactTimes) {
+        this.exactTimes = exactTimes;
+    }
+
+    public int getLabelOnly() {
+        return labelOnly;
+    }
+
+    public void setLabelOnly(int labelOnly) {
+        this.labelOnly = labelOnly;
+    }
+
+    public String toString() {
+        return "<Frequency " + getId()
+                + " start=" + toHH_MM_SS(startTime)
+                + " end=" + toHH_MM_SS(endTime)
+                + ">";
+    }
 }

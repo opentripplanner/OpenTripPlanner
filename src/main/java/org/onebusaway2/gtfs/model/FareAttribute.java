@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,142 +15,146 @@
  */
 package org.onebusaway2.gtfs.model;
 
-
 public final class FareAttribute extends IdentityBean<AgencyAndId> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final int MISSING_VALUE = -999;
+    private static final int MISSING_VALUE = -999;
 
-  private AgencyAndId id;
-  private float price;
-  private String currencyType;
-  private int paymentMethod;
-  private int transfers = MISSING_VALUE;
-  private int transferDuration = MISSING_VALUE;
+    private AgencyAndId id;
 
-  /** youthPrice is an extension to the GTFS spec to support Seattle fare types. */
-  private float youthPrice;
+    private float price;
 
-  /** seniorPrice is an extension to the GTFS spec to support Seattle fare types. */
-  private float seniorPrice;
-  
-  /** This is a proposed extension to the GTFS spec */
-  private int journeyDuration = MISSING_VALUE;
-  
-  public FareAttribute() {
-  }
+    private String currencyType;
 
-  public FareAttribute(FareAttribute fa) {
-    this.id = fa.id;
-    this.price = fa.price;
-    this.currencyType = fa.currencyType;
-    this.paymentMethod = fa.paymentMethod;
-    this.transfers = fa.transfers;
-    this.transferDuration = fa.transferDuration;
-    this.journeyDuration = fa.journeyDuration;
-  }
+    private int paymentMethod;
 
-  @Override
-  public AgencyAndId getId() {
-    return id;
-  }
+    private int transfers = MISSING_VALUE;
 
-  @Override
-  public void setId(AgencyAndId id) {
-    this.id = id;
-  }
+    private int transferDuration = MISSING_VALUE;
 
-  public float getPrice() {
-    return price;
-  }
+    /** youthPrice is an extension to the GTFS spec to support Seattle fare types. */
+    private float youthPrice;
 
-  public void setPrice(float price) {
-    this.price = price;
-  }
+    /** seniorPrice is an extension to the GTFS spec to support Seattle fare types. */
+    private float seniorPrice;
 
-  public String getCurrencyType() {
-    return currencyType;
-  }
+    /** This is a proposed extension to the GTFS spec */
+    private int journeyDuration = MISSING_VALUE;
 
-  public void setCurrencyType(String currencyType) {
-    this.currencyType = currencyType;
-  }
+    public FareAttribute() {
+    }
 
-  public int getPaymentMethod() {
-    return paymentMethod;
-  }
+    public FareAttribute(FareAttribute fa) {
+        this.id = fa.id;
+        this.price = fa.price;
+        this.currencyType = fa.currencyType;
+        this.paymentMethod = fa.paymentMethod;
+        this.transfers = fa.transfers;
+        this.transferDuration = fa.transferDuration;
+        this.journeyDuration = fa.journeyDuration;
+    }
 
-  public void setPaymentMethod(int paymentMethod) {
-    this.paymentMethod = paymentMethod;
-  }
+    @Override
+    public AgencyAndId getId() {
+        return id;
+    }
 
-  public boolean isTransfersSet() {
-    return transfers != MISSING_VALUE;
-  }
+    @Override
+    public void setId(AgencyAndId id) {
+        this.id = id;
+    }
 
-  public int getTransfers() {
-    return transfers;
-  }
+    public float getPrice() {
+        return price;
+    }
 
-  public void setTransfers(int transfers) {
-    this.transfers = transfers;
-  }
+    public void setPrice(float price) {
+        this.price = price;
+    }
 
-  public void clearTransfers() {
-    this.transfers = MISSING_VALUE;
-  }
+    public String getCurrencyType() {
+        return currencyType;
+    }
 
-  public boolean isTransferDurationSet() {
-    return transferDuration != MISSING_VALUE;
-  }
+    public void setCurrencyType(String currencyType) {
+        this.currencyType = currencyType;
+    }
 
-  public int getTransferDuration() {
-    return transferDuration;
-  }
+    public int getPaymentMethod() {
+        return paymentMethod;
+    }
 
-  public void setTransferDuration(int transferDuration) {
-    this.transferDuration = transferDuration;
-  }
+    public void setPaymentMethod(int paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 
-  public void clearTransferDuration() {
-    this.transferDuration = MISSING_VALUE;
-  }
+    public boolean isTransfersSet() {
+        return transfers != MISSING_VALUE;
+    }
 
-  public boolean isJourneyDurationSet() {
-    return journeyDuration != MISSING_VALUE;
-  }
+    public int getTransfers() {
+        return transfers;
+    }
 
-  public int getJourneyDuration() {
-    return journeyDuration;
-  }
+    public void setTransfers(int transfers) {
+        this.transfers = transfers;
+    }
 
-  public void setJourneyDuration(int journeyDuration) {
-    this.journeyDuration = journeyDuration;
-  }
+    public void clearTransfers() {
+        this.transfers = MISSING_VALUE;
+    }
 
-  public void clearJourneyDuration() {
-    this.journeyDuration = MISSING_VALUE;
-  }
+    public boolean isTransferDurationSet() {
+        return transferDuration != MISSING_VALUE;
+    }
 
-  public String toString() {
-    return "<FareAttribute " + getId() + ">";
-  }
+    public int getTransferDuration() {
+        return transferDuration;
+    }
 
-  public float getYouthPrice() {
-	return youthPrice;
-  }
+    public void setTransferDuration(int transferDuration) {
+        this.transferDuration = transferDuration;
+    }
 
-  public void setYouthPrice(float youthPrice) {
-	this.youthPrice = youthPrice;
-  }
+    public void clearTransferDuration() {
+        this.transferDuration = MISSING_VALUE;
+    }
 
-  public float getSeniorPrice() {
-	return seniorPrice;
-  }
+    public boolean isJourneyDurationSet() {
+        return journeyDuration != MISSING_VALUE;
+    }
 
-  public void setSeniorPrice(float seniorPrice) {
-	this.seniorPrice = seniorPrice;
-  }
+    public int getJourneyDuration() {
+        return journeyDuration;
+    }
+
+    public void setJourneyDuration(int journeyDuration) {
+        this.journeyDuration = journeyDuration;
+    }
+
+    public void clearJourneyDuration() {
+        this.journeyDuration = MISSING_VALUE;
+    }
+
+    public String toString() {
+        return "<FareAttribute " + getId() + ">";
+    }
+
+    public float getYouthPrice() {
+        return youthPrice;
+    }
+
+    public void setYouthPrice(float youthPrice) {
+        this.youthPrice = youthPrice;
+    }
+
+    public float getSeniorPrice() {
+        return seniorPrice;
+    }
+
+    public void setSeniorPrice(float seniorPrice) {
+        this.seniorPrice = seniorPrice;
+    }
 
 }

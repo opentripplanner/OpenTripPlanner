@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2011 Google, Inc.
  * Copyright (C) 2011 Laurent Gregoire <laurent.gregoire@gmail.com>
@@ -17,10 +17,32 @@
  */
 package org.onebusaway2.gtfs.impl;
 
-import org.onebusaway2.gtfs.model.*;
+import org.onebusaway2.gtfs.model.Agency;
+import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.onebusaway2.gtfs.model.FareAttribute;
+import org.onebusaway2.gtfs.model.FareRule;
+import org.onebusaway2.gtfs.model.FeedInfo;
+import org.onebusaway2.gtfs.model.Frequency;
+import org.onebusaway2.gtfs.model.IdentityBean;
+import org.onebusaway2.gtfs.model.Pathway;
+import org.onebusaway2.gtfs.model.Route;
+import org.onebusaway2.gtfs.model.ServiceCalendar;
+import org.onebusaway2.gtfs.model.ServiceCalendarDate;
+import org.onebusaway2.gtfs.model.ShapePoint;
+import org.onebusaway2.gtfs.model.Stop;
+import org.onebusaway2.gtfs.model.StopTime;
+import org.onebusaway2.gtfs.model.Transfer;
+import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.services.GtfsDao;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
@@ -36,45 +58,53 @@ import static java.util.stream.Collectors.toMap;
 public class GtfsDaoImpl implements GtfsDao {
 
     private Collection<Agency> agencies;
-    private Collection<ServiceCalendarDate> calendarDates;
-    private Collection<ServiceCalendar> calendars;
-    private Collection<FareAttribute> fareAttributes;
-    private Collection<FareRule> fareRules;
-    private Collection<FeedInfo> feedInfos;
-    private Collection<Frequency> frequencies;
-    private Collection<Pathway> pathways;
-    private Collection<Route> routes;
-    private Collection<ShapePoint> shapePoints;
-    private Map<AgencyAndId, Stop> stops;
-    private Collection<StopTime> stopTimes;
-    private Collection<Transfer> transfers;
-    private Collection<Trip> trips;
 
+    private Collection<ServiceCalendarDate> calendarDates;
+
+    private Collection<ServiceCalendar> calendars;
+
+    private Collection<FareAttribute> fareAttributes;
+
+    private Collection<FareRule> fareRules;
+
+    private Collection<FeedInfo> feedInfos;
+
+    private Collection<Frequency> frequencies;
+
+    private Collection<Pathway> pathways;
+
+    private Collection<Route> routes;
+
+    private Collection<ShapePoint> shapePoints;
+
+    private Map<AgencyAndId, Stop> stops;
+
+    private Collection<StopTime> stopTimes;
+
+    private Collection<Transfer> transfers;
+
+    private Collection<Trip> trips;
 
     // Indexes
     private Map<AgencyAndId, List<String>> tripAgencyIdsByServiceId = null;
+
     private Map<Stop, List<Stop>> stopsByStation = null;
+
     private Map<Trip, List<StopTime>> stopTimesByTrip = null;
+
     private Map<AgencyAndId, List<ShapePoint>> shapePointsByShapeId = null;
+
     private Map<AgencyAndId, List<ServiceCalendarDate>> calendarDatesByServiceId = null;
+
     private Map<AgencyAndId, List<ServiceCalendar>> calendarsByServiceId = null;
 
-    public GtfsDaoImpl(
-            Collection<Agency> agencies,
-            Collection<ServiceCalendarDate> calendarDates,
-            Collection<ServiceCalendar> calendars,
-            Collection<FareAttribute> fareAttributes,
-            Collection<FareRule> fareRules,
-            Collection<FeedInfo> feedInfos,
-            Collection<Frequency> frequencies,
-            Collection<Pathway> pathways,
-            Collection<Route> routes,
-            Collection<ShapePoint> shapePoints,
-            Collection<Stop> stops,
-            Collection<StopTime> stopTimes,
-            Collection<Transfer> transfers,
-            Collection<Trip> trips
-    ) {
+    public GtfsDaoImpl(Collection<Agency> agencies, Collection<ServiceCalendarDate> calendarDates,
+            Collection<ServiceCalendar> calendars, Collection<FareAttribute> fareAttributes,
+            Collection<FareRule> fareRules, Collection<FeedInfo> feedInfos,
+            Collection<Frequency> frequencies, Collection<Pathway> pathways,
+            Collection<Route> routes, Collection<ShapePoint> shapePoints, Collection<Stop> stops,
+            Collection<StopTime> stopTimes, Collection<Transfer> transfers,
+            Collection<Trip> trips) {
         this.agencies = agencies;
         this.calendarDates = insertIds(calendarDates);
         this.calendars = insertIds(calendars);
@@ -85,73 +115,89 @@ public class GtfsDaoImpl implements GtfsDao {
         this.pathways = pathways;
         this.routes = routes;
         this.shapePoints = shapePoints;
-        this.stops =  stops.stream().collect(toMap(Stop::getId, identity()));
+        this.stops = stops.stream().collect(toMap(Stop::getId, identity()));
         this.stopTimes = insertIds(stopTimes);
         this.transfers = insertIds(transfers);
         this.trips = trips;
     }
 
-    @Override public Collection<Agency> getAllAgencies() {
+    @Override
+    public Collection<Agency> getAllAgencies() {
         return agencies;
     }
 
-    @Override public Collection<ServiceCalendarDate> getAllCalendarDates() {
+    @Override
+    public Collection<ServiceCalendarDate> getAllCalendarDates() {
         return calendarDates;
     }
 
-    @Override public Collection<ServiceCalendar> getAllCalendars() {
+    @Override
+    public Collection<ServiceCalendar> getAllCalendars() {
         return calendars;
     }
 
-    @Override public Collection<FareAttribute> getAllFareAttributes() {
+    @Override
+    public Collection<FareAttribute> getAllFareAttributes() {
         return fareAttributes;
     }
 
-    @Override public Collection<FareRule> getAllFareRules() {
+    @Override
+    public Collection<FareRule> getAllFareRules() {
         return fareRules;
     }
 
-    @Override public Collection<FeedInfo> getAllFeedInfos() {
+    @Override
+    public Collection<FeedInfo> getAllFeedInfos() {
         return feedInfos;
     }
 
-    @Override public Collection<Frequency> getAllFrequencies() {
+    @Override
+    public Collection<Frequency> getAllFrequencies() {
         return frequencies;
     }
 
-    @Override public Collection<Route> getAllRoutes() {
+    @Override
+    public Collection<Route> getAllRoutes() {
         return routes;
     }
 
-    @Override public Collection<ShapePoint> getAllShapePoints() {
+    @Override
+    public Collection<ShapePoint> getAllShapePoints() {
         return shapePoints;
     }
 
-    @Override public Collection<StopTime> getAllStopTimes() {
+    @Override
+    public Collection<StopTime> getAllStopTimes() {
         return stopTimes;
     }
 
-    @Override public Collection<Stop> getAllStops() {
+    @Override
+    public Collection<Stop> getAllStops() {
         return stops.values();
     }
 
-    @Override public Collection<Transfer> getAllTransfers() {
+    @Override
+    public Collection<Transfer> getAllTransfers() {
         return transfers;
     }
 
-    @Override public Collection<Trip> getAllTrips() {
+    @Override
+    public Collection<Trip> getAllTrips() {
         return trips;
     }
 
-    @Override public Collection<Pathway> getAllPathways() {
+    @Override
+    public Collection<Pathway> getAllPathways() {
         return pathways;
     }
 
-    @Override public Stop getStopForId(AgencyAndId id) {
+    @Override
+    public Stop getStopForId(AgencyAndId id) {
         return stops.get(id);
     }
 
-    @Override public List<String> getTripAgencyIdsReferencingServiceId(AgencyAndId serviceId) {
+    @Override
+    public List<String> getTripAgencyIdsReferencingServiceId(AgencyAndId serviceId) {
 
         if (tripAgencyIdsByServiceId == null) {
 
@@ -161,10 +207,8 @@ public class GtfsDaoImpl implements GtfsDao {
                 AgencyAndId tripId = trip.getId();
                 String tripAgencyId = tripId.getAgencyId();
                 AgencyAndId tripServiceId = trip.getServiceId();
-                Set<String> agencyIds = agencyIdsByServiceIds.computeIfAbsent(
-                        tripServiceId,
-                        k -> new HashSet<>()
-                );
+                Set<String> agencyIds = agencyIdsByServiceIds
+                        .computeIfAbsent(tripServiceId, k -> new HashSet<>());
                 agencyIds.add(tripAgencyId);
             }
 
@@ -181,17 +225,16 @@ public class GtfsDaoImpl implements GtfsDao {
         return list(tripAgencyIdsByServiceId.get(serviceId));
     }
 
-    @Override public List<Stop> getStopsForStation(Stop station) {
+    @Override
+    public List<Stop> getStopsForStation(Stop station) {
         if (stopsByStation == null) {
             stopsByStation = new HashMap<>();
             for (Stop stop : getAllStops()) {
                 if (stop.getLocationType() == 0 && stop.getParentStation() != null) {
                     Stop parentStation = getStopForId(
                             new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()));
-                    List<Stop> subStops = stopsByStation.computeIfAbsent(
-                            parentStation,
-                            k -> new ArrayList<>(2)
-                    );
+                    List<Stop> subStops = stopsByStation
+                            .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
                     subStops.add(stop);
                 }
             }
@@ -199,12 +242,14 @@ public class GtfsDaoImpl implements GtfsDao {
         return list(stopsByStation.get(station));
     }
 
-    @Override public List<ShapePoint> getShapePointsForShapeId(AgencyAndId shapeId) {
+    @Override
+    public List<ShapePoint> getShapePointsForShapeId(AgencyAndId shapeId) {
         ensureShapePointRelation();
         return list(shapePointsByShapeId.get(shapeId));
     }
 
-    @Override public List<StopTime> getStopTimesForTrip(Trip trip) {
+    @Override
+    public List<StopTime> getStopTimesForTrip(Trip trip) {
 
         if (stopTimesByTrip == null) {
             stopTimesByTrip = getAllStopTimes().stream().collect(groupingBy(StopTime::getTrip));
@@ -217,7 +262,8 @@ public class GtfsDaoImpl implements GtfsDao {
         return list(stopTimesByTrip.get(trip));
     }
 
-    @Override public List<AgencyAndId> getAllServiceIds() {
+    @Override
+    public List<AgencyAndId> getAllServiceIds() {
         ensureCalendarDatesByServiceIdRelation();
         ensureCalendarsByServiceIdRelation();
         Set<AgencyAndId> serviceIds = new HashSet<>();
@@ -226,12 +272,14 @@ public class GtfsDaoImpl implements GtfsDao {
         return new ArrayList<>(serviceIds);
     }
 
-    @Override public List<ServiceCalendarDate> getCalendarDatesForServiceId(AgencyAndId serviceId) {
+    @Override
+    public List<ServiceCalendarDate> getCalendarDatesForServiceId(AgencyAndId serviceId) {
         ensureCalendarDatesByServiceIdRelation();
         return list(calendarDatesByServiceId.get(serviceId));
     }
 
-    @Override public ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId) {
+    @Override
+    public ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId) {
         ensureCalendarsByServiceIdRelation();
         List<ServiceCalendar> calendars = list(calendarsByServiceId.get(serviceId));
         switch (calendars.size()) {
@@ -248,26 +296,23 @@ public class GtfsDaoImpl implements GtfsDao {
 
     private void ensureCalendarDatesByServiceIdRelation() {
         if (calendarDatesByServiceId == null) {
-            calendarDatesByServiceId = getAllCalendarDates().stream().collect(
-                    groupingBy(ServiceCalendarDate::getServiceId)
-            );
+            calendarDatesByServiceId = getAllCalendarDates().stream()
+                    .collect(groupingBy(ServiceCalendarDate::getServiceId));
         }
     }
 
     private void ensureCalendarsByServiceIdRelation() {
         if (calendarsByServiceId == null) {
-            calendarsByServiceId =  getAllCalendars().stream().collect(
-                    groupingBy(ServiceCalendar::getServiceId)
-            );
+            calendarsByServiceId = getAllCalendars().stream()
+                    .collect(groupingBy(ServiceCalendar::getServiceId));
         }
     }
 
     private void ensureShapePointRelation() {
         if (shapePointsByShapeId == null) {
-            shapePointsByShapeId = getAllShapePoints().stream().collect(
-                    groupingBy(ShapePoint::getShapeId)
-            );
-            for(List<ShapePoint> list : shapePointsByShapeId.values()) {
+            shapePointsByShapeId = getAllShapePoints().stream()
+                    .collect(groupingBy(ShapePoint::getShapeId));
+            for (List<ShapePoint> list : shapePointsByShapeId.values()) {
                 Collections.sort(list);
             }
         }

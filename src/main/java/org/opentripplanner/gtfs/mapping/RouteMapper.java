@@ -21,6 +21,7 @@ import java.util.Map;
 
 class RouteMapper {
     private final AgencyMapper agencyMapper;
+
     private final Map<org.onebusaway.gtfs.model.Route, Route> mappedRoutes = new HashMap<>();
 
     RouteMapper(AgencyMapper agencyMapper) {

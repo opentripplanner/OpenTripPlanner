@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,119 +20,126 @@ import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar,
  * so as to avoid confusion with java.util.Calendar
- * 
+ *
  * @author bdferris
- * 
+ *
  */
 public final class ServiceCalendar extends IdentityBean<Integer> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private int id;
-  private AgencyAndId serviceId;
-  private int monday;
-  private int tuesday;
-  private int wednesday;
-  private int thursday;
-  private int friday;
-  private int saturday;
-  private int sunday;
+    private int id;
 
-  private ServiceDate startDate;
-  private ServiceDate endDate;
+    private AgencyAndId serviceId;
 
+    private int monday;
 
-  public Integer getId() {
-    return id;
-  }
+    private int tuesday;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private int wednesday;
 
-  public AgencyAndId getServiceId() {
-    return serviceId;
-  }
+    private int thursday;
 
-  public void setServiceId(AgencyAndId serviceId) {
-    this.serviceId = serviceId;
-  }
+    private int friday;
 
-  public int getMonday() {
-    return monday;
-  }
+    private int saturday;
 
-  public void setMonday(int monday) {
-    this.monday = monday;
-  }
+    private int sunday;
 
-  public int getTuesday() {
-    return tuesday;
-  }
+    private ServiceDate startDate;
 
-  public void setTuesday(int tuesday) {
-    this.tuesday = tuesday;
-  }
+    private ServiceDate endDate;
 
-  public int getWednesday() {
-    return wednesday;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setWednesday(int wednesday) {
-    this.wednesday = wednesday;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public int getThursday() {
-    return thursday;
-  }
+    public AgencyAndId getServiceId() {
+        return serviceId;
+    }
 
-  public void setThursday(int thursday) {
-    this.thursday = thursday;
-  }
+    public void setServiceId(AgencyAndId serviceId) {
+        this.serviceId = serviceId;
+    }
 
-  public int getFriday() {
-    return friday;
-  }
+    public int getMonday() {
+        return monday;
+    }
 
-  public void setFriday(int friday) {
-    this.friday = friday;
-  }
+    public void setMonday(int monday) {
+        this.monday = monday;
+    }
 
-  public int getSaturday() {
-    return saturday;
-  }
+    public int getTuesday() {
+        return tuesday;
+    }
 
-  public void setSaturday(int saturday) {
-    this.saturday = saturday;
-  }
+    public void setTuesday(int tuesday) {
+        this.tuesday = tuesday;
+    }
 
-  public int getSunday() {
-    return sunday;
-  }
+    public int getWednesday() {
+        return wednesday;
+    }
 
-  public void setSunday(int sunday) {
-    this.sunday = sunday;
-  }
+    public void setWednesday(int wednesday) {
+        this.wednesday = wednesday;
+    }
 
-  public ServiceDate getStartDate() {
-    return startDate;
-  }
+    public int getThursday() {
+        return thursday;
+    }
 
-  public void setStartDate(ServiceDate startDate) {
-    this.startDate = startDate;
-  }
+    public void setThursday(int thursday) {
+        this.thursday = thursday;
+    }
 
-  public ServiceDate getEndDate() {
-    return endDate;
-  }
+    public int getFriday() {
+        return friday;
+    }
 
-  public void setEndDate(ServiceDate endDate) {
-    this.endDate = endDate;
-  }
+    public void setFriday(int friday) {
+        this.friday = friday;
+    }
 
-  public String toString() {
-    return "<ServiceCalendar " + this.serviceId + " [" + this.monday
-        + this.tuesday + this.wednesday + this.thursday + this.friday
-        + this.saturday + this.sunday + "]>";
-  }
+    public int getSaturday() {
+        return saturday;
+    }
+
+    public void setSaturday(int saturday) {
+        this.saturday = saturday;
+    }
+
+    public int getSunday() {
+        return sunday;
+    }
+
+    public void setSunday(int sunday) {
+        this.sunday = sunday;
+    }
+
+    public ServiceDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(ServiceDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public ServiceDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(ServiceDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String toString() {
+        return "<ServiceCalendar " + this.serviceId + " [" + this.monday + this.tuesday
+                + this.wednesday + this.thursday + this.friday + this.saturday + this.sunday + "]>";
+    }
 }

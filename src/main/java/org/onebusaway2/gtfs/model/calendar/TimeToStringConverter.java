@@ -20,11 +20,11 @@ import java.util.regex.Pattern;
 
 public class TimeToStringConverter {
     private static final Pattern TIME_PATTERN = Pattern.compile("^(-?)(\\d+):(\\d\\d):(\\d\\d)$");
+
     private static final DecimalFormat TWO_DIGET_FORMAT = new DecimalFormat("00");
 
     public static String toHH_MM_SS(final int seconds) {
         int absSeconds = Math.abs(seconds);
-
 
         int secondsRest = absSeconds % 60;
         int hourAndMinutes = (absSeconds - secondsRest) / 60;
@@ -33,7 +33,7 @@ public class TimeToStringConverter {
 
         StringBuilder b = new StringBuilder();
 
-        if(seconds < 0) {
+        if (seconds < 0) {
             b.append('-');
         }
         b.append(TWO_DIGET_FORMAT.format(hours));

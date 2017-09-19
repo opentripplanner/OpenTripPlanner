@@ -16,14 +16,17 @@ package org.opentripplanner.gtfs.mapping;
 import org.junit.Test;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 public class AgencyAndIdMapperTest {
 
-    @Test public void testMapAgencyAndId() throws Exception {
-        org.onebusaway.gtfs.model.AgencyAndId inputId
-                = new org.onebusaway.gtfs.model.AgencyAndId("A", "1");
+    @Test
+    public void testMapAgencyAndId() throws Exception {
+        org.onebusaway.gtfs.model.AgencyAndId inputId = new org.onebusaway.gtfs.model.AgencyAndId(
+                "A", "1"
+        );
 
         AgencyAndId mappedId = mapAgencyAndId(inputId);
 
@@ -31,9 +34,9 @@ public class AgencyAndIdMapperTest {
         assertEquals("1", mappedId.getId());
     }
 
-    @Test public void testMapAgencyAndIdWithNulls() throws Exception {
-        org.onebusaway.gtfs.model.AgencyAndId inputId
-                = new org.onebusaway.gtfs.model.AgencyAndId();
+    @Test
+    public void testMapAgencyAndIdWithNulls() throws Exception {
+        org.onebusaway.gtfs.model.AgencyAndId inputId = new org.onebusaway.gtfs.model.AgencyAndId();
 
         AgencyAndId mappedId = mapAgencyAndId(inputId);
 

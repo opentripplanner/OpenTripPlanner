@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Brian Ferris <bdferris@onebusaway.org>
  * Copyright (C) 2013 Google, Inc.
  *
@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,202 +20,209 @@ import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
 
 public final class StopTime extends IdentityBean<Integer> implements Comparable<StopTime> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public static final int MISSING_VALUE = -999;
+    public static final int MISSING_VALUE = -999;
 
-  private int id;
-  private Trip trip;
-  private Stop stop;
-  private int arrivalTime = MISSING_VALUE;
-  private int departureTime = MISSING_VALUE;
-  private int timepoint = MISSING_VALUE;
-  private int stopSequence;
-  private String stopHeadsign;
-  private String routeShortName;
-  private int pickupType;
-  private int dropOffType;
-  private double shapeDistTraveled = MISSING_VALUE;
+    private int id;
 
-  /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
-  private String farePeriodId;
+    private Trip trip;
 
-  public StopTime() {
+    private Stop stop;
 
-  }
+    private int arrivalTime = MISSING_VALUE;
 
-  public StopTime(StopTime st) {
-    this.arrivalTime = st.arrivalTime;
-    this.departureTime = st.departureTime;
-    this.dropOffType = st.dropOffType;
-    this.id = st.id;
-    this.pickupType = st.pickupType;
-    this.routeShortName = st.routeShortName;
-    this.shapeDistTraveled = st.shapeDistTraveled;
-    this.stop = st.stop;
-    this.stopHeadsign = st.stopHeadsign;
-    this.stopSequence = st.stopSequence;
-    this.timepoint = st.timepoint;
-    this.trip = st.trip;
-  }
+    private int departureTime = MISSING_VALUE;
 
-  public Integer getId() {
-    return id;
-  }
+    private int timepoint = MISSING_VALUE;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private int stopSequence;
 
-  public Trip getTrip() {
-    return trip;
-  }
+    private String stopHeadsign;
 
-  public void setTrip(Trip trip) {
-    this.trip = trip;
-  }
+    private String routeShortName;
 
-  public int getStopSequence() {
-    return stopSequence;
-  }
+    private int pickupType;
 
-  public void setStopSequence(int stopSequence) {
-    this.stopSequence = stopSequence;
-  }
+    private int dropOffType;
 
-  public Stop getStop() {
-    return stop;
-  }
+    private double shapeDistTraveled = MISSING_VALUE;
 
-  public void setStop(Stop stop) {
-    this.stop = stop;
-  }
+    /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
+    private String farePeriodId;
 
-  public boolean isArrivalTimeSet() {
-    return arrivalTime != MISSING_VALUE;
-  }
+    public StopTime() {
 
-  /**
-   * @return arrival time, in seconds since midnight
-   */
-  public int getArrivalTime() {
-    return arrivalTime;
-  }
+    }
 
-  public void setArrivalTime(int arrivalTime) {
-    this.arrivalTime = arrivalTime;
-  }
+    public StopTime(StopTime st) {
+        this.arrivalTime = st.arrivalTime;
+        this.departureTime = st.departureTime;
+        this.dropOffType = st.dropOffType;
+        this.id = st.id;
+        this.pickupType = st.pickupType;
+        this.routeShortName = st.routeShortName;
+        this.shapeDistTraveled = st.shapeDistTraveled;
+        this.stop = st.stop;
+        this.stopHeadsign = st.stopHeadsign;
+        this.stopSequence = st.stopSequence;
+        this.timepoint = st.timepoint;
+        this.trip = st.trip;
+    }
 
-  public void clearArrivalTime() {
-    this.arrivalTime = MISSING_VALUE;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public boolean isDepartureTimeSet() {
-    return departureTime != MISSING_VALUE;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  /**
-   * @return departure time, in seconds since midnight
-   */
-  public int getDepartureTime() {
-    return departureTime;
-  }
+    public Trip getTrip() {
+        return trip;
+    }
 
-  public void setDepartureTime(int departureTime) {
-    this.departureTime = departureTime;
-  }
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
 
-  public void clearDepartureTime() {
-    this.departureTime = MISSING_VALUE;
-  }
-  
-  public boolean isTimepointSet() {
-    return timepoint != MISSING_VALUE;
-  }
-  
-  /**
-   * @return 1 if the stop-time is a timepoint location
-   */
-  public int getTimepoint() {
-    return timepoint;
-  }
+    public int getStopSequence() {
+        return stopSequence;
+    }
 
-  public void setTimepoint(int timepoint) {
-    this.timepoint = timepoint;
-  }
-  
-  public void clearTimepoint() {
-    this.timepoint = MISSING_VALUE;
-  }
+    public void setStopSequence(int stopSequence) {
+        this.stopSequence = stopSequence;
+    }
 
-  public String getStopHeadsign() {
-    return stopHeadsign;
-  }
+    public Stop getStop() {
+        return stop;
+    }
 
-  public void setStopHeadsign(String headSign) {
-    this.stopHeadsign = headSign;
-  }
+    public void setStop(Stop stop) {
+        this.stop = stop;
+    }
 
-  public String getRouteShortName() {
-    return routeShortName;
-  }
+    public boolean isArrivalTimeSet() {
+        return arrivalTime != MISSING_VALUE;
+    }
 
-  public void setRouteShortName(String routeShortName) {
-    this.routeShortName = routeShortName;
-  }
+    /**
+     * @return arrival time, in seconds since midnight
+     */
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
 
-  public int getPickupType() {
-    return pickupType;
-  }
+    public void setArrivalTime(int arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
 
-  public void setPickupType(int pickupType) {
-    this.pickupType = pickupType;
-  }
+    public void clearArrivalTime() {
+        this.arrivalTime = MISSING_VALUE;
+    }
 
-  public int getDropOffType() {
-    return dropOffType;
-  }
+    public boolean isDepartureTimeSet() {
+        return departureTime != MISSING_VALUE;
+    }
 
-  public void setDropOffType(int dropOffType) {
-    this.dropOffType = dropOffType;
-  }
+    /**
+     * @return departure time, in seconds since midnight
+     */
+    public int getDepartureTime() {
+        return departureTime;
+    }
 
-  public boolean isShapeDistTraveledSet() {
-    return shapeDistTraveled != MISSING_VALUE;
-  }
+    public void setDepartureTime(int departureTime) {
+        this.departureTime = departureTime;
+    }
 
-  public double getShapeDistTraveled() {
-    return shapeDistTraveled;
-  }
+    public void clearDepartureTime() {
+        this.departureTime = MISSING_VALUE;
+    }
 
-  public void setShapeDistTraveled(double shapeDistTraveled) {
-    this.shapeDistTraveled = shapeDistTraveled;
-  }
+    public boolean isTimepointSet() {
+        return timepoint != MISSING_VALUE;
+    }
 
-  public void clearShapeDistTraveled() {
-    this.shapeDistTraveled = MISSING_VALUE;
-  }
+    /**
+     * @return 1 if the stop-time is a timepoint location
+     */
+    public int getTimepoint() {
+        return timepoint;
+    }
 
-  public String getFarePeriodId() {
-    return farePeriodId;
-  }
+    public void setTimepoint(int timepoint) {
+        this.timepoint = timepoint;
+    }
 
-  public void setFarePeriodId(String farePeriodId) {
-    this.farePeriodId = farePeriodId;
-  }
+    public void clearTimepoint() {
+        this.timepoint = MISSING_VALUE;
+    }
 
-  public int compareTo(StopTime o) {
-    return this.getStopSequence() - o.getStopSequence();
-  }
+    public String getStopHeadsign() {
+        return stopHeadsign;
+    }
 
+    public void setStopHeadsign(String headSign) {
+        this.stopHeadsign = headSign;
+    }
 
-  @Override
-  public String toString() {
-      return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId()
-        + " trip=" + getTrip().getId() + " times="
-        + TimeToStringConverter.toHH_MM_SS(getArrivalTime())
-        + "-"
-        + TimeToStringConverter.toHH_MM_SS(getDepartureTime())
-        + ")";
-  }
+    public String getRouteShortName() {
+        return routeShortName;
+    }
+
+    public void setRouteShortName(String routeShortName) {
+        this.routeShortName = routeShortName;
+    }
+
+    public int getPickupType() {
+        return pickupType;
+    }
+
+    public void setPickupType(int pickupType) {
+        this.pickupType = pickupType;
+    }
+
+    public int getDropOffType() {
+        return dropOffType;
+    }
+
+    public void setDropOffType(int dropOffType) {
+        this.dropOffType = dropOffType;
+    }
+
+    public boolean isShapeDistTraveledSet() {
+        return shapeDistTraveled != MISSING_VALUE;
+    }
+
+    public double getShapeDistTraveled() {
+        return shapeDistTraveled;
+    }
+
+    public void setShapeDistTraveled(double shapeDistTraveled) {
+        this.shapeDistTraveled = shapeDistTraveled;
+    }
+
+    public void clearShapeDistTraveled() {
+        this.shapeDistTraveled = MISSING_VALUE;
+    }
+
+    public String getFarePeriodId() {
+        return farePeriodId;
+    }
+
+    public void setFarePeriodId(String farePeriodId) {
+        this.farePeriodId = farePeriodId;
+    }
+
+    public int compareTo(StopTime o) {
+        return this.getStopSequence() - o.getStopSequence();
+    }
+
+    @Override
+    public String toString() {
+        return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId() + " trip="
+                + getTrip().getId() + " times=" + TimeToStringConverter.toHH_MM_SS(getArrivalTime())
+                + "-" + TimeToStringConverter.toHH_MM_SS(getDepartureTime()) + ")";
+    }
 }

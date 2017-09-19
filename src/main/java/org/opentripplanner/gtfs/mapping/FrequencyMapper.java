@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
 class FrequencyMapper {
     private final TripMapper tripMapper;
 
@@ -34,7 +33,7 @@ class FrequencyMapper {
     }
 
     Frequency map(org.onebusaway.gtfs.model.Frequency orginal) {
-        return  orginal == null ? null : mappedFrequencys.computeIfAbsent(orginal, this::doMap);
+        return orginal == null ? null : mappedFrequencys.computeIfAbsent(orginal, this::doMap);
     }
 
     private Frequency doMap(org.onebusaway.gtfs.model.Frequency rhs) {

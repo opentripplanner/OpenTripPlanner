@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright (C) 2011 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,76 +19,82 @@ import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 
 public final class FeedInfo extends IdentityBean<Integer> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private int id;
-  private String publisherName;
-  private String publisherUrl;
-  private String lang;
-  private ServiceDate startDate;
-  private ServiceDate endDate;
-  private String version;
+    private int id;
 
-  public String getPublisherName() {
-    return publisherName;
-  }
+    private String publisherName;
 
-  public void setPublisherName(String publisherName) {
-    this.publisherName = publisherName;
-  }
+    private String publisherUrl;
 
-  public String getPublisherUrl() {
-    return publisherUrl;
-  }
+    private String lang;
 
-  public void setPublisherUrl(String publisherUrl) {
-    this.publisherUrl = publisherUrl;
-  }
+    private ServiceDate startDate;
 
-  public String getLang() {
-    return lang;
-  }
+    private ServiceDate endDate;
 
-  public void setLang(String lang) {
-    this.lang = lang;
-  }
+    private String version;
 
-  public ServiceDate getStartDate() {
-    return startDate;
-  }
+    public String getPublisherName() {
+        return publisherName;
+    }
 
-  public void setStartDate(ServiceDate startDate) {
-    this.startDate = startDate;
-  }
+    public void setPublisherName(String publisherName) {
+        this.publisherName = publisherName;
+    }
 
-  public ServiceDate getEndDate() {
-    return endDate;
-  }
+    public String getPublisherUrl() {
+        return publisherUrl;
+    }
 
-  public void setEndDate(ServiceDate endDate) {
-    this.endDate = endDate;
-  }
+    public void setPublisherUrl(String publisherUrl) {
+        this.publisherUrl = publisherUrl;
+    }
 
-  public String getVersion() {
-    return version;
-  }
+    public String getLang() {
+        return lang;
+    }
 
-  public void setVersion(String version) {
-    this.version = version;
-  }
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
 
-  @Override
-  public Integer getId() {
-    return id;
-  }
+    public ServiceDate getStartDate() {
+        return startDate;
+    }
 
-  @Override
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public void setStartDate(ServiceDate startDate) {
+        this.startDate = startDate;
+    }
 
-  public String toString() {
-    return "<FeedInfo " + getId() + ">";
-  }
+    public ServiceDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(ServiceDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String toString() {
+        return "<FeedInfo " + getId() + ">";
+    }
 
 }

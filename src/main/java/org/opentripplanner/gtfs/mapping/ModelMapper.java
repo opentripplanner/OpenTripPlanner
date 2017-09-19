@@ -18,34 +18,43 @@ import org.onebusaway2.gtfs.services.GtfsDao;
 
 public class ModelMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
+
     private final StopMapper stopMapper = new StopMapper();
+
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
+
     private final ServiceCalendarDateMapper serviceCalendarDateMapper = new ServiceCalendarDateMapper();
+
     private final FeedInfoMapper feedInfoMapper = new FeedInfoMapper();
+
     private final ShapePointMapper shapePointMapper = new ShapePointMapper();
+
     private final ServiceCalendarMapper serviceCalendarMapper = new ServiceCalendarMapper();
 
     private final PathwayMapper pathwayMapper = new PathwayMapper(stopMapper);
+
     private final RouteMapper routeMapper = new RouteMapper(agencyMapper);
+
     private final TripMapper tripMapper = new TripMapper(routeMapper);
+
     private final StopTimeMapper stopTimeMapper = new StopTimeMapper(stopMapper, tripMapper);
 
     private final FrequencyMapper frequencyMapper = new FrequencyMapper(tripMapper);
-    private final TransferMapper transferMapper = new TransferMapper(routeMapper, stopMapper, tripMapper);
 
-    private final FareRuleMapper fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
+    private final TransferMapper transferMapper = new TransferMapper(
+            routeMapper, stopMapper, tripMapper
+    );
 
-    public static GtfsDao mapDao(
-            org.onebusaway.gtfs.services.GtfsRelationalDao data
-    ) {
+    private final FareRuleMapper fareRuleMapper = new FareRuleMapper(
+            routeMapper, fareAttributeMapper
+    );
+
+    public static GtfsDao mapDao(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
         return new ModelMapper().map(data);
     }
 
-    private GtfsDao map(
-            org.onebusaway.gtfs.services.GtfsRelationalDao data
-    ) {
-        return new GtfsDaoImpl(
-                agencyMapper.map(data.getAllAgencies()),
+    private GtfsDao map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+        return new GtfsDaoImpl(agencyMapper.map(data.getAllAgencies()),
                 serviceCalendarDateMapper.map(data.getAllCalendarDates()),
                 serviceCalendarMapper.map(data.getAllCalendars()),
                 fareAttributeMapper.map(data.getAllFareAttributes()),

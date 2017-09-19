@@ -20,18 +20,26 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class FeedInfoMapperTest {
     private static final org.onebusaway.gtfs.model.FeedInfo FEED_INFO = new org.onebusaway.gtfs.model.FeedInfo();
 
-
     private static final Integer ID = 45;
+
     private static final ServiceDate START_DATE = new ServiceDate(2016, 10, 5);
+
     private static final ServiceDate END_DATE = new ServiceDate(2017, 12, 7);
+
     private static final String LANG = "US";
+
     private static final String PUBLISHER_NAME = "Name";
+
     private static final String PUBLISHER_URL = "www.url.pub";
+
     private static final String VERSION = "Version";
 
     static {
@@ -46,13 +54,15 @@ public class FeedInfoMapperTest {
 
     private FeedInfoMapper subject = new FeedInfoMapper();
 
-    @Test public void testMapCollection() throws Exception {
+    @Test
+    public void testMapCollection() throws Exception {
         assertNull(subject.map((Collection<FeedInfo>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(FEED_INFO)).size());
     }
 
-    @Test public void testMap() throws Exception {
+    @Test
+    public void testMap() throws Exception {
         org.onebusaway2.gtfs.model.FeedInfo result = subject.map(FEED_INFO);
 
         assertEquals(ID, result.getId());
@@ -64,7 +74,8 @@ public class FeedInfoMapperTest {
         assertEquals(VERSION, result.getVersion());
     }
 
-    @Test public void testMapWithNulls() throws Exception {
+    @Test
+    public void testMapWithNulls() throws Exception {
         org.onebusaway2.gtfs.model.FeedInfo result = subject.map(new FeedInfo());
 
         assertNotNull(result.getId());
@@ -76,9 +87,9 @@ public class FeedInfoMapperTest {
         assertNull(result.getVersion());
     }
 
-
     /** Mapping the same object twice, should return the the same instance. */
-    @Test public void testMapCache() throws Exception {
+    @Test
+    public void testMapCache() throws Exception {
         org.onebusaway2.gtfs.model.FeedInfo result1 = subject.map(FEED_INFO);
         org.onebusaway2.gtfs.model.FeedInfo result2 = subject.map(FEED_INFO);
 

@@ -43,8 +43,7 @@ public class MockGtfs {
         return ModelMapper.mapDao(gtfsDelegate.read());
     }
 
-    public GtfsDao read(org.onebusaway.gtfs.serialization.GtfsReader reader)
-            throws IOException {
+    public GtfsDao read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
         return ModelMapper.mapDao(gtfsDelegate.read(reader));
     }
 
