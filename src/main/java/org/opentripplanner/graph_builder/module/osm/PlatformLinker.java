@@ -10,6 +10,7 @@ import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -79,13 +80,14 @@ public class PlatformLinker {
         for (Area area : platforms) {
             List<OsmVertex> endpointsWithin = new ArrayList<>();
             List<Ring> rings = area.outermostRings;
+            AreaEdgeList edgeList = new AreaEdgeList();
             for (Ring ring : rings) {
                 endpointsWithin.addAll(endpoints.stream().filter(t -> contains(ring, t)).collect(Collectors.toList()));
 
                 for (OSMNode node : ring.nodes) {
                     Vertex vertexById = graph.getVertex("osm:node:" + node.getId());
                     if (vertexById != null) {
-                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById));
+                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById, edgeList));
                     }
                 }
 
@@ -120,7 +122,7 @@ public class PlatformLinker {
         return false;
     }
 
-    private void makePlatformEdges(Area area, OsmVertex from, OsmVertex to) {
+    private void makePlatformEdges(Area area, OsmVertex from, OsmVertex to, AreaEdgeList edgeList) {
         Coordinate[] coordinates = new Coordinate[] { from.getCoordinate(),
                 to.getCoordinate() };
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
@@ -135,12 +137,12 @@ public class PlatformLinker {
         String labelFromTo = "way (area) " + area.parent.getId() + " from " + from.getLabel()
                 + " to " + to.getLabel();
         I18NString nameFromTo = getNameForWay(area.parent, labelFromTo);
-        factory.createEdge(from, to, line, nameFromTo, length, areaPermissions, true);
+        factory.createAreaEdge(from, to, line, nameFromTo, length, areaPermissions, true, edgeList);
 
         String labelToFrom = "way (area) " + area.parent.getId() + " from " + to.getLabel()
                 + " to " + from.getLabel();
         I18NString nameToFrom = getNameForWay(area.parent, labelToFrom);
-        factory.createEdge(to, from, line, nameToFrom, length, areaPermissions, true);
+        factory.createAreaEdge(to, from, line, nameToFrom, length, areaPermissions, true, edgeList);
     }
 
     private I18NString getNameForWay(OSMWithTags way, String id) {
