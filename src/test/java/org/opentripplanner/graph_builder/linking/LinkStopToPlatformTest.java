@@ -37,11 +37,11 @@ public class LinkStopToPlatformTest {
 
         ArrayList<IntersectionVertex> vertices = new ArrayList<IntersectionVertex>();
 
-        vertices.add(new IntersectionVertex(_graph, "1", 10.22054, 59.13568, "Platform vertix 1"));
-        vertices.add(new IntersectionVertex(_graph, "2", 10.22432, 59.13519, "Platform vertix 2"));
-        vertices.add(new IntersectionVertex(_graph, "3", 10.22492, 59.13514, "Platform vertix 3"));
-        vertices.add(new IntersectionVertex(_graph, "4", 10.22493, 59.13518, "Platform vertix 4"));
-        vertices.add(new IntersectionVertex(_graph, "5", 10.22056, 59.13575, "Platform vertix 5"));
+        vertices.add(new IntersectionVertex(_graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
+        vertices.add(new IntersectionVertex(_graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
+        vertices.add(new IntersectionVertex(_graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
+        vertices.add(new IntersectionVertex(_graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
+        vertices.add(new IntersectionVertex(_graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
         AreaEdgeList areaEdgeList = new AreaEdgeList();
 
@@ -71,7 +71,7 @@ public class LinkStopToPlatformTest {
      * Tests that extra edges are added when linking stops to platform areas to prevent detours around the platform.
      */
     @Test
-    public void testLinkStopWithoutExtraEdges(){
+    public void testLinkStopWithoutExtraEdges() {
         SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
         splitter.link();
 
@@ -79,7 +79,7 @@ public class LinkStopToPlatformTest {
     }
 
     @Test
-    public void testLinkStopWithExtraEdges(){
+    public void testLinkStopWithExtraEdges() {
         SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
         splitter.setAddExtraEdgesToAreas(true);
         splitter.link();
