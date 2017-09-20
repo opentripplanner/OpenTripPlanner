@@ -22,7 +22,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import org.junit.Test;
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
+import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;

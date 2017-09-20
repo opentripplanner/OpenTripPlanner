@@ -13,7 +13,6 @@
 
 package org.opentripplanner.calendar.impl;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;

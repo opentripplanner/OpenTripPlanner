@@ -23,7 +23,7 @@ import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceImpl;
+import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Stop;
