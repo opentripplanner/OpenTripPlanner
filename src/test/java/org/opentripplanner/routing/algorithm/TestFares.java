@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
@@ -37,6 +36,8 @@ import org.opentripplanner.util.TestUtils;
 import java.io.File;
 import java.util.List;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+
 public class TestFares extends TestCase {
 
     private AStar aStar = new AStar();
@@ -49,7 +50,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -129,7 +130,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -168,7 +169,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();

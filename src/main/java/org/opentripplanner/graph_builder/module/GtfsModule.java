@@ -27,11 +27,19 @@ import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.*;
+import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.IdentityBean;
+import org.onebusaway.gtfs.model.Pathway;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
+import org.onebusaway.gtfs.model.ShapePoint;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -47,21 +55,23 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarSrvDataWithoutDatesForLocalizedSrvId;
 import static org.opentripplanner.gtfs.mapping.ModelMapper.mapDao;
 
 public class GtfsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
 
-    EntityHandler counter = new EntityCounter();
+    private EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory _fareServiceFactory;
 
     /** will be applied to all bundles which do not have the cacheDirectory property set */
-    private File cacheDirectory; 
-    
+    private File cacheDirectory;
+
     /** will be applied to all bundles which do not have the useCached property set */
-    private Boolean useCached; 
+    private Boolean useCached;
 
     Set<String> agencyIdsSeen = Sets.newHashSet();
 
@@ -69,7 +79,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     public List<GtfsBundle> gtfsBundles;
 
-    public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; };
+    public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; }
 
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
@@ -96,7 +106,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         MultiCalendarServiceImpl service = new MultiCalendarServiceImpl();
         GtfsStopContext stopContext = new GtfsStopContext();
-        
+
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
                 // apply global defaults to individual GTFSBundles (if globals have been set)
@@ -104,7 +114,6 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.cacheDirectory = cacheDirectory;
                 if (useCached != null && gtfsBundle.useCached == null)
                     gtfsBundle.useCached = useCached;
-
 
                 org.onebusaway2.gtfs.services.GtfsDao dao = mapDao(loadBundle(gtfsBundle));
 
@@ -115,12 +124,7 @@ public class GtfsModule implements GraphBuilderModule {
                 hf.setFareServiceFactory(_fareServiceFactory);
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
 
-
-                CalendarServiceDataFactoryImpl csfactory = new CalendarServiceDataFactoryImpl();
-                csfactory.setGtfsDao(dao);
-                org.onebusaway2.gtfs.model.calendar.CalendarServiceData data = csfactory.createData();
-
-                service.addData(data, context.getDao());
+                service.addData(createCalendarSrvDataWithoutDatesForLocalizedSrvId(dao), dao);
 
                 hf.subwayAccessTime = gtfsBundle.subwayAccessTime;
                 hf.maxInterlineDistance = gtfsBundle.maxInterlineDistance;
@@ -131,7 +135,7 @@ public class GtfsModule implements GraphBuilderModule {
                 }
                 if (gtfsBundle.linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
-                } 
+                }
                 if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }

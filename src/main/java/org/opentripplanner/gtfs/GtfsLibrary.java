@@ -17,7 +17,6 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.services.GtfsDao;
@@ -26,12 +25,14 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.mapping.ModelMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarService;
+
 public class GtfsLibrary {
 
     public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
     public static GtfsContext createContext(GtfsFeedId feedId, GtfsDao dao) {
-        CalendarService calendarService = CalendarServiceDataFactoryImpl.createCalendarService(dao);
+        CalendarService calendarService = createCalendarService(dao);
         return createContext(feedId, dao, calendarService);
     }
 
@@ -44,7 +45,7 @@ public class GtfsLibrary {
 
         GtfsFeedId feedId = gtfsImport.getFeedId();
         GtfsDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
-        CalendarService calendarService = CalendarServiceDataFactoryImpl.createCalendarService(otpDao);
+        CalendarService calendarService = createCalendarService(otpDao);
 
         return new GtfsContextImpl(feedId, otpDao, calendarService);
     }

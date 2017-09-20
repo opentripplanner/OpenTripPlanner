@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.Trip;
@@ -92,7 +92,7 @@ class Context {
         graph.index(new DefaultStreetVertexIndexFactory());
         graph.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
 
         feedId = context.getFeedId().getId();

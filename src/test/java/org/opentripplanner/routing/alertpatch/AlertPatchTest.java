@@ -20,7 +20,6 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
@@ -37,6 +36,8 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
+
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 public class AlertPatchTest extends TestCase {
     private Graph graph;
@@ -56,7 +57,7 @@ public class AlertPatchTest extends TestCase {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         graph.index(new DefaultStreetVertexIndexFactory());
 

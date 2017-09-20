@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 import java.io.File;
 import java.text.ParseException;
@@ -29,7 +30,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
@@ -119,7 +119,7 @@ public class TimetableSnapshotSourceTest {
     public void setUp() {
         graph.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         updater = new TimetableSnapshotSource(graph);
     }

@@ -25,7 +25,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.model.Stop;
@@ -61,6 +60,8 @@ import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+
 public class TestPatternHopFactory extends TestCase {
 
     private Graph graph;
@@ -78,7 +79,7 @@ public class TestPatternHopFactory extends TestCase {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
         
         String[] stops = {

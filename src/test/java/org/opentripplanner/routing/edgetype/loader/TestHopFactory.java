@@ -19,7 +19,6 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -38,6 +37,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+
 public class TestHopFactory extends TestCase {
 
     private Graph graph;
@@ -53,7 +54,7 @@ public class TestHopFactory extends TestCase {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                CalendarServiceDataFactoryImpl.createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getDao())
         );
 
         feedId = context.getFeedId().getId();
