@@ -16,14 +16,14 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.gtfs.BikeAccess;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
-import org.opentripplanner.model.CalendarService;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
@@ -110,6 +110,8 @@ public class GtfsModule implements GraphBuilderModule {
 
                 // NB! The calls below have side effects - the builder state is updated!
                 repairStopTimesForEachTrip(graph, builder.getStopTimesSortedByTrip());
+
+                // NB! The calls below have side effects - the builder state is updated!
                 createTripPatterns(graph, builder, calendarService);
 
                 PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());

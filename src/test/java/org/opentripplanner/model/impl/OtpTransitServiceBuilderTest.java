@@ -37,11 +37,8 @@ public class OtpTransitServiceBuilderTest {
     private static final String ID_4 = "4";
     private static final String ID_5 = "5";
     private static final String ID_6 = "6";
-
     private static final String FEED_ID = "F";
-
     private static final FeedScopedId SERVICE_WEEKDAYS_ID = new FeedScopedId(FEED_ID, "weekdays");
-
 
     private static OtpTransitServiceBuilder subject;
 

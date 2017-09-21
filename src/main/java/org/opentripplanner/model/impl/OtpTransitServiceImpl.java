@@ -128,7 +128,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public List<Stop> getStopsForStation(Stop station) {
+    public List<Stop> getStopsForStation(Stop station){
         ensureStopForStations();
         return immutableList(stopsByStation.get(station));
     }

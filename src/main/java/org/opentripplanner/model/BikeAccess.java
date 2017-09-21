@@ -1,7 +1,4 @@
-package org.opentripplanner.gtfs;
-
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
+package org.opentripplanner.model;
 
 /**
  * Model bike access for GTFS trips.

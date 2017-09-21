@@ -165,8 +165,8 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static GtfsContext createCtxBuilder() throws IOException {
-        GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
-        OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
+        GtfsContextBuilder ctxBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
+        OtpTransitServiceBuilder builder = ctxBuilder.getTransitBuilder();
         Agency agency = agency(builder);
 
         // Supplement test data with at least one entity in all collections
@@ -175,7 +175,7 @@ public class CalendarServiceDataFactoryImplTest {
         builder.getFareRules().add(new FareRule());
         builder.getFeedInfos().add(new FeedInfo());
 
-        return contextBuilder.build();
+        return ctxBuilder.build();
     }
 
     private static Agency agency(OtpTransitServiceBuilder builder) {
