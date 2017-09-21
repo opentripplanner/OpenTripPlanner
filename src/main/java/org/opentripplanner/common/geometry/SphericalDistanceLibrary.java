@@ -149,11 +149,11 @@ public abstract class SphericalDistanceLibrary {
      */
     public static final double fastDistance(double lat1, double lon1, double lat2, double lon2,
             double radius) {
-    	if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
-    			|| abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
-    		return distance(lat1, lon1, lat2, lon2, radius);
+        if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
+                || abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
+            return distance(lat1, lon1, lat2, lon2, radius);
 
-    	double dLat = toRadians(lat2 - lat1);
+        double dLat = toRadians(lat2 - lat1);
         double dLon = toRadians(lon2 - lon1) * cos(toRadians((lat1 + lat2) / 2));
         return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
     }
@@ -169,6 +169,10 @@ public abstract class SphericalDistanceLibrary {
      */
     public static double metersToDegrees(double distanceMeters) {
         return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+    }
+
+    public static double degreesToMeters(double distanceDegrees) {
+        return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * distanceDegrees / 360;
     }
 
     /**
