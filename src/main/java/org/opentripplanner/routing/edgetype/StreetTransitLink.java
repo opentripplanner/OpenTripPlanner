@@ -96,7 +96,7 @@ public class StreetTransitLink extends Edge {
         }
 
         // Do not get off at a real stop when on call-n-ride (force a transfer instead).
-        if (!(transitStop instanceof TemporaryTransitStop) && lastTripIsCallAndRide(s0)) {
+        if (s0.lastTripIsCallAndRide() && !(transitStop.checkCallAndRideBoardAlightOk(s0))) {
             return null;
         }
 
@@ -166,10 +166,6 @@ public class StreetTransitLink extends Edge {
 
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
-    }
-
-    private boolean lastTripIsCallAndRide(State s0) {
-        return s0.getLastPattern() != null && s0.getLastPattern().geometry == null;
     }
 
 }

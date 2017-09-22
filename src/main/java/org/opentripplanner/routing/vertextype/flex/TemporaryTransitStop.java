@@ -14,6 +14,7 @@ package org.opentripplanner.routing.vertextype.flex;
 
 import com.google.common.collect.Iterables;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
@@ -48,4 +49,8 @@ public class TemporaryTransitStop extends TransitStop implements TemporaryVertex
         return streetVertex;
     }
 
+    @Override
+    public boolean checkCallAndRideBoardAlightOk(State state) {
+        return true;
+    }
 }

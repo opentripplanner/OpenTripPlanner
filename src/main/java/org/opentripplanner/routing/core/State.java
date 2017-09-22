@@ -840,4 +840,8 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public boolean lastTripIsCallAndRide() {
+        return this.getLastPattern() != null && this.getLastPattern().geometry == null;
+    }
+
 }

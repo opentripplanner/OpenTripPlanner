@@ -32,6 +32,7 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,16 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
             return null;
         }
 
-        return (StreetVertex) v;
+        if (v instanceof StreetVertex) {
+            return (StreetVertex) v;
+        } else if (v instanceof TransitStop) {
+            TransitStop tstop = (TransitStop) v;
+            if (rr.rctx.graph.index.patternsForStop.get(tstop.getStop()).contains(hop.getPattern())) {
+                LOG.debug("ignoring flag stop at existing stop");
+                return null;
+            }
+        }
+        throw new RuntimeException("Unexpected location.");
     }
 
     @Override
@@ -128,7 +138,7 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
     private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<PatternHop, State> patternHopStateMap) {
         List<StreetEdge> flagStopEdges = getClosestStreetEdges(initVertex.getCoordinate());
 
-        for(StreetEdge streetEdge : flagStopEdges){
+        for(StreetEdge streetEdge : flagStopEdges) {
             State nearbyState = new State(initVertex, rr);
             nearbyState.backEdge = streetEdge;
             Collection<PatternHop> hops = graph.index.getHopsForEdge(streetEdge);

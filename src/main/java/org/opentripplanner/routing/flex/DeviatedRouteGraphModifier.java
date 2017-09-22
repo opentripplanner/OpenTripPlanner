@@ -135,6 +135,18 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public boolean checkHopAllowsBoardAlight(State s, PatternHop hop, boolean boarding) {
         StreetVertex sv = findFirstStreetVertex(s);
+        // If first vertex is not a StreetVertex, it's a transit vertex, which we'll catch later.
+        if (sv == null) {
+            // Do check for service
+            if (!s.getOptions().arriveBy) {
+                Point pt = GeometryUtils.getGeometryFactory().createPoint(s.getOptions().rctx.fromVertex.getCoordinate());
+                if (addHopAsDirectService(hop, pt)) {
+                    directServices.put(hop.getPattern(), hop);
+                }
+            }
+            return false;
+        }
+
         Point orig = GeometryUtils.getGeometryFactory().createPoint(sv.getCoordinate());
         Point dest = GeometryUtils.getGeometryFactory().createPoint(s.getVertex().getCoordinate());
         boolean ret = false;
@@ -147,10 +159,14 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
             double distance = SphericalDistanceLibrary.distance(s.getVertex().getCoordinate(), sv.getCoordinate());
             ret = distance < hop.getServiceAreaRadius();
         }
-        if (hop.hasServiceArea() && hop.getServiceArea().contains(orig) && directServices.get(hop.getPattern()) == null) {
+        if (addHopAsDirectService(hop, orig)) {
             directServices.put(hop.getPattern(), hop);
         }
         return ret;
+    }
+
+    private boolean addHopAsDirectService(PatternHop hop, Point orig) {
+        return hop.hasServiceArea() && hop.getServiceArea().contains(orig) && directServices.get(hop.getPattern()) == null;
     }
 
     @Override
@@ -180,16 +196,24 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
                 if (hop.getServiceArea().contains(dest)) {
                     TransitStop fromStop, toStop;
                     if (opt.arriveBy) {
-                        StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
-                        toStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
+                        if (opt.rctx.toVertex instanceof TransitStop) {
+                            toStop = (TransitStop) opt.rctx.toVertex;
+                        } else {
+                            StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
+                            toStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
+                        }
                         if (!(v instanceof TransitStop)) {
                             throw new RuntimeException("Unexpected error! Only non-transit stop should be destination");
                         } else {
                             fromStop = (TransitStop) v;
                         }
                     } else {
-                        StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
-                        fromStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+                        if (opt.rctx.fromVertex instanceof TransitStop) {
+                            fromStop = (TransitStop) opt.rctx.fromVertex;
+                        } else {
+                            StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
+                            fromStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+                        }
                         if (!(v instanceof TransitStop)) {
                             if (v == state.getOptions().rctx.toVertex) {
                                 StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
@@ -212,15 +236,16 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         return findFirstStreetVertex(s);
     }
 
+    // Return null if first vertex is not a street vertex
     private StreetVertex findFirstStreetVertex(State s) {
         return findFirstStreetVertex(s.getOptions().rctx, s.getOptions().arriveBy);
     }
 
     private StreetVertex findFirstStreetVertex(RoutingContext rctx, boolean reverse) {
         Vertex v = reverse ? rctx.toVertex : rctx.fromVertex;
-        if (!(v instanceof StreetVertex)) {
-            throw new RuntimeException("Not implemented: GTFS-flex from or to a stop.");
+        if (v instanceof StreetVertex) {
+            return (StreetVertex) v;
         }
-        return (StreetVertex) v;
+        return null;
     }
 }
