@@ -66,4 +66,33 @@ public class PropagatedTimesStoreTest extends TestCase {
         // 1000 should not be included in average
         assertEquals(1, pts.avgs[0]);
     }
+
+    /**
+     * Test that adjusting which numbers are included in averages works, but with more targets than testAverageInclusion.
+     * We calculate the min and max for frequency lines, and we don't include the extrema when we do the average.
+     */
+    @Test
+    public static void testAverageInclusionMultiTarget () {
+        ProfileRequest pr = new ProfileRequest();
+        Graph g = new Graph();
+
+        int[][] times = new int[][] {
+                new int[] {1, 100},
+                new int[] {1000, 2000}
+        };
+
+        PropagatedTimesStore pts = new PropagatedTimesStore(g, pr, 2);
+        pts.setFromArray(times, new boolean[] { true, true }, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        // average of 1 and 1000 is 500 (int math)
+        assertEquals(500, pts.avgs[0]);
+        // average of 100 and 2000 is 1050 (int math)
+        assertEquals(1050, pts.avgs[1]);
+
+        pts = new PropagatedTimesStore(g, pr, 2);
+        pts.setFromArray(times, new boolean[] { true, false }, PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
+        // 1000 should not be included in average
+        assertEquals(1, pts.avgs[0]);
+        // 2000 should not be included in average
+        assertEquals(100, pts.avgs[1]);
+    }
 }
