@@ -175,6 +175,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
+            s1.setIsLastBoardAlightDeviated(isDeviated());
             if (boarding) {
                 int boardingTime = options.getBoardTime(this.getPattern().mode);
                 if (boardingTime != 0) {
@@ -378,6 +379,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         return boarding ?
                 (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
                 (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
+    }
+
+    public boolean isDeviated() {
+        return false;
     }
 
     /** @return the stop where this board/alight edge is located. */

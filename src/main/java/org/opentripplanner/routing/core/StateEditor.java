@@ -518,6 +518,12 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.lastPattern = pattern;
     }
+
+    public void setIsLastBoardAlightDeviated(boolean isLastBoardAlightDeviated) {
+        cloneStateDataAsNeeded();
+        child.stateData.isLastBoardAlightDeviated = isLastBoardAlightDeviated;
+    }
+
     public void setOptions(RoutingRequest options) {
         cloneStateDataAsNeeded();
         child.stateData.opt = options;

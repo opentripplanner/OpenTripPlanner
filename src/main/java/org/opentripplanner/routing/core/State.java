@@ -638,6 +638,10 @@ public class State implements Cloneable {
         return stateData.lastPattern;
     }
 
+    public boolean isLastBoardAlightDeviated() {
+        return stateData.isLastBoardAlightDeviated;
+    }
+
     public ServiceDay getServiceDay() {
         return stateData.serviceDay;
     }
@@ -838,10 +842,6 @@ public class State implements Cloneable {
 
     public boolean hasEnteredNoThruTrafficArea() {
         return stateData.enteredNoThroughTrafficArea;
-    }
-
-    public boolean lastTripIsCallAndRide() {
-        return this.getLastPattern() != null && this.getLastPattern().geometry == null;
     }
 
 }

@@ -124,6 +124,11 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     }
 
     @Override
+    public boolean isDeviated() {
+        return boarding ? hop.isDeviatedRouteBoard() : hop.isDeviatedRouteAlight();
+    }
+
+    @Override
     public String toString() {
         return "FlexTransitBoardAlight(" +
                 (boarding ? "boarding " : "alighting ") +

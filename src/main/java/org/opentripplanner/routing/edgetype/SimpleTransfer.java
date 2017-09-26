@@ -62,7 +62,7 @@ public class SimpleTransfer extends Edge {
             return null;
         }
         // Don't allow SimpleTransfer right after Call-n-Ride - in that case we need to transfer at the same stop
-        if (s0.lastTripIsCallAndRide()) {
+        if (s0.isLastBoardAlightDeviated()) {
             return null;
         }
         // Only transfer right after riding a vehicle.
