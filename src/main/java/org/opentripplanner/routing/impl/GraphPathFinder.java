@@ -35,10 +35,7 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -99,10 +96,8 @@ public class GraphPathFinder {
             // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
-        // Without transit, we'd just just return multiple copies of the same on-street itinerary.
-        if (!options.modes.isTransit()) {
-            options.numItineraries = 1;
-        }
+        options.onStreetAlternatives = true;
+
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
@@ -170,8 +165,11 @@ public class GraphPathFinder {
                     options.banTrip(tripId);
                 }
                 if (tripIds.isEmpty()) {
-                    // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
-                    options.onlyTransitTrips = true;
+                    if (options.onStreetAlternatives) {
+                        banOnStreetPath(options, path);
+                    } else {
+                        options.onlyTransitTrips = true;
+                    }
                 }
             }
 
@@ -181,9 +179,20 @@ public class GraphPathFinder {
 
             LOG.debug("we have {} paths", paths.size());
         }
-        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
+        LOG.info("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
+    }
+
+    private void banOnStreetPath(RoutingRequest options, GraphPath path) {
+        int N = path.edges.size();
+        int nEdgesNotToBan = (int)(N * options.streetsNotBanPercent);
+        if (nEdgesNotToBan >= options.minEdgesNotToBan) {
+            List<Edge> ls = new LinkedList<>(path.edges.subList(nEdgesNotToBan, N - nEdgesNotToBan));
+            ls.forEach(options::banEdge);
+        } else {
+            path.edges.forEach(options::banEdge);
+        }
     }
 
     /* Try to find N paths through the Graph */
