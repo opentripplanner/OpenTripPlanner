@@ -99,8 +99,6 @@ public class GraphPathFinder {
             // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
-        options.onStreetAlternatives = true;
-
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
