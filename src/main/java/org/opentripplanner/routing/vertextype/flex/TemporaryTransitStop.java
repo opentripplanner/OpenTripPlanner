@@ -53,4 +53,9 @@ public class TemporaryTransitStop extends TransitStop implements TemporaryVertex
     public boolean checkCallAndRideBoardAlightOk(State state) {
         return true;
     }
+
+    @Override
+    public boolean checkCallAndRideStreetLinkOk(State s0) {
+        return true;
+    }
 }

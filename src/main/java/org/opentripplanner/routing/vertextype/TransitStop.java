@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,5 +118,10 @@ public class TransitStop extends TransitStationStop {
         }
         // only allow call-n-ride transfers at the same stop
         return s0.getPreviousStop().equals(getStop());
+    }
+
+    public boolean checkCallAndRideStreetLinkOk(State s0) {
+        RoutingContext rctx = s0.getOptions().rctx;
+        return this == rctx.fromVertex || this == rctx.toVertex;
     }
 }
