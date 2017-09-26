@@ -309,6 +309,10 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
+        if (options.isEdgeBanned(this)) {
+            return null;
+        }
+
         // Ensure we are actually walking, when walking a bike
         backWalkingBike &= TraverseMode.WALK.equals(backMode);
         walkingBike &= TraverseMode.WALK.equals(traverseMode);

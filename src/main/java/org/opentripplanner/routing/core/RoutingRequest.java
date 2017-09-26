@@ -268,6 +268,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     /** Set of preferred agencies by user. */
     public HashSet<String> preferredAgencies = new HashSet<String>();
+
+    public HashSet<Integer> bannedEdges = new HashSet<>();
     
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
@@ -446,6 +448,15 @@ public class RoutingRequest implements Cloneable, Serializable {
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
     private StreetEdge splitEdge = null;
+
+    /* ON-STREET ROUTE ALTERNATIVES */
+
+    /** Flag whether to produce routing alternatives for on-street modes, e.g. Drive Only. */
+    public boolean onStreetAlternatives = false;
+
+    public double streetsNotBanPercent = 0.15;
+
+    public int minEdgesNotToBan = 7;
 
     /* CONSTRUCTORS */
 
@@ -816,6 +827,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
+            clone.bannedEdges = (HashSet<Integer>) bannedEdges.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -979,7 +991,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + new Double(waitAtBeginningFactor).hashCode() * 15485863
-                + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
+                + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode() + bannedEdges.hashCode() * 1373 +
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
@@ -1130,6 +1142,14 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void banTrip(AgencyAndId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
+    }
+
+    public void banEdge(Edge edge) {
+        bannedEdges.add(edge.getId());
+    }
+
+    public boolean isEdgeBanned(Edge edge) {
+        return bannedEdges.contains(edge.getId());
     }
     
     /** 
