@@ -287,5 +287,9 @@ public class PartialPatternHop extends PatternHop {
         return startVehicleTime + endVehicleTime;
     }
 
+    @Override
+    public String getFeedId() {
+        return originalHop.getFeedId();
+    }
 }
 

@@ -187,6 +187,12 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return begin;
     }
 
+    @Override
+    public String getFeedId() {
+        // stops don't really have an agency id, they have the per-feed default id
+        return begin.getId().getAgencyId();
+    }
+
     public String toString() {
     	return "PatternHop(" + getFromVertex() + ", " + getToVertex() + ")";
     }
