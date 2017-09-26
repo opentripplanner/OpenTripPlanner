@@ -352,12 +352,12 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long   startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
-        // route agency ID is really per-feed default id (GTFS `agency_id` becomes route.agency.)
-        String feedId = firstRide.route.getAgencyId();
+        // stops don't really have an agency id, they have the per-feed default id
+        String feedId = firstRide.firstStop.getId().getAgencyId();  
         long lastRideStartTime = firstRide.startTime;
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
-            if ( ! ride.route.getAgencyId().equals(feedId)) {
+            if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
                 return new FareAndId(Float.POSITIVE_INFINITY, null);
             }
