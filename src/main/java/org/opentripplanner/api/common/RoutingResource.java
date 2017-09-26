@@ -371,6 +371,19 @@ public abstract class RoutingResource {
     @QueryParam("flagStopBufferSize")
     protected Double flagStopBufferSize;
 
+    /**
+     * Whether to use reservation-based services
+     */
+    @QueryParam("useReservationServices")
+    protected Boolean useReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services (not in data yet)
+     */
+    @QueryParam("useEligibilityServices")
+    protected Boolean useEligibilityServices = true;
+
+
     @QueryParam("maxHours")
     private Double maxHours;
 
@@ -614,6 +627,12 @@ public abstract class RoutingResource {
 
         if (flagStopBufferSize != null)
             request.flagStopBufferSize = flagStopBufferSize;
+
+        if (useReservationServices != null)
+            request.useReservationServices = useReservationServices;
+
+        if (useEligibilityServices != null)
+            request.useEligibilityServices = useEligibilityServices;
 
         if (maxHours != null)
             request.maxHours = maxHours;

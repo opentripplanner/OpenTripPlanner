@@ -404,6 +404,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double flagStopBufferSize;
 
     /**
+     * Whether to use reservation-based services
+     */
+    public boolean useReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services (not in data yet)
+     */
+    public boolean useEligibilityServices = true;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
      * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
