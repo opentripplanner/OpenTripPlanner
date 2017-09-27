@@ -192,7 +192,12 @@ public class GraphPathFinder {
                 }
                 // for direct-hop trip banning, limit the allowable call-n-ride time to what it is currently
                 if (tripIds.size() < 2) {
-                    options.maxCallAndRideSeconds = Math.min(options.maxCallAndRideSeconds, path.getCallAndRideDuration());
+                    int duration = path.getCallAndRideDuration();
+                    if (duration > 0) {
+                        int constantLimit = Math.min(0, duration - options.reduceCallAndRideSeconds);
+                        int ratioLimit = (int) Math.round(options.reduceCallAndRideRatio * duration);
+                        options.maxCallAndRideSeconds = Math.min(constantLimit, ratioLimit);
+                    }
                 }
             }
 

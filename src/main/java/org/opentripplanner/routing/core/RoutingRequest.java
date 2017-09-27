@@ -399,6 +399,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int maxCallAndRideSeconds = Integer.MAX_VALUE;
 
     /**
+     * Seconds to reduce maxCallAndRideSeconds after a complete call-n-ride itinerary
+     */
+    public int reduceCallAndRideSeconds = 15 * 60;
+
+    /**
+     * Percentage to reduce maxCallAndRideSeconds after a complete call-n-ride itinerary
+     */
+    public double reduceCallAndRideRatio = 0.5;
+
+    /**
      * Size of flag stop buffer in UI
      */
     public double flagStopBufferSize;
