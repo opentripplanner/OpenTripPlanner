@@ -16,9 +16,6 @@ package org.opentripplanner.index;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.onebusaway.gtfs.model.Agency;
@@ -36,11 +33,12 @@ import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.index.model.TransferShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -304,23 +302,16 @@ public class IndexAPI {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         
         if (stop != null) {
+            Collection<TransferShort> out = Sets.newHashSet();
+
             // get the transfers for the stop
             TransitStop v = index.stopVertexForStop.get(stop);
-            Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
-                @Override
-                public boolean apply(Edge edge) {
-                    return edge instanceof SimpleTransfer;
+            for (Edge edge : v.getOutgoing()) {
+                if (edge instanceof TransferEdge) {
+                    out.add(new TransferShort((TransferEdge) edge));
                 }
-            });
-            
-            Collection<Transfer> out = Collections2.transform(transfers, new Function<Edge, Transfer> () {
-                @Override
-                public Transfer apply(Edge edge) {
-                    // TODO Auto-generated method stub
-                    return new Transfer((SimpleTransfer) edge);
-                }
-            });
-            
+            }
+
             return Response.status(Status.OK).entity(out).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -632,19 +623,4 @@ public class IndexAPI {
 //                                @QueryParam("variables") HashMap<String, Object> variables) {
 //        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
 //    }
-
-    /** Represents a transfer from a stop */
-    private static class Transfer {
-        /** The stop we are connecting to */
-        public String toStopId;
-        
-        /** the on-street distance of the transfer (meters) */
-        public double distance;
-        
-        /** Make a transfer from a simpletransfer edge from the graph. */
-        public Transfer(SimpleTransfer e) {
-            toStopId = GtfsLibrary.convertIdToString(((TransitStop) e.getToVertex()).getStopId());
-            distance = e.getDistance();
-        }
-    }
 }

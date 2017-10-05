@@ -30,7 +30,7 @@ import java.util.Locale;
  *
  * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
  */
-public class SimpleTransfer extends Edge {
+public class SimpleTransfer extends TransferEdge {
     private static final long serialVersionUID = 20140408L;
 
     private double distance;
@@ -39,7 +39,7 @@ public class SimpleTransfer extends Edge {
     private List<Edge> edges;
 
     public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
-        super(from, to);
+        super(from, to, distance);
         this.distance = distance;
         this.geometry = geometry;
         this.edges = edges;
