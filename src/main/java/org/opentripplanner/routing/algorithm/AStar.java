@@ -142,6 +142,13 @@ public class AStar {
             State initialState = new State(options);
             runState.spt.add(initialState);
             runState.pq.insert(initialState, 0);
+
+            // For queries with multiple origins.  Add them all to the initial priority queue
+            for(int i = 0; i < options.rctx.origins.size(); i++){
+                State anotherState = new State(options.rctx.origins.get(i), options);
+                runState.spt.add(anotherState);
+                runState.pq.insert(anotherState, 0);
+            }
         }
     }
 
@@ -276,7 +283,9 @@ public class AStar {
                     runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal()) {
+            }  else if (!runState.options.batch && (runState.u_vertex == runState.rctx.target || runState.rctx.targets.contains(runState.u_vertex)) && runState.u.isFinal()) {
+
+
                 if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
                     continue;
                 }

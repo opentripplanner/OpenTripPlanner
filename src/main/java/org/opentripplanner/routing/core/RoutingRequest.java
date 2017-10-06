@@ -81,6 +81,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** An ordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
 
+    /** An un-ordered list of multiple locations that can be used as possible destinations. */
+    public List<GenericLocation> toPlaces;
+
+    /** An un-ordered list of multiple locations that can be used as possible origins. */
+    public List<GenericLocation> fromPlaces;
+
     /**
      * The maximum distance (in meters) the user is willing to walk for access/egress legs.
      * Defaults to unlimited.
@@ -755,6 +761,26 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
+        }
+    }
+
+    /**
+     * Sets multiToPlaces by parsing GenericLocations from a list of string.
+     */
+    public void  setToPlacesFromStrings(List<String> places) {
+        this.toPlaces = new ArrayList<GenericLocation>(places.size());
+        for (String place : places) {
+            toPlaces.add(GenericLocation.fromOldStyleString(place));
+        }
+    }
+
+    /**
+     * Sets multiFromPlaces by parsing GenericLocations from a list of string.
+     */
+    public void  setFromPlacesFromStrings(List<String> places) {
+        this.fromPlaces = new ArrayList<GenericLocation>(places.size());
+        for (String place : places) {
+            fromPlaces.add(GenericLocation.fromOldStyleString(place));
         }
     }
     
