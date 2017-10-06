@@ -487,11 +487,23 @@ public abstract class RoutingResource {
         if (intermediatePlaces != null)
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
 
-        if (toPlaces != null)
-            request.setToPlacesFromStrings(toPlaces);
+        // Make sure we handle null places and empty toPlaces
+        if (toPlaces != null){
+            if(toPlaces.size() > 0){
+                if(!toPlaces.get(0).equals("")) {
+                    request.setToPlacesFromStrings(toPlaces);
+                }
+            }
+        }
 
-        if (fromPlaces != null)
-            request.setFromPlacesFromStrings(fromPlaces);
+        // Make sure we handle null places and empty toPlaces
+        if (fromPlaces != null) {
+            if(fromPlaces.size() > 0) {
+                if (!fromPlaces.get(0).equals("")) {
+                    request.setFromPlacesFromStrings(fromPlaces);
+                }
+            }
+        }
 
         if (preferredRoutes != null)
             request.setPreferredRoutes(preferredRoutes);
