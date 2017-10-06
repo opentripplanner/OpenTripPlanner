@@ -275,14 +275,17 @@ public class RoutingContext implements Cloneable {
                 toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
 
                 // For requests with multiple possible toPlaces, add them all to the Graph
-                for(int i = 0; i < opt.toPlaces.size(); i++){
-                    toVertices.add(graph.streetIndex.getVertexForLocation(opt.toPlaces.get(i), opt, true));
+                if(opt.toPlaces != null) {
+                    for (int i = 0; i < opt.toPlaces.size(); i++) {
+                        toVertices.add(graph.streetIndex.getVertexForLocation(opt.toPlaces.get(i), opt, true));
+                    }
                 }
 
-                // For requets with multiple possible fromPlaces, add them all to the Graph.
-                for(int i = 0; i < opt.fromPlaces.size(); i++){
-                    fromVertices.add(graph.streetIndex.getVertexForLocation(opt.fromPlaces.get(i), opt, false));
-                    //graph.streetIndex.getVertexForLocation(opt.to, opt, true);
+                // For requests with multiple possible fromPlaces, add them all to the Graph
+                if(opt.fromPlaces != null) {
+                    for (int i = 0; i < opt.fromPlaces.size(); i++) {
+                        fromVertices.add(graph.streetIndex.getVertexForLocation(opt.fromPlaces.get(i), opt, false));
+                    }
                 }
 
                 if (opt.to.hasEdgeId()) {
