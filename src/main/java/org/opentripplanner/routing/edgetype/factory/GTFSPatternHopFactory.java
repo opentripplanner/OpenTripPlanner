@@ -934,7 +934,7 @@ public class GTFSPatternHopFactory {
 
     private void loadFeedInfo(Graph graph) {
         for (FeedInfo info : _dao.getAllFeedInfos()) {
-            graph.addFeedInfo(info);
+            graph.addFeedInfo(_feedId.getId(), info);
         }
     }
 
