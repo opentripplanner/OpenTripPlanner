@@ -317,6 +317,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Penalty for using a non-preferred transfer */
     public int nonpreferredTransferPenalty = 180;
 
+    /** Whether unknown transfers should be treated as forbidden */
+    public boolean unknownTransfersAreForbidden = false;
+
     /**
      * For the bike triangle, how important time is. 
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
@@ -962,6 +965,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && boardSlack == other.boardSlack
                 && alightSlack == other.alightSlack
                 && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
+                && unknownTransfersAreForbidden == other.unknownTransfersAreForbidden
                 && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
                 && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
                 && triangleSafetyFactor == other.triangleSafetyFactor
@@ -1008,6 +1012,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
+                + (unknownTransfersAreForbidden ? 15486157 : 0)
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899

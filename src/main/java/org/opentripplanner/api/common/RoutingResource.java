@@ -289,7 +289,13 @@ public abstract class RoutingResource {
      */
     @QueryParam("nonpreferredTransferPenalty")
     protected Integer nonpreferredTransferPenalty;
-    
+
+    /**
+     * If unknown transfers should be forbidden
+     */
+    @QueryParam("unknownTransfersAreForbidden")
+    protected Boolean unknownTransfersAreForbidden;
+
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
@@ -566,6 +572,9 @@ public abstract class RoutingResource {
 
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+
+        if (unknownTransfersAreForbidden != null)
+            request.unknownTransfersAreForbidden = unknownTransfersAreForbidden;
 
         if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: " +

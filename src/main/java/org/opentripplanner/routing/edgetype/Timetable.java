@@ -236,7 +236,11 @@ public class Timetable implements Serializable {
             }
         }
         if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
-            return t0; // no special rules, just board
+            if (state.getOptions().unknownTransfersAreForbidden) {
+                return -1;
+            } else {
+                return t0; // no special rules, just board
+            }
         }
         if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
             // This transfer is forbidden
