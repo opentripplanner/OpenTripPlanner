@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -83,18 +84,35 @@ public class TransferEdge extends Edge {
         return this.getName();
     }
 
+    @Override
     public State traverse(State s0) {
         /* Disallow chaining of transfer edges. TODO: This should really be guaranteed by the PathParser
            but the default Pathparser is currently very hard to read because
            we need a complement operator. */
-        if (s0.getBackEdge() instanceof TransferEdge) return null;
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) return null;
-        if (this.getDistance() > s0.getOptions().maxTransferWalkDistance) return null;
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(time);
-        s1.incrementWeight(time);
-        s1.setBackMode(TraverseMode.WALK);
-        return s1.makeState();
+
+        // Forbid taking shortcuts composed of two transfers in a row
+        if (s0.backEdge instanceof SimpleTransfer) {
+            return null;
+        }
+        if (s0.backEdge instanceof StreetTransitLink) {
+            return null;
+        }
+        if(distance > s0.getOptions().maxTransferWalkDistance) {
+            return null;
+        }
+        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
+        // Only transfer right after riding a vehicle.
+        RoutingRequest rr = s0.getOptions();
+        double walkspeed = rr.walkSpeed;
+        StateEditor se = s0.edit(this);
+        se.setBackMode(TraverseMode.WALK);
+        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+        se.incrementTimeInSeconds(time);
+        se.incrementWeight(time * rr.walkReluctance);
+        se.incrementWalkDistance(distance);
+        return se.makeState();
     }
 
     public void setGeometry(LineString geometry) {

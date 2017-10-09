@@ -50,30 +50,6 @@ public class SimpleTransfer extends TransferEdge {
     }
 
     @Override
-    public State traverse(State s0) {
-        // Forbid taking shortcuts composed of two transfers in a row
-        if (s0.backEdge instanceof SimpleTransfer) {
-            return null;
-        }
-        if (s0.backEdge instanceof StreetTransitLink) {
-            return null;
-        }
-        if(distance > s0.getOptions().maxTransferWalkDistance) {
-            return null;
-        }
-        // Only transfer right after riding a vehicle.
-        RoutingRequest rr = s0.getOptions();
-        double walkspeed = rr.walkSpeed;
-        StateEditor se = s0.edit(this);
-        se.setBackMode(TraverseMode.WALK);
-        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
-        se.incrementTimeInSeconds(time);
-        se.incrementWeight(time * rr.walkReluctance);
-        se.incrementWalkDistance(distance);
-        return se.makeState();
-    }
-
-    @Override
     public String getName() {
         return fromv.getName() + " => " + tov.getName();
     }
