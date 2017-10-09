@@ -150,6 +150,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
 
+        routingRequest.walkSpeed = 2.0;
+
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
         TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests

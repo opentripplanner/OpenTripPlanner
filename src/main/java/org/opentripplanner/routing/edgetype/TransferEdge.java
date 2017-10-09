@@ -91,7 +91,7 @@ public class TransferEdge extends Edge {
            we need a complement operator. */
 
         // Forbid taking shortcuts composed of two transfers in a row
-        if (s0.backEdge instanceof SimpleTransfer) {
+        if (s0.backEdge instanceof TransferEdge) {
             return null;
         }
         if (s0.backEdge instanceof StreetTransitLink) {
