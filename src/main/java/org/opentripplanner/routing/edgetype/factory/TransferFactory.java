@@ -138,14 +138,8 @@ public class TransferFactory {
             }
 
             double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
-            int time;
-            if (transfer.getTransferType() == 2) {
-                time = transfer.getMinTransferTime();
-            } else {
-                time = (int) distance; // fixme: handle timed transfers
-            }
 
-            TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
+            TransferEdge transferEdge = new TransferEdge(fromv, tov, distance);
             CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
             LineString geometry = _geometryFactory.createLineString(sequence);

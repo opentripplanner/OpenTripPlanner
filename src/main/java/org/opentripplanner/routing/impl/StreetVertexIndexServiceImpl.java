@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 
-import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -29,8 +28,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraversalRequirements;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -42,8 +39,6 @@ import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,7 +222,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternEdge || e instanceof SimpleTransfer)
+                if (e instanceof PatternEdge || e instanceof TransferEdge)
                     continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {

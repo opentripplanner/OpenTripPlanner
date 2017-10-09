@@ -25,12 +25,11 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -306,7 +305,7 @@ public class IndexGraphQLSchema {
                     .get(environment.getSource())
                     .getOutgoing()
                     .stream()
-                    .filter(edge -> edge instanceof SimpleTransfer)
+                    .filter(edge -> edge instanceof TransferEdge)
                     .map(edge -> new ImmutableMap.Builder<String, Object>()
                         .put("stop", ((TransitVertex) edge.getToVertex()).getStop())
                         .put("distance", edge.getDistance())

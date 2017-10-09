@@ -359,7 +359,7 @@ public class TestPatternHopFactory extends TestCase {
         
         TransitStop e_arrive = (TransitStop) graph.getVertex(feedId + ":E");
         TransitStop f_depart = (TransitStop) graph.getVertex(feedId + ":F");
-        Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
+        Edge edge = new TransferEdge(e_arrive, f_depart, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex(feedId + ":B_depart");

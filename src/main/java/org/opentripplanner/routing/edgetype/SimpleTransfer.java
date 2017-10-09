@@ -31,17 +31,13 @@ import java.util.Locale;
  * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
  */
 public class SimpleTransfer extends TransferEdge {
-    private static final long serialVersionUID = 20140408L;
+    private static final long serialVersionUID = 20171009L;
 
-    private double distance;
-    
-    private LineString geometry;
     private List<Edge> edges;
 
     public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
         super(from, to, distance);
-        this.distance = distance;
-        this.geometry = geometry;
+        setGeometry(geometry);
         this.edges = edges;
     }
 
@@ -53,29 +49,6 @@ public class SimpleTransfer extends TransferEdge {
     public String getName() {
         return fromv.getName() + " => " + tov.getName();
     }
-    
-    @Override
-    public String getName(Locale locale) {
-        //TODO: localize
-        return this.getName();
-    }
-
-    @Override
-    public double weightLowerBound(RoutingRequest rr) {
-        int time = (int) (distance / rr.walkSpeed); 
-        return (time * rr.walkReluctance);
-    }
-    
-    @Override
-    public double getDistance(){
-    	return this.distance;
-    }
-    
-    
-    @Override
-    public LineString getGeometry(){
-	   return this.geometry;
-   }
 
     public List<Edge> getEdges() { return this.edges; }
 

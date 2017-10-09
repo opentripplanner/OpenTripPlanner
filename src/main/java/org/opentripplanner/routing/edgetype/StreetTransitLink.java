@@ -89,7 +89,7 @@ public class StreetTransitLink extends Edge {
         }
 
         // Do not re-enter the street network following a transfer.
-        if (s0.backEdge instanceof SimpleTransfer) {
+        if (s0.backEdge instanceof TransferEdge) {
             return null;
         }
 

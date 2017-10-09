@@ -2,8 +2,8 @@ package org.opentripplanner.routing.spt;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -46,9 +46,9 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // The result of a SimpleTransfer must not block alighting normally from transit. States that are results of
-        // SimpleTransfers are incomparable with states that are not the result of SimpleTransfers.
-        if ((a.backEdge instanceof SimpleTransfer) != (b.backEdge instanceof SimpleTransfer)) {
+        // The result of a TransferEdge must not block alighting normally from transit. States that are results of
+        // TransferEdge are incomparable with states that are not the result of TransferEdge.
+        if ((a.backEdge instanceof TransferEdge) != (b.backEdge instanceof TransferEdge)) {
             return false;
         }
 

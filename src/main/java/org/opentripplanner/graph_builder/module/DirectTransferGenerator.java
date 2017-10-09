@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -88,7 +89,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             /* Determine the set of stops that are already reachable via other pathways or transfers */
             Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();
             for (Edge e : ts0.getOutgoing()) {
-                if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
+                if (e instanceof PathwayEdge || e instanceof TransferEdge) {
                     if (e.getToVertex() instanceof TransitStop) {
                         TransitStop to = (TransitStop) e.getToVertex();
                         pathwayDestinations.add(to);

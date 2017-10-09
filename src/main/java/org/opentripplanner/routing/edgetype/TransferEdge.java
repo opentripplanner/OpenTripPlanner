@@ -28,34 +28,23 @@ import java.util.Locale;
  */
 public class TransferEdge extends Edge {
 
-    private static final long serialVersionUID = 1L;
-    
-    int time = 0;
-    
-    double distance;
+    private static final long serialVersionUID = 2L;
+
+    private double distance;
 
     private LineString geometry = null;
 
     private boolean wheelchairAccessible = true;
 
     /**
-     * @see Transfer(Vertex, Vertex, double, int)
-     */
-    public TransferEdge(TransitStationStop fromv, TransitStationStop tov, double distance) {
-        this(fromv, tov, distance, (int) distance);
-    }
-    
-    /**
      * Creates a new Transfer edge.
      * @param fromv     the Vertex where the transfer originates
      * @param tov       the Vertex where the transfer ends
      * @param distance  the distance in meters from the origin Vertex to the destination
-     * @param time      the minimum time in seconds it takes to complete this transfer
      */
-    public TransferEdge(TransitStationStop fromv, TransitStationStop tov, double distance, int time) {
+    public TransferEdge(TransitStationStop fromv, TransitStationStop tov, double distance) {
         super(fromv, tov);
         this.distance = distance;
-        this.time = time; 
     }
 
     public String getDirection() {
@@ -105,18 +94,22 @@ public class TransferEdge extends Edge {
         }
         // Only transfer right after riding a vehicle.
         RoutingRequest rr = s0.getOptions();
-        double walkspeed = rr.walkSpeed;
         StateEditor se = s0.edit(this);
         se.setBackMode(TraverseMode.WALK);
-        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+        int time = getTime(rr);
         se.incrementTimeInSeconds(time);
         se.incrementWeight(time * rr.walkReluctance);
         se.incrementWalkDistance(distance);
         return se.makeState();
     }
 
+    @Override
+    public double weightLowerBound(RoutingRequest rr) {
+        return (getTime(rr) * rr.walkReluctance);
+    }
+
     public void setGeometry(LineString geometry) {
-        this.geometry  = geometry;
+        this.geometry = geometry;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -127,4 +120,11 @@ public class TransferEdge extends Edge {
         return wheelchairAccessible;
     }
 
+    /*
+     * Before merge with SimpleTransfer, this class had its own time parameter = min_transfer_time, or distance if min_tranfer_time unset.
+     * min_transfer_time is handled in the TransferTable, so now time can be calculated from distance.
+     */
+    private int getTime(RoutingRequest rr) {
+        return (int) Math.ceil(distance / rr.walkSpeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+    }
 }
