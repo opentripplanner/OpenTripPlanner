@@ -165,7 +165,6 @@ public class Router {
         JsonNode useFlexService = config.get("useFlexService");
         if (useFlexService != null) {
             graph.useFlexService = useFlexService.asBoolean(false);
-            defaultRoutingRequest.useFlexService = graph.useFlexService;
         }
         
         /* Create Graph updater modules from JSON config. */

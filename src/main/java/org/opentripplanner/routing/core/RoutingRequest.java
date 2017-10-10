@@ -389,11 +389,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double callAndRideReluctance = 2.0;
 
     /**
-     * Whether to use flex service
-     */
-    public boolean useFlexService = false;
-
-    /**
      * Total time we can spend on call-n-ride legs
      */
     public int maxCallAndRideSeconds = Integer.MAX_VALUE;

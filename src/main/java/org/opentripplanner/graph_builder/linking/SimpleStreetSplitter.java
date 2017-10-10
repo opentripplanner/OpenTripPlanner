@@ -516,7 +516,7 @@ public class SimpleStreetSplitter {
         //It can be null in tests
         if (options != null) {
             TraverseModeSet modes = options.modes;
-            if (modes.getCar() || options.useFlexService)
+            if (modes.getCar())
                 nonTransitMode = TraverseMode.CAR;
             else if (modes.getWalk())
                 nonTransitMode = TraverseMode.WALK;
