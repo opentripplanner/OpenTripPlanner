@@ -167,7 +167,9 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public void vertexVisitor(State state) {
         if (state.getVertex() instanceof TransitStop && !(state.getVertex() instanceof TemporaryVertex)) {
-            transitStopStates.add(state);
+            if (((TransitStop) state.getVertex()).getModes().contains(TraverseMode.BUS)) {
+                transitStopStates.add(state);
+            }
         }
         // Direct hop to destination if found
         boolean foundTarget = state.getVertex() == state.getOptions().rctx.toVertex;

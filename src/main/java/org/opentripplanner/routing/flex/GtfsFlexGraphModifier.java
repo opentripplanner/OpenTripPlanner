@@ -77,7 +77,6 @@ public abstract class GtfsFlexGraphModifier {
     protected Graph graph;
 
     private Map<StreetVertex, TemporaryTransitStop> temporaryTransitStopsForLocation = Maps.newHashMap();
-    private boolean mainSearchArriveBy;
 
     protected GtfsFlexGraphModifier(Graph graph) {
         this.graph = graph;
@@ -175,7 +174,6 @@ public abstract class GtfsFlexGraphModifier {
      * @param request request for graph search
      */
     public void createForwardHops(RoutingRequest request) {
-        mainSearchArriveBy = request.arriveBy;
         RoutingRequest forward = request.clone();
         forward.setMode(getMode());
         forward.setArriveBy(false);
@@ -190,7 +188,6 @@ public abstract class GtfsFlexGraphModifier {
      * @param request request for graph search
      */
     public void createBackwardHops(RoutingRequest request) {
-        mainSearchArriveBy = request.arriveBy;
         RoutingRequest backward = request.clone();
         backward.setMode(getMode());
         backward.setArriveBy(true);
@@ -369,25 +366,6 @@ public abstract class GtfsFlexGraphModifier {
         createBoardEdge(rr, transitStopDepart, patternDepartVertex, hop);
     }
 
-    public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop, TransitStop fromStop, TransitStop toStop) {
-        RoutingRequest request = rr.clone();
-        request.setMode(TraverseMode.CAR);
-        request.setArriveBy(mainSearchArriveBy);
-        RemainingWeightHeuristic save = request.rctx.remainingWeightHeuristic;
-        request.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
-        AStar astar = new AStar();
-        astar.getShortestPathTree(request);
-        request.rctx.remainingWeightHeuristic = save;
-        List<GraphPath> paths = astar.getPathsToTarget();
-        if (paths.isEmpty()) {
-            LOG.info("No path to target");
-            return;
-        }
-        GraphPath path = paths.iterator().next();
-
-        createDirectHop(rr, originalPatternHop, fromStop, toStop, path);
-    }
-
     public void createDirectHop(RoutingRequest rr, PatternHop originalPatternHop, TransitStop fromStop, TransitStop toStop, GraphPath path) {
         if (fromStop instanceof TemporaryTransitStop && fromStop.departVertex == null) {
             createTransitStopDepart(rr, (TemporaryTransitStop) fromStop);
@@ -511,7 +489,7 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     private Vertex findCarAccessibleVertex(RoutingRequest opt, Vertex vertex, boolean arriveBy) {
-        if (vertex instanceof TransitVertex) {
+        if (vertex instanceof TransitStop && ((TransitStop) vertex).getModes().contains(TraverseMode.BUS)) {
             return vertex;
         }
         return new CarPermissionSearch(opt, arriveBy).findVertexWithPermission(vertex, TraverseMode.CAR);
