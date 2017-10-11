@@ -47,6 +47,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternArriveVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternDepartVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
@@ -198,6 +199,9 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     protected void streetSearch(RoutingRequest rr) {
+        if (TraverseMode.CAR.equals(getMode())) {
+            modifyRequestForCarAccess(rr);
+        }
         for(Pair<State, PatternHop> p : getClosestPatternHops(rr)) {
             State s = p.getKey();
             PatternHop hop = p.getValue();
@@ -494,5 +498,22 @@ public abstract class GtfsFlexGraphModifier {
             }
         }
         return ret;
+    }
+
+    private void modifyRequestForCarAccess(RoutingRequest opt) {
+        Vertex fromVertex = findCarAccessibleVertex(opt, opt.rctx.fromVertex, false);
+        Vertex toVertex = findCarAccessibleVertex(opt, opt.rctx.toVertex, true);
+        Collection<TemporaryEdge> temporaryEdges = opt.rctx.temporaryEdges;
+        Collection<Vertex> temporaryVertices = opt.rctx.temporaryVertices;
+        opt.setRoutingContext(opt.rctx.graph, fromVertex, toVertex);
+        opt.rctx.temporaryEdges = temporaryEdges;
+        opt.rctx.temporaryVertices = temporaryVertices;
+    }
+
+    private Vertex findCarAccessibleVertex(RoutingRequest opt, Vertex vertex, boolean arriveBy) {
+        if (vertex instanceof TransitVertex) {
+            return vertex;
+        }
+        return new CarPermissionSearch(opt, arriveBy).findVertexWithPermission(vertex, TraverseMode.CAR);
     }
 }

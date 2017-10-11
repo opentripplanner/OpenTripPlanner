@@ -49,8 +49,6 @@ import java.util.Set;
  */
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
-    private static final int MAX_DRS_SEARCH_DIST = 1600 * 50; // approx 50 mile limit. Could be set by data.
-
     // want to ensure we only keep one pattern hop per trip pattern
     private Map<TripPattern, PatternHop> directServices = Maps.newHashMap();
     private Set<State> transitStopStates = Sets.newHashSet();
@@ -66,11 +64,8 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     @Override
     public SearchTerminationStrategy getSearchTerminationStrategy() {
-        // TODO: It's possible we need to have NO termination strategy under some conditions.
-        return (origin, target, state, s, opt) -> {
-            double distance = SphericalDistanceLibrary.distance(origin.getCoordinate(), state.getVertex().getCoordinate());
-            return distance > MAX_DRS_SEARCH_DIST;
-        };
+        // No termination strategy -- need to search until we find destination, in case we are in demand-response zone.
+        return null;
     }
 
     @Override
