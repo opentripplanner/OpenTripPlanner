@@ -24,6 +24,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -122,6 +123,12 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
                 LOG.debug("ignoring flag stop at existing stop");
                 return null;
             }
+            for (Edge e : tstop.getOutgoing()) {
+                if (e instanceof StreetTransitLink) {
+                    return (StreetVertex) e.getToVertex();
+                }
+            }
+            return null;
         }
         throw new RuntimeException("Unexpected location.");
     }
