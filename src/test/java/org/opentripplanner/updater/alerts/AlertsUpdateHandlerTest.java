@@ -39,6 +39,7 @@ public class AlertsUpdateHandlerTest {
     @Before
     public void setUp() {
         handler = new AlertsUpdateHandler();
+        handler.setFeedId("1");
         handler.setAlertPatchService(service);
     }
 
@@ -73,6 +74,16 @@ public class AlertsUpdateHandlerTest {
         AlertPatch patch = processOneAlert(alert);
         assertNull(patch.getAlert().effectiveStartDate);
         assertEquals(new Date(20 * 1000), patch.getAlert().effectiveEndDate);
+    }
+
+    @Test
+    public void testRouteFromTripDescriptor() {
+        GtfsRealtime.Alert alert = GtfsRealtime.Alert.newBuilder()
+                .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setTrip(
+                        GtfsRealtime.TripDescriptor.newBuilder().setRouteId("routeA")
+                )).build();
+        AlertPatch patch = processOneAlert(alert);
+        assertEquals("routeA", patch.getRoute().getId());
     }
 
     private AlertPatch processOneAlert(GtfsRealtime.Alert alert) {
