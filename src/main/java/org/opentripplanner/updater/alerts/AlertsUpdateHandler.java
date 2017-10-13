@@ -108,6 +108,8 @@ public class AlertsUpdateHandler {
             String routeId = null;
             if (informed.hasRouteId()) {
                 routeId = informed.getRouteId();
+            } else if (informed.hasTrip() && informed.getTrip().hasRouteId())  {
+                routeId = informed.getTrip().getRouteId();
             }
 
             int direction;
