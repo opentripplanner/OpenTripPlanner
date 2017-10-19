@@ -214,7 +214,7 @@ public class Graph implements Serializable {
     public Map<AgencyAndId, Stop> parentStopById = new HashMap<>();
 
     /** Landmarks **/
-    public Map<String, Landmark> landmarksByName;
+    public Map<String, Landmark> landmarksByName = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -1095,9 +1095,6 @@ public class Graph implements Serializable {
     }
 
     public void addLandmark(Landmark landmark) {
-        if (landmarksByName == null) {
-            landmarksByName = new HashMap<>();
-        }
         landmarksByName.put(landmark.getName(), landmark);
     }
 }
