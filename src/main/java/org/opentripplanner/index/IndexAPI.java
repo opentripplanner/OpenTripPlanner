@@ -36,6 +36,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TransferShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.Landmark;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -43,6 +44,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -585,6 +587,28 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
+    }
+
+    /** Get all landmark names */
+    @GET
+    @Path("/landmarks")
+    public Response getLandmarks() {
+        Set<String> landmarks = index.graph.landmarksByName.keySet();
+        return Response.status(Status.OK).entity(landmarks).build();
+    }
+
+    @GET
+    @Path("/landmarks/{landmark}")
+    public Response getLandmarkStops(@PathParam("landmark") String name) {
+        Landmark landmark = index.graph.landmarksByName.get(name);
+        if (landmark == null) {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+        List<StopShort> response = new ArrayList<>();
+        for (TransitStationStop stop : landmark.getStops()) {
+            response.add(new StopShort(stop.getStop()));
+        }
+        return Response.status(Status.OK).entity(response).build();
     }
 
     @POST

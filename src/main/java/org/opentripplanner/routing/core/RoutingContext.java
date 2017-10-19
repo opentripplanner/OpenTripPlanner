@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.Landmark;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -38,6 +39,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -273,6 +275,9 @@ public class RoutingContext implements Cloneable {
             else {
                 // normal mode, search for vertices based RoutingRequest and split streets
                 toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
+                if (toVertex == null && graph.landmarksByName.get(opt.to.place) != null) {
+                    expandLandmark(toVertices, opt.to.place);
+                }
 
                 // For requests with multiple possible toPlaces, add them all to the Graph
                 if(opt.toPlaces != null) {
@@ -302,6 +307,9 @@ public class RoutingContext implements Cloneable {
                     fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
                     if (opt.from.hasEdgeId()) {
                         fromBackEdge = graph.getEdgeById(opt.from.edgeId);
+                    }
+                    if (fromVertex == null && graph.landmarksByName.get(opt.from.place) != null) {
+                        expandLandmark(fromVertices, opt.from.place);
                     }
                 }
             }
@@ -357,6 +365,13 @@ public class RoutingContext implements Cloneable {
         }
     }
 
+    private void expandLandmark(List<Vertex> ret, String name) {
+        Landmark landmark = graph.landmarksByName.get(name);
+        for (TransitStationStop vertex : landmark.getStops()) {
+            ret.add(vertex);
+        }
+    }
+
     /* INSTANCE METHODS */
 
     public void check() {
@@ -364,12 +379,12 @@ public class RoutingContext implements Cloneable {
 
         // check origin present when not doing an arrive-by batch search
         if (!(opt.batch && opt.arriveBy))
-            if (fromVertex == null)
+            if (fromVertex == null && fromVertices.isEmpty())
                 notFound.add("from");
 
         // check destination present when not doing a depart-after batch search
         if (!opt.batch || opt.arriveBy) {
-            if (toVertex == null) {
+            if (toVertex == null && toVertices.isEmpty()) {
                 notFound.add("to");
             }
         }

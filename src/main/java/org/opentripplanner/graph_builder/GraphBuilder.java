@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.module.CrossFeedTransferGenerator;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.LandmarksModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
@@ -186,6 +187,7 @@ public class GraphBuilder implements Runnable {
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File crossFeedTransfers = null;
+        File landmarks = null;
         JsonNode builderConfig = null;
         JsonNode routerConfig = null;
         File demFile = null;
@@ -222,6 +224,10 @@ public class GraphBuilder implements Runnable {
                 case TRANSFERS:
                     LOG.info("Found feed transfers file {}", file);
                     crossFeedTransfers = file;
+                    break;
+                case LANDMARKS:
+                    LOG.info("Found landmarks file {}", file);
+                    landmarks = file;
                     break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
@@ -328,6 +334,9 @@ public class GraphBuilder implements Runnable {
         if (builderParams.htmlAnnotations) {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
+        if (landmarks != null) {
+            graphBuilder.addModule(new LandmarksModule(landmarks));
+        }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
@@ -338,7 +347,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, TRANSFERS, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, TRANSFERS, LANDMARKS, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -355,6 +364,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
             if (name.equals("feed_transfers.txt")) return TRANSFERS;
+            if (name.equals("landmarks.json")) return LANDMARKS;
              if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }

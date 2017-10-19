@@ -76,10 +76,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     /** The vertex that the main search is working towards. */
     Vertex target;
 
-    /** The additional/option vertices that the main search is working towards. */
-    Vertex targets;
-    Vertex origins;
-
     /** All vertices within walking distance of the origin (the vertex at which the main search begins). */
     Set<Vertex> preTransitVertices;
 
@@ -112,7 +108,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     @Override
     public void initialize(RoutingRequest request, long abortTime) {
         Vertex target = request.rctx.target;
-        if (target == this.target) {
+        if (target != null && target == this.target) {
             LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
             return;
         }
@@ -120,7 +116,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.graph = request.rctx.graph;
         long start = System.currentTimeMillis();
         this.target = target;
-        this.targets = targets;
         this.routingRequest = request;
         request.softWalkLimiting = false;
         request.softPreTransitLimiting = false;
@@ -281,8 +276,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // TODO use normal OTP search for this.
         BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
-        State initState = new State(initVertex, rr);
-        pq.insert(initState, 0);
+        if (initVertex != null) {
+            State initState = new State(initVertex, rr);
+            pq.insert(initState, 0);
+        }
 
         if(fromTarget) {
             // Add all the targets for trips with multiple possible targets.

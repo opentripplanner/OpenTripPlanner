@@ -39,6 +39,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.Landmark;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -211,6 +212,9 @@ public class Graph implements Serializable {
 
     /** Parent stops **/
     public Map<AgencyAndId, Stop> parentStopById = new HashMap<>();
+
+    /** Landmarks **/
+    public Map<String, Landmark> landmarksByName;
 
     public Graph(Graph basedOn) {
         this();
@@ -1088,5 +1092,12 @@ public class Graph implements Serializable {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public void addLandmark(Landmark landmark) {
+        if (landmarksByName == null) {
+            landmarksByName = new HashMap<>();
+        }
+        landmarksByName.put(landmark.getName(), landmark);
     }
 }
