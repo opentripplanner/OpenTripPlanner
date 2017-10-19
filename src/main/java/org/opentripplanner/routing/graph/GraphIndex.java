@@ -530,6 +530,18 @@ public class GraphIndex {
         return ret;
     }
 
+    /**
+     * Get parent stop for given stop.
+     */
+    public Stop getParentStopForStop(Stop stop) {
+        String ps = stop.getParentStation();
+        if (ps == null) {
+            return null;
+        }
+        AgencyAndId pid = new AgencyAndId(stop.getId().getAgencyId(), ps);
+        return graph.parentStopById.get(pid);
+    }
+
     /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
     public StopTreeCache getStopTreeCache() {
         if (stopTreeCache == null) {
