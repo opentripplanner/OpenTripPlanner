@@ -181,6 +181,10 @@ public class GraphPathFinder {
                 for (AgencyAndId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
+                List<AgencyAndId> routeIds = path.getRoutes();
+                for (AgencyAndId routeId : routeIds) {
+                    options.addUnpreferredRoute(routeId);
+                }
                 if (tripIds.isEmpty()) {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
@@ -333,6 +337,7 @@ public class GraphPathFinder {
         reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
         reversedOptions.bannedTrips = options.bannedTrips;
+        reversedOptions.unpreferredRoutes = options.unpreferredRoutes;
         return reversedOptions;
     }
 

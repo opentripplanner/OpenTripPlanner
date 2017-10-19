@@ -39,8 +39,6 @@ public class RouteMatcher implements Cloneable, Serializable {
     /* Set of matching route names (without specifying an agency ID) */
     private HashSet<String> routeNames = new HashSet<String>();
 
-    private static RouteMatcher EMPTY_MATCHER = new RouteMatcher();
-
     private RouteMatcher() {
     }
 
@@ -48,7 +46,8 @@ public class RouteMatcher implements Cloneable, Serializable {
      * Return an empty matcher (which match no routes).
      */
     public static RouteMatcher emptyMatcher() {
-        return EMPTY_MATCHER;
+        // This used to return a static empty matcher. Now modifications are allowed so we cannot do this.
+        return new RouteMatcher();
     }
 
     /**
@@ -111,7 +110,7 @@ public class RouteMatcher implements Cloneable, Serializable {
     }
 
     public boolean matches(Route route) {
-        if (this == EMPTY_MATCHER)
+        if (agencyAndRouteIds.isEmpty() && agencyIdAndRouteNames.isEmpty() && routeNames.isEmpty())
             return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
@@ -122,6 +121,10 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (routeNames.contains(routeName))
             return true;
         return false;
+    }
+
+    public void addRouteId(AgencyAndId id) {
+        agencyAndRouteIds.add(id);
     }
 
     public String asString() {
@@ -171,7 +174,11 @@ public class RouteMatcher implements Cloneable, Serializable {
 
     public RouteMatcher clone() {
         try {
-            return (RouteMatcher) super.clone();
+            RouteMatcher clone = (RouteMatcher) super.clone();
+            clone.agencyAndRouteIds = new HashSet<>(agencyAndRouteIds);
+            clone.agencyIdAndRouteNames = new HashSet<>(agencyIdAndRouteNames);
+            clone.routeNames = new HashSet<>(routeNames);
+            return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
             throw new RuntimeException(e);

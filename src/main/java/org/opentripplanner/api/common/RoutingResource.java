@@ -197,6 +197,12 @@ public abstract class RoutingResource {
      * to wait for preferred route. */
     @QueryParam("otherThanPreferredRoutesPenalty")
     protected Integer otherThanPreferredRoutesPenalty;
+
+    /**
+     * Penalty added for using every unpreferred route, i.e. number of seconds that we are willing to wait for preferred route.
+     */
+    @QueryParam("useUnpreferredRoutesPenalty")
+    protected Integer useUnpreferredRoutesPenalty;
     
     /** The comma-separated list of preferred agencies. */
     @QueryParam("preferredAgencies")
@@ -516,6 +522,9 @@ public abstract class RoutingResource {
 
         if (otherThanPreferredRoutesPenalty != null)
             request.setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
+
+        if (useUnpreferredRoutesPenalty != null)
+            request.setUseUnpreferredRoutesPenalty(useUnpreferredRoutesPenalty);
 
         if (preferredAgencies != null)
             request.setPreferredAgencies(preferredAgencies);

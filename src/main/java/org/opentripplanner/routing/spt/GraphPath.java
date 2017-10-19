@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -152,6 +153,24 @@ public class GraphPath {
                 if (trip != null && trip != lastTrip) {
                     ret.add(trip.getId());
                     lastTrip = trip;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @return all routes boarded in this graph path
+     */
+    public List<AgencyAndId> getRoutes() {
+        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+        Route lastRoute = null;
+        for (State s : states) {
+            if (s.getBackEdge() != null && s.getBackTrip() != null) {
+                Route route = s.getBackTrip().getRoute();
+                if (route != null && route != lastRoute) {
+                    ret.add(route.getId());
+                    lastRoute = route;
                 }
             }
         }
