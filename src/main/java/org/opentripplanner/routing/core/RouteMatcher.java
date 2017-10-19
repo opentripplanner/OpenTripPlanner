@@ -110,7 +110,7 @@ public class RouteMatcher implements Cloneable, Serializable {
     }
 
     public boolean matches(Route route) {
-        if (agencyAndRouteIds.isEmpty() && agencyIdAndRouteNames.isEmpty() && routeNames.isEmpty())
+        if (isEmpty())
             return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
@@ -121,6 +121,10 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (routeNames.contains(routeName))
             return true;
         return false;
+    }
+
+    public boolean isEmpty() {
+        return agencyAndRouteIds.isEmpty() && agencyIdAndRouteNames.isEmpty() && routeNames.isEmpty();
     }
 
     public void addRouteId(AgencyAndId id) {
