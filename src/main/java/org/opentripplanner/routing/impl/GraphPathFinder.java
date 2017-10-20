@@ -336,14 +336,27 @@ public class GraphPathFinder {
     }
 
     private void banOnStreetPath(RoutingRequest options, GraphPath path) {
+        long seed = requestSeed(options);
         int N = path.edges.size();
         int nEdgesNotToBan = (int)(N * options.streetsNotBanPercent);
         if (nEdgesNotToBan >= options.minEdgesNotToBan) {
             List<Edge> ls = new LinkedList<>(path.edges.subList(nEdgesNotToBan, N - nEdgesNotToBan));
-            ls.forEach(options::banEdge);
+            Collections.shuffle(ls, new Random(seed));
+            List<Edge> sl = ls.subList(0, (int) (ls.size() * options.remainingStreetsBanPercent));
+            sl.forEach(options::banEdge);
         } else {
             path.edges.forEach(options::banEdge);
         }
+    }
+
+    private long requestSeed(RoutingRequest options) {
+        int h1 = genericLocationHashCode(options.from);
+        int h2 = genericLocationHashCode(options.to);
+        return h1 + 17 * (options.dateTime / 1000) + 31 * h2;
+    }
+
+    private int genericLocationHashCode(GenericLocation loc) {
+        return (int)(loc.lat.floatValue() + 17 * loc.lng.floatValue());
     }
 
     /* Try to find N paths through the Graph */

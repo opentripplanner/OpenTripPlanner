@@ -458,6 +458,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public int minEdgesNotToBan = 7;
 
+    public double remainingStreetsBanPercent = 0.5;
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
