@@ -63,7 +63,12 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
 
         // read in transfers
         CsvEntityReader reader = new CsvEntityReader();
-        reader.addEntityHandler(o -> transfers.add(feedTransferToTransfer(resolver, (FeedTransfer) o)));
+        reader.addEntityHandler(o -> {
+            Transfer t = feedTransferToTransfer(resolver, (FeedTransfer) o);
+            if (t != null) {
+                transfers.add(t);
+            }
+        });
         try {
             reader.readEntities(FeedTransfer.class, new FileReader(transfersFile));
         } catch (IOException e) {
@@ -120,6 +125,10 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
 
         transfer.setMinTransferTime(feedTransfer.getMinTransferTime());
         transfer.setTransferType(feedTransfer.getTransferType());
+
+        if (transfer.getFromStop() == null || transfer.getToStop() == null) {
+            return null;
+        }
 
         return transfer;
     }
