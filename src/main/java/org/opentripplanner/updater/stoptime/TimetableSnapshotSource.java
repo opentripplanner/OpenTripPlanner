@@ -189,6 +189,9 @@ public class TimetableSnapshotSource {
             LOG.warn("updates is null");
             return;
         }
+        int appliedUpdates = 0;
+        int totalUpdates = updates.size();
+        long start = System.currentTimeMillis();
 
         // Acquire lock on buffer
         bufferLock.lock();
@@ -256,6 +259,7 @@ public class TimetableSnapshotSource {
 
                 if (applied) {
                     appliedBlockCount++;
+                    appliedUpdates++;
                 } else {
                     LOG.warn("Failed to apply TripUpdate.");
                     LOG.trace(" Contents: {}", tripUpdate);
@@ -279,6 +283,9 @@ public class TimetableSnapshotSource {
         } finally {
             // Always release lock
             bufferLock.unlock();
+            long stop = System.currentTimeMillis();
+            long delta = stop - start;
+            LOG.info("Feed {}: applied {} of {} updates in {} ms", feedId, appliedUpdates, totalUpdates, delta);
         }
     }
 
@@ -330,7 +337,7 @@ public class TimetableSnapshotSource {
         final TripPattern pattern = getPatternForTripId(feedId, tripId);
 
         if (pattern == null) {
-            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
+            LOG.warn("No pattern found for tripId {} with feedId {}, skipping TripUpdate.", tripId, feedId);
             return false;
         }
 

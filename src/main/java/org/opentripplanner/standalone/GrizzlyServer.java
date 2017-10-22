@@ -57,10 +57,22 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
+
+        int threadPoolMaxPoolSize = Runtime.getRuntime().availableProcessors();
+        if (System.getProperty("otp.threadPoolMaxPoolSize") != null) {
+            try {
+                threadPoolMaxPoolSize = Integer.parseInt(System.getProperty("otp.threadPoolMaxPoolSize"));
+                LOG.info("Thread pool size override to " + threadPoolMaxPoolSize);
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+        }
         /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(1)
-            .setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+            .setMaxPoolSize(threadPoolMaxPoolSize);
+
+        LOG.info("Thread pool size = " + threadPoolConfig.getMaxPoolSize());
 
         /* HTTP (non-encrypted) listener */
         NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
