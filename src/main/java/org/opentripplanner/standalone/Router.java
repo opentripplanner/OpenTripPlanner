@@ -56,6 +56,9 @@ public class Router {
     // A RoutingRequest containing default parameters that will be cloned when handling each request
     public RoutingRequest defaultRoutingRequest;
 
+    // save what is serialized into routingDefaultsNode so it's available for introspection
+    public JsonNode routingDefaultsNode;
+
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
@@ -96,6 +99,7 @@ public class Router {
             LOG.info("Loading default routing parameters from JSON:");
             ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
             this.defaultRoutingRequest = scraper.scrape(routingDefaultsNode);
+            this.routingDefaultsNode = routingDefaultsNode;
         } else {
             LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
             this.defaultRoutingRequest = new RoutingRequest();

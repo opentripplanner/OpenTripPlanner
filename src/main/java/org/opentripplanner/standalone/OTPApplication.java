@@ -77,6 +77,7 @@ public class OTPApplication extends Application {
             TileService.class,
             BikeRental.class,
             GraphVersionResource.class,
+            RoutingDefaultsResource.class,
             LIsochrone.class,
             ExternalGeocoderResource.class,
             TimeGridWs.class,
