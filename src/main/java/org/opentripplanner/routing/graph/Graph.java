@@ -38,6 +38,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.graph_builder.model.GraphVersion;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Landmark;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -53,7 +54,6 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -215,6 +215,8 @@ public class Graph implements Serializable {
 
     /** Landmarks **/
     public Map<String, Landmark> landmarksByName = new HashMap<>();
+
+    public GraphVersion graphVersion = null;
 
     public Graph(Graph basedOn) {
         this();
@@ -1096,5 +1098,17 @@ public class Graph implements Serializable {
 
     public void addLandmark(Landmark landmark) {
         landmarksByName.put(landmark.getName(), landmark);
+    }
+
+    public void setGraphVersion(GraphVersion gi) {
+        if (gi == null) {
+            // default if not found
+            gi = new GraphVersion();
+            gi.setCreatedDate(new Date());
+        }
+        graphVersion = gi;
+    }
+    public GraphVersion getGraphVersion() {
+        return graphVersion;
     }
 }
