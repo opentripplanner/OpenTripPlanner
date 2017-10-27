@@ -173,14 +173,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
                 radius = 0;
             }
 
-            if (st.getStartServiceAreaId() != null) {
-                area = st.getStartServiceAreaId();
+            if (st.getStartServiceArea() != null) {
+                area = st.getStartServiceArea().getAreaId();
             }
             serviceArea[s] = area;
-            if (st.getEndServiceAreaId() != null) {
-                if (!st.getEndServiceAreaId().equals(area)) {
+            if (st.getEndServiceArea() != null) {
+                if (!st.getEndServiceArea().getAreaId().equals(area)) {
                     String message = String.format("Trip %s: start service area %s does not match end area %s",
-                            st.getTrip().getId(), area, st.getEndServiceAreaId());
+                            st.getTrip().getId(), area, st.getEndServiceArea());
                     throw new IllegalArgumentException(message);
                 }
                 area = null;

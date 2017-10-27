@@ -213,7 +213,7 @@ public class Graph implements Serializable {
     public List<DemandResponseService> demandResponseServices = new ArrayList<>();
 
     /** Areas for flex service */
-    public Map<AgencyAndId, Polygon> areasById = new HashMap<>();
+    public Map<AgencyAndId, Geometry> areasById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();

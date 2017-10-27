@@ -13,9 +13,7 @@
 
 package org.opentripplanner.routing.flex;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.Route;
@@ -25,8 +23,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DemandResponseService implements Serializable {
 
@@ -36,23 +32,16 @@ public class DemandResponseService implements Serializable {
     private Route route;
     private int startTime; // start time, in seconds past midnight
     private int endTime; // end time, in seconds past midnight
-    private Polygon coverageArea;
+    private Geometry coverageArea;
 
-    public DemandResponseService(Trip trip, StopTime start, StopTime end, List<Area> areas) {
+    public DemandResponseService(Trip trip, StopTime start, StopTime end) {
         this.serviceId = trip.getServiceId();
         this.route = trip.getRoute();
         this.startTime = start.getDepartureTime();
         this.endTime = end.getArrivalTime();
-        areas.sort((a, b) -> a.getSequence() - b.getSequence());
-        ArrayList<Coordinate> coords = new ArrayList<>();
-        for (int i = 0; i < areas.size(); i++) {
-            Area area = areas.get(i);
-            coords.add(new Coordinate(area.getLon(), area.getLat()));
+        if (start.getStartServiceArea() != null) {
+            coverageArea = GeometryUtils.parseWkt(start.getStartServiceArea().getWkt());
         }
-        if (! coords.get(0).equals(coords.get(coords.size() - 1))) {
-            coords.add(coords.get(0));
-        }
-        coverageArea = GeometryUtils.getGeometryFactory().createPolygon(coords.toArray(new Coordinate[0]));
     }
 
     public AgencyAndId getServiceId() {
@@ -71,7 +60,7 @@ public class DemandResponseService implements Serializable {
         return endTime;
     }
 
-    public Polygon getCoverageArea() {
+    public Geometry getCoverageArea() {
         return coverageArea;
     }
 

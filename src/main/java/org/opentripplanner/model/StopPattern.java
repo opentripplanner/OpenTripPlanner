@@ -8,6 +8,7 @@ import java.util.function.Function;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
@@ -56,7 +57,7 @@ public class StopPattern implements Serializable {
     public final int[] continuousPickup;
     public final int[] continuousDropOff;
     public final double[] serviceAreaRadius;
-    public final Polygon[] serviceAreas; // likely at most one distinct object will be in this array
+    public final Geometry[] serviceAreas; // likely at most one distinct object will be in this array
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
@@ -113,11 +114,11 @@ public class StopPattern implements Serializable {
     }
 
     /** Assumes that stopTimes are already sorted by time. */
-    public StopPattern (List<StopTime> stopTimes, Function<String, Polygon> polygonById) {
+    public StopPattern (List<StopTime> stopTimes, Function<String, Geometry> areaGeometryByArea) {
         this (stopTimes.size());
         if (size == 0) return;
         double lastServiceAreaRadius = 0;
-        Polygon lastPolygon = null;
+        Geometry lastServiceArea = null;
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
@@ -143,13 +144,13 @@ public class StopPattern implements Serializable {
                 lastServiceAreaRadius = 0;
             }
 
-            if (polygonById != null) {
-                if (stopTime.getStartServiceAreaId() != null) {
-                    lastPolygon = polygonById.apply(stopTime.getStartServiceAreaId());
+            if (areaGeometryByArea != null) {
+                if (stopTime.getStartServiceArea() != null) {
+                    lastServiceArea = areaGeometryByArea.apply(stopTime.getStartServiceArea().getAreaId());
                 }
-                serviceAreas[i] = lastPolygon;
-                if (stopTime.getEndServiceAreaId() != null) {
-                    lastPolygon = null;
+                serviceAreas[i] = lastServiceArea;
+                if (stopTime.getEndServiceArea() != null) {
+                    lastServiceArea = null;
                 }
             }
         }

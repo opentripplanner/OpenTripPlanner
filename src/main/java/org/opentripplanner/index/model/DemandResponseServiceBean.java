@@ -37,7 +37,7 @@ public class DemandResponseServiceBean {
         route = new RouteShort(svc.getRoute());
         startTime = svc.getStartTime();
         endTime = svc.getEndTime();
-        coverageArea = PolylineEncoder.createEncodings(svc.getCoverageArea().getExteriorRing());
+        coverageArea = PolylineEncoder.createEncodings(svc.getCoverageArea().getBoundary());
     }
 
     public static List<DemandResponseServiceBean> list(Collection<DemandResponseService> services) {

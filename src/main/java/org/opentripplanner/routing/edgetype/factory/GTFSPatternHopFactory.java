@@ -24,7 +24,6 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import gnu.trove.list.TIntList;
@@ -105,8 +104,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
@@ -304,7 +301,7 @@ public class GTFSPatternHopFactory {
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
 
-    private Map<String, Polygon> _areasById = new HashMap<String, Polygon>();
+    private Map<String, Geometry> _areasById = new HashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 
@@ -396,9 +393,7 @@ public class GTFSPatternHopFactory {
             List<StopTime> stopTimes = new ArrayList<StopTime>(_dao.getStopTimesForTrip(trip));
 
             if (hasDemandService(stopTimes)) {
-                String areaId = stopTimes.get(0).getStartServiceAreaId();
-                List<Area> areas = _dao.getAllAreas().stream().filter(a -> a.getAreaId().equals(areaId)).collect(Collectors.toList());
-                addDemandService(graph, trip, stopTimes.get(0), stopTimes.get(1), areas);
+                addDemandService(graph, trip, stopTimes.get(0), stopTimes.get(1));
             }
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
@@ -1330,17 +1325,17 @@ public class GTFSPatternHopFactory {
         Iterator<StopTime> it = stopTimes.iterator();
         TIntList stopSequencesRemoved = new TIntArrayList();
         double serviceAreaRadius = 0.0d;
-        String serviceArea = null;
+        String serviceAreaWkt = null;
         while (it.hasNext()) {
             StopTime st = it.next();
             if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 serviceAreaRadius = st.getStartServiceAreaRadius();
             }
-            if (st.getStartServiceAreaId() != null) {
-                serviceArea = st.getStartServiceAreaId();
+            if (st.getStartServiceArea() != null) {
+                serviceAreaWkt = st.getStartServiceArea().getWkt();
             }
             if (prev != null) {
-                if (prev.getStop().equals(st.getStop()) && serviceAreaRadius == 0.0d && serviceArea == null) {
+                if (prev.getStop().equals(st.getStop()) && serviceAreaRadius == 0.0d && serviceAreaWkt == null) {
                     // OBA gives us unmodifiable lists, but we have copied them.
 
                     // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
@@ -1361,8 +1356,8 @@ public class GTFSPatternHopFactory {
             if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 serviceAreaRadius = 0.0d;
             }
-            if (st.getEndServiceAreaId() != null) {
-                serviceArea = null;
+            if (st.getEndServiceArea() != null) {
+                serviceAreaWkt = null;
             }
         }
         return stopSequencesRemoved;
@@ -1498,27 +1493,14 @@ public class GTFSPatternHopFactory {
     }
 
     private void loadAreaMap() {
-        _dao.getAllAreas()
-                .stream()
-                .collect(Collectors.groupingBy(Area::getAreaId, Collectors.toList()))
-                .forEach(this::loadArea);
-    }
-
-    private void loadArea(String name, List<Area> areas) {
-        areas.sort(Comparator.comparingInt(Area::getSequence));
-        double[] coordinates = new double[areas.size() * 2];
-        int i = 0;
-        for (Area area : areas) {
-            coordinates[i++] = area.getLon();
-            coordinates[i++] = area.getLat();
+        for (Area area : _dao.getAllAreas()) {
+            Geometry geometry = GeometryUtils.parseWkt(area.getWkt());
+            _areasById.put(area.getAreaId(), geometry);
         }
-        CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
-        Polygon polygon = _geometryFactory.createPolygon(sequence);
-        _areasById.put(name, polygon);
     }
 
     private void loadAreasIntoGraph(Graph graph) {
-        for (Map.Entry<String, Polygon> entry : _areasById.entrySet()) {
+        for (Map.Entry<String, Geometry> entry : _areasById.entrySet()) {
             AgencyAndId id = new AgencyAndId(_feedId.getId(), entry.getKey());
             graph.areasById.put(id, entry.getValue());
         }
@@ -1529,11 +1511,11 @@ public class GTFSPatternHopFactory {
             return false;
         StopTime st0 = stopTimes.get(0);
         StopTime st1 = stopTimes.get(1);
-        return st0.getStartServiceAreaId() != null
-                && st0.getStartServiceAreaId().equals(st1.getEndServiceAreaId());
+        return st0.getStartServiceArea() != null
+                && st0.getStartServiceArea().equals(st1.getEndServiceArea());
     }
 
-    private void addDemandService(Graph graph, Trip trip, StopTime st0, StopTime st1, List<Area> areas) {
-        graph.demandResponseServices.add(new DemandResponseService(trip, st0, st1, areas));
+    private void addDemandService(Graph graph, Trip trip, StopTime st0, StopTime st1) {
+        graph.demandResponseServices.add(new DemandResponseService(trip, st0, st1));
     }
 }

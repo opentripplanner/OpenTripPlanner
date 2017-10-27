@@ -22,6 +22,8 @@ import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
@@ -39,9 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
@@ -226,6 +226,15 @@ public class GeometryUtils {
             coords[i++] = new Coordinate(p.getLatitude(), p.getLongitude());
         }
         return coords;
+    }
+
+    public static Geometry parseWkt(String wkt) {
+        try {
+            return new WKTReader(GeometryUtils.getGeometryFactory()).read(wkt);
+        } catch(ParseException e) {
+            LOG.error("Unable to parse wkt: " + e);
+        }
+        return null;
     }
 
     public static Geometry shiftLineByPerpendicularVector(LineString line, double distance, boolean reverse) {

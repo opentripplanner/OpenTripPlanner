@@ -21,7 +21,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.Geometry;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -605,7 +605,7 @@ public class IndexAPI {
     @Path("/areas/{id}")
     public Response getAreaIdByFeedId(@PathParam("id") String areaIdString) {
         AgencyAndId id = GtfsLibrary.convertIdFromString(areaIdString);
-        Polygon area = index.areasById.get(id);
+        Geometry area = index.areasById.get(id);
         if (area == null) {
             return Response.status(Status.NOT_FOUND).build();
         }

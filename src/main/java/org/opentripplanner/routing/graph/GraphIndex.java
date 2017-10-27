@@ -18,8 +18,8 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
@@ -106,7 +106,7 @@ public class GraphIndex {
     public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
     public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
     public final Map<AgencyAndId, DemandResponseService> demandResponseServicesForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Polygon> areasById = Maps.newHashMap();
+    public final Map<AgencyAndId, Geometry> areasById = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;

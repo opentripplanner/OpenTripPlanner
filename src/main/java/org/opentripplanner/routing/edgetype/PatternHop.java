@@ -14,9 +14,9 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -44,13 +44,13 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private double serviceAreaRadius;
 
-    private Polygon serviceArea;
+    private Geometry serviceArea;
 
     public int stopIndex;
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestStops, double serviceAreaRadius, Polygon serviceArea, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestStops, double serviceAreaRadius, Geometry serviceArea, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
@@ -62,7 +62,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         this.serviceArea = serviceArea;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, double serviceAreaRadius, Polygon serviceArea) {
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, double serviceAreaRadius, Geometry serviceArea) {
         this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup, continuousDropoff), serviceAreaRadius, serviceArea, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
@@ -222,7 +222,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return serviceAreaRadius;
     }
 
-    public Polygon getServiceArea() {
+    public Geometry getServiceArea() {
         return serviceArea;
     }
 
