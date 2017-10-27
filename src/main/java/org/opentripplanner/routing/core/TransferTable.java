@@ -120,6 +120,24 @@ public class TransferTable implements Serializable {
         
         return transferTime;
     }
+
+    /**
+     * Determine whether a transfer from given stops depends on trips.
+     */
+    public boolean hasTripSpecificity(Stop fromStop, Stop toStop, boolean forwardInTime) {
+        checkNotNull(fromStop);
+        checkNotNull(toStop);
+
+        // Reverse from and to if we are moving backwards in time
+        if (!forwardInTime) {
+            Stop tempStop = fromStop;
+            fromStop = toStop;
+            toStop = tempStop;
+        }
+
+        StopTransfer stopTransfer = table.get(new P2<AgencyAndId>(fromStop.getId(), toStop.getId()));
+        return stopTransfer != null && stopTransfer.hasTripSpecificity();
+    }
     
     /**
      * Get the transfer time that should be used when transferring from a trip to another trip.

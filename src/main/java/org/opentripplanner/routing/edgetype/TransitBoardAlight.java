@@ -267,9 +267,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
-                // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
-                // However, experiments seem to show very little measurable improvement here (due to cache locality?)
-                // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
+                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding))
+                    continue;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
                 if (tripTimes != null) {

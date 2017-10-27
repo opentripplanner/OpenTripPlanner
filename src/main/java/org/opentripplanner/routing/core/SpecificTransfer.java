@@ -92,7 +92,11 @@ public class SpecificTransfer implements Serializable {
 
         this.transferTime = transferTime;
     }
-    
+
+    public boolean hasTripSpecificity() {
+        return fromTripId != null || toTripId != null;
+    }
+
     /**
      * @return specificity as defined in the specifications
      */

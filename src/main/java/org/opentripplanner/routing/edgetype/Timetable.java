@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.beust.jcommander.internal.Lists;
-
+import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -114,6 +113,8 @@ public class Timetable implements Serializable {
      * @param bestWait -1 means there is not yet any best known time.
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
+        if (this.pattern.services == null)
+            return true;
         // Check whether any services are running at all on this pattern.
         if ( ! sd.anyServiceRunning(this.pattern.services)) return false;
         // Make the search time relative to the given service day.
@@ -156,11 +157,21 @@ public class Timetable implements Serializable {
         int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
+
+        // Only compute transfer once, if possible - it's expensive.
+        int exampleAdjustedTime = -1;
+        boolean recomputeTime = !transferDependsOnTrip(s0, currentStop, boarding);
+        if (!recomputeTime) {
+            exampleAdjustedTime = adjustTimeForTransfer(s0, currentStop, getTripTimes(0).trip, boarding, serviceDay, time);
+        }
+
         for (TripTimes tt : tripTimes) {
             if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
-            int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
+            int adjustedTime = recomputeTime
+                ? adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time)
+                : exampleAdjustedTime;
             if (adjustedTime == -1) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
@@ -256,6 +267,14 @@ public class Timetable implements Serializable {
             if (minTime < t0) return minTime;
         }
         return t0;
+    }
+
+    private boolean transferDependsOnTrip(State state, Stop currentStop, boolean boarding) {
+        if (!state.isEverBoarded()) {
+            return false;
+        }
+        TransferTable transferTable = state.getOptions().getRoutingContext().transferTable;
+        return transferTable.hasTripSpecificity(state.getPreviousStop(), currentStop, boarding);
     }
 
     /**
