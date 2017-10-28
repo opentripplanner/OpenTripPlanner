@@ -93,6 +93,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new GbfsBikeRentalDataSource(networkName);
             } else if (sourceType.equals("smoove")) {
                 source = new SmooveBikeRentalDataSource();
+            } else if (sourceType.equals("bicimad")) {
+                source = new BicimadBikeRentalDataSource();
             }
         }
 
