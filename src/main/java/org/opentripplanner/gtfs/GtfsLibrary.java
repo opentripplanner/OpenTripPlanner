@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.mapping.ModelMapper;
@@ -31,12 +31,12 @@ public class GtfsLibrary {
 
     public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
-    public static GtfsContext createContext(GtfsFeedId feedId, GtfsDao dao) {
+    public static GtfsContext createContext(GtfsFeedId feedId, OtpTransitDao dao) {
         CalendarService calendarService = createCalendarService(dao);
         return createContext(feedId, dao, calendarService);
     }
 
-    public static GtfsContext createContext(GtfsFeedId feedId, GtfsDao dao, CalendarService calendarService) {
+    public static GtfsContext createContext(GtfsFeedId feedId, OtpTransitDao dao, CalendarService calendarService) {
         return new GtfsContextImpl(feedId, dao, calendarService);
     }
 
@@ -44,7 +44,7 @@ public class GtfsLibrary {
         GtfsImport gtfsImport = new GtfsImport(path);
 
         GtfsFeedId feedId = gtfsImport.getFeedId();
-        GtfsDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
+        OtpTransitDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
         CalendarService calendarService = createCalendarService(otpDao);
 
         return new GtfsContextImpl(feedId, otpDao, calendarService);
@@ -131,11 +131,11 @@ public class GtfsLibrary {
 
         private GtfsFeedId _feedId;
 
-        private GtfsDao _dao;
+        private OtpTransitDao _dao;
 
         private CalendarService _calendar;
 
-        public GtfsContextImpl(GtfsFeedId feedId, GtfsDao dao, CalendarService calendar) {
+        public GtfsContextImpl(GtfsFeedId feedId, OtpTransitDao dao, CalendarService calendar) {
             _feedId = feedId;
             _dao = dao;
             _calendar = calendar;
@@ -147,7 +147,7 @@ public class GtfsLibrary {
         }
 
         @Override
-        public GtfsDao getDao() {
+        public OtpTransitDao getDao() {
             return _dao;
         }
 

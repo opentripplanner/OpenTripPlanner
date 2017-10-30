@@ -13,8 +13,8 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.impl.GtfsDaoImpl;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.impl.OtpTransitDaoImpl;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 
 public class ModelMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
@@ -49,12 +49,12 @@ public class ModelMapper {
             routeMapper, fareAttributeMapper
     );
 
-    public static GtfsDao mapDao(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+    public static OtpTransitDao mapDao(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
         return new ModelMapper().map(data);
     }
 
-    private GtfsDao map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
-        return new GtfsDaoImpl(agencyMapper.map(data.getAllAgencies()),
+    private OtpTransitDao map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+        return new OtpTransitDaoImpl(agencyMapper.map(data.getAllAgencies()),
                 serviceCalendarDateMapper.map(data.getAllCalendarDates()),
                 serviceCalendarMapper.map(data.getAllCalendars()),
                 fareAttributeMapper.map(data.getAllFareAttributes()),

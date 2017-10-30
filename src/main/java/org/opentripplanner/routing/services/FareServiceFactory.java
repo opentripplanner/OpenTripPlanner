@@ -14,13 +14,13 @@
 package org.opentripplanner.routing.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 
 public interface FareServiceFactory {
 
     FareService makeFareService();
 
-    void processGtfs(GtfsDao dao);
+    void processGtfs(OtpTransitDao dao);
 
     void configure(JsonNode config);
 }

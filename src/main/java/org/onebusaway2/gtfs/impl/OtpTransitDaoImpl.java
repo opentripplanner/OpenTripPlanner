@@ -33,7 +33,7 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,7 +55,7 @@ import static java.util.stream.Collectors.toMap;
  *
  * @author bdferris
  */
-public class GtfsDaoImpl implements GtfsDao {
+public class OtpTransitDaoImpl implements OtpTransitDao {
 
     private Collection<Agency> agencies;
 
@@ -98,7 +98,7 @@ public class GtfsDaoImpl implements GtfsDao {
 
     private Map<AgencyAndId, List<ServiceCalendar>> calendarsByServiceId = null;
 
-    public GtfsDaoImpl(Collection<Agency> agencies, Collection<ServiceCalendarDate> calendarDates,
+    public OtpTransitDaoImpl(Collection<Agency> agencies, Collection<ServiceCalendarDate> calendarDates,
             Collection<ServiceCalendar> calendars, Collection<FareAttribute> fareAttributes,
             Collection<FareRule> fareRules, Collection<FeedInfo> feedInfos,
             Collection<Frequency> frequencies, Collection<Pathway> pathways,

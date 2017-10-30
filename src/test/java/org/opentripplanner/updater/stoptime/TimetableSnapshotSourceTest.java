@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -70,7 +70,7 @@ public class TimetableSnapshotSourceTest {
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
-        GtfsDao dao = context.getDao();
+        OtpTransitDao dao = context.getDao();
 
         feedId = context.getFeedId().getId();
 

@@ -17,7 +17,7 @@ import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 
 /**
  * This is actually kind of a hack, and assumes that there is only one copy of CalendarServiceData
@@ -32,7 +32,7 @@ public class MultiCalendarServiceImpl extends CalendarServiceImpl {
         super(new CalendarServiceData());
     }
 
-    public void addData(CalendarServiceData data, GtfsDao dao) {
+    public void addData(CalendarServiceData data, OtpTransitDao dao) {
         CalendarServiceData _data = super.getData();
         for (Agency agency : dao.getAllAgencies()) {
             String agencyId = agency.getId();

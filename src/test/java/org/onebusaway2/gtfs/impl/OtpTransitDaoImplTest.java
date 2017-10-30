@@ -45,7 +45,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
-public class GtfsDaoImplTest {
+public class OtpTransitDaoImplTest {
     private static final String FEED_ID = "Z";
 
     private static final AgencyAndId SERVICE_ALLDAYS_ID = new AgencyAndId(FEED_ID, "alldays");
@@ -55,7 +55,7 @@ public class GtfsDaoImplTest {
     private static final AgencyAndId STATION_ID = new AgencyAndId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
-    private static GtfsDaoImpl subject;
+    private static OtpTransitDaoImpl subject;
 
     private static Agency agency;
 
@@ -70,7 +70,7 @@ public class GtfsDaoImplTest {
         reader.setDefaultAgencyId(FEED_ID);
         reader.run();
 
-        subject = (GtfsDaoImpl) ModelMapper.mapDao(dao);
+        subject = (OtpTransitDaoImpl) ModelMapper.mapDao(dao);
         agency = first(subject.getAllAgencies());
 
         // Supplement test data with at least one entity in all collections
@@ -224,7 +224,7 @@ public class GtfsDaoImplTest {
     public void testGetShapePointsForShapeId() {
         List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new AgencyAndId("Z", "5"));
         assertEquals("[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
-                shapePoints.stream().map(GtfsDaoImplTest::toString).collect(toList()).toString());
+                shapePoints.stream().map(OtpTransitDaoImplTest::toString).collect(toList()).toString());
     }
 
     @Test

@@ -24,7 +24,7 @@ import org.onebusaway2.gtfs.model.ServiceCalendarDate;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,17 +51,17 @@ public class CalendarServiceDataFactoryImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceDataFactoryImpl.class);
 
-    private final GtfsDao dao;
+    private final OtpTransitDao dao;
 
-    public static CalendarService createCalendarService(GtfsDao dao) {
+    public static CalendarService createCalendarService(OtpTransitDao dao) {
         return new CalendarServiceImpl(createCalendarServiceData(dao));
     }
 
-    public static CalendarServiceData createCalendarServiceData(GtfsDao dao) {
+    public static CalendarServiceData createCalendarServiceData(OtpTransitDao dao) {
         return new CalendarServiceDataFactoryImpl(dao).createData();
     }
 
-    public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(GtfsDao dao) {
+    public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(OtpTransitDao dao) {
         return (new CalendarServiceDataFactoryImpl(dao) {
             @Override void addDatesForLocalizedServiceId(
                     AgencyAndId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data
@@ -71,7 +71,7 @@ public class CalendarServiceDataFactoryImpl {
         }).createData();
     }
 
-    private CalendarServiceDataFactoryImpl(GtfsDao dao) {
+    private CalendarServiceDataFactoryImpl(OtpTransitDao dao) {
         this.dao = dao;
     }
 

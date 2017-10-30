@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
@@ -49,7 +49,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     }
     
     @Override
-    public void processGtfs(GtfsDao dao) {
+    public void processGtfs(OtpTransitDao dao) {
     	// Add custom extension: trips may have a fare ID specified in KCM GTFS.
     	// Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
     	// since fare IDs may not be unique across feeds and trip agency IDsqq

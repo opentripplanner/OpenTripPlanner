@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Methods for accessing imported entities.
  */
-public interface GtfsDao {
+public interface OtpTransitDao {
 
     Collection<Agency> getAllAgencies();
 

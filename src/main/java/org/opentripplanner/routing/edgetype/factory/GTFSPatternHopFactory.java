@@ -40,7 +40,7 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -58,7 +58,6 @@ import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
 import org.opentripplanner.graph_builder.annotation.RepeatedStops;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
-import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -291,7 +290,7 @@ public class GTFSPatternHopFactory {
 
     private GtfsFeedId _feedId;
 
-    private GtfsDao _dao;
+    private OtpTransitDao _dao;
 
     private CalendarService _calendarService;
     

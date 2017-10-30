@@ -13,12 +13,12 @@
 
 package org.opentripplanner.gtfs;
 
-import org.onebusaway2.gtfs.services.GtfsDao;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 
 public interface GtfsContext {
     GtfsFeedId getFeedId();
-    GtfsDao getDao();
+    OtpTransitDao getDao();
     CalendarService getCalendarService();
 }
