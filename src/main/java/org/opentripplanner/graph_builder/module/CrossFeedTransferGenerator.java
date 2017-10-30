@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -64,8 +65,7 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
         // read in transfers
         CsvEntityReader reader = new CsvEntityReader();
         reader.addEntityHandler(o -> {
-            Transfer t = feedTransferToTransfer(resolver, (FeedTransfer) o);
-            if (t != null) {
+            for (Transfer t : expandFeedTransfer(resolver, (FeedTransfer) o)) {
                 transfers.add(t);
             }
         });
@@ -94,43 +94,41 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
         this.createTransferEdges = createTransferEdges;
     }
 
-    private Transfer feedTransferToTransfer(GraphEntityResolver resolver, FeedTransfer feedTransfer) {
+    private Collection<Transfer> expandFeedTransfer(GraphEntityResolver resolver, FeedTransfer feedTransfer) {
 
-        Transfer transfer = new Transfer();
-        String fromStop = feedTransfer.getFromStopId();
-        String toStop = feedTransfer.getToStopId();
-        String fromRoute = feedTransfer.getFromRouteId();
-        String toRoute = feedTransfer.getToRouteId();
-        String fromTrip = feedTransfer.getFromTripId();
-        String toTrip = feedTransfer.getToTripId();
+        Collection<Transfer> transfers = new ArrayList<>();
 
-        if (!TextUtils.isEmpty(fromStop)) {
-            transfer.setFromStop(resolver.getStop(fromStop));
-        }
-        if (!TextUtils.isEmpty(toStop)) {
-            transfer.setToStop(resolver.getStop(toStop));
-        }
-        if (!TextUtils.isEmpty(fromRoute)) {
-            transfer.setFromRoute(resolver.getRoute(fromRoute));
-        }
-        if (!TextUtils.isEmpty(toRoute)) {
-            transfer.setToRoute(resolver.getRoute(toRoute));
-        }
-        if (!TextUtils.isEmpty(fromTrip)) {
-            transfer.setFromTrip(resolver.getTrip(fromTrip));
-        }
-        if (!TextUtils.isEmpty(toTrip)) {
-            transfer.setToTrip(resolver.getTrip(toTrip));
-        }
+        for (Stop fromStop : resolver.getStops(feedTransfer.getFromStopId())) {
+            for (Stop toStop : resolver.getStops(feedTransfer.getToStopId())) {
+                Transfer transfer = new Transfer();
+                String fromRoute = feedTransfer.getFromRouteId();
+                String toRoute = feedTransfer.getToRouteId();
+                String fromTrip = feedTransfer.getFromTripId();
+                String toTrip = feedTransfer.getToTripId();
 
-        transfer.setMinTransferTime(feedTransfer.getMinTransferTime());
-        transfer.setTransferType(feedTransfer.getTransferType());
+                transfer.setFromStop(fromStop);
+                transfer.setToStop(toStop);
 
-        if (transfer.getFromStop() == null || transfer.getToStop() == null) {
-            return null;
+                if (!TextUtils.isEmpty(fromRoute)) {
+                    transfer.setFromRoute(resolver.getRoute(fromRoute));
+                }
+                if (!TextUtils.isEmpty(toRoute)) {
+                    transfer.setToRoute(resolver.getRoute(toRoute));
+                }
+                if (!TextUtils.isEmpty(fromTrip)) {
+                    transfer.setFromTrip(resolver.getTrip(fromTrip));
+                }
+                if (!TextUtils.isEmpty(toTrip)) {
+                    transfer.setToTrip(resolver.getTrip(toTrip));
+                }
+
+                transfer.setMinTransferTime(feedTransfer.getMinTransferTime());
+                transfer.setTransferType(feedTransfer.getTransferType());
+
+                transfers.add(transfer);
+            }
         }
-
-        return transfer;
+        return transfers;
     }
 
     private static class GraphEntityResolver implements StopIndex {
@@ -144,9 +142,19 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
             }
         }
 
-        private Stop getStop(String idStr) {
+        private Collection<Stop> getStops(String idStr) {
             AgencyAndId id = AgencyAndId.convertFromString(idStr, ':');
-            return graph.index.stopForId.get(id);
+            Collection<Stop> stops = new ArrayList<>();
+            Stop thisStop = graph.index.stopForId.get(id);
+            if (thisStop != null) {
+                stops.add(thisStop);
+            }
+            for (Stop stop : graph.index.stopsForParentStation.get(id.getId())) {
+                if (stop.getId().getAgencyId().equals(id.getAgencyId())) {
+                    stops.add(stop);
+                }
+            }
+            return stops;
         }
 
         private Route getRoute(String idStr) {

@@ -185,7 +185,7 @@ public class TransferFactory {
                 }
             }
 
-            LOG.info(
+            LOG.debug(
                     "Expanded transfer between stations \"{} ({})\" and \"{} ({})\" to {} transfers between {} and {} stops",
                     fromStop.getName(),
                     fromStop.getId(),
