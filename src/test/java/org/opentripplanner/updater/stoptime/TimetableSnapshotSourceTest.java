@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.onebusaway2.gtfs.model.*;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;

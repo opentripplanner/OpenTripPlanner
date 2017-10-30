@@ -33,7 +33,7 @@ import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 

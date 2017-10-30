@@ -19,7 +19,7 @@ import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;

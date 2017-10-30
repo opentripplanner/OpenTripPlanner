@@ -40,7 +40,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;

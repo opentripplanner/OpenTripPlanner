@@ -19,7 +19,7 @@ package org.opentripplanner.calendar.impl;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.CalendarService;
 
 import java.util.HashSet;
 import java.util.List;

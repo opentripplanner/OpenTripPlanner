@@ -24,8 +24,8 @@ import org.onebusaway2.gtfs.model.ServiceCalendarDate;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.CalendarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

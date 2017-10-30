@@ -32,7 +32,7 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -289,11 +289,12 @@ class OtpTransitDaoImpl implements OtpTransitDao {
     @Override
     public ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId) {
         ensureCalendarsByServiceIdRelation();
-        List<ServiceCalendar> calendars = nullSafeUnmodifiableList(calendarsByServiceId.get(serviceId));
-        switch (calendars.size()) {
-        case 0:
+        List<ServiceCalendar> calendars = calendarsByServiceId.get(serviceId);
+
+        if(calendars == null || calendars.isEmpty()) {
             return null;
-        case 1:
+        }
+        if(calendars.size() == 1) {
             return calendars.get(0);
         }
         throw new MultipleCalendarsForServiceIdException(serviceId);

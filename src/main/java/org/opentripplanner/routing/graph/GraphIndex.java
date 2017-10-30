@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Calendar;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,7 +28,7 @@ import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -60,14 +60,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**

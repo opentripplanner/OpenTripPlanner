@@ -13,8 +13,8 @@
 
 package org.opentripplanner.gtfs;
 
-import org.onebusaway2.gtfs.services.OtpTransitDao;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 
 public interface GtfsContext {

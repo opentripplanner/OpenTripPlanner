@@ -19,8 +19,8 @@ import java.io.IOException;
 
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 import org.opentripplanner.routing.core.TraverseMode;

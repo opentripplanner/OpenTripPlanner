@@ -17,7 +17,7 @@ import org.onebusaway2.gtfs.model.Agency;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.LocalizedServiceId;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 
 /**
  * This is actually kind of a hack, and assumes that there is only one copy of CalendarServiceData

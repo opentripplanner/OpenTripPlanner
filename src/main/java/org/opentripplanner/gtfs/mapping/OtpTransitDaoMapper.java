@@ -14,7 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.impl.OtpTransitDaoBuilder;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 
 public class OtpTransitDaoMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();

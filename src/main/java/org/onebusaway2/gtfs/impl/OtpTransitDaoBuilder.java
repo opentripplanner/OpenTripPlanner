@@ -29,7 +29,7 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 
 import java.util.ArrayList;
 import java.util.List;

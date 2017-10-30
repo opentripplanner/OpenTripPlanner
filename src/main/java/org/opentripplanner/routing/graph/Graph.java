@@ -30,7 +30,7 @@ import org.onebusaway2.gtfs.model.Stop;
 import org.onebusaway2.gtfs.model.FeedInfo;
 import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
-import org.onebusaway2.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;

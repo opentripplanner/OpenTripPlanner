@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.onebusaway2.gtfs.services.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitDao;
 
 public interface FareServiceFactory {
 

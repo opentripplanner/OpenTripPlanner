@@ -3,6 +3,7 @@ package org.onebusaway2.gtfs.services;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
+import org.opentripplanner.model.OtpTransitDao;
 
 import java.io.File;
 import java.io.IOException;
