@@ -23,7 +23,6 @@ import org.onebusaway2.gtfs.model.FareAttribute;
 import org.onebusaway2.gtfs.model.FareRule;
 import org.onebusaway2.gtfs.model.FeedInfo;
 import org.onebusaway2.gtfs.model.Frequency;
-import org.onebusaway2.gtfs.model.IdentityBean;
 import org.onebusaway2.gtfs.model.Pathway;
 import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.model.ServiceCalendar;
@@ -49,13 +48,19 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * A in-memory implementation of GtfsDao. It's super fast for most
- * methods, but only if you have enough memory to load your entire GTFS into
- * memory.
+ * A in-memory implementation of OtpTransitDao. It's super fast for most
+ * methods, but only if you have enough memory to load your entire OtpTransitDao
+ * into memory.
+ * <p>
+ * The Dao is read only, to enforece consistency after generating indexes and ids.
+ * You will get an exception if you try to add entities to one of the collections.
+ * If you need to modify a {@link OtpTransitDao}, you can create a new
+ * {@link OtpTransitDaoBuilder} based on your old data, do your modification and
+ * create a new unmodifiable dao.
  *
  * @author bdferris
  */
-public class OtpTransitDaoImpl implements OtpTransitDao {
+class OtpTransitDaoImpl implements OtpTransitDao {
 
     private Collection<Agency> agencies;
 
@@ -98,27 +103,30 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
 
     private Map<AgencyAndId, List<ServiceCalendar>> calendarsByServiceId = null;
 
-    public OtpTransitDaoImpl(Collection<Agency> agencies, Collection<ServiceCalendarDate> calendarDates,
-            Collection<ServiceCalendar> calendars, Collection<FareAttribute> fareAttributes,
-            Collection<FareRule> fareRules, Collection<FeedInfo> feedInfos,
-            Collection<Frequency> frequencies, Collection<Pathway> pathways,
-            Collection<Route> routes, Collection<ShapePoint> shapePoints, Collection<Stop> stops,
-            Collection<StopTime> stopTimes, Collection<Transfer> transfers,
-            Collection<Trip> trips) {
-        this.agencies = agencies;
-        this.calendarDates = insertIds(calendarDates);
-        this.calendars = insertIds(calendars);
-        this.fareAttributes = fareAttributes;
-        this.fareRules = insertIds(fareRules);
-        this.feedInfos = insertIds(feedInfos);
-        this.frequencies = insertIds(frequencies);
-        this.pathways = pathways;
-        this.routes = routes;
-        this.shapePoints = shapePoints;
+    /**
+     * Create a read only version of the OtpTransitDao.
+     * @see OtpTransitDaoBuilder Use builder to create an new OtpTransitDao.
+     */
+    OtpTransitDaoImpl(List<Agency> agencies, List<ServiceCalendarDate> calendarDates,
+            List<ServiceCalendar> calendars, List<FareAttribute> fareAttributes,
+            List<FareRule> fareRules, List<FeedInfo> feedInfos, List<Frequency> frequencies,
+            List<Pathway> pathways, List<Route> routes, List<ShapePoint> shapePoints,
+            List<Stop> stops, List<StopTime> stopTimes, List<Transfer> transfers,
+            List<Trip> trips) {
+        this.agencies = nullSafeUnmodifiableList(agencies);
+        this.calendarDates = nullSafeUnmodifiableList(calendarDates);
+        this.calendars = nullSafeUnmodifiableList(calendars);
+        this.fareAttributes = nullSafeUnmodifiableList(fareAttributes);
+        this.fareRules = nullSafeUnmodifiableList(fareRules);
+        this.feedInfos = nullSafeUnmodifiableList(feedInfos);
+        this.frequencies = nullSafeUnmodifiableList(frequencies);
+        this.pathways = nullSafeUnmodifiableList(pathways);
+        this.routes = nullSafeUnmodifiableList(routes);
+        this.shapePoints = nullSafeUnmodifiableList(shapePoints);
         this.stops = stops.stream().collect(toMap(Stop::getId, identity()));
-        this.stopTimes = insertIds(stopTimes);
-        this.transfers = insertIds(transfers);
-        this.trips = trips;
+        this.stopTimes = nullSafeUnmodifiableList(stopTimes);
+        this.transfers = nullSafeUnmodifiableList(transfers);
+        this.trips = nullSafeUnmodifiableList(trips);
     }
 
     @Override
@@ -222,7 +230,7 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
             }
         }
 
-        return list(tripAgencyIdsByServiceId.get(serviceId));
+        return nullSafeUnmodifiableList(tripAgencyIdsByServiceId.get(serviceId));
     }
 
     @Override
@@ -239,13 +247,13 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
                 }
             }
         }
-        return list(stopsByStation.get(station));
+        return nullSafeUnmodifiableList(stopsByStation.get(station));
     }
 
     @Override
     public List<ShapePoint> getShapePointsForShapeId(AgencyAndId shapeId) {
         ensureShapePointRelation();
-        return list(shapePointsByShapeId.get(shapeId));
+        return nullSafeUnmodifiableList(shapePointsByShapeId.get(shapeId));
     }
 
     @Override
@@ -259,7 +267,7 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
             }
         }
 
-        return list(stopTimesByTrip.get(trip));
+        return nullSafeUnmodifiableList(stopTimesByTrip.get(trip));
     }
 
     @Override
@@ -275,13 +283,13 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
     @Override
     public List<ServiceCalendarDate> getCalendarDatesForServiceId(AgencyAndId serviceId) {
         ensureCalendarDatesByServiceIdRelation();
-        return list(calendarDatesByServiceId.get(serviceId));
+        return nullSafeUnmodifiableList(calendarDatesByServiceId.get(serviceId));
     }
 
     @Override
     public ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId) {
         ensureCalendarsByServiceIdRelation();
-        List<ServiceCalendar> calendars = list(calendarsByServiceId.get(serviceId));
+        List<ServiceCalendar> calendars = nullSafeUnmodifiableList(calendarsByServiceId.get(serviceId));
         switch (calendars.size()) {
         case 0:
             return null;
@@ -318,11 +326,7 @@ public class OtpTransitDaoImpl implements OtpTransitDao {
         }
     }
 
-    private static <T> List<T> list(List<T> list) {
-        return list == null ? Collections.emptyList() : Collections.unmodifiableList(list);
-    }
-
-    private static <T extends IdentityBean<Integer>> Collection<T> insertIds(Collection<T> dates) {
-        return new ArrayListWithIdGeneration<>(dates);
+    private static <T> List<T> nullSafeUnmodifiableList(List<T> list) {
+        return Collections.unmodifiableList(list == null ? Collections.emptyList() : list);
     }
 }

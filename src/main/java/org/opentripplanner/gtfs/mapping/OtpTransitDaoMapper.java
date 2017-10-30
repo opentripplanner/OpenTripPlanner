@@ -13,10 +13,10 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.impl.OtpTransitDaoImpl;
+import org.onebusaway2.gtfs.impl.OtpTransitDaoBuilder;
 import org.onebusaway2.gtfs.services.OtpTransitDao;
 
-public class ModelMapper {
+public class OtpTransitDaoMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
 
     private final StopMapper stopMapper = new StopMapper();
@@ -50,24 +50,27 @@ public class ModelMapper {
     );
 
     public static OtpTransitDao mapDao(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
-        return new ModelMapper().map(data);
+        return new OtpTransitDaoMapper().map(data);
     }
 
     private OtpTransitDao map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
-        return new OtpTransitDaoImpl(agencyMapper.map(data.getAllAgencies()),
-                serviceCalendarDateMapper.map(data.getAllCalendarDates()),
-                serviceCalendarMapper.map(data.getAllCalendars()),
-                fareAttributeMapper.map(data.getAllFareAttributes()),
-                fareRuleMapper.map(data.getAllFareRules()),
-                feedInfoMapper.map(data.getAllFeedInfos()),
-                frequencyMapper.map(data.getAllFrequencies()),
-                pathwayMapper.map(data.getAllPathways()),
-                routeMapper.map(data.getAllRoutes()),
-                shapePointMapper.map(data.getAllShapePoints()),
-                stopMapper.map(data.getAllStops()),
-                stopTimeMapper.map(data.getAllStopTimes()),
-                transferMapper.map(data.getAllTransfers()),
-                tripMapper.map(data.getAllTrips())
-        );
+        OtpTransitDaoBuilder builder = new OtpTransitDaoBuilder();
+
+        builder.getAgencies().addAll(agencyMapper.map(data.getAllAgencies()));
+        builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
+        builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
+        builder.getFareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
+        builder.getFareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+        builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
+        builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
+        builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
+        builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
+        builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
+        builder.getStops().addAll(stopMapper.map(data.getAllStops()));
+        builder.getStopTimes().addAll(stopTimeMapper.map(data.getAllStopTimes()));
+        builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
+        builder.getTrips().addAll(tripMapper.map(data.getAllTrips()));
+
+        return builder.build();
     }
 }

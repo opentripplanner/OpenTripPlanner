@@ -22,7 +22,7 @@ import org.onebusaway2.gtfs.model.Route;
 import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.onebusaway2.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.gtfs.mapping.ModelMapper;
+import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarService;
@@ -44,7 +44,7 @@ public class GtfsLibrary {
         GtfsImport gtfsImport = new GtfsImport(path);
 
         GtfsFeedId feedId = gtfsImport.getFeedId();
-        OtpTransitDao otpDao = ModelMapper.mapDao(gtfsImport.getDao());
+        OtpTransitDao otpDao = OtpTransitDaoMapper.mapDao(gtfsImport.getDao());
         CalendarService calendarService = createCalendarService(otpDao);
 
         return new GtfsContextImpl(feedId, otpDao, calendarService);

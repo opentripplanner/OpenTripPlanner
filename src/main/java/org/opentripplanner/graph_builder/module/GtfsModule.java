@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarSrvDataWithoutDatesForLocalizedSrvId;
-import static org.opentripplanner.gtfs.mapping.ModelMapper.mapDao;
+import static org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper.mapDao;
 
 public class GtfsModule implements GraphBuilderModule {
 

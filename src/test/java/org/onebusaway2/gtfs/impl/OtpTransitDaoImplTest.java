@@ -33,8 +33,9 @@ import org.onebusaway2.gtfs.model.StopTime;
 import org.onebusaway2.gtfs.model.Transfer;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.onebusaway2.gtfs.services.OtpTransitDao;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.mapping.ModelMapper;
+import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class OtpTransitDaoImplTest {
     private static final AgencyAndId STATION_ID = new AgencyAndId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
-    private static OtpTransitDaoImpl subject;
+    private static OtpTransitDao subject;
 
     private static Agency agency;
 
@@ -70,14 +71,16 @@ public class OtpTransitDaoImplTest {
         reader.setDefaultAgencyId(FEED_ID);
         reader.run();
 
-        subject = (OtpTransitDaoImpl) ModelMapper.mapDao(dao);
-        agency = first(subject.getAllAgencies());
+        OtpTransitDaoBuilder builder = new OtpTransitDaoBuilder(OtpTransitDaoMapper.mapDao(dao));
+        agency = first(builder.getAgencies());
 
         // Supplement test data with at least one entity in all collections
-        subject.getAllCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
-        subject.getAllFareAttributes().add(createFareAttribute());
-        subject.getAllFareRules().add(new FareRule());
-        subject.getAllFeedInfos().add(new FeedInfo());
+        builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
+        builder.getFareAttributes().add(createFareAttribute());
+        builder.getFareRules().add(new FareRule());
+        builder.getFeedInfos().add(new FeedInfo());
+
+        subject = builder.build();
     }
 
     @Test
