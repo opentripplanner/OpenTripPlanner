@@ -86,7 +86,7 @@ public class RouteMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Route result = subject.map(ROUTE);
+        org.opentripplanner.model.Route result = subject.map(ROUTE);
 
         assertEquals("A_1", result.getId().toString());
         assertNotNull(result.getAgency());
@@ -108,7 +108,7 @@ public class RouteMapperTest {
         Route input = new Route();
         input.setId(AGENCY_AND_ID);
 
-        org.onebusaway2.gtfs.model.Route result = subject.map(input);
+        org.opentripplanner.model.Route result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getAgency());
@@ -130,8 +130,8 @@ public class RouteMapperTest {
      */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Route result1 = subject.map(ROUTE);
-        org.onebusaway2.gtfs.model.Route result2 = subject.map(ROUTE);
+        org.opentripplanner.model.Route result1 = subject.map(ROUTE);
+        org.opentripplanner.model.Route result2 = subject.map(ROUTE);
 
         assertTrue(result1 == result2);
     }

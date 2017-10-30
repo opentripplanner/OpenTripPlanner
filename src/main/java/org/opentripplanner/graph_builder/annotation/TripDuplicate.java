@@ -13,7 +13,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.graph_builder.annotation;
 
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 
 public class TripDuplicate extends GraphBuilderAnnotation {
 

@@ -16,8 +16,8 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 

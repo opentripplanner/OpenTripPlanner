@@ -15,8 +15,8 @@ package org.opentripplanner.routing.impl;
 
 import java.util.List;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;

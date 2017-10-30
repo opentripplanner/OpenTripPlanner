@@ -15,9 +15,9 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 
 public class TestSpecificTransfer extends TestCase {
 

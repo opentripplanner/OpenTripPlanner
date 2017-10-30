@@ -13,7 +13,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.model.FareAttribute;
+import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;

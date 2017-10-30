@@ -61,7 +61,7 @@ public class ShapePointMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.ShapePoint result = subject.map(SHAPE_POINT);
+        org.opentripplanner.model.ShapePoint result = subject.map(SHAPE_POINT);
 
         assertEquals(ID, result.getId());
         assertEquals(DIST_TRAVELED, result.getDistTraveled(), 0.0001d);
@@ -73,7 +73,7 @@ public class ShapePointMapperTest {
 
     @Test
     public void testMapWithNulls() throws Exception {
-        org.onebusaway2.gtfs.model.ShapePoint result = subject.map(new ShapePoint());
+        org.opentripplanner.model.ShapePoint result = subject.map(new ShapePoint());
 
         assertNotNull(result.getId());
         assertFalse(result.isDistTraveledSet());
@@ -86,8 +86,8 @@ public class ShapePointMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.ShapePoint result1 = subject.map(SHAPE_POINT);
-        org.onebusaway2.gtfs.model.ShapePoint result2 = subject.map(SHAPE_POINT);
+        org.opentripplanner.model.ShapePoint result1 = subject.map(SHAPE_POINT);
+        org.opentripplanner.model.ShapePoint result2 = subject.map(SHAPE_POINT);
 
         assertTrue(result1 == result2);
     }

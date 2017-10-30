@@ -15,10 +15,10 @@ package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;

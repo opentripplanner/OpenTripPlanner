@@ -15,8 +15,8 @@ package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Stop;
 
 public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
 

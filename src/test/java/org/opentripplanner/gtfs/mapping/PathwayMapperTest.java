@@ -66,7 +66,7 @@ public class PathwayMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Pathway result = subject.map(PATHWAY);
+        org.opentripplanner.model.Pathway result = subject.map(PATHWAY);
 
         assertEquals("A_1", result.getId().toString());
         assertNotNull(result.getFromStop());
@@ -81,7 +81,7 @@ public class PathwayMapperTest {
         Pathway input = new Pathway();
         input.setId(AGENCY_AND_ID);
 
-        org.onebusaway2.gtfs.model.Pathway result = subject.map(input);
+        org.opentripplanner.model.Pathway result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getFromStop());
@@ -94,8 +94,8 @@ public class PathwayMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Pathway result1 = subject.map(PATHWAY);
-        org.onebusaway2.gtfs.model.Pathway result2 = subject.map(PATHWAY);
+        org.opentripplanner.model.Pathway result1 = subject.map(PATHWAY);
+        org.opentripplanner.model.Pathway result2 = subject.map(PATHWAY);
 
         assertTrue(result1 == result2);
     }

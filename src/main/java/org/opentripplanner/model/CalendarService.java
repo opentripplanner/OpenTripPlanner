@@ -14,9 +14,7 @@
  */
 package org.opentripplanner.model;
 
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.util.Set;
 import java.util.TimeZone;

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 class ServiceDateMapper {
     static ServiceDate mapServiceDate(org.onebusaway.gtfs.model.calendar.ServiceDate orginal) {

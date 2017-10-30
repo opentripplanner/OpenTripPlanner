@@ -15,7 +15,7 @@ package org.opentripplanner.updater.alerts;
 
 import java.util.*;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;

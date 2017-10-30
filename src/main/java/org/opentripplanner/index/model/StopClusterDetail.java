@@ -1,9 +1,7 @@
 package org.opentripplanner.index.model;
 
 import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.profile.StopCluster;
 
 import java.util.Collection;

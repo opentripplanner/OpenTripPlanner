@@ -16,8 +16,8 @@ package org.opentripplanner.routing.edgetype.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.StopTransfer;

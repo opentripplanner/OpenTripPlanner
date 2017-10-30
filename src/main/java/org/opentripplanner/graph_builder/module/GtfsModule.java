@@ -145,7 +145,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         // We need to save the calendar service data so we can use it later
-        graph.putService(org.onebusaway2.gtfs.model.calendar.CalendarServiceData.class, service.getData());
+        graph.putService(org.opentripplanner.model.calendar.CalendarServiceData.class, service.getData());
         graph.updateTransitFeedValidity(service.getData());
 
         graph.hasTransit = true;

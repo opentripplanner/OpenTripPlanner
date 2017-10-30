@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.graph;
 
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;

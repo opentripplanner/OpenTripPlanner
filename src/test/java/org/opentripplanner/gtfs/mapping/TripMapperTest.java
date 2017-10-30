@@ -81,7 +81,7 @@ public class TripMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Trip result = subject.map(TRIP);
+        org.opentripplanner.model.Trip result = subject.map(TRIP);
 
         assertEquals("A_1", result.getId().toString());
         assertEquals(BIKES_ALLOWED, result.getBikesAllowed());
@@ -103,7 +103,7 @@ public class TripMapperTest {
         Trip input = new Trip();
         input.setId(AGENCY_AND_ID);
 
-        org.onebusaway2.gtfs.model.Trip result = subject.map(input);
+        org.opentripplanner.model.Trip result = subject.map(input);
 
         assertNotNull(result.getId());
         assertEquals(0, result.getBikesAllowed());
@@ -123,8 +123,8 @@ public class TripMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Trip result1 = subject.map(TRIP);
-        org.onebusaway2.gtfs.model.Trip result2 = subject.map(TRIP);
+        org.opentripplanner.model.Trip result1 = subject.map(TRIP);
+        org.opentripplanner.model.Trip result2 = subject.map(TRIP);
 
         assertTrue(result1 == result2);
     }

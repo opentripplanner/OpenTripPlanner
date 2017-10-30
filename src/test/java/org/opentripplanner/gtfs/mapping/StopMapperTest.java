@@ -88,7 +88,7 @@ public class StopMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Stop result = subject.map(STOP);
+        org.opentripplanner.model.Stop result = subject.map(STOP);
 
         assertEquals("A_1", result.getId().toString());
         assertEquals(CODE, result.getCode());
@@ -112,7 +112,7 @@ public class StopMapperTest {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
 
-        org.onebusaway2.gtfs.model.Stop result = subject.map(input);
+        org.opentripplanner.model.Stop result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getCode());
@@ -134,8 +134,8 @@ public class StopMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Stop result1 = subject.map(STOP);
-        org.onebusaway2.gtfs.model.Stop result2 = subject.map(STOP);
+        org.opentripplanner.model.Stop result1 = subject.map(STOP);
+        org.opentripplanner.model.Stop result2 = subject.map(STOP);
 
         assertTrue(result1 == result2);
     }

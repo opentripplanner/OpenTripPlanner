@@ -13,13 +13,12 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;

@@ -54,7 +54,7 @@ public class ServiceCalendarDateMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.ServiceCalendarDate result = subject.map(SERVICE_DATE);
+        org.opentripplanner.model.ServiceCalendarDate result = subject.map(SERVICE_DATE);
 
         assertEquals(ID, result.getId());
         assertEquals(DATE.getAsString(), result.getDate().getAsString());
@@ -66,7 +66,7 @@ public class ServiceCalendarDateMapperTest {
     @Test
     public void testMapWithNulls() throws Exception {
         ServiceCalendarDate input = new ServiceCalendarDate();
-        org.onebusaway2.gtfs.model.ServiceCalendarDate result = subject.map(input);
+        org.opentripplanner.model.ServiceCalendarDate result = subject.map(input);
 
         assertEquals(Integer.valueOf(0), result.getId());
         assertNull(result.getDate());
@@ -77,8 +77,8 @@ public class ServiceCalendarDateMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.ServiceCalendarDate result1 = subject.map(SERVICE_DATE);
-        org.onebusaway2.gtfs.model.ServiceCalendarDate result2 = subject.map(SERVICE_DATE);
+        org.opentripplanner.model.ServiceCalendarDate result1 = subject.map(SERVICE_DATE);
+        org.opentripplanner.model.ServiceCalendarDate result2 = subject.map(SERVICE_DATE);
 
         assertTrue(result1 == result2);
     }

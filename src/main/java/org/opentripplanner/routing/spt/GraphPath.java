@@ -16,8 +16,8 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;

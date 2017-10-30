@@ -15,7 +15,7 @@
  */
 package org.onebusaway2.gtfs.impl;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 
 public class MultipleCalendarsForServiceIdException extends RuntimeException {
 

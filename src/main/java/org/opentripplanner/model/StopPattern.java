@@ -7,9 +7,6 @@ import java.util.List;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.StopTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

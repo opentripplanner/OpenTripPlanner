@@ -15,7 +15,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.model.FareRule;
+import org.opentripplanner.model.FareRule;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;

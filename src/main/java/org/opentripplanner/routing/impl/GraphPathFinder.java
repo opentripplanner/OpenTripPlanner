@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;

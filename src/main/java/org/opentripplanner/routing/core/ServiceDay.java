@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
 

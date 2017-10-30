@@ -14,10 +14,10 @@
 package org.opentripplanner.routing.core;
 
 import org.junit.Test;
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.GenericLocation;
 
 import static org.junit.Assert.assertEquals;

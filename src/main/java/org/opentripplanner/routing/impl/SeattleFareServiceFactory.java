@@ -16,8 +16,8 @@ package org.opentripplanner.routing.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitDao;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;

@@ -1,8 +1,8 @@
 package org.onebusaway2.gtfs.impl;
 
 import org.junit.Test;
-import org.onebusaway2.gtfs.model.FareRule;
-import org.onebusaway2.gtfs.model.IdentityBean;
+import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.IdentityBean;
 
 import java.util.Arrays;
 import java.util.Collections;

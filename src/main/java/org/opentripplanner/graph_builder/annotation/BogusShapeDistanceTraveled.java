@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 
-import org.onebusaway2.gtfs.model.StopTime;
+import org.opentripplanner.model.StopTime;
 
 public class BogusShapeDistanceTraveled extends GraphBuilderAnnotation {
 

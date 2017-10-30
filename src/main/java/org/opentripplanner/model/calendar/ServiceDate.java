@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway2.gtfs.model.calendar;
+package org.opentripplanner.model.calendar;
 
-import org.onebusaway2.gtfs.model.ServiceCalendar;
-import org.onebusaway2.gtfs.model.ServiceCalendarDate;
-import org.onebusaway2.gtfs.model.StopTime;
+import org.opentripplanner.model.ServiceCalendar;
+import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.StopTime;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;

@@ -26,7 +26,7 @@ public class ServiceDateMapperTest {
     public void testMapServiceDate() throws Exception {
         ServiceDate input = new ServiceDate(2017, 10, 3);
 
-        org.onebusaway2.gtfs.model.calendar.ServiceDate result = mapServiceDate(input);
+        org.opentripplanner.model.calendar.ServiceDate result = mapServiceDate(input);
 
         assertEquals(2017, result.getYear());
         assertEquals(10, result.getMonth());

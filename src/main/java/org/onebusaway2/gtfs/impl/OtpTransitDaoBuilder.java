@@ -14,21 +14,21 @@
 */
 package org.onebusaway2.gtfs.impl;
 
-import org.onebusaway2.gtfs.model.Agency;
-import org.onebusaway2.gtfs.model.FareAttribute;
-import org.onebusaway2.gtfs.model.FareRule;
-import org.onebusaway2.gtfs.model.FeedInfo;
-import org.onebusaway2.gtfs.model.Frequency;
-import org.onebusaway2.gtfs.model.IdentityBean;
-import org.onebusaway2.gtfs.model.Pathway;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.ServiceCalendar;
-import org.onebusaway2.gtfs.model.ServiceCalendarDate;
-import org.onebusaway2.gtfs.model.ShapePoint;
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.StopTime;
-import org.onebusaway2.gtfs.model.Transfer;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.ServiceCalendar;
+import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitDao;
 
 import java.util.ArrayList;

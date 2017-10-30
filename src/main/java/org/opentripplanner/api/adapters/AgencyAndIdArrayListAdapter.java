@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 
 public class AgencyAndIdArrayListAdapter extends XmlAdapter<ArrayList<AgencyAndIdType>, ArrayList<AgencyAndId>> {
 

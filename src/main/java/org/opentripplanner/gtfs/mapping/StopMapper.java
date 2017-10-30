@@ -13,7 +13,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;

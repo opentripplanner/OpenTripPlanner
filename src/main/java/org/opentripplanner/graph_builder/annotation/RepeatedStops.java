@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import gnu.trove.list.TIntList;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 
 public class RepeatedStops extends GraphBuilderAnnotation {
 

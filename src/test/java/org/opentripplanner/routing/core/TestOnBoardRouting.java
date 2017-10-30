@@ -19,8 +19,8 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.onebusaway2.gtfs.model.Stop;
-import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;

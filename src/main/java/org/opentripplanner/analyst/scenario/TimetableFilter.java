@@ -1,8 +1,8 @@
 package org.opentripplanner.analyst.scenario;
 
 import com.google.common.primitives.Ints;
-import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.Collection;

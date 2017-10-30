@@ -16,7 +16,7 @@ package org.opentripplanner.routing.transit_index;
 import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.io.Serializable;

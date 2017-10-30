@@ -16,7 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.Set;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 public interface AlertPatchService {

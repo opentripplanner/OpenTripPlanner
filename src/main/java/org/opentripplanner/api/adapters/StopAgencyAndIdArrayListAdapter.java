@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 
 public class StopAgencyAndIdArrayListAdapter extends
         XmlAdapter<ArrayList<AgencyAndIdType>, ArrayList<Stop>> {

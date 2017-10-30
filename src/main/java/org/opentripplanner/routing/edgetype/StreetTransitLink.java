@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;

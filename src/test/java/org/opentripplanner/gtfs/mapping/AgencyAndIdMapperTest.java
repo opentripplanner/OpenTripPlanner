@@ -14,7 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.junit.Test;
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

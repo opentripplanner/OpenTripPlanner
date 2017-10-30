@@ -22,9 +22,9 @@ import java.util.List;
 
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.IdentityBean;
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.Trip;
 import org.onebusaway2.gtfs.services.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.gtfs.BikeAccess;

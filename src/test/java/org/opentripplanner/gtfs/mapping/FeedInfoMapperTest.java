@@ -63,7 +63,7 @@ public class FeedInfoMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.FeedInfo result = subject.map(FEED_INFO);
+        org.opentripplanner.model.FeedInfo result = subject.map(FEED_INFO);
 
         assertEquals(ID, result.getId());
         assertEquals("20161005", result.getStartDate().getAsString());
@@ -76,7 +76,7 @@ public class FeedInfoMapperTest {
 
     @Test
     public void testMapWithNulls() throws Exception {
-        org.onebusaway2.gtfs.model.FeedInfo result = subject.map(new FeedInfo());
+        org.opentripplanner.model.FeedInfo result = subject.map(new FeedInfo());
 
         assertNotNull(result.getId());
         assertNull(result.getStartDate());
@@ -90,8 +90,8 @@ public class FeedInfoMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.FeedInfo result1 = subject.map(FEED_INFO);
-        org.onebusaway2.gtfs.model.FeedInfo result2 = subject.map(FEED_INFO);
+        org.opentripplanner.model.FeedInfo result1 = subject.map(FEED_INFO);
+        org.opentripplanner.model.FeedInfo result2 = subject.map(FEED_INFO);
 
         assertTrue(result1 == result2);
     }

@@ -22,18 +22,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.Context;
-
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.GraphService;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.opentripplanner.standalone.OTPApplication;
-import org.opentripplanner.standalone.OTPServer;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
 

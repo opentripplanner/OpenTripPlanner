@@ -13,7 +13,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 
 public class AgencyAndIdMapper {
     public static AgencyAndId mapAgencyAndId(org.onebusaway.gtfs.model.AgencyAndId id) {

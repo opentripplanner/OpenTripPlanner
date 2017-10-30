@@ -15,8 +15,7 @@ package org.opentripplanner.extra_graph;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Collection;

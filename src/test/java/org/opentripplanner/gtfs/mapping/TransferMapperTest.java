@@ -88,7 +88,7 @@ public class TransferMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Transfer result = subject.map(TRANSFER);
+        org.opentripplanner.model.Transfer result = subject.map(TRANSFER);
 
         assertEquals(ID, result.getId());
         assertNotNull(result.getFromRoute());
@@ -103,7 +103,7 @@ public class TransferMapperTest {
 
     @Test
     public void testMapWithNulls() throws Exception {
-        org.onebusaway2.gtfs.model.Transfer result = subject.map(new Transfer());
+        org.opentripplanner.model.Transfer result = subject.map(new Transfer());
 
         assertNotNull(result.getId());
         assertNull(result.getFromRoute());
@@ -119,8 +119,8 @@ public class TransferMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Transfer result1 = subject.map(TRANSFER);
-        org.onebusaway2.gtfs.model.Transfer result2 = subject.map(TRANSFER);
+        org.opentripplanner.model.Transfer result1 = subject.map(TRANSFER);
+        org.opentripplanner.model.Transfer result2 = subject.map(TRANSFER);
 
         assertTrue(result1 == result2);
     }

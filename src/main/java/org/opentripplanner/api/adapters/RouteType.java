@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Route;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

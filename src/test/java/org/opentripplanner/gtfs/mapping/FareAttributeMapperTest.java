@@ -71,7 +71,7 @@ public class FareAttributeMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.FareAttribute result = subject.map(FARE_ATTRIBUTE);
+        org.opentripplanner.model.FareAttribute result = subject.map(FARE_ATTRIBUTE);
 
         assertEquals("A_1", result.getId().toString());
         assertEquals(CURRENCY_TYPE, result.getCurrencyType());
@@ -88,7 +88,7 @@ public class FareAttributeMapperTest {
     public void testMapWithNulls() throws Exception {
         FareAttribute orginal = new FareAttribute();
         orginal.setId(ID);
-        org.onebusaway2.gtfs.model.FareAttribute result = subject.map(orginal);
+        org.opentripplanner.model.FareAttribute result = subject.map(orginal);
 
         assertNotNull(result.getId());
         assertNull(result.getCurrencyType());
@@ -104,8 +104,8 @@ public class FareAttributeMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.FareAttribute result1 = subject.map(FARE_ATTRIBUTE);
-        org.onebusaway2.gtfs.model.FareAttribute result2 = subject.map(FARE_ATTRIBUTE);
+        org.opentripplanner.model.FareAttribute result1 = subject.map(FARE_ATTRIBUTE);
+        org.opentripplanner.model.FareAttribute result2 = subject.map(FARE_ATTRIBUTE);
 
         assertTrue(result1 == result2);
     }

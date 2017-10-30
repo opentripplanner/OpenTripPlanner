@@ -21,7 +21,7 @@ import java.util.TimeZone;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import org.onebusaway2.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Fare;
 
 /**

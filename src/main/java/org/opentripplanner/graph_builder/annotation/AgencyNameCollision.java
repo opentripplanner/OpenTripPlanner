@@ -13,7 +13,7 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import org.onebusaway2.gtfs.model.Agency;
+import org.opentripplanner.model.Agency;
 
 public class AgencyNameCollision extends GraphBuilderAnnotation {
 

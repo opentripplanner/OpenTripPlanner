@@ -15,7 +15,7 @@ package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.model.Route;
 
 public class RouteAdapter extends XmlAdapter<RouteType, Route> {
 

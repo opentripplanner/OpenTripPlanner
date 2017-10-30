@@ -17,8 +17,8 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.OtpTransitDao;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;

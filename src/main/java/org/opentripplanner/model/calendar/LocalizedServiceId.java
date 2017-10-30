@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusaway2.gtfs.model.calendar;
+package org.opentripplanner.model.calendar;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.CalendarService;
 
 import java.io.Serializable;

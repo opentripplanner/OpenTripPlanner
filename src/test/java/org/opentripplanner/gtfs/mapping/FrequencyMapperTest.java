@@ -69,7 +69,7 @@ public class FrequencyMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.Frequency result = subject.map(FREQUENCY);
+        org.opentripplanner.model.Frequency result = subject.map(FREQUENCY);
 
         assertEquals(ID, result.getId());
         assertEquals(START_TIME, result.getStartTime());
@@ -82,7 +82,7 @@ public class FrequencyMapperTest {
 
     @Test
     public void testMapWithNulls() throws Exception {
-        org.onebusaway2.gtfs.model.Frequency result = subject.map(new Frequency());
+        org.opentripplanner.model.Frequency result = subject.map(new Frequency());
 
         assertNotNull(result.getId());
         assertEquals(0, result.getStartTime());
@@ -96,8 +96,8 @@ public class FrequencyMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.Frequency result1 = subject.map(FREQUENCY);
-        org.onebusaway2.gtfs.model.Frequency result2 = subject.map(FREQUENCY);
+        org.opentripplanner.model.Frequency result1 = subject.map(FREQUENCY);
+        org.opentripplanner.model.Frequency result2 = subject.map(FREQUENCY);
 
         assertTrue(result1 == result2);
     }

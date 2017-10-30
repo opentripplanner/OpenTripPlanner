@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.gtfs.GtfsLibrary;
 

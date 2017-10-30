@@ -13,7 +13,7 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 
 public class TripOvertaking extends GraphBuilderAnnotation {
 

@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.onebusaway2.gtfs.model.AgencyAndId;
-import org.onebusaway2.gtfs.model.FareAttribute;
+import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.common.model.P2;
 
 public class FareRuleSet implements Serializable {

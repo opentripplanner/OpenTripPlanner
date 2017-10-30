@@ -91,7 +91,7 @@ public class StopTimeMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.onebusaway2.gtfs.model.StopTime result = subject.map(STOP_TIME);
+        org.opentripplanner.model.StopTime result = subject.map(STOP_TIME);
 
         assertEquals(ID, result.getId());
         assertEquals(ARRIVAL_TIME, result.getArrivalTime());
@@ -110,7 +110,7 @@ public class StopTimeMapperTest {
 
     @Test
     public void testMapWithNulls() throws Exception {
-        org.onebusaway2.gtfs.model.StopTime result = subject.map(new StopTime());
+        org.opentripplanner.model.StopTime result = subject.map(new StopTime());
 
         assertNotNull(result.getId());
         assertFalse(result.isArrivalTimeSet());
@@ -129,8 +129,8 @@ public class StopTimeMapperTest {
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.onebusaway2.gtfs.model.StopTime result1 = subject.map(STOP_TIME);
-        org.onebusaway2.gtfs.model.StopTime result2 = subject.map(STOP_TIME);
+        org.opentripplanner.model.StopTime result1 = subject.map(STOP_TIME);
+        org.opentripplanner.model.StopTime result2 = subject.map(STOP_TIME);
 
         assertTrue(result1 == result2);
     }
