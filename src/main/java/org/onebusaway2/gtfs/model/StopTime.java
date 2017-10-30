@@ -16,7 +16,7 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
+import org.opentripplanner.util.TimeToStringConverter;
 
 public final class StopTime extends IdentityBean<Integer> implements Comparable<StopTime> {
 

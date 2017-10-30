@@ -1,4 +1,4 @@
-package org.onebusaway2.gtfs.model.calendar;
+package org.opentripplanner.util;
 
 /**
  * Indicates the "time" is not on the expected format.

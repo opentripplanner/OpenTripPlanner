@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
-package org.onebusaway2.gtfs.model.calendar;
+package org.opentripplanner.util;
 
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;

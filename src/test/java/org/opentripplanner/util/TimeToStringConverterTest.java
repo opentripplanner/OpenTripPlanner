@@ -13,13 +13,13 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.onebusaway2.gtfs.model;
+package org.opentripplanner.util;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.onebusaway2.gtfs.model.calendar.TimeToStringConverter.parseHH_MM_SS;
-import static org.onebusaway2.gtfs.model.calendar.TimeToStringConverter.toHH_MM_SS;
+import static org.opentripplanner.util.TimeToStringConverter.parseHH_MM_SS;
+import static org.opentripplanner.util.TimeToStringConverter.toHH_MM_SS;
 
 public class TimeToStringConverterTest {
 

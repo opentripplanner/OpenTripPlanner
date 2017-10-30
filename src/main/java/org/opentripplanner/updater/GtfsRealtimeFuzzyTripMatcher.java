@@ -3,7 +3,7 @@ package org.opentripplanner.updater;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.onebusaway2.gtfs.model.AgencyAndId;
 import org.onebusaway2.gtfs.model.Route;
-import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
+import org.opentripplanner.util.TimeToStringConverter;
 import org.onebusaway2.gtfs.model.Trip;
 import org.onebusaway2.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TripPattern;

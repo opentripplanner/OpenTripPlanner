@@ -16,9 +16,7 @@
  */
 package org.onebusaway2.gtfs.model;
 
-import org.onebusaway2.gtfs.model.calendar.TimeToStringConverter;
-
-import static org.onebusaway2.gtfs.model.calendar.TimeToStringConverter.toHH_MM_SS;
+import static org.opentripplanner.util.TimeToStringConverter.toHH_MM_SS;
 
 public final class Frequency extends IdentityBean<Integer> {
 
