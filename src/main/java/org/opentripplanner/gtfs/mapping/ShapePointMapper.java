@@ -14,18 +14,17 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.ShapePoint;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
-
 class ShapePointMapper {
     private Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints = new HashMap<>();
 
     Collection<ShapePoint> map(Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints) {
-        return mapCollection(allShapePoints, this::map);
+        return MapUtils.mapToList(allShapePoints, this::map);
     }
 
     ShapePoint map(org.onebusaway.gtfs.model.ShapePoint orginal) {

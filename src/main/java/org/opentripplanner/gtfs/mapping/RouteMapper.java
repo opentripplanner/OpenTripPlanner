@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Route;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ class RouteMapper {
     }
 
     Collection<Route> map(Collection<org.onebusaway.gtfs.model.Route> agencies) {
-        return MapCollection.mapCollection(agencies, this::map);
+        return MapUtils.mapToList(agencies, this::map);
     }
 
     Route map(org.onebusaway.gtfs.model.Route orginal) {

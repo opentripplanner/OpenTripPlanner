@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Pathway;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ class PathwayMapper {
     }
 
     Collection<Pathway> map(Collection<org.onebusaway.gtfs.model.Pathway> allPathways) {
-        return MapCollection.mapCollection(allPathways, this::map);
+        return MapUtils.mapToList(allPathways, this::map);
     }
 
     Pathway map(org.onebusaway.gtfs.model.Pathway orginal) {

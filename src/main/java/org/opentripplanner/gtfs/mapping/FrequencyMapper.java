@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Frequency;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ class FrequencyMapper {
     }
 
     Collection<Frequency> map(Collection<org.onebusaway.gtfs.model.Frequency> allFrequencys) {
-        return MapCollection.mapCollection(allFrequencys, this::map);
+        return MapUtils.mapToList(allFrequencys, this::map);
     }
 
     Frequency map(org.onebusaway.gtfs.model.Frequency orginal) {

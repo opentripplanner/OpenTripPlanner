@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class MapUtils {
 
@@ -89,5 +91,15 @@ public class MapUtils {
                 mapList.put(key, value);
             }
         }
+    }
+
+    /**
+     * Map a collection of objects of type <em>S</em> to a list of type <em>T</em> using the
+     * provided mapping function.
+     * <p>
+     * Nullsafe: if <em>entities</em> is <code>null</code>, then <code>null</code> is returned.
+     */
+    public static <S, T> List<T> mapToList(Collection<S> entities, Function<S, T> mapper) {
+        return entities == null ? null : entities.stream().map(mapper).collect(Collectors.toList());
     }
 }

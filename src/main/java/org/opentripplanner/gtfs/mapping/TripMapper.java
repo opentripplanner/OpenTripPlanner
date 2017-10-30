@@ -14,12 +14,11 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Trip;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 
 class TripMapper {
 
@@ -32,7 +31,7 @@ class TripMapper {
     }
 
     Collection<Trip> map(Collection<org.onebusaway.gtfs.model.Trip> trips) {
-        return mapCollection(trips, this::map);
+        return MapUtils.mapToList(trips, this::map);
     }
 
     Trip map(org.onebusaway.gtfs.model.Trip orginal) {

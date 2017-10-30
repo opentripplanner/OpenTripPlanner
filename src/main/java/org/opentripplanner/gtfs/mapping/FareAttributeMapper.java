@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.FareAttribute;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ class FareAttributeMapper {
     private Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
     Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
-        return MapCollection.mapCollection(allStops, this::map);
+        return MapUtils.mapToList(allStops, this::map);
     }
 
     FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {

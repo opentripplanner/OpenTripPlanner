@@ -14,19 +14,19 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.FeedInfo;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 
 class FeedInfoMapper {
     private Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
 
     Collection<FeedInfo> map(Collection<org.onebusaway.gtfs.model.FeedInfo> feedInfos) {
-        return feedInfos == null ? null : mapCollection(feedInfos, this::map);
+        return feedInfos == null ? null : MapUtils.mapToList(feedInfos, this::map);
     }
 
     FeedInfo map(org.onebusaway.gtfs.model.FeedInfo orginal) {

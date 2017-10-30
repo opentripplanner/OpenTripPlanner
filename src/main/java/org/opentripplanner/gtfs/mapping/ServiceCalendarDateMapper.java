@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.ServiceCalendarDate;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ class ServiceCalendarDateMapper {
 
     Collection<ServiceCalendarDate> map(
             Collection<org.onebusaway.gtfs.model.ServiceCalendarDate> allServiceDates) {
-        return MapCollection.mapCollection(allServiceDates, this::map);
+        return MapUtils.mapToList(allServiceDates, this::map);
     }
 
     ServiceCalendarDate map(org.onebusaway.gtfs.model.ServiceCalendarDate orginal) {

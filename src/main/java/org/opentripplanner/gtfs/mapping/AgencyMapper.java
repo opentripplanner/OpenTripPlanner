@@ -14,6 +14,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Agency;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ class AgencyMapper {
     private final Map<org.onebusaway.gtfs.model.Agency, Agency> mappedAgencies = new HashMap<>();
 
     Collection<Agency> map(Collection<org.onebusaway.gtfs.model.Agency> agencies) {
-        return MapCollection.mapCollection(agencies, this::map);
+        return MapUtils.mapToList(agencies, this::map);
     }
 
     Agency map(org.onebusaway.gtfs.model.Agency orginal) {

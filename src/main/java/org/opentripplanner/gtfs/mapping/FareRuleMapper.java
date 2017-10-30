@@ -16,6 +16,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.FareRule;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ class FareRuleMapper {
     }
 
     Collection<FareRule> map(Collection<org.onebusaway.gtfs.model.FareRule> allFareRules) {
-        return MapCollection.mapCollection(allFareRules, this::map);
+        return MapUtils.mapToList(allFareRules, this::map);
     }
 
     FareRule map(org.onebusaway.gtfs.model.FareRule orginal) {

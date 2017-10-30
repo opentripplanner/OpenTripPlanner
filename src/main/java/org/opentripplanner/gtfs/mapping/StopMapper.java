@@ -14,19 +14,19 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway2.gtfs.model.Stop;
+import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-import static org.opentripplanner.gtfs.mapping.MapCollection.mapCollection;
 
 class StopMapper {
     private Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
 
     Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
-        return mapCollection(allStops, this::map);
+        return MapUtils.mapToList(allStops, this::map);
     }
 
     Stop map(org.onebusaway.gtfs.model.Stop orginal) {
