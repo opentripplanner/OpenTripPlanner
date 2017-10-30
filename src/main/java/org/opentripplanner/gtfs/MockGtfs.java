@@ -1,4 +1,4 @@
-package org.onebusaway2.gtfs.services;
+package org.opentripplanner.gtfs;
 
 import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;

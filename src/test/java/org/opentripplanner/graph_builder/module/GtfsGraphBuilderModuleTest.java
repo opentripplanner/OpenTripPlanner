@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.IdentityBean;
 import org.opentripplanner.model.Trip;
-import org.onebusaway2.gtfs.services.MockGtfs;
+import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
