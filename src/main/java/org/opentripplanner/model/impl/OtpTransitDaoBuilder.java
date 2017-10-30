@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not; see <http://www.gnu.org/licenses/>. 
 */
-package org.onebusaway2.gtfs.impl;
+package org.opentripplanner.model.impl;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;

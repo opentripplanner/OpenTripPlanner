@@ -13,7 +13,7 @@
 
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway2.gtfs.impl.OtpTransitDaoBuilder;
+import org.opentripplanner.model.impl.OtpTransitDaoBuilder;
 import org.opentripplanner.model.OtpTransitDao;
 
 public class OtpTransitDaoMapper {

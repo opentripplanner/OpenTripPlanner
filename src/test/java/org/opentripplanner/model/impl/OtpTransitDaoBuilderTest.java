@@ -1,4 +1,4 @@
-package org.onebusaway2.gtfs.impl;
+package org.opentripplanner.model.impl;
 
 import org.junit.Test;
 import org.opentripplanner.model.FareRule;
@@ -11,7 +11,7 @@ import java.util.List;
 import static java.lang.Integer.valueOf;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.onebusaway2.gtfs.impl.OtpTransitDaoBuilder.generateNoneExistingIds;
+import static org.opentripplanner.model.impl.OtpTransitDaoBuilder.generateNoneExistingIds;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
