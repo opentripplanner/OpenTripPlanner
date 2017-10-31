@@ -22,6 +22,19 @@
       <level>WARN</level>
     </filter>
   </appender>
+
+  <appender name="TaggedStopsLog" class="ch.qos.logback.core.FileAppender">
+    <file>taggedStops.log</file>
+    <append>false</append>
+    <!-- set immediateFlush to false for much higher logging throughput -->
+    <immediateFlush>false</immediateFlush>
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
   <!-- Change this to debug to let more messages through. -->
   <root level="info">
     <appender-ref ref="stdout" />
@@ -54,5 +67,8 @@
   <logger name="com.sun.jersey" level="warn" />
   <!-- Suppress an inconsequential IOException that is logged at debug level. -->
   <logger name="org.glassfish.grizzly" level="info" />
+  <logger name="org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule" level="debug" additivity="false">
+    <appender-ref ref="TaggedStopsLog"/>
+  </logger>
 
 </configuration>
