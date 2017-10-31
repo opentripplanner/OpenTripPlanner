@@ -160,8 +160,8 @@ public class Timetable implements Serializable {
 
         // Only compute transfer once, if possible - it's expensive.
         int exampleAdjustedTime = -1;
-        boolean recomputeTime = !transferDependsOnTrip(s0, currentStop, boarding);
-        if (!recomputeTime) {
+        boolean recomputeTime = transferDependsOnTrip(s0, currentStop, boarding);
+        if (!recomputeTime && tripTimes.size() > 0) {
             exampleAdjustedTime = adjustTimeForTransfer(s0, currentStop, getTripTimes(0).trip, boarding, serviceDay, time);
         }
 
