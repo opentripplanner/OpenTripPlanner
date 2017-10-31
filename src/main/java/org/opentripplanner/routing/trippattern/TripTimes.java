@@ -331,7 +331,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         if (banned != null && banned.contains(stopIndex)) {
             return false;
         }
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
+        if (options.wheelchairAccessible && trip.getWheelchairAccessible() == 2) {
             return false;
         }
         // Establish whether we have a rented _or_ owned bicycle.

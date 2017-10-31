@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Pathway;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -29,19 +30,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 public class PathwayEdge extends Edge {
 
+    private enum Mode { NONE, PATH, STAIRS, ELEVATOR }
+
     private int traversalTime;
 
     private int wheelchairTraversalTime = -1;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, int traversalTime, int wheelchairTraversalTime) {
+    private Mode pathwayMode = Mode.NONE;
+
+    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, int traversalTime, int wheelchairTraversalTime) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
         this.wheelchairTraversalTime = wheelchairTraversalTime;
+        switch (pathwayMode) {
+            case Pathway.MODE_PATH:
+                this.pathwayMode = Mode.PATH;
+                break;
+            case Pathway.MODE_ELEVATOR:
+                this.pathwayMode = Mode.ELEVATOR;
+                break;
+            case Pathway.MODE_STAIRS:
+                this.pathwayMode = Mode.STAIRS;
+                break;
+        }
     }
 
-    public PathwayEdge(Vertex fromv, Vertex tov, int traversalTime) {
-        super(fromv, tov);
-        this.traversalTime = traversalTime;
+    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, int traversalTime) {
+        this(fromv, tov, pathwayMode, traversalTime, -1);
     }
 
     private static final long serialVersionUID = -3311099256178798981L;
@@ -65,7 +80,14 @@ public class PathwayEdge extends Edge {
     }
 
     public String getName() {
-        return "pathway";
+        switch(pathwayMode) {
+            case ELEVATOR:
+                return "elevator";
+            case STAIRS:
+                return "stairs";
+            default:
+                return "pathway";
+        }
     }
 
     @Override
