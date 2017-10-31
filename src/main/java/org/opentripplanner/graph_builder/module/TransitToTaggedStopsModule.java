@@ -102,7 +102,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
                 new StreetTransitLink(ts, tsv, wheelchairAccessible);
                 new StreetTransitLink(tsv, ts, wheelchairAccessible);
-                LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
+                LOG.debug("Connected " + ts.toString() + " (" + ts.getStopCode() + ") to " + tsv.getLabel() + " at " + tsv.getCoordinate().toString());
                 return true;
             }
         }
