@@ -18,7 +18,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -295,5 +294,12 @@ public abstract class Vertex implements Serializable, Cloneable {
             result.add((StreetEdge) out);
         }
         return result;
+    }
+
+    /**
+     * Return true if this vertex should be linked to street network by SimpleStreetSplitter
+     */
+    public boolean shouldLinkToStreet() {
+        return false;
     }
 }
