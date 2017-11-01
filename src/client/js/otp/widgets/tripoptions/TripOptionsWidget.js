@@ -682,6 +682,62 @@ otp.widgets.tripoptions.MaxBikeSelector =
 
 });
 
+otp.widgets.tripoptions.MaxSlopeSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+
+    selectorWidget : null,
+
+    lastSliderValue : null,
+
+    initialize : function(tripWidget) {
+        var this_ = this;
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-maxSlope";
+
+        ich['otp-tripOptions-maxSlope']({
+            widgetId : this.id,
+            //TRANSLATORS: label Max Slope
+            maxSlope: _tr("Max Slope"),
+            maxRange: _tr("10.0"),
+            minRange: _tr("0.0")
+        }).appendTo(this.$());
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $('#'+this.id+'-weightSlider').slider({
+            min : 0.0,
+            max : 10.0,
+            step: 0.00001,
+            value : this_.lastSliderValue || 0.0833333333333,
+        })
+        .on({
+            slidechange: function(evt) {
+                this_.lastSliderValue = $(this).slider('value');
+                this_.tripWidget.inputChanged({
+                    maxSlope : this_.lastSliderValue,
+                });
+                $('#'+this_.id+'-curSlope').text("Current slope: " + this_.lastSliderValue);
+            },
+        });
+    },
+
+    restorePlan : function(planData) {
+        if(planData.queryParams.maxSlope) {
+            this.lastSliderValue = planData.queryParams.maxSlope;
+            $('#'+this.id+'-weightSlider').slider('value', this.lastSliderValue);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+    }
+
+});
+
 //** PreferredRoutes **//
 
 otp.widgets.tripoptions.PreferredRoutes =
