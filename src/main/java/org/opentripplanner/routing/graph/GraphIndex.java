@@ -726,8 +726,7 @@ public class GraphIndex {
         for (TripPattern pattern : patternForId.values()) {
             if (pattern.hasFlexService()) {
                 LOG.debug("Matching {}", pattern);
-
-                if (pattern.geometry != null) {
+                if (pattern.geometry != null && !isSinglePoint(pattern.geometry)) {
                     List<Edge> edges = matcher.match(pattern.geometry);
                     if (edges == null || edges.isEmpty()) {
                         LOG.warn("Could not match to street network: {}", pattern);
