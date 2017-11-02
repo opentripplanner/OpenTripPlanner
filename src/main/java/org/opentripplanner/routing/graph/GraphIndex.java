@@ -717,6 +717,10 @@ public class GraphIndex {
     }
 
     private void initializeHopsForEdgeMap() {
+        if (!graph.hasStreets) {
+            LOG.info("Cannot initialize hop-to-street-edge map; graph does not have streets loaded.");
+            return;
+        }
         StreetMatcher matcher = new StreetMatcher(graph);
         LOG.info("Finding corresponding street edges for trip patterns...");
         for (TripPattern pattern : patternForId.values()) {
