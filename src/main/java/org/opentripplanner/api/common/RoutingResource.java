@@ -214,7 +214,26 @@ public abstract class RoutingResource {
      */
     @QueryParam("unpreferredRoutes")
     protected String unpreferredRoutes;
-    
+
+    /**
+     * The list of preferred start routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
+     * underscores, 42 is the route internal ID).
+     */
+    @QueryParam("preferredStartRoutes")
+    protected String preferredStartRoutes;
+
+    /** The list of preferred end routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
+     * underscores, 42 is the route internal ID).
+     */
+    @QueryParam("preferredEndRoutes")
+    protected String preferredEndRoutes;
+
+    /**
+     * Penalty added for using every unpreferred start or end routes, i.e. number of seconds that we are willing to wait for preferred route.
+     */
+    @QueryParam("useUnpreferredStartEndPenalty")
+    protected Integer useUnpreferredStartEndPenalty;
+
     /** The comma-separated list of unpreferred agencies. */
     @QueryParam("unpreferredAgencies")
     protected String unpreferredAgencies;
@@ -531,6 +550,15 @@ public abstract class RoutingResource {
 
         if (unpreferredRoutes != null)
             request.setUnpreferredRoutes(unpreferredRoutes);
+
+        if (preferredStartRoutes != null)
+            request.setPreferredStartRoutes(preferredStartRoutes);
+
+        if (preferredEndRoutes != null)
+            request.setPreferredEndRoutes(preferredEndRoutes);
+
+        if (useUnpreferredStartEndPenalty != null)
+            request.setUseUnpreferredStartEndPenalty(useUnpreferredStartEndPenalty);
 
         if (unpreferredAgencies != null)
             request.setUnpreferredAgencies(unpreferredAgencies);

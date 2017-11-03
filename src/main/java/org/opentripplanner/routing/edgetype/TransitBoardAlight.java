@@ -92,6 +92,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             return ((PatternStopVertex) tov).getTripPattern();
         else
             return ((PatternStopVertex) fromv).getTripPattern();
+
     }
                            
     public String getDirection() {
@@ -173,6 +174,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
+
+            // Check to see if we have a preferred starting or ending route when leaving transit
+            long preferences_penalty = options.preferencesPenaltyForFinalRoute(getPattern().route);
+            s1.incrementWeight(preferences_penalty);
+
             if (boarding) {
                 int boardingTime = options.getBoardTime(this.getPattern().mode);
                 if (boardingTime != 0) {
@@ -294,8 +300,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (options.tripIsBanned(trip)) return null;
 
             /* Check if route is preferred by the user. */
-            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
-            
+
+            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route, s0);
+
             /* Compute penalty for non-preferred transfers. */
             int transferPenalty = 0;
             /* If this is not the first boarding, then we are transferring. */
