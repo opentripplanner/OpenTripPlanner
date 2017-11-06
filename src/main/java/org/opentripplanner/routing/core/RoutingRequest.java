@@ -177,6 +177,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
     public double walkReluctance = 2.0;
 
+    /** Default walk reluctance for optimize type = walking */
+    public double walkReluctanceOptimizeWalk = 3.5;
+
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
     
@@ -1191,6 +1194,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
             // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setWalkReluctanceOptimizeWalk(double walkReluctance) {
+        if (walkReluctance > 0) {
+            this.walkReluctanceOptimizeWalk = walkReluctance;
         }
     }
 
