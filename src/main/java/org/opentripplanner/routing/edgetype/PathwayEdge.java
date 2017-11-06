@@ -1,17 +1,3 @@
-package org.opentripplanner.routing.edgetype;
-
-import org.onebusaway.gtfs.model.Pathway;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.routing.core.TraverseMode;
-import java.util.Locale;
-
 /* This program is free software: you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License
 as published by the Free Software Foundation, either version 3 of
@@ -25,6 +11,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+package org.opentripplanner.routing.edgetype;
+
+import org.onebusaway.gtfs.model.Elevator;
+import org.onebusaway.gtfs.model.Pathway;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.core.TraverseMode;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 /**
  * A walking pathway as described in GTFS
  */
@@ -37,6 +44,8 @@ public class PathwayEdge extends Edge {
     private int wheelchairTraversalTime = -1;
 
     private Mode pathwayMode = Mode.NONE;
+
+    private List<Elevator> elevators = new ArrayList<>();
 
     public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, int traversalTime, int wheelchairTraversalTime) {
         super(fromv, tov);
@@ -99,7 +108,7 @@ public class PathwayEdge extends Edge {
     public State traverse(State s0) {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0) {
+            if (wheelchairTraversalTime < 0 || elevatorIsOutOfService(s0)) {
                 return null;
             }
             time = wheelchairTraversalTime;
@@ -109,5 +118,28 @@ public class PathwayEdge extends Edge {
         s1.incrementWeight(time);
         s1.setBackMode(getMode());
         return s1.makeState();
+    }
+
+    private boolean elevatorIsOutOfService(State s0) {
+        Set<String> outages = new HashSet<>();
+        for (AlertPatch alert : s0.getOptions().rctx.graph.getAlertPatches(this)) {
+            if (alert.getStop() != null) {
+                outages.add(alert.getStop().getId());
+            }
+        }
+        for (Elevator elevator : elevators) {
+            if (outages.contains(elevator.getElevatorId().getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addElevator(Elevator elevator) {
+        elevators.add(elevator);
+    }
+
+    public List<Elevator> getElevators() {
+        return elevators;
     }
 }

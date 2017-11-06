@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.google.common.collect.Multimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -164,6 +163,12 @@ public class AlertPatch implements Serializable {
                 }
             }
         }
+
+        if (route == null && trip == null && stop == null && this.stop != null) {
+            for (Edge edge : graph.index.pathwayForElevator.get(this.stop.getId())) {
+                graph.addAlertPatch(edge, this);
+            }
+        }
     }
 
     public void remove(Graph graph) {
@@ -223,6 +228,12 @@ public class AlertPatch implements Serializable {
                     graph.removeAlertPatch(edge, this);
                     break;
                 }
+            }
+        }
+
+        if (route == null && trip == null && stop == null && this.stop != null) {
+            for (Edge edge : graph.index.pathwayForElevator.get(this.stop.getId())) {
+                graph.removeAlertPatch(edge, this);
             }
         }
     }

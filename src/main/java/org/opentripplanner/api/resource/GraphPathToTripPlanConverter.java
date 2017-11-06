@@ -232,10 +232,10 @@ public abstract class GraphPathToTripPlanConverter {
      * @param states The one-dimensional array of input states
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
      */
-    private static State[][] sliceStates(State[] origStates) {
+    private static State[][] sliceStates(State[] states) {
         boolean trivial = true;
 
-        for (State state : origStates) {
+        for (State state : states) {
             TraverseMode traverseMode = state.getBackMode();
 
             if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
@@ -248,23 +248,10 @@ public abstract class GraphPathToTripPlanConverter {
             throw new TrivialPathException();
         }
 
-        State states[] = new State[origStates.length];
-
-        int length = 0;
-        for (int i = 0; i < origStates.length; i++) {
-            if (origStates[i].getBackEdge() instanceof PathwayEdge &&
-                    origStates[i-1].getBackEdge() instanceof StreetTransitLink) {
-                states[length-1] = origStates[i];
-            } else {
-                states[length] = origStates[i];
-                length++;
-            }
-        }
-
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
-        for (int i = 1; i < length - 1; i++) {
+        for (int i = 1; i < states.length - 1; i++) {
             TraverseMode backMode = states[i].getBackMode();
             TraverseMode forwardMode = states[i + 1].getBackMode();
 
@@ -276,19 +263,19 @@ public abstract class GraphPathToTripPlanConverter {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
                 } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
-                    if (legIndexPairs[1] != length - 1) {
+                    if (legIndexPairs[1] != states.length - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
-                    legIndexPairs = new int[] {i, length - 1};
+                    legIndexPairs = new int[] {i, states.length - 1};
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[] {i, length - 1};
+                legIndexPairs = new int[] {i, states.length - 1};
             } else if (edge instanceof PatternInterlineDwell) {         // Interlining => leg switch
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[] {i + 1, length - 1};
+                legIndexPairs = new int[] {i + 1, states.length - 1};
             }
         }
 

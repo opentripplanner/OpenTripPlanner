@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Calendar;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,6 +22,7 @@ import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Elevator;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -47,6 +47,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -60,14 +61,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**
@@ -101,6 +97,7 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
+    public final Multimap<String, PathwayEdge> pathwayForElevator = ArrayListMultimap.create();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -147,6 +144,12 @@ public class GraphIndex {
                 TablePatternEdge patternEdge = (TablePatternEdge) edge;
                 TripPattern pattern = patternEdge.getPattern();
                 patternForId.put(pattern.code, pattern);
+            }
+            if (edge instanceof PathwayEdge) {
+                PathwayEdge pathwayEdge = (PathwayEdge) edge;
+                for (Elevator elevator : pathwayEdge.getElevators()) {
+                    pathwayForElevator.put(elevator.getElevatorId().getId(), pathwayEdge);
+                }
             }
         }
         for (Vertex vertex : vertices) {
