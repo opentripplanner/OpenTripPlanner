@@ -516,6 +516,7 @@ public class TestPatternHopFactory extends TestCase {
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
         options.transferSlack = (0);
+        options.setUseUnpreferredStartEndPenalty(0);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.dateTime = TestUtils.toSeconds(startTime);
@@ -579,7 +580,8 @@ public class TestPatternHopFactory extends TestCase {
         RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
-        options.setRoutingContext(graph, stop_c, stop_d);  
+        options.setRoutingContext(graph, stop_c, stop_d);
+        options.setUseUnpreferredStartEndPenalty(0);
                 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
