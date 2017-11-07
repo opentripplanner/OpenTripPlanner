@@ -147,7 +147,7 @@ public class GraphBuilder implements Runnable {
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
 
         for (File file : dir.listFiles()) {
-            switch (InputFileType.forFile(file)) {
+            switch (InputFileType.forFile(file, builderParams)) {
                 case GTFS:
                     LOG.info("Found GTFS file {}", file);
                     gtfsFiles.add(file);
@@ -164,7 +164,7 @@ public class GraphBuilder implements Runnable {
                         LOG.info("Skipping DEM file {}", file);
                     }
                     break;
-                case NETEX:
+                case NETEX_NO:
                     LOG.info("Found NETEX file {}", file);
                     netexFiles.add(file);
                     break;
@@ -229,7 +229,7 @@ public class GraphBuilder implements Runnable {
         }else if(hasNETEX){
             List<NetexBundle> netexBundles = Lists.newArrayList();
             for(File netexFile : netexFiles){
-                NetexBundle netexBundle = new NetexBundle(netexFile);
+                NetexBundle netexBundle = new NetexBundle(netexFile, builderParams);
                 if (builderParams.parentStopLinking) {
                     netexBundle.linkStopsToParentStations = true;
                 }
@@ -304,8 +304,8 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, NETEX, OTHER;
-        public static InputFileType forFile(File file) {
+        GTFS, OSM, DEM, CONFIG, GRAPH, NETEX_NO, OTHER;
+        public static InputFileType forFile(File file, GraphBuilderParameters buildConfig) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
                 try {
@@ -315,14 +315,7 @@ public class GraphBuilder implements Runnable {
                     if (stopTimesEntry != null) return GTFS;
                 } catch (Exception e) { /* fall through */ }
             }
-            if (name.endsWith(".zip")) {
-                try {
-                    ZipFile zip = new ZipFile(file);
-                    ZipEntry netexCommonFile = zip.stream().filter(files -> !files.getName().startsWith(NetexBundle.NETEX_COMMON_FILE_NAME_PREFIX)).findFirst().orElse(null);
-                    zip.close();
-                    if (netexCommonFile != null) return NETEX;
-                } catch (Exception e) { /* fall through */ }
-            }
+            if (buildConfig.netex.moduleFileMatches(name)) return NETEX_NO;
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;

@@ -1,6 +1,9 @@
 package org.opentripplanner.graph_builder.model;
 
 
+import org.opentripplanner.standalone.GraphBuilderParameters;
+import org.opentripplanner.standalone.NetexParameters;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +30,19 @@ public class NetexBundle {
 
     private double maxStopToShapeSnapDistance = 150;
 
+    private NetexParameters netexParameters;
+
     public NetexBundle(File file) {
         this.file = file;
+    }
+
+    public NetexBundle(File netexFile, GraphBuilderParameters builderParams) {
+        this.file = netexFile;
+        linkStopsToParentStations = builderParams.parentStopLinking;
+        parentStationTransfers = builderParams.stationTransfers;
+        subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
+        maxInterlineDistance = builderParams.maxInterlineDistance;
+        netexParameters = builderParams.netex;
     }
 
     public File getFile() {
