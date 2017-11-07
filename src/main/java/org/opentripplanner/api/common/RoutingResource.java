@@ -592,8 +592,8 @@ public abstract class RoutingResource {
             optimize = OptimizeType.QUICK;
             request.transferPenalty += 1800;
         } else if (optimize == OptimizeType.WALKING) {
-            optimize = OptimizeType.WALKING;
-            request.walkReluctance = request.walkReluctanceOptimizeWalk;
+            optimize = OptimizeType.QUICK;
+            request.walkReluctance *= request.optimizeWalkMultiplier;
         }
 
         if (batch != null)

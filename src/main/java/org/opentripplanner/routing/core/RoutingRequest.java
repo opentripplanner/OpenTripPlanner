@@ -17,7 +17,6 @@ import com.google.common.base.Objects;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -177,8 +176,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
     public double walkReluctance = 2.0;
 
-    /** Default walk reluctance for optimize type = walking */
-    public double walkReluctanceOptimizeWalk = 3.5;
+    /** Multiplier for OptimizeType = walking */
+    public double optimizeWalkMultiplier = 3.5;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
@@ -1197,9 +1196,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setWalkReluctanceOptimizeWalk(double walkReluctance) {
-        if (walkReluctance > 0) {
-            this.walkReluctanceOptimizeWalk = walkReluctance;
+    public void setOptimizeWalkMultiplier(double optimizeWalkMultiplier) {
+        if (optimizeWalkMultiplier > 0) {
+            this.optimizeWalkMultiplier = optimizeWalkMultiplier;
         }
     }
 
