@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype.factory;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -33,7 +32,7 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
  */
 public class GtfsStopContext {
 
-    public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
+    public Map<AgencyAndId, Stop> stops = new HashMap<>();
 
     // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
     public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();

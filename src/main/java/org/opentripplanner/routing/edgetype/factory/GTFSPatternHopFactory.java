@@ -980,11 +980,11 @@ public class GTFSPatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
-            if (context.stops.contains(stop.getId())) {
+            if (context.stops.containsKey(stop.getId())) {
                 LOG.error("Skipping stop {} because we already loaded an identical ID.", stop.getId());
                 continue;
             }
-            context.stops.add(stop.getId());
+            context.stops.put(stop.getId(), stop);
 
             int locationType = stop.getLocationType();
 
@@ -1010,6 +1010,16 @@ public class GTFSPatternHopFactory {
                     // Add edges from arrive to stop and stop to depart
                     new PreAlightEdge(arrive, stopVertex);
                     new PreBoardEdge(stopVertex, depart);
+                }
+            }
+        }
+        // Resolve wheelchair_acessibility
+        for (Stop stop : context.stationStopNodes.keySet()) {
+            if (stop.getWheelchairBoarding() == 0 && stop.getParentStation() != null) {
+                AgencyAndId id = new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation());
+                Stop parent = context.stops.get(id);
+                if (parent != null) {
+                    stop.setWheelchairBoarding(parent.getWheelchairBoarding());
                 }
             }
         }
