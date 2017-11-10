@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A multimap from Trip to a sorted list of StopTimes.
@@ -81,5 +82,12 @@ public class TripStopTimes {
         List<StopTime> values = new ArrayList<>(list);
         Collections.sort(values);
         return values;
+    }
+
+    /**
+     * Return a all values for all trips merged into a set.
+     */
+    public Set<StopTime> valuesAsSet() {
+        return map.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
     }
 }

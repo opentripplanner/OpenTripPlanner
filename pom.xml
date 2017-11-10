@@ -78,10 +78,14 @@
     </scm>
 
     <properties>
+        <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>20.1</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
         <jackson.version>2.9.7</jackson.version>
+        <jaxb.java.time.adapters.version>1.1.3</jaxb.java.time.adapters.version>
         <jersey.version>2.18</jersey.version>
+
+        <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -567,6 +571,22 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>jackson2-geojson</artifactId>
+            <version>0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.migesok</groupId>
+            <artifactId>jaxb-java-time-adapters</artifactId>
+            <version>${jaxb.java.time.adapters.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-java-model</artifactId>
+            <version>1.0.8</version>
         </dependency>
 
         <!-- TESTING -->
