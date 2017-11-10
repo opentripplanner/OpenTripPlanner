@@ -199,6 +199,10 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
                             StreetVertex toVertex = findFirstStreetVertex(opt.rctx, true);
                             toStop = getTemporaryStop(toVertex, null, opt.rctx, opt);
                         }
+                        Point toPt = GeometryUtils.getGeometryFactory().createPoint(toStop.getCoordinate());
+                        if (!hop.getServiceArea().contains(toPt)) {
+                            continue;
+                        }
                         if (!(v instanceof TransitStop)) {
                             throw new RuntimeException("Unexpected error! Only non-transit stop should be destination");
                         } else {
@@ -210,6 +214,10 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
                         } else {
                             StreetVertex fromVertex = findFirstStreetVertex(opt.rctx, false);
                             fromStop = getTemporaryStop(fromVertex, null, opt.rctx, opt);
+                        }
+                        Point fromPt = GeometryUtils.getGeometryFactory().createPoint(fromStop.getCoordinate());
+                        if (!hop.getServiceArea().contains(fromPt)) {
+                            continue;
                         }
                         if (!(v instanceof TransitStop)) {
                             if (v == state.getOptions().rctx.toVertex) {
