@@ -1248,24 +1248,24 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Check if final route before walking is unpreferred. */
     public long preferencesPenaltyForFinalRoute(Route route) {
-        if (preferredEndRoutes != null && !this.arriveBy && !preferredEndRoutes.matches(route)){
+        if (preferredEndRoutes != null && !this.arriveBy && !preferredEndRoutes.isEmpty() && !preferredEndRoutes.matches(route)){
             return useUnpreferredStartEndPenalty;
         }
-        if (preferredStartRoutes != null && this.arriveBy && !preferredStartRoutes.matches(route)){
+        if (preferredStartRoutes != null && this.arriveBy && !preferredStartRoutes.isEmpty() && !preferredStartRoutes.matches(route)){
             return useUnpreferredStartEndPenalty;
         }
         return 0;
     }
 
     /** Check if route is preferred according to this request. */
-    public long preferencesPenaltyForRoute(Route route, State state ) {
+    public long preferencesPenaltyForRoute(Route route, State state) {
         long preferences_penalty = 0;
         String agencyID = route.getAgency().getId();
 
         // Add penalty if we have a preferred start that is violated
         boolean isUnpreferredStart = false;
-        if (state != null && preferredStartRoutes != null && route != null && !state.isEverBoarded()){
-            if (!this.arriveBy){
+        if (state != null && preferredStartRoutes != null && !preferredStartRoutes.isEmpty() && !state.isEverBoarded()) {
+            if (!this.arriveBy) {
                 if (!preferredStartRoutes.matches(route)) {
                     isUnpreferredStart = true;
                 }
@@ -1274,16 +1274,17 @@ public class RoutingRequest implements Cloneable, Serializable {
 
         // Add penalty if we have a preferred end that is vioalated
         boolean isUnpreferredEnd = false;
-        if (state != null && preferredEndRoutes != null && route != null && !state.isEverBoarded()){
-            if (this.arriveBy){
+        if (state != null && preferredEndRoutes != null && !preferredEndRoutes.isEmpty() && !state.isEverBoarded()) {
+            if (this.arriveBy) {
                 if (!preferredEndRoutes.matches(route)) {
                     isUnpreferredEnd = true;
                 }
             }
         }
 
-        if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
+        if ((preferredRoutes != null && !preferredRoutes.isEmpty()) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
             boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID);
             if (!isPreferedRoute && !isPreferedAgency) {
