@@ -134,7 +134,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.5; // ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.0833333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
@@ -539,6 +539,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+            bikeWalkingOptions.maxSlope = maxSlope;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
