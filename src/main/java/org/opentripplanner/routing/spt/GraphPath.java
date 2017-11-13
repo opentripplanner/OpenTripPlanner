@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.spt;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class GraphPath {
     // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
 
-    private List<AlertPatch> realtimeConsequences;
+    private List<AlertPatch> realtimeConsequences = Collections.emptyList();
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
