@@ -13,40 +13,48 @@
 
 package org.opentripplanner.util;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
 public class HttpUtils {
-    
+
     private static final int TIMEOUT_CONNECTION = 5000;
+    private static final int TIMEOUT_CONNECTION_REQUEST = 5000;
     private static final int TIMEOUT_SOCKET = 5000;
 
     public static InputStream getData(String url) throws IOException {
-        return getData(url, null, null);
+        return getData(url, null, null, TIMEOUT_CONNECTION, TIMEOUT_CONNECTION_REQUEST, TIMEOUT_SOCKET);
     }
 
-    public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue) throws ClientProtocolException, IOException {
+    public static InputStream getData(String url, int connectionTimeout, int connectionRequestTimeout, int socketTimeout) throws IOException {
+        return getData(url, null, null, connectionTimeout, connectionRequestTimeout, socketTimeout);
+    }
+
+    public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue) throws IOException {
+        return getData(url, requestHeaderName, requestHeaderValue, TIMEOUT_CONNECTION, TIMEOUT_CONNECTION_REQUEST, TIMEOUT_SOCKET);
+    }
+
+    public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue, int connectionTimeout, int connectionRequestTimeout, int socketTimeout) throws IOException {
         HttpGet httpget = new HttpGet(url);
         if (requestHeaderValue != null) {
             httpget.addHeader(requestHeaderName, requestHeaderValue);
         }
-        HttpClient httpclient = getClient();
+
+        HttpClient httpclient = getClient(connectionTimeout, connectionRequestTimeout, socketTimeout);
         HttpResponse response = httpclient.execute(httpget);
-        if(response.getStatusLine().getStatusCode() != 200)
+        if (response.getStatusLine().getStatusCode() != 200) {
             return null;
+        }
 
         HttpEntity entity = response.getEntity();
         if (entity == null) {
@@ -57,7 +65,7 @@ public class HttpUtils {
 
     public static void testUrl(String url) throws IOException {
         HttpHead head = new HttpHead(url);
-        HttpClient httpclient = getClient();
+        HttpClient httpclient = getClient(0, 0, 0);
         HttpResponse response = httpclient.execute(head);
 
         StatusLine status = response.getStatusLine();
@@ -70,14 +78,14 @@ public class HttpUtils {
                     + status.getReasonPhrase());
         }
     }
-    
-    private static HttpClient getClient() {
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_CONNECTION);
-        HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_SOCKET);
-        
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.setParams(httpParams);
-        return httpclient;
+
+    private static HttpClient getClient(int connectionTimeout, int connectionRequestTimeout, int socketTimeout) {
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(connectionTimeout > 0 ? connectionTimeout : TIMEOUT_CONNECTION)
+                .setConnectionRequestTimeout(connectionRequestTimeout > 0 ? connectionRequestTimeout : TIMEOUT_CONNECTION_REQUEST)
+                .setSocketTimeout(socketTimeout > 0 ? socketTimeout : TIMEOUT_SOCKET)
+                .build();
+
+        return HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }
 }

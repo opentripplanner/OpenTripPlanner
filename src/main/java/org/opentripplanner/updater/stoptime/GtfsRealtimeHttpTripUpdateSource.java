@@ -31,8 +31,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonConfigurable {
-    private static final Logger LOG =
-            LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
 
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -47,6 +46,12 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
 
     private String url;
 
+    private int connectionTimeout;
+
+    private int connectionRequestTimeout;
+
+    private int socketTimeout;
+
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         String url = config.path("url").asText();
@@ -55,6 +60,9 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
         }
         this.url = url;
         this.feedId = config.path("feedId").asText();
+        this.connectionTimeout = config.path("connectionTimeoutMills").asInt();
+        this.connectionRequestTimeout = config.path("connectionRequestTimeoutMills").asInt();
+        this.socketTimeout = config.path("socketTimeoutMills").asInt();
     }
 
     @Override
@@ -64,7 +72,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
         List<TripUpdate> updates = null;
         fullDataset = true;
         try {
-            InputStream is = HttpUtils.getData(url);
+            InputStream is = HttpUtils.getData(url, connectionTimeout, connectionRequestTimeout, socketTimeout);
             if (is != null) {
                 // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);

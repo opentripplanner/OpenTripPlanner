@@ -40,6 +40,9 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
  * myalert.url = http://host.tld/path
  * myalert.earlyStartSec = 3600
  * myalert.feedId = TA
+ * myalert.connectionTimeoutMills = 3000
+ * myalert.connectionRequestTimeoutMills = 10000
+ * myalert.socketTimeoutMills = 3000
  * </pre>
  */
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
@@ -61,6 +64,12 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private AlertsUpdateHandler updateHandler = null;
 
+    private int connectionTimeout;
+
+    private int connectionRequestTimeout;
+
+    private int socketTimeout;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -81,6 +90,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
+        this.connectionTimeout = config.path("connectionTimeoutMills").asInt();
+        this.connectionRequestTimeout = config.path("connectionRequestTimeoutMills").asInt();
+        this.socketTimeout = config.path("socketTimeoutMills").asInt();
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
     }
 
@@ -98,7 +110,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         try {
-            InputStream data = HttpUtils.getData(url);
+            InputStream data = HttpUtils.getData(url, connectionTimeout, connectionRequestTimeout, socketTimeout);
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
