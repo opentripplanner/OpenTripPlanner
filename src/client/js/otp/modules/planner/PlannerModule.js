@@ -33,6 +33,7 @@ otp.modules.planner.defaultQueryParams = {
     triangleTimeFactor              : 0.333,
     triangleSlopeFactor             : 0.333,
     triangleSafetyFactor            : 0.334,
+    maxSlope                        : 0.5,
 }
 
 otp.modules.planner.PlannerModule =
