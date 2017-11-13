@@ -134,7 +134,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.5; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
@@ -525,6 +525,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
+            bikeWalkingOptions.maxSlope = maxSlope;
             bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
@@ -595,6 +596,14 @@ public class RoutingRequest implements Cloneable, Serializable {
             return maxWalkDistance;
         } else {
             return Double.MAX_VALUE;            
+        }
+    }
+
+    public double getMaxSlope() {
+        if(modes.isTransit() || (batch && !softWalkLimiting)) {
+            return maxSlope;
+        } else{
+            return maxSlope;
         }
     }
     
@@ -1099,6 +1108,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (maxWalkDistance > 0) {
             this.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+        }
+    }
+
+    public void setMaxSlope(double maxSlope){
+        if(maxSlope > 0){
+            this.maxSlope = maxSlope;
+            bikeWalkingOptions.maxSlope = maxSlope;
         }
     }
 
