@@ -79,6 +79,9 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
+    /** Whether alert affects routing (only elevator alerts) */
+    private boolean routingConsequence = false;
+
     @XmlElement
     public Alert getAlert() {
         return alert;
@@ -166,6 +169,7 @@ public class AlertPatch implements Serializable {
 
         if (route == null && trip == null && stop == null && this.stop != null) {
             for (Edge edge : graph.index.pathwayForElevator.get(this.stop.getId())) {
+                routingConsequence = true;
                 graph.addAlertPatch(edge, this);
             }
         }
@@ -319,6 +323,10 @@ public class AlertPatch implements Serializable {
 
     public boolean hasTrip() {
         return trip != null;
+    }
+
+    public boolean isRoutingConsequence() {
+        return routingConsequence;
     }
 
     public boolean equals(Object o) {

@@ -108,7 +108,7 @@ public class PathwayEdge extends Edge {
     public State traverse(State s0) {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0 || elevatorIsOutOfService(s0)) {
+            if (wheelchairTraversalTime < 0 || (!s0.getOptions().ignoreRealtimeUpdates && elevatorIsOutOfService(s0))) {
                 return null;
             }
             time = wheelchairTraversalTime;
@@ -123,7 +123,7 @@ public class PathwayEdge extends Edge {
     private boolean elevatorIsOutOfService(State s0) {
         Set<String> outages = new HashSet<>();
         for (AlertPatch alert : s0.getOptions().rctx.graph.getAlertPatches(this)) {
-            if (alert.getStop() != null) {
+            if (alert.displayDuring(s0) && alert.getStop() != null) {
                 outages.add(alert.getStop().getId());
             }
         }

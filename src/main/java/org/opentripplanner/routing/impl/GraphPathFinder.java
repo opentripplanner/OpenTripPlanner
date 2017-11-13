@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
@@ -134,15 +135,24 @@ public class GraphPathFinder {
         // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
+        /*
+         * In order to find service alerts which may have impacted your route, start with ignoreRealtimeUpdates = true
+         */
+        if (options.findRealtimeConsequences && options.modes.isTransit()) {
+            options.ignoreRealtimeUpdates = true;
+        }
+
         /* In long distance mode, maxWalk has a different meaning than it used to.
          * It's the radius around the origin or destination within which you can walk on the streets.
          * If no value is provided, max walk defaults to the largest double-precision float.
          * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
+
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
+        List<AlertPatch> realtimeConsequences = Lists.newArrayList();
         while (paths.size() < options.numItineraries) {
             // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
             int timeoutIndex = paths.size();
@@ -174,6 +184,22 @@ public class GraphPathFinder {
                 newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
             }
 
+            if (options.findRealtimeConsequences && options.ignoreRealtimeUpdates) {
+                for (GraphPath path : newPaths) {
+                    for (State s : path.states) {
+                        if (s.getBackEdge() != null) {
+                            for (AlertPatch alert : options.rctx.graph.getAlertPatches(s.getBackEdge())) {
+                                if (alert.displayDuring(s) && alert.isRoutingConsequence()) {
+                                    realtimeConsequences.add(alert);
+                                }
+                            }
+                        }
+                    }
+                }
+                options.ignoreRealtimeUpdates = false;
+                continue;
+            }
+
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
@@ -189,6 +215,8 @@ public class GraphPathFinder {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
                 }
+                // add consequences
+                path.setRealtimeConsequences(realtimeConsequences);
             }
 
             paths.addAll(newPaths.stream()
