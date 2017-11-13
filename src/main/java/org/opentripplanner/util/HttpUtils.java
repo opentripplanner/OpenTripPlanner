@@ -65,7 +65,7 @@ public class HttpUtils {
 
     public static void testUrl(String url) throws IOException {
         HttpHead head = new HttpHead(url);
-        HttpClient httpclient = getClient(0, 0, 0);
+        HttpClient httpclient = getClient(TIMEOUT_CONNECTION, TIMEOUT_CONNECTION_REQUEST, TIMEOUT_SOCKET);
         HttpResponse response = httpclient.execute(head);
 
         StatusLine status = response.getStatusLine();
