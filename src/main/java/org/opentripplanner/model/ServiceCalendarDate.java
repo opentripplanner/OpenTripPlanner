@@ -3,13 +3,12 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.model.calendar.ServiceDate;
 
-import java.util.Objects;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * @author bdferris
+ *
  */
 public final class ServiceCalendarDate implements Serializable, Comparable<ServiceCalendarDate> {
 
@@ -70,10 +69,6 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
                 + this.exceptionType + ">";
     }
 
-    /**
-     * Note: this class has a natural ordering that is inconsistent with equals witch
-     * uses the <em>id</em> only.
-     */
     @Override
     public int compareTo(ServiceCalendarDate other) {
         int c = serviceId.compareTo(other.serviceId);

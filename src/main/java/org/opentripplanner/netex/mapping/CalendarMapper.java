@@ -23,6 +23,8 @@ import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.PropertyOfDay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.List;
 
 // TODO TGR - Add Unit tests
 public class CalendarMapper {
+    private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
     public static Collection<ServiceCalendarDate> mapToCalendarDates(FeedScopedId serviceId, NetexDao netexDao) {
         Collection<ServiceCalendarDate> serviceCalendarDates = new ArrayList<>();
@@ -73,7 +76,7 @@ public class CalendarMapper {
                         }
                     }
 
-                    for (LocalDateTime date = fromDate; date.isBefore(toDate); date = date.plusDays(1)) {
+                    for (LocalDateTime date = fromDate; date.isBefore(toDate.plusDays(1)); date = date.plusDays(1)) {
                         ServiceCalendarDate serviceCalendarDate = mapServiceCalendarDate(date, serviceId, 1);
 
                         if (daysOfWeek.contains(DayOfWeekEnumeration.EVERYDAY)) {
@@ -152,6 +155,10 @@ public class CalendarMapper {
         }
 
         serviceCalendarDates.removeAll(serviceCalendarDatesRemove);
+
+        if (serviceCalendarDates.isEmpty()) {
+            LOG.warn("ServiceCode " + serviceId + " does not contain any serviceDates");
+        }
 
         return serviceCalendarDates;
     }
