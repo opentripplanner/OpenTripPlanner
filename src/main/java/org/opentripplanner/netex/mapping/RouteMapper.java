@@ -18,6 +18,10 @@ public class RouteMapper {
 
         if (line.getOperatorRef() == null) {
             LOG.warn("Line " + line.getId() + " does not have an operator.");
+            Agency unknownAgency = new Agency();
+            unknownAgency.setId("Unknown");
+            unknownAgency.setName("Unknown agency");
+            otpRoute.setAgency(unknownAgency);
         } else {
             String agencyId = line.getOperatorRef().getRef();
             Agency agency = transitBuilder.getAgencies().stream().filter(a -> a.getId().equals(agencyId)).findFirst().get();
