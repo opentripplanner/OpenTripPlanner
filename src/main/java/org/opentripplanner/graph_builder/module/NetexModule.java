@@ -208,9 +208,7 @@ public class NetexModule implements GraphBuilderModule {
                     netexDao.getMultimodalStopPlaceById().put(stopPlace.getId(), stopPlace);
                 } else {
                     netexDao.getStopsById().put(stopPlace.getId(), stopPlace);
-                    if (stopPlace.getQuays() == null) {
-                        LOG.warn(stopPlace.getId() + " does not contain any quays");
-                    } else {
+                    if (stopPlace.getQuays() != null) {
                         List<Object> quayRefOrQuay = stopPlace.getQuays().getQuayRefOrQuay();
                         for (Object quayObject : quayRefOrQuay) {
                             if (quayObject instanceof Quay) {
@@ -242,35 +240,11 @@ public class NetexModule implements GraphBuilderModule {
                                 StopPlace stopPlace = netexDao.getStopPlaceByQuay().get(quay);
                                 netexDao.getStopPointStopPlaceMap().put(passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(), stopPlace.getId());
                                 netexDao.getStopPointQuayMap().put(passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(), quay.getId());
-
-                                // Load stopPlace and quay from netexStopDao into netexDao
-                                if (!netexDao.getStopPlaceMap().containsKey(stopPlace.getId())) {
-                                    netexDao.getStopPlaceMap().put(stopPlace.getId(), stopPlace);
-                                }
-                                if (!netexDao.getQuayMap().containsKey(quay.getId())) {
-                                    netexDao.getQuayMap().put(quay.getId(), quay);
-                                }
                             } else {
                                 LOG.warn("Quay " + passengerStopAssignment.getQuayRef().getRef() + " not found in stop place file.");
                             }
                         }
                     }
-                }
-            }
-
-            // Load parent stops from NetexStopDao into NetexDao
-
-            for (StopPlace stopPlace : netexDao.getAllStopPlaces()) {
-                if (!netexDao.getParentStopPlaceById().containsKey(stopPlace.getId())) {
-                    netexDao.getParentStopPlaceById().put(stopPlace.getId(), stopPlace);
-                }
-            }
-
-            // Load multimodal stops from NetexStopDao into NetexDao
-
-            for (StopPlace stopPlace : netexDao.getMultimodalStopPlaceById().values()) {
-                if (!netexDao.getMultimodalStopPlaceById().containsKey(stopPlace.getId())) {
-                    netexDao.getMultimodalStopPlaceById().put(stopPlace.getId(), stopPlace);
                 }
             }
 

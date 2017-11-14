@@ -44,9 +44,10 @@ public class NetexMapper {
             }
         }
 
-        for (StopPlace stopPlace : netexDao.getStopPlaceMap().values()) {
-            if (stopPlace != null) {
-                Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlace, netexDao.getParentStopPlaceById());
+        for (String stopPlaceId : netexDao.getStopsById().keySet()) {
+            Collection<StopPlace> stopPlaceAllVersions = netexDao.getStopsById().get(stopPlaceId);
+            if (stopPlaceAllVersions != null) {
+                Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions, netexDao.getPare.);
                 for (Stop stop : stops) {
                     transitBuilder.getStops().add(stop);
                 }
@@ -56,6 +57,8 @@ public class NetexMapper {
         for (JourneyPattern journeyPattern : netexDao.getJourneyPatternsById().values()) {
             if (journeyPattern != null) {
                 tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexDao);
+            } else {
+                int i = 0;
             }
         }
 
