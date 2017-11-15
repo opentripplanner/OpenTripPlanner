@@ -277,7 +277,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     /** Set of preferred agencies by user. */
     public HashSet<String> preferredAgencies = new HashSet<String>();
-    
+
+    public HashSet<Integer> preferredRouteTypes = new HashSet<>();
+
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -647,6 +649,15 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
     }
 
+    public void setPreferredRouteTypes(String s) {
+        if (s != null && !s.equals("")) {
+            preferredRouteTypes = new HashSet<>();
+            for (String si : s.split(",")) {
+                preferredRouteTypes.add(Integer.parseInt(si));
+            }
+        }
+    }
+
     public void setPreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             preferredRoutes = RouteMatcher.parse(s);
@@ -889,6 +900,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
             clone.preferredAgencies = (HashSet<String>) preferredAgencies.clone();
+            clone.preferredRouteTypes = (HashSet<Integer>) preferredRouteTypes.clone();
             clone.preferredRoutes = preferredRoutes.clone();
             clone.preferredStartRoutes = preferredStartRoutes.clone();
             clone.preferredEndRoutes = preferredEndRoutes.clone();
@@ -1286,11 +1298,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
 
         if ((preferredRoutes != null && !preferredRoutes.isEmpty()) ||
-                (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+                (preferredAgencies != null && !preferredAgencies.isEmpty()) ||
+                (preferredRouteTypes != null && !preferredRouteTypes.isEmpty())) {
 
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
             boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID);
-            if (!isPreferedRoute && !isPreferedAgency) {
+            boolean isPreferredType = preferredRouteTypes != null && preferredRouteTypes.contains(route.getType());
+            if (!isPreferedRoute && !isPreferedAgency && !isPreferredType) {
                 preferences_penalty += otherThanPreferredRoutesPenalty;
             }
             else {

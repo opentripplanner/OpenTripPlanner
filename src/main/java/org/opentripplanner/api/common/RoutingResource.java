@@ -207,7 +207,14 @@ public abstract class RoutingResource {
     /** The comma-separated list of preferred agencies. */
     @QueryParam("preferredAgencies")
     protected String preferredAgencies;
-    
+
+    /**
+     * Comma-separated list of preferred route types
+     * See: https://developers.google.com/transit/gtfs/reference/extended-route-types
+     */
+    @QueryParam("preferredRouteTypes")
+    protected String preferredRouteTypes;
+
     /**
      * The list of unpreferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
      * underscores, 42 is the route internal ID).
@@ -547,6 +554,9 @@ public abstract class RoutingResource {
 
         if (preferredAgencies != null)
             request.setPreferredAgencies(preferredAgencies);
+
+        if (preferredRouteTypes != null)
+            request.setPreferredRouteTypes(preferredRouteTypes);
 
         if (unpreferredRoutes != null)
             request.setUnpreferredRoutes(unpreferredRoutes);
