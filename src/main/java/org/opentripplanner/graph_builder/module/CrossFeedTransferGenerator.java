@@ -50,8 +50,6 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
 
     private File transfersFile;
 
-    private boolean createTransferEdges;
-
     public CrossFeedTransferGenerator(File transfersFile) {
         this.transfersFile = transfersFile;
     }
@@ -61,12 +59,18 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
         LOG.info("Creating feed transfers....");
         GraphEntityResolver resolver = new GraphEntityResolver(graph);
         List<Transfer> transfers = Lists.newArrayList();
+        List<Transfer> needsEdge = Lists.newArrayList();
 
         // read in transfers
         CsvEntityReader reader = new CsvEntityReader();
         reader.addEntityHandler(o -> {
-            for (Transfer t : expandFeedTransfer(resolver, (FeedTransfer) o)) {
+            FeedTransfer ft = (FeedTransfer) o;
+            boolean streetTransfer = ft.getStreetTransfer() > 0;
+            for (Transfer t : expandFeedTransfer(resolver, ft)) {
                 transfers.add(t);
+                if (!streetTransfer) {
+                    needsEdge.add(t);
+                }
             }
         });
         try {
@@ -81,17 +85,11 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
         TransferFactory factory = new TransferFactory(resolver);
 
         factory.loadTransferTable(graph, transfers);
-        if (createTransferEdges) {
-            factory.createTransferEdges(transfers);
-        }
+        factory.createTransferEdges(needsEdge);
     }
 
     @Override
     public void checkInputs() {
-    }
-
-    public void setCreateTransferEdges(boolean createTransferEdges) {
-        this.createTransferEdges = createTransferEdges;
     }
 
     private Collection<Transfer> expandFeedTransfer(GraphEntityResolver resolver, FeedTransfer feedTransfer) {

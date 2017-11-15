@@ -273,7 +273,7 @@ public class GraphBuilder implements Runnable {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
-                gtfsBundle.setTransfersTxtDefinesStationPaths(builderParams.useTransfersTxt && crossFeedTransfers == null);
+                gtfsBundle.setTransfersTxtDefinesStationPaths(builderParams.useTransfersTxt);
                 if (builderParams.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }
@@ -324,15 +324,15 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {
+            // Make transfer edges from feed_transfers.txt
+            if (crossFeedTransfers != null)  {
+                CrossFeedTransferGenerator module = new CrossFeedTransferGenerator(crossFeedTransfers);
+                graphBuilder.addModule(module);
+            }
             // The stops can be linked to each other once they are already linked to the street network.
             if (!builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
-            }
-            if (crossFeedTransfers != null)  {
-                CrossFeedTransferGenerator module = new CrossFeedTransferGenerator(crossFeedTransfers);
-                module.setCreateTransferEdges(builderParams.useTransfersTxt);
-                graphBuilder.addModule(module);
             }
         }
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));

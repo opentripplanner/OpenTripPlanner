@@ -117,6 +117,7 @@ public class TransferFactory {
 
     // Only create one TransferEdge per stop pair (though there could be more Transfers in transfers.txt)
     public void createTransferEdges(Collection<Transfer> transfers) {
+        LOG.info("creating transfer edges from file...");
         Set<Pair<Vertex, Vertex>> knownTransfers = Sets.newHashSet();
 
         for (Transfer transfer : transfers) {

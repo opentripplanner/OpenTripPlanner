@@ -47,6 +47,9 @@ public class FeedTransfer implements Serializable {
     @CsvField(name = "min_transfer_time", optional = true)
     private int minTransferTime = MISSING_VALUE;
 
+    @CsvField(name = "street_transfer", optional = true)
+    private int streetTransfer;
+
     public FeedTransfer() {
 
     }
@@ -60,6 +63,7 @@ public class FeedTransfer implements Serializable {
         this.toTripId = obj.toTripId;
         this.transferType = obj.transferType;
         this.minTransferTime = obj.minTransferTime;
+        this.streetTransfer = obj.streetTransfer;
     }
 
     public String getFromStopId() {
@@ -132,6 +136,14 @@ public class FeedTransfer implements Serializable {
 
     public void clearMinTransferTime() {
         this.minTransferTime = MISSING_VALUE;
+    }
+
+    public int getStreetTransfer() {
+        return streetTransfer;
+    }
+
+    public void setStreetTransfer(int streetTransfer) {
+        this.streetTransfer = streetTransfer;
     }
 
     public String toString() {
