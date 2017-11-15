@@ -280,6 +280,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public HashSet<Integer> preferredRouteTypes = new HashSet<>();
 
+    public HashSet<Integer> bannedRouteTypes = new HashSet<>();
+
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -658,6 +660,15 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setBannedRouteTypes(String s) {
+        if (s != null && !s.equals("")) {
+            bannedRouteTypes = new HashSet<>();
+            for (String si : s.split(",")) {
+                bannedRouteTypes.add(Integer.parseInt(si));
+            }
+        }
+    }
+
     public void setPreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             preferredRoutes = RouteMatcher.parse(s);
@@ -901,6 +912,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.bannedStopsHard = bannedStopsHard.clone();
             clone.preferredAgencies = (HashSet<String>) preferredAgencies.clone();
             clone.preferredRouteTypes = (HashSet<Integer>) preferredRouteTypes.clone();
+            clone.bannedRouteTypes = (HashSet<Integer>) bannedRouteTypes.clone();
             clone.preferredRoutes = preferredRoutes.clone();
             clone.preferredStartRoutes = preferredStartRoutes.clone();
             clone.preferredEndRoutes = preferredEndRoutes.clone();
@@ -1254,6 +1266,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (bannedRoutes != null) {
             Route route = trip.getRoute();
             if (bannedRoutes.matches(route)) {
+                return true;
+            }
+        }
+
+        /* check if route type is banned */
+        if (bannedRouteTypes != null) {
+            if (bannedRouteTypes.contains(trip.getRoute().getType())) {
                 return true;
             }
         }

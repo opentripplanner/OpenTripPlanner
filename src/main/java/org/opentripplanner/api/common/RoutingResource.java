@@ -216,6 +216,12 @@ public abstract class RoutingResource {
     protected String preferredRouteTypes;
 
     /**
+     * Comma-separated list of banned route types
+     */
+    @QueryParam("bannedRouteTypes")
+    protected String bannedRouteTypes;
+
+    /**
      * The list of unpreferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
      * underscores, 42 is the route internal ID).
      */
@@ -557,6 +563,9 @@ public abstract class RoutingResource {
 
         if (preferredRouteTypes != null)
             request.setPreferredRouteTypes(preferredRouteTypes);
+
+        if (bannedRouteTypes != null)
+            request.setBannedRouteTypes(bannedRouteTypes);
 
         if (unpreferredRoutes != null)
             request.setUnpreferredRoutes(unpreferredRoutes);
