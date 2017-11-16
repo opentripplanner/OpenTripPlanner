@@ -1,35 +1,39 @@
 package org.opentripplanner.netex;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.model.NetexBundle;
 import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendarDate;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.standalone.GraphBuilderParameters;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 // TODO - The mapping needs better tests
 public class MappingTest {
-    private static final String NETEX_FILENAME = "src/test/resources/netex/netex_minimal.zip";
+    private static final String NETEX_DIR = "src/test/resources/netex";
+
+    private static final String NETEX_FILENAME = "netex_minimal.zip";
 
     private static OtpTransitServiceBuilder otpBuilder;
 
-    @BeforeClass
-    public static void setUpNetexMapping() throws Exception {
-
-        NetexBundle netexBundle = new NetexBundle(new File(NETEX_FILENAME));
+    @BeforeClass public static void setUpNetexMapping() throws Exception {
+        JsonNode buildConfig = new OTPConfiguration(null)
+                .getGraphConfig(new File(NETEX_DIR))
+                .builderConfig();
+        NetexBundle netexBundle = new NetexBundle(
+                new File(NETEX_DIR, NETEX_FILENAME),
+                new GraphBuilderParameters(buildConfig)
+        );
         NetexModule netexModule = new NetexModule(Collections.singletonList(netexBundle));
-        otpBuilder = netexModule.getOtpDao().stream().findFirst().orElseThrow(IllegalStateException::new);
+        otpBuilder = netexModule.getOtpDao().stream().findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Test public void testNetexRoutes() {
@@ -38,38 +42,10 @@ public class MappingTest {
     }
 
     @Test public void testNetexStopTimes() {
-        Set<StopTime> stopTimesNetex = new HashSet<>(
-                otpBuilder.getStopTimesSortedByTrip().valuesAsSet());
-        Assert.assertEquals(0, stopTimesNetex.size());
+        Assert.assertEquals(0, otpBuilder.getStopTimesSortedByTrip().valuesAsSet().size());
     }
 
     @Test public void testNetexCalendar() {
-        for (ServiceCalendarDate serviceCalendarDate : otpBuilder.getCalendarDates()) {
-            String newId = convertServiceIdFormat(serviceCalendarDate.getServiceId().getId());
-            serviceCalendarDate.getServiceId().setId(newId);
-        }
-
-        final Collection<ServiceCalendarDate> datesNetex = new ArrayList<>(
-                otpBuilder.getCalendarDates());
-
-        Assert.assertEquals(24, datesNetex.size());
-    }
-
-    private static String convertServiceIdFormat(String netexServiceId) {
-        StringBuilder gtfsServiceId = new StringBuilder();
-        boolean first = true;
-
-        String[] splitId = netexServiceId.split("\\+");
-        Arrays.sort(splitId);
-
-        for (String singleId : splitId) {
-            if (first) {
-                gtfsServiceId.append(singleId);
-                first = false;
-            } else {
-                gtfsServiceId.append("-").append(singleId.split(":")[2]);
-            }
-        }
-        return gtfsServiceId.toString();
+        Assert.assertEquals(24, otpBuilder.getCalendarDates().size());
     }
 }

@@ -230,12 +230,6 @@ public class GraphBuilder implements Runnable {
             List<NetexBundle> netexBundles = Lists.newArrayList();
             for(File netexFile : netexFiles){
                 NetexBundle netexBundle = new NetexBundle(netexFile, builderParams);
-                if (builderParams.parentStopLinking) {
-                    netexBundle.linkStopsToParentStations = true;
-                }
-                netexBundle.parentStationTransfers = builderParams.stationTransfers;
-                netexBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
-                netexBundle.maxInterlineDistance = builderParams.maxInterlineDistance;
                 netexBundles.add(netexBundle);
             }
             NetexModule netexModule = new NetexModule(netexBundles);

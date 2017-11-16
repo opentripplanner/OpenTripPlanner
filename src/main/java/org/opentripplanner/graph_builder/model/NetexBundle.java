@@ -7,84 +7,65 @@ import org.opentripplanner.standalone.NetexParameters;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class NetexBundle {
 
-    private File file;
-    public static final String NETEX_COMMON_FILE_NAME_PREFIX =  "_";
+    private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
 
-    public static final String NETEX_STOP_PLACE_FILENAME =  "_stops.xml";
+    private final File file;
 
-    public boolean linkStopsToParentStations = false;
+    public final boolean linkStopsToParentStations;
 
-    public boolean parentStationTransfers = false;
+    public final boolean parentStationTransfers;
 
-    public int subwayAccessTime;
+    public final int subwayAccessTime;
 
-    public int maxInterlineDistance;
+    public final int maxInterlineDistance;
 
-    private double maxStopToShapeSnapDistance = 150;
+    public final NetexParameters netexParameters;
 
-    private NetexParameters netexParameters;
-
-    public NetexBundle(File file) {
-        this.file = file;
+    public NetexBundle(File netexZipFile, GraphBuilderParameters builderParams) {
+        this.file = netexZipFile;
+        this.linkStopsToParentStations = builderParams.parentStopLinking;
+        this.parentStationTransfers = builderParams.stationTransfers;
+        this.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
+        this.maxInterlineDistance = builderParams.maxInterlineDistance;
+        this.netexParameters = builderParams.netex;
     }
 
-    public NetexBundle(File netexFile, GraphBuilderParameters builderParams) {
-        this.file = netexFile;
-        linkStopsToParentStations = builderParams.parentStopLinking;
-        parentStationTransfers = builderParams.stationTransfers;
-        subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
-        maxInterlineDistance = builderParams.maxInterlineDistance;
-        netexParameters = builderParams.netex;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public NetexParameters getNetexParameters() {
-        return netexParameters;
+    public String getFilename() {
+        return file.getPath();
     }
 
     public List<ZipEntry> getFileEntriesInOrder(){
-        List<ZipEntry> fileEntriesList = new ArrayList<>();
-
         try {
-            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-
-            // Add stop place file
-            fileEntriesList.add(zipFile.stream().filter(files ->
-                    files.getName().equals(NETEX_STOP_PLACE_FILENAME)).findFirst().get());
-
-            List<ZipEntry> commonFiles = zipFile.stream().filter(files -> files.getName().startsWith
-                    (NETEX_COMMON_FILE_NAME_PREFIX) && !(files.getName().equals(NETEX_STOP_PLACE_FILENAME))).collect(Collectors.toList());
-
-            for (ZipEntry commonFile : commonFiles) {
-                // Add common file for this codespace
-                fileEntriesList.add(commonFile);
-                String prefix = commonFile.getName().split("_")[1];
-                // Add all line files for this codespace
-                fileEntriesList.addAll(zipFile.stream().filter(files -> files.getName().startsWith
-                        (prefix)).collect(Collectors.toList()));
-            }
-
-            return fileEntriesList;
+            return new NetexArrangeZipFileEntriesInOrder(file, netexParameters).getEntriesInOrder();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void withZipFile(Consumer<ZipFile> zipFileConsumer) {
+        try {
+            ZipFile zipFile = null;
+            try {
+                zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+                zipFileConsumer.accept(zipFile);
+            }
+            finally {
+                if(zipFile != null) {
+                    zipFile.close();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Deprecated
     public InputStream getFileInputStream(ZipEntry entry){
         try {
             ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
@@ -107,10 +88,7 @@ public class NetexBundle {
     }
 
     public double getMaxStopToShapeSnapDistance() {
-        return maxStopToShapeSnapDistance;
+        return MAX_STOP_TO_SHAPE_SNAP_DISTANCE;
     }
 
-    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
-        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
-    }
 }
