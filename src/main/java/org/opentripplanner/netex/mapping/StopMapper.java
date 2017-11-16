@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class StopMapper {
     private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
 
-    public Collection<Stop> mapParentAndChildStops(Collection<StopPlace> stopPlaceAllVersions, Map<String, StopPlace> parentStopPlacesById){
+    public Collection<Stop> mapParentAndChildStops(Collection<StopPlace> stopPlaceAllVersions){
         ArrayList<Stop> stops = new ArrayList<>();
 
         Stop stop = new Stop();
@@ -30,21 +30,6 @@ public class StopMapper {
                 .collect(Collectors.toList());
 
         StopPlace stopPlaceLatest = Iterables.getLast(stopPlaceAllVersions);
-
-        if (stopPlaceLatest.getName() != null) {
-            stop.setName(stopPlaceLatest.getName().getValue());
-        } else if (stopPlaceLatest.getParentSiteRef() != null && parentStopPlacesById.containsKey(stopPlaceLatest.getParentSiteRef().getRef())) {
-            String parentName = parentStopPlacesById.get(stopPlaceLatest.getParentSiteRef().getRef()).getName().getValue();
-            if (parentName != null) {
-                stop.setName(parentName);
-            } else {
-                LOG.warn("No name found for stop " + stopPlaceLatest.getId() + " or in parent stop");
-                stop.setName("Not found");
-            }
-        } else {
-            LOG.warn("No name found for stop " + stopPlaceLatest.getId() + " or in parent stop");
-            stop.setName("Not found");
-        }
 
         if(stopPlaceLatest.getCentroid() != null){
             stop.setLat(stopPlaceLatest.getCentroid().getLocation().getLatitude().doubleValue());
