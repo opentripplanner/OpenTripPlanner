@@ -409,6 +409,20 @@ otp.modules.fieldtrip.FieldTripModule =
         }, this));
     },
 
+    setPaymentInfo : function(request, classpassId, paymentPreference, ccType, ccName, ccLastFour, checkNumber) {
+        this.serverRequest('/fieldtrip/setRequestPaymentInfo', 'POST', {
+            requestId: request.id,
+            classpassId: classpassId,
+            paymentPreference: paymentPreference,
+            ccType: ccType,
+            ccName: ccName,
+            ccLastFour: ccLastFour,
+            checkNumber: checkNumber
+        }, _.bind(function(data) {
+            this.loadRequests();
+        }, this));
+    },
+
     showRequest : function(request) {
         this.loadFullRequest(request, _.bind(function(fullReq) {
             if(_.has(this.requestWidgets, fullReq.id)) {

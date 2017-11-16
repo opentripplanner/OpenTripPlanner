@@ -200,10 +200,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 this_.module.setClasspassId(this_.request, classpassId);
             }
         });
+        this.content.find('.updatePaymentButton').click(function(evt) {
+            this_.showUpdatePaymentDialog();
+        });
         this.content.find('.addNoteButton').click(function(evt) {
-            /*otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
-                this_.module.addNote(this_.request, input, "internal");
-            });*/
             this_.showNoteDialog();
         });
 
@@ -248,6 +248,42 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             var text = dialog.find(".textarea").val();
             var type = dialog.find('input:radio[name=type]:checked').val();
             this_.module.addNote(this_.request, text, type);
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },
+
+    showUpdatePaymentDialog : function() {
+        var this_ = this;
+
+        var dialog = ich['otp-fieldtrip-paymentDialog']({
+            classpassId: this.request.classpassId,
+            paymentPreference: this.request.paymentPreference,
+            ccName: this.request.ccName,
+            ccType: this.request.ccType,
+            ccLastFour: this.request.ccLastFour,
+            checkNumber: this.request.checkNumber,
+        }).dialog({
+            title : "Update Payment Info",
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 400
+        });
+
+        dialog.find(".okButton").button().click(function() {
+            this_.module.setPaymentInfo(this_.request,
+              dialog.find(".classpassId").val(),
+              dialog.find(".paymentPreference").val(),
+              dialog.find(".ccType").val(),
+              dialog.find(".ccName").val(),
+              dialog.find(".ccLastFour").val(),
+              dialog.find(".checkNumber").val()
+            );
+
             dialog.dialog("close");
         });
 
