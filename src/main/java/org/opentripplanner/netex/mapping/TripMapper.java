@@ -27,9 +27,9 @@ public class TripMapper {
         }
 
         Trip trip = new Trip();
-        trip.setId(FeedScopedIdFactory.createAgencyAndId(serviceJourney.getId()));
+        trip.setId(FeedScopedIdFactory.createFeedScopedId(serviceJourney.getId()));
 
-        trip.setRoute(gtfsDao.getRoutes().get(FeedScopedIdFactory.createAgencyAndId(lineRef)));
+        trip.setRoute(gtfsDao.getRoutes().get(FeedScopedIdFactory.createFeedScopedId(lineRef)));
         DayTypeRefs_RelStructure dayTypes = serviceJourney.getDayTypes();
 
         StringBuilder serviceId = new StringBuilder();
@@ -50,7 +50,7 @@ public class TripMapper {
             netexDao.getServiceIds().put(serviceId.toString(), serviceId.toString());
         }
 
-        trip.setServiceId(FeedScopedIdFactory.createAgencyAndId(serviceId.toString()));
+        trip.setServiceId(FeedScopedIdFactory.createFeedScopedId(serviceId.toString()));
 
         return trip;
     }

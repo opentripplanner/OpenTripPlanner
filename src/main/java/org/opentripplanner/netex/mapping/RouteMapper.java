@@ -27,7 +27,7 @@ public class RouteMapper {
             Agency agency = transitBuilder.getAgencies().stream().filter(a -> a.getId().equals(agencyId)).findFirst().get();
             otpRoute.setAgency(agency);
         }
-        otpRoute.setId(FeedScopedIdFactory.createAgencyAndId(line.getId()));
+        otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
         otpRoute.setType(transportTypeMapper.mapTransportType(line.getTransportMode().value()));

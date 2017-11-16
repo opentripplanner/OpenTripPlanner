@@ -53,8 +53,8 @@ public class NetexBundle {
         this.file = file;
     }
 
-    public InputStream getStopPlaceFile() {
-        return null;
+    public NetexParameters getNetexParameters() {
+        return netexParameters;
     }
 
     public List<ZipEntry> getFileEntriesInOrder(){

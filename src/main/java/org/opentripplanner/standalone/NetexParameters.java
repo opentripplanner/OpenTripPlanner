@@ -28,6 +28,15 @@ public class NetexParameters {
 
     private static final String GROUP_FILE_PATTERN = "(\\w{3})-.*\\.xml";
 
+    private static final String NETEX_FEED_ID = "RB";
+
+    /**
+     * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file
+     * feed_info.txt.
+     */
+
+    public final String netexFeedId;
+
     /**
      * This field is used to identify Netex module (zip) files. The format is
      * a regular expression. The regular expression should match the name
@@ -95,11 +104,13 @@ public class NetexParameters {
             sharedFilePattern = Pattern.compile(SHARED_FILE_PATTHER);
             sharedGroupFilePattern = Pattern.compile(SHARED_GROUP_FILE_PATTERN);
             groupFilePattern = Pattern.compile(GROUP_FILE_PATTERN);
+            netexFeedId = NETEX_FEED_ID;
         } else {
             moduleFilePattern = pattern("moduleFilePattern", MODULE_FILE_PATTERN, config);
             sharedFilePattern = pattern("sharedFilePattern", SHARED_FILE_PATTHER, config);
             sharedGroupFilePattern = pattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN, config);
             groupFilePattern = pattern("groupFilePattern", GROUP_FILE_PATTERN, config);
+            netexFeedId = config.path("netexFeedId").asText(NETEX_FEED_ID);
         }
     }
 

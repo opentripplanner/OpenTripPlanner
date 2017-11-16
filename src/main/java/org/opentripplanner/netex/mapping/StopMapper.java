@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,7 @@ public class StopMapper {
             LOG.warn(stopPlaceLatest.getId() + " does not contain any coordinates.");
         }
 
-        stop.setId(FeedScopedIdFactory.createAgencyAndId(stopPlaceLatest.getId()));
+        stop.setId(FeedScopedIdFactory.createFeedScopedId(stopPlaceLatest.getId()));
         stops.add(stop);
 
         // Get quays from all versions of stop place
@@ -61,7 +60,7 @@ public class StopMapper {
                         stopQuay.setName(stop.getName());
                         stopQuay.setLat(quay.getCentroid().getLocation().getLatitude().doubleValue());
                         stopQuay.setLon(quay.getCentroid().getLocation().getLongitude().doubleValue());
-                        stopQuay.setId(FeedScopedIdFactory.createAgencyAndId(quay.getId()));
+                        stopQuay.setId(FeedScopedIdFactory.createFeedScopedId(quay.getId()));
                         stopQuay.setParentStation(stop.getId().getId());
 
                         if (!quaysSeen.contains(quay.getId())) {

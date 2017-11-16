@@ -12,6 +12,7 @@ import org.rutebanken.netex.model.StopPlace;
 import java.util.Collection;
 
 import static org.opentripplanner.netex.mapping.CalendarMapper.mapToCalendarDates;
+import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 public class NetexMapper {
 
@@ -63,7 +64,7 @@ public class NetexMapper {
         }
 
         for (String serviceId : netexDao.getServiceIds().values()) {
-            transitBuilder.getCalendarDates().addAll(mapToCalendarDates(FeedScopedIdFactory.createAgencyAndId(serviceId), netexDao));
+            transitBuilder.getCalendarDates().addAll(mapToCalendarDates(createFeedScopedId(serviceId), netexDao));
         }
 
         return transitBuilder;

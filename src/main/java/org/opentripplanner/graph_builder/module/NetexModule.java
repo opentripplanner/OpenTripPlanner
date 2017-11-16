@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.model.NetexDao;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.mapping.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
@@ -91,13 +92,15 @@ public class NetexModule implements GraphBuilderModule {
             for(NetexBundle netexBundle : netexBundles){
                 NetexDao netexDao = loadBundle(netexBundle);
 
+                FeedScopedIdFactory.setFeedId(netexBundle.getNetexParameters().netexFeedId);
+
                 NetexMapper otpMapper = new NetexMapper(new OtpTransitServiceBuilder());
                 OtpTransitServiceBuilder daoBuilder = otpMapper.mapNetexToOtp(netexDao);
 
                 calendarService.addData(daoBuilder);
 
                 PatternHopFactory hf = new PatternHopFactory(
-                        new GtfsFeedId.Builder().id("RB").build(),
+                        new GtfsFeedId.Builder().id(netexBundle.getNetexParameters().netexFeedId).build(),
                         daoBuilder.build(),
                         _fareServiceFactory,
                         netexBundle.getMaxStopToShapeSnapDistance(),

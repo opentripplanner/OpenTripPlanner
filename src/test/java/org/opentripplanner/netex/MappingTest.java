@@ -1,7 +1,7 @@
 package org.opentripplanner.netex;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.model.NetexBundle;
 import org.opentripplanner.graph_builder.module.NetexModule;
@@ -20,36 +20,37 @@ import java.util.Set;
 
 // TODO - The mapping needs better tests
 public class MappingTest {
-    private OtpTransitServiceBuilder otpBuilderFromNetex;
+    private static final String NETEX_FILENAME = "src/test/resources/netex/netex_minimal.zip";
 
-    private File netexFile = new File("src/test/resources/netex/netex_minimal.zip");
+    private static OtpTransitServiceBuilder otpBuilder;
 
-    @Before public void setUpNetexMapping() throws Exception {
-        NetexBundle netexBundle = new NetexBundle(netexFile);
+    @BeforeClass
+    public static void setUpNetexMapping() throws Exception {
+
+        NetexBundle netexBundle = new NetexBundle(new File(NETEX_FILENAME));
         NetexModule netexModule = new NetexModule(Collections.singletonList(netexBundle));
-        this.otpBuilderFromNetex = netexModule.getOtpDao().stream().findFirst()
-                .orElseThrow(IllegalStateException::new);
+        otpBuilder = netexModule.getOtpDao().stream().findFirst().orElseThrow(IllegalStateException::new);
     }
 
     @Test public void testNetexRoutes() {
-        ArrayList<Route> routesNetex = new ArrayList<>(otpBuilderFromNetex.getRoutes().values());
+        ArrayList<Route> routesNetex = new ArrayList<>(otpBuilder.getRoutes().values());
         Assert.assertEquals(2, routesNetex.size());
     }
 
     @Test public void testNetexStopTimes() {
         Set<StopTime> stopTimesNetex = new HashSet<>(
-                otpBuilderFromNetex.getStopTimesSortedByTrip().valuesAsSet());
+                otpBuilder.getStopTimesSortedByTrip().valuesAsSet());
         Assert.assertEquals(0, stopTimesNetex.size());
     }
 
     @Test public void testNetexCalendar() {
-        for (ServiceCalendarDate serviceCalendarDate : otpBuilderFromNetex.getCalendarDates()) {
+        for (ServiceCalendarDate serviceCalendarDate : otpBuilder.getCalendarDates()) {
             String newId = convertServiceIdFormat(serviceCalendarDate.getServiceId().getId());
             serviceCalendarDate.getServiceId().setId(newId);
         }
 
         final Collection<ServiceCalendarDate> datesNetex = new ArrayList<>(
-                otpBuilderFromNetex.getCalendarDates());
+                otpBuilder.getCalendarDates());
 
         Assert.assertEquals(24, datesNetex.size());
     }

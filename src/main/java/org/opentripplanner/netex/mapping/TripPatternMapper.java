@@ -42,7 +42,7 @@ public class TripPatternMapper {
 
         Route route = netexDao.getRouteById().get(journeyPattern.getRouteRef().getRef());
         org.opentripplanner.model.Route otpRoute = transitBuilder.getRoutes().get(
-                FeedScopedIdFactory.createAgencyAndId(route.getLineRef().getValue().getRef()));
+                FeedScopedIdFactory.createFeedScopedId(route.getLineRef().getValue().getRef()));
 
         if (serviceJourneys == null) {
             LOG.warn("ServiceJourneyPattern " + journeyPattern.getId() + " does not contain any serviceJourneys.");
@@ -171,7 +171,7 @@ public class TripPatternMapper {
                     }
                     else {
                         Stop stopPlace = transitBuilder.getStops()
-                                .get(FeedScopedIdFactory.createAgencyAndId(stopId));
+                                .get(FeedScopedIdFactory.createFeedScopedId(stopId));
                         if (stopPlace == null) {
                             LOG.warn("StopPlace not found for " + scheduledStopPointRef.getValue().getRef());
                         }
@@ -197,7 +197,7 @@ public class TripPatternMapper {
                     }
                     else {
                         Stop quay = transitBuilder.getStops()
-                                .get(FeedScopedIdFactory.createAgencyAndId(stopId));
+                                .get(FeedScopedIdFactory.createFeedScopedId(stopId));
                         if (quay == null) {
                             LOG.warn("Quay not found for " + scheduledStopPointRef.getValue().getRef());
                         }
