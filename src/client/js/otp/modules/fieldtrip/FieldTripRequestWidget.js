@@ -165,7 +165,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
-                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass Hop Card # ' + req.classpassId + ')';
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -175,7 +175,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
-                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass Hop Card # ' + req.classpassId + ')';
                     content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
