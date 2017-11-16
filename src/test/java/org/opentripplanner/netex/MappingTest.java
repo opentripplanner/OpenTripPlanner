@@ -51,7 +51,7 @@ public class MappingTest {
         final Collection<ServiceCalendarDate> datesNetex = new ArrayList<>(
                 otpBuilderFromNetex.getCalendarDates());
 
-        Assert.assertEquals(22, datesNetex.size());
+        Assert.assertEquals(24, datesNetex.size());
     }
 
     private static String convertServiceIdFormat(String netexServiceId) {
