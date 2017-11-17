@@ -30,6 +30,12 @@ public class StopMapper {
 
         StopPlace stopPlaceLatest = Iterables.getLast(stopPlaceAllVersions);
 
+        if (stopPlaceLatest.getName() != null) {
+            stop.setName(stopPlaceLatest.getName().getValue());
+        } else {
+            stop.setName("N/A");
+        }
+
         if(stopPlaceLatest.getCentroid() != null){
             stop.setLat(stopPlaceLatest.getCentroid().getLocation().getLatitude().doubleValue());
             stop.setLon(stopPlaceLatest.getCentroid().getLocation().getLongitude().doubleValue());
