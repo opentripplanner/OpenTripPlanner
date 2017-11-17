@@ -6,6 +6,7 @@ import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.NetexBundle;
 import org.opentripplanner.graph_builder.model.NetexDao;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.mapping.FeedScopedIdFactory;
@@ -63,7 +64,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -95,9 +95,8 @@ public class NetexModule implements GraphBuilderModule {
             for(NetexBundle netexBundle : netexBundles){
                 NetexDao netexDao = loadBundle(netexBundle);
 
-                FeedScopedIdFactory.setFeedId(netexBundle.netexParameters.netexFeedId);
-
-                NetexMapper otpMapper = new NetexMapper(new OtpTransitServiceBuilder());
+                NetexMapper otpMapper = new NetexMapper(new OtpTransitServiceBuilder(),
+                        netexBundle.netexParameters.netexFeedId);
                 OtpTransitServiceBuilder daoBuilder = otpMapper.mapNetexToOtp(netexDao);
 
                 calendarService.addData(daoBuilder);
@@ -157,7 +156,7 @@ public class NetexModule implements GraphBuilderModule {
         for(NetexBundle bundle : netexBundles) {
             NetexDao netexDao = loadBundle(bundle);
 
-            NetexMapper otpMapper = new NetexMapper(new OtpTransitServiceBuilder());
+            NetexMapper otpMapper = new NetexMapper(new OtpTransitServiceBuilder(), bundle.netexParameters.netexFeedId);
             otpDaoList.add(otpMapper.mapNetexToOtp(netexDao));
         }
 

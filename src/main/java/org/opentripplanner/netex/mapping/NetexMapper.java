@@ -16,22 +16,22 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
 
 public class NetexMapper {
 
-    final OtpTransitServiceBuilder transitBuilder;
-
-    AgencyMapper agencyMapper = new AgencyMapper();
-
-    RouteMapper routeMapper = new RouteMapper();
-
-    StopMapper stopMapper = new StopMapper();
-
-    TripPatternMapper tripPatternMapper = new TripPatternMapper();
+    private final OtpTransitServiceBuilder transitBuilder;
+    private final AgencyMapper agencyMapper = new AgencyMapper();
+    private final RouteMapper routeMapper = new RouteMapper();
+    private final StopMapper stopMapper = new StopMapper();
+    private final TripPatternMapper tripPatternMapper = new TripPatternMapper();
+    private final String agencyId;
 
 
-    public NetexMapper(OtpTransitServiceBuilder transitBuilder) {
+    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
         this.transitBuilder = transitBuilder;
+        this.agencyId = agencyId;
     }
 
     public OtpTransitServiceBuilder mapNetexToOtp(NetexDao netexDao) {
+        FeedScopedIdFactory.setFeedId(agencyId);
+
         for (Operator operator : netexDao.getOperators().values()) {
             if (operator != null) {
                 transitBuilder.getAgencies().add(agencyMapper.mapAgency(operator, "Europe/Oslo"));
