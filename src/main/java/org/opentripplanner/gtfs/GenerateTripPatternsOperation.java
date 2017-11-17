@@ -13,6 +13,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -25,7 +26,7 @@ import java.util.List;
 
 /**
  * This class is responsible for generating trip patterns when loading GTFS data. This was
- * previously done in the {@link org.opentripplanner.routing.edgetype.factory.PatternHopFactory},
+ * previously done in the {@link PatternHopFactory},
  * and the code is extracted out of it to make the PatternHopFactory reusable
  * for NETEX and GTFS file import.
  */

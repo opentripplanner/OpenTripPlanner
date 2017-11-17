@@ -47,7 +47,9 @@ public class AlertPatchTest extends TestCase {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .build();
-        PatternHopFactory factory = new PatternHopFactory(context);        factory.run(graph);
+        PatternHopFactory factory = new PatternHopFactory(context);
+        factory.run(graph);
+
         graph.putService(
                 CalendarServiceData.class,
                 createCalendarServiceData(context.getTransitBuilder())

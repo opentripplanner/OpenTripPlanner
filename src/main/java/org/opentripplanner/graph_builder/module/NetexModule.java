@@ -6,10 +6,8 @@ import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.NetexBundle;
 import org.opentripplanner.graph_builder.model.NetexDao;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.mapping.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
@@ -165,8 +163,7 @@ public class NetexModule implements GraphBuilderModule {
 
     private Unmarshaller getUnmarshaller() throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(PublicationDeliveryStructure.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return unmarshaller;
+        return jaxbContext.createUnmarshaller();
     }
 
 
