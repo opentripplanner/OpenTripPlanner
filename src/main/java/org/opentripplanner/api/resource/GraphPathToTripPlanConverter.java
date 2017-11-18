@@ -25,7 +25,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -337,8 +336,20 @@ public abstract class GraphPathToTripPlanConverter {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
+        if (leg.isTransitLeg()) {
+            addRealTimeData(leg, states);
 
+            leg.interStopGeometry = new ArrayList<>();
+            for (Edge edge : edges) {
+                if (edge instanceof HopEdge) {
+                    LineString edgeGeom = edge.getGeometry();
+                    CoordinateArrayListSequence edgeCoords = new CoordinateArrayListSequence();
+                    edgeCoords.extend(edgeGeom.getCoordinates());
+                    Geometry geom = GeometryUtils.getGeometryFactory().createLineString(edgeCoords);
+                    leg.interStopGeometry.add(PolylineEncoder.createEncodings(geom));
+                }
+            }
+        }
         return leg;
     }
 
