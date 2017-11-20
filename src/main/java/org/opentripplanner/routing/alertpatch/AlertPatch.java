@@ -135,13 +135,15 @@ public class AlertPatch implements Serializable {
 
             if (tripPatterns != null) {
                 for (TripPattern tripPattern : tripPatterns) {
+
                     if (direction != null && !direction.equals(tripPattern.getDirection())) {
                         continue;
                     }
-                    if (directionId != -1 && directionId == tripPattern.directionId) {
+                    if (directionId != -1 && directionId != tripPattern.directionId) {
                         continue;
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                             graph.addAlertPatch(tripPattern.boardEdges[i], this);
                             graph.addAlertPatch(tripPattern.alightEdges[i], this);
