@@ -155,17 +155,6 @@ public abstract class GtfsFlexGraphModifier {
      */
     public abstract StreetVertex getLocationForTemporaryStop(State s, PatternHop hop);
 
-    /**
-     * Subclasses can override this method to provide extra hops (not found in graph search)
-     * at which to create new vertices/edges, e.g. for flag stops where start/end vertices can be
-     * ON hop.
-     * 
-     * @param rr request for graph search
-     * @param patternHopStateMap map to insert new PatternHop/State pairs into
-     */
-    public void findExtraHops(RoutingRequest rr, Map<PatternHop, State> patternHopStateMap) {
-    }
-
     public void vertexVisitor(State state) {}
 
     /**
@@ -288,8 +277,6 @@ public abstract class GtfsFlexGraphModifier {
 
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
         gd.getShortestPathTree(new State(initVertex, rr));
-
-        findExtraHops(rr, patternHopStateMap);
 
         return patternHopStateMap.entrySet()
                 .stream()

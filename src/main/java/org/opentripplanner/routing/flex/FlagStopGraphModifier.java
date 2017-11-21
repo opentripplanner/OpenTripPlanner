@@ -89,12 +89,6 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
     }
 
     @Override
-    public void findExtraHops(RoutingRequest rr, Map<PatternHop, State> patternHopStateMap) {
-        Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
-        findFlagStopEdgesNearby(rr, initVertex, patternHopStateMap);
-    }
-
-    @Override
     public StreetVertex getLocationForTemporaryStop(State s, PatternHop hop) {
         RoutingRequest rr = s.getOptions();
         Vertex initVertex = rr.arriveBy ? rr.rctx.toVertex : rr.rctx.fromVertex;
@@ -136,66 +130,5 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public boolean checkHopAllowsBoardAlight(State state, PatternHop hop, boolean boarding) {
         return hop.canRequestService(boarding);
-    }
-
-    /**
-     * Find the street edges that were split at beginning of search by StreetSplitter, check whether they are served by flag stop routes.
-     * This is duplicating the work done earlier by StreetSplitter, but want to minimize the number of changes introduced by flag stops.
-     */
-    private void findFlagStopEdgesNearby(RoutingRequest rr, Vertex initVertex, Map<PatternHop, State> patternHopStateMap) {
-        List<StreetEdge> flagStopEdges = getClosestStreetEdges(initVertex.getCoordinate());
-
-        for(StreetEdge streetEdge : flagStopEdges) {
-            State nearbyState = new State(initVertex, rr);
-            nearbyState.backEdge = streetEdge;
-            Collection<PatternHop> hops = graph.index.getHopsForEdge(streetEdge);
-            for (PatternHop hop : hops) {
-                if (checkHopAllowsBoardAlight(nearbyState, hop, !rr.arriveBy)) {
-                    patternHopStateMap.put(hop, nearbyState);
-                }
-            }
-        }
-    }
-
-    /**
-     * Find the nearest street edges to the given point, check if they are served by flag stop routes.
-     */
-    private List<StreetEdge> getClosestStreetEdges(Coordinate pointLocation) {
-
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
-
-        Envelope env = new Envelope(pointLocation);
-
-        // local equirectangular projection
-        double lat = pointLocation.getOrdinate(1);
-        final double xscale = Math.cos(lat * Math.PI / 180);
-
-        env.expandBy(radiusDeg / xscale, radiusDeg);
-
-        Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(env);
-        if (edges.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Map<Double, List<StreetEdge>> edgeDistanceMap = new TreeMap<>();
-        for(Edge edge : edges){
-            if(edge instanceof StreetEdge){
-                LineString line = edge.getGeometry();
-                double dist = SphericalDistanceLibrary.fastDistance(pointLocation, line);
-                double roundOff = (double) Math.round(dist * 100) / 100;
-                if(!edgeDistanceMap.containsKey(roundOff))
-                    edgeDistanceMap.put(roundOff, new ArrayList<>());
-                edgeDistanceMap.get(roundOff).add((StreetEdge) edge);
-            }
-        }
-
-        List<StreetEdge> closestEdges = edgeDistanceMap.values().iterator().next();
-        List<StreetEdge> ret = new ArrayList<>();
-        for(StreetEdge closestEdge : closestEdges){
-            Collection<PatternHop> patternHops = graph.index.getHopsForEdge(closestEdge);
-            if(patternHops.size() > 0) {
-                ret.add(closestEdge);
-            }
-        }
-        return ret;
     }
 }

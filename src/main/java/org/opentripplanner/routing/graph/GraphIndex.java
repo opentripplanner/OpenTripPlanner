@@ -54,6 +54,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
+import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -772,6 +773,9 @@ public class GraphIndex {
     }
 
     public Collection<PatternHop> getHopsForEdge(Edge e) {
+        if (e instanceof TemporaryPartialStreetEdge) {
+            e = ((TemporaryPartialStreetEdge) e).getParentEdge();
+        }
         return hopsForEdge.get(e);
     }
 
