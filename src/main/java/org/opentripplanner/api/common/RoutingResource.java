@@ -362,6 +362,10 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /* If trip discovery mode (look out a week) should be used */
+    @QueryParam("serviceDayLookout")
+    private Integer serviceDayLookout;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -593,6 +597,9 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (serviceDayLookout != null)
+            request.setServiceDayLookout(serviceDayLookout);
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
