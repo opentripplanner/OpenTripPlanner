@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<kml xmlns='http://www.opengis.net/kml/2.2'>
+	<Document>
+		<name>NS Fietsenstallingen</name>
+		<description><![CDATA[]]></description>
+		<Folder>
+			<name>Naamloze laag</name>
+			<Placemark>
+				<styleUrl>#icon-22</styleUrl>
+				<name>Station Alkmaar</name>
+				<ExtendedData>
+				</ExtendedData>
+				<description><![CDATA[Fietspoint Stoop<br>Stationsweg 43<br>1815 CB ALKMAAR<br><br>Openingstijden <br>maandag - vrijdag: 4.45 - 2.15 <br>zaterdag: 4.45 - 2.45 uur <br>zondag: 5.45 - 2.15 uur<br> Bezoek NS Fietsenstalling (http://www.nsfietsenstalling.nl/)]]></description>
+				<Point>
+					<coordinates>4.73985,52.637531,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<styleUrl>#icon-22</styleUrl>
+				<name>Station Alkmaar Noord</name>
+				<ExtendedData>
+				</ExtendedData>
+				<description><![CDATA[Drechterwaard 112<br>1824 DX Alkmaar<br><br>Openingstijden <br>maandag - vrijdag: 5.30 - 3.00 uur <br>zaterdag: 6.30 - 2.00 uur <br>zondag: 7.00 - 02.00 uur<br>feestdagen gesloten<br> Bezoek NS Fietsenstalling (http://www.nsfietsenstalling.nl/)]]></description>
+				<Point>
+					<coordinates>4.76371,52.643959,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<styleUrl>#icon-22</styleUrl>
+				<name>Station Almelo</name>
+				<ExtendedData>
+				</ExtendedData>
+				<description><![CDATA[Van Schagen Rijwielshop en zelfservice stalling<br>Stationsplein 1<br>7607 GD Almelo<br><br>Openingstijden <br>Zelfservice stalling <br>maandag - zondag <br>vanaf een kwartier voor de eerste tot een kwartier na de laatste trein<br>Van Schagen Rijwielshop <br>maandag - vrijdag: 7.00 - 13.00 uur en 16.00 - 19.00 uur <br>zaterdag en zondag: gesloten<br>Let op, in juli en augustus zijn de openingstijden aangepast; <br>maandag - vrijdag: 7.00 - 10.00 uur en 16.00 - 19.00 uur <br>zaterdag en zondag: gesloten<br> <br>Bezoek NS Fietsenstalling (http://www.nsfietsenstalling.nl/)]]></description>
+				<Point>
+					<coordinates>6.65732,52.35614,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<styleUrl>#icon-22</styleUrl>
+				<name>Station Almere Buiten</name>
+				<ExtendedData>
+				</ExtendedData>
+				<description><![CDATA[Fietsenstalling<br>Noordeinde 164<br>1334 BC Almere<br><br>Openingstijden <br>maandag: gesloten <br>dinsdag - zaterdag: 9.00 - 17.00 uur <br>zondag: gesloten<br> <br>Bezoek NS Fietsenstalling (http://www.nsfietsenstalling.nl/)]]></description>
+				<Point>
+					<coordinates>5.2778,52.394661,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<styleUrl>#icon-22</styleUrl>
+				<name>Station Almere Centrum</name>
+				<ExtendedData>
+				</ExtendedData>
+				<description><![CDATA[Rijwielshop<br>Busplein 16<br>1315 KR ALMERE<br><br>Openingstijden <br>maandag - vrijdag: 6.15 - 20.15 uur <br>zaterdag: 10.00 - 17.00 uur <br>zondag: gesloten<br>Bezoek NS Fietsenstalling (http://www.nsfietsenstalling.nl/)]]></description>
+				<Point>
+					<coordinates>5.21781,52.37461900000001,0.0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Style id='icon-22'>
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+			</IconStyle>
+		</Style>
+	</Document>
+</kml>

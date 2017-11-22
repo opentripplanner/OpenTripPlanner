@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- an osm file where an edge of a park and ride is coincident exactly with an edge of a road -->
+<osm version='0.6' upload='true' generator='JOSM'>
+  <!-- nodes for the lot -->
+  <node id='-12' action='modify' visible='true' lat='0' lon='0' />
+  <node id='-100' action='modify' visible='true' lat='1' lon='1' />
+  <node id='-8' action='modify' visible='true' lat='0' lon='1' />
+
+  <!-- nodes for the road. Note that they are identical to two of the nodes for the lot -->
+  <node id='-6' action='modify' visible='true' lat='0.0' lon='0.0' />
+  <node id='-10' action='modify' visible='true' lat='0' lon='1' />
+
+  <way id='-16' action='modify' visible='true'>
+    <nd ref='-12' />
+    <nd ref='-100' />
+    <nd ref='-8' />
+    <nd ref='-12' />
+    <tag k='area' v='yes' />
+    <tag k='park_ride' v='bus' />
+  </way>
+
+  <way id='-14' action='modify' visible='true'>
+    <nd ref='-6' />
+    <nd ref='-10' />
+    <tag k='highway' v='residential' />
+  </way>
+</osm>

@@ -1,0 +1,4 @@
+route_id,service_id,trip_id
+1a|bus,1a|bus|1,1a|bus|1
+1a|ferry,1a|ferry|1,1a|ferry|1
+1a|train,1a|train|1,1a|train|1

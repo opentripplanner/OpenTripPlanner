@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+<Document>
+  <name>NS Fietsenstallingen</name>
+  <description><![CDATA[]]></description>
+  <Placemark>
+    <name>Station Alkmaar</name>
+    <Snippet>Fietspoint Stoop        Stationsweg 43       1815 CB ALKMAAR</Snippet>
+    <description><![CDATA[<strong>Fietspoint Stoop</strong><br>Stationsweg 43<br>1815 CB ALKMAAR<br><br><strong>Openingstijden</strong> 
+<div>maandag - vrijdag: 4.45 - 2.15 <br>zaterdag: 4.45 - 2.45 uur <br>zondag:&nbsp;5.45 - 2.15 uur<br>&nbsp;</div>Bezoek <a href="http://www.nsfietsenstalling.nl/" target="_blank">NS Fietsenstalling</a>]]></description>
+    <Point>
+      <coordinates>4.739850,52.637531,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Station Alkmaar Noord</name>
+    <Snippet>Drechterwaard 110       1824 DX Alkmaar                                  Opening</Snippet>
+    <description><![CDATA[Drechterwaard 112<br>1824 DX Alkmaar<br><br><strong>Openingstijden</strong> 
+<p>maandag - vrijdag: 5.30 - 3.00 uur <br>zaterdag: 6.30 - 2.00 uur <br>zondag: 7.00 - 02.00 uur</p>
+<p>feestdagen gesloten</p>
+<p>&nbsp;</p>Bezoek <a href="http://www.nsfietsenstalling.nl/" target="_blank">NS Fietsenstalling</a><br>]]></description>
+    <Point>
+      <coordinates>4.763710,52.643959,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Station Almelo</name>
+    <Snippet>Van Schagen Rijwielshop en zelfservice stalling        Stationsplein 1       760</Snippet>
+    <description><![CDATA[<strong>Van Schagen Rijwielshop en zelfservice stalling</strong><br>Stationsplein 1<br>7607 GD Almelo<br><br><strong>Openingstijden</strong> 
+<p><strong>Zelfservice stalling </strong><br>maandag - zondag <br>vanaf een kwartier voor de eerste tot&nbsp;een kwartier na de laatste trein</p>
+<p><strong>Van Schagen Rijwielshop</strong> <br>maandag - vrijdag: 7.00 - 13.00 uur en 16.00 - 19.00 uur <br>zaterdag en zondag: gesloten</p>
+<p><strong>Let op, in juli en augustus&nbsp;zijn de openingstijden aangepast; <br></strong>maandag - vrijdag: 7.00 - 10.00 uur en 16.00 - 19.00 uur <br>zaterdag en zondag: gesloten</p>
+<div>&nbsp;</div>
+<div>Bezoek <a href="http://www.nsfietsenstalling.nl/" target="_blank">NS Fietsenstalling</a><br>&nbsp;</div>]]></description>
+    <Point>
+      <coordinates>6.657320,52.356140,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Station Almere Buiten</name>
+    <Snippet>Noordeinde 164       1334 BC Almere                                  Openingstij</Snippet>
+    <description><![CDATA[<b>Fietsenstalling</b><br>Noordeinde 164<br>1334 BC Almere<br><br><strong>Openingstijden</strong> 
+<div>maandag: gesloten <br>dinsdag - zaterdag: 9.00 - 17.00 uur <br>zondag: gesloten<br>&nbsp;</div>
+<div>Bezoek <a href="http://www.nsfietsenstalling.nl/" target="_blank">NS Fietsenstalling</a><br>&nbsp;</div>]]></description>
+    <LookAt>
+      <longitude>6.654590</longitude>
+      <latitude>52.351860</latitude>
+      <altitude>0.000000</altitude>
+      <heading>-0.002208</heading>
+      <tilt>0.000000</tilt>
+      <range>5480.931152</range>
+    </LookAt>
+    <Point>
+      <coordinates>5.277800,52.394661,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Station Zwolle</name>
+    <Snippet>Openingstijden        maandag - zondag  vanaf een kwa</Snippet>
+    <description><![CDATA[<strong>Openingstijden</strong>
+		  			<p>maandag - zondag <br>
+vanaf een kwartier voor de eerste tot een kwartier na de laatste trein</p>Bezoek&nbsp;<a href="http://www.nsfietsenstalling.nl/" target="_blank">NS Fietsenstalling</a>]]></description>
+    <Point>
+      <coordinates>6.091060,52.504990,0.000000</coordinates>
+    </Point>
+  </Placemark>
+</Document>
+</kml>

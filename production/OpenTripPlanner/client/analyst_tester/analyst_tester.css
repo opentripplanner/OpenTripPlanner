@@ -1,0 +1,114 @@
+html {
+    height: 100%
+}
+
+body {
+    height: 100%;
+    font-family: sans-serif;
+    line-height: 16px;
+    font-size: 15px;
+    color: #06185c;
+    margin: 0px;
+    /* do not add scroll bars unless overridden on sub-elements */
+    overflow: hidden;
+}
+
+div#map {
+    height: 100%;
+    background: #eee;
+    margin: 0px;
+    padding: 0px;
+}
+
+div#toolbox {
+    height: 100%; width: 320px;
+    float: left;
+    background: #ccc;
+    margin: 0px;
+    padding: 0px;
+    /* add vertical scroll bar if content does not fit */
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+img#legend {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 {
+    font-size: 125%;
+    font-weight: bold;
+    background: #888;
+    padding: 0.4em;
+    margin: 0px;
+}
+
+h2 {
+    font-size: 100%;
+}
+
+p {
+    font-size: 100%
+}
+
+p.footnote {
+    font-size: 75%;
+}
+
+div#toolbox {
+    margin: 0px;
+    padding: 0em;
+}
+
+form {
+    margin: 0px;
+    padding: 0.4em 0.4em 0.6em 0.4em;
+}
+
+form span {
+    /* group labels and their buttons together on a single line */
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    /* can we keep rows of buttons from wrapping when vertical scroll bar appears ? */
+    /* white-space: */
+}
+
+input {
+    margin: 2px;
+}
+
+form span label {
+    float: left;
+    width: 150px;
+}
+
+form span input {
+    float: right;
+    width: 150px;
+}
+
+form span select {
+    float: right;
+    width: 150px;
+}
+
+form span.timeEntry select {
+    float: left;
+}
+
+.autoWidth {
+    width: auto;
+}
+
+.narrowInput {
+    width: 4em;
+}
+
+.fullWidth {
+    width: 100%;
+}

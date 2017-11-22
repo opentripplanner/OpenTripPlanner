@@ -1,0 +1,5 @@
+#!/bin/sh
+# Run OTP in standalone mode with the supplied arguments.
+# Standalone OTP can build a graph, visualize a graph, run an OTP API server,
+# or any combination of these.
+java -Xmx6G -Xverify:none -jar `dirname $0`/target/${project.build.finalName}-shaded.jar "$@"

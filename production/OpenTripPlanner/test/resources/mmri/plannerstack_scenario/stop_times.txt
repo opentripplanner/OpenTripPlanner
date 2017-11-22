@@ -1,0 +1,12 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence
+plannerstack_scenario|intercity,00:01:00,00:01:00,plannerstack_scenario1,1
+plannerstack_scenario|intercity,00:04:00,00:04:00,plannerstack_scenario3,2
+plannerstack_scenario|slt|1,00:01:00,00:01:00,plannerstack_scenario1,1
+plannerstack_scenario|slt|1,00:03:00,00:03:00,plannerstack_scenario2,2
+plannerstack_scenario|slt|1,00:05:00,00:05:00,plannerstack_scenario3,3
+plannerstack_scenario|slt|2,00:06:00,00:06:00,plannerstack_scenario3,1
+plannerstack_scenario|slt|2,00:09:00,00:09:00,plannerstack_scenario2,2
+plannerstack_scenario|slt|2,00:11:00,00:11:00,plannerstack_scenario1,3
+plannerstack_scenario|slt|3,00:10:00,00:10:00,plannerstack_scenario3,1
+plannerstack_scenario|slt|3,00:14:00,00:14:00,plannerstack_scenario2,2
+plannerstack_scenario|slt|3,00:16:00,00:16:00,plannerstack_scenario1,3

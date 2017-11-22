@@ -1,0 +1,17 @@
+.otp-dialogContent {
+    position: absolute;
+    top: 10px;
+    bottom: 45px;
+    left: 10px;
+    right: 10px;
+}
+
+.otp-dialogButtonRow {
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    right: 0px;
+    height: 30px;
+    text-align: center;
+    margin-top: 8px;
+}

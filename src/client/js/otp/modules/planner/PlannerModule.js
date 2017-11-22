@@ -25,7 +25,7 @@ otp.modules.planner.defaultQueryParams = {
     maxWalkDistance                 : 804.672, // 1/2 mi.
     maxSlope                        : 0.0833333333,
     metricDefaultMaxWalkDistance    : 750, // meters
-    imperialDefaultMaxWalkDistance  : 804.672, // 0.5 mile
+    imperialDefaultMaxWalkDistance  : 804.673, // 0.5 mile
     preferredRoutes                 : null,
     otherThanPreferredRoutesPenalty : 300,
     bannedTrips                     : null,

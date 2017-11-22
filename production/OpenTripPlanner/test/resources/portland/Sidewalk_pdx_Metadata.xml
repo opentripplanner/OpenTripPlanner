@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>City of Portland</origin>
+				<pubdate></pubdate>
+				<title>sidewalk_pdx</title>
+				<onlink Sync="TRUE">\\gisstore\gis\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\OTP\Sidewalk_pdx_Metadata</onlink></citeinfo>
+		</citation>
+		<descript>
+			<abstract></abstract>
+			<purpose></purpose>
+			<supplinf></supplinf>
+		</descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>Current</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>Ground condition</current>
+		</timeperd>
+		<status>
+			<progress>Complete</progress>
+			<update>Unknown</update>
+		</status>
+		<keywords>
+			<theme>
+				<themekt>
+				</themekt>
+			</theme>
+			<place>
+				<placekt>
+				</placekt>
+				<placekey>Portland</placekey>
+				<placekey>Multnomah County</placekey>
+				<placekey>Washington County</placekey>
+				<placekey>Clackamas County</placekey>
+				<placekey>Oregon</placekey>
+			</place>
+		</keywords>
+		<accconst>None</accconst>
+		<useconst>These data are distributed uner the terms of the City of Portland Data Distribution Policy.  To review the Data Distribution Agreement, please visit http://Portland Data Distribution Policy.</useconst>
+	</idinfo>
+	<dataqual>
+		<posacc>
+			<horizpa>
+				<horizpar>
+				Registered to tax lots. Street center lines were digitized from aerial orthophotography at +/- 10 feet accuracy. Tax lots were fit to the street centerlines. Beaverton, Oregon City and Tigard planning areas were improved to +/- 5 feet accuracy. Multnomah County was created with coordinate geometry using better control. 
+				</horizpar>
+			</horizpa>
+		</posacc>
+		<lineage>
+			<procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE">G:\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\City of Portland\Sidewalk_pdx_Metadata</srcused><date Sync="TRUE">20091113</date><time Sync="TRUE">19285800</time></procstep></lineage>
+	</dataqual>
+	<spdoinfo>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm>
+				<sdtstype> Line</sdtstype>
+			</sdtsterm>
+			<rastinfo>
+				<rasttype></rasttype>
+			</rastinfo>
+		</ptvctinf>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<planar>
+				<gridsys>
+					<gridsysn>State plane coordinate system 1983(91).</gridsysn>
+					<spcs>
+						<spcszone>5076</spcszone>
+					</spcs>
+				</gridsys>
+				<planci>
+					<plandu>International feet</plandu>
+				</planci>
+			</planar>
+			<geodetic>
+				<horizdn>North American Datum of 1983/1991 (HPGN)</horizdn>
+			</geodetic>
+		</horizsys>
+	</spref>
+	<eainfo>
+		<detailed>
+			<enttyp>
+				<enttypl>sidewalk_pdx</enttypl>
+				<enttypd></enttypd>
+			</enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Feature ID</attrdef>
+			</attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Column containing the shape geometry</attrdef>
+			</attr>
+			<attr>
+				<attrlabl>ImagePath</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>DrainageStyle_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>HistFeatures_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>Material_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>RampStyle_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>SidewalkType_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>WarningStyle_</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>ASSETID</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+			<attr>
+				<attrlabl>LocationID</attrlabl>
+				<attrdef></attrdef>
+			</attr>
+		</detailed>
+	</eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>City of Portland - BTS/CGIS</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<address>1120 SW Fifth Avenue, Suite #450</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97204</postal>
+				</cntaddr>
+				<cntvoice>503 823-5632</cntvoice>
+				<cntfax>503 823-9176</cntfax>
+				<cntemail>cgis@ci.portland.or.us</cntemail>
+			</cntinfo>
+		</distrib>
+		<distliab>The information in this file was derived from digital databases on the City of Portland GIS. Care was taken in the creation of this file. The City  cannot accept any responsibility for errors, omissions, or positional accuracy.  There are no warranties, expressed or implied.</distliab>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<formname>Shapefile  - Cost Recovery fee will be charged for conversion.</formname>
+					<transize>0Mb</transize>
+				</digtinfo>
+				<digtopt>
+					<offoptn>
+						<offmedia>CD-ROM</offmedia>
+						<recfrmt> ISO9660 (DOS, Unix or Macintosh)</recfrmt>
+					</offoptn>
+				</digtopt>
+				<digtopt>
+					<onlinopt>
+						<computer>
+							<networka>
+								<networkr>www.portlandonline.com</networkr>
+							</networka>
+						</computer>
+						<accinstr> The City of Portland can place the data on a CD upon request.  In most cases, a fee will be charged for data reproduction and preparation.  Call 503-823-5632 or e-mail cgis@ci.portland.or.us for instructions.</accinstr>
+					</onlinopt>
+				</digtopt>
+			</digform>
+			<fees></fees>
+		</stdorder>
+	</distinfo>
+	<metainfo>
+		<metd>20091101</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+					<cntper>Kevin York</cntper>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 823-5383</cntvoice>
+				<cntfax></cntfax>
+				<cntemail>Kevin.York@trans.ci.portland.or.us</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv> 19940608</metstdv>
+	</metainfo>
+	<Esri><MetaID>{249A2497-DECE-46D7-96FC-5D068B6A2B4C}</MetaID><CreaDate>20091113</CreaDate><CreaTime>19285800</CreaTime><SyncOnce>TRUE</SyncOnce></Esri><distInfo><distributor><distorTran><onLineSrc><linkage Sync="TRUE">file://\\gisstore\gis\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\OTP\Sidewalk_pdx_Metadata</linkage><protocol Sync="TRUE">Local Area Network</protocol></onLineSrc></distorTran></distributor></distInfo></metadata>

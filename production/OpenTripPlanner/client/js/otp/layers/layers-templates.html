@@ -1,0 +1,37 @@
+<script id="otp-stopsLayer-popup" type="text/html">
+
+    <div>
+        <div style="font-weight: bold; font-size: 16px;">
+            {{#titleLink}}<a href="{{titleLink}}" target="_blank">{{/titleLink}}
+            {{name}}
+            {{#titleLink}}</a>{{/titleLink}}
+        </div>
+
+        {{#desc}}
+            <div style="font-style: italic; font-size: 11px;">{{desc}}</div>
+        {{/desc}}
+
+        <div style="font-size: 10px;">
+            [
+			<a href="#" class="stopViewerLink">{{stop_viewer}}</a>
+            {{#url}}
+                | <a href="{{url}}" target="_blank">{{agencyStopLinkText}}</a>
+            {{/url}}
+            ]
+        </div>
+		<div style="margin-top: 6px;"><b>{{plan_trip}}</b>: [ <a href="#" class="planFromLink">{{from_stop}}</a> | <a href="#" class="planToLink">{{to_stop}}</a> ]</div>
+        <div style="margin-top: 6px;" >
+			<b>{{routes_on_stop}}</b>:
+            <ul class="routeList"/>
+        </div>
+    </div>
+</script>
+
+<script id="otp-stopsLayer-popupRoute" type="text/html">
+    <li style="margin: 0px;">
+        {{#shortName}}
+            ({{shortName}})
+        {{/shortName}}
+        {{longName}}
+    </li>
+</script>

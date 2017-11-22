@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Profile Analyst Tester</title>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <!-- CSS is necessary to set html-body-div heights all to 100%, otherwise you will see no map. -->
+        <link rel="stylesheet" href="analyst_tester.css" />
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+
+(function () { // create a context for the purpose of namespacing and applying strict syntax
+    'use strict';
+
+    // Basic test of one-to-many basic earliest arrival routing and travel time tiles
+    // served up at http://localhost:8080/analyst_tile_tester.html
+    // Or access it using as file:// URL to allow modifying this client code while using a running OTP server.
+    // When you move the marker, a request is sent to OTP to generate a time surface, and then a tile layer is added.
+
+    var map = L.map('map');
+
+    L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var travelTimeTileLayer = L.tileLayer('http://localhost:8080/otp/surfaces/0/isotiles/{z}/{x}/{y}.png');
+    travelTimeTileLayer.addTo(map);
+
+    var fromMarker = L.marker(center, {draggable: true});
+
+    // Find center of default region
+    var center;
+    var req = new XMLHttpRequest();
+    req.open('GET', 'http://localhost:8080/otp/routers/default', false); // async=false, define center before setting up map
+    req.setRequestHeader("Accept", "application/json");
+    req.onload = function() {
+        var resp = JSON.parse(req.responseText);
+        // console.log(resp);
+        var lat = resp['centerLatitude'];
+        var lng = resp['centerLongitude'];
+        var center = new L.LatLng(lat, lng);
+        map.setView(center, 13);
+        fromMarker.setLatLng(center);
+    };
+    req.send(null);
+
+    function makeSurface() {
+        var req = new XMLHttpRequest();
+        var fromPos = fromMarker.getLatLng();
+        var qstring = '?fromPlace=' + fromPos.lat + ',' + fromPos.lng;
+        qstring += '&batch=true';
+        req.open('POST', 'http://localhost:8080/otp/surfaces' + qstring, true); // async=true, background call
+        req.setRequestHeader("Accept", "application/json");
+        req.onload = function() {
+            var resp = JSON.parse(req.responseText);
+            console.log(resp);
+            var surfaceId = resp['id'];
+            var url = 'http://localhost:8080/otp/surfaces/' + surfaceId + '/isotiles/{z}/{x}/{y}.png';
+            travelTimeTileLayer.setUrl(url);
+        };
+        req.send(null);
+    }
+
+    fromMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        // this.bindPopup(pos.toString()).openPopup();
+        makeSurface();
+    });
+
+    fromMarker.addTo(map);
+
+}()); // close namespace and call to execute.
+
+        </script>
+    </body>
+</html>

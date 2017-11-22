@@ -1,0 +1,4 @@
+route_id,service_id,trip_id
+1g|bus,ignore,1g|bus|1
+1g|bus,ignore,1g|bus|2
+1g|bus,ignore,1g|bus|3

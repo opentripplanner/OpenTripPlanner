@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>Metro Data Resource Center</origin>
+				<pubdate>200204</pubdate>
+				<title>Sidewalk Lookup Table</title>
+				<ftname Sync="TRUE">sidewalk</ftname><geoform Sync="TRUE">tabular digital data</geoform><onlink Sync="TRUE">\\192.168.10.11\rlislite\streets\sidewalk.dbf</onlink></citeinfo>
+		</citation>
+		<descript>
+			<abstract>These data represent a regional inventory of sidewalks on all streets within  the Portland, Oregon urban growth boundary and the City of Vancouver, Washington based on the RLIS street centerline file.  The table should be joined to the Streets shapefile using Localid as the join field. Inventory includes only those streets,pathways and other features that are represented by the RLIS street centerline file.  Information includes the presence or absence of sidewalks on both sides of street centerline segments; the estimated percentage of sidewalk coverage (comparing length of existing sidewalk to possible length of sidewalk for each centerline segment); the estimated percentage of proposed sidewalk coverage (comparing length of proposed sidewalk to possible length for each centerline segment); the sidewalk width (recorded as less than five feet or five feet and wider) has been recorded in some areas in the interest of increasing ADA compliance.    To date, sidewalk width has been recorded within the City of Portland and a few  other areas only.</abstract>
+			<purpose>Tri-Met and Metro initiated the Pedestrian Access to Transit Project to create a comprehensive inventory map and databases of the region's pedestrian system.  Cities and counties will be able to use the inventory to improve pedestrian connections to transit routes and stops.</purpose>
+			<supplinf>Full inventory (including Clark County data), specialized data editing tools and additional information about the sidewalk inventory are available at; ftp://ftp.metro-region.org/dist/drc/Sidewalks/.  Please contact the Metro Data Resource Center for further information.</supplinf>
+			<langdata Sync="TRUE">en</langdata></descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>200204</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>Ground condition</current>
+		</timeperd>
+		<status>
+			<progress>In work</progress>
+			<update>Annually</update>
+		</status>
+		<keywords>
+			<theme>
+				<themekt>None </themekt>
+				<themekey>sidewalk</themekey>
+				<themekey>pedestrian</themekey>
+				<themekey>transit</themekey>
+			</theme>
+			<place>
+				<placekt>
+				</placekt>
+				<placekey>Portland</placekey>
+				<placekey>Multnomah County</placekey>
+				<placekey>Washington County</placekey>
+				<placekey>Clackamas County</placekey>
+				<placekey>Oregon</placekey>
+			</place>
+		</keywords>
+		<accconst>None</accconst>
+		<useconst>These data are sold under the agreement that the user may use the data in its business activity and for no other purpose whatsoever. User shall not allow access to the data by any other person or organization, unless authorized in writing by the Metro DRC or, if the other party is a contractor providing services to a government requiring usage of the data in order to provide contractual services.  User shall not duplicate the data except for the following:  (1) User may make one backup copy of the data, and  (2) User may translate the data into other formats and/or media.  For full product purchase agreement that accompanies these data, please see http://storefront.metro-region.org/drc/rlislite/subscribe/license.cfm</useconst>
+		<native Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 2; ESRI ArcCatalog 9.3.0.1770</native><natvform Sync="TRUE">dBASE Table</natvform></idinfo>
+	<dataqual>
+		<posacc>
+			<horizpa>
+				<horizpar>
+				Registered to streets. The street linework is contained within the street rights-of-way as shown on the tax lot layer. As the tax lot horizonal accuracy is improved, streets are adjusted accordingly. The tax lots are digitized at +/- 10 feet accuracy. Beaverton, Oregon City and Tigard planning areas are improved to +/- 5 feet accuracy. Multnomah County was created with coordinate geometry using better control. 
+				</horizpar>
+			</horizpa>
+		</posacc>
+		<lineage>
+		</lineage>
+	</dataqual>
+	<spdoinfo>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm>
+				<sdtstype> Line</sdtstype>
+			</sdtsterm>
+			<rastinfo>
+				<rasttype>NA</rasttype>
+			</rastinfo>
+		</ptvctinf>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<planar>
+				<gridsys>
+					<gridsysn>State plane coordinate system 1983.</gridsysn>
+					<spcs>
+						<spcszone>5076</spcszone>
+					</spcs>
+				</gridsys>
+				<planci>
+					<plandu>International feet</plandu>
+				</planci>
+			</planar>
+			<geodetic>
+				<horizdn>North American Datum of 1983/1991 (HPGN)</horizdn>
+			</geodetic>
+		</horizsys>
+	</spref>
+	<eainfo>
+		<detailed Name="sidewalk">
+			<enttyp>
+				<enttypl>Sidewalk.dbf</enttypl>
+				<enttypd>Sidewalk attribute table</enttypd>
+				<enttypt Sync="TRUE">Table</enttypt><enttypc Sync="TRUE">83468</enttypc></enttyp>
+			<attr><attrlabl Sync="TRUE">OID</attrlabl><attalias Sync="TRUE">OID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv></attr><attr>
+				<attrlabl>Ls</attrlabl>
+				<attrdef>Sidewalk status, left side of street</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>No data</edomvd>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>No sidewalk</edomvd>
+					</edom>
+					<edom>
+						<edomv>2</edomv>
+						<edomvd>Sidewalk exists (may be 10% to 100% complete, see Lpct) and/or 
+sidewalk proposed (may be 10% to 100% proposed, see Lprp)</edomvd>
+					</edom>
+					<edom>
+						<edomv>99</edomv>
+						<edomvd>Sidewalk exists, but on which side of street is not known.</edomvd>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">LS</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Rs</attrlabl>
+				<attrdef>Sidewalk status, right side of street</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>No data</edomvd>
+					</edom>
+					<edom>
+						<edomv>2</edomv>
+						<edomvd>Sidewalk exists (may be 10% to 100% complete, see Rpct) and/or
+sidewalk proposed (may be 10% to 100% proposed, see Rprp)</edomvd>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>No sidewalk</edomvd>
+					</edom>
+					<edom>
+						<edomv>99</edomv>
+						<edomvd>Sidewalk exists, but on which side of street is not known</edomvd>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">RS</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Lwidth</attrlabl>
+				<attrdef>Sidewalk width, left side of street</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>No data</edomvd>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>Sidewalk width less than five feet</edomvd>
+					</edom>
+					<edom>
+						<edomv>5</edomv>
+						<edomvd>Sidewalk width five feet or greater</edomvd>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">LWIDTH</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Rwidth</attrlabl>
+				<attrdef>Sidewalk width, right side of street</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>No data</edomvd>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>Sidewalk width less than five feet</edomvd>
+					</edom>
+					<edom>
+						<edomv>5</edomv>
+						<edomvd>Sidewalk width five feet or greater</edomvd>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">RWIDTH</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Lpct</attrlabl>
+				<attrdef>Percent existing sidewalk length compared to possible full length, left side of street</attrdef>
+				<attalias Sync="TRUE">LPCT</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Rpct</attrlabl>
+				<attrdef>Percent existing sidewalk length compared to possible full length, right side of street</attrdef>
+				<attalias Sync="TRUE">RPCT</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Did</attrlabl>
+				<attrdef>Number of times data has been modified.  Also designates "type" of segment when all other fields (except Localid) are "0"</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>No data entered for that segment</edomvd>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>Data has been modified once, if all other numeric fields are 0 then no data was available for that segment</edomvd>
+					</edom>
+					<edom>
+						<edomv>2</edomv>
+						<edomvd>Data has been modified twice, no other significance</edomvd>
+					</edom>
+					<edom>
+						<edomv>3</edomv>
+						<edomvd>Data has been modified three times, no other significance</edomvd>
+					</edom>
+					<edom>
+						<edomv>4</edomv>
+						<edomvd>Data has been modified four times, if all other numeric fields are 0 then the segment is a "paper street" representing no actual road</edomvd>
+					</edom>
+					<edom>
+						<edomv>5</edomv>
+						<edomvd>Data has been modified 5 times, if all other numeric fields are 0 then the segment is a designated pedestrian or bicycle path, not a sidewalk associated with a street</edomvd>
+					</edom>
+					<edom>
+						<edomv>6</edomv>
+						<edomvd>Data has been modified six times, or if all other numeric fields are 0 then segment is a "possible" pedestrian path (such as an alley, parking lot, open field, etc) but no sidewalks exist</edomvd>
+					</edom>
+					<edom>
+						<edomv>7</edomv>
+						<edomvd>Data has been modified seven times, if all other numeric fields are 0 then segment is a railroad</edomvd>
+					</edom>
+					<edom>
+						<edomv>8</edomv>
+						<edomvd>Data has been modified eight times, if all other numeric fields are 0 then the segment is a freeway</edomvd>
+					</edom>
+					<edom>
+						<edomv>9</edomv>
+						<edomvd>Data has been modified nine times, if all other numeric fields are 0 then the segment is a possible pedestrian path (a questionable "Did 6")</edomvd>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">DID</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Lprp</attrlabl>
+				<attrdef>Percent proposed sidewalk length compared to possible full length, left side of street</attrdef>
+				<attalias Sync="TRUE">LPRP</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Rprp</attrlabl>
+				<attrdef>Percent proposed sidewalk length compared to possible full length, right side of street</attrdef>
+				<attalias Sync="TRUE">RPRP</attalias><attrtype Sync="TRUE">SmallInteger</attrtype><attwidth Sync="TRUE">3</attwidth><atprecis Sync="TRUE">3</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Localid</attrlabl>
+				<attrdef>Unique street centerline segment identity.  Same as Rlis Localid</attrdef>
+				<attalias Sync="TRUE">LOCALID</attalias><attrtype Sync="TRUE">Integer</attrtype><attwidth Sync="TRUE">6</attwidth><atprecis Sync="TRUE">6</atprecis><attscale Sync="TRUE">0</attscale></attr>
+		</detailed>
+	</eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 797-1742</cntvoice>
+				<cntfax>503 797-1909</cntfax>
+				<cntemail>drc@metro.dst.or.us</cntemail>
+			</cntinfo>
+		</distrib>
+		<distliab>The information in this file was derived from digital databases on Metro's GIS. Care was taken in the creation of this file.  Metro cannot accept any responsibility for errors, omissions, or positional accuracy.  There are no warranties, expressed or implied.</distliab>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<formname>Shapefile, arc export, DXF or MapInfo. Hourly fee will be charged for conversion</formname>
+					<transize></transize>
+					<dssize Sync="TRUE">2.707</dssize></digtinfo>
+				<digtopt>
+					<offoptn>
+						<offmedia>CD-ROM</offmedia>
+						<recfrmt> ISO9660 (DOS, Unix, or Macintosh)</recfrmt>
+					</offoptn>
+				</digtopt>
+				<digtopt>
+					<onlinopt>
+						<computer>
+							<networka>
+								<networkr>ftp.metro-region.org</networkr>
+							</networka>
+						</computer>
+						<accinstr> Metro can place data on its FTP site on request.  In most cases, a fee for the data will be charged.  Call 503 797-1742 or email drc@metro.dst.or.us for instructions.</accinstr>
+					</onlinopt>
+				</digtopt>
+			</digform>
+			<fees></fees>
+		</stdorder>
+		<resdesc Sync="TRUE">Downloadable Data</resdesc></distinfo>
+	<metainfo>
+		<metd>20020528</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+					<cntper>Mark Bosworth</cntper>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 797-1583</cntvoice>
+				<cntfax>503 797-1909</cntfax>
+				<cntemail>bosworth@metro.dst.or.us</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv> 19940608</metstdv>
+		<langmeta Sync="TRUE">en</langmeta><mettc Sync="TRUE">local time</mettc><metextns><onlink Sync="TRUE">http://www.esri.com/metadata/esriprof80.html</onlink><metprof Sync="TRUE">ESRI Metadata Profile</metprof></metextns></metainfo>
+	<dataIdInfo><envirDesc Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 2; ESRI ArcCatalog 9.3.0.1770</envirDesc><dataLang><languageCode Sync="TRUE" value="en"></languageCode></dataLang><idCitation><resTitle Sync="TRUE">sidewalk</resTitle><presForm><PresFormCd Sync="TRUE" value="011"></PresFormCd></presForm></idCitation></dataIdInfo><mdLang><languageCode Sync="TRUE" value="en"></languageCode></mdLang><mdStanName Sync="TRUE">ISO 19115 Geographic Information - Metadata</mdStanName><mdStanVer Sync="TRUE">DIS_ESRI1.0</mdStanVer><mdChar><CharSetCd Sync="TRUE" value="004"></CharSetCd></mdChar><mdHrLv><ScopeCd Sync="TRUE" value="005"></ScopeCd></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><distInfo><distributor><distorTran><onLineSrc><orDesc Sync="TRUE">002</orDesc><linkage Sync="TRUE">file://\\192.168.10.11\rlislite\streets\sidewalk.dbf</linkage><protocol Sync="TRUE">Local Area Network</protocol></onLineSrc><transSize Sync="TRUE">2.707</transSize></distorTran><distorFormat><formatName Sync="TRUE">dBASE Table</formatName></distorFormat></distributor></distInfo><Esri><SyncDate>20081031</SyncDate><SyncTime>13433000</SyncTime><ModDate>20081031</ModDate><ModTime>13433000</ModTime></Esri><mdDateSt Sync="TRUE">20081031</mdDateSt></metadata>

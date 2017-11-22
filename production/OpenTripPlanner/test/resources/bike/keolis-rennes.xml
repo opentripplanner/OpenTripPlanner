@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<opendata>
+	<request>http://data.keolis-rennes.com/xml/?version=2.0&amp;key=********&amp;cmd=getbikestations</request>
+	<answer>
+		<status code="0" message="OK"/>
+		<data>
+			<station>
+				<number>75</number>
+				<name>ZAC SAINT SULPICE</name>
+				<address>RUE DE FOUGÈRES </address>
+				<state>1</state>
+				<latitude>48.1321</latitude>
+				<longitude>-1.63528</longitude>
+				<slotsavailable>24</slotsavailable>
+				<bikesavailable>6</bikesavailable>
+				<pos>0</pos>
+				<district>Maurepas - Patton</district>
+				<lastupdate>2014-04-22T21:53:02+02:00</lastupdate>
+			</station>
+			<station>
+				<number>52</number>
+				<name>VILLEJEAN-UNIVERSITE</name>
+				<address>PLACE RECTEUR HENRI LE MOAL</address>
+				<state>1</state>
+				<latitude>48.121075</latitude>
+				<longitude>-1.704122</longitude>
+				<slotsavailable>26</slotsavailable>
+				<bikesavailable>0</bikesavailable>
+				<pos>1</pos>
+				<district>Villejean-Beauregard</district>
+				<lastupdate>2014-04-22T21:53:02+02:00</lastupdate>
+			</station>
+			<station>
+				<number>81</number>
+				<name>TURMEL</name>
+				<address>RUE MIRABEAU </address>
+				<state>1</state>
+				<latitude>48.122475</latitude>
+				<longitude>-1.651089</longitude>
+				<slotsavailable>12</slotsavailable>
+				<bikesavailable>3</bikesavailable>
+				<pos>0</pos>
+				<district>Maurepas - Patton</district>
+				<lastupdate>2014-04-22T21:53:02+02:00</lastupdate>
+			</station>
+			<station>
+				<number>12</number>
+				<name>TNB</name>
+				<address>SQUARE DE KERGUS </address>
+				<state>1</state>
+				<latitude>48.107697</latitude>
+				<longitude>-1.673695</longitude>
+				<slotsavailable>2</slotsavailable>
+				<bikesavailable>26</bikesavailable>
+				<pos>0</pos>
+				<district>Centre-Ville</district>
+				<lastupdate>2014-04-22T21:53:02+02:00</lastupdate>
+			</station>
+		</data>
+	</answer>
+</opendata>

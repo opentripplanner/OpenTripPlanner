@@ -1,0 +1,3 @@
+route_id,service_id,trip_id,wheelchair_accessible
+2b|attr,ignore,2b|1,2
+2b|attr,ignore,2b|2,1

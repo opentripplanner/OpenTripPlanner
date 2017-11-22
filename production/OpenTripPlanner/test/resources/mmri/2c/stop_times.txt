@@ -1,0 +1,7 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence
+2c|train|1,00:01:00,00:01:00,2c1,1
+2c|train|1,00:02:00,00:02:00,2c2,2
+2c|train|2,00:03:00,00:03:00,2c2,2
+2c|train|2,00:04:00,00:04:00,2c3,3
+2c|bus,00:02:00,00:02:00,2c4,4
+2c|bus,00:06:00,00:06:00,2c5,5

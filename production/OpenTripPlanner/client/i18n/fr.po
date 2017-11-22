@@ -1,0 +1,1259 @@
+# French translations for OpenTripPlanner.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the OpenTripPlanner
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenTripPlanner VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-02-24 12:23+0100\n"
+"PO-Revision-Date: 2015-02-24 12:23+0100\n"
+"Last-Translator: Nicolas Derive <kalon33@ubuntu.com>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:278
+msgid "Transit"
+msgstr "Transports en commun"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:281
+msgid "Bus Only"
+msgstr "Bus uniquement"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:284
+msgid "Rail Only"
+msgstr "Ferré uniquement"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:287
+msgid "Bicycle Only"
+msgstr "Vélo uniquement"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:290
+msgid "Bicycle &amp; Transit"
+msgstr "Transports en commun + Vélo"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:293
+msgid "Walk Only"
+msgstr "Marche seulement"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:296
+msgid "Drive Only"
+msgstr "Voiture seulement"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:299
+msgid "Park and Ride"
+msgstr "Parc Relais"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
+#: src/client/js/otp/config.js:302
+msgid "Kiss and Ride"
+msgstr "arrêt minute"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets) (Park bicycle at Public transit station and take a
+#. transit
+#: src/client/js/otp/config.js:306
+msgid "Bike and Ride"
+msgstr "Parc Relais Vélo"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:313
+msgid "Rented Bicycle"
+msgstr "Vélo Libre Service"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:316
+msgid "Transit & Rented Bicycle"
+msgstr "Transports en commun et Vélo Libre Service"
+
+#. Context menu
+#: src/client/js/otp/core/MapContextMenu.js:36
+msgid "Recenter Map Here"
+msgstr "Centrer la carte ici"
+
+#. Context menu
+#: src/client/js/otp/core/MapContextMenu.js:39
+msgid "Zoom In"
+msgstr "Zoomer"
+
+#. Context menu
+#: src/client/js/otp/core/MapContextMenu.js:42
+msgid "Zoom Out"
+msgstr "Dézoomer"
+
+#: src/client/js/otp/core/WidgetManagerMenu.js:34
+msgid "Minimize all"
+msgstr "Tout minimiser"
+
+#: src/client/js/otp/core/WidgetManagerMenu.js:42
+msgid "Unminimize all"
+msgstr "Tout restaurer"
+
+#. widget title
+#: src/client/js/otp/layers/StopsLayer.js:70
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr "Visualisateur d'arrêt"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: src/client/js/otp/layers/StopsLayer.js:72
+msgid "Plan Trip"
+msgstr "Organiser un voyage"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: src/client/js/otp/layers/StopsLayer.js:74
+msgid "From Stop"
+msgstr "De l'arrêt"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: src/client/js/otp/layers/StopsLayer.js:76
+msgid "To Stop"
+msgstr "À l'arrêt"
+
+#: src/client/js/otp/layers/StopsLayer.js:77
+msgid "Routes Serving Stop"
+msgstr "Lignes desservant l'arrêt"
+
+#. Legend title in Analyst
+#: src/client/js/otp/modules/analyst/AnalystLegendWidget.js:26
+msgid "Legend : travel time in minutes"
+msgstr "Légende : temps de trajet en minutes"
+
+#. module name
+#: src/client/js/otp/modules/analyst/AnalystModule.js:22
+msgid "Analyst"
+msgstr "Analyseur"
+
+#. Button to update analyst information
+#: src/client/js/otp/modules/analyst/AnalystModule.js:65
+msgid "Refresh"
+msgstr "Rafraîchir"
+
+#. Context menu set this point as analysis location
+#: src/client/js/otp/modules/analyst/AnalystModule.js:94
+msgid "Set as Analysis Location"
+msgstr "Définir comme origine de l'analyse"
+
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:69
+msgid "Bike Share Planner"
+msgstr "Organisation en Vélo Libre Service"
+
+#. widget name
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:110
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:44
+msgid "Trip Options"
+msgstr "Paramètres de l'itinéraire"
+
+#. Popup title station from where bike is picked
+#. up
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:209
+msgid "PICK UP BIKE"
+msgstr "Récupérer un vélo"
+
+#. Popup title alternative station to pickup bike on bike
+#. sharing
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:218
+msgid "ALTERNATE PICKUP"
+msgstr "Alternative de récupération de vélo"
+
+#. Popup title
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:223
+msgid "DROP OFF BIKE"
+msgstr "Déposer le vélo"
+
+#. Popup title
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:231
+msgid "ALTERNATE DROP OFF"
+msgstr "Alternative de dépôt de vélo"
+
+#. Popup title Bike sharing station
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:236
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:315
+msgid "BIKE STATION"
+msgstr "Station de vélos"
+
+#. Bike sharing station: station name
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:320
+msgid "Station:"
+msgstr "Station :"
+
+#. number of bikes
+#. availible in a bike sharing
+#. station
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:321
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:57
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:69
+#, python-format
+msgid "<strong>%d</strong> bike available"
+msgid_plural "<strong>%d</strong> bikes available"
+msgstr[0] "<strong>%d</strong> vélo disponible"
+msgstr[1] "<strong>%d</strong> vélos disponibles"
+
+#. number of free
+#. places to put bikes
+#. in a bike sharing
+#. station
+#: src/client/js/otp/modules/bikeshare/BikeShareModule.js:322
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:65
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:71
+#, python-format
+msgid "<strong>%d</strong> dock available"
+msgid_plural "<strong>%d</strong> docks available"
+msgstr[0] "<strong>%d</strong> emplacements disponibles"
+msgstr[1] "<strong>%d</strong> emplacements disponibles"
+
+#. Recommended Pick Up: bike sharing
+#. station name
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:53
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:68
+msgid "Recommended Pick Up:"
+msgstr "Station de récupération de vélo recommandée :"
+
+#. Recommended Drop Off: bike sharing
+#. station name
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:60
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:70
+msgid "Recommended Drop Off:"
+msgstr "Station de dépôt de vélo recommandée"
+
+#. module name
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:22
+msgid "Multimodal Trip Planner"
+msgstr "Planificateur d'itinéraires multimodal"
+
+#. Widget title
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:132
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:42
+msgid "Itineraries"
+msgstr "Itinéraires"
+
+#. widget title
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:98
+#, python-format
+msgid "%d Itinerary Returned"
+msgid_plural "%d Itineraries Returned"
+msgstr[0] "%d itinéraire trouvé"
+msgstr[1] "%d itinéraires trouvés"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:112
+msgid "Link to search"
+msgstr "Lien vers cette recherche"
+
+#. button to first itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:171
+msgid "First"
+msgstr "Premier"
+
+#. button to previous itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:186
+msgid "Previous"
+msgstr "Précédent"
+
+#. button to next itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:202
+msgid "Next"
+msgstr "Suivant"
+
+#. button to last itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:218
+msgid "Last"
+msgstr "Dernier"
+
+#. Used when passengers can stay on vehicle. Continues
+#. as [agency] route name
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:346
+msgid "CONTINUES AS"
+msgstr "Continue comme"
+
+#. Something in Public transport is x minutes late
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:354
+#, python-format
+msgid "%d min late"
+msgid_plural "%d mins late"
+msgstr[0] "en retard de %d min"
+msgstr[1] "en retard de %d mins"
+
+#. Something in Public transport is x minutes early
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:357
+#, python-format
+msgid "%d min early"
+msgid_plural "%d mins early"
+msgstr[0] "en avance de %d min"
+msgstr[1] "en avance de %d mins"
+
+#. Something in Public transport is on time
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:360
+msgid "on time"
+msgstr "à l'heure"
+
+#. [distance] to [name of destination]
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:365
+#: src/client/js/otp/modules/planner/Itinerary.js:252
+#: src/client/js/otp/modules/planner/Itinerary.js:336
+msgctxt "direction"
+msgid " to "
+msgstr " jusqu'à "
+
+#. used in sentence like: <Long name of public transport route> "to" <Public
+#. transport
+#. headsign>. Used in showing itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:384
+#: src/client/js/otp/modules/planner/Itinerary.js:248
+#: src/client/js/otp/modules/planner/Itinerary.js:333
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:127
+msgctxt "bus_direction"
+msgid " to "
+msgstr " vers "
+
+#. Shown as alert text before showing itinerary.
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:433
+msgid "Total walk distance for this trip exceeds specified maximum"
+msgstr "La distance de marche totale pour ce voyage excède le maximum spécifié"
+
+#. Start: Time and date (Shown before path itinerary)
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:442
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:184
+msgctxt "template"
+msgid "Start"
+msgstr "Départ"
+
+#. End: Time and date (Shown after path itinerary)
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:445
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:185
+msgid "End"
+msgstr "Arrivée"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:450
+#: src/client/js/otp/modules/planner/Itinerary.js:299
+msgid "Trip Summary"
+msgstr "Résumé du voyage"
+
+#. Travel: hour date on which this trip is made
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:452
+#: src/client/js/otp/modules/planner/Itinerary.js:300
+msgid "Travel"
+msgstr "Voyage"
+
+#. Time: minutes How long is this trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:454
+#: src/client/js/otp/modules/planner/Itinerary.js:301
+msgid "Time"
+msgstr "Durée"
+
+#. Total foot distance for trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:462
+#: src/client/js/otp/modules/planner/Itinerary.js:305
+msgid "Total Walk"
+msgstr "Total de marche"
+
+#. Total distance on a bike for this trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:469
+msgid "Total Bike"
+msgstr "Total de vélo"
+
+#. how many public transit transfers in a trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:475
+#: src/client/js/otp/modules/planner/Itinerary.js:303
+msgid "Transfers"
+msgstr "correspondances"
+
+#. cost of trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:481
+#: src/client/js/otp/modules/planner/Itinerary.js:308
+msgid "Fare"
+msgstr "Tarif"
+
+#. Valid date time; When is this trip correct
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:489
+msgid "Valid"
+msgstr "Valide le"
+
+#. Links to this itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:494
+msgid "Link to Itinerary"
+msgstr "Lien vers l'itinéraire"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:499
+msgid "Print"
+msgstr "Imprimer"
+
+#. Default subject when sending trip to email
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:509
+msgid "Your Trip"
+msgstr "Votre voyage"
+
+#. Link to send trip by email
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:512
+msgid "Email"
+msgstr "Courriel"
+
+#. public transport drives every N minutes
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:532
+#, python-format
+msgid "every %d min"
+msgid_plural "every %d mins"
+msgstr[0] "toutes les %d min"
+msgstr[1] "toutes les %d mins"
+
+#. Depart station / Board at station in itinerary
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
+msgctxt "itinerary"
+msgid "Depart"
+msgstr "Départ"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
+msgid "<b>Board</b> at "
+msgstr "<b>Montez</b> à "
+
+#. Public transport <Stop> (stop name)
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:92
+msgid "Stop"
+msgstr "Arrêt"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:577
+#: src/client/js/otp/modules/planner/Itinerary.js:262
+#: src/client/js/otp/modules/planner/Itinerary.js:345
+msgid "Time in transit"
+msgstr "Temps de correspondance"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:579
+#: src/client/js/otp/widgets/transit/TripViewerWidget.js:35
+msgid "Trip Viewer"
+msgstr "Visualisateur de voyage"
+
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:637
+msgid "late as"
+msgstr "en retard à"
+
+#. Stay on board/Alight [at stop name]
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:643
+msgid "Stay on board"
+msgstr "rester à bord"
+
+#. Alight Public transit route name (agency name
+#. Stop ID ) end time
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:643
+#: src/client/js/otp/modules/planner/Itinerary.js:265
+#: src/client/js/otp/modules/planner/Itinerary.js:348
+msgid "Alight"
+msgstr "Descendre"
+
+#. [Stay on board/Alight] at [stop name]
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:645
+msgid "at"
+msgstr "à"
+
+#. Fare Currency Fare price
+#: src/client/js/otp/modules/planner/Itinerary.js:102
+#, python-format
+msgid "%(currency)s %(price)s"
+msgstr "%(price)s %(currency)s"
+
+#. Start: location at [time date] (Used in print itinerary
+#. when do you start your trip)
+#: src/client/js/otp/modules/planner/Itinerary.js:237
+#: src/client/js/otp/modules/planner/Itinerary.js:322
+#, python-format
+msgid "Start: %(location)s at %(time_date)s"
+msgstr "Départ : %(location)s à %(time_date)s"
+
+#. Board Public transit route name (agency name
+#. Stop ID ) start time
+#: src/client/js/otp/modules/planner/Itinerary.js:261
+#: src/client/js/otp/modules/planner/Itinerary.js:344
+msgid "Board"
+msgstr "Monter"
+
+#: src/client/js/otp/modules/planner/Itinerary.js:261
+#: src/client/js/otp/modules/planner/Itinerary.js:265
+#: src/client/js/otp/modules/planner/Itinerary.js:344
+#: src/client/js/otp/modules/planner/Itinerary.js:348
+#, python-format
+msgid "(%(agency_id)s Stop ID #%(stop_id)s),"
+msgstr "arrêt #%(stop_id)s) de (%(agency_id)s,"
+
+#. End: location at [time date] (Used in print itinerary
+#. when do you come at a destination)
+#: src/client/js/otp/modules/planner/Itinerary.js:295
+#: src/client/js/otp/modules/planner/Itinerary.js:366
+#, python-format
+msgid "End: %(location)s at %(time_date)s"
+msgstr "Arrivée : %(location)s à %(time_date)s"
+
+#. text at end of email %s is link to this itinerary
+#: src/client/js/otp/modules/planner/Itinerary.js:370
+#, python-format
+msgid ""
+"\n"
+"View itinerary online:\n"
+"%(itinerary_link)s\n"
+msgstr ""
+"\n"
+"Voir l'itinéraire en ligne :\n"
+"%(itinerary_link)s\n"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:98
+#: src/client/js/otp/modules/planner/PlannerModule.js:99
+msgid ""
+"We're sorry. The trip planner is temporarily unavailable. Please try "
+"again later."
+msgstr ""
+"Nous sommes désolé. Le planificateur de voyage est temporairement "
+"indisponible. Merci de réessayer plus tard."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:100
+msgid ""
+"Trip is not possible.  You might be trying to plan a trip outside the map"
+" data boundary."
+msgstr ""
+"Ce trajet n'est pas possible. Vous essayez probablement de planifier un "
+"trajet en dehors des limites de la zone couverte."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:101
+msgid ""
+"Trip is not possible.  Your start or end point might not be safely "
+"accessible (for instance), you might be starting on a residential street "
+"connected only to a highway)."
+msgstr ""
+"Ce trajet n'est pas possible. Vos points de départ et d'arrivée peuvent "
+"ne pas être accessible de manière sûre (par exemple, vous commencez peut "
+"être votre trajet sur une route résidentielle uniquement reliée à une "
+"autoroute)."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:102
+msgid ""
+"No transit times available. The date may be past or too far in the future"
+" or there may not be transit service for your trip at the time you chose."
+msgstr ""
+"Aucune durée de voyage disponible. La date est peut être passée ou trop "
+"loin dans le futur, ou il n'y a peut être pas de transports en service "
+"pour votre trajet à l'heure choisie."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:103
+msgid ""
+"The trip planner is taking way too long to process your request. Please "
+"try again later."
+msgstr ""
+"Le planificateur de voyage prend largement trop de temps à étudier votre "
+"demande. Merci de réessayer plus tard."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:104
+msgid "The request has errors that the server is not willing or able to process."
+msgstr ""
+"La requête renvoie des erreurs que le serveur ne souhaite ou ne peut pas "
+"traiter."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:105
+msgid "Origin is unknown. Can you be a bit more descriptive?"
+msgstr "L'origine est inconnue. Pouvez-vous être plus précis ?"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:106
+msgid "Destination is unknown.  Can you be a bit more descriptive?"
+msgstr "La destination est inconnue. Pouvez-vous être plus précis ?"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:107
+msgid ""
+"Both origin and destination are unknown. Can you be a bit more "
+"descriptive?"
+msgstr ""
+"L'origine et la destination sont toutes deux inconnues. Pouvez-vous être "
+"plus précis ?"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:108
+msgid "Both origin and destination are not wheelchair accessible"
+msgstr "Ni l'origine ni la destination ne sont accessibles en fauteuil roulant"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:109
+msgid "Origin is within a trivial distance of the destination."
+msgstr "L'origine est à une distance trop courte de la destination."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:111
+msgid ""
+"The trip planner is unsure of the location you want to start from. Please"
+" select from the following options, or be more specific."
+msgstr ""
+"Le planificateur de voyage n'est pas sûr du lieu d'où vous voulez partir."
+" Merci de le sélectionner parmi les options suivantes, ou d'être plus "
+"précis."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:112
+msgid ""
+"The trip planner is unsure of the destination you want to go to. Please "
+"select from the following options, or be more specific."
+msgstr ""
+"Le planificateur de voyage n'est pas sûr du lieu où vous désirez vous "
+"rendre. Merci de le sélectionner parmi les options suivantes, ou d'être "
+"plus précis."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:113
+msgid ""
+"Both origin and destination are ambiguous. Please select from the "
+"following options, or be more specific."
+msgstr ""
+"L'origine et la destination sont toutes deux ambigües. Merci de les "
+"sélectionner parmi les options suivantes, ou d'être plus précis."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:115
+msgid ""
+"All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
+"must be set if any are"
+msgstr ""
+"Toutes les options triangleSafetyFactor, triangleSlopeFactor, et "
+"triangleTimeFactor doivent être paramétrées si l'une d'elles l'est"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:116
+msgid ""
+"The values of triangleSafetyFactor, triangleSlopeFactor, and "
+"triangleTimeFactor must sum to 1"
+msgstr ""
+"Les valeurs de triangleSafetyFactor, triangleSlopeFactor, et "
+"triangleTimeFactor doivent avoir pour addition 1"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:117
+msgid ""
+"If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are "
+"provided, OptimizeType must be TRIANGLE"
+msgstr ""
+"Si triangleSafetyFactor, triangleSlopeFactor, et triangleTimeFactor sont "
+"fournis, OptimizeType doit être TRIANGLE"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:118
+msgid ""
+"If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, "
+"and triangleTimeFactor must be set"
+msgstr ""
+"Si OptimizeType est TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, "
+"et triangleTimeFactor doivent être paramétrées"
+
+#. Context menu
+#: src/client/js/otp/modules/planner/PlannerModule.js:194
+msgid "Set as Start Location"
+msgstr "Définir comme point de départ"
+
+#. Context menu
+#: src/client/js/otp/modules/planner/PlannerModule.js:198
+msgid "Set as End Location"
+msgstr "Définir comme point d'arrivée"
+
+#. Shown in a popup on first point of a path in a map
+#: src/client/js/otp/modules/planner/PlannerModule.js:219
+msgctxt "popup"
+msgid "Start"
+msgstr "Départ"
+
+#. shown in a popup on last point of a path in a map
+#: src/client/js/otp/modules/planner/PlannerModule.js:250
+msgid "Destination"
+msgstr "Destination"
+
+#. Used in showing why trip wasn't found
+#: src/client/js/otp/modules/planner/PlannerModule.js:458
+#, python-format
+msgid "Error %(error_id)d"
+msgstr "Erreur %(error_id)d"
+
+#. Title of no trip dialog
+#: src/client/js/otp/modules/planner/PlannerModule.js:460
+msgid "No Trip Found"
+msgstr "Aucun voyage trouvé"
+
+#. shown when clicked on route on map
+#: src/client/js/otp/modules/planner/PlannerModule.js:516
+#, python-format
+msgid "Your %(bike_share_name)s route"
+msgstr "Votre itinéraire en %(bike_share_name)s"
+
+#. Text which is shown when clicking bike route
+#. in a map
+#: src/client/js/otp/modules/planner/PlannerModule.js:522
+msgid "Your bike route"
+msgstr "Votre itinéraire en vélo"
+
+#. Shown in map when clicking on a route
+#: src/client/js/otp/modules/planner/PlannerModule.js:530
+#, python-format
+msgid "Walk to the %(bike_share_name)s dock."
+msgstr "Marcher jusqu'à l'emplacement %(bike_share_name)s."
+
+#. Shown in map when clicking on a route
+#: src/client/js/otp/modules/planner/PlannerModule.js:534
+#, python-format
+msgid "Walk from the %(bike_share_name)s dock to your destination."
+msgstr "Marcher de l'emplacement %(bike_share_name)s jusqu'à votre destination"
+
+#. Text which is shown when clicking walking
+#. route in a map
+#: src/client/js/otp/modules/planner/PlannerModule.js:540
+msgid "Your walk route"
+msgstr "Votre itinéraire à pieds"
+
+#. Start on [street name] heading [Absolute direction] used in travel plan
+#. generation
+#: src/client/js/otp/util/Itin.js:111
+msgid "north"
+msgstr "nord"
+
+#: src/client/js/otp/util/Itin.js:112
+msgid "northeast"
+msgstr "nord-est"
+
+#: src/client/js/otp/util/Itin.js:113
+msgid "east"
+msgstr "est"
+
+#: src/client/js/otp/util/Itin.js:114
+msgid "southeast"
+msgstr "sud-est"
+
+#: src/client/js/otp/util/Itin.js:115
+msgid "south"
+msgstr "sud"
+
+#: src/client/js/otp/util/Itin.js:116
+msgid "southwest"
+msgstr "sud-ouest"
+
+#: src/client/js/otp/util/Itin.js:117
+msgid "west"
+msgstr "ouest"
+
+#: src/client/js/otp/util/Itin.js:118
+msgid "northwest"
+msgstr "nord-ouest"
+
+#. depart at street name/corner of x y etc. (First instruction in
+#. itinerary)
+#: src/client/js/otp/util/Itin.js:139
+msgctxt "itinerary"
+msgid "depart"
+msgstr "Départ"
+
+#. [Relative direction (Hard/Slightly Left/Right...)] to continue
+#. on /on to [streetname]
+#: src/client/js/otp/util/Itin.js:142
+msgid "hard left"
+msgstr "complètement à gauche"
+
+#: src/client/js/otp/util/Itin.js:143
+msgid "left"
+msgstr "à gauche"
+
+#: src/client/js/otp/util/Itin.js:144
+msgid "slight left"
+msgstr "légèrement à gauche"
+
+#: src/client/js/otp/util/Itin.js:145
+msgid "continue"
+msgstr "continuer"
+
+#: src/client/js/otp/util/Itin.js:146
+msgid "slight right"
+msgstr "légèrement à droite"
+
+#: src/client/js/otp/util/Itin.js:147
+msgid "right"
+msgstr "à droite"
+
+#: src/client/js/otp/util/Itin.js:148
+msgid "hard right"
+msgstr "complètement à droite"
+
+#: src/client/js/otp/util/Itin.js:151
+msgid "elevator"
+msgstr "ascenseur"
+
+#: src/client/js/otp/util/Itin.js:152
+msgid "U-turn left"
+msgstr "virage en U à gauche"
+
+#: src/client/js/otp/util/Itin.js:153
+msgid "U-turn right"
+msgstr "virage en U à droite"
+
+#. Walk distance to place (itinerary header)
+#: src/client/js/otp/util/Itin.js:177
+msgid "Walk"
+msgstr "Marche à pied"
+
+#. Cycle distance to place (itinerary header)
+#: src/client/js/otp/util/Itin.js:179
+msgid "Cycle"
+msgstr "Vélo"
+
+#. Car distance to place (itinerary header)
+#: src/client/js/otp/util/Itin.js:181
+msgid "Car"
+msgstr "Voiture"
+
+#. Bus: (route number) Start station to end station (itinerary header)
+#: src/client/js/otp/util/Itin.js:183
+msgid "Bus"
+msgstr "Bus"
+
+#: src/client/js/otp/util/Itin.js:184
+msgid "Subway"
+msgstr "Métro"
+
+#. Used for intercity or long-distance travel.
+#: src/client/js/otp/util/Itin.js:186
+msgid "Train"
+msgstr "Train"
+
+#: src/client/js/otp/util/Itin.js:187
+msgid "Ferry"
+msgstr "Ferry"
+
+#. Tram, Streetcar, Light rail. Any light rail or street
+#. level system within a metropolitan area.
+#: src/client/js/otp/util/Itin.js:190
+msgid "Light Rail"
+msgstr "Tram ou Trolley"
+
+#. Used for street-level cable cars where the cable runs
+#. beneath the car.
+#: src/client/js/otp/util/Itin.js:193
+msgid "Cable Car"
+msgstr "Tramway funiculaire"
+
+#. Any rail system designed for steep inclines.
+#: src/client/js/otp/util/Itin.js:195
+msgid "Funicular"
+msgstr "Funiculaire"
+
+#. Gondola, Suspended cable car. Typically used for aerial
+#. cable cars where the car is suspended from the cable.
+#: src/client/js/otp/util/Itin.js:198
+msgid "Aerial Tram"
+msgstr "Téléphérique"
+
+#. WALK/CYCLE distance to [Bicycle rental station]
+#: src/client/js/otp/util/Itin.js:208
+msgid "Bicycle rental station"
+msgstr "Station de vélo libre service"
+
+#. WALK/CYCLE distance to [Bicycle rental] {name}
+#: src/client/js/otp/util/Itin.js:210
+msgid "Bicycle rental"
+msgstr "Station de vélo libre service"
+
+#: src/client/js/otp/util/Itin.js:252
+#, python-format
+msgid ""
+"Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
+" exit on <b>%(street_name)s</b>"
+msgstr ""
+"Prendre le rond-point <b>dans le sens contraire des aiguilles d'une "
+"montre</b> jusqu'à la <b>%(ordinal_exit_number)s</b> sortie sur "
+"<b>%(street_name)s</b>"
+
+#: src/client/js/otp/util/Itin.js:254
+#, python-format
+msgid ""
+"Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
+"%(street_name)s"
+msgstr ""
+"Prendre le rond-point dans le sens contraire des aiguilles d'une montre "
+"jusqu'à la %(ordinal_exit_number)s sortie sur %(street_name)s"
+
+#: src/client/js/otp/util/Itin.js:258
+#, python-format
+msgid ""
+"Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
+"on <b>%(street_name)s</b>"
+msgstr ""
+"Prendre le rond-point <b>dans le sens des aiguilles d'une montre</b> "
+"jusqu'à la <b>%(ordinal_exit_number)s</b> sortie sur "
+"<b>%(street_name)s</b>"
+
+#: src/client/js/otp/util/Itin.js:260
+#, python-format
+msgid ""
+"Take roundabout clockwise to %(ordinal_exit_number)s exit on "
+"%(street_name)s"
+msgstr ""
+"Prendre le rond-point dans le sens des aiguilles d'une montre jusqu'à la "
+"%(ordinal_exit_number)s sortie sur %(street_name)s"
+
+#. Start on [stret name] heading [compas direction]
+#: src/client/js/otp/util/Itin.js:268
+msgid "Start on"
+msgstr "Partir de"
+
+#: src/client/js/otp/util/Itin.js:268
+msgid " heading "
+msgstr " vers le "
+
+#. [Relative direction (Left/Right...)] to continue
+#. on /on to [streetname]
+#: src/client/js/otp/util/Itin.js:274
+msgid "to continue on"
+msgstr "pour continuer sur"
+
+#: src/client/js/otp/util/Itin.js:274
+msgid "on to"
+msgstr "sur"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:31
+msgid "first"
+msgstr "première"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:34
+msgid "second"
+msgstr "seconde"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:37
+msgid "third"
+msgstr "troisième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:40
+msgid "fourth"
+msgstr "quatrième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:43
+msgid "fifth"
+msgstr "cinquième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:46
+msgid "sixth"
+msgstr "sixième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:49
+msgid "seventh"
+msgstr "septième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:52
+msgid "eight"
+msgstr "huitième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:55
+msgid "ninth"
+msgstr "neuvième"
+
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: src/client/js/otp/util/Text.js:58
+msgid "tenth"
+msgstr "dixième"
+
+#. n hour/hours use short form
+#: src/client/js/otp/util/Time.js:29 src/client/js/otp/util/Time.js:45
+#, python-format
+msgid "%d hr"
+msgid_plural "%d hrs"
+msgstr[0] "%d h"
+msgstr[1] "%d h"
+
+#. n minute/minutes use short form
+#: src/client/js/otp/util/Time.js:33 src/client/js/otp/util/Time.js:45
+#, python-format
+msgid "%d min"
+msgid_plural "%d mins"
+msgstr[0] "%d min"
+msgstr[1] "%d mins"
+
+#. n second/seconds use short form
+#: src/client/js/otp/util/Time.js:47
+#, python-format
+msgid "%d sec"
+msgid_plural "%d secs"
+msgstr[0] "%d s"
+msgstr[1] "%d s"
+
+#: src/client/js/otp/widgets/Dialogs.js:22
+msgid "OK"
+msgstr "OK"
+
+#. Minimize widget in context menu
+#: src/client/js/otp/widgets/Widget.js:107
+msgid "Minimize"
+msgstr "Minimiser"
+
+#. Bring widget to front in context menu
+#: src/client/js/otp/widgets/Widget.js:110
+msgid "Bring to front"
+msgstr "Placer au dessus"
+
+#. Send widget to back in context menu
+#: src/client/js/otp/widgets/Widget.js:113
+msgid "Send to back"
+msgstr "Placer en dessous"
+
+#. Public transit Route: routename (Used in Trip viewer)
+#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:42
+msgid "Route:"
+msgstr "Ligne :"
+
+#. Public Transit Route variant: Start - end stop (Used in
+#. trip viewer)
+#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:62
+msgid "Variant:"
+msgstr "Variante :"
+
+#. Widget title
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:31
+msgid "Stop Finder"
+msgstr "Recherche d'arrêt"
+
+#. [Public transport] Agency: Selector for Public transport agencies
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:48
+msgid "Agency"
+msgstr "Transporteur"
+
+#. Search for Stops by ID
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:50
+msgid "By ID"
+msgstr "Par identifiant"
+
+#. Search for Stops by Name
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:52
+msgid "By Name"
+msgstr "Par nom"
+
+#. Search for Stops by ID/by Name
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:54
+msgid "Search"
+msgstr "Recherche"
+
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:95
+msgid "No Stops Found"
+msgstr "Aucun arrêt trouvé"
+
+#. Date: date chooser (In stop viewer)
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:49
+msgid "Date"
+msgstr "Date"
+
+#. Button
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:51
+msgid "Find Stops"
+msgstr "Trouver les arrêts"
+
+#. When no public transit stops were selected in stop viewer
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:53
+msgid "(No Stop Selected)"
+msgstr "(Aucun arrêt sélectionné)"
+
+#. Trip block (A block consists of two or more
+#. sequential trips made using the same vehicle, where a passenger
+#. can transfer from one trip to the next just by staying in the
+#. vehicle.)
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:132
+msgid "Block"
+msgstr "Bloc"
+
+#. Recenter map on this stop (Shown at each stop in
+#. Trip viewer
+#: src/client/js/otp/widgets/transit/TripViewerWidget.js:114
+msgid "Recenter"
+msgstr "Recentrer"
+
+#. Link to Stop viewer (Shown at each stop in Trip
+#. viewer)
+#: src/client/js/otp/widgets/transit/TripViewerWidget.js:122
+msgid "Viewer"
+msgstr "Visualisateur"
+
+#. Optimization for bicycle shown in bike triangle. Optimized
+#. for speed
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:49
+msgid "Quick"
+msgstr "Le plus Rapide"
+
+#. Optimization for bicycle shown in bike triangle. Optimized
+#. for flat terrain
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:52
+msgid "Flat"
+msgstr "Le plus Plat"
+
+#. Optimization for bicycle shown in bike triangle. Optimized
+#. for bike friendly infrastructure. Cycle roads etc...
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:55
+msgid "Bike Friendly"
+msgstr "Adapté au vélo"
+
+#. First letter of Bike Friendly
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:90
+msgid "B"
+msgstr "A"
+
+#. First letter of Flat
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:95
+msgid "F"
+msgstr "P"
+
+#. First letter of Quick
+#: src/client/js/otp/widgets/tripoptions/BikeTrianglePanel.js:100
+msgid "Q"
+msgstr "R"
+
+#. All public transport routes. Shown in
+#. Preffered/Banned routes widget
+#: src/client/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:47
+msgid "All Routes"
+msgstr "Tous les itinéraires"
+
+#. save preffered/banned public transport routes
+#: src/client/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:49
+msgid "Save"
+msgstr "Sauvegarder"
+
+#. Close preffered/banned public transport routes
+#. widget
+#: src/client/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:52
+msgid "Close"
+msgstr "Fermer"
+
+#. Widget title
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:32
+msgid "Travel Options"
+msgstr "Paramètres de voyage"
+
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:186
+msgid "Geocoder"
+msgstr "Géocodeur"
+
+#. Depart [time dropdown] [date dropdown]. Used in
+#. dropdown as a label to choose wanted time/date of departure
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:313
+msgctxt "tripoptions"
+msgid "Depart"
+msgstr "Départ"
+
+#. Arrive [time dropdown] [date dropdown]. Used in
+#. dropdown as a label to choose wanted time/date of arrival.
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:316
+msgid "Arrive"
+msgstr "Arrivée"
+
+#. on button that sets time and date of arrival/departure to now
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
+msgid "Now"
+msgstr "Maintenant"
+
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+msgid "Wheelchair accesible trip:"
+msgstr "Accessible aux fauteuils roulants:"
+
+#. Label for dropdown Travel by: [mode of transport]
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
+msgid "Travel by"
+msgstr "Voyager par"
+
+#. default value for preset values of maximum walk
+#. distances in Trip Options
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:580
+msgid "Presets"
+msgstr "Val. pré-définies"
+
+#. label for choosing how much should person's trip on foot be
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:643
+msgid "Maximum walk"
+msgstr "Marcher au maximum"
+
+#. label for choosing how much should person's trip on bicycle be
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:666
+msgid "Maximum bike"
+msgstr "Parcours à vélo maximum"
+
+#. label Preferred Routes: (routes/None)
+#. widget title
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:698
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:709
+msgid "Preferred Routes"
+msgstr "Itinéraires préférés"
+
+#. button to edit Preffered public transport Routes
+#. buton edit Banned public transport routes
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:700
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:809
+msgid "Edit"
+msgstr "Modifier"
+
+#. Words in brackets when no Preffered public transport route is set
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:702
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:777
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:872
+msgid "None"
+msgstr "Aucune"
+
+#. Label for Weight slider  to set to preffered public
+#. transport routes
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:705
+msgid "Weight"
+msgstr "Pondération"
+
+#. label Banned public transport Routes: (routes/None)
+#. (Routes you don't want to take)
+#. Widget title
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:818
+msgid "Banned routes"
+msgstr "Itinéraires à éviter"
+
+#. In Bike share planner radio button: <Use>: My Own Bike A shared bike
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:947
+msgid "Use"
+msgstr "Utiliser"
+
+#. In Bike share planner radio button: Use: <My Own Bike> A shared bike
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:949
+msgid "My Own Bike"
+msgstr "mon propre vélo"
+
+#. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:951
+msgid "A Shared Bike"
+msgstr "un Vélo Libre Service"
+
+#. button to send query for trip planning
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1092
+msgid "Plan Your Trip"
+msgstr "Calculer votre itinéraire"
+

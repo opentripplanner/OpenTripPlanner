@@ -1,0 +1,4 @@
+route_id,service_id,trip_id
+2c|train|1,ignore,2c|train|1
+2c|train|2,ignore,2c|train|2
+2c|bus,ignore,2c|bus

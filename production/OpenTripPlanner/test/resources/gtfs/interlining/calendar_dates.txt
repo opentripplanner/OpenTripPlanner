@@ -1,0 +1,2 @@
+date,service_id,exception_type
+20140101,serv0,1

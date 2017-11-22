@@ -1,0 +1,4 @@
+stop_id,stop_name,stop_lat,stop_lon
+plannerstack_scenario1,Stop plannerstack_scenario1,2.701,2.700
+plannerstack_scenario2,Stop plannerstack_scenario2,2.702,2.700
+plannerstack_scenario3,Stop plannerstack_scenario3,2.703,2.700
