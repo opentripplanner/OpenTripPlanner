@@ -486,6 +486,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean enterStationsWithCar = false;
 
+    /** whether to use trip discovery mode - search farther in future or past for shortest trip */
+    public boolean tripDiscoveryMode = false;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -1007,7 +1010,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && tripDiscoveryMode == other.tripDiscoveryMode;
     }
 
     /**
@@ -1038,7 +1042,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(useTraffic).hashCode() * 10169
+                + new Boolean(tripDiscoveryMode).hashCode() * 209477;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1280,4 +1285,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     }
 
+    public void setTripDiscoveryMode(boolean tripDiscoveryMode) {
+        this.tripDiscoveryMode = tripDiscoveryMode;
+    }
 }

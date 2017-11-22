@@ -380,7 +380,15 @@ public class RoutingContext implements Cloneable {
                 addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
                 addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
                         calendarService, agency.getId()));
+                if (opt.tripDiscoveryMode) {
+                    ServiceDate sd = serviceDate;
+                    for (int i = 0; i < 15; i++) {
+                        sd = opt.arriveBy ? sd.previous() : sd.next();
+                        addIfNotExists(this.serviceDays, new ServiceDay(graph, sd, calendarService, agency.getId()));
+                    }
+                }
             }
+
         }
     }
 
