@@ -124,6 +124,11 @@ public abstract class GraphPathToTripPlanConverter {
                 lastLeg.to.orig = plan.to.orig;
             }
         }
+
+        if (request.rctx.graph.outOfAreaNotesService != null) {
+            addOutOfAreaWarnings(plan, request, requestedLocale);
+        }
+
         request.rctx.debugOutput.finishedRendering();
         return plan;
     }
@@ -1155,6 +1160,12 @@ public abstract class GraphPathToTripPlanConverter {
             out.add(new P2<Double>(coordArr[i].x + distanceOffset, coordArr[i].y + heightOffset));
         }
         return out;
+    }
+
+    private static void addOutOfAreaWarnings(TripPlan plan, RoutingRequest request, Locale locale) {
+        for (Alert alert : request.rctx.graph.outOfAreaNotesService.getAlerts(request)) {
+            plan.addAlert(alert, locale);
+        }
     }
 
 }

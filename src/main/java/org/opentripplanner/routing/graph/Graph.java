@@ -49,6 +49,7 @@ import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.services.notes.OutOfAreaNotesService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
@@ -115,6 +116,8 @@ public class Graph implements Serializable {
     private transient GeometryIndex geomIndex;
 
     private transient SampleFactory sampleFactory;
+
+    public OutOfAreaNotesService outOfAreaNotesService;
 
     public final Deduplicator deduplicator = new Deduplicator();
 

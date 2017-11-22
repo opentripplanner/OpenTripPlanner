@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.FlexDirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.OutOfAreaModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
@@ -188,6 +189,7 @@ public class GraphBuilder implements Runnable {
         JsonNode builderConfig = null;
         JsonNode routerConfig = null;
         File demFile = null;
+        File boundaryFile = null;
         LOG.info("Searching for graph builder input files in {}", dir);
         if ( ! dir.isDirectory() && dir.canRead()) {
             LOG.error("'{}' is not a readable directory.", dir);
@@ -217,6 +219,10 @@ public class GraphBuilder implements Runnable {
                     } else {
                         LOG.info("Skipping DEM file {}", file);
                     }
+                    break;
+                case GEOJSON:
+                    LOG.info("Found geojson area file {}", file);
+                    boundaryFile = file;
                     break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
@@ -320,6 +326,10 @@ public class GraphBuilder implements Runnable {
         if (builderParams.htmlAnnotations) {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
+        if (boundaryFile != null) {
+            graphBuilder.addModule(new OutOfAreaModule(boundaryFile, builderParams.fromPlaceOutOfAreaMessage,
+                    builderParams.toPlaceOutOfAreaMessage));
+        }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
@@ -330,7 +340,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, GEOJSON, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -346,6 +356,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
+            if (name.endsWith(".geojson")) return GEOJSON;
             if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }
