@@ -41,7 +41,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -78,32 +78,32 @@ public class TimetableSnapshotSourceTest {
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
-        OtpTransitDao dao = context.getDao();
+        OtpTransitService transitService = context.getOtpTransitService();
 
         feedId = context.getFeedId().getId();
 
-        for (ShapePoint shapePoint : dao.getAllShapePoints()) {
+        for (ShapePoint shapePoint : transitService.getAllShapePoints()) {
             shapePoint.getShapeId().setAgencyId(feedId);
         }
-        for (Route route : dao.getAllRoutes()) {
+        for (Route route : transitService.getAllRoutes()) {
             route.getId().setAgencyId(feedId);
         }
-        for (Stop stop : dao.getAllStops()) {
+        for (Stop stop : transitService.getAllStops()) {
             stop.getId().setAgencyId(feedId);
         }
-        for (Trip trip : dao.getAllTrips()) {
+        for (Trip trip : transitService.getAllTrips()) {
             trip.getId().setAgencyId(feedId);
         }
-        for (ServiceCalendar serviceCalendar : dao.getAllCalendars()) {
+        for (ServiceCalendar serviceCalendar : transitService.getAllCalendars()) {
             serviceCalendar.getServiceId().setAgencyId(feedId);
         }
-        for (ServiceCalendarDate serviceCalendarDate : dao.getAllCalendarDates()) {
+        for (ServiceCalendarDate serviceCalendarDate : transitService.getAllCalendarDates()) {
             serviceCalendarDate.getServiceId().setAgencyId(feedId);
         }
-        for (FareAttribute fareAttribute : dao.getAllFareAttributes()) {
+        for (FareAttribute fareAttribute : transitService.getAllFareAttributes()) {
             fareAttribute.getId().setAgencyId(feedId);
         }
-        for (Pathway pathway : dao.getAllPathways()) {
+        for (Pathway pathway : transitService.getAllPathways()) {
             pathway.getId().setAgencyId(feedId);
         }
 
@@ -127,7 +127,7 @@ public class TimetableSnapshotSourceTest {
     public void setUp() {
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         updater = new TimetableSnapshotSource(graph);
     }

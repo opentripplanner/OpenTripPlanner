@@ -60,7 +60,9 @@ public class TimetableSnapshotTest {
 
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class, createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class, createCalendarServiceData(context.getOtpTransitService())
+        );
 
         patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {

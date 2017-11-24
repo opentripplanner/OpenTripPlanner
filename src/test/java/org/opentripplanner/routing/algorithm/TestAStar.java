@@ -44,7 +44,7 @@ public class TestAStar extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         RoutingRequest options = new RoutingRequest();
 

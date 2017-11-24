@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs;
 import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +40,11 @@ public class MockGtfs {
         gtfsDelegate.putLines(fileName, rows);
     }
 
-    public OtpTransitDao read() throws IOException {
+    public OtpTransitService read() throws IOException {
         return OtpTransitDaoMapper.mapDao(gtfsDelegate.read());
     }
 
-    public OtpTransitDao read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
+    public OtpTransitService read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
         return OtpTransitDaoMapper.mapDao(gtfsDelegate.read(reader));
     }
 

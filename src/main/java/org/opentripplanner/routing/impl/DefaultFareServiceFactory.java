@@ -18,7 +18,7 @@ import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -52,8 +52,8 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void processGtfs(OtpTransitDao dao) {
-        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), regularFareRules);
+    public void processGtfs(OtpTransitService transitService) {
+        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
     protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,

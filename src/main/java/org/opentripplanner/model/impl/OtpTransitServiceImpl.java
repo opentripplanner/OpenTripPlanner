@@ -32,7 +32,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,13 +54,13 @@ import static java.util.stream.Collectors.toMap;
  * <p>
  * The Dao is read only, to enforece consistency after generating indexes and ids.
  * You will get an exception if you try to add entities to one of the collections.
- * If you need to modify a {@link OtpTransitDao}, you can create a new
- * {@link OtpTransitDaoBuilder} based on your old data, do your modification and
+ * If you need to modify a {@link OtpTransitService}, you can create a new
+ * {@link OtpTransitBuilder} based on your old data, do your modification and
  * create a new unmodifiable dao.
  *
  * @author bdferris
  */
-class OtpTransitDaoImpl implements OtpTransitDao {
+class OtpTransitServiceImpl implements OtpTransitService {
 
     private Collection<Agency> agencies;
 
@@ -105,9 +105,9 @@ class OtpTransitDaoImpl implements OtpTransitDao {
 
     /**
      * Create a read only version of the OtpTransitDao.
-     * @see OtpTransitDaoBuilder Use builder to create an new OtpTransitDao.
+     * @see OtpTransitBuilder Use builder to create an new OtpTransitDao.
      */
-    OtpTransitDaoImpl(List<Agency> agencies, List<ServiceCalendarDate> calendarDates,
+    OtpTransitServiceImpl(List<Agency> agencies, List<ServiceCalendarDate> calendarDates,
             List<ServiceCalendar> calendars, List<FareAttribute> fareAttributes,
             List<FareRule> fareRules, List<FeedInfo> feedInfos, List<Frequency> frequencies,
             List<Pathway> pathways, List<Route> routes, List<ShapePoint> shapePoints,

@@ -57,7 +57,7 @@ public class AlertPatchTest extends TestCase {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         graph.index(new DefaultStreetVertexIndexFactory());
 

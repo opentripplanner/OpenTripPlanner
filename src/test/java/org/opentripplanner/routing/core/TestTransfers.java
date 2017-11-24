@@ -92,7 +92,7 @@ class Context {
         graph.index(new DefaultStreetVertexIndexFactory());
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
 
         feedId = context.getFeedId().getId();

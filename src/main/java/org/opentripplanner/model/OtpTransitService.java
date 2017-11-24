@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Methods for accessing imported entities.
  */
-public interface OtpTransitDao {
+public interface OtpTransitService {
 
     Collection<Agency> getAllAgencies();
 

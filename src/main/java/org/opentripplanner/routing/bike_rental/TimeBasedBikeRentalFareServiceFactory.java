@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -47,7 +47,7 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
     }
 
     @Override
-    public void processGtfs(OtpTransitDao dao) {
+    public void processGtfs(OtpTransitService transitService) {
         // Nothing to do
     }
 

@@ -50,7 +50,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -130,7 +130,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -169,7 +169,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();

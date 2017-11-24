@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
@@ -49,14 +49,15 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     }
     
     @Override
-    public void processGtfs(OtpTransitDao dao) {
+    public void processGtfs(OtpTransitService transitService) {
     	// Add custom extension: trips may have a fare ID specified in KCM GTFS.
     	// Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
     	// since fare IDs may not be unique across feeds and trip agency IDsqq
     	// may not match fare attribute agency IDs (which are feed IDs).
     	
     	Map<AgencyAndId, FareRuleSet> feedFareRules = new HashMap<>();
-    	fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), feedFareRules);
+    	fillFareRules(null, transitService.getAllFareAttributes(),
+                transitService.getAllFareRules(), feedFareRules);
     	
     	regularFareRules.putAll(feedFareRules);
     	
@@ -67,7 +68,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         	feedFareRulesById.put(id, rule);
         }
         
-        for (Trip trip : dao.getAllTrips()) {
+        for (Trip trip : transitService.getAllTrips()) {
         	String fareId = trip.getFareId();
         	FareRuleSet rule = feedFareRulesById.get(fareId);
         	if (rule != null)

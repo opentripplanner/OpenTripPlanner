@@ -48,7 +48,7 @@ public class TestGraphPath extends TestCase {
         hl.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
     }
 

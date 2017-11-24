@@ -24,7 +24,7 @@ import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.LocalizedServiceId;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.CalendarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,18 +51,18 @@ public class CalendarServiceDataFactoryImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceDataFactoryImpl.class);
 
-    private final OtpTransitDao dao;
+    private final OtpTransitService transitService;
 
-    public static CalendarService createCalendarService(OtpTransitDao dao) {
-        return new CalendarServiceImpl(createCalendarServiceData(dao));
+    public static CalendarService createCalendarService(OtpTransitService transitService) {
+        return new CalendarServiceImpl(createCalendarServiceData(transitService));
     }
 
-    public static CalendarServiceData createCalendarServiceData(OtpTransitDao dao) {
-        return new CalendarServiceDataFactoryImpl(dao).createData();
+    public static CalendarServiceData createCalendarServiceData(OtpTransitService transitService) {
+        return new CalendarServiceDataFactoryImpl(transitService).createData();
     }
 
-    public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(OtpTransitDao dao) {
-        return (new CalendarServiceDataFactoryImpl(dao) {
+    public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(OtpTransitService transitService) {
+        return (new CalendarServiceDataFactoryImpl(transitService) {
             @Override void addDatesForLocalizedServiceId(
                     AgencyAndId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data
             ) {
@@ -71,8 +71,8 @@ public class CalendarServiceDataFactoryImpl {
         }).createData();
     }
 
-    private CalendarServiceDataFactoryImpl(OtpTransitDao dao) {
-        this.dao = dao;
+    private CalendarServiceDataFactoryImpl(OtpTransitService transitService) {
+        this.transitService = transitService;
     }
 
     CalendarServiceData createData() {
@@ -81,7 +81,7 @@ public class CalendarServiceDataFactoryImpl {
 
         setTimeZonesForAgencies(data);
 
-        List<AgencyAndId> serviceIds = dao.getAllServiceIds();
+        List<AgencyAndId> serviceIds = transitService.getAllServiceIds();
 
         int index = 0;
 
@@ -112,7 +112,7 @@ public class CalendarServiceDataFactoryImpl {
 
     void addDatesForLocalizedServiceId (
             AgencyAndId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data) {
-        List<String> tripAgencyIds = dao.getTripAgencyIdsReferencingServiceId(serviceId);
+        List<String> tripAgencyIds = transitService.getTripAgencyIdsReferencingServiceId(serviceId);
         Set<TimeZone> timeZones = new HashSet<>();
         for (String tripAgencyId : tripAgencyIds) {
             TimeZone timeZone = data.getTimeZoneForAgencyId(tripAgencyId);
@@ -133,19 +133,19 @@ public class CalendarServiceDataFactoryImpl {
     private Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId,
             TimeZone serviceIdTimeZone) {
         Set<ServiceDate> activeDates = new HashSet<>();
-        ServiceCalendar c = dao.getCalendarForServiceId(serviceId);
+        ServiceCalendar c = transitService.getCalendarForServiceId(serviceId);
 
         if (c != null) {
             addDatesFromCalendar(c, serviceIdTimeZone, activeDates);
         }
-        for (ServiceCalendarDate cd : dao.getCalendarDatesForServiceId(serviceId)) {
+        for (ServiceCalendarDate cd : transitService.getCalendarDatesForServiceId(serviceId)) {
             addAndRemoveDatesFromCalendarDate(cd, activeDates);
         }
         return activeDates;
     }
 
     private void setTimeZonesForAgencies(CalendarServiceData data) {
-        for (Agency agency : dao.getAllAgencies()) {
+        for (Agency agency : transitService.getAllAgencies()) {
             TimeZone timeZone = TimeZone.getTimeZone(agency.getTimezone());
             if (timeZone.getID().equals("GMT") && !agency.getTimezone().toUpperCase()
                     .equals("GMT")) {

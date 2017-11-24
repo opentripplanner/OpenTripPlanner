@@ -33,7 +33,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 
@@ -46,7 +46,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
-public class OtpTransitDaoImplTest {
+public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";
 
     private static final AgencyAndId SERVICE_ALLDAYS_ID = new AgencyAndId(FEED_ID, "alldays");
@@ -56,7 +56,7 @@ public class OtpTransitDaoImplTest {
     private static final AgencyAndId STATION_ID = new AgencyAndId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
-    private static OtpTransitDao subject;
+    private static OtpTransitService subject;
 
     private static Agency agency;
 
@@ -71,7 +71,7 @@ public class OtpTransitDaoImplTest {
         reader.setDefaultAgencyId(FEED_ID);
         reader.run();
 
-        OtpTransitDaoBuilder builder = new OtpTransitDaoBuilder(OtpTransitDaoMapper.mapDao(dao));
+        OtpTransitBuilder builder = new OtpTransitBuilder(OtpTransitDaoMapper.mapDao(dao));
         agency = first(builder.getAgencies());
 
         // Supplement test data with at least one entity in all collections
@@ -227,7 +227,7 @@ public class OtpTransitDaoImplTest {
     public void testGetShapePointsForShapeId() {
         List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new AgencyAndId("Z", "5"));
         assertEquals("[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
-                shapePoints.stream().map(OtpTransitDaoImplTest::toString).collect(toList()).toString());
+                shapePoints.stream().map(OtpTransitServiceImplTest::toString).collect(toList()).toString());
     }
 
     @Test

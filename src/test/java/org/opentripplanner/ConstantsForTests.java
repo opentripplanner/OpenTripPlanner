@@ -82,7 +82,7 @@ public class ConstantsForTests {
             // this is now making a duplicate calendarservicedata but it's oh so practical
             portlandGraph.putService(
                     CalendarServiceData.class,
-                    createCalendarServiceData(portlandContext.getDao())
+                    createCalendarServiceData(portlandContext.getOtpTransitService())
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class ConstantsForTests {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         return graph;
     }

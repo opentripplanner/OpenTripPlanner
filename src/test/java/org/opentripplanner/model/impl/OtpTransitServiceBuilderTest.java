@@ -11,12 +11,12 @@ import java.util.List;
 import static java.lang.Integer.valueOf;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.opentripplanner.model.impl.OtpTransitDaoBuilder.generateNoneExistingIds;
+import static org.opentripplanner.model.impl.OtpTransitBuilder.generateNoneExistingIds;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
  */
-public class OtpTransitDaoBuilderTest {
+public class OtpTransitServiceBuilderTest {
 
     private static final Integer ID_1 = valueOf(1);
     private static final Integer ID_4 = valueOf(4);

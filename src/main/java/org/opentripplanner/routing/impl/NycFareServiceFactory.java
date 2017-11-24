@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
@@ -26,7 +26,7 @@ public class NycFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void processGtfs(OtpTransitDao dao) {
+    public void processGtfs(OtpTransitService transitService) {
     }
 
     @Override

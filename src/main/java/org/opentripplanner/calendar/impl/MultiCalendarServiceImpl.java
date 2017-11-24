@@ -17,7 +17,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.LocalizedServiceId;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 
 /**
  * This is actually kind of a hack, and assumes that there is only one copy of CalendarServiceData
@@ -32,9 +32,9 @@ public class MultiCalendarServiceImpl extends CalendarServiceImpl {
         super(new CalendarServiceData());
     }
 
-    public void addData(CalendarServiceData data, OtpTransitDao dao) {
+    public void addData(CalendarServiceData data, OtpTransitService transitService) {
         CalendarServiceData _data = super.getData();
-        for (Agency agency : dao.getAllAgencies()) {
+        for (Agency agency : transitService.getAllAgencies()) {
             String agencyId = agency.getId();
             _data.putTimeZoneForAgencyId(agencyId, data.getTimeZoneForAgencyId(agencyId));
         }

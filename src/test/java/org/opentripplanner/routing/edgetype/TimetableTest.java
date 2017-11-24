@@ -71,7 +71,7 @@ public class TimetableTest {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
 
         patternIndex = new HashMap<AgencyAndId, TripPattern>();

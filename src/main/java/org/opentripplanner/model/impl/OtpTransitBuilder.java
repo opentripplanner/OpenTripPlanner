@@ -29,12 +29,12 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitDao;
+import org.opentripplanner.model.OtpTransitService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OtpTransitDaoBuilder {
+public class OtpTransitBuilder {
     private final List<Agency> agencies = new ArrayList<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
@@ -63,14 +63,14 @@ public class OtpTransitDaoBuilder {
 
     private final List<Trip> trips = new ArrayList<>();
 
-    public OtpTransitDaoBuilder() {
+    public OtpTransitBuilder() {
     }
 
-    public OtpTransitDaoBuilder(OtpTransitDao dao) {
-        add(dao);
+    public OtpTransitBuilder(OtpTransitService transitService) {
+        add(transitService);
     }
 
-    public OtpTransitDaoBuilder add(OtpTransitDao other) {
+    public OtpTransitBuilder add(OtpTransitService other) {
         agencies.addAll(other.getAllAgencies());
         calendarDates.addAll(other.getAllCalendarDates());
         calendars.addAll(other.getAllCalendars());
@@ -144,11 +144,11 @@ public class OtpTransitDaoBuilder {
         return trips;
     }
 
-    public OtpTransitDao build() {
+    public OtpTransitService build() {
 
         createNoneExistingIds();
 
-        return new OtpTransitDaoImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
+        return new OtpTransitServiceImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
                 feedInfos, frequencies, pathways, routes, shapePoints, stops, stopTimes, transfers,
                 trips);
     }

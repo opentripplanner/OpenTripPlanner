@@ -79,7 +79,7 @@ public class TestPatternHopFactory extends TestCase {
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getDao())
+                createCalendarServiceData(context.getOtpTransitService())
         );
         
         String[] stops = {
