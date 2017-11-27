@@ -71,7 +71,6 @@ public class FrequencyMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Frequency result = subject.map(FREQUENCY);
 
-        assertEquals(ID, result.getId());
         assertEquals(START_TIME, result.getStartTime());
         assertEquals(END_TIME, result.getEndTime());
         assertEquals(EXACT_TIMES, result.getExactTimes());
@@ -84,7 +83,6 @@ public class FrequencyMapperTest {
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.Frequency result = subject.map(new Frequency());
 
-        assertNotNull(result.getId());
         assertEquals(0, result.getStartTime());
         assertEquals(0, result.getEndTime());
         assertEquals(0, result.getExactTimes());

@@ -154,13 +154,7 @@ public class OtpTransitBuilder {
     }
 
     private void createNoneExistingIds() {
-        generateNoneExistingIds(calendarDates);
-        generateNoneExistingIds(calendars);
-        generateNoneExistingIds(fareRules);
         generateNoneExistingIds(feedInfos);
-        generateNoneExistingIds(frequencies);
-        generateNoneExistingIds(stopTimes);
-        generateNoneExistingIds(transfers);
     }
 
     static <T extends IdentityBean<Integer>> void generateNoneExistingIds(List<T> entities) {

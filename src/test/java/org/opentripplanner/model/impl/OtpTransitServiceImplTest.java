@@ -76,8 +76,9 @@ public class OtpTransitServiceImplTest {
 
         // Supplement test data with at least one entity in all collections
         builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
-        builder.getFareAttributes().add(createFareAttribute());
-        builder.getFareRules().add(new FareRule());
+        FareRule rule = createFareRule();
+        builder.getFareAttributes().add(rule.getFare());
+        builder.getFareRules().add(rule);
         builder.getFeedInfos().add(new FeedInfo());
 
         subject = builder.build();
@@ -124,7 +125,10 @@ public class OtpTransitServiceImplTest {
         Collection<FareRule> fareRules = subject.getAllFareRules();
 
         assertEquals(1, fareRules.size());
-        assertEquals("<FareRule 1>", first(fareRules).toString());
+        assertEquals(
+                "<FareRule  origin='Zone A' contains='Zone B' destination='Zone C'>",
+                first(fareRules).toString()
+        );
     }
 
     @Test
@@ -140,7 +144,10 @@ public class OtpTransitServiceImplTest {
         Collection<Frequency> frequencies = subject.getAllFrequencies();
 
         assertEquals(2, frequencies.size());
-        assertEquals("<Frequency 1 start=06:00:00 end=10:00:01>", first(frequencies).toString());
+        assertEquals(
+                "<Frequency trip=agency_15.1 start=06:00:00 end=10:00:01>",
+                first(frequencies).toString()
+        );
     }
 
     @Test
@@ -164,7 +171,7 @@ public class OtpTransitServiceImplTest {
         Collection<Transfer> transfers = subject.getAllTransfers();
 
         assertEquals(9, transfers.size());
-        assertEquals("<Transfer 1>", first(transfers).toString());
+        assertEquals("<Transfer stop=Z_F..Z_E>", first(transfers).toString());
     }
 
     @Test
@@ -262,8 +269,22 @@ public class OtpTransitServiceImplTest {
     private static FareAttribute createFareAttribute() {
         FareAttribute fa = new FareAttribute();
         fa.setId(new AgencyAndId(agency.getId(), "FA"));
+        FareRule rule = new FareRule();
+        rule.setFare(fa);
         return fa;
     }
+
+    private static FareRule createFareRule() {
+        FareAttribute fa = new FareAttribute();
+        fa.setId(new AgencyAndId(agency.getId(), "FA"));
+        FareRule rule = new FareRule();
+        rule.setOriginId("Zone A");
+        rule.setContainsId("Zone B");
+        rule.setDestinationId("Zone C");
+        rule.setFare(fa);
+        return rule;
+    }
+
 
     private static ServiceCalendarDate createAServiceCalendarDateExclution(AgencyAndId serviceId) {
         ServiceCalendarDate date = new ServiceCalendarDate();

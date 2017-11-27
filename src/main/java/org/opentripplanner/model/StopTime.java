@@ -18,13 +18,14 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.util.TimeToStringConverter;
 
-public final class StopTime extends IdentityBean<Integer> implements Comparable<StopTime> {
+import java.io.Serializable;
+import java.util.Objects;
+
+public final class StopTime implements Serializable, Comparable<StopTime> {
 
     private static final long serialVersionUID = 1L;
 
     public static final int MISSING_VALUE = -999;
-
-    private int id;
 
     private Trip trip;
 
@@ -59,7 +60,6 @@ public final class StopTime extends IdentityBean<Integer> implements Comparable<
         this.arrivalTime = st.arrivalTime;
         this.departureTime = st.departureTime;
         this.dropOffType = st.dropOffType;
-        this.id = st.id;
         this.pickupType = st.pickupType;
         this.routeShortName = st.routeShortName;
         this.shapeDistTraveled = st.shapeDistTraveled;
@@ -68,14 +68,6 @@ public final class StopTime extends IdentityBean<Integer> implements Comparable<
         this.stopSequence = st.stopSequence;
         this.timepoint = st.timepoint;
         this.trip = st.trip;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Trip getTrip() {
@@ -217,6 +209,23 @@ public final class StopTime extends IdentityBean<Integer> implements Comparable<
 
     public int compareTo(StopTime o) {
         return this.getStopSequence() - o.getStopSequence();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        StopTime stopTime = (StopTime) o;
+        return stopSequence == stopTime.stopSequence
+                && Objects.equals(trip, stopTime.trip)
+                && Objects.equals(stop, stopTime.stop);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trip, stop, stopSequence);
     }
 
     @Override

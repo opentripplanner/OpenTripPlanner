@@ -46,7 +46,6 @@ class FareRuleMapper {
     private FareRule doMap(org.onebusaway.gtfs.model.FareRule rhs) {
         FareRule lhs = new FareRule();
 
-        lhs.setId(rhs.getId());
         lhs.setFare(fareAttributeMapper.map(rhs.getFare()));
         lhs.setRoute(routeMapper.map(rhs.getRoute()));
         lhs.setOriginId(rhs.getOriginId());

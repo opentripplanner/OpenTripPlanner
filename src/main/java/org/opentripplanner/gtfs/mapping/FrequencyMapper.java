@@ -40,7 +40,6 @@ class FrequencyMapper {
     private Frequency doMap(org.onebusaway.gtfs.model.Frequency rhs) {
         Frequency lhs = new Frequency();
 
-        lhs.setId(rhs.getId());
         lhs.setTrip(tripMapper.map(rhs.getTrip()));
         lhs.setStartTime(rhs.getStartTime());
         lhs.setEndTime(rhs.getEndTime());

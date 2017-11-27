@@ -15,13 +15,14 @@
  */
 package org.opentripplanner.model;
 
-public final class ShapePoint extends IdentityBean<Integer> implements Comparable<ShapePoint> {
+import java.io.Serializable;
+import java.util.Objects;
+
+public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
 
     private static final long serialVersionUID = 1L;
 
     private static final double MISSING_VALUE = -999;
-
-    private int id;
 
     private AgencyAndId shapeId;
 
@@ -34,14 +35,6 @@ public final class ShapePoint extends IdentityBean<Integer> implements Comparabl
     private double distTraveled = MISSING_VALUE;
 
     public ShapePoint() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public AgencyAndId getShapeId() {
@@ -95,6 +88,21 @@ public final class ShapePoint extends IdentityBean<Integer> implements Comparabl
 
     public void setLon(double lon) {
         this.lon = lon;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ShapePoint that = (ShapePoint) o;
+        return sequence == that.sequence && Objects.equals(shapeId, that.shapeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shapeId, sequence);
     }
 
     @Override

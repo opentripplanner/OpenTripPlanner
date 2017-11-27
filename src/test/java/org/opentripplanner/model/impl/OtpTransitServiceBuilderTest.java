@@ -1,7 +1,7 @@
 package org.opentripplanner.model.impl;
 
 import org.junit.Test;
-import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.IdentityBean;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class OtpTransitServiceBuilderTest {
         List<? extends IdentityBean<Integer>> list;
 
         // An empty list should not cause any trouble (Exception)
-        generateNoneExistingIds(Collections.<FareRule>emptyList());
+        generateNoneExistingIds(Collections.<FeedInfo>emptyList());
 
 
         // Generate id for one value
@@ -65,7 +65,7 @@ public class OtpTransitServiceBuilderTest {
     }
 
     private static IdentityBean<Integer> newEntity(Integer id) {
-        FareRule e = new FareRule();
+        FeedInfo e = new FeedInfo();
         if(id != null) {
             e.setId(id);
         }

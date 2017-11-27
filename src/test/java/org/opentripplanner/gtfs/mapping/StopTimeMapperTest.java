@@ -93,7 +93,6 @@ public class StopTimeMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.StopTime result = subject.map(STOP_TIME);
 
-        assertEquals(ID, result.getId());
         assertEquals(ARRIVAL_TIME, result.getArrivalTime());
         assertEquals(DEPARTURE_TIME, result.getDepartureTime());
         assertEquals(DROP_OFF_TYPE, result.getDropOffType());
@@ -112,7 +111,6 @@ public class StopTimeMapperTest {
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.StopTime result = subject.map(new StopTime());
 
-        assertNotNull(result.getId());
         assertFalse(result.isArrivalTimeSet());
         assertFalse(result.isDepartureTimeSet());
         assertEquals(0, result.getDropOffType());

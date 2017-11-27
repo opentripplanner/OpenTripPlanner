@@ -90,7 +90,6 @@ public class TransferMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Transfer result = subject.map(TRANSFER);
 
-        assertEquals(ID, result.getId());
         assertNotNull(result.getFromRoute());
         assertNotNull(result.getFromTrip());
         assertNotNull(result.getFromStop());
@@ -105,7 +104,6 @@ public class TransferMapperTest {
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.Transfer result = subject.map(new Transfer());
 
-        assertNotNull(result.getId());
         assertNull(result.getFromRoute());
         assertNull(result.getFromTrip());
         assertNull(result.getFromStop());

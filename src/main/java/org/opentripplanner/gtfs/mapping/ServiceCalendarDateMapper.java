@@ -35,7 +35,6 @@ class ServiceCalendarDateMapper {
     private ServiceCalendarDate doMap(org.onebusaway.gtfs.model.ServiceCalendarDate rhs) {
         ServiceCalendarDate lhs = new ServiceCalendarDate();
 
-        lhs.setId(rhs.getId());
         lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
         lhs.setDate(ServiceDateMapper.mapServiceDate(rhs.getDate()));
         lhs.setExceptionType(rhs.getExceptionType());

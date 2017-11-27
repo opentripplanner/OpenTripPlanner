@@ -70,7 +70,6 @@ public class FareRuleMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.FareRule result = subject.map(FARE_RULE);
 
-        assertEquals(ID, result.getId());
         assertEquals(CONTAINS_ID, result.getContainsId());
         assertEquals(DESTINATION_ID, result.getDestinationId());
         assertEquals(ORIGIN_ID, result.getOriginId());
@@ -82,7 +81,6 @@ public class FareRuleMapperTest {
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.FareRule result = subject.map(new FareRule());
 
-        assertNotNull(result.getId());
         assertNull(result.getContainsId());
         assertNull(result.getDestinationId());
         assertNull(result.getOriginId());

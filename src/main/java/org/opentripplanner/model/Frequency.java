@@ -16,13 +16,14 @@
  */
 package org.opentripplanner.model;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 import static org.opentripplanner.util.TimeToStringConverter.toHH_MM_SS;
 
-public final class Frequency extends IdentityBean<Integer> {
+public final class Frequency implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private int id;
 
     private Trip trip;
 
@@ -35,16 +36,6 @@ public final class Frequency extends IdentityBean<Integer> {
     private int exactTimes = 0;
 
     private int labelOnly = 0;
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Trip getTrip() {
         return trip;
@@ -94,8 +85,24 @@ public final class Frequency extends IdentityBean<Integer> {
         this.labelOnly = labelOnly;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Frequency frequency = (Frequency) o;
+        return startTime == frequency.startTime && endTime == frequency.endTime
+                && headwaySecs == frequency.headwaySecs && Objects.equals(trip, frequency.trip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trip, startTime, endTime, headwaySecs);
+    }
+
     public String toString() {
-        return "<Frequency " + getId()
+        return "<Frequency trip=" + trip.getId()
                 + " start=" + toHH_MM_SS(startTime)
                 + " end=" + toHH_MM_SS(endTime)
                 + ">";

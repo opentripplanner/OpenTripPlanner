@@ -63,7 +63,6 @@ public class ShapePointMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.ShapePoint result = subject.map(SHAPE_POINT);
 
-        assertEquals(ID, result.getId());
         assertEquals(DIST_TRAVELED, result.getDistTraveled(), 0.0001d);
         assertEquals(LAT, result.getLat(), 0.0001d);
         assertEquals(LON, result.getLon(), 0.0001d);
@@ -75,7 +74,6 @@ public class ShapePointMapperTest {
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.ShapePoint result = subject.map(new ShapePoint());
 
-        assertNotNull(result.getId());
         assertFalse(result.isDistTraveledSet());
         assertEquals(0d, result.getLat(), 0.00001);
         assertEquals(0d, result.getLon(), 0.00001);

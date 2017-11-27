@@ -77,7 +77,6 @@ public class ServiceCalendarMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.ServiceCalendar result = subject.map(CALENDAR);
 
-        assertEquals(ID, result.getId());
         assertEquals("A_1", result.getServiceId().toString());
         assertEquals(MONDAY, result.getMonday());
         assertEquals(TUESDAY, result.getTuesday());
@@ -95,7 +94,6 @@ public class ServiceCalendarMapperTest {
         ServiceCalendar input = new ServiceCalendar();
         org.opentripplanner.model.ServiceCalendar result = subject.map(input);
 
-        assertEquals(Integer.valueOf(0), result.getId());
         assertEquals(0, result.getMonday());
         assertEquals(0, result.getTuesday());
         assertEquals(0, result.getWednesday());

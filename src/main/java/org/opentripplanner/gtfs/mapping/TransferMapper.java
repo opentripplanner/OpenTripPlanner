@@ -46,9 +46,6 @@ class TransferMapper {
     private Transfer doMap(org.onebusaway.gtfs.model.Transfer rhs) {
         Transfer lhs = new Transfer();
 
-        lhs.setId(rhs.getId());
-
-        lhs.setId(rhs.getId());
         lhs.setFromStop(stopMapper.map(rhs.getFromStop()));
         lhs.setFromRoute(routeMapper.map(rhs.getFromRoute()));
         lhs.setFromTrip(tripMapper.map(rhs.getFromTrip()));

@@ -16,13 +16,13 @@
  */
 package org.opentripplanner.model;
 
-public final class Transfer extends IdentityBean<Integer> {
+import java.io.Serializable;
+
+public final class Transfer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
-
-    private int id;
 
     private Stop fromStop;
 
@@ -44,7 +44,6 @@ public final class Transfer extends IdentityBean<Integer> {
     }
 
     public Transfer(Transfer obj) {
-        this.id = obj.id;
         this.fromStop = obj.fromStop;
         this.fromRoute = obj.fromRoute;
         this.fromTrip = obj.fromTrip;
@@ -53,16 +52,6 @@ public final class Transfer extends IdentityBean<Integer> {
         this.toTrip = obj.toTrip;
         this.transferType = obj.transferType;
         this.minTransferTime = obj.minTransferTime;
-    }
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Stop getFromStop() {
@@ -138,6 +127,14 @@ public final class Transfer extends IdentityBean<Integer> {
     }
 
     public String toString() {
-        return "<Transfer " + getId() + ">";
+        return "<Transfer"
+                + toStrOpt(" stop=", fromStop, toStop)
+                + toStrOpt(" route=", fromRoute, toRoute)
+                + toStrOpt(" trip=", fromTrip, toTrip)
+                + ">";
+    }
+
+    private static String toStrOpt(String lbl, IdentityBean arg1, IdentityBean arg2) {
+        return  (arg1 == null ? "" : (lbl + arg1.getId() + ".." + arg2.getId()));
     }
 }

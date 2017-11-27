@@ -17,6 +17,9 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.model.calendar.ServiceDate;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar,
  * so as to avoid confusion with java.util.Calendar
@@ -24,11 +27,9 @@ import org.opentripplanner.model.calendar.ServiceDate;
  * @author bdferris
  *
  */
-public final class ServiceCalendar extends IdentityBean<Integer> {
+public final class ServiceCalendar implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private int id;
 
     private AgencyAndId serviceId;
 
@@ -49,14 +50,6 @@ public final class ServiceCalendar extends IdentityBean<Integer> {
     private ServiceDate startDate;
 
     private ServiceDate endDate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public AgencyAndId getServiceId() {
         return serviceId;
@@ -136,6 +129,26 @@ public final class ServiceCalendar extends IdentityBean<Integer> {
 
     public void setEndDate(ServiceDate endDate) {
         this.endDate = endDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ServiceCalendar that = (ServiceCalendar) o;
+        return monday == that.monday && tuesday == that.tuesday && wednesday == that.wednesday
+                && thursday == that.thursday && friday == that.friday && saturday == that.saturday
+                && sunday == that.sunday && Objects.equals(serviceId, that.serviceId) && Objects
+                .equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects
+                .hash(serviceId, monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+                        startDate, endDate);
     }
 
     public String toString() {

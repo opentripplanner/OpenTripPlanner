@@ -43,9 +43,6 @@ class StopTimeMapper {
     private StopTime doMap(org.onebusaway.gtfs.model.StopTime rhs) {
         StopTime lhs = new StopTime();
 
-        lhs.setId(rhs.getId());
-
-        lhs.setId(rhs.getId());
         lhs.setTrip(tripMapper.map(rhs.getTrip()));
         lhs.setStop(stopMapper.map(rhs.getStop()));
         lhs.setArrivalTime(rhs.getArrivalTime());

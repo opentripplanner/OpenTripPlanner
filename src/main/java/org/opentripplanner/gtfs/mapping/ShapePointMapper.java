@@ -34,7 +34,6 @@ class ShapePointMapper {
     private ShapePoint doMap(org.onebusaway.gtfs.model.ShapePoint rhs) {
         ShapePoint lhs = new ShapePoint();
 
-        lhs.setId(rhs.getId());
         lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
         lhs.setSequence(rhs.getSequence());
         lhs.setLat(rhs.getLat());

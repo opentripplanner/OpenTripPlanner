@@ -15,11 +15,11 @@
  */
 package org.opentripplanner.model;
 
-public final class FareRule extends IdentityBean<Integer> {
+import java.io.Serializable;
+
+public final class FareRule implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private int id;
 
     private FareAttribute fare;
 
@@ -30,16 +30,6 @@ public final class FareRule extends IdentityBean<Integer> {
     private String destinationId;
 
     private String containsId;
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public FareAttribute getFare() {
         return fare;
@@ -82,6 +72,20 @@ public final class FareRule extends IdentityBean<Integer> {
     }
 
     public String toString() {
-        return "<FareRule " + getId() + ">";
+        return "<FareRule "
+                + toStrOpt(" route=", route)
+                + toStrOpt(" origin=", originId)
+                + toStrOpt(" contains=", containsId)
+                + toStrOpt(" destination=", destinationId)
+                + ">";
+    }
+
+
+    private static String toStrOpt(String lbl, IdentityBean arg) {
+        return (arg == null ? "" : lbl + arg.getId());
+    }
+
+    private static String toStrOpt(String lbl, String arg) {
+        return (arg == null ? "" : lbl + '\'' + arg + '\'');
     }
 }
