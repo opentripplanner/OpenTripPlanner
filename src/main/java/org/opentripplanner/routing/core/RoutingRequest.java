@@ -136,6 +136,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The maximum slope of streets for wheelchair trips. */
     public double maxSlope = 0.0833333; // ADA max wheelchair ramp slope is a good default.
 
+    /** The slope factor for wheelchair trips. */
+    public double slopeFactor = 1;
+
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
 
@@ -606,6 +609,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         } else{
             return maxSlope;
         }
+    }
+
+    public double getSlopeFactor() {
+        return slopeFactor;
     }
     
     public void setWalkBoardCost(int walkBoardCost) {
@@ -1119,6 +1126,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setSlopeFactor(double slopeFactor){
+        if(slopeFactor > 0){
+            this.slopeFactor = slopeFactor;
+        }
+    }
     public void setMaxPreTransitTime(int maxPreTransitTime) {
         if (maxPreTransitTime > 0) {
             this.maxPreTransitTime = maxPreTransitTime;
