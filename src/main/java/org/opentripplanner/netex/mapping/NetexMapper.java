@@ -46,7 +46,7 @@ public class NetexMapper {
         for (String stopPlaceId : netexDao.getStopPlaceIds()) {
             Collection<StopPlace> stopPlaceAllVersions = netexDao.lookupStopPlacesById(stopPlaceId);
             if (stopPlaceAllVersions != null) {
-                Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
+                Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions, netexDao);
                 for (Stop stop : stops) {
                     transitBuilder.getStops().add(stop);
                 }

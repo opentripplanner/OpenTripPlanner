@@ -60,7 +60,7 @@ public class NetexDaoTest {
     }
 
     @Test
-    public void lookupQuayIdByStopPointRef() throws Exception {
+    public void lookupQuayIdByStopPointRef() {
         assertNull(root.lookupQuayIdByStopPointRef(ID));
         assertNull(child.lookupQuayIdByStopPointRef(ID));
 
@@ -75,7 +75,7 @@ public class NetexDaoTest {
     }
 
     @Test
-    public void lookupQuayById() throws Exception {
+    public void lookupQuayById() {
         Quay quayA = quay(ID, null);
         Quay quayB = quay(ID, "image_1");
 

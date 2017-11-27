@@ -14,6 +14,7 @@
 */
 package org.opentripplanner.netex.loader;
 
+import com.google.common.collect.Iterables;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -61,9 +62,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -239,17 +243,15 @@ public class NetexLoader {
                     if (assignment.getValue() instanceof PassengerStopAssignment) {
                         PassengerStopAssignment passengerStopAssignment = (PassengerStopAssignment) assignment
                                 .getValue();
+                        String quayRef = passengerStopAssignment.getQuayRef().getRef();
                         if (passengerStopAssignment.getQuayRef() != null) {
-                            Quay quay = currentNetexDao()
-                                    .lookupQuayById(passengerStopAssignment.getQuayRef().getRef());
-                            if (quay != null) {
+                            Quay quay = currentNetexDao().lookupQuayLastVersionById(quayRef);
                                 currentNetexDao().addQuayIdByStopPointRef(
-                                        passengerStopAssignment.getScheduledStopPointRef()
-                                                .getValue().getRef(), quay.getId());
-                            } else {
-                                LOG.warn("Quay " + passengerStopAssignment.getQuayRef().getRef()
-                                        + " not found in stop place file.");
-                            }
+                                        passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
+                                        quay.getId()
+                                );
+                        } else {
+                            LOG.warn("Quay " + quayRef + " not found in stop place file.");
                         }
                     }
                 }

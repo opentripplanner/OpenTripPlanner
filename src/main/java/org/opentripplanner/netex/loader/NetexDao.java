@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -14,10 +15,12 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class holds indexes of Netex objects for lookup during
@@ -57,7 +60,7 @@ public class NetexDao {
 
     private final Multimap<String, StopPlace> stopPlaceById = ArrayListMultimap.create();
 
-    private final Map<String, Quay> quayById = new HashMap<>();
+    private final Multimap<String, Quay> quayById = ArrayListMultimap.create();
 
     private String timeZone;
 
@@ -108,9 +111,15 @@ public class NetexDao {
     /**
      * Lookup quay in this class and if not found delegate up to the parent NetexDao.
      */
-    Quay lookupQuayById(String id) {
-        Quay v = quayById.get(id);
+    public Collection<Quay> lookupQuayById(String id) {
+        Collection<Quay> v = quayById.get(id);
         return returnLocalValue(v) ? v : parent.lookupQuayById(id);
+    }
+
+    Quay lookupQuayLastVersionById(String id) {
+        return lookupQuayById(id).stream()
+                .max(Comparator.comparingInt(o2 -> Integer.parseInt(o2.getVersion())))
+                .orElse(null);
     }
 
     void addDayTypeAvailable(String dayType, Boolean available) {
