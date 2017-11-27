@@ -372,8 +372,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;
-                weight = costs * (elevationUtilsSpeed / speed);
-                //weight = costs * scale factor (that you get from the front end slider)
+                double slopeWeight = costs * (elevationUtilsSpeed / speed);
+                weight = costs * scaleFactor;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code

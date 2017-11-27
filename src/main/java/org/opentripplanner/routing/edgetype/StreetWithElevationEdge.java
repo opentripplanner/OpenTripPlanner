@@ -40,6 +40,8 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     private float maxSlope;
 
+    private float slopeFactor;
+
     private boolean flattened;
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -92,6 +94,9 @@ public class StreetWithElevationEdge extends StreetEdge {
     public float getMaxSlope() {
         return maxSlope;
     }
+
+    @Override
+    public float getSlopeFactor() { return slopeFactor; }
 
     @Override
     public double getSlopeSpeedEffectiveLength() {
