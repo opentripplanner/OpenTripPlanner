@@ -733,7 +733,63 @@ otp.widgets.tripoptions.MaxSlopeSelector =
     },
 
     isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+        return otp.util.Itin.includesWalk(mode);
+    }
+
+});
+
+otp.widgets.tripoptions.SlopeFactorSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+
+    selectorWidget : null,
+
+    lastSliderValue : null,
+
+    initialize : function(tripWidget) {
+        var this_ = this;
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-slopeFactor";
+
+        ich['otp-tripOptions-slopeFactor']({
+            widgetId : this.id,
+            //TRANSLATORS: label Max Slope
+            slopeFactor: _tr("Slope Factor"),
+            maxSlopeFactor: _tr("100.0%"),
+            minSlopeFactor: _tr("0.0%")
+        }).appendTo(this.$());
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $('#'+this.id+'-weightSlider').slider({
+            min : 0.0,
+            max : 1.0,
+            step: 0.0001,
+            value : this_.lastSliderValue || 1.0,
+        })
+        .on({
+            slidechange: function(evt) {
+                this_.lastSliderValue = $(this).slider('value');
+                this_.tripWidget.inputChanged({
+                    slopeFactor : this_.lastSliderValue,
+                });
+                $('#'+this_.id+'-curSlopeFactor').text("Current slope factor: " + (this_.lastSliderValue * 100) + "%");
+            },
+        });
+    },
+
+    restorePlan : function(planData) {
+        if(planData.queryParams.slopeFactor) {
+            this.lastSliderValue = planData.queryParams.slopeFactor;
+            $('#'+this.id+'-weightSlider').slider('value', this.lastSliderValue);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesWalk(mode);
     }
 
 });

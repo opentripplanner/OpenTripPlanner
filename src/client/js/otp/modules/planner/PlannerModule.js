@@ -24,6 +24,7 @@ otp.modules.planner.defaultQueryParams = {
     mode                            : "TRANSIT,WALK",
     maxWalkDistance                 : 804.672, // 1/2 mi.
     maxSlope                        : 0.0833333333,
+    slopeFactor                     : 1.0,
     metricDefaultMaxWalkDistance    : 750, // meters
     imperialDefaultMaxWalkDistance  : 804.673, // 0.5 mile
     preferredRoutes                 : null,
@@ -341,7 +342,8 @@ otp.modules.planner.PlannerModule =
                 date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance,
-                maxSlope: this.maxSlope
+                maxSlope: this.maxSlope,
+                slopeFactor: this.slopeFactor
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });

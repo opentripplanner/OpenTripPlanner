@@ -198,8 +198,11 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
+        if (getMaxSlope() > options.maxSlope) {
+            return false;
+        }
         if (options.wheelchairAccessible) {
-            if (getMaxSlope() > options.maxSlope) {
+            if (!isWheelchairAccessible()) {
                 return false;
             }
         }
