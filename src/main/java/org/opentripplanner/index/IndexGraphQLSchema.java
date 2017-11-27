@@ -731,7 +731,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("url")
-                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("timezone")
