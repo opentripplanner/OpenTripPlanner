@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
-
 /**
  * Models boarding or alighting a vehicle - that is to say, traveling from a state off 
  * vehicle to a state on vehicle. When traversed forward on a boarding or backwards on an 
@@ -268,7 +267,12 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
-                TripTimes tripTimes = getNextTrip(s0, sd);
+                /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
+                Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
+                /* Skip this day/timetable if no trip in it could possibly be useful. */
+                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding))
+                    continue;
+                TripTimes tripTimes = getNextTrip(s0, sd, timetable);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
                     int wait = calculateWait(s0, sd, tripTimes);
@@ -363,16 +367,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         return 0;
     }
 
-    public TripTimes getNextTrip(State s0, ServiceDay sd) {
-        RoutingRequest options = s0.getOptions();
-        Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-                /* Skip this day/timetable if no trip in it could possibly be useful. */
-        // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
-        // However, experiments seem to show very little measurable improvement here (due to cache locality?)
-        // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
-                /* Find the next or prev departure depending on final boolean parameter. */
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
-        return tripTimes;
+    public TripTimes getNextTrip(State s0, ServiceDay sd, Timetable timetable) {
+        return timetable.getNextTrip(s0, sd, stopIndex, boarding);
     }
 
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {

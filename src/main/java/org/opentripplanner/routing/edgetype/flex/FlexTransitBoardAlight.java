@@ -72,29 +72,31 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     }
 
     @Override
-    public TripTimes getNextTrip(State s0, ServiceDay sd) {
+    public TripTimes getNextTrip(State s0, ServiceDay sd, Timetable timetable) {
         if (hop.isUnscheduled()) {
             RoutingRequest options = s0.getOptions();
-            Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
             int time = (int) Math.round(hop.timeLowerBound(options));
             return timetable.getNextCallNRideTrip(s0, sd, getStopIndex(), boarding, time);
         }
         double adjustment = boarding ? startIndex : -1 * (1 - endIndex);
-        RoutingRequest options = s0.getOptions();
-        Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
-        TripTimes tripTimes = timetable.getNextTrip(s0, sd, getStopIndex(), boarding, adjustment, hop.getStartVehicleTime(), hop.getEndVehicleTime());
-        return tripTimes;
+        return timetable.getNextTrip(s0, sd, getStopIndex(), boarding, adjustment, hop.getStartVehicleTime(), hop.getEndVehicleTime());
     }
 
     @Override
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
         if (hop.isUnscheduled()) {
             int currTime = sd.secondsSinceMidnight(s0.getTimeSeconds());
+            boolean useClockTime = !s0.getOptions().ignoreDrtAdvanceBookMin;
+            long clockTime = s0.getOptions().clockTimeSec;
             if (boarding) {
-                int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime);
+                int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime, sd, useClockTime, clockTime);
+                if (scheduledTime < 0)
+                    throw new IllegalArgumentException("Unexpected bad wait time");
                 return (int) (sd.time(scheduledTime) - s0.getTimeSeconds());
             } else {
-                int scheduledTime = tripTimes.getCallAndRideAlightTime(getStopIndex(), currTime, (int) hop.timeLowerBound(s0.getOptions()));
+                int scheduledTime = tripTimes.getCallAndRideAlightTime(getStopIndex(), currTime, (int) hop.timeLowerBound(s0.getOptions()), sd, useClockTime, clockTime);
+                if (scheduledTime < 0)
+                    throw new IllegalArgumentException("Unexpected bad wait time");
                 return (int) (s0.getTimeSeconds() - (sd.time(scheduledTime)));
             }
         }

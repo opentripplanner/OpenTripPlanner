@@ -244,6 +244,8 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         Stop currentStop = pattern.getStop(stopIndex);
         int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        boolean useClockTime = !s0.getOptions().ignoreDrtAdvanceBookMin;
+        long clockTime = s0.getOptions().clockTimeSec;
         for (TripTimes tt : tripTimes) {
             if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
@@ -251,15 +253,15 @@ public class Timetable implements Serializable {
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
             if (boarding) {
-                int depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime);
-                if (depTime >= adjustedTime && depTime < bestTime) {
+                int depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime, serviceDay, useClockTime, clockTime);
+                if (depTime >= adjustedTime && depTime < bestTime && inBounds(depTime)) {
                     bestTrip = tt;
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, directTime);
+                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, directTime, serviceDay, useClockTime, clockTime);
                 if (arvTime < 0) continue;
-                if (arvTime <= adjustedTime && arvTime > bestTime) {
+                if (arvTime <= adjustedTime && arvTime > bestTime && inBounds(arvTime)) {
                     bestTrip = tt;
                     bestTime = arvTime;
                 }
@@ -269,6 +271,9 @@ public class Timetable implements Serializable {
         return bestTrip;
     }
 
+    private boolean inBounds(int time) {
+        return time >= minTime && time <= maxTime;
+    }
 
     /**
      * Check transfer table rules. Given the last alight time from the State,
@@ -625,6 +630,14 @@ public class Timetable implements Serializable {
             TripTimes tt = freq.tripTimes;
             tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }
+    }
+
+    public int getMaxTime() {
+        return maxTime;
+    }
+
+    public int getMinTime() {
+        return minTime;
     }
 
 } 

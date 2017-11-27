@@ -425,6 +425,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useEligibilityServices = true;
 
     /**
+     * Whether to ignore DRT time limits
+     */
+    public boolean ignoreDrtAdvanceBookMin = false;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
      * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
@@ -494,6 +499,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
     private StreetEdge splitEdge = null;
+
+    public long clockTimeSec;
 
     /* CONSTRUCTORS */
 
@@ -1011,7 +1018,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && tripDiscoveryMode == other.tripDiscoveryMode;
+                && tripDiscoveryMode == other.tripDiscoveryMode
+                && ignoreDrtAdvanceBookMin == other.ignoreDrtAdvanceBookMin;
     }
 
     /**
@@ -1043,7 +1051,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
-                + new Boolean(tripDiscoveryMode).hashCode() * 209477;
+                + new Boolean(tripDiscoveryMode).hashCode() * 209477
+                + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 1371;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1287,5 +1296,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setTripDiscoveryMode(boolean tripDiscoveryMode) {
         this.tripDiscoveryMode = tripDiscoveryMode;
+    }
+
+    public void resetClockTime() {
+        this.clockTimeSec = System.currentTimeMillis() / 1000;
     }
 }

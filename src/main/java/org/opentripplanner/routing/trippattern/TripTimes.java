@@ -18,12 +18,12 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Polygon;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -325,14 +325,35 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
     }
 
-    public int getCallAndRideBoardTime(int stop, long currTime) {
-        return (int) Math.min(Math.max(currTime, getDepartureTime(stop)), getArrivalTime(stop + 1));
+    public int getCallAndRideBoardTime(int stop, long currTime, ServiceDay sd, boolean useClockTime, long startClockTime) {
+        int ret = (int) Math.min(Math.max(currTime, getDepartureTime(stop)), getArrivalTime(stop + 1));
+        if (useClockTime) {
+            int clockTime = sd.secondsSinceMidnight(startClockTime) + (trip.getDrtAdvanceBookMin() * 60);
+            if (ret >= clockTime) {
+                return ret;
+            } else if (clockTime < getArrivalTime(stop + 1)) {
+                return clockTime;
+            } else {
+                return -1;
+            }
+        }
+        return ret;
     }
 
-    public int getCallAndRideAlightTime(int stop, long currTime, int directTime) {
+    public int getCallAndRideAlightTime(int stop, long currTime, int directTime, ServiceDay sd, boolean useClockTime, long startClockTime) {
         int travelTime = getDemandResponseMaxTime(directTime);
         currTime -= travelTime;
         int startOfService = (int) Math.min(Math.max(currTime, getDepartureTime(stop - 1)), getArrivalTime(stop));
+        if (useClockTime) {
+            int clockTime = sd.secondsSinceMidnight(startClockTime) + (trip.getDrtAdvanceBookMin() * 60);
+            if (startOfService >= clockTime) {
+                // do nothing
+            } else if (clockTime < getArrivalTime(stop)) {
+                startOfService = clockTime;
+            } else {
+                return -1;
+            }
+        }
         return startOfService + travelTime;
     }
 

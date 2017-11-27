@@ -383,6 +383,11 @@ public abstract class RoutingResource {
     @QueryParam("useEligibilityServices")
     protected Boolean useEligibilityServices = true;
 
+    /**
+     * Whether to ignore DRT time limits
+     */
+    @QueryParam("ignoreDrtAdvanceBookMin")
+    protected Boolean ignoreDrtAdvanceBookMin;
 
     @QueryParam("maxHours")
     private Double maxHours;
@@ -450,6 +455,8 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+
+            request.resetClockTime();
         }
 
         if (wheelchair != null)
@@ -640,6 +647,9 @@ public abstract class RoutingResource {
 
         if (useEligibilityServices != null)
             request.useEligibilityServices = useEligibilityServices;
+
+        if (ignoreDrtAdvanceBookMin != null)
+            request.ignoreDrtAdvanceBookMin = ignoreDrtAdvanceBookMin;
 
         if (maxHours != null)
             request.maxHours = maxHours;
