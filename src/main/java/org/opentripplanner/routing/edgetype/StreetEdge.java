@@ -247,7 +247,6 @@ public class StreetEdge extends Edge implements Cloneable {
     public float getMaxSlope() {
         return 0.0f;
     }
-
     @Override
     public double getDistance() {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
@@ -376,7 +375,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;
                 double slopeWeight = costs * (elevationUtilsSpeed / speed);
-                weight = costs * scaleFactor;
+                weight = slopeWeight * options.slopeFactor + time * (1 - options.slopeFactor);
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
