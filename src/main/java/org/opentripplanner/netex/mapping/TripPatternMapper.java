@@ -74,12 +74,13 @@ public class TripPatternMapper {
 
                 Stop quay = findQuay(ref, journeyPattern, netexDao, transitBuilder);
 
-                if (quay == null) {
-                    LOG.warn("Quay not found for timetabledPassingTimes: " + passingTime.getId());
-                } else {
-                    stopTimes.add(mapToStopTime(trip, findStopPoint(ref, journeyPattern), quay,
-                            passingTime, stopSequence));
+                if (quay != null) {
+                    StopPointInJourneyPattern stopPoint = findStopPoint(ref, journeyPattern);
+                    StopTime stopTime = mapToStopTime(trip, stopPoint, quay, passingTime, stopSequence, netexDao);
+                    stopTimes.add(stopTime);
                     ++stopSequence;
+                } else {
+                    LOG.warn("Quay not found for timetabledPassingTimes: " + passingTime.getId());
                 }
             }
 
@@ -121,7 +122,7 @@ public class TripPatternMapper {
     }
 
     private StopTime mapToStopTime(Trip trip, StopPointInJourneyPattern stopPoint, Stop quay,
-            TimetabledPassingTime passingTime, int stopSequence) {
+                                   TimetabledPassingTime passingTime, int stopSequence, NetexDao netexDao) {
         StopTime stopTime = new StopTime();
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
@@ -142,6 +143,13 @@ public class TripPatternMapper {
 
         if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
             LOG.warn("Time missing for trip " + trip.getId());
+        }
+
+        if (stopPoint.getDestinationDisplayRef() != null) {
+            String destinationRef = stopPoint.getDestinationDisplayRef().getRef();
+            if (netexDao.getDestinationDisplayMap().containsKey(destinationRef)) {
+                stopTime.setStopHeadsign(netexDao.getDestinationDisplayMap().get(destinationRef).getFrontText().getValue());
+            }
         }
 
         return stopTime;

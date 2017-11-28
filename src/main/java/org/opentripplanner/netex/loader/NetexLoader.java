@@ -27,6 +27,7 @@ import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
+import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
 import org.rutebanken.netex.model.Journey_VersionStructure;
@@ -297,6 +298,13 @@ public class NetexLoader {
                     if (pattern.getValue() instanceof JourneyPattern) {
                         currentNetexDao().addJourneyPattern((JourneyPattern) pattern.getValue());
                     }
+                }
+            }
+
+            //destinationDisplays
+            if (sf.getDestinationDisplays() != null) {
+                for (DestinationDisplay destinationDisplay : sf.getDestinationDisplays().getDestinationDisplay()) {
+                    currentNetexDao().getDestinationDisplayMap().put(destinationDisplay.getId(), destinationDisplay);
                 }
             }
         }

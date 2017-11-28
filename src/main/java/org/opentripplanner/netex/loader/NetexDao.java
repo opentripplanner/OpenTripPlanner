@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.loader;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
+import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.OperatingPeriod;
@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * This class holds indexes of Netex objects for lookup during
@@ -61,6 +60,8 @@ public class NetexDao {
     private final Multimap<String, StopPlace> stopPlaceById = ArrayListMultimap.create();
 
     private final Multimap<String, Quay> quayById = ArrayListMultimap.create();
+
+    private final Map<String, DestinationDisplay> destinationDisplayMap = new HashMap<>();
 
     private String timeZone;
 
@@ -267,5 +268,9 @@ public class NetexDao {
 
     private static boolean notEmpty(Collection c) {
         return !(c == null || c.isEmpty());
+    }
+
+    public Map<String, DestinationDisplay> getDestinationDisplayMap() {
+        return destinationDisplayMap;
     }
 }
