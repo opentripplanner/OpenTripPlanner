@@ -64,10 +64,9 @@ public class UnknownTransferConsequencesStrategy extends SingleOptionStrategy<Bo
                         boolean feedTransfer = transferTable.hasFeedTransfers(fromFeed, toFeed, true);
                         if (feedTransfer && mainSearchUnknownTransfers) {
                             alerts.add(Alert.createSimpleAlerts("Unknown transfer",
-                                    "Forbidden unknown transfer: from stop " + fromStop.getId() + " to " + toStop.getId() + " (" +
-                                            fromStop.getName() + " to " + toStop.getName() + ")"
-                                            + "; route " + shortName(fromTrip) + " to " + shortName(toTrip)
-                                            + " [ itinerary: " + getItineraryString(path) + " ]"));
+                                    "Alternate itinerary available with unknown transfer: "
+                                    + getItineraryString(path)
+                                    + " (transfer from " + fromStop.getName() + " to " + toStop.getName() + ")"));
                         }
                     }
                 }
@@ -77,10 +76,7 @@ public class UnknownTransferConsequencesStrategy extends SingleOptionStrategy<Bo
     }
 
     private static String getItineraryString(GraphPath path) {
-        return path.getRoutes().stream().map(AgencyAndId::getId).collect(Collectors.joining(", "));
+        return path.getRoutes().stream().map(AgencyAndId::getId).collect(Collectors.joining(" → "));
     }
-
-    private static String shortName(Trip trip) {
-        return trip.getRoute().getShortName() != null ? trip.getRoute().getShortName() : trip.getRoute().getLongName();
-    }
+    
 }
