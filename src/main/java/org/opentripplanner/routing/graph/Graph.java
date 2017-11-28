@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.graph;
 
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -49,6 +48,7 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.consequences.ConsequencesStrategyFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -67,6 +67,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -215,6 +216,9 @@ public class Graph implements Serializable {
 
     /** Landmarks **/
     public Map<String, Landmark> landmarksByName = new HashMap<>();
+
+    /** Consequences strategy */
+    public ConsequencesStrategyFactory consequencesStrategy;
 
     public GraphVersion graphVersion = null;
 

@@ -20,6 +20,7 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -46,7 +47,7 @@ public class GraphPath {
     // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
 
-    private List<AlertPatch> realtimeConsequences = Collections.emptyList();
+    private List<Alert> realtimeConsequences = Collections.emptyList();
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -236,11 +237,11 @@ public class GraphPath {
         return rctx;
     }
 
-    public List<AlertPatch> getRealtimeConsequences() {
+    public List<Alert> getRealtimeConsequences() {
         return realtimeConsequences;
     }
 
-    public void setRealtimeConsequences(List<AlertPatch> realtimeConsequences) {
+    public void setRealtimeConsequences(List<Alert> realtimeConsequences) {
         this.realtimeConsequences = realtimeConsequences;
     }
 }

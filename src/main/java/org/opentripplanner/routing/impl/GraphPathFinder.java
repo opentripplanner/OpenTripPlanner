@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
@@ -31,6 +31,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.consequences.ConsequencesStrategy;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
@@ -136,10 +137,12 @@ public class GraphPathFinder {
         options.longDistance = true;
 
         /*
-         * In order to find service alerts which may have impacted your route, start with ignoreRealtimeUpdates = true
+         * See what may have impacted your route
          */
-        if (options.findRealtimeConsequences && options.modes.isTransit()) {
-            options.ignoreRealtimeUpdates = true;
+        ConsequencesStrategy consequencesStrategy = null;
+        boolean findRealtimeConsequences = options.rctx.graph.consequencesStrategy != null && options.findRealtimeConsequences && options.modes.isTransit();
+        if (findRealtimeConsequences) {
+            consequencesStrategy = options.rctx.graph.consequencesStrategy.create(options);
         }
 
         /* In long distance mode, maxWalk has a different meaning than it used to.
@@ -152,7 +155,7 @@ public class GraphPathFinder {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
-        List<AlertPatch> realtimeConsequences = Lists.newArrayList();
+        List<Alert> realtimeConsequences = Lists.newArrayList();
         while (paths.size() < options.numItineraries) {
             // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
             int timeoutIndex = paths.size();
@@ -184,19 +187,10 @@ public class GraphPathFinder {
                 newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
             }
 
-            if (options.findRealtimeConsequences && options.ignoreRealtimeUpdates) {
-                for (GraphPath path : newPaths) {
-                    for (State s : path.states) {
-                        if (s.getBackEdge() != null) {
-                            for (AlertPatch alert : options.rctx.graph.getAlertPatches(s.getBackEdge())) {
-                                if (alert.displayDuring(s) && alert.isRoutingConsequence()) {
-                                    realtimeConsequences.add(alert);
-                                }
-                            }
-                        }
-                    }
-                }
-                options.ignoreRealtimeUpdates = false;
+            if (findRealtimeConsequences) {
+                realtimeConsequences.addAll(consequencesStrategy.getConsequences(newPaths));
+                findRealtimeConsequences = consequencesStrategy.hasAnotherStrategy();
+                consequencesStrategy.postprocess();
                 continue;
             }
 

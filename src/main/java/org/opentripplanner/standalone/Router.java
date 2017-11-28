@@ -14,13 +14,20 @@ import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.consequences.ConsequencesStrategyFactory;
+import org.opentripplanner.routing.consequences.ElevatorConsequencesStrategy;
+import org.opentripplanner.routing.consequences.MultipleConsequencesStrategy;
+import org.opentripplanner.routing.consequences.UnknownTransferConsequencesStrategy;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
@@ -164,6 +171,8 @@ public class Router {
         } else {
             graph.stopClusterMode = "proximity";
         }
+
+        graph.consequencesStrategy = getConsequencesStrategyConfig(config.get("consequences"));
         
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);
@@ -178,6 +187,29 @@ public class Router {
         } catch (Exception e) {
             LOG.error("Error computing ellipsoid/geoid difference");
         }
+    }
+
+    private ConsequencesStrategyFactory getConsequencesStrategyConfig(JsonNode config) {
+        if (config == null) {
+            return null;
+        }
+        if (config.isTextual()) {
+            if (config.asText().equals("elevator")) {
+                return ElevatorConsequencesStrategy::new;
+            } else if (config.asText().equals("transfers")) {
+                return UnknownTransferConsequencesStrategy::new;
+            } else {
+                throw new IllegalArgumentException("Bad configuration for consequences strategy");
+            }
+        } else if (config.isArray()) {
+            List<ConsequencesStrategyFactory> factoryList = new ArrayList<>();
+            Iterator<JsonNode> iter = config.iterator();
+            while (iter.hasNext()) {
+                factoryList.add(getConsequencesStrategyConfig(iter.next()));
+            }
+            return opt -> new MultipleConsequencesStrategy(opt, factoryList);
+        }
+        return null;
     }
 
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */

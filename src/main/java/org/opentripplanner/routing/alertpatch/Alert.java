@@ -57,6 +57,13 @@ public class Alert implements Serializable {
         return note;
     }
 
+    public static Alert createSimpleAlerts(String header, String description) {
+        Alert note = new Alert();
+        note.alertHeaderText = new NonLocalizedString(header);
+        note.alertDescriptionText = new NonLocalizedString(description);
+        return note;
+    }
+
     public boolean equals(Object o) {
         if (!(o instanceof Alert)) {
             return false;
