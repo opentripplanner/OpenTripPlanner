@@ -115,6 +115,8 @@ public class Timetable implements Serializable {
      * @param bestWait -1 means there is not yet any best known time.
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
+        if (this.pattern.services == null)
+            return true;
         // Check whether any services are running at all on this pattern.
         if ( ! sd.anyServiceRunning(this.pattern.services)) return false;
         // Make the search time relative to the given service day.
