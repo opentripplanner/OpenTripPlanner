@@ -15,6 +15,7 @@ package org.opentripplanner.graph_builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import org.opentripplanner.common.walk.WalkComfortCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
@@ -27,7 +28,6 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -246,6 +246,8 @@ public class GraphBuilder implements Runnable {
             osmModule.staticParkAndRide = builderParams.staticParkAndRide;
             osmModule.banDiscouragedWalking = builderParams.banDiscouragedWalking;
             osmModule.banDiscouragedBiking = builderParams.banDiscouragedBiking;
+            osmModule.walkConfig = OTPMain.loadJson(new File(dir, WalkComfortCalculator.WALK_CONFIG_FILENAME));
+            osmModule.includeOsmTags = builderParams.includeOsmTags;
             graphBuilder.addModule(osmModule);
             PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
             pruneFloatingIslands.setPruningThresholdIslandWithoutStops(builderParams.pruningThresholdIslandWithoutStops);

@@ -157,6 +157,8 @@ public class GraphBuilderParameters {
      */
     public final double maxTransferDistance;
 
+    public final boolean includeOsmTags;
+
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
@@ -190,6 +192,7 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
+        includeOsmTags = config.path("includeOsmTags").asBoolean(false);
     }
 
 }
