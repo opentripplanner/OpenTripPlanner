@@ -8,6 +8,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.sentry.Sentry;
+import io.sentry.context.Context;
+import io.sentry.event.Event;
+import io.sentry.event.EventBuilder;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -40,6 +46,8 @@ public class GraphQlPlanner {
 
     private GraphIndex index;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
     }
@@ -48,7 +56,22 @@ public class GraphQlPlanner {
 
         Router router = (Router)environment.getContext();
 
+        Context sentryContext = Sentry.getContext();
+
         RoutingRequest request = createRequest(environment);
+
+        sentryContext.addExtra("from",request.from.toDescriptiveString());
+        sentryContext.addExtra("to",request.to.toDescriptiveString());
+        sentryContext.addExtra("time",request.getDateTime().toString());
+        sentryContext.addExtra("zoneids",request.getZoneIdSet().toString());
+        sentryContext.addExtra("walkReluctance",request.walkReluctance);
+        sentryContext.addExtra("walkSpeed",request.walkSpeed);
+        sentryContext.addExtra("transferPenalty",request.transferPenalty);
+        sentryContext.addExtra("walkBoardCost",request.walkBoardCost);
+        sentryContext.addExtra("minTransferTime",request.transferSlack);
+        sentryContext.addExtra("modes",request.modes.toString());
+        sentryContext.addExtra("arriveBy",request.arriveBy);
+
         GraphPathFinder gpFinder = new GraphPathFinder(router);
 
         TripPlan plan = new TripPlan(
@@ -80,6 +103,32 @@ public class GraphQlPlanner {
             }
         }
 
+        sentryContext.addExtra("aborted",request.rctx.aborted);
+        sentryContext.addExtra("timedOut",request.rctx.debugOutput.timedOut);
+
+
+        try {
+            sentryContext.addExtra("debugOutput",mapper.writeValueAsString(request.rctx.debugOutput));
+        } catch (JsonProcessingException e) {
+            LOG.warn("Unable to serialize debugOutput");
+        }
+        sentryContext.addExtra("messages",Arrays.toString(messages.toArray()));
+
+        if (request.rctx.debugOutput.timedOut) {
+            EventBuilder eventBuilder = new EventBuilder()
+                    .withMessage("Search timeout")
+                    .withLevel(Event.Level.ERROR)
+                    .withLogger(LOG.getName());
+            Sentry.capture(eventBuilder);
+        }
+
+        if (plan.itinerary.isEmpty()) {
+            EventBuilder eventBuilder = new EventBuilder()
+                    .withMessage("Zero routes found")
+                    .withLevel(Event.Level.ERROR)
+                    .withLogger(LOG.getName());
+            Sentry.capture(eventBuilder);
+        }
 
         return ImmutableMap.<String, Object>builder()
             .put("plan", plan)
