@@ -117,8 +117,12 @@ public class WalkStep {
      * distance.
      */
     @XmlTransient
+    @JsonSerialize
     public List<P2<Double>> elevation;
 
+    /**
+     * A list of alerts relevant to this step.
+     */
     @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;

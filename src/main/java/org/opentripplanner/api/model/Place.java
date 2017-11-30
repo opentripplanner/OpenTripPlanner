@@ -73,6 +73,9 @@ public class Place {
     @JsonSerialize
     public String orig;
 
+    /**
+     * For transit stops, the zone of the stop, if given in GTFS.
+     */
     @XmlAttribute
     @JsonSerialize
     public String zoneId;

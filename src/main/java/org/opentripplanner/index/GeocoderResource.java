@@ -1,5 +1,6 @@
 package org.opentripplanner.index;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.OTPServer;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Response;
  * OTP simple built-in geocoder.
  * Client geocoder modules usually read XML, but GeocoderBuiltin reads JSON.
  */
+@Ignore
 @Path("/routers/{routerId}/geocode")
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {

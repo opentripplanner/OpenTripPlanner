@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.standalone.OTPServer;
@@ -36,6 +37,7 @@ import org.opentripplanner.standalone.Router;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
+@Ignore
 @Path("/routers/{routerId}/bike_rental")
 @XmlRootElement
 public class BikeRental {

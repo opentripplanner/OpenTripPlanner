@@ -23,6 +23,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -57,7 +58,8 @@ public abstract class RoutingResource {
      * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
      * path parameter should be included in the path annotations of all its subclasses.
      */
-    @PathParam("routerId") 
+    @Ignore
+    @PathParam("routerId")
     public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
@@ -73,7 +75,7 @@ public abstract class RoutingResource {
     /** An ordered list of intermediate locations to be visited (see the fromPlace for format). Parameter can be specified multiple times. */
     @QueryParam("intermediatePlaces")
     protected List<String> intermediatePlaces;
-
+    
     /** An un-ordered list of destination locations **/
     @QueryParam("toPlaces")
     protected List<String> toPlaces;
@@ -82,19 +84,19 @@ public abstract class RoutingResource {
     @QueryParam("fromPlaces")
     protected List<String> fromPlaces;
 
-    /** The date that the trip should depart (or arrive, for requests where arriveBy is true). */
+    /** The date that the trip should depart (or arrive, for requests where arriveBy is true). For example: <code>09/01/2017</code> */
     @QueryParam("date")
     protected String date;
     
-    /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
+    /** The time that the trip should depart (or arrive, for requests where arriveBy is true). Example: <code>9:00 am</code> */
     @QueryParam("time")
     protected String time;
     
-    /** Whether the trip should depart or arrive at the specified date and time. */
+    /** Whether the trip should depart or arrive at the specified date and time. Defaults to false (depart-at specified time). */
     @QueryParam("arriveBy")
     protected Boolean arriveBy;
     
-    /** Whether the trip must be wheelchair accessible. */
+    /** Whether the trip must be wheelchair accessible. <code>true</code> or <code>false</code>.*/
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
 
@@ -107,6 +109,7 @@ public abstract class RoutingResource {
      * ride or kiss and ride). Defaults to unlimited.
      */
     @QueryParam("maxPreTransitTime")
+    @Ignore
     protected Integer maxPreTransitTime;
 
     /**
@@ -115,6 +118,7 @@ public abstract class RoutingResource {
      * of not wanting to walk too much without asking for totally ridiculous itineraries, but this
      * observation should in no way be taken as scientific or definitive. Your mileage may vary.
      */
+    @Ignore
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
 
@@ -131,10 +135,12 @@ public abstract class RoutingResource {
      * If we only tried the shortest possible transfer at each stop to neighboring stop patterns,
      * this problem could disappear.
      */
+    @Ignore
     @QueryParam("waitReluctance")
     protected Double waitReluctance;
 
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
+    @Ignore
     @QueryParam("waitAtBeginningFactor")
     protected Double waitAtBeginningFactor;
 
@@ -148,41 +154,68 @@ public abstract class RoutingResource {
 
     /** The time it takes the user to fetch their bike and park it again in seconds.
      *  Defaults to 0. */
+    @Ignore
     @QueryParam("bikeSwitchTime")
     protected Integer bikeSwitchTime;
 
     /** The cost of the user fetching their bike and parking it again.
      *  Defaults to 0. */
+    @Ignore
     @QueryParam("bikeSwitchCost")
     protected Integer bikeSwitchCost;
 
     /** For bike triangle routing, how much safety matters (range 0-1). */
+    @Ignore
     @QueryParam("triangleSafetyFactor")
     protected Double triangleSafetyFactor;
     
     /** For bike triangle routing, how much slope matters (range 0-1). */
+    @Ignore
     @QueryParam("triangleSlopeFactor")
     protected Double triangleSlopeFactor;
     
-    /** For bike triangle routing, how much time matters (range 0-1). */            
+    /** For bike triangle routing, how much time matters (range 0-1). */
+    @Ignore
     @QueryParam("triangleTimeFactor")
     protected Double triangleTimeFactor;
 
-    /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
+    /** The set of characteristics that the user wants to optimize for. See {@link OptimizeType}.
+     *  NOTE: This only affects bicycle routing. To penalize transfers in transit searches, use transferPenalty..
+     */
+    @Ignore
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
-    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.
+     * Allowable values (order of modes in set is not significant):
+     * <table class="table">
+     *     <tr><th>mode</th><th>Parameter value</th></tr>
+     *     <tr><td>Walk only</td><td>WALK</td></tr>
+     *     <tr><td>Drive only</td><td>CAR</td></tr>
+     *     <tr><td>Bicycle only</td><td>BICYCLE</td></tr>
+     *     <tr><td>Transit</td><td>TRANSIT,WALK</td></tr>
+     *     <tr><td>Park-and-ride</td><td>CAR_PARK,TRANSIT</td></tr>
+     *     <tr><td>Kiss-and-ride</td><td>CAR,TRANSIT</td></tr>
+     *     <tr><td>Bicycle and transit</td><td>BICYCLE,TRANSIT</td></tr>
+     *     <tr><td>Bicycle and ride</td><td>BICYCLE_PARK,TRANSIT</td></tr>
+     *     <tr><td>Bikeshare</td><td>BICYCLE_RENT</td></tr>
+     *     <tr><td>Bikeshare and transit</td><td>BICYCLE_RENT,TRANSIT</td></tr>
+     * </table>
+     *
+     * In addition, restrict transit usage to a mode by replacing TRANSIT with any subset of the following:
+     * SUBWAY, RAIL, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR, AIRPLANE
+     */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
+    @Ignore
     @QueryParam("minTransferTime")
     protected Integer minTransferTime;
 
-    /** The maximum number of possible itineraries to return. */
+    /** The maximum number of possible itineraries to return. Default is 3. */
     @QueryParam("numItineraries")
     protected Integer numItineraries;
 
@@ -195,6 +228,7 @@ public abstract class RoutingResource {
 
     /** Penalty added for using every route that is not preferred if user set any route as preferred, i.e. number of seconds that we are willing
      * to wait for preferred route. */
+    @Ignore
     @QueryParam("otherThanPreferredRoutesPenalty")
     protected Integer otherThanPreferredRoutesPenalty;
 
@@ -262,13 +296,15 @@ public abstract class RoutingResource {
      * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
      * is used when boarding while walking.
      */
+    @Ignore
     @QueryParam("walkBoardCost")
     protected Integer walkBoardCost;
     
     /**
      * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
-     * is used when boarding while cycling. This is usually higher that walkBoardCost.
+     * is used when boarding while cycling. This is usually higher that walkBoardCost. Defaults to 600.
      */
+    @Ignore
     @QueryParam("bikeBoardCost")
     protected Integer bikeBoardCost;
     
@@ -279,7 +315,15 @@ public abstract class RoutingResource {
     @QueryParam("bannedRoutes")
     protected String bannedRoutes;
     
-    /** The comma-separated list of banned agencies. */
+    /**
+     * The comma-separated list of banned agencies. For any entity (route, agency, trip, or stop), if it is:
+     *  <ul>
+     *      <li><b>banned</b>: will not appear in trip plan results</li>
+     *      <li><b>unpreferred</b>: a penalty is applied during the graph search; may still appear in results.</li>
+     *      <li><b>preferred</b>: a penalty is applied to other entities during the graph search.</li>
+     *  </ul>
+     *
+     */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
     
@@ -314,6 +358,7 @@ public abstract class RoutingResource {
      * value to discourage transfers.  Of course, transfers that save significant
      * time or walking will still be taken.
      */
+    @Ignore
     @QueryParam("transferPenalty")
     protected Integer transferPenalty;
     
@@ -325,6 +370,7 @@ public abstract class RoutingResource {
      * significant time or walking will still be taken.
      * When no preferred or timed transfer is defined, this value is ignored.
      */
+    @Ignore
     @QueryParam("nonpreferredTransferPenalty")
     protected Integer nonpreferredTransferPenalty;
 
@@ -335,21 +381,32 @@ public abstract class RoutingResource {
     protected Boolean unknownTransfersAreForbidden;
 
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
-     *  that a trip will be allowed.  Larger values will slow performance, but could give
-     *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
-     *  org.opentripplanner.api.ws.Planner. */
+     *  that a trip will be allowed for non-long distance search.  Larger values will slow performance, but could give
+     *  better routes. Defaults to 2.
+     *
+     *  NOTE: This value is no longer respected for /plan calls.
+     */
+    @Ignore
+    @Deprecated
     @QueryParam("maxTransfers")
     protected Integer maxTransfers;
 
-    /** If true, goal direction is turned off and a full path tree is built (specify only once) */
+    /**
+     *  If true, goal direction is turned off and a full path tree is built (specify only once)
+     *
+     *  MTA NOTE: this parameter should not be used for trip planning.
+     */
+    @Ignore
     @QueryParam("batch")
     protected Boolean batch;
 
     /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
+    @Ignore
     @QueryParam("startTransitStopId")
     protected String startTransitStopId;
 
     /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+    @Ignore
     @QueryParam("startTransitTripId")
     protected String startTransitTripId;
 
@@ -366,28 +423,46 @@ public abstract class RoutingResource {
      * A value of 0 means that initial wait time will not be subtracted out (will be clamped to 0).
      * A value of -1 (the default) means that clamping is disabled, so any amount of initial wait 
      * time will be subtracted out.
+     *
+     * MTA NOTE: This should not be used for trip planning.
      */
+    @Ignore
     @QueryParam("clampInitialWait")
     protected Long clampInitialWait;
 
     /**
      * If true, this trip will be reverse-optimized on the fly. Otherwise, reverse-optimization
      * will occur once a trip has been chosen (in Analyst, it will not be done at all).
+     *
+     * MTA NOTE: This should be considered a developer option.
      */
+    @Ignore
     @QueryParam("reverseOptimizeOnTheFly")
     protected Boolean reverseOptimizeOnTheFly;
-        
+
+    /**
+     * Minimum time it takes to board a vehicle (default is 0).
+     */
+    @Ignore
     @QueryParam("boardSlack")
     private Integer boardSlack;
-    
+
+    /**
+     * Minimum time it takes to alight a vehicle (default is 0).
+     */
+    @Ignore
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
+    /**
+     * Locale for dates, times, etc. Defaults to en_US.
+     */
+    @Ignore
     @QueryParam("locale")
     private String locale;
 
     /**
-     * If true, realtime updates are ignored during this search.
+     * If true, realtime updates are ignored during this search. Defaults to false.
      */
     @QueryParam("ignoreRealtimeUpdates")
     protected Boolean ignoreRealtimeUpdates;
@@ -395,22 +470,38 @@ public abstract class RoutingResource {
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
+     *
+     * MTA NOTE: This should be considered a developer option.
      */
+    @Ignore
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
 
+    /** The maximum duration of a returned itinerary, in hours. Default to unlimited. */
+    @Ignore
     @QueryParam("maxHours")
     private Double maxHours;
 
+    /** Whether maxHours limit should consider wait/idle time between the itinerary and the requested arrive/depart time. Defaults to false. */
+    @Ignore
     @QueryParam("useRequestedDateTimeInMaxHours")
     private Boolean useRequestedDateTimeInMaxHours;
 
+    /**
+     * Option to disable the default filtering of GTFS-RT alerts by time. Defaults to false.
+     *
+     * MTA NOTE: This should be considered a developer option.
+     */
+    @Ignore
     @QueryParam("disableAlertFiltering")
     private Boolean disableAlertFiltering;
 
     /**
-     * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.
+     * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query. Defaults to false.
+     *
+     * MTA NOTE: This should be considered a developer option.
      */
+    @Ignore
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 

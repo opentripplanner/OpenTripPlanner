@@ -1,5 +1,6 @@
 package org.opentripplanner.api.resource;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.api.model.PointSetShort;
 import org.opentripplanner.standalone.OTPServer;
@@ -24,6 +25,7 @@ import java.io.OutputStream;
  * Indicators
  * TimeSurfaces
  */
+@Ignore
 @Path("/pointsets")
 public class PointSetResource {
 

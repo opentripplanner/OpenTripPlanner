@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.resource;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.common.MavenVersion;
 
 import javax.ws.rs.GET;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+@Ignore
 @Path("/")
 @XmlRootElement 
 public class ServerInfo {

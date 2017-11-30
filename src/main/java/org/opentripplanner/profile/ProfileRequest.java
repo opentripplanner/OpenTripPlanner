@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.joda.time.LocalDate;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 /**
  * All the modifiable parameters for profile routing.
  */
+@Ignore
 public class ProfileRequest implements Serializable, Cloneable {
     private static final long serialVersionUID = -6501962907644662303L;
 
