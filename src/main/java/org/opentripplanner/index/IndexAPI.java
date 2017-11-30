@@ -77,7 +77,6 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
-@Ignore
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
@@ -598,6 +597,7 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(landmarks).build();
     }
 
+    /** Get all stops associated with a given landmark. */
     @GET
     @Path("/landmarks/{landmark}")
     public Response getLandmarkStops(@PathParam("landmark") String name) {

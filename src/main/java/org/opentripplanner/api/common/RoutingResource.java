@@ -54,17 +54,17 @@ public abstract class RoutingResource {
 
     /**
      * The routerId selects between several graphs on the same server. The routerId is pulled from
-     * the path, not the query parameters. However, the class RoutingResource is not annotated with
-     * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
-     * path parameter should be included in the path annotations of all its subclasses.
+     * the path, not the query parameters.
+     *
+     * For default router, use "default".
      */
-    @Ignore
     @PathParam("routerId")
     public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
-     *  <code>mtanyctsubway_A27_S</code>.  */
+     *  <code>mtanyctsubway_A27_S</code>. If the graph contains landmarks, a landmark can also be
+     *  used, for example, <code>Chinatown</code>.*/
     @QueryParam("fromPlace")
     protected String fromPlace;
 
@@ -75,7 +75,7 @@ public abstract class RoutingResource {
     /** An ordered list of intermediate locations to be visited (see the fromPlace for format). Parameter can be specified multiple times. */
     @QueryParam("intermediatePlaces")
     protected List<String> intermediatePlaces;
-    
+
     /** An un-ordered list of destination locations **/
     @QueryParam("toPlaces")
     protected List<String> toPlaces;
@@ -179,10 +179,11 @@ public abstract class RoutingResource {
     @QueryParam("triangleTimeFactor")
     protected Double triangleTimeFactor;
 
-    /** The set of characteristics that the user wants to optimize for. See {@link OptimizeType}.
-     *  NOTE: This only affects bicycle routing. To penalize transfers in transit searches, use transferPenalty..
+    /**
+     * The set of characteristics that the user wants to optimize for. See {@link OptimizeType}.
+     * Only QUICK, TRANSFERS, and WALKING are relevant for transit routing; all other values are for
+     * bike routing.
      */
-    @Ignore
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
@@ -244,13 +245,14 @@ public abstract class RoutingResource {
 
     /**
      * Comma-separated list of preferred route types
-     * See: https://developers.google.com/transit/gtfs/reference/extended-route-types
+     * See route types <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">reference.</a>
      */
     @QueryParam("preferredRouteTypes")
     protected String preferredRouteTypes;
 
     /**
      * Comma-separated list of banned route types
+     * See route types <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">reference.</a>
      */
     @QueryParam("bannedRouteTypes")
     protected String bannedRouteTypes;
@@ -393,8 +395,6 @@ public abstract class RoutingResource {
 
     /**
      *  If true, goal direction is turned off and a full path tree is built (specify only once)
-     *
-     *  MTA NOTE: this parameter should not be used for trip planning.
      */
     @Ignore
     @QueryParam("batch")
@@ -424,7 +424,6 @@ public abstract class RoutingResource {
      * A value of -1 (the default) means that clamping is disabled, so any amount of initial wait 
      * time will be subtracted out.
      *
-     * MTA NOTE: This should not be used for trip planning.
      */
     @Ignore
     @QueryParam("clampInitialWait")
@@ -434,7 +433,6 @@ public abstract class RoutingResource {
      * If true, this trip will be reverse-optimized on the fly. Otherwise, reverse-optimization
      * will occur once a trip has been chosen (in Analyst, it will not be done at all).
      *
-     * MTA NOTE: This should be considered a developer option.
      */
     @Ignore
     @QueryParam("reverseOptimizeOnTheFly")
@@ -470,8 +468,6 @@ public abstract class RoutingResource {
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
-     *
-     * MTA NOTE: This should be considered a developer option.
      */
     @Ignore
     @QueryParam("disableRemainingWeightHeuristic")
@@ -489,8 +485,6 @@ public abstract class RoutingResource {
 
     /**
      * Option to disable the default filtering of GTFS-RT alerts by time. Defaults to false.
-     *
-     * MTA NOTE: This should be considered a developer option.
      */
     @Ignore
     @QueryParam("disableAlertFiltering")
@@ -498,8 +492,6 @@ public abstract class RoutingResource {
 
     /**
      * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query. Defaults to false.
-     *
-     * MTA NOTE: This should be considered a developer option.
      */
     @Ignore
     @QueryParam("geoidElevation")
