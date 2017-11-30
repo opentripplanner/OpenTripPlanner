@@ -179,6 +179,8 @@ public class GraphBuilderParameters {
      */
     public final double maxTransferDistance;
 
+    public final boolean includeOsmTags;
+
     /**
      * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
      */
@@ -220,6 +222,7 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
+        includeOsmTags = config.path("includeOsmTags").asBoolean(false);
     }
 
 

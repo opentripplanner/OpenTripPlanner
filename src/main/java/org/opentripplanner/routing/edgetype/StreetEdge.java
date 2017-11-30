@@ -28,6 +28,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * This represents a street segment.
@@ -108,6 +109,15 @@ public class StreetEdge extends Edge implements Cloneable {
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
+    /** The walk comfort score. Applied as multiplier to edge weight; 1.0 is baseline */
+    protected float walkComfortScore;
+
+    /**
+     *  Map of OSM tags for this way. Only stored when 'includeOsmWays' builder param is true;
+     *  enables on-the-fly recalculation of walk comfort scores for testing/calibration purposes.
+     */
+    private Map<String, String> osmTags;
+
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
@@ -116,6 +126,7 @@ public class StreetEdge extends Edge implements Cloneable {
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
         this.bicycleSafetyFactor = 1.0f;
+        this.walkComfortScore = 1.0f;
         this.name = name;
         this.setPermission(permission);
         this.setCarSpeed(DEFAULT_CAR_SPEED);
@@ -359,6 +370,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 // FIXME: this causes steep stairs to be avoided. see #1297.
                 double distance = getSlopeWalkSpeedEffectiveLength();
                 weight = distance / speed;
+                weight = weight * walkComfortScore;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
@@ -578,6 +590,14 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public float getBicycleSafetyFactor() {
         return bicycleSafetyFactor;
+    }
+
+    public void setWalkComfortScore(float walkComfortScore) {
+        this.walkComfortScore = walkComfortScore;
+    }
+
+    public float getWalkComfortScore() {
+        return walkComfortScore;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -831,6 +851,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
             for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
                 e.setBicycleSafetyFactor(getBicycleSafetyFactor());
+                e.setWalkComfortScore(getWalkComfortScore());
                 e.setHasBogusName(hasBogusName());
                 e.setStairs(isStairs());
                 e.setWheelchairAccessible(isWheelchairAccessible());
@@ -878,5 +899,13 @@ public class StreetEdge extends Edge implements Cloneable {
             return ((SplitterVertex) tov).nextNodeId;
         else
             return -1;
+    }
+
+    public Map<String, String> getOsmTags() {
+        return osmTags;
+    }
+
+    public void setOsmTags(Map<String, String> osmTags) {
+        this.osmTags = osmTags;
     }
 }

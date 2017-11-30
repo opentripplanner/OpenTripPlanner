@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -10,6 +11,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.common.walk.WalkComfortCalculator;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
@@ -55,6 +57,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private Set<Object> _uniques = new HashSet<Object>();
 
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
+
+    private WalkComfortCalculator walkLTSGenerator;
 
     public boolean skipVisibility = false;
 
@@ -104,6 +108,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * Whether we should create bike P+R stations from OSM data. (default false)
      */
     public boolean staticBikeParkAndRide;
+
+    public JsonNode walkConfig;
+
+    public boolean includeOsmTags = false;
+
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -155,6 +164,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        walkLTSGenerator = new WalkComfortCalculator(walkConfig);
         OSMDatabase osmdb = new OSMDatabase();
         Handler handler = new Handler(graph, osmdb);
         for (OpenStreetMapProvider provider : _providers) {
@@ -675,11 +685,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                         WayProperties wayData, OSMWithTags way) {
 
             Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
+            float walkSafetyFactor = walkLTSGenerator.computeScore(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
             // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);
+                street.setWalkComfortScore(walkSafetyFactor);
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
@@ -688,6 +700,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
                 street.setNoThruTraffic(noThruTraffic);
+
+                // store the ways w/ the graph
+                if (includeOsmTags) street.setOsmTags(way.getTags());
             }
 
             if (backStreet != null) {
@@ -696,12 +711,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     bestBikeSafety = (float)safety;
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
+                backStreet.setWalkComfortScore(walkSafetyFactor);
+
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
+
+                // store the ways w/ the graph
+                if (includeOsmTags) backStreet.setOsmTags(way.getTags());
             }
+
+
         }
 
         private void setWayName(OSMWithTags way) {
