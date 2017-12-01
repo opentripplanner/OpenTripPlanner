@@ -39,7 +39,8 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-
+import com.google.transit.realtime.GtfsRealtimeNYCT;
+import com.google.transit.realtime.GtfsRealtimeNYCT.NyctStopTimeUpdate;
 
 /**
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
@@ -503,6 +504,15 @@ public class Timetable implements Serializable {
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                             }
+                        }
+                    }
+
+                    NyctStopTimeUpdate ext = update.getExtension(GtfsRealtimeNYCT.nyctStopTimeUpdate);
+                    if (ext != null) {
+                        if (ext.hasActualTrack()) {
+                            newTimes.setTrack(i, ext.getActualTrack());
+                        } else if (ext.hasScheduledTrack()) {
+                            newTimes.setTrack(i, ext.getScheduledTrack());
                         }
                     }
 

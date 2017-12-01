@@ -108,6 +108,13 @@ public class Place {
     public String bikeShareId;
 
     /**
+     * If we have track data
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public String track;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */

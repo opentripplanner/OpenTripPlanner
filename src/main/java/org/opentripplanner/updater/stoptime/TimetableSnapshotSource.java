@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.transit.realtime.GtfsRealtimeNYCT;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -252,9 +253,9 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-                    case MODIFIED:
-                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
-                        break;
+//                    case MODIFIED:
+//                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
+//                        break;
                 }
 
                 if (applied) {
@@ -322,9 +323,9 @@ public class TimetableSnapshotSource {
             }
 
             // If stops are modified, handle trip update like a modified trip
-            if (hasModifiedStops) {
-                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
-            }
+//            if (hasModifiedStops) {
+//                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
+//            }
         }
 
         return tripScheduleRelationship;
@@ -644,6 +645,7 @@ public class TimetableSnapshotSource {
 
         // Create StopTimes
         final List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());
+        List<String> tracks = new ArrayList<>();
         for (int index = 0; index < tripUpdate.getStopTimeUpdateCount(); ++index) {
             final StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
             final Stop stop = stops.get(index);
@@ -698,6 +700,21 @@ public class TimetableSnapshotSource {
 
                 // Add stop time to list
                 stopTimes.add(stopTime);
+
+                // ensure tracks is same length as stopTimes
+                GtfsRealtimeNYCT.NyctStopTimeUpdate ext = stopTimeUpdate.getExtension(GtfsRealtimeNYCT.nyctStopTimeUpdate);
+                tracks.add(null);
+                if (ext != null) {
+                    String track =  null;
+                    if (ext.hasActualTrack()) {
+                        track = ext.getActualTrack();
+                    } else if (ext.hasScheduledTrack()) {
+                        track = ext.getScheduledTrack();
+                    }
+                    if (track != null) {
+                        tracks.set(tracks.size() - 1, track);
+                    }
+                }
             }
         }
 
@@ -725,6 +742,7 @@ public class TimetableSnapshotSource {
         for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
             newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
             newTripTimes.updateDepartureTime(stopIndex, newTripTimes.getScheduledDepartureTime(stopIndex));
+            newTripTimes.setTrack(stopIndex, tracks.get(stopIndex));
         }
 
         // Set service code of new trip times

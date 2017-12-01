@@ -116,6 +116,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
 
+    /** Track information, if available */
+    private String[] tracks;
+
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
@@ -449,5 +452,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             hasher.putInt(getScheduledArrivalTime(hop + 1));
         }
         return hasher.hash();
+    }
+
+    public void setTrack(int stop, String track) {
+        if (tracks == null) {
+            tracks = new String[getNumStops()];
+        }
+        tracks[stop] = track;
+    }
+
+    public String getTrack(int stop) {
+        return tracks == null ? null : tracks[stop];
     }
 }
