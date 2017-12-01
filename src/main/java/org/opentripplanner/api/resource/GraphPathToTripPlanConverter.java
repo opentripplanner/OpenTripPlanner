@@ -727,11 +727,12 @@ public abstract class GraphPathToTripPlanConverter {
             leg.realTime = true;
             if (leg.from.stopIndex != null) {
                 leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
+                leg.from.track = tripTimes.getTrack(leg.from.stopIndex);
             }
-            leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
-            // add track info, null if not supplied
-            leg.from.track = tripTimes.getTrack(leg.from.stopIndex);
-            leg.to.track = tripTimes.getTrack(leg.to.stopIndex);
+            if (leg.to.stopIndex != null) {
+                leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
+                leg.to.track = tripTimes.getTrack(leg.to.stopIndex);
+            }
         }
     }
 
