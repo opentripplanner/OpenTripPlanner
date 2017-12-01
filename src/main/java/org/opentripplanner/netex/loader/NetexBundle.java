@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.model;
+package org.opentripplanner.netex.loader;
 
 
 import org.opentripplanner.standalone.GraphBuilderParameters;
@@ -7,7 +7,6 @@ import org.opentripplanner.standalone.NetexParameters;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -41,15 +40,15 @@ public class NetexBundle {
         return file.getPath();
     }
 
-    public List<ZipEntry> getFileEntriesInOrder(){
+    NetexZipFileHierarchy fileHirarcy(){
         try {
-            return new NetexArrangeZipFileEntriesInOrder(file, netexParameters).getEntriesInOrder();
+            return new NetexZipFileHierarchy(file, netexParameters);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void withZipFile(Consumer<ZipFile> zipFileConsumer) {
+    void withZipFile(Consumer<ZipFile> zipFileConsumer) {
         try {
             ZipFile zipFile = null;
             try {

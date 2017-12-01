@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.graph_builder.model.NetexDao;
+import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.netex.loader.NetexDao;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -16,11 +17,12 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
 
 public class NetexMapper {
 
-    private final OtpTransitServiceBuilder transitBuilder;
     private final AgencyMapper agencyMapper = new AgencyMapper();
     private final RouteMapper routeMapper = new RouteMapper();
     private final StopMapper stopMapper = new StopMapper();
     private final TripPatternMapper tripPatternMapper = new TripPatternMapper();
+
+    private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
 
 
@@ -29,24 +31,20 @@ public class NetexMapper {
         this.agencyId = agencyId;
     }
 
-    public OtpTransitServiceBuilder mapNetexToOtp(NetexDao netexDao) {
+    public void mapNetexToOtp(NetexDao netexDao) {
         FeedScopedIdFactory.setFeedId(agencyId);
 
-        for (Operator operator : netexDao.getOperators().values()) {
-            if (operator != null) {
-                transitBuilder.getAgencies().add(agencyMapper.mapAgency(operator, "Europe/Oslo"));
-            }
+        for (Operator operator : netexDao.getOperators()) {
+            transitBuilder.getAgencies().add(agencyMapper.mapAgency(operator, "Europe/Oslo"));
         }
 
-        for (Line line : netexDao.getLineById().values()) {
-            if (line != null) {
-                Route route = routeMapper.mapRoute(line, transitBuilder);
-                transitBuilder.getRoutes().add(route);
-            }
+        for (Line line : netexDao.getLines()) {
+            Route route = routeMapper.mapRoute(line, transitBuilder);
+            transitBuilder.getRoutes().add(route);
         }
 
-        for (String stopPlaceId : netexDao.getStopsById().keySet()) {
-            Collection<StopPlace> stopPlaceAllVersions = netexDao.getStopsById().get(stopPlaceId);
+        for (String stopPlaceId : netexDao.getStopPlaceIds()) {
+            Collection<StopPlace> stopPlaceAllVersions = netexDao.lookupStopPlacesById(stopPlaceId);
             if (stopPlaceAllVersions != null) {
                 Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
                 for (Stop stop : stops) {
@@ -55,16 +53,14 @@ public class NetexMapper {
             }
         }
 
-        for (JourneyPattern journeyPattern : netexDao.getJourneyPatternsById().values()) {
-            if (journeyPattern != null) {
-                tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexDao);
-            }
+        for (JourneyPattern journeyPattern : netexDao.getJourneyPatterns()) {
+            tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexDao);
         }
 
-        for (String serviceId : netexDao.getServiceIds().values()) {
-            transitBuilder.getCalendarDates().addAll(mapToCalendarDates(createFeedScopedId(serviceId), netexDao));
+        for (String serviceId : netexDao.getCalendarServiceIds()) {
+            transitBuilder.getCalendarDates().addAll(
+                    mapToCalendarDates(createFeedScopedId(serviceId), netexDao)
+            );
         }
-
-        return transitBuilder;
     }
 }

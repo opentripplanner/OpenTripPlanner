@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.graph_builder.model.NetexDao;
+import org.opentripplanner.netex.loader.NetexDao;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TripPatternMapper {
@@ -40,12 +41,12 @@ public class TripPatternMapper {
         List<Trip> trips = new ArrayList<>();
 
         //find matching journey pattern
-        List<ServiceJourney> serviceJourneys = netexDao.getServiceJourneyById()
-                .get(journeyPattern.getId());
+        Collection<ServiceJourney> serviceJourneys = netexDao.lookupServiceJourneysById(
+                journeyPattern.getId());
 
         StopPattern stopPattern = null;
 
-        Route route = netexDao.getRouteById().get(journeyPattern.getRouteRef().getRef());
+        Route route = netexDao.lookupRouteById(journeyPattern.getRouteRef().getRef());
         org.opentripplanner.model.Route otpRoute = transitBuilder.getRoutes()
                 .get(FeedScopedIdFactory.createFeedScopedId(route.getLineRef().getValue().getRef()));
 
@@ -157,8 +158,9 @@ public class TripPatternMapper {
                 if (stop.getId().equals(pointInJourneyPatterRef)) {
                     JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef = ((StopPointInJourneyPattern) point)
                             .getScheduledStopPointRef();
-                    String stopId = netexDao.getStopPointQuayMap()
-                            .get(scheduledStopPointRef.getValue().getRef());
+                    String stopId = netexDao.lookupQuayIdByStopPointRef(
+                            scheduledStopPointRef.getValue().getRef()
+                    );
                     if (stopId == null) {
                         LOG.warn("No passengerStopAssignment found for " + scheduledStopPointRef
                                 .getValue().getRef());

@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder;
 import com.google.common.collect.Lists;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.model.NetexBundle;
+import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;

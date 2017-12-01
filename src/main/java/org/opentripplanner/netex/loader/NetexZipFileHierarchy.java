@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
-package org.opentripplanner.graph_builder.model;
+package org.opentripplanner.netex.loader;
 
 import org.opentripplanner.standalone.NetexParameters;
 import org.slf4j.Logger;
@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-class NetexArrangeZipFileEntriesInOrder {
+class NetexZipFileHierarchy {
     private static final Logger LOG = LoggerFactory
-            .getLogger(NetexArrangeZipFileEntriesInOrder.class);
+            .getLogger(NetexZipFileHierarchy.class);
 
     private final ZipFile zipFile;
 
@@ -44,14 +44,22 @@ class NetexArrangeZipFileEntriesInOrder {
 
     private String currentGroup = null;
 
-    NetexArrangeZipFileEntriesInOrder(File filename, NetexParameters netexConfig)
+    NetexZipFileHierarchy(File filename, NetexParameters netexConfig)
             throws IOException {
         this.zipFile = new ZipFile(filename, ZipFile.OPEN_READ);
         this.config = netexConfig;
+        distributeEntries();
     }
 
-    List<ZipEntry> getEntriesInOrder() {
+    Iterable<ZipEntry> sharedEntries() {
+        return sharedEntries;
+    }
 
+    Iterable<GroupEntries> groups() {
+        return groupEntries.values();
+    }
+
+    private void distributeEntries() {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         while (entries.hasMoreElements()) {
@@ -60,30 +68,17 @@ class NetexArrangeZipFileEntriesInOrder {
 
             if (isSharedFile(name)) {
                 sharedEntries.add(entry);
-                continue;
             }
-            if (isGroupEntry(name, config.sharedGroupFilePattern)) {
-                groupEntries.get(currentGroup).sharedEntries.add(entry);
-                continue;
+            else if (isGroupEntry(name, config.sharedGroupFilePattern)) {
+                groupEntries.get(currentGroup).addSharedEntry(entry);
             }
-            if (isGroupEntry(name, config.groupFilePattern)) {
-                groupEntries.get(currentGroup).entries.add(entry);
-                continue;
+            else if (isGroupEntry(name, config.groupFilePattern)) {
+                groupEntries.get(currentGroup).addIndependentEntries(entry);
             }
-            LOG.warn("Netex file ignored: {}. The file do not match file patterns.", name);
+            else {
+                LOG.warn("Netex file ignored: {}. The file do not match file patterns.", name);
+            }
         }
-
-        return mergeAllEntriesIntoOneList();
-    }
-
-    private List<ZipEntry> mergeAllEntriesIntoOneList() {
-        List<ZipEntry> allEntries = new ArrayList<>(sharedEntries);
-
-        for (GroupEntries it : groupEntries.values()) {
-            allEntries.addAll(it.sharedEntries);
-            allEntries.addAll(it.entries);
-        }
-        return allEntries;
     }
 
     private boolean isSharedFile(String name) {
@@ -105,15 +100,4 @@ class NetexArrangeZipFileEntriesInOrder {
         return true;
     }
 
-    private static class GroupEntries {
-        String group;
-
-        List<ZipEntry> sharedEntries = new ArrayList<>();
-
-        List<ZipEntry> entries = new ArrayList<>();
-
-        GroupEntries(String group) {
-            this.group = group;
-        }
-    }
 }

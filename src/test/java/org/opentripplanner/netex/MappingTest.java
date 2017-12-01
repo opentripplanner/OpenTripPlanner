@@ -4,16 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.graph_builder.model.NetexBundle;
-import org.opentripplanner.graph_builder.module.NetexModule;
+import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.loader.NetexBundle;
+import org.opentripplanner.netex.loader.NetexLoader;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 // TODO - The mapping needs better tests
 public class MappingTest {
@@ -31,9 +32,14 @@ public class MappingTest {
                 new File(NETEX_DIR, NETEX_FILENAME),
                 new GraphBuilderParameters(buildConfig)
         );
-        NetexModule netexModule = new NetexModule(Collections.singletonList(netexBundle));
-        otpBuilder = netexModule.getOtpDao().stream().findFirst()
-                .orElseThrow(IllegalStateException::new);
+        otpBuilder = new NetexLoader(netexBundle).loadBundle();
+    }
+
+    @Test public void testAgencies() {
+        List<Agency> agencies = otpBuilder.getAgencies();
+
+        // TODO TGR - fix this test
+        Assert.assertEquals(1, agencies.size());
     }
 
     @Test public void testNetexRoutes() {
