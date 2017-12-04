@@ -26,8 +26,11 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.MtaPathComparator;
+import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.DominanceFunction;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
@@ -36,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -476,6 +480,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Whether to find impacts of realtime alerts */
     public boolean findRealtimeConsequences = true;
+
+    /** Which path comparator to use */
+    public String pathComparator = null;
 
     /** Saves split edge which can be split on origin/destination search
      *
@@ -1401,5 +1408,12 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
+        if ("mta".equals(pathComparator)) {
+            return new MtaPathComparator(compareStartTimes);
+        }
+        return new PathComparator(compareStartTimes);
     }
 }
