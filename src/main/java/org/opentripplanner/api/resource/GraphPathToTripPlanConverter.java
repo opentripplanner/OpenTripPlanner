@@ -25,7 +25,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -567,6 +566,13 @@ public abstract class GraphPathToTripPlanConverter {
                     }
                 }
             }
+        }
+
+        Trip trip = states[states.length - 1].getBackTrip();
+        if (trip != null && trip.getNote() != null) {
+            TimetableNote note = trip.getNote();
+            Alert alert = Alert.createSimpleAlerts(note.getTitle(), note.getDesc());
+            leg.addAlert(alert, requestedLocale);
         }
     }
 

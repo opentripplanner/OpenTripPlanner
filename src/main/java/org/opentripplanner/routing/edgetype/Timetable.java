@@ -174,6 +174,7 @@ public class Timetable implements Serializable {
                 ? adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time)
                 : exampleAdjustedTime;
             if (adjustedTime == -1) continue;
+            adjustedTime += tt.getDepartureBuffer(stopIndex);
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
@@ -202,6 +203,7 @@ public class Timetable implements Serializable {
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
+            adjustedTime += tt.getDepartureBuffer(stopIndex);
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search

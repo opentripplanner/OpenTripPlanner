@@ -109,6 +109,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private final int[] stopSequences;
 
     /**
+     * Departure buffers, if this trip has any
+     */
+    private final int[] departureBuffers;
+
+    /**
      * The real-time state of this TripTimes.
      */
     private RealTimeState realTimeState = RealTimeState.SCHEDULED;
@@ -129,6 +134,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
+        final int[] departureBuffers = new int[nStops];
+        boolean hasDepartureBuffers = false;
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
@@ -138,7 +145,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             arrivals[s] = st.getArrivalTime() - timeShift;
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
+            if (st.getDepartureBuffer() != -1) {
+                hasDepartureBuffers = true;
+            }
             s++;
+        }
+        if (hasDepartureBuffers) {
+            for (int i = 0; i < stopTimes.size(); i++) {
+                departureBuffers[i] = Math.max(0, stopTimes.get(i).getDepartureBuffer());
+            }
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
@@ -149,6 +164,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+        if (hasDepartureBuffers) {
+            this.departureBuffers = deduplicator.deduplicateIntArray(departureBuffers);
+        } else {
+            this.departureBuffers = null;
+        }
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -164,6 +184,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
+        this.departureBuffers = object.departureBuffers;
     }
 
     /**
@@ -257,6 +278,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** @return the difference between the scheduled and actual departure times at this stop. */
     public int getDepartureDelay(final int stop) {
         return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
+    }
+
+    /** Return the buffer required for boarding at this stop. 0 if no buffer. */
+    public int getDepartureBuffer(final int stop) {
+        return departureBuffers == null ? 0 : departureBuffers[stop];
     }
 
     /**

@@ -186,6 +186,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     s1.incrementTimeInSeconds(boardingTime);
                     s1.incrementWeight(boardingTime * options.waitReluctance);
                 }
+                int bufferTime = s0.getTripTimes().getDepartureBuffer(stopIndex);
+                s1.incrementTimeInSeconds(bufferTime);
+                s1.incrementWeight(bufferTime * options.waitReluctance);
             } else {
                 int alightTime = options.getAlightTime(this.getPattern().mode);
                 if (alightTime != 0) {
@@ -312,7 +315,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                                    getStop(), s0.getPreviousTrip(), trip, boarding);
                 transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
                                    options.nonpreferredTransferPenalty);
-            }            
+            }
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
