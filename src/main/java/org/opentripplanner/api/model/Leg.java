@@ -290,6 +290,8 @@ public class Leg {
     @JsonSerialize
     public Boolean rentedBike;
 
+    public List<Departure> nextDepartures;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg

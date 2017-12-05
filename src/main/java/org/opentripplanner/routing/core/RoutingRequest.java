@@ -484,6 +484,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Which path comparator to use */
     public String pathComparator = null;
 
+    /** How far to look out, in seconds, to add upcoming trips. Defaults to half an hour. */
+    public int nextDepartureWindow = 1800;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -1080,7 +1083,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && nextDepartureWindow == other.nextDepartureWindow;
     }
 
     /**
@@ -1111,7 +1115,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(useTraffic).hashCode() * 10169
+                + Integer.hashCode(nextDepartureWindow) * 1373;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters

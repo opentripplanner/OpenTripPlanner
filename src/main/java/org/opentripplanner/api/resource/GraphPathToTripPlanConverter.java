@@ -340,7 +340,10 @@ public abstract class GraphPathToTripPlanConverter {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
+        if (leg.isTransitLeg()) {
+            addRealTimeData(leg, states);
+            addNextDepartures(leg, states);
+        }
 
         return leg;
     }
@@ -738,6 +741,58 @@ public abstract class GraphPathToTripPlanConverter {
             if (leg.to.stopIndex != null) {
                 leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
                 leg.to.track = tripTimes.getTrack(leg.to.stopIndex);
+            }
+        }
+    }
+
+    /**
+     * Add next departures to a {@link Leg}.
+     *
+     * @param leg The leg to add the departures to
+     * @param states The states that go with the leg
+     */
+    private static void addNextDepartures(Leg leg, State[] states) {
+        State state = states[0].getBackState();
+        if (state == null) {
+            // potentially OnBoardDepart itinerary
+            return;
+        }
+        RoutingRequest options = state.getOptions();
+        if (options.nextDepartureWindow <= 0)
+            return;
+        TimeZone tz = options.rctx.graph.getTimeZone();
+        long time = state.getTimeSeconds();
+        int stopIndex;
+        TripPattern pattern;
+        if (states[0].backEdge instanceof TransitBoardAlight) {
+            TransitBoardAlight edge = (TransitBoardAlight) (states[0].backEdge);
+            stopIndex = edge.getStopIndex();
+            pattern = edge.getPattern();
+        } else if (states[0].backEdge instanceof PatternInterlineDwell) {
+            stopIndex = 0;
+            pattern = ((OnboardVertex) state.backEdge.getToVertex()).getTripPattern();
+        } else {
+            LOG.error("Unexpected edge {}", states[0].backEdge);
+            return;
+        }
+        leg.nextDepartures = new ArrayList<>();
+        for (ServiceDay sd : options.rctx.serviceDays) {
+            Timetable timetable = pattern.getUpdatedTimetable(options, sd);
+            if (timetable.temporallyViable(sd, time, -1, true)) {
+                List<TripTimes> sortedTimes = new ArrayList<>(timetable.tripTimes);
+                sortedTimes.sort(Comparator.comparingInt(tt -> tt.getDepartureTime(stopIndex)));
+                for (TripTimes tt : sortedTimes) {
+                    if (!timetable.isTripTimesOk(tt, sd, state, stopIndex))
+                        continue;
+                    long deptTime = sd.time(tt.getDepartureTime(stopIndex));
+                    if (deptTime > time) {
+                        if (deptTime > time + options.nextDepartureWindow) {
+                            break;
+                        }
+                        Departure dept = new Departure(tz, sd, tt, stopIndex);
+                        leg.nextDepartures.add(dept);
+                    }
+                }
             }
         }
     }

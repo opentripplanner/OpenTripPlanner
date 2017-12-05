@@ -497,6 +497,10 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /** How far to look out, in seconds, to add upcoming trips. Defaults to 1800 seconds (half an hour). */
+    @QueryParam("nextDepartureWindow")
+    private Integer nextDepartureWindow = 1800;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -771,6 +775,9 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (nextDepartureWindow != null)
+            request.nextDepartureWindow = nextDepartureWindow;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
