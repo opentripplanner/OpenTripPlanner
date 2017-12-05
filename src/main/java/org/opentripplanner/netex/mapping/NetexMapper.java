@@ -1,13 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.netex.loader.NetexDao;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.loader.NetexDao;
+import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Collection;
@@ -34,12 +33,12 @@ public class NetexMapper {
     public void mapNetexToOtp(NetexDao netexDao) {
         FeedScopedIdFactory.setFeedId(agencyId);
 
-        for (Operator operator : netexDao.getOperators()) {
-            transitBuilder.getAgencies().add(agencyMapper.mapAgency(operator, "Europe/Oslo"));
+        for (Authority authority : netexDao.getAuthorities()) {
+            transitBuilder.getAgencies().add(agencyMapper.mapAgency(authority, netexDao.getTimeZone()));
         }
 
         for (Line line : netexDao.getLines()) {
-            Route route = routeMapper.mapRoute(line, transitBuilder);
+            Route route = routeMapper.mapRoute(line, transitBuilder, netexDao, netexDao.getTimeZone());
             transitBuilder.getRoutes().add(route);
         }
 

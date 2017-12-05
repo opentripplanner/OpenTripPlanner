@@ -2,13 +2,14 @@ package org.opentripplanner.netex.loader;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -53,7 +54,13 @@ public class NetexDao {
 
     private final Map<String, OperatingPeriod> operatingPeriodById = new HashMap<>();
 
-    private final Map<String, Operator> operators = new HashMap<>();
+    private final Map<String, Authority> authoritiesById = new HashMap<>();
+
+    private final Map<String, Authority> authoritiesByNetworkId = new HashMap<>();
+
+    private final Map<String, Network> networkByLineId = new HashMap<>();
+
+    private final Map<String, Network> networkById = new HashMap<>();
 
     private final Set<String> calendarServiceIds = new HashSet<>();
 
@@ -231,6 +238,22 @@ public class NetexDao {
         operatingPeriodById.put(operatingPeriod.getId(), operatingPeriod);
     }
 
+    public void addAuthority(Authority authority){
+        authoritiesById.put(authority.getId(), authority);
+    }
+
+    /**
+     * Lookup Authority in this class and if not found delegate up to the parent NetexDao.
+     */
+    public Authority lookupAuthorityById(String id){
+        Authority v = authoritiesById.get(id);
+        return returnLocalValue(v) ? v : parent.lookupAuthorityById(id);
+    }
+
+    public Collection<Authority> getAuthorities(){
+        return authoritiesById.values();
+    }
+
     /**
      * Lookup operating period in this class and if not found delegate up to the parent NetexDao.
      */
@@ -247,12 +270,34 @@ public class NetexDao {
                 (parent != null && parent.operatingPeriodExist(id));
     }
 
-    void addOperator(Operator operator) {
-        operators.put(operator.getId(), operator);
+    public void addAuthorityByNetworkId(Authority authority, String networkId) {
+        authoritiesByNetworkId.put(networkId, authority);
     }
 
-    public Collection<Operator> getOperators() {
-        return operators.values();
+    /**
+     * Lookup authority in this class and if not found delegate up to the parent NetexDao.
+     */
+    public Authority lookupAuthoritiesByNetworkId(String networkId) {
+        Authority v = authoritiesByNetworkId.get(networkId);
+        return returnLocalValue(v) ? v : parent.lookupAuthoritiesByNetworkId(networkId);
+    }
+
+    public void addNetworkByLineId(Network network, String lineId) {
+        networkByLineId.put(lineId, network);
+    }
+
+    public Network lookupNetworkByLineId(String lineId) {
+        Network v = networkByLineId.get(lineId);
+        return returnLocalValue(v) ? v : parent.lookupNetworkByLineId(lineId);
+    }
+
+    public void addNetwork(Network network) {
+        networkById.put(network.getId(), network);
+    }
+
+    public Network lookupNetworkById(String networkId) {
+        Network v = networkById.get(networkId);
+        return returnLocalValue(v) ? v : parent.lookupNetworkById(networkId);
     }
 
 

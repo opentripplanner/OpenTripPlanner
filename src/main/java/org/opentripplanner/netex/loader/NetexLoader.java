@@ -14,12 +14,12 @@
 */
 package org.opentripplanner.netex.loader;
 
-import com.google.common.collect.Iterables;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.mapping.ServiceIdMapper;
+import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
 import org.rutebanken.netex.model.DataManagedObjectStructure;
@@ -35,9 +35,9 @@ import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LinesInFrame_RelStructure;
 import org.rutebanken.netex.model.LinkSequence_VersionStructure;
+import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.rutebanken.netex.model.Quay;
@@ -63,12 +63,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -271,21 +268,42 @@ public class NetexLoader {
                 }
             }
 
-            // Network - Skip OrganisationRef (Authority)
-            // Network network = sf.getNetwork();
-            // if (network != null) {
-            // }
+            //network
+            Network network = sf.getNetwork();
+            if(network != null){
+                currentNetexDao().addNetwork(network);
+
+                String orgRef = network.getTransportOrganisationRef().getValue().getRef();
+
+                Authority authority = currentNetexDao().lookupAuthorityById(orgRef);
+                if (authority != null) {
+                    currentNetexDao().addAuthorityByNetworkId(authority, network.getId());
+                }
+
+// TODO TGR - This code is not used, remove before PR
+//                if (network.getGroupsOfLines() != null) {
+//                    GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
+//                    List<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
+//                    for (GroupOfLines group : groupOfLines) {
+//                        currentNetexDao().addAuthoritiesByGroupOfLinesId().put(group.getId(), orgRef);
+//                    }
+//                }
+            }
 
             //lines
             LinesInFrame_RelStructure lines = sf.getLines();
-            if (lines != null) {
+            if(lines != null){
                 List<JAXBElement<? extends DataManagedObjectStructure>> line_ = lines.getLine_();
                 for (JAXBElement element : line_) {
                     if (element.getValue() instanceof Line) {
                         Line line = (Line) element.getValue();
                         currentNetexDao().addLine(line);
+                        String groupRef = line.getRepresentedByGroupRef().getRef();
+                        Network network2 = currentNetexDao().lookupNetworkById(groupRef);
+                        if (network2 != null) {
+                            currentNetexDao().addNetworkByLineId(network2, line.getId());
+                        }
                     }
-
                 }
             }
 
@@ -408,11 +426,14 @@ public class NetexLoader {
             List<JAXBElement<? extends DataManagedObjectStructure>> organisations = resourceFrame
                     .getOrganisations().getOrganisation_();
             for (JAXBElement element : organisations) {
-                // Skip Authority, not used
-
-                if (element.getValue() instanceof Operator) {
-                    currentNetexDao().addOperator((Operator) element.getValue());
+                if(element.getValue() instanceof Authority){
+                    Authority authority = (Authority) element.getValue();
+                    currentNetexDao().addAuthority(authority);
                 }
+                // TODO TGR - remove this before PR
+                // if (element.getValue() instanceof Operator) {
+                //    currentNetexDao().addOperator((Operator) element.getValue());
+                //}
             }
         }
     }

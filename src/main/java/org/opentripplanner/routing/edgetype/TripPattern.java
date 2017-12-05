@@ -468,7 +468,7 @@ public class TripPattern implements Cloneable, Serializable {
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         services = new BitSet();
         for (Trip trip : trips) {
-            AgencyAndId serviceId = trip.getServiceId();
+            FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
                 services.set(serviceCodes.get(trip.getServiceId()));
             }
