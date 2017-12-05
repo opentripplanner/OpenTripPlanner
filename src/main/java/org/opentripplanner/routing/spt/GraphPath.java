@@ -16,12 +16,12 @@ package org.opentripplanner.routing.spt;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -180,6 +180,14 @@ public class GraphPath {
             }
         }
         return ret;
+    }
+
+    public String getRoutePatternHash() {
+        StringJoiner hash = new StringJoiner("#");
+        for (AgencyAndId r : getRoutes()) {
+            hash.add(r.toString());
+        }
+        return hash.toString();
     }
 
     public String toString() {

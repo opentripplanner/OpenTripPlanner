@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
@@ -107,6 +108,11 @@ public class StreetTransitLink extends Edge {
             return null;
         }
 
+        // check if path is banned
+        if (isLeavingTransitNetwork(req) && req.isPathBanned(s0)) {
+            return null;
+        }
+
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows searching for nearby transit stops using walk-only options.
@@ -161,5 +167,12 @@ public class StreetTransitLink extends Edge {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
 
-
+    private boolean isLeavingTransitNetwork(RoutingRequest options) {
+        if (options.arriveBy && tov == transitStop) {
+            return true;
+        } else if (!options.arriveBy && fromv == transitStop) {
+            return true;
+        }
+        return false;
+    }
 }

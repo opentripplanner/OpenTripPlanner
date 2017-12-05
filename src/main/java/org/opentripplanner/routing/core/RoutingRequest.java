@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -286,6 +287,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public HashSet<Integer> bannedRouteTypes = new HashSet<>();
 
+    private Set<String> bannedPaths = new HashSet<>();
+
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -486,6 +489,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** How far to look out, in seconds, to add upcoming trips. Defaults to half an hour. */
     public int nextDepartureWindow = 1800;
+
+    /** Whether to apply "hard path banning", where after a sequence of routes is used, it can't be used again */
+    public boolean hardPathBanning = true;
 
     /** Saves split edge which can be split on origin/destination search
      *
@@ -934,6 +940,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.preferredEndRoutes = preferredEndRoutes.clone();
             clone.unpreferredAgencies = (HashSet<String>) unpreferredAgencies.clone();
             clone.unpreferredRoutes = unpreferredRoutes.clone();
+            clone.bannedPaths = new HashSet<>(bannedPaths);
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -1084,7 +1091,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && nextDepartureWindow == other.nextDepartureWindow;
+                && nextDepartureWindow == other.nextDepartureWindow
+                && hardPathBanning == other.hardPathBanning;
     }
 
     /**
@@ -1116,7 +1124,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
-                + Integer.hashCode(nextDepartureWindow) * 1373;
+                + Integer.hashCode(nextDepartureWindow) * 1373
+                + Boolean.hashCode(hardPathBanning) * 63061489;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1421,4 +1430,27 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return new PathComparator(compareStartTimes);
     }
+
+    public void banPath(GraphPath path) {
+        bannedPaths.add(path.getRoutePatternHash());
+    }
+
+    public boolean isPathBanned(State s0) {
+        if (bannedPaths.isEmpty()) {
+            return false;
+        }
+        GraphPath path = new GraphPath(s0, false);
+        String hash = path.getRoutePatternHash();
+        if (bannedPaths.contains(hash)) {
+            return true;
+        }
+        // Ensure we don't get trivially different paths. (Todo - will this kick out useful paths too?)
+        for (String other : bannedPaths) {
+            if (hash.startsWith(other + "#")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

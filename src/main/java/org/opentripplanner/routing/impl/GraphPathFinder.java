@@ -201,28 +201,23 @@ public class GraphPathFinder {
                 for (AgencyAndId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
-                List<AgencyAndId> routeIds = path.getRoutes();
-                for (AgencyAndId routeId : routeIds) {
-                    options.addUnpreferredRoute(routeId);
-                }
                 if (tripIds.isEmpty()) {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
+                } else if (options.hardPathBanning) {
+                    options.banPath(path);
                 }
                 // add consequences
                 path.setRealtimeConsequences(realtimeConsequences);
-            }
 
-            paths.addAll(newPaths.stream()
-                    .filter(path -> {
-                        double duration = options.useRequestedDateTimeInMaxHours
-                            ? options.arriveBy
-                                ? options.dateTime - path.getStartTime()
-                                : path.getEndTime() - options.dateTime
-                            : path.getDuration();
-                        return duration < options.maxHours * 60 * 60;
-                    })
-                    .collect(Collectors.toList()));
+                double duration = options.useRequestedDateTimeInMaxHours
+                        ? (options.arriveBy ? options.dateTime - path.getStartTime() : path.getEndTime() - options.dateTime)
+                        : path.getDuration();
+
+                if (duration < options.maxHours * 60 * 60) {
+                    paths.add(path);
+                }
+            }
 
             LOG.debug("we have {} paths", paths.size());
         }
