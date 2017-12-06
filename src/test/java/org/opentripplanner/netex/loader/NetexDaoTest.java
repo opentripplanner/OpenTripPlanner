@@ -79,17 +79,17 @@ public class NetexDaoTest {
         Quay quayA = quay(ID, null);
         Quay quayB = quay(ID, "image_1");
 
-        assertNull(root.lookupQuayById(ID));
-        assertNull(child.lookupQuayById(ID));
+        assertTrue(root.lookupQuayById(ID).isEmpty());
+        assertTrue(child.lookupQuayById(ID).isEmpty());
 
         root.addQuay(quayA);
 
-        assertEquals(quayA, root.lookupQuayById(ID));
-        assertEquals(quayA, child.lookupQuayById(ID));
+        assertEquals(singletonList(quayA), root.lookupQuayById(ID));
+        assertEquals(singletonList(quayA), child.lookupQuayById(ID));
 
         child.addQuay(quayB);
 
-        assertEquals(quayB, child.lookupQuayById(ID));
+        assertEquals(singletonList(quayB), child.lookupQuayById(ID));
     }
 
     @Test
