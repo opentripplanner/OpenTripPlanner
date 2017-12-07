@@ -7,7 +7,11 @@ _Note: this documentation is targeted primarily at the OTP development community
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
 
+[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
+
 **Latest Project Updates**
+
+ * **Version 1.2 was released on 18 August 2017.**
 
  * After seven years of hard work and almost 10,000 commits from over 100 contributors around the world, **version 1.0 was released on 9 September 2016**!
  
@@ -25,25 +29,6 @@ If you want to get started right away running your own OTP instance, the best pl
  * OpenTripPlanner has become <a href="http://sfconservancy.org/">Software Freedom Conservancy's</a> thirty-first member project. Conservancy is a non-profit public charity that provides a range of financial and administrative services to member projects that develop Free, Libre, and Open Source Software. By joining Conservancy, OpenTripPlanner obtains the benefits of a formal non-profit organizational structure while keeping the project focused on software development and documentation.
 
  * TriMet relaunched Portland Oregon's [official trip planner](http://ride.trimet.org) which is now powered by OTP. Read [more about the project](https://github.com/openplans/OpenTripPlanner/wiki/Portland-Regional-Trip-Planner), and see also TriMet's 2009-2011 [OTP Final Report](https://github.com/opentripplanner/OpenTripPlanner/wiki/Reports/OTP%20Final%20Report%20-%20Metro%202009-2011%20RTO%20Grant.pdf).
-
-
-## Status
-
-[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
-
-**Version 1.1 was released on 16 March 2017**. OTP now:
-
- * Plans multi-modal walking, wheelchair, bicycle and transit trips
- * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors
- * Shows graphical elevation profiles for bike trips
- * Imports data from GTFS, OpenStreetMap, and digital elevation models
- * Typically provides multiple itineraries in a fraction of a second even in large metropolitan networks
- * Exposes a web services API which other apps or front-ends can build on
- * Supports [GTFS-Realtime](https://developers.google.com/transit/gtfs-realtime/) for service changes and alerts in both polling (pull) and streaming (push) modes
- * Supports bike rental with dynamic availability information, as well as park-and-ride and kiss-and-ride
- * Supports one-to-many and many-to-many searches for planning, alternatives analysis, and accessibility research purposes
-
-See the [Milestones](https://github.com/opentripplanner/OpenTripPlanner/milestones) page to explore upcoming developments.
 
 
 ## Basic OTP Architecture

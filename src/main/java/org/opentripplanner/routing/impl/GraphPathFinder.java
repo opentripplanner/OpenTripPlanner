@@ -170,7 +170,7 @@ public class GraphPathFinder {
             }
 
             // Do a full reversed search to compact the legs
-            if(options.compactLegsByReversedSearch) {
+            if(options.compactLegsByReversedSearch){
                 newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
             }
 
