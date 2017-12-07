@@ -92,9 +92,9 @@ import graphql.schema.PropertyDataFetcher;
 import graphql.schema.TypeResolver;
 
 public class IndexGraphQLSchema {
-    
+
     public static String experimental(String message) {
-        return String.format("!!This api is experimental and might change without further notice!!\n %s", message); 
+        return String.format("!!This api is experimental and might change without further notice!!\n %s", message);
     }
 
     public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
@@ -127,7 +127,7 @@ public class IndexGraphQLSchema {
         .value("ADDED", RealTimeState.ADDED, "The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.")
         .value("MODIFIED", RealTimeState.MODIFIED, "The trip information has been updated and resulted in a different trip pattern compared to the trip pattern of the scheduled trip.")
         .build();
-    
+
     public static GraphQLEnumType pickupDropoffTypeEnum = GraphQLEnumType.newEnum()
         .name("PickupDropoffType")
         .value("SCHEDULED", StopPattern.PICKDROP_SCHEDULED, "Regularly scheduled pickup / drop off.")
@@ -185,7 +185,7 @@ public class IndexGraphQLSchema {
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
-    
+
     public GraphQLOutputType ticketType = new GraphQLTypeReference("TicketType");
 
     public GraphQLOutputType alertType = new GraphQLTypeReference("Alert");
@@ -1882,8 +1882,8 @@ public class IndexGraphQLSchema {
                 .build()
             )
             .build();
-            
-                
+
+
         carParkType = GraphQLObjectType.newObject()
             .name("CarPark")
             .withInterface(nodeInterface)
@@ -2997,6 +2997,22 @@ public class IndexGraphQLSchema {
                     .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("totalTime")
                         .type(Scalars.GraphQLLong)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("pathCalculationTime")
+                        .type(Scalars.GraphQLLong)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("precalculationTime")
+                        .type(Scalars.GraphQLLong)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("renderingTime")
+                        .type(Scalars.GraphQLLong)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("timedOut")
+                        .type(Scalars.GraphQLBoolean)
                         .build())
                     .build()))
                 .dataFetcher(environment -> (((Map)environment.getSource()).get("debugOutput")))
