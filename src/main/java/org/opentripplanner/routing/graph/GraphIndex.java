@@ -988,24 +988,24 @@ public class GraphIndex {
 
     private void clusterByParentStation() {
         LOG.info("Clustering stops by parent station...");
-        for (Stop stop : stopForId.values()) {
-            String ps = stop.getParentStation();
-            if (ps == null || ps.isEmpty()) {
-                continue;
-            }
-            StopCluster cluster;
-            if (stopClusterForId.containsKey(ps)) {
-                cluster = stopClusterForId.get(ps);
-            } else {
-                cluster = new StopCluster(ps, stop.getName());
+    	for (Stop stop : stopForId.values()) {
+    	    String ps = stop.getParentStation();
+    	    if (ps == null || ps.isEmpty()) {
+    	        continue;
+    	    }
+    	    StopCluster cluster;
+    	    if (stopClusterForId.containsKey(ps)) {
+    	        cluster = stopClusterForId.get(ps);
+    	    } else {
+    	        cluster = new StopCluster(ps, stop.getName());
+    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
+                cluster.setCoordinates(parent.getLat(), parent.getLon());
                 stopClusterForId.put(ps, cluster);
-            }
-            cluster.children.add(stop);
-            stopClusterForStop.put(stop, cluster);
-        }
-        for (Map.Entry<String, StopCluster> cluster : stopClusterForId.entrySet()) {
-            cluster.getValue().computeCenter();
-        }
+
+	        }
+    	    cluster.children.add(stop);
+    	    stopClusterForStop.put(stop, cluster);    
+    	}
     }
 
     public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
