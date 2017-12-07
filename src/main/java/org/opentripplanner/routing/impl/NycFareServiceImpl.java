@@ -59,9 +59,9 @@ public class NycFareServiceImpl implements FareService, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final float ORDINARY_FARE = 2.25f;
+	private static final float ORDINARY_FARE = 2.75f;
 
-	private static final float EXPRESS_FARE = 5.50f;
+	private static final float EXPRESS_FARE = 6.50f;
 
 	private static final float EXPENSIVE_EXPRESS_FARE = 7.50f; // BxM4C only
 
