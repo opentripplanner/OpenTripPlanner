@@ -244,7 +244,9 @@ public class AStar {
              * Terminate based on timeout?
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+                // Send warning to sentry later in code
+                // LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
