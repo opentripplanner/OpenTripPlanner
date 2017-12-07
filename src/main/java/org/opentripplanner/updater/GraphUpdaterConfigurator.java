@@ -7,6 +7,7 @@ import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
+import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
@@ -78,6 +79,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("websocket-gtfs-rt-updater")) {
                     updater = new WebsocketGtfsRealtimeUpdater();
+                }
+                else if (type.equals("MQTT-gtfs-rt-updater")) {
+                    updater = new MqttGtfsRealtimeUpdater();
                 }
                 else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
