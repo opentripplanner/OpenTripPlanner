@@ -828,7 +828,6 @@ public class GTFSPatternHopFactory {
         /* Indicates that stop times in this trip are being shifted forward one day. */
         
         for (int i = 1; i < stopTimes.size(); i++) {
-            boolean st1bogus = false;
             StopTime st1 = stopTimes.get(i);
 
             /* If the feed did not specify any timepoints, mark all times that are present as timepoints. */
@@ -883,7 +882,7 @@ public class GTFSPatternHopFactory {
 /* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
 //                st1.clearArrivalTime();
 //                st1.clearDepartureTime();
-                st1bogus = true;
+
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
@@ -895,8 +894,8 @@ public class GTFSPatternHopFactory {
                         (float) hopDistance, st0.getTrip(), st0.getStopSequence())));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect
-            if ( ! st1bogus)  
-                st0 = st1;
+
+            st0 = st1;
         } // END for loop over stop times
     }
     
