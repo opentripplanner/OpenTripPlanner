@@ -266,7 +266,12 @@ public abstract class GraphPathToTripPlanConverter {
                     if (legIndexPairs[1] != states.length - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
-                    legIndexPairs = new int[] {i, states.length - 1};
+                    if (states[i - 1].getBackEdge() instanceof LegSwitchingEdge) {
+                        // Include from from LegSwitchingEdge
+                        legIndexPairs = new int[] {i-1, states.length - 1};
+                    } else {
+                        legIndexPairs = new int[] {i, states.length - 1};
+                    }
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;
@@ -449,6 +454,19 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (i + 1 < legsStates.length) {
+                if (legs.get(i).intermediatePlace) {
+                    Leg leg = legs.get(i);
+                    Leg nextLeg = legs.get(i + 1);
+                    if (nextLeg != null && !nextLeg.intermediatePlace && nextLeg.isTransitLeg()) {
+                        long waitTime = nextLeg.startTime.getTimeInMillis() -
+                            leg.endTime.getTimeInMillis();
+                        leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + waitTime);
+                        leg.from.departure = leg.startTime;
+                        leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + waitTime);
+                        leg.to.arrival = leg.endTime;
+                    }
+                }
+
                 legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
                 legs.get(i).to.departure = legs.get(i + 1).from.departure;
 
@@ -468,6 +486,7 @@ public abstract class GraphPathToTripPlanConverter {
                     legs.get(i).alightRule = alightRule;    // leg, don't alight now.
                 }
             }
+
         }
     }
 
@@ -633,6 +652,10 @@ public abstract class GraphPathToTripPlanConverter {
         leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
         leg.to.departure = null;
 
+        if (states[0].getBackEdge() instanceof LegSwitchingEdge) {
+            leg.intermediatePlace = true;
+        }
+
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
 
@@ -702,7 +725,13 @@ public abstract class GraphPathToTripPlanConverter {
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
+            place.bikeParkId = ((BikeParkVertex) vertex).getId();
+            LOG.trace("Added bike parking Id {} to place", place.bikeParkId);
             place.vertexType = VertexType.BIKEPARK;
+        } else if (vertex instanceof ParkAndRideVertex) {
+            place.carParkId = ((ParkAndRideVertex) vertex).getId();
+            LOG.trace("Added bike parking Id {} to place", place.bikeParkId);
+            place.vertexType = VertexType.PARKANDRIDE;
         } else {
             place.vertexType = VertexType.NORMAL;
         }

@@ -83,6 +83,14 @@ public class BarrierVertexTest {
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(noBikeBollard, BarrierVertex.defaultBarrierPermissions));
         assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
+
+        /* test that traversal limitations work also without barrier tag  */
+        OSMNode accessBarrier = new OSMNode();
+        accessBarrier.addTag("access", "no");
+
+        bv.setBarrierPermissions(OSMFilter
+            .getPermissionsForEntity(accessBarrier, BarrierVertex.defaultBarrierPermissions));
+        assertEquals(StreetTraversalPermission.NONE, bv.getBarrierPermissions());
     }
 
     /**

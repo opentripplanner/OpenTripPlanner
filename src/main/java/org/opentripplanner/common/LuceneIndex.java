@@ -20,6 +20,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -104,7 +105,7 @@ public class LuceneIndex {
         }
         doc.add(new DoubleField("lat", stop.getLat(), Field.Store.YES));
         doc.add(new DoubleField("lon", stop.getLon(), Field.Store.YES));
-        doc.add(new StringField("id", stop.getId().toString(), Field.Store.YES));
+        doc.add(new StringField("id", GtfsLibrary.convertIdToString(stop.getId()), Field.Store.YES));
         doc.add(new StringField("category", Category.STOP.name(), Field.Store.YES));
         iwriter.addDocument(doc);
     }
@@ -159,9 +160,14 @@ public class LuceneIndex {
         /* Turn the query string into a Lucene query.*/
         BooleanQuery query = new BooleanQuery();
         BooleanQuery termQuery = new BooleanQuery();
-
         if (autocomplete) {
-            termQuery.add(new PrefixQuery(new Term("name", queryString)), BooleanClause.Occur.SHOULD);
+            for (String term : queryString.split(" ")) {
+                termQuery.add(new TermQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
+                termQuery.add(new PrefixQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
+                // This makes it possible to search for a stop code
+                termQuery.add(new TermQuery(new Term("code", term)),
+                    BooleanClause.Occur.SHOULD);
+            }
         } else {
             List<String> list = new ArrayList<String>();
             Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(queryString);
@@ -171,15 +177,18 @@ public class LuceneIndex {
                 // if token is a quoted search phrase
                 if (token.startsWith("\"") && token.endsWith("\"")) {
                     PhraseQuery phraseQuery = new PhraseQuery();
-                    for (String phraseToken : token.substring(1, token.length() - 1).split(" ")) {
+                    for (String phraseToken : token.substring(1, token.length() - 1)
+                        .split(" ")) {
                         phraseQuery.add(new Term("name", phraseToken.toLowerCase()));
                     }
                     termQuery.add(phraseQuery, BooleanClause.Occur.SHOULD);
                 } else { // a regular unquoted search term
-                    termQuery.add(new FuzzyQuery(new Term("name", token)), BooleanClause.Occur.SHOULD);
+                    termQuery.add(new FuzzyQuery(new Term("name", token)),
+                        BooleanClause.Occur.SHOULD);
 
                     // This makes it possible to search for a stop code
-                    termQuery.add(new TermQuery(new Term("code", token)), BooleanClause.Occur.SHOULD);
+                    termQuery.add(new TermQuery(new Term("code", token)),
+                        BooleanClause.Occur.SHOULD);
                 }
             }
         }

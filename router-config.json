@@ -1,0 +1,38 @@
+{
+  "routingDefaults": {
+      "walkSpeed": 1.3,
+            "transferSlack": 120,
+            "maxTransfers": 4,
+            "waitReluctance": 0.95,
+            "waitAtBeginningFactor": 0.7,
+            "walkReluctance": 1.75,
+            "stairsReluctance": 1.65,
+            "walkBoardCost": 540
+  },
+
+  "updaters": [
+    {
+      "type": "stop-time-updater",
+      "frequencySec": 60,
+      "sourceType": "gtfs-http",
+      "url": "http://beta.digitransit.fi/siri2gtfsrt/HSL",
+      "defaultAgencyId": "HSL",
+      "fuzzyTripMatching": true,
+      "feedId": "hsl-stop-times"
+    },
+    {
+      "type": "real-time-alerts",
+      "frequencySec": 30,
+      "url": "http://beta.digitransit.fi/hslalert/",
+      "fuzzyTripMatching": true
+      "feedId": "hsl-alerts",
+    }
+  ],
+  boardTimes: {
+    AIRPLANE: 2700
+  },
+  alightTimes: {
+    AIRPLANE: 1200
+  }
+}
+

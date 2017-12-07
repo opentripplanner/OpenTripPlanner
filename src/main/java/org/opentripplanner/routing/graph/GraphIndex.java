@@ -1,24 +1,49 @@
 package org.opentripplanner.routing.graph;
 
-import com.google.common.collect.ArrayListMultimap;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.toList;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Calendar;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import graphql.ExceptionWhileDataFetching;
+import graphql.schema.GraphQLSchema;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -34,41 +59,53 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.FieldErrorInstrumentation;
 import org.opentripplanner.index.IndexGraphQLSchema;
+import org.opentripplanner.index.ResourceConstrainedExecutorServiceExecutionStrategy;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.ExtendedTraverseVisitor;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.car_park.CarPark;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
+import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.DominanceFunction;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -88,6 +125,7 @@ public class GraphIndex {
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
+    public final Map<AgencyAndId, Stop> stationForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
     public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
@@ -97,10 +135,11 @@ public class GraphIndex {
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<AgencyAndId, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
+    public final Map<AgencyAndId, TicketType> ticketTypesForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -119,13 +158,29 @@ public class GraphIndex {
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
-    public GraphQL graphQL;
-
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
+    final GraphQLSchema indexSchema;
+
+    public final ExecutorService threadPool;
+
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
+        
+        FareService fareService = graph.getService(FareService.class);
+        if(fareService instanceof DefaultFareServiceImpl) {
+            LOG.info("Collecting fare information...");
+            DefaultFareServiceImpl defaultFareServiceImpl = (DefaultFareServiceImpl) fareService;
+            Map<FareType, Collection<FareRuleSet>> data = defaultFareServiceImpl.getFareRulesPerType();
+            for(Entry<FareType, Collection<FareRuleSet>> kv:data.entrySet()) {
+                if(FareType.regular == kv.getKey()) {
+                    for(FareRuleSet rs: kv.getValue()) {
+                        ticketTypesForId.put(rs.getFareAttribute().getId(), new TicketType(rs));
+                    }
+                }
+            }                             
+        }
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {
@@ -137,7 +192,7 @@ public class GraphIndex {
         }
 
         Collection<Edge> edges = graph.getEdges();
-        /* We will keep a separate set of all vertices in case some have the same label. 
+        /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         Set<Vertex> vertices = Sets.newHashSet();
         for (Edge edge : edges) {
@@ -156,7 +211,15 @@ public class GraphIndex {
                 Stop stop = transitStop.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                if (stop.getParentStation() != null) {
+                    stopsForParentStation.put(
+                        new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()), stop);
+                }
+            }
+            else if (vertex instanceof TransitStation) {
+                TransitStation transitStation = (TransitStation) vertex;
+                Stop stop = transitStation.getStop();
+                stationForId.put(stop.getId(), stop);
             }
         }
         for (TransitStop stopVertex : stopVertexForStop.values()) {
@@ -183,11 +246,13 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQL = new GraphQL(
-                new IndexGraphQLSchema(this).indexSchema,
-                new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
-                        new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-                )));
+        threadPool = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
+                .build()
+        );
+
+        indexSchema = new IndexGraphQLSchema(this).indexSchema;
+        getLuceneIndex();
         LOG.info("Done indexing graph.");
     }
 
@@ -206,14 +271,6 @@ public class GraphIndex {
                 stopClusterSpatialIndex.insert(envelope, cluster);
             }
         }
-    }
-
-    private void analyzeServices() {
-        // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
-        // TODO catalog days of the week and exceptions for each service day.
-        // Make a table of which services are running on each calendar day.
-        // Really the calendarService should be entirely replaced with a set
-        // of simple indexes in GraphIndex.
     }
 
     /** Get all trip patterns running through any stop in the given stop cluster. */
@@ -334,12 +391,98 @@ public class GraphIndex {
         return visitor.stopsFound;
     }
 
+    public List<PlaceAndDistance> findClosestPlacesByWalking(double lat, double lon, int maxDistance, int maxResults,
+            List<TraverseMode> filterByModes,
+            List<PlaceType> filterByPlaceTypes,
+            List<AgencyAndId> filterByStops,
+            List<AgencyAndId> filterByRoutes,
+            List<String> filterByBikeRentalStations,
+            List<String> filterByBikeParks,
+            List<String> filterByCarParks) {
+        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        rr.allowBikeRental = true;
+        //rr.bikeParkAndRide = true;
+        //rr.parkAndRide = true;
+        //rr.modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
+        rr.from = new GenericLocation(lat, lon);
+        rr.batch = true;
+        rr.setRoutingContext(graph);
+        rr.walkSpeed = 1;
+        rr.dominanceFunction = new DominanceFunction.LeastWalk();
+        // RR dateTime defaults to currentTime.
+        // If elapsed time is not capped, searches are very slow.
+        rr.worstTime = (rr.dateTime + maxDistance);
+        rr.setNumItineraries(1);
+        //rr.arriveBy = true;
+        PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(filterByModes, filterByPlaceTypes, filterByStops, filterByRoutes, filterByBikeRentalStations, filterByBikeParks, filterByCarParks);
+        AStar astar = new AStar();
+        astar.setTraverseVisitor(visitor);
+        SearchTerminationStrategy strategy = new SearchTerminationStrategy() {
+            @Override
+            public boolean shouldSearchTerminate(Vertex origin, Vertex target, State current, ShortestPathTree spt,
+                    RoutingRequest traverseOptions) {
+                // the first n stops the search visit may not be the nearest n
+                // but when we have at least n stops found, we can update the
+                // max distance to be the furthest of the places so far
+                // and let the search terminate at that distance
+                // and then return the first n
+                if (visitor.placesFound.size() >= maxResults) {
+                    int furthestDistance = 0;
+                    for (PlaceAndDistance pad : visitor.placesFound) {
+                        if (pad.distance > furthestDistance) {
+                            furthestDistance = pad.distance;
+                        }
+                    }
+                    rr.worstTime = (rr.dateTime + furthestDistance);
+                }
+                return false;
+            }
+        };
+        astar.getShortestPathTree(rr, 100, strategy); // timeout in seconds
+        // Destroy the routing context, to clean up the temporary edges & vertices
+        rr.rctx.destroy();
+        List<PlaceAndDistance> results = visitor.placesFound;
+        results.sort((pad1, pad2) -> pad1.distance - pad2.distance);
+        return results.subList(0, min(results.size(), maxResults));
+    }
+
+    public LuceneIndex getLuceneIndex() {
+        synchronized (this) {
+            if (luceneIndex == null) {
+                File directory;
+                try {
+                    directory = Files.createTempDirectory(graph.routerId + "_lucene",
+                        (FileAttribute<?>[]) new FileAttribute[]{}).toFile();
+                } catch (IOException e) {
+                    return null;
+                }
+                // Synchronously lazy-initialize the Lucene index
+                luceneIndex = new LuceneIndex(this, directory, false);
+            }
+            return luceneIndex;
+        }
+    }
+
     public static class StopAndDistance {
         public Stop stop;
         public int distance;
 
         public StopAndDistance(Stop stop, int distance){
             this.stop = stop;
+            this.distance = distance;
+        }
+    }
+
+    public static enum PlaceType {
+        STOP, DEPARTURE_ROW, BICYCLE_RENT, BIKE_PARK, CAR_PARK;
+    }
+
+    public static class PlaceAndDistance {
+        public Object place;
+        public int distance;
+
+        public PlaceAndDistance(Object place, int distance) {
+            this.place = place;
             this.distance = distance;
         }
     }
@@ -358,6 +501,181 @@ public class GraphIndex {
         }
     }
 
+    public static class DepartureRow {
+        public String id;
+        public Stop stop;
+        public TripPattern pattern;
+
+        public DepartureRow(Stop stop, TripPattern pattern) {
+            this.id = toId(stop, pattern);
+            this.stop = stop;
+            this.pattern = pattern;
+        }
+
+        private static String toId(Stop stop, TripPattern pattern) {
+            return stop.getId().getAgencyId() + ";" + stop.getId().getId() + ";" + pattern.code;
+        }
+
+        public List<TripTimeShort> getStoptimes(GraphIndex index, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
+            return index.stopTimesForPattern(stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups);
+        }
+
+        public static DepartureRow fromId(GraphIndex index, String id) {
+            String[] parts = id.split(";", 3);
+            AgencyAndId stopId = new AgencyAndId(parts[0], parts[1]);
+            String code = parts[2];
+            return new DepartureRow(index.stopForId.get(stopId), index.patternForId.get(code));
+        }
+    }
+
+    private static <T> Set<T> toSet(List<T> list) {
+        if (list == null) return null;
+        return new HashSet<T>(list);
+    }
+
+    private class PlaceFinderTraverseVisitor implements ExtendedTraverseVisitor {
+        public List<PlaceAndDistance> placesFound = new ArrayList<>();
+        private Set<TraverseMode> filterByModes;
+        private Set<AgencyAndId> filterByStops;
+        private Set<AgencyAndId> filterByRoutes;
+        private Set<String> filterByBikeRentalStation;
+        private Set<String> seenDepartureRows = new HashSet<String>();
+        private Set<AgencyAndId> seenStops = new HashSet<AgencyAndId>();
+        private Set<String> seenBicycleRentalStations = new HashSet<String>();
+        private Set<String> seenBikeParks = new HashSet<String>();
+        private Set<String> seenCarParks = new HashSet<String>();
+        private Set<String> filterByBikeParks;
+        private Set<String> filterByCarParks;
+        private boolean includeStops;
+        private boolean includeDepartureRows;
+        private boolean includeBikeShares;
+        private boolean includeBikeParks;
+        private boolean includeCarParks;
+
+        public PlaceFinderTraverseVisitor(
+                List<TraverseMode> filterByModes,
+                List<PlaceType> filterByPlaceTypes,
+                List<AgencyAndId> filterByStops,
+                List<AgencyAndId> filterByRoutes,
+                List<String> filterByBikeRentalStations,
+                List<String> filterByBikeParks,
+                List<String> filterByCarParks) {
+            this.filterByModes = toSet(filterByModes);
+            this.filterByStops = toSet(filterByStops);
+            this.filterByRoutes = toSet(filterByRoutes);
+            this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
+            this.filterByBikeParks = toSet(filterByBikeParks);
+            this.filterByCarParks = toSet(filterByCarParks);
+
+            includeStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.STOP);
+            includeDepartureRows = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.DEPARTURE_ROW);
+            includeBikeShares = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
+            includeBikeParks = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BIKE_PARK);
+            includeCarParks = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.CAR_PARK);
+        }
+
+        @Override public void preVisitEdge(Edge edge, State state) {
+            if (edge instanceof ParkAndRideLinkEdge) {
+                visitVertex(state.edit(edge).makeState());
+            } else if (edge instanceof StreetBikeParkLink) {
+                visitVertex(state.edit(edge).makeState());
+            }
+        }
+        @Override public void visitEdge(Edge edge, State state) {
+        }
+        @Override public void visitEnqueue(State state) {
+        }
+        @Override public void visitVertex(State state) {
+            Vertex vertex = state.getVertex();
+            int distance = (int)state.getWalkDistance();
+            if (vertex instanceof TransitStop) {
+                visitStop(((TransitStop)vertex).getStop(), distance);
+            } else if (vertex instanceof BikeRentalStationVertex) {
+                visitBikeRentalStation(((BikeRentalStationVertex)vertex).getStation(), distance);
+            } else if (vertex instanceof BikeParkVertex) {
+                visitBikePark(((BikeParkVertex)vertex).getBikePark(), distance);
+            } else if (vertex instanceof ParkAndRideVertex) {
+                visitCarPark(((ParkAndRideVertex)vertex).getCarPark(), distance);
+            }
+        }
+        private void visitBikeRentalStation(BikeRentalStation station, int distance) {
+            handleBikeRentalStation(station, distance);
+        }
+
+        private void visitStop(Stop stop, int distance) {
+            handleStop(stop, distance);
+            handleDepartureRows(stop, distance);
+        }
+
+        private void visitBikePark(BikePark bikePark, int distance) {
+            handleBikePark(bikePark, distance);
+        }
+
+        private void visitCarPark(CarPark carPark, int distance) {
+            handleCarPark(carPark, distance);
+        }
+
+        private void handleStop(Stop stop, int distance) {
+            if (filterByStops != null && !filterByStops.contains(stop.getId())) return;
+            if (includeStops && !seenStops.contains(stop.getId()) && (filterByModes == null || stopHasRoutesWithMode(stop, filterByModes))) {
+                placesFound.add(new PlaceAndDistance(stop, distance));
+                seenStops.add(stop.getId());
+            }
+        }
+
+        private void handleDepartureRows(Stop stop, int distance) {
+            if (includeDepartureRows) {
+                List<TripPattern> patterns = patternsForStop.get(stop)
+                    .stream()
+                    .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.mode))
+                    .filter(pattern -> filterByRoutes == null || filterByRoutes.contains(pattern.route.getId()))
+                    .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
+                    .collect(toList());
+
+                for (TripPattern pattern : patterns) {
+                    String seenKey = GtfsLibrary.convertIdToString(pattern.route.getId()) + ":" + pattern.code;
+                    if (!seenDepartureRows.contains(seenKey)) {
+                        DepartureRow row = new DepartureRow(stop, pattern);
+                        PlaceAndDistance place = new PlaceAndDistance(row, distance);
+                        placesFound.add(place);
+                        seenDepartureRows.add(seenKey);
+                    }
+                }
+            }
+        }
+
+        private void handleBikeRentalStation(BikeRentalStation station, int distance) {
+            if (!includeBikeShares) return;
+            if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) return;
+            if (seenBicycleRentalStations.contains(station.id)) return;
+            seenBicycleRentalStations.add(station.id);
+            placesFound.add(new PlaceAndDistance(station, distance));
+        }
+
+        private void handleBikePark(BikePark bikePark, int distance) {
+            if (!includeBikeParks) return;
+            if (filterByBikeParks != null && !filterByBikeParks.contains(bikePark.id)) return;
+            if (seenBikeParks.contains(bikePark.id)) return;
+            seenBikeParks.add(bikePark.id);
+            placesFound.add(new PlaceAndDistance(bikePark, distance));
+        }
+
+        private void handleCarPark(CarPark carPark, int distance) {
+            if (!includeCarParks) return;
+            if (filterByCarParks != null && !filterByCarParks.contains(carPark.id)) return;
+            if (seenCarParks.contains(carPark.id)) return;
+            seenCarParks.add(carPark.id);
+            placesFound.add(new PlaceAndDistance(carPark, distance));
+        }
+    }
+
+    private Stream<TraverseMode> modesForStop(Stop stop) {
+        return routesForStop(stop).stream().map(GtfsLibrary::getTraverseMode);
+    }
+
+    private boolean stopHasRoutesWithMode(Stop stop, Set<TraverseMode> modes) {
+        return modesForStop(stop).anyMatch(modes::contains);
+    }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
@@ -396,13 +714,12 @@ public class GraphIndex {
     }
 
     /**
-     * Fetch upcoming vehicle departures from a stop.
-     * It goes though all patterns passing the stop for the previous, current and next service date.
-     * It uses a priority queue to keep track of the next departures. The queue is shared between all dates, as services
-     * from the previous service date can visit the stop later than the current service date's services. This happens
+     * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop
+     * for the previous, current and next service date. It uses a priority queue to keep track of
+     * the next departures. The queue is shared between all dates, as services from the previous
+     * service date can visit the stop later than the current service date's services. This happens
      * eg. with sleeper trains.
      *
-     * TODO: Add frequency based trips
      * @param stop Stop object to perform the search for
      * @param startTime Start time for the search. Seconds from UNIX epoch
      * @param timeRange Searches forward for timeRange seconds from startTime
@@ -410,86 +727,132 @@ public class GraphIndex {
      * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
      * @return
      */
-    public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
+    public List<StopTimesInPattern> stopTimesForStop(final Stop stop, final long startTime, final int timeRange, final int numberOfDepartures, boolean omitNonPickups) {
+   
+        final List<StopTimesInPattern> ret = new ArrayList<>();
 
-        if (startTime == 0) {
-            startTime = System.currentTimeMillis() / 1000;
-        }
-        List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableSnapshot snapshot = null;
-        if (graph.timetableSnapshotSource != null) {
-            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
-        }
-        Date date = new Date(startTime * 1000);
-        ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
+        for (final TripPattern pattern : patternsForStop.get(stop)) {
+            
+            final List<TripTimeShort> stopTimesForStop = stopTimesForPattern(stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups);
 
-        for (TripPattern pattern : patternsForStop.get(stop)) {
-
-            // Use the Lucene PriorityQueue, which has a fixed size
-            PriorityQueue<TripTimeShort> pq = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
-                @Override
-                protected boolean lessThan(TripTimeShort tripTimeShort, TripTimeShort t1) {
-                    // Calculate exact timestamp
-                    return (tripTimeShort.serviceDay + tripTimeShort.realtimeDeparture) >
-                            (t1.serviceDay + t1.realtimeDeparture);
-                }
-            };
-
-            // Loop through all possible days
-            for (ServiceDate serviceDate : serviceDates) {
-                ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
-                Timetable tt;
-                if (snapshot != null){
-                    tt = snapshot.resolve(pattern, serviceDate);
-                } else {
-                    tt = pattern.scheduledTimetable;
-                }
-
-                if (!tt.temporallyViable(sd, startTime, timeRange, true)) continue;
-
-                int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
-                int sidx = 0;
-                for (Stop currStop : pattern.stopPattern.stops) {
-                    if (currStop == stop) {
-                        if(omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
-                        for (TripTimes t : tt.tripTimes) {
-                            if (!sd.serviceRunning(t.serviceCode)) continue;
-                            if (t.getDepartureTime(sidx) != -1 &&
-                                    t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-                                pq.insertWithOverflow(new TripTimeShort(t, sidx, stop, sd));
-                            }
-                        }
-
-                        // TODO: This needs to be adapted after #1647 is merged
-                        for (FrequencyEntry freq : tt.frequencyEntries) {
-                            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
-                            int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
-                            if (departureTime == -1) continue;
-                            int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -
-                                    freq.tripTimes.getDepartureTime(0);
-                            int i = 0;
-                            while (departureTime <= lastDeparture && i < numberOfDepartures) {
-                                pq.insertWithOverflow(new TripTimeShort(freq.materialize(sidx, departureTime, true), sidx, stop, sd));
-                                departureTime += freq.headway;
-                                i++;
-                            }
-                        }
-                    }
-                    sidx++;
-                }
-            }
-
-            if (pq.size() != 0) {
-                StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-                while (pq.size() != 0) {
-                    stopTimes.times.add(0, pq.pop());
-                }
+            
+            if (stopTimesForStop.size() >0) {
+                final StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+                stopTimes.times.addAll(stopTimesForStop);
                 ret.add(stopTimes);
             }
         }
         return ret;
     }
+    
+    /**
+     * Fetch next n upcoming vehicle departures for a stop of pattern. It goes
+     * though the previous, current and next service date. It uses a priority
+     * queue to keep track of the next departures. The queue is shared between
+     * all dates, as services from the previous service date can visit the stop
+     * later than the current service date's services. This happens eg. with
+     * sleeper trains.
+     *
+     * @param stop
+     *            Stop object to perform the search for
+     * @param startTime
+     *            Start time for the search. Seconds from UNIX epoch
+     * @param pattern
+     *            The selected pattern. If null an empty list is returned.
+     * @param timeRange
+     *            Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures
+     *            Number of departures to fetch per pattern
+     * @return
+     */
+    public List<TripTimeShort> stopTimesForPattern(final Stop stop, final TripPattern pattern, long startTime, final int timeRange,
+            int numberOfDepartures, boolean omitNonPickups) {
 
+        if (pattern == null) { 
+            return Collections.emptyList();
+        }
+
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis() / 1000;
+        }
+
+        final PriorityQueue<TripTimeShort> ret = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
+            
+            @Override
+            protected boolean lessThan(final TripTimeShort t1, final TripTimeShort t2) {
+                return (t1.serviceDay + t1.realtimeDeparture) > (t2.serviceDay
+                        + t2.realtimeDeparture);
+            }
+        };
+
+        final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null)
+            ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
+
+        Date date = new Date(startTime * 1000);
+        final ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
+
+        // Loop through all possible days
+        for (final ServiceDate serviceDate : serviceDates) {
+            final ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService,
+                    pattern.route.getAgency().getId());
+            Timetable tt;
+
+            if (snapshot != null) {
+                tt = snapshot.resolve(pattern, serviceDate);
+            } else {
+                tt = pattern.scheduledTimetable;
+            }
+
+            if (!tt.temporallyViable(sd, startTime, timeRange, true))
+                continue;
+
+            final int starttimeSecondsSinceMidnight = sd.secondsSinceMidnight(startTime);
+            int stopIndex = 0;
+
+            // loop through all stops of pattern
+            for (final Stop currStop : pattern.stopPattern.stops) {
+                if (currStop.equals(stop)) {
+                    if(omitNonPickups && pattern.stopPattern.pickups[stopIndex] == pattern.stopPattern.PICKDROP_NONE) continue;
+                    for (final TripTimes triptimes : tt.tripTimes) {
+                        if (!sd.serviceRunning(triptimes.serviceCode))
+                            continue;
+                        int stopDepartureTime = triptimes.getDepartureTime(stopIndex);
+                        if (stopDepartureTime != -1 && stopDepartureTime >= starttimeSecondsSinceMidnight && stopDepartureTime < starttimeSecondsSinceMidnight + timeRange) {
+                            ret.insertWithOverflow(new TripTimeShort(triptimes, stopIndex, currStop, sd));
+                        }
+                    }
+
+                    // TODO: This needs to be adapted after #1647 is merged
+                    for (final FrequencyEntry freq : tt.frequencyEntries) {
+                        if (!sd.serviceRunning(freq.tripTimes.serviceCode))
+                            continue;
+                        int departureTime = freq.nextDepartureTime(stopIndex, starttimeSecondsSinceMidnight);
+                        if (departureTime == -1)
+                            continue;
+                        final int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(stopIndex)
+                                - freq.tripTimes.getDepartureTime(0);
+
+                        while (departureTime <= lastDeparture && ret.size() < numberOfDepartures) {
+                            ret.insertWithOverflow(new TripTimeShort(freq.materialize(stopIndex, departureTime, true),
+                                    stopIndex, currStop, sd));
+                            departureTime += freq.headway;
+                        }
+                    }
+                }
+
+                stopIndex++;
+            }
+        }
+
+        final List<TripTimeShort> result = new ArrayList<>();
+        while(ret.size()>0) {
+            result.add(0, ret.pop());
+        }
+        
+        return result; 
+    }
+  
+    
     /**
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
      * timetables for a single day.
@@ -589,7 +952,7 @@ public class GraphIndex {
             clusterByProximity();
         }
     }
-  
+
     private void clusterByProximity() {	
     	int psIdx = 0; // unique index for next parent stop
 	    LOG.info("Clustering stops by geographic proximity and name...");
@@ -622,6 +985,7 @@ public class GraphIndex {
 	        stopClusterForId.put(cluster.id, cluster);
 	    }
     }
+
     private void clusterByParentStation() {
         LOG.info("Clustering stops by parent station...");
     	for (Stop stop : stopForId.values()) {
@@ -643,19 +1007,107 @@ public class GraphIndex {
     	    stopClusterForStop.put(stop, cluster);    
     	}
     }
-    
-    public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
-        ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
+
+    public Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
-        HashMap<String, Object> content = new HashMap<>();
-        if (!executionResult.getErrors().isEmpty()) {
+        HashMap<String, Object> content = getGraphQLExecutionResult(query, router, variables,
+            operationName, timeout, maxResolves, headers);
+        if (content.get("errors") != null) {
+            // TODO: Put correct error code, eg. 400 for syntax error
             res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
-            content.put("errors", executionResult.getErrors());
+        }
+        return res.entity(content).build();
+    }
+
+    public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
+        Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
+        
+        GraphQL graphQL = GraphQL.newGraphQL(indexSchema).queryExecutionStrategy(
+            new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
+        ).instrumentation(FieldErrorInstrumentation.get(query, router, variables, headers)).build();
+
+        if (variables == null) {
+            variables = new HashMap<>();
+        }
+        
+        ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
+        HashMap<String, Object> content = new HashMap<>();
+        
+        if (!executionResult.getErrors().isEmpty()) {
+            content.put("errors",
+                executionResult
+                    .getErrors()
+                    .stream()
+                    .map(error -> {
+                        if (error instanceof ExceptionWhileDataFetching) {
+                            StringWriter sw = new StringWriter();
+                            PrintWriter pw = new PrintWriter(sw);
+                            ((ExceptionWhileDataFetching) error).getException().printStackTrace(pw);
+                            HashMap<String, Object> response = new HashMap<String, Object>();
+                            response.put("message", error.getMessage());
+                            response.put("locations", error.getLocations());
+                            response.put("errorType", error.getErrorType());
+                            response.put("stack", sw.toString());
+                            return response;
+                        } else {
+                            return error;
+                        }
+                    })
+                    .collect(Collectors.toList()));
         }
         if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
         }
-        return res.entity(content).build();
+        return content;
+    }
+
+    private Stream<AlertPatch> getAlertPatchStream() {
+        if (graph.updaterManager == null) {
+            return Stream.empty();
+        }
+        return graph.updaterManager.getUpdaterList().stream()
+            .filter(GtfsRealtimeAlertsUpdater.class::isInstance)
+            .map(GtfsRealtimeAlertsUpdater.class::cast)
+            .map(GtfsRealtimeAlertsUpdater::getAlertPatchService)
+            .map(AlertPatchService::getAllAlertPatches)
+            .flatMap(Collection::stream);
+    }
+
+    public List<AlertPatch> getAlerts() {
+        return getAlertPatchStream()
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForRoute(Route route) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getRoute() != null)
+            .filter(alertPatch -> route.getId().equals(alertPatch.getRoute()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForTrip(Trip trip) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTrip() != null)
+            .filter(alertPatch -> trip.getId().equals(alertPatch.getTrip()))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForPattern(TripPattern pattern) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getTripPatterns() != null)
+            .filter(alertPatch -> alertPatch.getTripPatterns().stream().anyMatch(tripPattern -> pattern.code.equals(tripPattern.code)))
+            .collect(Collectors.toList());
+    }
+
+    public List<AlertPatch> getAlertsForAgency(Agency agency) {
+        return getAlertPatchStream()
+            .filter(alertPatch -> alertPatch.getAgency() != null)
+            .filter(alertPatch -> agency.getId().equals(alertPatch.getAgency()))
+            .collect(Collectors.toList());
+    }
+
+    public AlertPatch getAlertForId(String id) {
+        return getAlertPatchStream().filter(alertPatch -> id.equals(alertPatch.getId())).findFirst().get();
     }
 
     /**
@@ -692,4 +1144,7 @@ public class GraphIndex {
         return allAgencies;
     }
 
+    public Collection<TicketType> getAllTicketTypes() {
+        return ticketTypesForId.values();
+    }
 }

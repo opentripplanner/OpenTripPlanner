@@ -45,6 +45,7 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,10 +110,12 @@ public class GraphBuilder implements Runnable {
     }
     
     public void setPath (String path) {
+        MDC.put("routerPath", path);
         graphFile = new File(path.concat("/Graph.obj"));
     }
     
     public void setPath (File path) {
+        MDC.put("routerPath", path.getPath());
         graphFile = new File(path, "Graph.obj");
     }
 

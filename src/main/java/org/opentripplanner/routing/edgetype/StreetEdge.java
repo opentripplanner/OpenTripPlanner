@@ -377,6 +377,12 @@ public class StreetEdge extends Edge implements Cloneable {
                 double elevationUtilsSpeed = 4.0 / 3.0;
                 weight = costs * (elevationUtilsSpeed / speed);
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
+
+                if (getStreetClass() == CLASS_STREET || getPermission().allows(TraverseMode.CAR)) {
+                    // Add weight on edges allowed for cars, in order to prefer walkways
+                    weight *= options.walkOnStreetReluctance;
+                }
+
                 /*
                 // debug code
                 if(weight > 100){
@@ -416,6 +422,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
         }
+
+        int roundedTime = (int) Math.ceil(time);
 
         /* Compute turn cost. */
         StreetEdge backPSE;
@@ -466,8 +474,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
             }
 
-            long turnTime = (long) Math.ceil(realTurnCost);
-            time += turnTime;
+            int turnTime = (int) Math.ceil(realTurnCost);
+            roundedTime += turnTime;
             weight += options.turnReluctance * realTurnCost;
         }
         
@@ -484,7 +492,6 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        int roundedTime = (int) Math.ceil(time);
         if (options.kissAndRide || options.parkAndRide) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
@@ -772,12 +779,12 @@ public class StreetEdge extends Edge implements Cloneable {
      * TODO change everything to clockwise from North
      */
 	public int getInAngle() {
-		return this.inAngle * 180 / 128;
+		return (int) Math.round(this.inAngle * 180 / 128.0);
 	}
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle * 180 / 128;
+		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {

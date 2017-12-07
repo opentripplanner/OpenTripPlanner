@@ -110,6 +110,10 @@ public abstract class RoutingResource {
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
 
+    /** How much more reluctant is the user to walk on streets with car traffic allowed **/
+    @QueryParam("walkOnStreetReluctance")
+    protected Double walkOnStreetReluctance;
+
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
@@ -361,6 +365,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
+    
+    /** 
+     * @see {@link org.opentripplanner.routing.core.RoutingRequest#carParkCarLegWeight} 
+     */
+    @QueryParam("carParkCarLegWeight")
+    private Double carParkCarLegWeight;
 
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -390,29 +400,7 @@ public abstract class RoutingResource {
         if (toPlace != null)
             request.setToString(toPlace);
 
-        {
-            //FIXME: move into setter method on routing request
-            TimeZone tz;
-            tz = router.graph.getTimeZone();
-            if (date == null && time != null) { // Time was provided but not date
-                LOG.debug("parsing ISO datetime {}", time);
-                try {
-                    // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
-                    DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
-                    XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
-                    GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
-                    if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                        gregCal.setTimeZone(tz);
-                    }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
-                } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(date, time, tz);
-                }
-            } else {
-                request.setDateTime(date, time, tz);
-            }
-        }
+        request.parseTime(router.graph.getTimeZone(), this.date, this.time);
 
         if (wheelchair != null)
             request.setWheelchairAccessible(wheelchair);
@@ -428,11 +416,18 @@ public abstract class RoutingResource {
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
 
+        if(carParkCarLegWeight != null) {
+            request.setCarParkCarLegWeight(carParkCarLegWeight);
+        }
+        
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 
         if (waitReluctance != null)
             request.setWaitReluctance(waitReluctance);
+
+        if (walkOnStreetReluctance != null)
+            request.setWalkOnStreetReluctance(walkOnStreetReluctance);
 
         if (waitAtBeginningFactor != null)
             request.setWaitAtBeginningFactor(waitAtBeginningFactor);
@@ -453,19 +448,10 @@ public abstract class RoutingResource {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setOptimize(optimize);
             if (optimize == OptimizeType.TRIANGLE) {
-                if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-                    throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-                }
-                if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-                    throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-                }
-                // FIXME couldn't this be simplified by only specifying TWO of the values?
-                if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-                    throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-                }
-                request.setTriangleSafetyFactor(triangleSafetyFactor);
-                request.setTriangleSlopeFactor(triangleSlopeFactor);
-                request.setTriangleTimeFactor(triangleTimeFactor);
+                RoutingRequest.assertTriangleParameters(triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor);
+                request.setTriangleSafetyFactor(this.triangleSafetyFactor);
+                request.setTriangleSlopeFactor(this.triangleSlopeFactor);
+                request.setTriangleTimeFactor(this.triangleTimeFactor);
             }
         }
 
@@ -552,10 +538,7 @@ public abstract class RoutingResource {
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
+        request.assertSlack();
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
@@ -604,7 +587,7 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    public static HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }

@@ -164,6 +164,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     /** For each fare type (regular, student, etc...) the collection of rules that apply. */
     protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
+    public Map<FareType, Collection<FareRuleSet>> getFareRulesPerType() {
+        return fareRulesPerType;
+    }
+
     public DefaultFareServiceImpl() {
         fareRulesPerType = new HashMap<>();
     }

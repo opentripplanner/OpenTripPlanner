@@ -54,6 +54,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.Router;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -197,6 +198,9 @@ public class Graph implements Serializable {
     /** Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or ferries. */
     public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
 
+    /** Has information how different transport modes are weighted. By default a weight of 1 is assigned. higher weight means higher cost. */
+    public Map<TraverseMode, Double> modeWeights = Collections.EMPTY_MAP;
+    
     /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
     public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
 
