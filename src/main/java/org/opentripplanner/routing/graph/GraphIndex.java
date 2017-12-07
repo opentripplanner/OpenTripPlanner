@@ -48,6 +48,7 @@ import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -122,6 +123,7 @@ public class GraphIndex {
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
+    public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stationForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
@@ -186,6 +188,7 @@ public class GraphIndex {
                 agencyForId.put(agency.getId(), agency);
                 this.agenciesForFeedId.put(feedId, agencyForId);
             }
+            this.feedInfoForId.put(feedId, graph.getFeedInfo(feedId));
         }
 
         Collection<Edge> edges = graph.getEdges();
