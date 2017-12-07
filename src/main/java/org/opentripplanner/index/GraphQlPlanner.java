@@ -1,19 +1,7 @@
 package org.opentripplanner.index;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sentry.Sentry;
-import io.sentry.context.Context;
-import io.sentry.event.Event;
-import io.sentry.event.EventBuilder;
+import com.google.common.collect.ImmutableMap;
+import graphql.schema.DataFetchingEnvironment;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -36,9 +24,9 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableMap;
-
-import graphql.schema.DataFetchingEnvironment;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class GraphQlPlanner {
 
@@ -46,7 +34,6 @@ public class GraphQlPlanner {
 
     private GraphIndex index;
 
-    private ObjectMapper mapper = new ObjectMapper();
 
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
@@ -54,87 +41,50 @@ public class GraphQlPlanner {
 
     public Map<String, Object> plan(DataFetchingEnvironment environment) {
 
-        Router router = (Router)environment.getContext();
+        Router router = (Router) environment.getContext();
 
-        Context sentryContext = Sentry.getContext();
 
         RoutingRequest request = createRequest(environment);
 
-        sentryContext.addExtra("from",request.from.toDescriptiveString());
-        sentryContext.addExtra("to",request.to.toDescriptiveString());
-        sentryContext.addExtra("time",request.getDateTime().toString());
-        sentryContext.addExtra("zoneids",request.getZoneIdSet().toString());
-        sentryContext.addExtra("walkReluctance",request.walkReluctance);
-        sentryContext.addExtra("walkSpeed",request.walkSpeed);
-        sentryContext.addExtra("transferPenalty",request.transferPenalty);
-        sentryContext.addExtra("walkBoardCost",request.walkBoardCost);
-        sentryContext.addExtra("minTransferTime",request.transferSlack);
-        sentryContext.addExtra("modes",request.modes.toString());
-        sentryContext.addExtra("arriveBy",request.arriveBy);
+        SentryUtilities.setupSentryBeforePlan(request);
 
         GraphPathFinder gpFinder = new GraphPathFinder(router);
 
         TripPlan plan = new TripPlan(
-            new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
-            new Place(request.to.lng, request.to.lat, request.getToPlace().name),
-            request.getDateTime());
+                new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
+                new Place(request.to.lng, request.to.lat, request.getToPlace().name),
+                request.getDateTime());
         List<Message> messages = new ArrayList<>();
         DebugOutput debugOutput = new DebugOutput();
-        
+
         try {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
             plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
-        
+
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass())) {
+            if (!PlannerError.isPlanningError(e.getClass())) {
                 messages.add(error.message);
             }
         } catch (Throwable t) {
             LOG.warn("Unchecked error while planning path: ", t);
-        }
-        finally {
+        } finally {
             if (request != null) {
                 if (request.rctx != null) {
                     debugOutput = request.rctx.debugOutput;
-     
+
                 }
                 request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
             }
         }
 
-        sentryContext.addExtra("aborted",request.rctx.aborted);
-        sentryContext.addExtra("timedOut",request.rctx.debugOutput.timedOut);
-
-
-        try {
-            sentryContext.addExtra("debugOutput",mapper.writeValueAsString(request.rctx.debugOutput));
-        } catch (JsonProcessingException e) {
-            LOG.warn("Unable to serialize debugOutput");
-        }
-        sentryContext.addExtra("messages",Arrays.toString(messages.toArray()));
-
-        if (request.rctx.debugOutput.timedOut) {
-            EventBuilder eventBuilder = new EventBuilder()
-                    .withMessage("Search timeout")
-                    .withLevel(Event.Level.ERROR)
-                    .withLogger(LOG.getName());
-            Sentry.capture(eventBuilder);
-        }
-
-        if (plan.itinerary.isEmpty()) {
-            EventBuilder eventBuilder = new EventBuilder()
-                    .withMessage("Zero routes found")
-                    .withLevel(Event.Level.ERROR)
-                    .withLogger(LOG.getName());
-            Sentry.capture(eventBuilder);
-        }
+        SentryUtilities.setupSentryAfterPlan(request, plan, messages);
 
         return ImmutableMap.<String, Object>builder()
-            .put("plan", plan)
-            .put("messages", messages)
-            .put("debugOutput", debugOutput)
-            .build();
+                .put("plan", plan)
+                .put("messages", messages)
+                .put("debugOutput", debugOutput)
+                .build();
     }
 
     private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
@@ -189,7 +139,7 @@ public class GraphQlPlanner {
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
-        Router router = (Router)environment.getContext();
+        Router router = (Router) environment.getContext();
         RoutingRequest request = router.defaultRoutingRequest.clone();
         request.routerId = router.id;
 
@@ -261,10 +211,10 @@ public class GraphQlPlanner {
             new QualifiedModeSet(environment.getArgument("modes")).applyToRoutingRequest(request);
             request.setModes(request.modes);
         }
-        
+
         if (hasArgument(environment, "ticketTypes")) {
             String ticketTypes = environment.getArgument("ticketTypes");
-            request.setZoneIdSet(ZoneIdSet.create(index,  ticketTypes));
+            request.setZoneIdSet(ZoneIdSet.create(index, ticketTypes));
             //TODO should we increase max walk distance?
             //request.setMaxWalkDistance(request.getMaxWalkDistance()*2); 
         } else {
