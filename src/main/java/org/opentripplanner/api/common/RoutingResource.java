@@ -354,6 +354,9 @@ public abstract class RoutingResource {
     @QueryParam("maxHours")
     private Double maxHours;
 
+    @QueryParam("useRequestedDateTimeInMaxHours")
+    private Boolean useRequestedDateTimeInMaxHours;
+
     @QueryParam("disableAlertFiltering")
     private Boolean disableAlertFiltering;
 
@@ -564,6 +567,9 @@ public abstract class RoutingResource {
 
         if (maxHours != null)
             request.maxHours = maxHours;
+
+        if (useRequestedDateTimeInMaxHours != null)
+            request.useRequestedDateTimeInMaxHours = useRequestedDateTimeInMaxHours;
 
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;

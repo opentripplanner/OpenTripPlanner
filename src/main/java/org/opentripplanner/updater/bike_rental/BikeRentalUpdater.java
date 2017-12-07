@@ -110,6 +110,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new SmooveBikeRentalDataSource();
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
+            } else if (sourceType.equals("gbfs")) {
+                source = new GbfsBikeRentalDataSource();
             }
         }
 
