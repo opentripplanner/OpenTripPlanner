@@ -243,6 +243,7 @@ public class GraphBuilder implements Runnable {
             osmModule.customNamer = builderParams.customNamer;
             osmModule.setDefaultWayPropertySetSource(builderParams.wayPropertySet);
             osmModule.skipVisibility = !builderParams.areaVisibility;
+            osmModule.platformEntriesLinking = builderParams.platformEntriesLinking;
             osmModule.staticBikeRental = builderParams.staticBikeRental;
             osmModule.staticBikeParkAndRide = builderParams.staticBikeParkAndRide;
             osmModule.staticParkAndRide = builderParams.staticParkAndRide;
