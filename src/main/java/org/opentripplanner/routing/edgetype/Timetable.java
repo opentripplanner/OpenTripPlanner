@@ -167,7 +167,7 @@ public class Timetable implements Serializable {
         }
 
         for (TripTimes tt : tripTimes) {
-            if (!isTripTimesOk(tt, serviceDay, s0, stopIndex))
+            if (!isTripTimesOk(tt, serviceDay, s0, stopIndex, true))
                 continue;
             int adjustedTime = recomputeTime
                 ? adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time)
@@ -197,7 +197,7 @@ public class Timetable implements Serializable {
         FrequencyEntry bestFreq = null;
         for (FrequencyEntry freq : frequencyEntries) {
             TripTimes tt = freq.tripTimes;
-            if (!isTripTimesOk(tt, serviceDay, s0, stopIndex))
+            if (!isTripTimesOk(tt, serviceDay, s0, stopIndex, true))
                 continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
@@ -227,10 +227,10 @@ public class Timetable implements Serializable {
         return bestTrip;
     }
 
-    public boolean isTripTimesOk(TripTimes tt, ServiceDay serviceDay, State s0, int stopIndex) {
+    public boolean isTripTimesOk(TripTimes tt, ServiceDay serviceDay, State s0, int stopIndex, boolean checkBannedTrips) {
         if (tt.isCanceled()) return false;
         if ( ! serviceDay.serviceRunning(tt.serviceCode)) return false; // TODO merge into call on next line
-        if ( ! tt.tripAcceptable(s0, stopIndex)) return false;
+        if ( ! tt.tripAcceptable(s0, stopIndex, checkBannedTrips)) return false;
         return true;
     }
 

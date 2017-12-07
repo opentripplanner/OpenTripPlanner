@@ -782,7 +782,7 @@ public abstract class GraphPathToTripPlanConverter {
                 List<TripTimes> sortedTimes = new ArrayList<>(timetable.tripTimes);
                 sortedTimes.sort(Comparator.comparingInt(tt -> tt.getDepartureTime(stopIndex)));
                 for (TripTimes tt : sortedTimes) {
-                    if (!timetable.isTripTimesOk(tt, sd, state, stopIndex))
+                    if (!timetable.isTripTimesOk(tt, sd, state, stopIndex, false))
                         continue;
                     long deptTime = sd.time(tt.getDepartureTime(stopIndex));
                     if (deptTime > time) {

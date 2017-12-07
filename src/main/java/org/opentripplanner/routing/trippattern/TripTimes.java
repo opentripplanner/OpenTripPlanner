@@ -355,9 +355,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * and transfers with minimum time or forbidden transfers.
      */
     public boolean tripAcceptable(final State state0, final int stopIndex) {
+        return tripAcceptable(state0, stopIndex, true);
+    }
+
+    public boolean tripAcceptable(final State state0, final int stopIndex, boolean checkBannedTrips) {
         final RoutingRequest options = state0.getOptions();
         final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
+        if (checkBannedTrips && banned != null && banned.contains(stopIndex)) {
             return false;
         }
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() == 2) {
