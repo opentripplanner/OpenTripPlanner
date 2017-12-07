@@ -873,12 +873,18 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(1)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(false)
+                    .build())
                 .dataFetcher(environment -> {
                     GraphIndex.DepartureRow departureRow = environment.getSource();
                     long startTime = environment.getArgument("startTime");
                     int timeRange = environment.getArgument("timeRange");
                     int maxDepartures = environment.getArgument("numberOfDepartures");
-                    return departureRow.getStoptimes(index, startTime, timeRange, maxDepartures);
+                    boolean omitNonPickups = environment.getArgument("omitNonPickups");
+                    return departureRow.getStoptimes(index, startTime, timeRange, maxDepartures, omitNonPickups);
                 })
                 .build())
             .build();
@@ -1000,12 +1006,18 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(2)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(false)
+                    .build())
                 .dataFetcher(environment ->
                     index.stopTimesForPattern(environment.getSource(),
                         index.patternForId.get(environment.getArgument("id")),
                         environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
-                        environment.getArgument("numberOfDepartures")))
+                        environment.getArgument("numberOfDepartures"),
+                        environment.getArgument("omitNonPickups")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
@@ -1122,6 +1134,11 @@ public class IndexGraphQLSchema {
                     .name("date")
                     .type(Scalars.GraphQLString)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(false)
+                    .build())
                 .dataFetcher(environment -> {
                     ServiceDate date;
                     try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
@@ -1130,15 +1147,16 @@ public class IndexGraphQLSchema {
                         return null;
                     }
                     Stop stop = environment.getSource();
+                    boolean omitNonPickups = environment.getArgument("omitNonPickups")
                     if (stop.getLocationType() == 1) {
                         // Merge all stops if this is a station
                         return index.stopsForParentStation
                             .get(stop.getId())
                             .stream()
-                            .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date).stream())
+                            .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date,omitNonPickups).stream())
                             .collect(Collectors.toList());
                     }
-                    return index.getStopTimesForStop(stop, date);
+                    return index.getStopTimesForStop(stop, date, omitNonPickups);
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1159,6 +1177,11 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(false)
+                    .build())
                 .dataFetcher(environment -> {
                     Stop stop = environment.getSource();
                     if (stop.getLocationType() == 1) {
@@ -1170,7 +1193,8 @@ public class IndexGraphQLSchema {
                                 index.stopTimesForStop(singleStop,
                                     environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
-                                    environment.getArgument("numberOfDepartures"))
+                                    environment.getArgument("numberOfDepartures"),
+                                    environment.getArgument("omitNonPickups"))
                                 .stream()
                             )
                             .collect(Collectors.toList());
@@ -1178,7 +1202,8 @@ public class IndexGraphQLSchema {
                     return index.stopTimesForStop(stop,
                         environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
-                        environment.getArgument("numberOfDepartures"));
+                        environment.getArgument("numberOfDepartures"),
+                        environment.getArgument("omitNonPickups"));
 
                 })
                 .build())
@@ -1200,6 +1225,11 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLInt)
                     .defaultValue(5)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(false)
+                    .build())
                 .dataFetcher(environment -> {
                     Stop stop = environment.getSource();
                     Stream<StopTimesInPattern> stream;
@@ -1211,7 +1241,8 @@ public class IndexGraphQLSchema {
                                 index.stopTimesForStop(singleStop,
                                     environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
-                                    environment.getArgument("numberOfDepartures"))
+                                    environment.getArgument("numberOfDepartures"),
+                                    environment.getArgument("omitNonPickups"))
                                     .stream()
                             );
                     }
@@ -1220,7 +1251,8 @@ public class IndexGraphQLSchema {
                             environment.getSource(),
                             environment.getArgument("startTime"),
                             environment.getArgument("timeRange"),
-                            environment.getArgument("numberOfDepartures")
+                            environment.getArgument("numberOfDepartures"),
+                            environment.getArgument("omitNonPickups")
                         ).stream();
                     }
                     return stream.flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
