@@ -1147,7 +1147,7 @@ public class IndexGraphQLSchema {
                         return null;
                     }
                     Stop stop = environment.getSource();
-                    boolean omitNonPickups = environment.getArgument("omitNonPickups")
+                    boolean omitNonPickups = environment.getArgument("omitNonPickups");
                     if (stop.getLocationType() == 1) {
                         // Merge all stops if this is a station
                         return index.stopsForParentStation
