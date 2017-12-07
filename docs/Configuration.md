@@ -237,9 +237,19 @@ The current list of `combinationStrategy` is:
 
 ## OSM / OpenStreetMap configuration
 
+It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part of the routing graph.
+
 ### Way property sets
 
+OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
 You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
+
+There are currently 2 wayPropertySets defined;
+
+- `default` which is based on California/US mapping standard
+- `norway` which is adjusted to rules and speeds in Norway
+
+To add your own custom property set have a look at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet` and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones. The mechanism is that for any two identical tags, OTP will use the first one.
 
 ```JSON
 // build-config.json
@@ -248,7 +258,6 @@ You can adjust which road types that are accessible by foot, car & bicycle as we
 }
 ```
 
-There are currently 2 wayPropertySets defined; "default" and "norway".
 
 ### Custom naming
 
