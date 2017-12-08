@@ -257,7 +257,7 @@ public class Timetable implements Serializable {
         if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
             String fromFeed = state.getPreviousStop().getId().getAgencyId();
             String toFeed = currentStop.getId().getAgencyId();
-            if (state.getOptions().unknownTransfersAreForbidden && transferTable.hasFeedTransfers(fromFeed, toFeed, boarding)) {
+            if (!state.getOptions().allowUnknownTransfers && transferTable.hasFeedTransfers(fromFeed, toFeed, boarding)) {
                 return -1;
             } else {
                 return t0; // no special rules, just board

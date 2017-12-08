@@ -379,8 +379,8 @@ public abstract class RoutingResource {
     /**
      * If unknown transfers should be forbidden
      */
-    @QueryParam("unknownTransfersAreForbidden")
-    protected Boolean unknownTransfersAreForbidden;
+    @QueryParam("allowUnknownTransfers")
+    protected Boolean allowUnknownTransfers;
 
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed for non-long distance search.  Larger values will slow performance, but could give
@@ -731,8 +731,8 @@ public abstract class RoutingResource {
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
 
-        if (unknownTransfersAreForbidden != null)
-            request.unknownTransfersAreForbidden = unknownTransfersAreForbidden;
+        if (allowUnknownTransfers != null)
+            request.allowUnknownTransfers = allowUnknownTransfers;
 
         if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: " +

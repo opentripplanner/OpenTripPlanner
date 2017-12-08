@@ -36,9 +36,9 @@ public class UnknownTransferConsequencesStrategy extends SingleOptionStrategy<Bo
     private boolean mainSearchUnknownTransfers;
 
     public UnknownTransferConsequencesStrategy(RoutingRequest options) {
-        super(() -> options.unknownTransfersAreForbidden,
-                (b) -> options.unknownTransfersAreForbidden = b,
-                false);
+        super(() -> options.allowUnknownTransfers,
+                (b) -> options.allowUnknownTransfers = b,
+                true);
         this.options = options;
         this.mainSearchUnknownTransfers = getOldValue();
     }
@@ -62,12 +62,12 @@ public class UnknownTransferConsequencesStrategy extends SingleOptionStrategy<Bo
                         String fromFeed = fromStop.getId().getAgencyId();
                         String toFeed = toStop.getId().getAgencyId();
                         boolean feedTransfer = transferTable.hasFeedTransfers(fromFeed, toFeed, true);
-                        if (feedTransfer && mainSearchUnknownTransfers) {
+                        if (feedTransfer && !mainSearchUnknownTransfers) {
                             alerts.add(Alert.createSimpleAlerts("Unknown transfer",
                                     "Alternate itinerary available with unknown transfer: "
                                     + itineraryString(path)
                                     + " (transfer " + transferName(fromStop.getName(), toStop.getName())
-                                    + routeName(fromTrip, toTrip, path) + ")"));
+                                    + routeName(fromTrip, toTrip, path) + ")."));
                         }
                     }
                 }
