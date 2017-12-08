@@ -6,6 +6,7 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
@@ -56,7 +57,13 @@ public class NetexDao {
 
     private final Map<String, Authority> authoritiesById = new HashMap<>();
 
+    private final Map<String, Authority> authoritiesByGroupOfLinesId = new HashMap<>();
+
     private final Map<String, Authority> authoritiesByNetworkId = new HashMap<>();
+
+    private final Map<String, GroupOfLines> groupOfLinesByLineId = new HashMap<>();
+
+    private final Map<String, GroupOfLines> groupOfLinesById = new HashMap<>();
 
     private final Map<String, Network> networkByLineId = new HashMap<>();
 
@@ -270,6 +277,18 @@ public class NetexDao {
                 (parent != null && parent.operatingPeriodExist(id));
     }
 
+    public void addAuthorityByGroupOfLinesId(Authority authority, String groupOfLinesId) {
+        authoritiesByGroupOfLinesId.put(groupOfLinesId, authority);
+    }
+
+    /**
+     * Lookup authority in this class and if not found delegate up to the parent NetexDao.
+     */
+    public Authority lookupAuthorityByGroupOfLinesId(String groupOfLinesId) {
+        Authority v = authoritiesByGroupOfLinesId.get(groupOfLinesId);
+        return returnLocalValue(v) ? v : parent.lookupAuthorityByGroupOfLinesId(groupOfLinesId);
+    }
+
     public void addAuthorityByNetworkId(Authority authority, String networkId) {
         authoritiesByNetworkId.put(networkId, authority);
     }
@@ -277,9 +296,33 @@ public class NetexDao {
     /**
      * Lookup authority in this class and if not found delegate up to the parent NetexDao.
      */
-    public Authority lookupAuthoritiesByNetworkId(String networkId) {
+    public Authority lookupAuthorityByNetworkId(String networkId) {
         Authority v = authoritiesByNetworkId.get(networkId);
-        return returnLocalValue(v) ? v : parent.lookupAuthoritiesByNetworkId(networkId);
+        return returnLocalValue(v) ? v : parent.lookupAuthorityByNetworkId(networkId);
+    }
+
+    public void addGroupOfLines(GroupOfLines groupOfLines) {
+        groupOfLinesById.put(groupOfLines.getId(), groupOfLines);
+    }
+
+    /**
+     * Lookup authority in this class and if not found delegate up to the parent NetexDao.
+     */
+    public GroupOfLines lookupGroupOfLinesById(String id) {
+        GroupOfLines v = groupOfLinesById.get(id);
+        return returnLocalValue(v) ? v : parent.lookupGroupOfLinesById(id);
+    }
+
+    public void addGroupOfLinesByLineId(GroupOfLines groupOfLines, String lineId) {
+        groupOfLinesByLineId.put(lineId, groupOfLines);
+    }
+
+    /**
+     * Lookup authority in this class and if not found delegate up to the parent NetexDao.
+     */
+    public GroupOfLines lookupGroupOfLinesByLineId(String lineId) {
+        GroupOfLines v = groupOfLinesByLineId.get(lineId);
+        return returnLocalValue(v) ? v : parent.lookupGroupOfLinesByLineId(lineId);
     }
 
     public void addNetworkByLineId(Network network, String lineId) {

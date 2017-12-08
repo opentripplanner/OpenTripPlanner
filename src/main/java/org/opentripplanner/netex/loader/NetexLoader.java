@@ -276,18 +276,21 @@ public class NetexLoader {
                 String orgRef = network.getTransportOrganisationRef().getValue().getRef();
 
                 Authority authority = currentNetexDao().lookupAuthorityById(orgRef);
+
                 if (authority != null) {
                     currentNetexDao().addAuthorityByNetworkId(authority, network.getId());
                 }
 
-// TODO TGR - This code is not used, remove before PR
-//                if (network.getGroupsOfLines() != null) {
-//                    GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
-//                    List<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
-//                    for (GroupOfLines group : groupOfLines) {
-//                        currentNetexDao().addAuthoritiesByGroupOfLinesId().put(group.getId(), orgRef);
-//                    }
-//                }
+                if (network.getGroupsOfLines() != null) {
+                    GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
+                    List<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
+                    for (GroupOfLines group : groupOfLines) {
+                        currentNetexDao().addGroupOfLines(group);
+                        if (authority != null) {
+                            currentNetexDao().addAuthorityByGroupOfLinesId(authority, group.getId());
+                        }
+                    }
+                }
             }
 
             //lines
@@ -302,6 +305,12 @@ public class NetexLoader {
                         Network network2 = currentNetexDao().lookupNetworkById(groupRef);
                         if (network2 != null) {
                             currentNetexDao().addNetworkByLineId(network2, line.getId());
+                        }
+                        else {
+                            GroupOfLines groupOfLines = currentNetexDao().lookupGroupOfLinesById(groupRef);
+                            if (groupOfLines != null) {
+                                currentNetexDao().addGroupOfLinesByLineId(groupOfLines, line.getId());
+                            }
                         }
                     }
                 }
