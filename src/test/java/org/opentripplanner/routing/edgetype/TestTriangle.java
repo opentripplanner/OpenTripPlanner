@@ -65,6 +65,7 @@ public class TestTriangle extends TestCase {
         options.optimize = OptimizeType.TRIANGLE;
         options.bikeSpeed = 6.0;
         options.walkReluctance = 1;
+        options.maxSlope = 10.0;
 
         options.setTriangleSafetyFactor(0);
         options.setTriangleSlopeFactor(0);
