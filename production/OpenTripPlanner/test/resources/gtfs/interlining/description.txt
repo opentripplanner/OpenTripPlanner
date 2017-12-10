@@ -1,0 +1,6 @@
+This feed contains two routes. Both routes start and end at the same transit stop, but they pass
+through different intermediate stops. One route has several trips with the same block ID and the 
+other does not. The stoptimes for the two routes are identical, but the one with interlining 
+allows you to reach the destination without transferring. That one should be considered optimal, 
+and the resulting route should contain no transfers.
+

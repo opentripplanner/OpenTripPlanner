@@ -1,0 +1,54 @@
+{
+    "type": "FeatureCollection",
+    "id": "XYZ",
+    "properties" : {
+        "schema": {
+            "schools" : {
+                "label" : "Schools",
+                "type" : "category",
+                "style" : {
+                    "color" : "#afafaf"
+                }
+            },
+            "schools:level" : {
+                "label" : "Mid-level schools",
+                "type" : "attribute",
+                "style" : {
+                    "color" : "#afafaf"
+                }
+            }
+        }
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "id": "XYZ0001",
+            "properties": {
+                "label": "Block One",
+                "structured": {
+                    "age": 10,
+                    "education": 6
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [4.500000, 5.600000]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "XYZ0002",
+            "properties": {
+                "label": "Block Two",
+                "structured": {
+                    "age": 5,
+                    "education": 5
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [4.500100, 5.600100]
+            }
+        }
+    ]
+}

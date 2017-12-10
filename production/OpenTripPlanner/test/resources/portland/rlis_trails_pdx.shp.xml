@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>Metro Data Resource Center</origin>
+				<pubdate>1997</pubdate>
+				<title>Trails</title>
+				<ftname Sync="TRUE">trails_pdx</ftname><geoform Sync="TRUE">vector digital data</geoform><onlink Sync="TRUE">\\gisstore\gis\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\OTP\trails_pdx.shp</onlink></citeinfo>
+		</citation>
+		<descript>
+			<abstract>Adopted and proposed regional trails and greenways.</abstract>
+			<purpose></purpose>
+			<supplinf></supplinf>
+			<langdata Sync="TRUE">en</langdata></descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>20090504</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>Ground condition</current>
+		</timeperd>
+		<status>
+			<progress>Complete</progress>
+			<update>Continually</update>
+		</status>
+		<spdom>
+			<bounding>
+				<westbc>-123.47121656  </westbc>
+				<eastbc>-121.65053671  </eastbc>
+				<northbc>45.82618832    </northbc>
+				<southbc>44.85462409    </southbc>
+			</bounding>
+			<lboundng><leftbc Sync="TRUE">7319650.986094</leftbc><rightbc Sync="TRUE">7897057.698693</rightbc><bottombc Sync="TRUE">552938.055304</bottombc><topbc Sync="TRUE">879529.922102</topbc></lboundng></spdom>
+		<keywords>
+			<theme>
+				<themekt>None </themekt>
+				<themekey>Bikes</themekey>
+				<themekey>bicycles</themekey>
+				<themekey>bikeway</themekey>
+				<themekey>trails</themekey>
+			</theme>
+			<place>
+				<placekt>None </placekt>
+				<placekey>Portland</placekey>
+				<placekey>Multnomah County</placekey>
+				<placekey>Washington County</placekey>
+				<placekey>Clackamas County</placekey>
+				<placekey>Oregon</placekey>
+			</place>
+		</keywords>
+		<accconst>None</accconst>
+		<useconst>None</useconst>
+		<native Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 3; ESRI ArcCatalog 9.2.4.1420</native><natvform Sync="TRUE">Shapefile</natvform></idinfo>
+	<dataqual>
+		<logic></logic>
+		<complete></complete>
+		<posacc>
+			<horizpa>
+				<horizpar>
+				Cenceptual trails and greenways, not registered to parcels or streets.
+				</horizpar>
+			</horizpa>
+		</posacc>
+		<lineage>
+			<procstep>
+				<procdesc> Added trail type 4 of "Completed Interregional Trail"</procdesc>
+				<procdate>20030212</procdate>
+			</procstep>
+			<procstep>
+				<procdesc> Added trail type 7 : Funded - Scheduled for Construction</procdesc>
+				<procdate>20060612</procdate>
+			</procstep>
+			<procstep>
+				<procdesc> Added Type = 8 for Nominated trails</procdesc>
+				<procdate>20080225</procdate>
+			</procstep>
+			<procstep>
+				<procdesc> Added attributes from Connecting Green project</procdesc>
+				<procdate>20081031</procdate>
+			</procstep>
+			<procstep>
+				<procdesc> Added Status and Surface attributes</procdesc>
+				<procdate>20090224</procdate>
+			</procstep>
+		</lineage>
+	</dataqual>
+	<spdoinfo>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm Name="trails_pdx">
+				<sdtstype> Line</sdtstype>
+				<ptvctcnt Sync="TRUE">0</ptvctcnt></sdtsterm>
+			<esriterm Name="trails_pdx"><efeatyp Sync="TRUE">Simple</efeatyp><efeageom Sync="TRUE">Polyline</efeageom><esritopo Sync="TRUE">FALSE</esritopo><efeacnt Sync="TRUE">0</efeacnt><spindex Sync="TRUE">FALSE</spindex><linrefer Sync="TRUE">FALSE</linrefer></esriterm></ptvctinf>
+		<rastinfo>
+			<rasttype>NA</rasttype>
+		</rastinfo>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<planar>
+				<planci>
+					<plance></plance>
+					<plandu>International feet</plandu>
+					<coordrep><absres Sync="TRUE">0.000000</absres><ordres Sync="TRUE">0.000000</ordres></coordrep></planci>
+				<mapproj><mapprojn Sync="TRUE">Lambert Conformal Conic</mapprojn><lambertc><stdparll Sync="TRUE">44.333333</stdparll><stdparll Sync="TRUE">46.000000</stdparll><longcm Sync="TRUE">-120.500000</longcm><latprjo Sync="TRUE">43.666667</latprjo><feast Sync="TRUE">8202099.737533</feast><fnorth Sync="TRUE">0.000000</fnorth></lambertc></mapproj></planar>
+			<geodetic>
+				<horizdn>North American Datum of 1983/1991 (HPGN)</horizdn>
+				<semiaxis></semiaxis>
+				<ellips Sync="TRUE">Geodetic Reference System 80</ellips><denflat Sync="TRUE">298.257222</denflat></geodetic>
+			<cordsysn><geogcsn Sync="TRUE">GCS_North_American_1983_HARN</geogcsn><projcsn Sync="TRUE">NAD_1983_HARN_StatePlane_Oregon_North_FIPS_3601_Feet_Intl</projcsn></cordsysn></horizsys>
+	</spref>
+	<eainfo>
+		<detailed Name="trails_pdx">
+			<enttyp>
+				<enttypl>Trails.dbf</enttypl>
+				<enttypd>Description of trails and greenways attributes</enttypd>
+				<enttypds></enttypds>
+				<enttypt Sync="TRUE">Feature Class</enttypt><enttypc Sync="TRUE">0</enttypc></enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Feature ID</attrdef>
+				<attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv>
+				<attalias Sync="TRUE">FID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdefs Sync="TRUE">ESRI</attrdefs></attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Column containing the shape geometry</attrdef>
+				<attrdomv><udom Sync="TRUE">Coordinates defining the features.</udom></attrdomv>
+				<attalias Sync="TRUE">Shape</attalias><attrtype Sync="TRUE">Geometry</attrtype><attwidth Sync="TRUE">0</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdefs Sync="TRUE">ESRI</attrdefs></attr>
+			<attr>
+				<attrlabl>TYPE</attrlabl>
+				<attrdef>Type of trail</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>0</edomv>
+						<edomvd>Not yet adopted</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>1</edomv>
+						<edomvd>Existing trail</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>2</edomv>
+						<edomvd>Proposed trail</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>3</edomv>
+						<edomvd>Proposed river trail</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>4</edomv>
+						<edomvd>Completed Inter-regional Trail</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>6</edomv>
+						<edomvd>Proposed greenway corridor</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>7</edomv>
+						<edomvd>Funded - Scheduled for construction</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>8</edomv>
+						<edomvd>Nominated trails</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>5</edomv>
+						<edomvd>Proposed inter-regional trail</edomvd>
+						<edomvds></edomvds>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">TYPE</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">5</attwidth></attr>
+			<attr>
+				<attrlabl>NAME</attrlabl>
+				<attrdef>Name of trail</attrdef>
+				<attrdomv>
+				</attrdomv>
+				<attalias Sync="TRUE">NAME</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">60</attwidth></attr>
+			<attr>
+				<attrlabl>LENGTH</attrlabl>
+				<attrdef>Length of trail segment in miles</attrdef>
+				<attrdomv>
+				</attrdomv>
+				<attalias Sync="TRUE">LENGTH</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><atnumdec Sync="TRUE">8</atnumdec></attr>
+		</detailed>
+	</eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<addrtype></addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 797-1742</cntvoice>
+				<cntfax>503 797-1909</cntfax>
+				<cntemail>drc@metro.dst.or.us</cntemail>
+			</cntinfo>
+		</distrib>
+		<distliab>The information in this file was derived from digital databases on Metro's GIS. Care was taken in the creation of this file.  Metro cannot accept any responsibility for errors, omissions, or positional accuracy.  There are no warranties, expressed or implied.</distliab>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<formname>Shapefile or ESRI geodatabase format. Hourly fee will be charged for conversion</formname>
+					<transize></transize>
+					<dssize Sync="TRUE">0.000</dssize></digtinfo>
+				<digtopt>
+					<offoptn>
+						<offmedia>CD-ROM or DVD</offmedia>
+						<recfmt> ISO9660 (DOS, Unix, or Macintosh)</recfmt>
+					</offoptn>
+					<onlinopt>
+						<computer>
+							<networka>
+								<networkr>ftp.oregonmetro.gov</networkr>
+							</networka>
+						</computer>
+						<accinstr> Metro can place data on its FTP site on request.  In most cases, a fee for the data will be charged.  Call 503 797-1742 or email drc@metro.dst.or.us for instructions.</accinstr>
+					</onlinopt>
+				</digtopt>
+			</digform>
+			<fees>Call 503-797-1742 or email drc@oregonmetro.gov for information.</fees>
+		</stdorder>
+		<resdesc Sync="TRUE">Downloadable Data</resdesc></distinfo>
+	<metainfo>
+		<metd>20090504</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+					<cntper>Max Woodbury</cntper>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503-797-1563</cntvoice>
+				<cntfax>503-797-1909</cntfax>
+				<cntemail>max.woodbury@oregonmetro.gov</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv> 19940608</metstdv>
+		<langmeta Sync="TRUE">en</langmeta><mettc Sync="TRUE">local time</mettc><metextns><onlink Sync="TRUE">http://www.esri.com/metadata/esriprof80.html</onlink><metprof Sync="TRUE">ESRI Metadata Profile</metprof></metextns></metainfo>
+	<dataIdInfo><envirDesc Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 3; ESRI ArcCatalog 9.2.4.1420</envirDesc><dataLang><languageCode Sync="TRUE" value="en"></languageCode></dataLang><idCitation><resTitle Sync="TRUE">trails_pdx</resTitle><presForm><PresFormCd Sync="TRUE" value="005"></PresFormCd></presForm></idCitation><spatRpType><SpatRepTypCd Sync="TRUE" value="001"></SpatRepTypCd></spatRpType><dataExt><geoEle><GeoBndBox esriExtentType="native"><westBL Sync="TRUE">7319650.986094</westBL><eastBL Sync="TRUE">7897057.698693</eastBL><northBL Sync="TRUE">879529.922102</northBL><southBL Sync="TRUE">552938.055304</southBL><exTypeCode Sync="TRUE">1</exTypeCode></GeoBndBox></geoEle></dataExt><geoBox esriExtentType="decdegrees"><westBL Sync="TRUE">-123.974967</westBL><eastBL Sync="TRUE">-121.683027</eastBL><northBL Sync="TRUE">46.072822</northBL><southBL Sync="TRUE">45.1321</southBL><exTypeCode Sync="TRUE">1</exTypeCode></geoBox></dataIdInfo><mdLang><languageCode Sync="TRUE" value="en"></languageCode></mdLang><mdStanName Sync="TRUE">ISO 19115 Geographic Information - Metadata</mdStanName><mdStanVer Sync="TRUE">DIS_ESRI1.0</mdStanVer><mdChar><CharSetCd Sync="TRUE" value="004"></CharSetCd></mdChar><mdHrLv><ScopeCd Sync="TRUE" value="005"></ScopeCd></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><distInfo><distributor><distorTran><onLineSrc><orDesc Sync="TRUE">002</orDesc><linkage Sync="TRUE">file://\\gisstore\gis\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\OTP\trails_pdx.shp</linkage><protocol Sync="TRUE">Local Area Network</protocol></onLineSrc><transSize Sync="TRUE">0.000</transSize></distorTran><distorFormat><formatName Sync="TRUE">Shapefile</formatName></distorFormat></distributor></distInfo><refSysInfo><RefSystem><refSysID><identCode Sync="TRUE">NAD_1983_HARN_StatePlane_Oregon_North_FIPS_3601_Feet_Intl</identCode></refSysID></RefSystem></refSysInfo><spatRepInfo><VectSpatRep><topLvl><TopoLevCd Sync="TRUE" value="001"></TopoLevCd></topLvl><geometObjs Name="trails_pdx"><geoObjTyp><GeoObjTypCd Sync="TRUE" value="001"></GeoObjTypCd></geoObjTyp><geoObjCnt Sync="TRUE">0</geoObjCnt></geometObjs></VectSpatRep></spatRepInfo><Esri><SyncDate>20091113</SyncDate><SyncTime>19022200</SyncTime><ModDate>20091113</ModDate><ModTime>19022200</ModTime><DataProperties><lineage><Process ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20090806" Time="114229">CopyFeatures trails.shp R:\\rlislite\\DVD\\ESRISHAPEFILES\\TRANSIT\trails.shp # 0 0 0</Process><Process Name="Clip_1" ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Analysis Tools.tbx\Clip" Date="20091113" Time="190225">Clip trails cty_fill "G:\DOCS\demosofflaptop\Memos\Projects\Metro Travel Options Grant\Data\OTP\trails_pdx.shp" #</Process></lineage></DataProperties></Esri><mdDateSt Sync="TRUE">20091113</mdDateSt></metadata>

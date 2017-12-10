@@ -1,0 +1,4 @@
+route_id,service_id,trip_id
+2f|intercity,ignore,2f|intercity
+2f|slt|1,ignore,2f|slt|1
+2f|slt|2,ignore,2f|slt|2

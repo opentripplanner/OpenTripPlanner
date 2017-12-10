@@ -1,0 +1,127 @@
+.otp-calltaker-tripOptionsWidget {
+    bottom: 20px;
+    right: 10px;
+}
+
+.otp-calltaker-itinerariesWidget {
+    top: 60px;
+    left: 10px;
+    width: 450px;
+    bottom: 30px;
+}
+
+
+.otp-callHistoryWidget {
+  bottom: 20px;
+  right: 320px;
+}
+
+.otp-callHistory-buttonRow {
+    height: 30px;
+    margin: 8px 0px 10px 0px;
+    background: #666;
+    padding: 6px 8px;
+}
+
+.otp-callHistory-buttonRowText {
+    text-align: right;
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 5px;
+    color: white;
+}
+
+.otp-callHistory-callListContainer {
+    float: left;
+    width: 120px
+    border: 2px solid red;
+}
+
+.otp-callHistory-callList {
+    background: #bbb;
+    border: 1px solid black;
+    overflow: auto;
+    width: 120px;
+    height: 200px;
+}
+
+.otp-callHistory-queryListContainer {
+    margin-left: 130px
+}
+
+.otp-callHistory-queryList {
+    background: #bbb;
+    border: 1px solid black;
+    overflow: auto;    
+    width: 250px;
+    height: 200px;
+}
+
+.otp-callHistory-callListItem {
+    background: white;
+    padding: 2px;
+    margin: 3px;
+    /*border-bottom: 2px solid gray;*/
+    cursor: pointer;
+}
+
+.otp-callHistory-callListItem:hover {
+    background: #eee;
+}
+
+
+.otp-calltaker-mailablesWidget {
+    width: 500px;
+    height: 400px;
+}
+
+.otp-calltaker-mailables-listHeader {
+    font-size: 15px;
+    font-weight: bold;
+    padding: 3px;
+}
+
+.otp-calltaker-mailables-list {
+    position: absolute;
+    top: 22px;
+    bottom: 0px;
+    width: 100%;
+    border: 1px solid black;
+    background: white;
+    overflow: auto;
+    
+    -moz-box-sizing:    border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing:         border-box;
+}
+
+.otp-calltaker-mailables-fullListItem {
+    padding: 3px;
+    margin: 4px;
+    background: #eee;
+    cursor: move;
+}
+
+.otp-calltaker-mailables-selectedListHover {
+    background: #cff;
+    border: 2px solid black;
+}
+
+.otp-calltaker-mailables-selectedListItem {
+    padding: 3px;
+    margin: 4px;
+    background: #eee;
+}
+
+.otp-calltaker-mailables-selectedListItem-name {
+    font-weight: bold;
+}
+
+.otp-calltaker-mailables-selectedListItem-closeButton {
+    font-size: 10px;
+}
+
+.otp-calltaker-mailables-selectedListItem-quantity {
+    width: 20px;
+    font-size: 10px;
+}

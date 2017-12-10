@@ -94,6 +94,12 @@ public abstract class RoutingResource {
     @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
 
+    @QueryParam("maxSlope")
+    protected Double maxSlope;
+
+    @QueryParam("slopeFactor")
+    protected Double slopeFactor;
+
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
@@ -424,7 +430,12 @@ public abstract class RoutingResource {
             request.setMaxWalkDistance(maxWalkDistance);
             request.maxTransferWalkDistance = maxWalkDistance;
         }
-
+        if(maxSlope != null){
+            request.setMaxSlope(maxSlope);
+        }
+        if(slopeFactor != null){
+            request.setSlopeFactor(slopeFactor);
+        }
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
 

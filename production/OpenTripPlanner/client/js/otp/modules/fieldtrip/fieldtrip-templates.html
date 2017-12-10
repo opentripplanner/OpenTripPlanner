@@ -1,0 +1,430 @@
+<script id="otp-fieldtrip-manager" type="text/html">
+    <div id="{{widgetId}}-tabs" class="otp-fieldTripManager-tabs notDraggable" style="position: absolute; top: 30px; bottom: 50px; left: 10px; right: 10px;">
+        <ul>
+            <li><a href="#{{widgetId}}-newRequestsTab">New Requests</a></li>
+            <li><a href="#{{widgetId}}-plannedRequestsTab">Planned</a></li>
+            <li><a href="#{{widgetId}}-cancelledRequestsTab">Cancelled</a></li>
+            <li><a href="#{{widgetId}}-pastTripsTab">Past Trips</a></li>
+        </ul>
+        <div id="{{widgetId}}-newRequestsTab">
+            <div class="otp-fieldTripManager-requestsList newRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-plannedRequestsTab">
+            <div class="otp-fieldTripManager-requestsList plannedRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-cancelledRequestsTab">
+            <div class="otp-fieldTripManager-requestsList cancelledRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-pastTripsTab">
+            <div class="otp-fieldTripManager-requestsList pastTripsList">
+            </div>
+        </div>
+    </div>
+    <div class="notDraggable" style="position: absolute; height: 30px; bottom: 10px; left:10px; right:10px;">
+
+        <div style="position: absolute; right: 0px; text-align: right;">
+            Daily Report for:
+            <input type="text" class="reportDateInput" style="width: 75px; text-align: center;"></input>&nbsp;
+            <button class="viewReportButton">View</button>
+        </div>
+
+        <button class="refreshButton">Refresh Requests</button>
+    </div>
+
+
+</script>
+
+
+<script id="otp-fieldtrip-requestRow" type="text/html">
+    <div class="otp-fieldTripRequests-listRow">
+        <h5>{{schoolName}} Trip on {{formattedDate}} (#{{id}})</h5>
+        Submitted by {{teacherName}} on {{timeStamp}}<br>
+        <b>Outbound Trip:</b>
+            {{#outboundTripStatus}}{{outboundTripStatus}}{{/outboundTripStatus}}
+            {{^outboundTripStatus}}Not Planned{{/outboundTripStatus}}<br>
+        <b>Inbound Trip:</b>
+            {{#inboundTripStatus}}{{inboundTripStatus}}{{/inboundTripStatus}}
+            {{^inboundTripStatus}}Not Planned{{/inboundTripStatus}}
+
+    </div>
+</script>
+
+
+<script id="otp-fieldtrip-request" type="text/html">
+    <div class="otp-fieldTrip-requestWidget-content notDraggable">
+        <div class="otp-fieldTrip-requestWidget-summary">
+            <b>Destination</b>: {{endLocation}}<br>
+            <b>Day of Travel</b>: {{travelDate}}
+                <span style="font-size: .8em">[<a href="#" class="changeDateLink">Change</a>]</span><br>
+            <b>Teacher/School</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
+            <b>Teacher Address</b>: {{address}}, {{city}} {{state}} {{zip}}<br>
+            <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;
+            <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
+            <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
+            <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
+                {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
+                <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}
+                &nbsp;<span style="font-size: .8em">[<a href="#" class="changeGroupSizeLink">Change</a>]</span><br>
+            <b>Start Address</b>: {{startLocation}}<br>
+            <b>Time Arriving at Destination</b>: {{arriveDestinationTime}}<br>
+            <b>Time Leaving at Destination</b>: {{leaveDestinationTime}}<br>
+            <b>Time Due Back at School</b>: {{arriveSchoolTime}}<br>
+            <b>Intermediate Locations</b>:
+                {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
+            <b>Payment Preference</b>: {{paymentPreference}}<br>
+            {{#requireInvoice}}<span style="color: white; background: #800;">&nbsp;{{/requireInvoice}}
+            <b>Invoice Required?</b>:
+                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}
+            {{#requireInvoice}}&nbsp;</span>{{/requireInvoice}}<br>
+            <b>Class Pass ID</b>:
+                {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
+
+            <b>Teacher Notes:</b>
+                {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}&nbsp;<span style="font-size: .8em">[<a href="#" class="editTeacherNotesLink">Edit</a>]</span><br>
+            <i>Request submitted: {{timeStamp}}</i>
+
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">User Feedback</div>
+            {{#feedback}}
+                <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
+                    {{feedback}}
+                    <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
+                        Submitted {{timeStamp}}
+                    </div>
+                </div>
+            {{/feedback}}
+            {{^feedback}}
+                <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
+                    No feedback submitted yet.
+                </div>
+            {{/feedback}}
+
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Internal Agent Notes</div>
+            {{#internalNotes}}
+                <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
+                    <div style="float:right; font-size: 8px;"><button class="deleteNoteButton-{{id}}">X</button></div>
+                    {{note}}
+                    <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
+                        Submitted by {{userName}} on {{timeStamp}}
+                    </div>
+                </div>
+            {{/internalNotes}}
+            {{^internalNotes}}
+                <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
+                    No internal notes.
+                </div>
+            {{/internalNotes}}
+
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Operational Notes</div>
+            {{#operationalNotes}}
+                <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
+                    <div style="float:right; font-size: 8px;"><button class="deleteNoteButton-{{id}}">X</button></div>
+                    {{note}}
+                    <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
+                        Submitted by {{userName}} on {{timeStamp}}
+                    </div>
+                </div>
+            {{/operationalNotes}}
+            {{^operationalNotes}}
+                <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
+                    No operational notes.
+                </div>
+            {{/operationalNotes}}
+
+        </div>
+        <!--<div style="position: absolute; bottom: 0px; height: 120px; left:0px; right: 0px;">-->
+        <div class="otp-fieldTrip-requestWidget-tripBoxContainer" style="left:0px;">
+            <div class="otp-fieldTrip-requestWidget-tripBox" style="margin-right:5px;">
+                <b>OUTBOUND TRIP</b>
+                <div class="otp-fieldTrip-requestWidget-planInfo outboundPlanInfo">
+                    {{#outboundPlanInfo}}
+                        {{outboundPlanInfo}}
+                    {{/outboundPlanInfo}}
+                    {{^outboundPlanInfo}}
+                        (No Trip Planned)
+                    {{/outboundPlanInfo}}
+                </div>
+                <button class="otp-fieldTrip-requestWidget-button outboundPlanButton">Plan from Request</button>
+                <button class="otp-fieldTrip-requestWidget-button outboundSaveButton">Save Active Plan</button>
+            </div>
+        </div>
+        <div class="otp-fieldTrip-requestWidget-tripBoxContainer" style="right:0px;">
+            <div class="otp-fieldTrip-requestWidget-tripBox" style="margin-left:5px;">
+                <b>INBOUND TRIP</b>
+                <div class="otp-fieldTrip-requestWidget-planInfo inboundPlanInfo">
+                    {{#inboundPlanInfo}}
+                        {{inboundPlanInfo}}
+                    {{/inboundPlanInfo}}
+                    {{^inboundPlanInfo}}
+                        (No Trip Planned)
+                    {{/inboundPlanInfo}}
+                </div>
+                <button class="otp-fieldTrip-requestWidget-button inboundPlanButton">Plan from Request</button>
+                <button class="otp-fieldTrip-requestWidget-button inboundSaveButton">Save Active Plan</button>
+            </div>
+        </div>
+        <div class="otp-fieldTrip-requestWidget-bottomRow">
+            <div style="text-align:center;">
+                <button class="cancelRequestButton">Cancel Request</button>
+                <button class="setClasspassButton">Set Class Pass ID</button>
+                <button class="addNoteButton">Add Note</button>
+            </div>
+            <div style="text-align:center; margin-top: 6px;">
+                <a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> |
+                <a href="{{dsUrl}}/fieldtrip/receipt?requestId={{id}}" target="blank_">Receipt Link</a> |
+                <a href="#" class="printablePlanLink">Printable Trip Plan</a> |
+                <a href="{{dsUrl}}/fieldtrip/opsReport?month={{travelMonth}}&day={{travelDay}}&year={{travelYear}}" target="blank_">Daily Report</a>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script id="otp-fieldtrip-geocoder" type="text/html">
+    <div class="notDraggable" style="position: absolute; top: 35px; left: 10px; bottom: 10px; right: 10px;">
+        <div class="otp-fieldTrip-geocoder-endpointContainer" style="left:0px;">
+            <div class="otp-fieldTrip-geocoder-endpointBox" style="margin-right:5px;">
+                <h6>Origin</h6>
+                <div style="position: relative;">
+                    <div style="position: absolute; left: 0px; right: 80px;">
+                        <input type="text" class="originInput borderBox" style="width: 100%;" value="{{origin}}" />
+                    </div>
+                    <div style="position: absolute; right: 0px; width: 75px;">
+                        <button class="refreshOriginButton borderBox" style="width: 100%">Refresh</button>
+                    </div>
+                </div>
+                <div style="position: absolute; top: 54px; left: 8px;">Geocoder Results:</div>
+                <div class="otp-fieldTrip-geocoder-listContainer">
+                    <select size=10 class="originSelect borderBox" style="width: 100%; height: 100%; background: white;" />
+                </div>
+            </div>
+        </div>
+        <div class="otp-fieldTrip-geocoder-endpointContainer" style="right:0px;">
+            <div class="otp-fieldTrip-geocoder-endpointBox" style="margin-left:5px;">
+
+                <h6>Destination</h6>
+                <div style="position: relative;">
+                    <div style="position: absolute; left: 0px; right: 80px;">
+                        <input type="text" class="destinationInput borderBox" style="width: 100%;" value="{{destination}}" />
+                    </div>
+                    <div style="position: absolute; right: 0px; width: 75px;">
+                        <button class="refreshDestinationButton borderBox" style="width: 100%">Refresh</button>
+                    </div>
+                </div>
+                <div style="position: absolute; top: 54px; left: 8px;">Geocoder Results:</div>
+                <div class="otp-fieldTrip-geocoder-listContainer">
+                    <select size=10 class="destinationSelect borderBox" style="width: 100%; height: 100%; background: white;" />
+                </div>
+
+            </div>
+        </div>
+
+        <div class="otp-fieldTrip-geocoder-buttonRow">
+            {{#showGeocoders}}
+                Geocoder:
+                <select class="geocoderSelect" style="margin-right: 20px;">
+                    {{#geocoders}}
+                         <option>{{name}}</option>
+                    {{/geocoders}}
+                </select>
+            {{/showGeocoders}}
+            <button class="useLocationsButton">Use Selected Locations</button>
+            <button class="closeButton">Close</button>
+
+        </div>
+
+    </div>
+</script>
+
+<script id="otp-fieldtrip-printablePlan" type="text/html">
+    <div>
+        <div style="font-family: sans-serif;">
+            <div style="font-size: 30px; font-weight: bold; border-bottom: 3px solid gray;">
+                Field Trip Plan: {{schoolName}} Trip to {{endLocation}}
+            </div>
+
+            <div style="margin-top: 1em;">
+                <b>Teacher</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
+                <b>Teacher Address</b>: {{address}}, {{city}} {{state}} {{zip}}<br>
+                <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;
+                <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
+                <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
+                <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
+                    {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
+                    <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+                {{#classpassId}}
+                    <b>Class Pass ID</b>: {{classpassId}}<br>
+                {{/classpassId}}
+
+                <i>Request submitted: {{timeStamp}}</i>
+            </div>
+
+            <div class="otp-fieldtrip-printablePlan-tripContainer">
+                <div class="otp-fieldtrip-printablePlan-tripHeader">
+                    Outbound Trip (to Destination)
+                </div>
+                <div class="otp-fieldtrip-printablePlan-tripBody">
+                    {{#outboundItineraries}}
+                        <div class="otp-fieldtrip-printablePlan-itinContainer">
+                            <div class="otp-fieldtrip-printablePlan-itinHeader">
+                                {{passengers}} passengers on following Itinerary:
+                            </div>
+                            <div class="otp-fieldtrip-printablePlan-itinBody outbound-itinBody-{{outboundItinIndex}}">
+                            </div>
+                        </div>
+                    {{/outboundItineraries}}
+                    {{^outboundItineraries}}
+                        <i>No Outbound Trip Planned</i>
+                    {{/outboundItineraries}}
+                </div>
+            </div>
+
+            <div class="otp-fieldtrip-printablePlan-tripContainer">
+                <div class="otp-fieldtrip-printablePlan-tripHeader">
+                    Inbound Trip (from Destination)
+                </div>
+                <div class="otp-fieldtrip-printablePlan-tripBody">
+                    {{#inboundItineraries}}
+                        <div class="otp-fieldtrip-printablePlan-itinContainer">
+                            <div class="otp-fieldtrip-printablePlan-itinHeader">
+                                {{passengers}} passengers on following Itinerary:
+                            </div>
+                            <div class="otp-fieldtrip-printablePlan-itinBody inbound-itinBody-{{inboundItinIndex}}">
+                            </div>
+                        </div>
+                    {{/inboundItineraries}}
+                    {{^inboundItineraries}}
+                        <i>No Inbound Trip Planned</i>
+                    {{/inboundItineraries}}
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script id="otp-fieldtrip-noteDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            {{message}}
+            <div style="margin-top: 6px;">
+                <textarea class="borderBox textarea" style="z-index: 1000000; width: 100%; height: 3em;">{{text}}</textarea>
+            </div>
+            {{#showTypeSelection}}
+                <div style="margin-top: 5px;">Type:&nbsp;
+                    <input type="radio" name="type" value="internal" checked> Internal&nbsp;&nbsp;
+                    <input type="radio" name="type" value="operational"> Operational
+                </div>
+            {{/showTypeSelection}}
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
+        </div>
+    </div>
+</script>
+
+
+<script id="otp-fieldtrip-searchWidget" type="text/html">
+    <div class="searchTabs notDraggable" style="position: absolute; top: 30px; bottom: 10px; left: 10px; right: 10px;">
+        <ul>
+            <li><a href="#{{widgetId}}-optionsTab">Search Options</a></li>
+            <li><a href="#{{widgetId}}-resultsTab">Results</a></li>
+        </ul>
+        <div id="{{widgetId}}-optionsTab">
+            <div class="otp-fieldtrip-searchWidget-tabArea">
+                Find Field Trips Where:
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    Teacher&nbsp;&nbsp;
+                    <select class="teacherOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="like">Like</option>
+                        <option value="!=">Not Equal</option>
+                    </select>
+                    <input class="teacherInput" type="text"></input>
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    <input type="radio" name="andor1" value="and"> and&nbsp;&nbsp;
+                    <input type="radio" name="andor1" value="or" checked> or
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    School&nbsp;&nbsp;
+                    <select class="schoolOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="like">Like</option>
+                        <option value="!=">Not Equal</option>
+                    </select>
+                    <input class="schoolInput" type="text"></input>
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    <input type="radio" name="andor2" value="and"> and&nbsp;&nbsp;
+                    <input type="radio" name="andor2" value="or" checked> or
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    Date&nbsp;&nbsp;
+                    <select class="dateOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="<">Is Before</option>
+                        <option value=">">Is After</option>
+                        <option value="between">Is Between</option>
+                    </select>
+                    <input class="dateInput1" type="text" style="width: 100px;"></input>
+                    <span class="extendedDateInput">
+                        and <input class="dateInput2" type="text" style="width: 100px;"></input>
+                    </span>
+                </div>
+
+                <div style="margin: 24px 0px; text-align: center;">
+                    Show:
+                    <input type="radio" name="plannedOnly" value="true"> Planned Trips Only &nbsp;&nbsp;
+                    <input type="radio" name="plannedOnly" value="false" checked> All Trips
+                </div>
+
+
+                <div style="text-align: center; margin-top: 25px;">
+                    <button id="{{widgetId}}-searchButton">Search</button>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px; font-style: italic; font-size: .9em;">
+                    Note: for &quot;like&quot; queries, use % for wildcard matches<br>(e.g. &quot% High School&quot)
+                </div>
+
+            </div>
+        </div>
+        <div id="{{widgetId}}-resultsTab">
+            <div class="resultsArea otp-fieldtrip-searchWidget-tabArea">
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="otp-fieldtrip-groupSizeDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            <div style="margin-top: 6px;">
+                Number of Students:&nbsp;
+                <input class='numStudents' style='display: inline; width: 50px;' type="text" value="{{numStudents}}" />
+            </div>
+            <div style="margin-top: 6px;">
+                Student Age Range:&nbsp;
+                <input class='minimumAge' style='display: inline; width: 50px;' type="text" value="{{minimumAge}}" /> to
+                <input class='maximumAge' style='display: inline; width: 50px;' type="text" value="{{maximumAge}}" />
+            </div>
+            <div style="margin-top: 6px;">
+                Number of Chaperones:&nbsp;
+                <input class='numChaperones' style='display: inline; width: 50px;' type="text" value="{{numChaperones}}" />
+            </div>
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
+        </div>
+    </div>
+</script>

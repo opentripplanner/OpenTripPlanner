@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>Metro Data Resource Center</origin>
+				<pubdate>200203</pubdate>
+				<title>Bike routes</title>
+				<ftname Sync="TRUE">bike_rte</ftname><geoform Sync="TRUE">vector digital data</geoform><onlink Sync="TRUE"></onlink></citeinfo>
+		</citation>
+		<descript>
+			<abstract>Regional bike routes as they appear on Metro's 2007 Bike There! map. The Bike There! map provides a "snap shot" of bike lanes and multi-use paths in the Metro region.  In addition, the map rates selected through streets where bicyclists share the road with motorists --including within the City of Portland designated signed bike routes and 'bike boulevards'.   Streets shown on this map were chosen in consultation with cities and counties, citizen groups, recreational and commuter bicyclists, and transportation planners throughout the region.  More experienced cyclists may feel some good cycling streets were omitted from the map. Beginning cyclists may find some of the streets more difficult than they would like. In many cases, neighborhood streets with low traffic volumes and speeds offer alternatives to some of the busier streets shown on the map.  The shared roadway color-coded ratings should assist bicyclists in finding the kinds of streets they'll enjoy riding.</abstract>
+			<purpose>The bike route layer provides an interconnected regional network of safe and convenient bikeways and is one way Metro plans to meet the region's goal of increased transportation options.</purpose>
+			<supplinf></supplinf>
+			<langdata Sync="TRUE">en</langdata></descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>20071024</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>Ground condition</current>
+		</timeperd>
+		<status>
+			<progress>Complete</progress>
+			<update>As needed</update>
+		</status>
+		<spdom>
+			<bounding>
+				<westbc> -123.15156069 </westbc>
+				<eastbc>-122.31651100  </eastbc>
+				<northbc>45.70263875    </northbc>
+				<southbc>45.23396470    </southbc>
+			</bounding>
+			<lboundng><leftbc Sync="TRUE">7474337.872281</leftbc><rightbc Sync="TRUE">7897525.146189</rightbc><bottombc Sync="TRUE">478099.934379</bottombc><topbc Sync="TRUE">794705.081669</topbc></lboundng></spdom>
+		<keywords>
+			<theme>
+				<themekt>None </themekt>
+				<themekey>bike</themekey>
+				<themekey>bicycle</themekey>
+				<themekey>bike path</themekey>
+				<themekey>bike trail</themekey>
+				<themekey>bikeway</themekey>
+				<themekey>trail</themekey>
+				<themekey>multi-use path</themekey>
+				<themekey>path</themekey>
+			</theme>
+			<place>
+				<placekt>None </placekt>
+				<placekey>Portland</placekey>
+				<placekey>Multnomah County</placekey>
+				<placekey>Washington County</placekey>
+				<placekey>Clackamas County</placekey>
+				<placekey>Oregon</placekey>
+			</place>
+		</keywords>
+		<accconst>None</accconst>
+		<useconst>These data are sold under the agreement that the user may use the data in its business activity and for no other purpose whatsoever. User shall not allow access to the data by any other person or organization, unless authorized in writing by the Metro DRC or, if the other party is a contractor providing services to a government requiring usage of the data in order to provide contractual services.  User shall not duplicate the data except for the following:  (1) User may make one backup copy of the data, and  (2) User may translate the data into other formats and/or media.  For full product purchase agreement that accompanies these data, please see http://storefront.metro-region.org/drc/rlislite/subscribe/license.cfm</useconst>
+		<native Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 3; ESRI ArcCatalog 9.3.1.1850</native><natvform Sync="TRUE">Shapefile</natvform></idinfo>
+	<dataqual>
+		<logic></logic>
+		<complete></complete>
+		<posacc>
+			<horizpa>
+				<horizpar>
+				Registered to streets. The street linework is contained within the street rights-of-way as shown on the tax lot layer. As the tax lot horizonal accuracy is improved, streets are adjusted accordingly. The tax lots are digitized at +/- 10 feet accuracy. Beaverton, Oregon City and Tigard planning areas are improved to +/- 5 feet accuracy. Multnomah County was created with coordinate geometry using better control. 
+				</horizpar>
+			</horizpa>
+		</posacc>
+		<lineage>
+			<procstep>
+				<procdesc> Projection information (.prj file), compatible with ArcGIS 8.1, was added to the layer.</procdesc>
+				<procdate>20010715</procdate>
+			</procstep>
+			<procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE"></srcused><date Sync="TRUE">20091113</date><time Sync="TRUE">18475300</time></procstep></lineage>
+	</dataqual>
+	<spdoinfo>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm Name="bike_rte">
+				<sdtstype> Line</sdtstype>
+				<ptvctcnt Sync="TRUE">0</ptvctcnt></sdtsterm>
+			<esriterm Name="bike_rte"><efeatyp Sync="TRUE">Simple</efeatyp><efeageom Sync="TRUE">Polyline</efeageom><esritopo Sync="TRUE">FALSE</esritopo><efeacnt Sync="TRUE">0</efeacnt><spindex Sync="TRUE">FALSE</spindex><linrefer Sync="TRUE">FALSE</linrefer></esriterm></ptvctinf>
+		<rastinfo>
+			<rasttype>NA</rasttype>
+		</rastinfo>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<planar>
+				<planci>
+					<plance></plance>
+					<plandu>International feet</plandu>
+					<coordrep><absres Sync="TRUE">0.000000</absres><ordres Sync="TRUE">0.000000</ordres></coordrep></planci>
+				<mapproj><mapprojn Sync="TRUE">Lambert Conformal Conic</mapprojn><lambertc><stdparll Sync="TRUE">44.333333</stdparll><stdparll Sync="TRUE">46.000000</stdparll><longcm Sync="TRUE">-120.500000</longcm><latprjo Sync="TRUE">43.666667</latprjo><feast Sync="TRUE">8202099.737533</feast><fnorth Sync="TRUE">0.000000</fnorth></lambertc></mapproj></planar>
+			<geodetic>
+				<horizdn>North American Datum of 1983/1991 (HPGN)</horizdn>
+				<semiaxis></semiaxis>
+				<ellips Sync="TRUE">Geodetic Reference System 80</ellips><denflat Sync="TRUE">298.257222</denflat></geodetic>
+			<cordsysn><geogcsn Sync="TRUE">GCS_North_American_1983_HARN</geogcsn><projcsn Sync="TRUE">NAD_1983_HARN_StatePlane_Oregon_North_FIPS_3601</projcsn></cordsysn></horizsys>
+	</spref>
+	<eainfo>
+		<detailed Name="bike_rte">
+			<enttyp>
+				<enttypl>Bike_rte.dbf</enttypl>
+				<enttypd>Bike route attributes</enttypd>
+				<enttypds></enttypds>
+				<enttypt Sync="TRUE">Feature Class</enttypt><enttypc Sync="TRUE">0</enttypc></enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Feature ID</attrdef>
+				<attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv>
+				<attalias Sync="TRUE">FID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdefs Sync="TRUE">ESRI</attrdefs></attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Column containing the shape geometry</attrdef>
+				<attrdomv><udom Sync="TRUE">Coordinates defining the features.</udom></attrdomv>
+				<attalias Sync="TRUE">Shape</attalias><attrtype Sync="TRUE">Geometry</attrtype><attwidth Sync="TRUE">0</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdefs Sync="TRUE">ESRI</attrdefs></attr>
+			<attr><attrlabl Sync="TRUE">PREFIX</attrlabl><attalias Sync="TRUE">PREFIX</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">7</attwidth></attr><attr><attrlabl Sync="TRUE">STREETNAME</attrlabl><attalias Sync="TRUE">STREETNAME</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">40</attwidth></attr><attr><attrlabl Sync="TRUE">FTYPE</attrlabl><attalias Sync="TRUE">FTYPE</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">7</attwidth></attr><attr>
+				<attrlabl>BIKEMODE</attrlabl>
+				<attrdef>Type of bike route</attrdef>
+				<attrdomv>
+					<edom>
+						<edomv>Regional multi-use path</edomv>
+						<edomvd>Physically separated from motor vehicle traffic; used by bicyclists, pedestrians, skaters and other non-motorized travelers</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Planned regional multi-use path</edomv>
+						<edomvd>Scheduled for construction</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Bike lane</edomv>
+						<edomvd>Striped portions of the roadway designated as a bicycle travel lane; carry only one-way traffic; usually located on busy streets.  Complete in spring 2002.</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Planned bike lane</edomv>
+						<edomvd>Scheduled for striping</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Local multi-use path</edomv>
+						<edomvd>Physically separated from motor vehicle traffic; used by bicyclists, pedestrians, skaters and other non-motorized travelers</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Moderate traffic through street</edomv>
+						<edomvd>Daily traffic volumes of 3,000 to 10,000 vehicles and speeds of 25 to 35 mph</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>High traffic through street</edomv>
+						<edomvd>Daily traffic volumes greater than 10,000 and speeds greater than 35 mph</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Caution area</edomv>
+						<edomvd>Bicyclists may encounter one or more of the following: narrow travel lanes, high traffic volumes, sharp curves and limited visibility, large trucks, difficult intersections</edomvd>
+						<edomvds></edomvds>
+					</edom>
+					<edom>
+						<edomv>Low traffic through street</edomv>
+						<edomvd>Daily traffic volumes of less than 3,000 vehicles and speeds of less than 25 mph</edomvd>
+						<edomvds></edomvds>
+					</edom>
+				</attrdomv>
+				<attalias Sync="TRUE">BIKEMODE</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">32</attwidth></attr>
+			<attr><attrlabl Sync="TRUE">LOCALID</attrlabl><attalias Sync="TRUE">LOCALID</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">11</attwidth><atnumdec Sync="TRUE">2</atnumdec></attr></detailed>
+	</eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<addrtype></addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 797-1742</cntvoice>
+				<cntfax>503 797-1909</cntfax>
+				<cntemail>drc@metro.dst.or.us</cntemail>
+			</cntinfo>
+		</distrib>
+		<distliab>The information in this file was derived from digital databases on Metro's GIS. Care was taken in the creation of this file.  Metro cannot accept any responsibility for errors, omissions, or positional accuracy.  There are no warranties, expressed or implied.</distliab>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<formname>Shapefile or ESRI geodatabase format. Hourly fee will be charged for conversion</formname>
+					<transize></transize>
+					<dssize Sync="TRUE">0.000</dssize></digtinfo>
+				<digtopt>
+					<offoptn>
+						<offmedia>CD-ROM or DVD</offmedia>
+						<recfmt> ISO9660 (DOS, Unix, or Macintosh)</recfmt>
+					</offoptn>
+					<onlinopt>
+						<computer>
+							<networka>
+								<networkr>ftp.oregonmetro.gov</networkr>
+							</networka>
+						</computer>
+						<accinstr> Metro can place data on its FTP site on request.  In most cases, a fee for the data will be charged.  Call 503 797-1742 or email drc@metro.dst.or.us for instructions.</accinstr>
+					</onlinopt>
+				</digtopt>
+			</digform>
+			<fees>$6 in bike stores, book shops or at Metro.  See www.metro-region.org/drc, for list of locations.</fees>
+		</stdorder>
+		<resdesc Sync="TRUE">Downloadable Data</resdesc></distinfo>
+	<metainfo>
+		<metd>20090415</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>Metro Data Resource Center</cntorg>
+					<cntper>Minott Kerr</cntper>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<address>600 NE Grand Ave.</address>
+					<city>Portland</city>
+					<state>OR</state>
+					<postal>97232</postal>
+				</cntaddr>
+				<cntvoice>503 797-1679</cntvoice>
+				<cntfax>503 797-1909</cntfax>
+				<cntemail>minott.kerr@oregonmetro.gov</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv> 19940608</metstdv>
+		<langmeta Sync="TRUE">en</langmeta><mettc Sync="TRUE">local time</mettc><metextns><onlink Sync="TRUE">http://www.esri.com/metadata/esriprof80.html</onlink><metprof Sync="TRUE">ESRI Metadata Profile</metprof></metextns></metainfo>
+	<dataIdInfo><envirDesc Sync="TRUE">Microsoft Windows XP Version 5.1 (Build 2600) Service Pack 3; ESRI ArcCatalog 9.3.1.1850</envirDesc><dataLang><languageCode Sync="TRUE" value="en"></languageCode></dataLang><idCitation><resTitle Sync="TRUE">bike_rte</resTitle><presForm><PresFormCd Sync="TRUE" value="005"></PresFormCd></presForm></idCitation><spatRpType><SpatRepTypCd Sync="TRUE" value="001"></SpatRepTypCd></spatRpType><dataExt><geoEle><GeoBndBox esriExtentType="native"><westBL Sync="TRUE">7474337.872281</westBL><eastBL Sync="TRUE">7897525.146189</eastBL><northBL Sync="TRUE">794705.081669</northBL><southBL Sync="TRUE">478099.934379</southBL><exTypeCode Sync="TRUE">1</exTypeCode></GeoBndBox></geoEle></dataExt><geoBox esriExtentType="decdegrees"><westBL Sync="TRUE">-123.354596</westBL><eastBL Sync="TRUE">-121.676986</eastBL><northBL Sync="TRUE">45.840255</northBL><southBL Sync="TRUE">44.943335</southBL><exTypeCode Sync="TRUE">1</exTypeCode></geoBox></dataIdInfo><mdLang><languageCode Sync="TRUE" value="en"></languageCode></mdLang><mdStanName Sync="TRUE">ISO 19115 Geographic Information - Metadata</mdStanName><mdStanVer Sync="TRUE">DIS_ESRI1.0</mdStanVer><mdChar><CharSetCd Sync="TRUE" value="004"></CharSetCd></mdChar><mdHrLv><ScopeCd Sync="TRUE" value="005"></ScopeCd></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><distInfo><distributor><distorTran><onLineSrc><orDesc Sync="TRUE">002</orDesc><linkage Sync="TRUE">file://</linkage><protocol Sync="TRUE">Local Area Network</protocol></onLineSrc><transSize Sync="TRUE">0.000</transSize></distorTran><distorFormat><formatName Sync="TRUE">Shapefile</formatName></distorFormat></distributor></distInfo><refSysInfo><RefSystem><refSysID><identCode Sync="TRUE">NAD_1983_HARN_StatePlane_Oregon_North_FIPS_3601</identCode></refSysID></RefSystem></refSysInfo><spatRepInfo><VectSpatRep><topLvl><TopoLevCd Sync="TRUE" value="001"></TopoLevCd></topLvl><geometObjs Name="bike_rte"><geoObjTyp><GeoObjTypCd Sync="TRUE" value="001"></GeoObjTypCd></geoObjTyp><geoObjCnt Sync="TRUE">0</geoObjCnt></geometObjs></VectSpatRep></spatRepInfo><Esri><SyncDate>20090806</SyncDate><SyncTime>11421800</SyncTime><ModDate>20090806</ModDate><ModTime>11421800</ModTime><DataProperties><lineage><Process ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20090806" Time="114223">CopyFeatures bike_rte.shp R:\\rlislite\\DVD\\ESRISHAPEFILES\\TRANSIT\bike_rte.shp # 0 0 0</Process></lineage></DataProperties><MetaID>{C47F6967-B4A8-4656-9ED1-0F9BAEE1EC89}</MetaID><CreaDate>20091113</CreaDate><CreaTime>18475300</CreaTime><SyncOnce>TRUE</SyncOnce></Esri><mdDateSt Sync="TRUE">20090806</mdDateSt></metadata>

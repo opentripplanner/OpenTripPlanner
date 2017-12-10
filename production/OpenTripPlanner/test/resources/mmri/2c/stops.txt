@@ -1,0 +1,8 @@
+stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station
+2c1,Stop 2c1,2.301,2.300,0,2c_parent_1_4
+2c2,Stop 2c2,2.302,2.300,0,
+2c3,Stop 2c3,2.303,2.300,0,2c_parent_2_5
+2c4,Stop 2c4,2.301,2.301,0,2c_parent_1_4
+2c5,Stop 2c5,2.303,2.301,0,2c_parent_2_5
+2c_parent_1_4,StopArea 1 4,2.301,2.3005,1,
+2c_parent_2_5,StopArea 2 5,2.303,2.3005,1,

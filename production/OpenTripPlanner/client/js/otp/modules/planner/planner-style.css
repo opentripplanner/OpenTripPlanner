@@ -1,0 +1,393 @@
+/* Multimodal Module Widget Styles */
+
+/* Itineraries Widget */
+
+.otp-defaultItinsWidget {
+  top: 60px;
+  left: 10px;
+  width: 300px;
+  height: 300px;
+}
+
+@media only screen and (min-width: 1024px) {
+  .otp-defaultItinsWidget {
+    width: 450px;
+  }
+}
+
+@media only screen and (min-height: 768px) {
+  .otp-defaultItinsWidget {
+    hieght: 350px;
+  }
+}
+
+.otp-itinsWidget-footer {
+    padding-bottom: .4em;
+}
+
+.otp-itinsWidget-searchLink {
+    font-size: .9em;
+    padding-top: .3em;
+    text-align: center;
+}
+
+
+.otp-itinsAccord {
+  font-size: 12px;
+}
+
+.otp-itinsAccord h3 {
+  font-size: 12px;
+}
+
+/*
+.otp-itinsAccord-header-number {
+    float: left;
+    font-weight: bold;
+    font-size: 1.5em;
+    height: 1.2em;
+    padding-top:.1em  
+}
+
+.otp-itinsAccord-header-icons {
+    float:left;
+    height: 1.2em;
+    padding-top: .35em;
+    margin-left: .6em;
+}
+
+.otp-itinsAccord-header-duration {
+    float: left;
+    height: 1.2em;
+    margin-left: .8em;
+    padding-top:.45em
+}
+
+.otp-itinsAccord-header-groupSize {
+    float: left;
+    height: 1.2em;
+    margin-left: .8em;
+    padding-top:.45em;
+    font-weight: bold;
+}
+
+/* new header styling */
+
+.otp-itinsAccord-header-number {
+    position:absolute;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.otp-itinsAccord-header-time {
+    position:absolute;
+    width: 30px;
+    height: 12px;
+    top: 4px;
+    color: white;
+    font-size: 9px;
+    font-weight: bold;
+    text-shadow: none;
+    text-align: center;
+    background: black;
+    padding-top: 1px;    
+}
+
+.otp-itinsAccord-header-segment {
+    position:absolute;
+    top: 0px;
+    height: 17px;
+    font-weight: bold;
+    text-shadow: none;
+    padding-top:3px;
+    text-align: left;
+}
+
+.otp-itinsAccord-header-groupSize {
+    position:absolute;
+    top: 0px;
+    right: 0px;
+    height: 19px;
+    width: 37px;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: none;
+    padding-top: 1px;
+    padding-right: 3px;
+    text-align: right;
+    background: #ccc url(images/user_icon.png) 3px 2px no-repeat;
+    border-radius: 3px;
+}
+
+
+.otp-itinStartRow {
+    margin-bottom: .5em;
+}
+
+.otp-itinAlertRow {
+    background: #C00000;
+    color: white;
+    padding: 3px;
+    font-size: .8em;
+    margin-bottom: .5em;
+}
+
+.otp-itinEndRow {
+    margin-top: .5em;
+}
+
+.otp-itinTripSummary {
+    margin-top: 15px;
+    padding: 5px;
+    border: 1px solid #bbb;
+    background: #eee;
+}
+
+.otp-itinTripSummaryHeader {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #aaa;
+    margin-bottom: .5em;
+}
+
+.otp-itinTripSummaryLabel {
+    float: left;
+    font-weight: bold;
+    width: 8.5em;
+}
+
+.otp-itinTripSummaryText {
+    margin-left: 7.5em;
+}
+
+.otp-itinTripSummaryFooter {
+    font-size: .9em;
+    margin-top: 1.2em;
+    color: gray;
+    text-align: center;
+}
+
+.otp-itinsButtonRow {
+    margin-top: .5em;  
+    font-size: .9em;
+    text-align: center;
+}
+
+.otp-itin-leg-leftcol {
+    font-size: .9em;
+    color: black;
+    width: 50px;
+    float: left;
+}
+
+.otp-itin-leg-endpointDesc {
+    font-size: .9em;
+    border-left: 1px solid #ccc;
+    margin-left: 55px;
+    padding: .0em 0 0 5px;
+    cursor: pointer;
+}
+
+.otp-itin-leg-endpointDescSub {
+    font-size: .8em;
+    border-left: 1px solid #ccc;
+    margin-left: 55px;
+    padding: .0em 0 0 5px;
+    color: gray;
+    cursor: pointer;
+}
+
+.otp-itin-leg-buffer {
+    font-size: .9em;
+    height: .9em;
+    border-left: 1px solid #ccc;
+    margin-left: 55px;
+}
+
+.otp-itin-leg-elapsedDesc {
+    font-size: .9em;
+    border-left: 1px solid #ccc;
+    color: gray;
+    margin-left: 55px;
+    padding-left: 5px;
+}
+
+.otp-itin-leg-intStops {
+    background: #ddd;
+    font-size: .9em;
+    padding: .5em 0 .5em 5px;
+    border-left: 1px solid #ccc;
+    margin-left: 55px;
+}
+
+.otp-itin-leg-intStopsHeader {
+    background: #ddd;
+    padding: .2em .4em;
+    font-style: italic;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.otp-itin-leg-intStopsList {
+    background: #ddd;
+    padding: .4em;
+}
+
+.otp-itin-leg-intStopsListItem {
+    padding-bottom: .3em;
+    cursor: pointer;
+}
+
+
+.otp-itin-iconModeSymbol {
+    width: 16px;
+    height: 16px;
+    margin-left: 7px;
+    background: black;
+}
+
+.otp-itin-div-icon {
+    width: 20px;
+    height: 30px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.otp-itin-div-icon-nw {
+    background: url('images/mode/mode_bubble_nw.png');
+}
+
+.otp-itin-div-icon-ne {
+    background: url('images/mode/mode_bubble_ne.png');
+}
+
+.otp-itin-div-icon-sw {
+    background: url('images/mode/mode_bubble_sw.png');
+}
+
+.otp-itin-div-icon-se {
+    background: url('images/mode/mode_bubble_se.png');
+}
+
+.otp-itin-div-icon-nw-highlight {
+    background: url('images/mode/mode_bubble_nw_highlight.png');
+}
+
+.otp-itin-div-icon-ne-highlight {
+    background: url('images/mode/mode_bubble_ne_highlight.png');
+}
+
+.otp-itin-div-icon-sw-highlight {
+    background: url('images/mode/mode_bubble_sw_highlight.png');
+}
+
+.otp-itin-div-icon-se-highlight {
+    background: url('images/mode/mode_bubble_se_highlight.png');
+}
+
+
+.otp-itin-div-icon-topRow-n {
+    height: 16px;
+    margin-top: 3px;
+}
+
+.otp-itin-div-icon-topRow-s {
+    height: 16px;
+    margin-top: 16px;
+}
+
+.otp-itin-step-row {
+    background: #e8e8e8;
+    margin-bottom: .3em;
+    padding: .3em;
+    cursor: pointer;
+}
+
+.otp-itin-step-icon {
+    margin: 3px 8px 3px 4px;
+    width: 20px;
+    height: 20px;
+    float: left;
+}
+
+.otp-itin-step-dist {
+    margin: 0px 4px 0px 8px;
+    font-size: .8em;
+    width: 25px;
+    float: right;
+    text-align: center;
+    color: gray;
+    
+}
+
+.otp-itin-step-text {
+    font-size: .8em;
+    margin: 0px 30px;
+}
+
+/* alert display style */
+
+.otp-itin-alert {
+    margin-top: 10px;
+    border: 1px solid red;
+    padding: 8px;
+}
+
+.otp-itin-alert-left {
+    background: url('../../../../images/alert.png');
+    background-position: 0px 3px;
+    background-repeat: no-repeat;
+    float: left;
+    width: 16px;
+    height: 16px;
+}
+
+.otp-itin-alert-main {
+    margin-left: 20px;
+}
+
+.otp-itin-alert-header {
+    font-weight: bold;
+    font-size: .9em;
+    margin-bottom: 2px;
+}
+
+.otp-itin-alert-description {
+    font-size: .9em;
+}
+
+.otp-itin-alert-toggleButton {
+    width: 15px;
+    height: 15px;
+    float: right;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: -1px;
+}
+
+/* print window style */
+
+.otp-itin-printWindow {
+    font-family: sans-serif;
+}
+
+.otp-itin-printWindow h4 {
+    border-bottom: 3px solid #ccc;
+    padding-bottom: .1em;
+    margin-top: 1.5em;
+    margin-bottom: .8em;
+}
+
+.otp-itin-printWindow ul {
+    font-size: .9em;
+}
+
+.otp-itin-printWindow li {
+    margin-left: -8px;
+}
+
+.otp-itin-print-step {
+    margin-top: .5em;
+}

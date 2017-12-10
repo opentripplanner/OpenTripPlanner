@@ -718,6 +718,7 @@ public class GraphPathToTripPlanConverterTest {
 
         forwardOptions.rctx = forwardContext;
         forwardOptions.dateTime = 0L;
+        forwardOptions.maxSlope = 10.0;
         forwardOptions.bikeRentalPickupTime = 4;
         forwardOptions.bikeRentalDropoffTime = 2;
 
@@ -763,6 +764,7 @@ public class GraphPathToTripPlanConverterTest {
 
         backwardOptions.rctx = backwardContext;
         backwardOptions.dateTime = 60L;
+        backwardOptions.maxSlope = 10.0;
         backwardOptions.bikeRentalPickupTime = 4;
         backwardOptions.bikeRentalDropoffTime = 2;
         backwardOptions.setArriveBy(true);
@@ -810,6 +812,7 @@ public class GraphPathToTripPlanConverterTest {
 
         onboardOptions.rctx = onboardContext;
         onboardOptions.dateTime = 6L;
+        onboardOptions.maxSlope = 10.0;
         onboardOptions.bikeRentalPickupTime = 4;
         onboardOptions.bikeRentalDropoffTime = 2;
 

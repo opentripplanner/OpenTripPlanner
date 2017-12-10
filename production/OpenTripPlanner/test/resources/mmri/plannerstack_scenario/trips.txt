@@ -1,0 +1,5 @@
+route_id,service_id,trip_id
+plannerstack_scenario|intercity,ignore,plannerstack_scenario|intercity
+plannerstack_scenario|slt|1,ignore,plannerstack_scenario|slt|1
+plannerstack_scenario|slt|2,ignore,plannerstack_scenario|slt|2
+plannerstack_scenario|slt|2,ignore,plannerstack_scenario|slt|3

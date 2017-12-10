@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3562' visible='true' lat='47.613105237992706' lon='19.07629066942048' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3559' visible='true' lat='47.61175012425288' lon='19.072923702010815' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3557' visible='true' lat='47.61103833944692' lon='19.07130737702123' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3552' action='modify' visible='true' lat='47.607088333039776' lon='19.07484210371454' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3550' action='modify' visible='true' lat='47.61273544294714' lon='19.088726159395158' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3548' action='modify' visible='true' lat='47.62055981212921' lon='19.081723381375618' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3547' action='modify' visible='true' lat='47.61491354715798' lon='19.067839325695005' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3539' action='modify' visible='true' lat='47.61230244205035' lon='19.077034352319757' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3538' action='modify' visible='true' lat='47.613926071848276' lon='19.080890994588945' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3537' action='modify' visible='true' lat='47.61588468747063' lon='19.079076523199795' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3536' action='modify' visible='true' lat='47.61426111848569' lon='19.075219880930614' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3527' action='modify' visible='true' lat='47.60907461932589' lon='19.075402090323422' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3525' action='modify' visible='true' lat='47.613725826493116' lon='19.086449839187146' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3523' action='modify' visible='true' lat='47.61933630816407' lon='19.081252099073193' />
+  <node timestamp='2010-03-26T06:57:06Z' version='0' id='-3522' action='modify' visible='true' lat='47.61468560002495' lon='19.070204350209465' />
+  <way timestamp='2010-03-26T06:57:06Z' version='0' id='-3560' action='modify' visible='true'>
+    <nd ref='-3557' />
+    <nd ref='-3559' />
+    <nd ref='-3562' />
+    <tag k='highway' v='footway' />
+  </way>
+  <way timestamp='2010-03-26T06:57:06Z' version='0' id='-3549' action='modify' visible='true'>
+    <nd ref='-3547' />
+    <nd ref='-3548' />
+    <nd ref='-3550' />
+    <nd ref='-3552' />
+    <nd ref='-3557' />
+    <nd ref='-3547' />
+    <tag k='highway' v='footway' />
+  </way>
+  <way timestamp='2010-03-26T06:57:06Z' version='0' id='-3535' action='modify' visible='true'>
+    <nd ref='-3536' />
+    <nd ref='-3537' />
+    <nd ref='-3538' />
+    <nd ref='-3539' />
+    <nd ref='-3562' />
+    <nd ref='-3536' />
+  </way>
+  <way timestamp='2010-03-26T06:57:06Z' version='0' id='-3524' action='modify' visible='true'>
+    <nd ref='-3522' />
+    <nd ref='-3523' />
+    <nd ref='-3525' />
+    <nd ref='-3527' />
+    <nd ref='-3559' />
+    <nd ref='-3522' />
+  </way>
+  <relation timestamp='2010-03-26T06:57:06Z' version='0' id='-3542' action='modify' visible='true'>
+    <member type='way' ref='-3524' role='outer' />
+    <member type='way' ref='-3535' role='inner' />
+    <tag k='highway' v='platform' />
+    <tag k='type' v='multipolygon' />
+  </relation>
+</osm>

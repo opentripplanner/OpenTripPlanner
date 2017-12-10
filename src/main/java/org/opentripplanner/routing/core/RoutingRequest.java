@@ -134,7 +134,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.0833333; // ADA max wheelchair ramp slope is a good default.
+
+    /** The slope factor for wheelchair trips. */
+    public double slopeFactor = 1;
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
@@ -525,6 +528,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
+            bikeWalkingOptions.maxSlope = maxSlope;
             bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
@@ -538,6 +542,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+            bikeWalkingOptions.maxSlope = maxSlope;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
@@ -596,6 +601,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         } else {
             return Double.MAX_VALUE;            
         }
+    }
+
+    public double getMaxSlope() {
+        if(modes.isTransit() || (batch && !softWalkLimiting)) {
+            return maxSlope;
+        } else{
+            return maxSlope;
+        }
+    }
+
+    public double getSlopeFactor() {
+        return slopeFactor;
     }
     
     public void setWalkBoardCost(int walkBoardCost) {
@@ -1102,6 +1119,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setMaxSlope(double maxSlope){
+        if(maxSlope > 0){
+            this.maxSlope = maxSlope;
+            bikeWalkingOptions.maxSlope = maxSlope;
+        }
+    }
+
+    public void setSlopeFactor(double slopeFactor){
+        if(slopeFactor > 0){
+            this.slopeFactor = slopeFactor;
+        }
+    }
     public void setMaxPreTransitTime(int maxPreTransitTime) {
         if (maxPreTransitTime > 0) {
             this.maxPreTransitTime = maxPreTransitTime;

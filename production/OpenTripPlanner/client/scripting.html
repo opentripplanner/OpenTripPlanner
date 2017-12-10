@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OTP Scripting</title>
+</head>
+<h1>OTP Simple Scripting Client</h1>
+<p>
+	Select a script file to run and click 'Run script'.
+	Check-out OTP server log to see console output and progress.
+	To automate this process, you can use <em>curl</em>: <code>curl --form "scriptfile=@myscript.py" localhost:8080/otp/scripting/run</code>.
+</p>
+<body>
+	<form enctype='multipart/form-data' action="/otp/scripting/run"
+		method="post">
+		<input name="scriptfile" type="file" /> <input type="submit"
+			value="Run script" />
+	</form>
+</body>
+</html>

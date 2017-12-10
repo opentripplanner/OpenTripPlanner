@@ -198,11 +198,11 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
+        if (getMaxSlope() > options.maxSlope) {
+            return false;
+        }
         if (options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
-                return false;
-            }
-            if (getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -247,7 +247,6 @@ public class StreetEdge extends Edge implements Cloneable {
     public float getMaxSlope() {
         return 0.0f;
     }
-
     @Override
     public double getDistance() {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
@@ -375,7 +374,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;
-                weight = costs * (elevationUtilsSpeed / speed);
+                double slopeWeight = costs * (elevationUtilsSpeed / speed);
+                weight = slopeWeight * options.slopeFactor + time * (1 - options.slopeFactor);
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code

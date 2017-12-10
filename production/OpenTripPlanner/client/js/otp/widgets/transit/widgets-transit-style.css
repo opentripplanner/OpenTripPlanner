@@ -1,0 +1,204 @@
+.otp-tripViewer {
+    /*height: 150px;*/
+    width: 300px;
+}
+
+.otp-tripViewer-select {
+    margin-bottom: 6px;
+}
+
+.otp-tripViewer-close {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.otp-tripViewer-stopList {
+    height: 200px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+    padding: 4px 8px;
+}
+
+.otp-tripViewer-stopRow {
+    height: 32px;
+}
+
+.otp-tripViewer-stopRow-name {
+    color: black;
+    white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+    font-size: 11px;
+    margin-bottom: 1px;
+    padding-top: 3px;
+}
+
+.otp-tripViewer-stopRow-idLine {
+    font-size: 10px;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.otp-tripViewer-stopRow-idLine a {
+    text-decoration: none;
+}
+
+.otp-tripViewer-stopRow-idLine a:hover {
+    text-decoration: underline;
+}
+
+.otp-tripViewer-scheduleLink {
+    text-align: center;
+    margin-top: 4px;    
+}
+
+/** Stop Viewer **/
+
+.otp-stopViewer {
+    width: 150px;
+    height: 250px;
+}
+
+.otp-stopViewer-container {
+    position: absolute;
+    top: 30px;
+    bottom: 10px;    
+    left: 10px;
+    right: 10px; 
+}
+
+.otp-stopViewer-stopInfo {
+    height: 48px;
+    border: 1px solid #bbb;
+    padding: 3px;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.otp-stopViewer-reloadButton {
+    font-size: 11px;
+}
+
+.otp-stopViewer-idInput {
+    font-size: 11px;
+    width: 50px;
+}
+
+.otp-stopViewer-dateInput {
+    font-size: 12px;
+    width: 80px;
+}
+
+
+.otp-stopViewer-timeList {
+    position: absolute;
+    top: 85px;
+    bottom: 20px;
+    left: 0px;
+    right: 0px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-stopViewer-timeListItem {
+    margin: 6px 5px;
+    text-align: center;
+}
+
+.otp-stopViewer-timeRow {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.otp-stopViewer-routeRow {
+    font-size: 11px;
+    font-weight: bold;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.otp-stopViewer-tripRow {
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.otp-stopViewer-headsignRow {
+    font-size: 10px;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.otp-stopViewer-blockRow {
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.otp-stopViewer-findButtonRow {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 16px;
+    text-align: center;
+}
+
+
+/** Stop Finder **/
+
+.otp-stopFinder {
+    width: 250px;
+    height: 250px;
+}
+
+.otp-stopFinder-container {
+    position: absolute;
+    top: 30px;
+    bottom: 10px;    
+    left: 10px;
+    right: 10px; 
+}
+
+.otp-stopFinder-buttonRow {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 16px;
+    text-align: center;
+}
+
+.otp-stopFinder-stopList {
+    position: absolute;
+    top: 80px;
+    left: 0px;
+    right: 0px;
+    bottom: 5px;
+    border: 1px solid black;
+    background: white;
+    overflow: auto;
+    padding: 5px;
+}
+
+.otp-stopFinder-stopRow {
+    margin: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #f0f0f0;
+    padding: 2px;
+}

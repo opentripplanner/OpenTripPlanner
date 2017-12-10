@@ -1,0 +1,123 @@
+
+.otp-alerts-alertsWidget {
+    left: 20px;
+    top: 80px;
+    width: 300px;
+}
+
+.otp-alerts-alertRow {
+    margin: 5px;
+    padding: 4px;
+    background: #eee;
+    cursor: pointer;
+}
+
+.otp-alerts-alertRow:hover {
+    background: #f8f8f8;
+}
+
+
+.otp-alerts-alertsWidget-alertsList {
+    height: 200px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+/** EntitiesWidget **/
+
+.otp-alerts-entitiesWidget {
+    right: 20px;
+    bottom: 20px;
+}
+
+.otp-alerts-entitiesWidget-tabPanel {
+    width: 200px;
+    height: 250px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-alerts-entitiesWidget-select {
+    height: 100%;
+    width: 100%;
+    background: #eee;
+}
+
+.otp-alerts-entitiesWidget-buttonRow {
+    text-align: center;
+    margin: 10px;
+}
+
+.otp-alerts-entitiesWidget-entityRow {
+    margin: 5px;
+    padding: 4px;
+    background: #eee;
+    cursor: move;
+}
+
+.otp-alerts-entitiesWidget-routeRow:hover {
+    background: #f8f8f8;
+}
+
+
+/** EditAlertWidget **/
+
+.otp-alerts-editAlertWidget {
+    left: 20px;
+    bottom: 20px;
+    width: 360px;
+}
+
+.otp-alerts-editAlert-text {
+    width: 100%;
+    height: 40px;
+}
+
+.otp-alerts-editAlert-rangeList {
+    width: 100%;
+    height: 80px;
+    overflow: auto;
+    background: #f0f0f0;
+    border: 1px solid black;
+}
+
+.otp-alerts-editAlert-dateInput {
+    width:35%;
+    font-size: 12px;
+}
+
+.otp-alerts-editAlert-entitiesList {
+    overflow: auto;
+    background: #fff;
+    border: 1px solid black;
+    height: 80px;
+}
+
+.otp-alerts-editAlert-entitiesList-dropHover {
+    background: #cff;
+    border: 2px solid black;
+}
+
+.otp-alerts-editAlert-entityRow {
+    margin: 5px;
+    padding: 4px;
+    background: #eee;
+}
+
+.entityRow:hover {
+    background: #f8f8f8;
+}
+
+.otp-alerts-editAlert-deleteRangeButton {
+    float:right;
+    font-size: 10px;
+    width: 20x;
+}
+
+.otp-alerts-editAlert-deleteEntityButton {
+    float:right;
+    font-size: 10px;
+    width: 20x;
+}

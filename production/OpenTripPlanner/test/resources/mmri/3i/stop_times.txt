@@ -1,0 +1,3 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence
+3i|1,00:01:00,00:01:00,3i1,1
+3i|1,00:02:00,00:02:00,3i2,2

@@ -1,0 +1,6 @@
+route_id,service_id,trip_id,block_id
+route0,serv0,route0-trip1,block0
+route0,serv0,route0-trip2,block1
+route1,serv0,route1-trip1,block2
+route1,serv0,route1-trip2,block2
+

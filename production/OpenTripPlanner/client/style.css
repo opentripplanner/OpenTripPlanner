@@ -1,0 +1,1137 @@
+/* =html5doctor.com Reset Stylesheet \\v1.6.1 \\ Last Updated: 2010-09-17 \\ http://richclarkdesign.com \\ @rich_clark
+-------------------------------------------------------------- */
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section { display:block; }
+nav ul { list-style:none; }
+blockquote, q { quotes:none; }
+blockquote:before, blockquote:after,
+q:before, q:after { content:''; content:none; }
+a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
+ins { background-color:#ff9; color:#000; text-decoration:none; }
+mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
+del { text-decoration: line-through; }
+abbr[title], dfn[title] { border-bottom:1px dotted; cursor:help; }
+/* tables still need cellspacing="0" in the markup */
+table { border-collapse:collapse; border-spacing:0; }
+hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
+input, select { vertical-align:middle; }
+
+
+/* Base Typography
+-------------------------------------------------------------- */
+
+body { font:13px/1.231 sans-serif; *font-size:small; }
+select, input, textarea, button { font:99% sans-serif; }
+pre, code, kbd, samp { font-family: monospace, sans-serif; }
+
+
+/* Base Styles
+-------------------------------------------------------------- */
+
+
+body, select, input, textarea {
+  /* #444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
+  color: #444;
+  /* set your base font here, to apply evenly */
+  font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
+}
+/* Headers (h1,h2,etc) have no default font-size or margin,
+   you'll want to define those yourself. */
+h1,h2,h3,h4,h5,h6 {
+  font-weight: bold;
+  margin-bottom: 0.25em;
+  text-shadow: -1px 1px #fff;
+}
+h1 { font-size: 2em; }
+h2 { font-size: 1.75em; }
+h3 { font-size: 1.5em; }
+h4 { font-size: 1.5em; color: #666;}
+h5 { font-size: 1.25em; }
+h6 { font-size: 1.25em; color: #666; }
+/* always force a scrollbar in non-IE */
+html { overflow-y: scroll; }
+/* Accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
+a:hover, a:active { outline: none; }
+a, a:active, a:visited { color: #0073e5; }
+a:hover { color: #57a2ee; }
+ul, ol { margin-left: 1.8em; margin-bottom: 0.75em }
+ol { list-style-type: decimal; }
+li { margin-bottom: 0.5em }
+p { margin-bottom: 1.25em; line-height: 1.75; }
+/* Remove margins for navigation lists */
+nav ul, nav li { margin: 0; }
+small { font-size: 85%; }
+strong, th { font-weight: bold; }
+td, td img { vertical-align: top; }
+sub { vertical-align: sub; font-size: smaller; }
+sup { vertical-align: super; font-size: smaller; }
+pre {
+  padding: 15px;
+  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+  white-space: pre; /* CSS2 */
+  white-space: pre-wrap; /* CSS 2.1 */
+  white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
+  word-wrap: break-word; /* IE */
+}
+hr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  margin: .5em 0 .5em 0; 
+}
+textarea { overflow: auto; } /* thnx ivannikolic! www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
+.ie6 legend, .ie7 legend { margin-left: -7px; } /* thnx ivannikolic! */
+/* align checkboxes, radios, text inputs with their label
+   by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
+input[type="radio"] { vertical-align: text-bottom; }
+input[type="checkbox"] { vertical-align: bottom; }
+.ie7 input[type="checkbox"] { vertical-align: baseline; }
+.ie6 input { vertical-align: text-bottom; }
+/* hand cursor on clickable input elements */
+label, input[type=button], input[type=submit], button { cursor: pointer; }
+/* webkit browsers add a 2px margin outside the chrome of form elements */
+button, input, select, textarea { margin: 0; }
+/* colors for form validity */
+input:valid, textarea:valid   {  }
+input:invalid, textarea:invalid {
+      border-radius: 1px;
+    -moz-box-shadow: 0px 0px 5px red;
+ -webkit-box-shadow: 0px 0px 5px red;
+         box-shadow: 0px 0px 5px red;
+}
+.no-boxshadow input:invalid,
+.no-boxshadow textarea:invalid { background-color: #f0dddd; }
+/* These selection declarations have to be separate.
+   No text-shadow: twitter.com/miketaylr/status/12228805301
+   Also: hot pink. */
+::-moz-selection{ background: #FF5E99; color:#fff; text-shadow: none; }
+::selection { background:#FF5E99; color:#fff; text-shadow: none; }
+/*  j.mp/webkit-tap-highlight-color */
+a:link { -webkit-tap-highlight-color: #FF5E99; }
+/* make buttons play nice in IE:
+   www.viget.com/inspire/styling-the-button-element-in-internet-explorer/ */
+button {width: auto; overflow: visible;}
+/* bicubic resizing for non-native sized IMG:
+   code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
+.ie7 img {-ms-interpolation-mode: bicubic;}
+
+/* >> The Magnificent CLEARFIX: Updated to prevent margin-collapsing on child elements << j.mp/bestclearfix */
+.clearfix:before, .clearfix:after {
+  content: "\0020"; display: block; height: 0; visibility: hidden;
+}
+.clearfix:after { clear: both; }
+/* Fix clearfix: blueprintcss.lighthouseapp.com/projects/15318/tickets/5-extra-margin-padding-bottom-of-page */
+.clearfix { zoom: 1; }
+
+.borderBox {
+     box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+}
+
+
+/* Structure
+-------------------------------------------------------------- */
+
+body {
+  background: #444;
+}
+
+
+/* Header
+-------------------------------------------------------------- */
+
+
+/* Branding (top bar) */
+
+#branding {
+  height: 2.25em;
+  overflow: visible;
+  position: relative;
+  z-index: 100;
+  color: #fff;
+
+  background-color: #444;
+
+  background-image: linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -o-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -moz-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -ms-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+
+  background-image: -webkit-gradient(
+  	linear,
+  	left bottom,
+  	left top,
+  	color-stop(0, rgb(68,68,68)),
+  	color-stop(1, rgb(102,102,102))
+  );
+}
+
+@media only screen and (min-width: 768px) {
+  #branding {
+    height: 4em;
+  }
+}
+
+/* Module Selector */
+
+#otp_moduleSelector {
+  font-size: 11px;
+  margin: 6px 10px;
+}
+
+@media only screen and (min-width: 768px) {
+
+  #otp_moduleSelector {
+    font-size: 16px;
+    margin: 13px 20px;
+  }
+}
+
+
+
+#otp_topbutton {
+  float: left;
+  width: 90px;
+  height: 42px;
+  background: gray;
+  font-weight: bold;
+  font-size: 30px;
+  padding: 6px 0px 4px 10px;
+  cursor: pointer;
+}
+
+#otp_topbutton:hover {
+  color: cyan;
+}
+
+#otp_toptitle {
+  float: left;
+  width: 300px;
+  height: 42px;
+  font-weight: bold;
+  font-size: 30px;
+  padding: 6px 0px 4px 12px;
+}
+
+#otp-widgetManager {
+    float: right;
+    width: 30px;
+    height: 30px;
+    margin: 10px 10px 0 0;
+    background: url('images/gear.svg');
+    background-size: 30px 30px;
+    cursor: pointer;
+}
+
+.otp-widgetManagerMenu {
+    top: 40px;
+    right: 10px;
+    text-align: right;
+}
+
+#addthis {
+  display: none;
+}
+
+/* the logo */
+#logo {
+  display: none;
+  float: left;
+  height:30px;
+  margin: 10px 0px 0px 10px;
+}
+
+}
+#logo .ribbon {
+  position: relative;
+  height: 5em;
+  right: -10px;
+  padding: 0 10px 0 1.5em;
+  border-top: 1px solid #529be6;
+  border-bottom: 1px solid #2a65a1;
+
+  background-color: #68aff7;
+
+  background-image: linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -o-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -moz-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -ms-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+
+  background-image: -webkit-gradient(
+  	linear,
+  	left bottom,
+  	left top,
+  	color-stop(0, rgb(86,162,238)),
+  	color-stop(1, rgb(120,185,255))
+  );
+
+     -moz-box-shadow: inset -2px 1px 1px rgba(255,255,255,0.5);
+  -webkit-box-shadow: inset -2px 1px 1px rgba(255,255,255,0.5);
+          box-shadow: inset -2px 1px 1px rgba(255,255,255,0.5);
+}
+#logo .ribbon:before,
+#logo .ribbon:after { 
+  content: "\0020";
+  display: block; 
+	width: 100%; 
+	height: 100%; 
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  z-index: -1;
+  border: 1px solid #2a65a1;
+  border-top: 1px solid #529be6;
+  border-left: 2px solid #498fd7;
+
+  background-color: #68aff7;
+
+  background-image: linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -o-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -moz-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+  background-image: -ms-linear-gradient(bottom, rgb(86,162,238) 0%, rgb(120,185,255) 100%);
+
+  background-image: -webkit-gradient(
+  	linear,
+  	left bottom,
+  	left top,
+  	color-stop(0, rgb(86,162,238)),
+  	color-stop(1, rgb(120,185,255))
+  );
+
+          transform: skew(45deg,0deg);
+      -ms-transform: skew(45deg,0deg);
+  -webkit-transform: skew(45deg,0deg);
+       -o-transform: skew(45deg,0deg);
+     -moz-transform: skew(45deg,0deg);
+
+     -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+             border-radius: 8px;
+
+     -moz-box-shadow: -5px 0 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.5);
+  -webkit-box-shadow: -5px 0 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.5);
+          box-shadow: -5px 0 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.5);
+}
+#logo .ribbon:after {
+  padding-right: 6em;
+  right: -6em;
+  margin-right: -1px;
+  border-left: 2px solid #498fd7;
+          transform: skew(-45deg,0deg);
+      -ms-transform: skew(-45deg,0deg);
+  -webkit-transform: skew(-45deg,0deg);
+       -o-transform: skew(-45deg,0deg);
+     -moz-transform: skew(-45deg,0deg);
+
+        -moz-box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.25), inset 1px 1px 1px rgba(255,255,255,0.5);
+     -webkit-box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.25), inset 1px 1px 1px rgba(255,255,255,0.5);
+             box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.25), inset 1px 1px 1px rgba(255,255,255,0.5);
+}
+
+#site-title {
+  font-size: 1.25em;
+  margin: .325em .25em;
+  float: left;
+  padding-left: 5px;
+}
+
+#site-title a {
+  text-decoration: none;
+  color: #fff;
+  text-shadow: -1px -1px 1px rgba(42,101,161,0.25),
+               -1px  1px 1px rgba(42,101,161,0.25),
+                1px -1px 1px rgba(42,101,161,0.25),
+                1px  1px 1px rgba(42,101,161,0.25)
+}
+#site-title a:hover {
+  text-shadow: -1px -1px 1px rgba(42,101,161,0.5),
+               -1px  1px 1px rgba(42,101,161,0.75),
+                1px -1px 1px rgba(42,101,161,0.25),
+                1px  1px 1px rgba(42,101,161,0.5)
+}
+#site-description {
+  color: #dfeefd;
+  font-size: 1em;
+  margin: 0 20px 0 0;
+  text-shadow: -1px -1px 1px rgba(42,101,161,0.25),
+               -1px  1px 1px rgba(42,101,161,0.25),
+                1px -1px 1px rgba(42,101,161,0.25),
+                1px  1px 1px rgba(42,101,161,0.25)
+}
+
+/* AddThis */
+#branding .addthis_toolbox {
+  margin: 1.25em 0 0 0;
+  float: right;
+  min-width: 163px;
+}
+
+/* Navigation: Main Menu */
+#main-menu {
+  padding: .25em;
+  float: right;
+}
+#main-menu li {
+  float: left;
+}
+#main-menu a {
+  display: block;
+  color: #fff;
+  font-size: 1em;
+  font-weight: bold;
+  line-height: 1.75;
+  text-decoration: none;
+  padding: 0 0.75em;
+  position: relative;
+  z-index: 1000;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+}
+#main-menu a:hover {
+  background-color: #333;
+}
+
+
+
+/* The Map
+-------------------------------------------------------------- */
+
+#map {
+  position: absolute;
+  top: 2.25em;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
+
+@media only screen and (min-width: 768px) {
+  #map {
+    top: 4em;
+  }
+}
+
+
+/*.leaflet-control-zoom {
+  display: none;
+}*/
+
+.leaflet-container .leaflet-control-attribution {
+  font-size: 6px;
+}
+
+
+.otp-popupMenu {
+  position : fixed;
+  z-index: 10001;
+  padding: 0px;
+  background: #eee;
+  border: 1px solid #acacac;
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #9a9a9a;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+     -moz-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+          box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+.otp-popupMenu-item {
+    padding: .4em;
+    cursor: pointer;
+}
+
+.otp-popupMenu-item:hover {
+    background: #f8f8f8;
+}
+
+/* Minimize Tray
+-------------------------------------------------------------- */
+
+#otp-minimize-tray {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 28px;
+    z-index: 10000;
+}
+
+.otp-minimized-tab {
+    float: left;
+    z-index: 10000;
+    font-size: 14px;
+    text-shadow: -1px 1px 0 #ffffff;
+    font-weight: bold;
+    background: #eee;
+    padding: 5px 2px 3px 6px;
+    margin-left: 10px;
+    width: 150px;
+    height: 20px;
+    cursor: pointer;
+    overflow: hidden;   
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    border-top: 1px solid #acacac;
+    border-top: 1px solid #bfbfbf;
+    border-left: 1px solid #acacac;
+    border-left: 1px solid #bfbfbf;
+    border-right: 1px solid #acacac;
+    border-tight: 1px solid #bfbfbf;
+
+    -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+          border-radius: 3px;
+         -moz-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+    -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+          box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+/* Widgets
+-------------------------------------------------------------- */
+  
+.otp-widget {
+  position : absolute;
+  z-index: 1000;
+}
+
+.otp-widget-nonTransparent {
+  padding: 5px 10px;
+  background: #eee;
+  border: 1px solid #acacac;
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #9a9a9a;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+     -moz-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+          box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+.otp-widget .close {
+	color: #666;
+	cursor: pointer;
+	font-size: 20px;
+  font-weight: bold;
+	text-shadow: -1px 1px 0 #ffffff;
+  padding: 0 0.4em 0.23em;
+	float: right;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 10000;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.otp-widget .close:hover {
+	color: red;
+}
+
+.otp-widget-header {
+    font-size: 16px;
+    min-height: 16px;
+    text-shadow: -1px 1px 0 #ffffff;
+    font-weight: bold;
+    margin-bottom: 5px;
+    overflow: hidden;   
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+}
+
+.otp-widget-header-buttons {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 20px;
+    width: 50px;
+}
+
+.otp-widget-header-button {
+	color: #666;
+	cursor: pointer;
+	font-size: 20px;
+    font-weight: bold;
+	text-shadow: -1px 1px 0 #ffffff;
+    padding: 0 10px 0px 2px;
+	position: static;
+	float: right;
+	width: 8px;
+	z-index: 10000;
+    /*-webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;*/
+}
+
+.otp-widget-header-minimize:hover {
+	color: red;
+}
+
+.otp-defaultInfoWidget {
+    width: 40em;
+    height: 60%;
+  	overflow: auto;
+}
+  
+#otp-tripResultsWidget {
+  width: 230px;
+  height: auto;
+  left: 20px;
+  bottom: 7.5em;
+  display: none;
+}
+
+#otp-noTripWidget {
+  left: 0.5em;
+  right: 0.5em;
+  bottomm: 5em;
+  font-size: 85%;
+  background-color: #ffa07a;
+  background-color: rgba(255,160,122,0.85);
+  display: none;
+}
+
+#otp-tipWidget {
+  left: 0.5em;
+  right: 0.5em;
+  bottom: 1em;
+  font-size: 85%;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.5em;
+  text-shadow: -1px 1px #fff;
+  background-color: #e3e57a;
+  background-color: rgba(227,229,122,0.8);
+  border: 1px solid #b1b24e;
+  border-top: 1px solid #d1d263;
+  border-bottom: 1px solid #929339;
+}
+
+#otp-bikestationsWidget {
+  visibility: hidden;
+}
+
+#otp-contactWidget, #otp-aboutWidget {
+  display: none;
+  position: absolute;
+  top: 2.5em;
+  right: 0.25em;
+  left: 0.25em;
+  z-index: 2000;
+}
+
+#otp-aboutWidget .content, #otp-contactWidget .content {
+	padding: 2em;
+}
+
+#otp-aboutWidget .content img, #otp-contactWidget .content img {
+  max-width: 100%;
+}
+
+#otp-aboutWidget .content a, #otp-contactWidget .content a {
+	text-decoration: none;
+	color: rgb(82, 155, 230);
+	font-weight: bold;
+}
+
+#otp-aboutWidget .title, #otp-contactWidget .title {
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+#otp-aboutWidget .text, #otp-contactWidget .text {
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.otp-defaultLabel {
+    margin: 4px 0px 2px 0px;
+}
+
+.ui-dialog-titlebar {
+  font-size: 14px;
+  padding:2px;
+}
+
+.ui-dialog-content {
+  font-size: 12px;
+}
+
+/* TripSummaryWidget */
+
+.otp-defaultTripWidget {
+  width: auto;
+  bottom: 10px;
+  left: 10px;
+}
+
+.otp-defaultTripWidget hr {
+  display: none;
+}
+
+@media only screen and (min-width: 768px) {
+  .otp-defaultTripWidget {
+    width: 340px;
+    /*top: auto;
+    left: 20px;
+    bottom: 100px;*/
+    
+    padding: 10px;
+  }
+
+  .otp-defaultTripWidget hr {
+    display: block;
+  }
+}
+
+
+h3.your-trip,
+h6.drag-to-change {
+  display: none;
+}
+
+/*#otp-fieldtrip-optionsWidget {
+    bottom: 10px;
+    left: 10px;
+}
+
+#otp-calltaker-optionsWidget {
+    bottom: 10px;
+    left: 10px;
+}*/
+
+
+/* Bike Triangle */
+
+.otp-bikeTriangle {
+  display: none;
+}
+
+
+@media only screen and (min-width: 768px) {  
+  .otp-bikeTriangle {
+    display: block;
+    height: 100px;
+  }
+}
+ 
+/* Stop Times Widget */
+
+.otp-stopTimes-list {
+    width: 80px;
+    height: 120px;
+    overflow: auto;
+    background: white;
+    border: 1px solid black;
+    margin-top: 5px;
+}
+
+.otp-stopTimes-list-item {
+    margin: .2em 0 .2em .5em;
+}
+
+.otp-stopTimes-close {
+    text-align:center;
+    margin-top: 8px;
+    font-size: .8em;
+}
+
+/* Preferred Routes Selector Widget */
+
+.otp-preferredRoutesSelectorWidget {
+    width: 400px;
+}
+
+.otp-preferredRoutesSelectorWidget-buttonRow {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.otp-preferredRoutesSelectorWidget-list {
+    width: 170px;
+    background:white;
+}
+
+.otp-preferredRoutesSelectorWidget-middle {
+    padding-top: 32px;
+    margin: 0px 180px;
+    text-align:center;
+    font-size:12px;
+}
+
+/*  Call History / Past Queries Widget */
+
+/*
+
+.otp-pastQueriesWidget {
+  bottom: 20px;
+  right: 10px;
+}
+
+.otp-pastQueriesHeader {
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.otp-pastQueriesList {
+  width: 300px;
+  height: 200px;
+  padding: 4px;
+  background: white;
+  border: 1px solid black;
+  overflow: auto;
+}
+
+.otp-pastQueryRow {
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.otp-pastQueryRowTime {
+  color: red;
+  font-weight: bold;
+  float: left;
+  text-align: right;
+  width: 70px;
+}
+
+.otp-pastQueryRowDesc {
+  margin-left: 80px;
+}
+*/
+
+/*ul.otp-stats {
+  list-style: none;
+  margin: 0;
+}
+ul.otp-stats li { 
+  margin-bottom: 0;
+  font-weight: bold;
+  font-size: 2em;
+}
+ul.otp-stats li strong { 
+  display: none;
+}*/
+
+.otp-tripSummary-distance {
+  float: left;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+.otp-tripSummary-duration {
+  font-weight: bold;
+  text-align: right; 
+  font-size: 2em;
+}
+
+.otp-tripSummary-timeSummary {
+    text-align: right;
+    margin-bottom: .5em;
+    font-style: italic;
+}
+
+#share-route-header,
+#share-route {
+  display: none;
+}
+
+p#splash-text {
+  position: absolute;
+  top: 6.75em;
+  right: 0;
+  line-height: 1.5;
+  font-weight: bold;
+  text-align: left;
+  padding: 1em 1.25em;
+  color: #444;
+  text-shadow: -1px 1px #fff;
+  background-color: #9ad5ea;
+  background-color: rgba(154,213,234,0.85);
+  border-left: 1px solid #7ab1c5;
+  border-top: 1px solid #8bc9de;
+  border-bottom: 1px solid #699bac;
+  z-index: 1;
+     -webkit-border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+         -moz-border-radius-topleft: 3px;
+      -moz-border-radius-bottomleft: 3px;
+             border-top-left-radius: 3px;
+          border-bottom-left-radius: 3px;
+}
+p#splash-text span {
+  display: block;
+}
+
+#otp-spinner {
+  width: 32px;
+  height: 32px;
+  position: fixed;
+  left: 50%;
+  margin-left: -16px;
+  top: 50%;
+  margin-top: -16px;  
+  z-index: 10000;
+  display: none;
+}
+
+
+
+
+/* =Media Queries for Responsive Layout
+-------------------------------------------------------------- */
+
+@media only screen and (min-width: 320px) {
+  #otp-noTripWidget {
+    bottom: 4em;
+  }  
+}
+
+
+@media only screen and (min-width: 768px) {
+
+  #logo {
+    display: block;
+  }
+
+  #addthis {
+    display: block;
+  }
+  #logo .ribbon {
+    height: 6em;
+    padding: 0 1.5em 0 2em;
+  }
+  #site-title {
+     margin: 1em 0;
+     padding-left: 10px;
+  }
+  #site-description {
+    font-size: 1.25em;
+  }
+
+  /* Navigation: Main Menu */
+  #main-menu {
+    padding: 1em;
+  }
+  #main-menu li {
+    float: left;
+    margin-right: 1em;
+  }
+
+  /* AddThis 
+  #branding .addthis_toolbox {
+    margin: 1.25em 0 0 1.25em;
+  }*/
+
+  /* Map UI */
+  .leaflet-control-zoom {
+    display: block;
+  }
+  .leaflet-container .leaflet-control-attribution {
+    font-size: 10px;
+  }
+
+  #otp-tipWidget {
+    left: 20px;
+    right: auto;
+    bottom: 2.5em;
+    height: 1.5em;
+    font-size: 1em;
+    line-height: 1.5;
+    padding-right: 1em;
+    padding-left: 1em;
+    white-space: nowrap;
+  }
+
+  #otp-noTripWidget {
+    width: 230px;
+    height: auto;
+    left: 20px;
+    bottom: 7.5em;
+    font-size: 1em;
+  }
+  
+  #otp-bikestationsWidget {
+    visibility: visible;
+  	right: 10px;
+  	bottom: 2.5em;
+  	text-align: center;
+  	background: transparent;
+  	padding: 0;
+  	border: 0;
+  	   -moz-box-shadow: none;
+  	-webkit-box-shadow: none;
+  	        box-shadow: none;
+  }
+  
+  #otp-bikestationsWidget .button {
+  	cursor: pointer;
+	  background:#ccc;
+	  color: #111;
+	  margin: 0.5em 0 0;
+	  padding: 0.5em 1em;
+	  -webkit-border-radius: 3px;
+	     -moz-border-radius: 3px;
+	          border-radius: 3px;
+       -moz-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+	  -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+	          box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  }
+  
+  #otp-bikestationsWidget .button.left {
+  	background-color: #3fc100;
+  	background-color: rgba(153,204,153, 0.8);
+	  border: 1px solid #51be1b;
+	  border-top: 1px solid #7fca5b;
+	  border-bottom: 1px solid #70995c;
+  }
+  
+  #otp-bikestationsWidget .button.right {
+  	background-color: #fd7474;
+	  background-color: rgba(255,159,159, 0.8);
+	  border: 1px solid #ff9191;
+	  border-top: 1px solid #fea6a6;
+	  border-bottom: 1px solid #e68b8b;
+  }
+
+  #otp-contactWidget, #otp-aboutWidget {
+    top: 10em;
+    right: auto;
+    left: 1.75em;
+    width: 40em;
+    bottom: 7.5em;
+  	padding: 0;
+  	overflow: hidden;
+  }
+  #otp-aboutWidget .content, #otp-contactWidget .content {
+  	overflow: auto;
+  	padding: 0 1em 2em;
+  	margin: 0 1em 0 0;
+  	position: absolute;
+  	top: 2em;
+  	bottom: 2em;
+  }
+  #otp-aboutWidget .content::-webkit-scrollbar-track
+  {
+  	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  	border-radius: 10px;
+  	background-color: #F5F5F5;
+  }
+
+  #otp-aboutWidget .content::-webkit-scrollbar
+  {
+  	width: 12px;
+  	background-color: #F5F5F5;
+  }
+
+  #otp-aboutWidget .content::-webkit-scrollbar-thumb
+  {
+  	border-radius: 10px;
+  	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  	background-color: #555;
+  }
+
+  h6.drag-to-change {
+    display: block;
+  }
+
+  
+  #otp-tsw-bikeTypeRow {
+    margin: .5em 0;
+  }
+  
+  ul.otp-stats {
+    margin: 0 0 0.25em;
+  }
+  ul.otp-stats li { 
+/*    margin-bottom: 0.25em */
+/*    font-weight: normal;*/
+/*    font-size: 1em;*/
+    display: inline;
+    margin: 0;
+  }
+  ul.otp-stats li strong { 
+/*    display: inline;*/
+  }
+
+  #share-route-header,
+  #share-route {
+    display: block;
+  }
+  #share-route-header {
+    float: left;
+    margin-right: 0.25em;
+  }
+
+  p#splash-text {
+    top: 7.5em;
+    font-size: 1.2em;
+  }
+
+}
+
+@media only screen and (min-width: 1024px) {
+
+  #otp-tipWidget {
+    bottom: 2em;
+    font-size: 1.25em;
+  }
+
+  #otp-bikestationsWidget .button {
+	  width: 16em;
+  	float: left;
+  	margin: 0 0 0 0.5em;
+  }
+  
+
+}
+
+@media only screen and (min-width: 1300px) {
+}
+
+
+/* =Media Query Size Indicator
+-------------------------------------------------------------- */
+
+/* Uncomment the following to display the media query results in your browser. */
+/*body:after { content: "less than 320px"; font-size: 300%; font-weight: bold; position: fixed; bottom: 0; width: 100%; text-align: center; background-color: hsla(1,60%,40%,0.7); color: #fff; }
+@media only screen and (min-width: 320px) { body:after { content: "320 to 479px"; background-color: hsla(90,60%,40%,0.7); } }
+@media only screen and (min-width: 480px) { body:after { content: "480 to 767px"; background-color: hsla(180,60%,40%,0.7); } }
+@media only screen and (min-width: 768px) { body:after { content: "768 to 1023px"; background-color: hsla(270,60%,40%,0.7); } }
+@media only screen and (min-width: 1024px) { body:after { content: "1024 to 1299px"; background-color: hsla(360,60%,40%,0.7); } }
+@media only screen and (min-width: 1300px) { body:after { content: "1300 and up"; background-color: hsla(60,60%,40%,0.7); } }*/

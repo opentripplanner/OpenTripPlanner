@@ -1,0 +1,4 @@
+date,service_id,exception_type
+20140101,1a|bus|1,1
+20140101,1a|ferry|1,1
+20140101,1a|train|1,1

@@ -1,0 +1,6 @@
+lat,lon,school:primary,school:secondary,school:university,pop:child,pop:adult,pop:senior
+1.246712227724,2.246712227724,  0,  0,  0, 13, 40, 6
+1.250305476011,2.250305476011,
+1.253898724297,2.253898724297,  0,  0,  0, 13, 40, 6, 7, 8, 9, 0
+1.257491972584,2.257491972584, 50, 50,  0, 12, 30, 7
+# This CSV has one line with too many fields and another line with too few fields.
