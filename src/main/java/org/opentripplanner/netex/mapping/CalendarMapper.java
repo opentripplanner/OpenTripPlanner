@@ -26,6 +26,7 @@ import org.rutebanken.netex.model.PropertyOfDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,6 +159,8 @@ public class CalendarMapper {
 
         if (serviceCalendarDates.isEmpty()) {
             LOG.warn("ServiceCode " + serviceId + " does not contain any serviceDates");
+            // Add one date exception when list is empty to ensure serviceId is not lost
+            serviceCalendarDates.add(mapServiceCalendarDate(LocalDate.now().atStartOfDay(), serviceId, 2));
         }
 
         return serviceCalendarDates;
