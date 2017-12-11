@@ -64,25 +64,19 @@ For simplicity we'll skip saving this file and start up an OTP server immediatel
 
     java -Xmx2G -jar otp-0.19.0-shaded.jar --build /home/username/otp --inMemory
 
-where `/home/username/otp` should be the directory where you put your input files. The graph build operation should
-take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you can open
-[http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
-interact with your local OpenTripPlanner instance. Remember to use the `--analyst` flag to start the program if you wish to use the Analyst extension. 
+where `/home/username/otp` should be the directory where you put your input files. Remember to use the `--analyst` flag to start the program if you wish to use the Analyst extension. The graph build operation should take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you have an OpenTripPlanner server running locally and can open [http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
+interact with your local OpenTripPlanner instance. GET requests can now also be directed at [http://localhost:8080/](http://localhost:8080/) to interact with the [API](http://dev.opentripplanner.org/apidoc/1.0.0/index.html#resources). 
 
-There are a number of different APIs allowing you to interact with your local server through GET requests. For example, you might try one of the following:
-
-45.51884/-122.67921
-
-- Generate 1 hour a travel time isochrone originating in Pioneer Square, November 14th, 1:02pm: [`http://localhost:8080/otp/routers/default/isochrone?fromPlace=45.51884,-122.67921&date=11-14-2017&time1:02pm&cutoffSec=3600`]()
+There are a number of different resources available through the GET API which can return results either in XML or JSON. For example, you might try one of the following:
 
 - Fetch a list all GTFS routes on the default router: [`http://localhost:8080/otp/routers/default/index/routes`](http://localhost:8080/otp/routers/default/index/routes)
 
 - Fetch a list of all stops on TriMet route 52: [`http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops`](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
-These and many other APIs are documented in detail [here](http://dev.opentripplanner.org/apidoc/1.0.0/index.html#resources).
+- Generate 1 hour a travel time isochrone originating in Pioneer Square, November 14th 2017, 1:02pm: [`http://localhost:8080/otp/routers/default/isochrone?fromPlace=45.51884,-122.67921&date=11-14-2017&time1:02pm&cutoffSec=3600`](http://localhost:8080/otp/routers/default/isochrone?fromPlace=45.51884,-122.67921&date=11-14-2017&time1:02pm&cutoffSec=3600)
 
 ## Advanced usage
 
-Try the `--help` option for a full list of command line parameters. See the [configuration](Configuration) page for more advanced topics.
+Try the `--help` option for a full list of command line parameters. See the [configuration](Configuration) page for configuration settings which effect either the router instance or the graph building process (e.g. fare settings, elevation models, request logging, transfer settings, etc.) 
 
 
