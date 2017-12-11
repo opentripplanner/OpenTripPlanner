@@ -71,13 +71,15 @@ interact with your local OpenTripPlanner instance. Remember to use the `--analys
 
 There are a number of different APIs allowing you to interact with your local server through GET requests. For example, you might try one of the following:
 
-- 
+45.51884/-122.67921
+
+- Generate 1 hour a travel time isochrone originating in Pioneer Square, November 14th, 1:02pm: [`http://localhost:8080/otp/routers/default/isochrone?fromPlace=45.51884,-122.67921&date=11-14-2017&time1:02pm&cutoffSec=3600`]()
 
 - Fetch a list all GTFS routes on the default router: [`http://localhost:8080/otp/routers/default/index/routes`](http://localhost:8080/otp/routers/default/index/routes)
 
 - Fetch a list of all stops on TriMet route 52: [`http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops`](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
-These and many other APIs are documented in detail [here](http://dev.opentripplanner.org/apidoc/1.0.0/index.html#resources) 
+These and many other APIs are documented in detail [here](http://dev.opentripplanner.org/apidoc/1.0.0/index.html#resources).
 
 ## Advanced usage
 
