@@ -66,18 +66,18 @@ For simplicity we'll skip saving this file and start up an OTP server immediatel
 
 where `/home/username/otp` should be the directory where you put your input files. The graph build operation should
 take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you can open
-[http://localhost:8080/](http://localhost:8080/) in a web browser. Remember to use the `--analyst` flag to start the program if you wish to use the Analyst extension. You should be presented with a web client that will
-interact with your local OpenTripPlanner instance. You can also try out some web service URLs to explore the transit data:
+[http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
+interact with your local OpenTripPlanner instance. Remember to use the `--analyst` flag to start the program if you wish to use the Analyst extension. 
 
-- [A list of all routers](http://localhost:8080/otp/routers/default/)
+There are a number of different APIs allowing you to interact with your local server through GET requests. As an example, you might try one of the following:
 
-- [List all GTFS routes on the default router](http://localhost:8080/otp/routers/default/index/routes)
+- Fetch a list all GTFS routes on the default router: `http://localhost:8080/otp/routers/default/index/routes`
 
-- [All stops on TriMet route 52](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
+- [Fetch a list of all stops on TriMet route 52](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
-- [All routes passing though TriMet stop 7003](http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes)
 
-- [All unique sequences of stops on the TriMet Green rail line](http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns)
+
+These and other 
 
 ## Advanced usage
 
