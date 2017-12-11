@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -170,7 +171,9 @@ public class GraphPath {
     public List<AgencyAndId> getRoutes() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
         Route lastRoute = null;
-        for (State s : states) {
+        Iterator<State> iter = back ? states.descendingIterator() : states.iterator();
+        while(iter.hasNext()) {
+            State s = iter.next();
             if (s.getBackEdge() != null && s.getBackTrip() != null) {
                 Route route = s.getBackTrip().getRoute();
                 if (route != null && route != lastRoute) {
