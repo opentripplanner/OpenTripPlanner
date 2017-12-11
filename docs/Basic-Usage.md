@@ -69,15 +69,15 @@ take about one minute to complete, and then you'll see a `Grizzly server running
 [http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
 interact with your local OpenTripPlanner instance. Remember to use the `--analyst` flag to start the program if you wish to use the Analyst extension. 
 
-There are a number of different APIs allowing you to interact with your local server through GET requests. As an example, you might try one of the following:
+There are a number of different APIs allowing you to interact with your local server through GET requests. For example, you might try one of the following:
 
-- Fetch a list all GTFS routes on the default router: `http://localhost:8080/otp/routers/default/index/routes`
+- 
 
-- [Fetch a list of all stops on TriMet route 52](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
+- Fetch a list all GTFS routes on the default router: [`http://localhost:8080/otp/routers/default/index/routes`](http://localhost:8080/otp/routers/default/index/routes)
 
+- Fetch a list of all stops on TriMet route 52: [`http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops`](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
-
-These and other 
+These and many other APIs are documented in detail [here](http://dev.opentripplanner.org/apidoc/1.0.0/index.html#resources) 
 
 ## Advanced usage
 
