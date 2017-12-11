@@ -76,7 +76,7 @@ specify how long it takes to reach a subway platform
 ```JSON
 // build-config.json
 {
-  subwayAccessTime: 2.5
+  "subwayAccessTime": 2.5
 }
 ```
 
@@ -109,7 +109,7 @@ connections between each pair of stops in the same station to favor in-station t
 ```JSON
 // build-config.json
 {
-  stationTransfers: true
+  "stationTransfers": true
 }
 ```
 
@@ -138,7 +138,7 @@ directory:
 ```JSON
 // build-config.json
 {
-  fetchElevationUS: true
+  "fetchElevationUS": true
 }
 ```
 
@@ -190,10 +190,10 @@ are considered to be sub-fares).
 // build-config.json
 {
   // Select the custom fare "seattle"
-  fares: "seattle"
+  "fares": "seattle",
   // OR this alternative form that could allow additional configuration
-  fares: {
-	type: "seattle"
+  "fares": {
+	"type": "seattle"
   }
 }
 ```
@@ -201,16 +201,16 @@ are considered to be sub-fares).
 ```JSON
 // build-config.json
 {
-  fares: {
+  "fares": {
     // Combine two fares by simply adding them
-    combinationStrategy: "additive",
+    "combinationStrategy": "additive",
     // First fare to combine
-    fare0: "new-york",
+    "fare0": "new-york",
     // Second fare to combine
-    fare1: {
-      type: "bike-rental-time-based",
-      currency: "USD",
-      prices: {
+    "fare1": {
+      "type": "bike-rental-time-based",
+      "currency": "USD",
+      "prices": {
           // For trip shorter than 30', $4 fare
           "30":   4.00,
           // For trip shorter than 1h, $6 fare
@@ -235,8 +235,31 @@ The current list of `combinationStrategy` is:
 
 - `additive` - simply adds all sub-fares.
 
+## OSM / OpenStreetMap configuration
 
-## Custom OSM naming
+It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part of the routing graph.
+
+### Way property sets
+
+OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
+You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
+
+There are currently 2 wayPropertySets defined;
+
+- `default` which is based on California/US mapping standard
+- `norway` which is adjusted to rules and speeds in Norway
+
+To add your own custom property set have a look at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet` and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones. The mechanism is that for any two identical tags, OTP will use the first one.
+
+```JSON
+// build-config.json
+{
+  osmWayPropertySet: "norway"
+}
+```
+
+
+### Custom naming
 
 You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field in `build-config.json`,
 such as:
@@ -244,7 +267,7 @@ such as:
 ```JSON
 // build-config.json
 {
-  osmNaming: "portland"
+  "osmNaming": "portland"
 }
 ```
 
@@ -270,10 +293,10 @@ Any public field or setter method in this class can be given a default value usi
 
 ```JSON
 {
-    routingDefaults: {
-        walkSpeed: 2.0,
-        stairsReluctance: 4.0,
-        carDropoffTime: 240
+    "routingDefaults": {
+        "walkSpeed": 2.0,
+        "stairsReluctance": 4.0,
+        "carDropoffTime": 240
     }
 }
 ```
@@ -295,11 +318,11 @@ seconds needed for the boarding and alighting processes in `router-config.json` 
 
 ```JSON
 {
-  boardTimes: {
-    AIRPLANE: 2700
+  "boardTimes": {
+    "AIRPLANE": 2700
   },
-  alightTimes: {
-    AIRPLANE: 1200
+  "alightTimes": {
+    "AIRPLANE": 1200
   }
 }
 ```
@@ -315,7 +338,7 @@ help identify problematic searches and improve our routing methods. The simplest
 ```JSON
 // router-config.json
 {
-  timeout: 5.5
+  "timeout": 5.5
 }
 ```
 
@@ -326,7 +349,7 @@ The alternative is:
 ```JSON
 // router-config.json
 {
-  timeouts: [5, 4, 3, 1]
+  "timeouts": [5, 4, 3, 1]
 }
 ```
 
@@ -350,7 +373,7 @@ performed only if you specify a log file name in the router config:
 ```JSON
 // router-config.json
 {
-  requestLogFile: "/var/otp/request.log"
+  "requestLogFile": "/var/otp/request.log"
 }
 ```
 
@@ -395,7 +418,7 @@ or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
 of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, the Dutch OVFiets system, ShareBike and a generic KML format.
+Bixi, the Dutch OVFiets system, ShareBike, GBFS and a generic KML format.
 It is straightforward to extend OTP to support any bike rental system that
 exposes a JSON API or provides KML place markers, though it requires writing a little code.
 
@@ -434,68 +457,77 @@ connect to a network resource is the `url` field.
 {
     // Routing defaults are any public field or setter in the Java class
     // org.opentripplanner.routing.core.RoutingRequest
-    routingDefaults: {
-        numItineraries: 6,
-        walkSpeed: 2.0,
-        stairsReluctance: 4.0,
-        carDropoffTime: 240
+    "routingDefaults": {
+        "numItineraries": 6,
+        "walkSpeed": 2.0,
+        "stairsReluctance": 4.0,
+        "carDropoffTime": 240
     },
 
-    updaters: [
+    "updaters": [
 
         // GTFS-RT service alerts (frequent polling)
         {
-            type: "real-time-alerts",
-            frequencySec: 30,
-            url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-            feedId: "TriMet"
+            "type": "real-time-alerts",
+            "frequencySec": 30,
+            "url": "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+            "feedId": "TriMet"
         },
 
         // Polling bike rental updater.
         // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
         // city-bikes, citi-bike-nyc, next-bike, vcub, kml
         {
-            type: "bike-rental",
-            frequencySec: 300,
-            sourceType: "city-bikes",
-            url: "http://host.domain.tld"
+            "type": "bike-rental",
+            "frequencySec": 300,
+            "sourceType": "city-bikes",
+            "url": "http://host.domain.tld"
         },
 
-        <!--- San Francisco Bay Area bike share -->
+        //<!--- San Francisco Bay Area bike share -->
         {
           "type": "bike-rental",
           "frequencySec": 300,
           "sourceType": "sf-bay-area",
           "url": "http://www.bayareabikeshare.com/stations/json"
-        }
+        },
+
+        //<!--- Tampa Area bike share -->
+        {
+          "type": "bike-rental",
+          "frequencySec": 300,
+          "sourceType": "gbfs",
+          "url": "http://coast.socialbicycles.com/opendata/"
+        },
+
 
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
         {
-            type: "bike-rental",
-            sourceType: "bixi",
-            url: "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
-            frequencySec: -1
+            "type": "bike-rental",
+            "sourceType": "bixi",
+            "url": "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
+            "frequencySec": -1
 		},
 
         // Bike parking availability
         {
-            type: "bike-park"
-        }
+            "type": "bike-park"
+        },
 
         // Polling for GTFS-RT TripUpdates)
         {
-            type: "stop-time-updater",
-            frequencySec: 60,
+            "type": "stop-time-updater",
+            "frequencySec": 60,
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
-            sourceType: "gtfs-http",
-            url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-            feedId: "TriMet"
+            "sourceType": "gtfs-http",
+            "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+            "feedId": "TriMet"
         },
 
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
-            type: "websocket-gtfs-rt-updater"
+            "type": "websocket-gtfs-rt-updater"
         },
 
         // OpenTraffic data
@@ -509,3 +541,28 @@ connect to a network resource is the `url` field.
     ]
 }
 ```
+#### GBFS Configuration
+
+Steps to add a GBFS feed to a router:
+
+- Add one entry in the `updater` field of `router-config.json` in the format
+
+```JSON
+{
+     "type": "bike-rental",
+     "frequencySec": 60,
+     "sourceType": "gbfs",
+     "url": "http://coast.socialbicycles.com/opendata/"
+}
+```
+
+- Follow these instructions to fill these fields:
+
+```
+type: "bike-rental"
+frequencySec: frequency in seconds in which the GBFS service will be polled
+sourceType: "gbfs"
+url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
+```
+\* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
+

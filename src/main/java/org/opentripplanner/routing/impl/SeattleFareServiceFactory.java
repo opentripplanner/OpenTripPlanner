@@ -35,14 +35,14 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     @Override
     public FareService makeFareService() {
     	
-    	DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+    	SeattleFareServiceImpl fareService = new SeattleFareServiceImpl();
     	fareService.addFareRules(FareType.regular, regularFareRules.values());
     	fareService.addFareRules(FareType.youth, regularFareRules.values());
     	fareService.addFareRules(FareType.senior, regularFareRules.values());
-    	
+
     	return fareService;
     }
-    
+
     @Override
     public void configure(JsonNode config) {
         // No config for the moment
@@ -52,7 +52,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     public void processGtfs(GtfsRelationalDao dao) {
     	// Add custom extension: trips may have a fare ID specified in KCM GTFS.
     	// Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
-    	// since fare IDs may not be unique across feeds and trip agency IDs
+    	// since fare IDs may not be unique across feeds and trip agency IDsqq
     	// may not match fare attribute agency IDs (which are feed IDs).
     	
     	Map<AgencyAndId, FareRuleSet> feedFareRules = new HashMap<>();

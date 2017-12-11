@@ -31,6 +31,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Route;
@@ -338,6 +339,7 @@ public class GTFSPatternHopFactory {
         // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
         loadStops(graph);
         loadPathways(graph);
+        loadFeedInfo(graph);
         loadAgencies(graph);
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
         // Perhaps it is to allow name collisions with previously loaded feeds.
@@ -491,6 +493,14 @@ public class GTFSPatternHopFactory {
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
+
+        /* Store parent stops in graph, even if not linked. These are needed for clustering*/
+        for(TransitStationStop stop : context.stationStopNodes.values()){
+            if(stop instanceof TransitStation){
+                TransitStation parentStopVertex = (TransitStation) stop;
+                graph.parentStopById.put(parentStopVertex.getStopId(), parentStopVertex.getStop());
+            }
+        }
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
@@ -902,6 +912,12 @@ public class GTFSPatternHopFactory {
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
             graph.addAgency(_feedId.getId(), agency);
+        }
+    }
+
+    private void loadFeedInfo(Graph graph) {
+        for (FeedInfo info : _dao.getAllFeedInfos()) {
+            graph.addFeedInfo(info);
         }
     }
 

@@ -19,6 +19,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -70,6 +71,8 @@ public class SimpleStreetSplitter {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
     public static final int MAX_SEARCH_RADIUS_METERS = 1000;
+
+    public static final int MIN_SNAP_DISTANCE_WARNING = 20;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
     public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
@@ -202,6 +205,13 @@ public class SimpleStreetSplitter {
                 return 1;
             return 0;
         });
+
+        if (!candidateEdges.isEmpty() && vertex instanceof TransitStop) {
+            int distance = (int)SphericalDistanceLibrary.degreesToMeters(distances.get(candidateEdges.get(0).getId()));
+            if (distance > MIN_SNAP_DISTANCE_WARNING) {
+                LOG.info(String.format(graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStop)vertex, distance))));
+            }
+        }
 
         // find the closest candidate edges
         if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg) {

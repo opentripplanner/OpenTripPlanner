@@ -81,16 +81,6 @@ public class WayPropertySet {
         maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]+?)(?:[ ]?(kmh|km/h|kmph|kph|mph|knots))?$");
     }
 
-    public void setBase(WayPropertySetSource base) {
-       this.base = base;
-       WayPropertySet props = base.getWayPropertySet();
-       creativeNamers = props.creativeNamers;
-       defaultProperties = props.defaultProperties;
-       notes = props.notes;
-       slopeOverrides = props.slopeOverrides;
-       wayProperties = props.wayProperties;
-    }
-
     /**
      * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
      * will have their safety values applied if they match at all.
@@ -361,4 +351,47 @@ public class WayPropertySet {
         
         return metersSecond;
     }
+    
+	public void createNames(String spec, String patternKey) {
+		String pattern = patternKey;
+		CreativeNamer namer = new CreativeNamer(pattern);
+		addCreativeNamer(new OSMSpecifier(spec), namer);
+	}
+
+	public  void createNotes(String spec, String patternKey, NoteMatcher matcher) {
+		String pattern = patternKey;
+		// TODO: notes aren't localized
+		NoteProperties properties = new NoteProperties(pattern, matcher);
+		addNote(new OSMSpecifier(spec), properties);
+	}
+
+	public void setProperties(String spec,
+			StreetTraversalPermission permission) {
+		setProperties( spec, permission, 1.0, 1.0);
+	}
+
+	/**
+	 * Note that the safeties here will be adjusted such that the safest street
+	 * has a safety value of 1, with all others scaled proportionately.
+	 */
+	public void setProperties(String spec,
+			StreetTraversalPermission permission, double safety, double safetyBack) {
+		setProperties(spec, permission, safety, safetyBack, false);
+	}
+
+	public void setProperties(String spec,
+			StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
+		WayProperties properties = new WayProperties();
+		properties.setPermission(permission);
+		properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
+		addProperties(new OSMSpecifier(spec), properties, mixin);
+	}
+
+	public void setCarSpeed(String spec, float speed) {
+		SpeedPicker picker = new SpeedPicker();
+		picker.specifier = new OSMSpecifier(spec);
+		picker.speed = speed;
+		addSpeedPicker(picker);
+	}
+
 }

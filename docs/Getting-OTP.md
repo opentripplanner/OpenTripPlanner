@@ -99,7 +99,7 @@ To make use of OTP in another Maven project, you must specify it as a dependency
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
