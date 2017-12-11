@@ -69,6 +69,7 @@ public class StopMapper {
                         stopQuay.setLat(quay.getCentroid().getLocation().getLatitude().doubleValue());
                         stopQuay.setLon(quay.getCentroid().getLocation().getLongitude().doubleValue());
                         stopQuay.setId(FeedScopedIdFactory.createFeedScopedId(quay.getId()));
+                        stopQuay.setPlatformCode(quay.getPublicCode());
                         stopQuay.setParentStation(stop.getId().getId());
 
 
