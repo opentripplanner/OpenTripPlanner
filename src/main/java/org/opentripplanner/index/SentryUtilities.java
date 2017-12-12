@@ -66,14 +66,6 @@ public final class SentryUtilities {
             } catch (JsonProcessingException e) {
                 LOG.warn("Unable to serialize debugOutput");
             }
-
-            if (request.rctx.debugOutput.timedOut) {
-                EventBuilder eventBuilder = new EventBuilder()
-                        .withMessage("Search timeout")
-                        .withLevel(Event.Level.ERROR)
-                        .withLogger(LOG.getName());
-                Sentry.capture(eventBuilder);
-            }
         }
         sentryContext.addExtra("messages", Arrays.toString(messages.toArray()));
 
