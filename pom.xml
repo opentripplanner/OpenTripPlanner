@@ -775,11 +775,6 @@
             <version>2.4.0</version>
         </dependency>
         <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry</artifactId>
-            <version>1.6.3</version>
-        </dependency>
-        <dependency>
           <groupId>io.sentry</groupId>
           <artifactId>sentry-logback</artifactId>
           <version>1.6.3</version>
