@@ -287,6 +287,15 @@ public class Leg {
      @JsonSerialize
      public String drtDropOffMessage;
 
+
+     @XmlAttribute
+     @JsonSerialize
+     public String continuousPickupMessage;
+
+     @XmlAttribute
+     @JsonSerialize
+     public String continuousDropOffMessage;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg

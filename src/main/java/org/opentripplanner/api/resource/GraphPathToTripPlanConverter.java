@@ -615,6 +615,8 @@ public abstract class GraphPathToTripPlanConverter {
             leg.drtAdvanceBookMin = trip.getDrtAdvanceBookMin();
             leg.drtPickupMessage = trip.getDrtPickupMessage();
             leg.drtDropOffMessage = trip.getDrtDropOffMessage();
+            leg.continuousPickupMessage = trip.getContinuousPickupMessage();
+            leg.continuousDropOffMessage = trip.getContinuousDropOffMessage();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
