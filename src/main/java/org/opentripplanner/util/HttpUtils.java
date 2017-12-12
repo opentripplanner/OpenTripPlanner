@@ -16,7 +16,7 @@ package org.opentripplanner.util;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,42 +25,33 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 public class HttpUtils {
     
-    private static final int TIMEOUT_CONNECTION = 30000;
-    private static final int TIMEOUT_SOCKET = 30000;
+    private static final long TIMEOUT_CONNECTION = 5000;
+    private static final int TIMEOUT_SOCKET = 5000;
 
     public static InputStream getData(String url) throws IOException {
         return getData(url, null, null);
     }
 
     public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue) throws ClientProtocolException, IOException {
-        URL url2 = new URL(url);
-        String proto = url2.getProtocol();
-        if (proto.equals("http") || proto.equals("https")) {
-            HttpGet httpget = new HttpGet(url);
-            if (requestHeaderValue != null) {
-                httpget.addHeader(requestHeaderName, requestHeaderValue);
-            }
-            HttpClient httpclient = getClient();
-            HttpResponse response = httpclient.execute(httpget);
-            if(response.getStatusLine().getStatusCode() != 200)
-                return null;
-
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                return null;
-            }
-            return entity.getContent();
-        } else {
-            // Local file probably, try standard java
-            return url2.openStream();
+        HttpGet httpget = new HttpGet(url);
+        if (requestHeaderValue != null) {
+            httpget.addHeader(requestHeaderName, requestHeaderValue);
         }
+        HttpClient httpclient = getClient();
+        HttpResponse response = httpclient.execute(httpget);
+        if(response.getStatusLine().getStatusCode() != 200)
+            return null;
+
+        HttpEntity entity = response.getEntity();
+        if (entity == null) {
+            return null;
+        }
+        return entity.getContent();
     }
 
     public static void testUrl(String url) throws IOException {
@@ -80,12 +71,11 @@ public class HttpUtils {
     }
     
     private static HttpClient getClient() {
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_CONNECTION);
-        HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_SOCKET);
-        
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.setParams(httpParams);
-        return httpclient;
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(TIMEOUT_SOCKET).build())
+                .setConnectionTimeToLive(TIMEOUT_CONNECTION, TimeUnit.MILLISECONDS)
+                .build();
+
+        return httpClient;
     }
 }
