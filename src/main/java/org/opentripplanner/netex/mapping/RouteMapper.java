@@ -14,7 +14,7 @@ public class RouteMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);
 
-    private TransportTypeMapper transportTypeMapper = new TransportTypeMapper();
+    private TransportModeMapper transportModeMapper = new TransportModeMapper();
     private AgencyMapper agencyMapper = new AgencyMapper();
 
     org.opentripplanner.model.Route mapRoute(Line line, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao, String timeZone){
@@ -48,7 +48,7 @@ public class RouteMapper {
         otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
-        otpRoute.setType(transportTypeMapper.mapTransportType(line.getTransportMode().value()));
+        otpRoute.setType(transportModeMapper.getTransportMode(line.getTransportMode(), line.getTransportSubmode()));
 
         return otpRoute;
     }

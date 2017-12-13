@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class StopMapper {
     private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
 
-    TransportTypeMapper transportTypeMapper = new TransportTypeMapper();
+    private StopPlaceTypeMapper transportModeMapper  = new StopPlaceTypeMapper();
 
     public Collection<Stop> mapParentAndChildStops(Collection<StopPlace> stopPlaceAllVersions, NetexDao netexDao){
         ArrayList<Stop> stops = new ArrayList<>();
@@ -49,9 +49,7 @@ public class StopMapper {
 
         stop.setId(FeedScopedIdFactory.createFeedScopedId(stopPlaceLatest.getId()));
 
-        if (stopPlaceLatest.getTransportMode() != null) {
-            stop.setVehicleType(transportTypeMapper.mapTransportType(stopPlaceLatest.getTransportMode().value()));
-        }
+        stop.setVehicleType(transportModeMapper.getTransportMode(stopPlaceLatest));
 
         stops.add(stop);
 
