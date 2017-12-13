@@ -125,7 +125,6 @@ public final class FieldErrorInstrumentation implements Instrumentation {
                     List itineraries = (List) plan.get("itineraries");
                     if(itineraries !=null && itineraries.isEmpty()) {           
                         setMetadata();
-                        LOG.warn("Zero routes found");
                         logged=true;
                     }
                 } 

@@ -9,18 +9,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +27,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import graphql.ExceptionWhileDataFetching;
+import graphql.GraphQLError;
 import graphql.schema.GraphQLSchema;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -44,6 +35,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import io.sentry.Sentry;
+import io.sentry.context.Context;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -1054,6 +1047,12 @@ public class GraphIndex {
                         }
                     })
                     .collect(Collectors.toList()));
+
+            for (GraphQLError error :executionResult.getErrors()) {
+                Sentry.getContext().addExtra("message",error.getMessage());
+                Sentry.getContext().addExtra("errorType",error.getErrorType());
+                Sentry.capture(((ExceptionWhileDataFetching) error).getException());
+            }
         }
         if (executionResult.getData() != null) {
             content.put("data", executionResult.getData());
