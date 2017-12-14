@@ -11,7 +11,7 @@ public class TransportModeMapper {
         if (transportSubmodeStructure == null)
             switch (netexTransportMode) {
                 case AIR:
-                    return 1000;
+                    return 1100;
                 case BUS:
                     return 700;
                 case CABLEWAY:
@@ -115,7 +115,7 @@ public class TransportModeMapper {
                     case LONG_DISTANCE:
                         return 102;
                     case NIGHT_RAIL:
-                        return 0;
+                        return 100;
                     case REGIONAL_RAIL:
                         return 103;
                     case TOURIST_RAILWAY:
