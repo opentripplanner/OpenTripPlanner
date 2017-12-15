@@ -13,7 +13,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Elevator;
 import org.onebusaway.gtfs.model.Pathway;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -26,9 +25,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -37,7 +34,7 @@ import java.util.Set;
  */
 public class PathwayEdge extends Edge {
 
-    private enum Mode { NONE, PATH, STAIRS, ELEVATOR }
+    private enum Mode { NONE, WALKWAY, STAIRS, ELEVATOR }
 
     private int traversalTime;
 
@@ -45,15 +42,18 @@ public class PathwayEdge extends Edge {
 
     private Mode pathwayMode = Mode.NONE;
 
-    private List<Elevator> elevators = new ArrayList<>();
+    private String pathwayCode;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, int traversalTime, int wheelchairTraversalTime) {
+    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime, int wheelchairTraversalTime) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
         this.wheelchairTraversalTime = wheelchairTraversalTime;
         switch (pathwayMode) {
-            case Pathway.MODE_PATH:
-                this.pathwayMode = Mode.PATH;
+            case Pathway.MODE_LINK:
+                this.pathwayMode = Mode.NONE;
+                break;
+            case Pathway.MODE_WALKWAY:
+                this.pathwayMode = Mode.WALKWAY;
                 break;
             case Pathway.MODE_ELEVATOR:
                 this.pathwayMode = Mode.ELEVATOR;
@@ -62,10 +62,11 @@ public class PathwayEdge extends Edge {
                 this.pathwayMode = Mode.STAIRS;
                 break;
         }
+        this.pathwayCode = pathwayCode;
     }
 
-    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, int traversalTime) {
-        this(fromv, tov, pathwayMode, traversalTime, -1);
+    public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime) {
+        this(fromv, tov, pathwayMode, pathwayCode, traversalTime, -1);
     }
 
     private static final long serialVersionUID = -3311099256178798981L;
@@ -94,6 +95,8 @@ public class PathwayEdge extends Edge {
                 return "elevator";
             case STAIRS:
                 return "stairs";
+            case WALKWAY:
+                return "walkway";
             default:
                 return "pathway";
         }
@@ -105,10 +108,19 @@ public class PathwayEdge extends Edge {
         return this.getName();
     }
 
+    public String getPathwayCode() {
+        return pathwayCode;
+    }
+
+    public boolean isElevator() {
+        return Mode.ELEVATOR.equals(pathwayMode);
+    }
+
     public State traverse(State s0) {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0 || (!s0.getOptions().ignoreRealtimeUpdates && elevatorIsOutOfService(s0))) {
+            if (wheelchairTraversalTime < 0 ||
+                    (!s0.getOptions().ignoreRealtimeUpdates && pathwayMode.equals(Mode.ELEVATOR) && elevatorIsOutOfService(s0))) {
                 return null;
             }
             time = wheelchairTraversalTime;
@@ -127,19 +139,9 @@ public class PathwayEdge extends Edge {
                 outages.add(alert.getStop().getId());
             }
         }
-        for (Elevator elevator : elevators) {
-            if (outages.contains(elevator.getElevatorId().getId())) {
-                return true;
-            }
+        if (outages.contains(pathwayCode)) {
+            return true;
         }
         return false;
-    }
-
-    public void addElevator(Elevator elevator) {
-        elevators.add(elevator);
-    }
-
-    public List<Elevator> getElevators() {
-        return elevators;
     }
 }

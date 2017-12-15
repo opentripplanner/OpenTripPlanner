@@ -31,7 +31,6 @@ import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Elevator;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Pathway;
@@ -959,21 +958,14 @@ public class GTFSPatternHopFactory {
     }
 
     private void loadPathways(Graph graph) {
-        Multimap<Pathway, Elevator> elevatorByPathway = ArrayListMultimap.create();
-        for (Elevator elev : _dao.getAllElevators()) {
-            elevatorByPathway.put(elev.getPathway(), elev);
-        }
         for (Pathway pathway : _dao.getAllPathways()) {
             Vertex fromVertex = context.stationStopNodes.get(pathway.getFromStop());
             Vertex toVertex = context.stationStopNodes.get(pathway.getToStop());
             PathwayEdge edge;
             if (pathway.isWheelchairTraversalTimeSet()) {
-                edge = new PathwayEdge(fromVertex, toVertex, pathway.getPathwayMode(), pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
+                edge = new PathwayEdge(fromVertex, toVertex, pathway.getPathwayMode(), pathway.getPathwayCode(), pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
             } else {
-                edge = new PathwayEdge(fromVertex, toVertex, pathway.getPathwayMode(), pathway.getTraversalTime());
-            }
-            for (Elevator elev : elevatorByPathway.get(pathway)) {
-                edge.addElevator(elev);
+                edge = new PathwayEdge(fromVertex, toVertex, pathway.getPathwayMode(), pathway.getPathwayCode(), pathway.getTraversalTime());
             }
         }
     }

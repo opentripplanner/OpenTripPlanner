@@ -22,7 +22,6 @@ import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Elevator;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -147,8 +146,8 @@ public class GraphIndex {
             }
             if (edge instanceof PathwayEdge) {
                 PathwayEdge pathwayEdge = (PathwayEdge) edge;
-                for (Elevator elevator : pathwayEdge.getElevators()) {
-                    pathwayForElevator.put(elevator.getElevatorId().getId(), pathwayEdge);
+                if (pathwayEdge.isElevator()) {
+                    pathwayForElevator.put(pathwayEdge.getPathwayCode(), pathwayEdge);
                 }
             }
         }
