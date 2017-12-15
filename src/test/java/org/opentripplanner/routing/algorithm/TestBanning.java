@@ -81,6 +81,57 @@ public class TestBanning extends TestCase {
         }
     }
 
+    public void testWhiteListedRoutes() {
+
+        Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+
+        String feedId = graph.getFeedIds().iterator().next();
+        RoutingRequest options = new RoutingRequest();
+        Vertex start = graph.getVertex(feedId + ":8371");
+        Vertex end = graph.getVertex(feedId + ":8374");
+        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
+        // must set routing context _after_ options is fully configured (time)
+        options.setRoutingContext(graph, start, end);
+        ShortestPathTree spt = null;
+
+        /*
+         * Same as testBannedRoutes, only for whitelisted routes. The last three entries in maxLines are removed, because
+         * it only matches against lineName, not lineId.
+         */
+        String[][] maxLines = { { "MAX Red Line", null }, { "MAX Blue Line", null },
+                { "MAX Green Line", null } };
+        for (int i = 0; i < maxLines.length; ++i) {
+            String lineName = maxLines[i][0];
+            String lineId = maxLines[i][1];
+            String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
+                    + (lineId != null ? "_" + lineId : "");
+            options.setWhiteListedRoutes(routeSpecStr);
+            spt = aStar.getShortestPathTree(options);
+            GraphPath path = spt.getPath(end, true);
+            for (State s : path.states) {
+                if (s.getBackEdge() instanceof PatternHop) {
+                    PatternHop e = (PatternHop) s.getBackEdge();
+                    Route route = e.getPattern().route;
+                    assertTrue(options.whiteListedRoutes.matches(route));
+                    boolean notFoundMaxLine = true;
+                    boolean foundMaxLine = false;
+                    for (int j = 0; j < maxLines.length; ++j) {
+                        if (e.getName().equals(maxLines[j][0])) {
+                            if (j != i) {
+                                notFoundMaxLine = false;
+                            } else {
+                                foundMaxLine = true;
+                            }
+
+                        }
+                    }
+                    assertTrue(notFoundMaxLine);
+                    assertTrue(foundMaxLine);
+                }
+            }
+        }
+    }
+
     public void testWholeBannedTrips() {
         doTestBannedTrips(false, 42);
     }

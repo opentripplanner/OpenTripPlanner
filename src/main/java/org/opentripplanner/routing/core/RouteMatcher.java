@@ -124,6 +124,10 @@ public class RouteMatcher implements Cloneable, Serializable {
         return false;
     }
 
+    public boolean isEmpty() {
+        return agencyAndRouteIds.size() == 0 && agencyIdAndRouteNames.size() == 0 && routeNames.size() == 0;
+    }
+
     public String asString() {
         StringBuilder builder = new StringBuilder();
         for (AgencyAndId agencyAndId : agencyAndRouteIds) {

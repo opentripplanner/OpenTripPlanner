@@ -251,8 +251,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Do not use certain named routes */
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
+    /** Only use certain named routes */
+    public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
+
     /** Do not use certain named agencies */
     public HashSet<String> bannedAgencies = new HashSet<String>();
+
+    /** Only use certain named agencies */
+    public HashSet<String> whiteListedAgencies = new HashSet<String>();
 
     /** Do not use certain trips */
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
@@ -652,6 +658,13 @@ public class RoutingRequest implements Cloneable, Serializable {
             bannedRoutes = RouteMatcher.emptyMatcher();
     }
 
+    public void setWhiteListedRoutes(String s) {
+        if (s != null && !s.equals(""))
+            whiteListedRoutes = RouteMatcher.parse(s);
+        else
+            whiteListedRoutes = RouteMatcher.emptyMatcher();
+    }
+
     public void setBannedStops(String s) {
         if (s != null && !s.equals("")) {
             bannedStops = StopMatcher.parse(s);
@@ -673,6 +686,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+    }
+
+    public void setWhiteListedAgencies(String s) {
+        if (s != null && !s.equals(""))
+            whiteListedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
     }
 
     public final static int MIN_SIMILARITY = 1000;
@@ -1149,6 +1167,25 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (bannedRoutes != null) {
             Route route = trip.getRoute();
             if (bannedRoutes.matches(route)) {
+                return true;
+            }
+        }
+
+        /* check if agency is whitelisted for this plan */
+        if (whiteListedAgencies != null && whiteListedAgencies.size() > 0) {
+            if (whiteListedAgencies.contains(trip.getRoute().getAgency().getId())) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        /* check if route is whitelisted for this plan */
+        if (whiteListedRoutes != null && !whiteListedRoutes.isEmpty()) {
+            Route route = trip.getRoute();
+            if (whiteListedRoutes.matches(route)) {
+                return false;
+            } else {
                 return true;
             }
         }
