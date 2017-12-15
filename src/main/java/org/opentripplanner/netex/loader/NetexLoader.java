@@ -331,7 +331,7 @@ public class NetexLoader {
             //destinationDisplays
             if (sf.getDestinationDisplays() != null) {
                 for (DestinationDisplay destinationDisplay : sf.getDestinationDisplays().getDestinationDisplay()) {
-                    currentNetexDao().getDestinationDisplayMap().put(destinationDisplay.getId(), destinationDisplay);
+                    currentNetexDao().addDestinationDisplay(destinationDisplay);
                 }
             }
         }

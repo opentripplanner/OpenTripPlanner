@@ -343,6 +343,14 @@ public class NetexDao {
         return returnLocalValue(v) ? v : parent.lookupNetworkById(networkId);
     }
 
+    public void addDestinationDisplay(DestinationDisplay value) {
+        destinationDisplayMap.put(value.getId(), value);
+    }
+
+    public DestinationDisplay lookUpDestinationDisplayById(String id) {
+        DestinationDisplay v = destinationDisplayMap.get(id);
+        return returnLocalValue(v) ? v : parent.lookUpDestinationDisplayById(id);
+    }
 
     /* private methods */
 
@@ -356,9 +364,5 @@ public class NetexDao {
 
     private static boolean notEmpty(Collection c) {
         return !(c == null || c.isEmpty());
-    }
-
-    public Map<String, DestinationDisplay> getDestinationDisplayMap() {
-        return destinationDisplayMap;
     }
 }

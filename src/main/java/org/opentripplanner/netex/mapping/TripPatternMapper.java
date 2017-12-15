@@ -9,6 +9,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
@@ -166,9 +167,9 @@ class TripPatternMapper {
         }
 
         if (stopPoint.getDestinationDisplayRef() != null) {
-            String destinationRef = stopPoint.getDestinationDisplayRef().getRef();
-            if (netexDao.getDestinationDisplayMap().containsKey(destinationRef)) {
-                currentHeadsign = netexDao.getDestinationDisplayMap().get(destinationRef).getFrontText().getValue();
+            DestinationDisplay value = netexDao.lookUpDestinationDisplayById(stopPoint.getDestinationDisplayRef().getRef());
+            if (value != null) {
+                currentHeadsign = value.getFrontText().getValue();
             }
         }
 
