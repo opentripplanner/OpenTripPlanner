@@ -72,10 +72,12 @@ class TripPatternMapper {
             if (stopTimes != null) {
                 transitBuilder.getStopTimesSortedByTrip().replace(trip, stopTimes);
 
-                // If all stoptime headsigns are the same, move headsign up to trip
-                if (stopTimes.stream().map(StopTime::getStopHeadsign).distinct().count() == 1) {
+                // Set first headsign as trip headsign
+                if (stopTimes.size() > 0) {
                     trip.setTripHeadsign(stopTimes.stream().findFirst().get().getStopHeadsign());
-                    stopTimes.forEach(s -> s.setStopHeadsign(null));
+                }
+                else {
+                    trip.setTripHeadsign("");
                 }
 
                 // We only generate a stopPattern for the first trip in the JourneyPattern.
