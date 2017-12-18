@@ -28,31 +28,22 @@ public class OutOfAreaNotesService implements Serializable {
 
     private Geometry area;
 
-    private String startLocationMessage;
-
-    private String endLocationMessage;
+    private String outOfAreaMessage;
 
     public void setArea(Geometry area) {
         this.area = area;
     }
 
-    public void setStartLocationMessage(String startLocationMessage) {
-        this.startLocationMessage = startLocationMessage;
-    }
-
-    public void setEndLocationMessage(String endLocationMessage) {
-        this.endLocationMessage = endLocationMessage;
+    public void setOutOfAreaMessage(String outOfAreaMessage) {
+        this.outOfAreaMessage = outOfAreaMessage;
     }
 
     public Collection<Alert> getAlerts(RoutingRequest request) {
         Point fromPoint = GeometryUtils.getGeometryFactory().createPoint(request.rctx.fromVertex.getCoordinate());
         Point toPoint = GeometryUtils.getGeometryFactory().createPoint(request.rctx.toVertex.getCoordinate());
         Collection<Alert> alerts = new ArrayList<>();
-        if (!area.contains(fromPoint)) {
-            alerts.add(Alert.createSimpleAlerts(startLocationMessage));
-        }
-        if (!area.contains(toPoint)) {
-            alerts.add(Alert.createSimpleAlerts(endLocationMessage));
+        if (!area.contains(fromPoint) || !area.contains(toPoint)) {
+            alerts.add(Alert.createSimpleAlerts(outOfAreaMessage));
         }
         return alerts;
     }

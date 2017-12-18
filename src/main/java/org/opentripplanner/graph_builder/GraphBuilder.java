@@ -327,8 +327,7 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
         if (boundaryFile != null) {
-            graphBuilder.addModule(new OutOfAreaModule(boundaryFile, builderParams.fromPlaceOutOfAreaMessage,
-                    builderParams.toPlaceOutOfAreaMessage));
+            graphBuilder.addModule(new OutOfAreaModule(boundaryFile, builderParams.outOfAreaMessage));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;

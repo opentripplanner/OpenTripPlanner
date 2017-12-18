@@ -27,12 +27,11 @@ public class OutOfAreaModule implements GraphBuilderModule {
 
     private File geojsonFile;
 
-    private String startMessage, endMessage;
+    private String outOfAreaMessage;
 
-    public OutOfAreaModule(File geojsonFile, String startMessage, String endMessage) {
+    public OutOfAreaModule(File geojsonFile, String outOfAreaMessage) {
         this.geojsonFile = geojsonFile;
-        this.startMessage = startMessage;
-        this.endMessage = endMessage;
+        this.outOfAreaMessage = outOfAreaMessage;
     }
 
     @Override
@@ -47,8 +46,7 @@ public class OutOfAreaModule implements GraphBuilderModule {
         }
         OutOfAreaNotesService svc = new OutOfAreaNotesService();
         svc.setArea(area);
-        svc.setStartLocationMessage(startMessage);
-        svc.setEndLocationMessage(endMessage);
+        svc.setOutOfAreaMessage(outOfAreaMessage);
         graph.outOfAreaNotesService = svc;
     }
 

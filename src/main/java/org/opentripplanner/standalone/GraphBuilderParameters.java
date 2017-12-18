@@ -149,14 +149,10 @@ public class GraphBuilderParameters {
     public final boolean createFlexTransfers;
 
     /**
-     * Message for from-place out of area
+     * Message for out of area
      */
-    public final String fromPlaceOutOfAreaMessage;
+    public final String outOfAreaMessage;
 
-    /**
-     * Message for from-place out of area
-     */
-    public final String toPlaceOutOfAreaMessage;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -191,8 +187,7 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         createFlexTransfers = config.path("createFlexTransfers").asBoolean(false);
-        fromPlaceOutOfAreaMessage = config.path("fromPlaceOutOfAreaMessage").asText("From place out of area.");
-        toPlaceOutOfAreaMessage = config.path("toPlaceOutOfAreaMessage").asText("To place out of area");
+        outOfAreaMessage = config.path("outOfAreaMessage").asText("One or more endpoints is out of area.");
     }
 
 }
