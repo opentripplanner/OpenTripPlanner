@@ -27,7 +27,11 @@ public final class SentryUtilities {
         sentryContext.addExtra("numItineraries",request.numItineraries);
         sentryContext.addExtra("from",request.from.toDescriptiveString());
         sentryContext.addExtra("to",request.to.toDescriptiveString());
-        sentryContext.addExtra("intermediatePlaces",request.intermediatePlaces.stream().map(intermediatePlace -> intermediatePlace.toDescriptiveString()).collect(Collectors.joining(", ")));
+
+        if (request.intermediatePlaces != null) {
+            sentryContext.addExtra("intermediatePlaces", request.intermediatePlaces.stream().map(intermediatePlace -> intermediatePlace.toDescriptiveString()).collect(Collectors.joining(", ")));
+        }
+
         sentryContext.addExtra("time",request.getDateTime().toString());
         sentryContext.addExtra("unixTime",request.getDateTime().getTime());
         sentryContext.addExtra("zoneids",request.getZoneIdSet().toString());
