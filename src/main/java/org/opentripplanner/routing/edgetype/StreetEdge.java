@@ -680,6 +680,7 @@ public class StreetEdge extends Edge implements Cloneable {
 	    }
 	}
 
+	@Override
 	public boolean isWheelchairAccessible() {
 		return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
 	}

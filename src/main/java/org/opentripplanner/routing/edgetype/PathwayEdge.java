@@ -116,10 +116,15 @@ public class PathwayEdge extends Edge {
         return Mode.ELEVATOR.equals(pathwayMode);
     }
 
+    @Override
+    public boolean isWheelchairAccessible() {
+        return wheelchairTraversalTime >= 0;
+    }
+
     public State traverse(State s0) {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0 ||
+            if (!isWheelchairAccessible() ||
                     (!s0.getOptions().ignoreRealtimeUpdates && pathwayMode.equals(Mode.ELEVATOR) && elevatorIsOutOfService(s0))) {
                 return null;
             }

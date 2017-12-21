@@ -13,17 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.LineString;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
@@ -39,6 +34,7 @@ public class SimpleTransfer extends TransferEdge {
         super(from, to, distance);
         setGeometry(geometry);
         this.edges = edges;
+        setWheelchairAccessible(edges.stream().allMatch(Edge::isWheelchairAccessible));
     }
 
     public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
