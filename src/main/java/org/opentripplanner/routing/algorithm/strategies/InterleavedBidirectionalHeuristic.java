@@ -30,6 +30,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -76,6 +77,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     /** The vertex that the main search is working towards. */
     Vertex target;
 
+    /** Or search works towards multiple targets (landmark support) */
+    List<Vertex> targets;
+
     /** All vertices within walking distance of the origin (the vertex at which the main search begins). */
     Set<Vertex> preTransitVertices;
 
@@ -108,7 +112,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     @Override
     public void initialize(RoutingRequest request, long abortTime) {
         Vertex target = request.rctx.target;
-        if (target != null && target == this.target) {
+        List<Vertex> targets = request.rctx.targets;
+        if ((target != null && target == this.target || (targets != null && targets == this.targets)) ) {
             LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
             return;
         }
@@ -116,6 +121,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.graph = request.rctx.graph;
         long start = System.currentTimeMillis();
         this.target = target;
+        this.targets = targets;
         this.routingRequest = request;
         request.softWalkLimiting = false;
         request.softPreTransitLimiting = false;
