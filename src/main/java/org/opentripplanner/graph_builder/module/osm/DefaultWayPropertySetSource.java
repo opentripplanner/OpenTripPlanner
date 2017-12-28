@@ -89,14 +89,16 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("highway=primary", StreetTraversalPermission.ALL, 2.06, 2.06);
         props.setProperties("highway=primary_link", StreetTraversalPermission.ALL, 2.06, 2.06);
 
+        // allow ALL access on trunk ways
+        props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
+                2.06);
+        props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
+
+
         /* DRIVING ONLY */
         // trunk and motorway links are often short distances and necessary connections
-        props.setProperties("highway=trunk_link", StreetTraversalPermission.CAR, 2.06,
-                2.06);
         props.setProperties("highway=motorway_link", StreetTraversalPermission.CAR, 2.06,
                 2.06);
-
-        props.setProperties("highway=trunk", StreetTraversalPermission.CAR, 7.47, 7.47);
         props.setProperties("highway=motorway", StreetTraversalPermission.CAR, 8, 8);
 
         /* cycleway=lane */
