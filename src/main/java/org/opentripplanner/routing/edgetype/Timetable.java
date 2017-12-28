@@ -167,8 +167,6 @@ public class Timetable implements Serializable {
         }
 
         for (TripTimes tt : tripTimes) {
-            if (!isTripTimesOk(tt, serviceDay, s0, stopIndex, true))
-                continue;
             int adjustedTime = recomputeTime
                 ? adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time)
                 : exampleAdjustedTime;
@@ -180,15 +178,19 @@ public class Timetable implements Serializable {
                                            // now its not sure if this check should be still in place because there is a boolean field
                                            // for canceled trips
                 if (depTime >= adjustedTime && depTime < bestTime) {
-                    bestTrip = tt;
-                    bestTime = depTime;
+                    if (isTripTimesOk(tt, serviceDay, s0, stopIndex, true)) {
+                        bestTrip = tt;
+                        bestTime = depTime;
+                    }
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
-                    bestTrip = tt;
-                    bestTime = arvTime;
+                    if (isTripTimesOk(tt, serviceDay, s0, stopIndex, true)) {
+                        bestTrip = tt;
+                        bestTime = arvTime;
+                    }
                 }
             }
         }
