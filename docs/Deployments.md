@@ -5,9 +5,7 @@
 The following are known deployments of OTP in a government- or agency-sponsored production capacity:
 
 * **Norway (nationwide)** Ruter provides a [journey planner for the Oslo region](https://ruter.no/). It has been in production since January 2016 and serves around 200,000 users per day. Since November 2017, Entur has also prodvided a [nation-wide journey planner](https://en-tur.no/) which consumes schedule data in the EU standard NeTEx format with SIRI realtime updates.
-
-* **Finland (nationwide)** The [Helsinki Regional Transport Authority](https://www.reittiopas.fi/), the [Finnish Transport Agency](https://opas.matka.fi/), and other [Finnish cities](https://waltti.fi/?lang=en) have collaborated to create [Digitransit](https://digitransit.fi/en/), providing OTP-based trip planners, APIs, open data, Docker containers and open source code. Each member organisation runs its own instance of a shared codebase and deployment environment. Their source code is available [on Github](https://github.com/HSLdevcom/), including a [new custom UI](https://github.com/HSLdevcom/digitransit-ui).
-
+* **Finland (nationwide)** The [Helsinki Regional Transport Authority](https://www.reittiopas.fi/), the [Finnish Transport Agency](https://opas.matka.fi/), and other [Finnish cities](https://waltti.fi/?lang=en) have collaborated to create [Digitransit](https://digitransit.fi/en/), providing OTP-based trip planners, APIs, open data, Docker containers and open source code. Each member organisation runs its own instance of a shared codebase and deployment environment. Their source code is available [on Github](https://github.com/HSLdevcom/), including a [new custom UI](https://github.com/HSLdevcom/digitransit-ui). This system also has a strong real-time component.
 * **Los Angeles, California** The new [metro.net trip planner](https://www.metro.net/).
 * **Boston, Massachusetts** The [Massachusetts Bay Transportation Authority trip planner](https://www.mbta.com/trip-planner).
 * **New York State** The State Department of Transportation's [transit trip planner](http://511ny.org/tripplanner/default.aspx) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
@@ -47,4 +45,3 @@ The following OTP-based services are demonstrations or prototypes. Caveats/discl
 * [**South Africa**](http://app.fromA2B.co.za) fromA2B Gauteng Public Transport Planner.
 * [**London, UK**](http://london.optitrans.net/) from Opti-Trans.
 * [**Canberra, Austrailia**](http://bus.lambdacomplex.org/tripPlanner.php) Action Busses, etc.
-* [**Helsinki**](http://dev.hsl.fi/navigator-proto/) With an interesting real-time interface.
