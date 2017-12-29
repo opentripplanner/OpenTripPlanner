@@ -27,8 +27,6 @@ The following OTP-based services are presented as production-quality deployments
 * [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android) by CUTR-USF and Vreixo González can find itineraries on many different OTP servers via a service discovery mechanism.
 * [**ViviBus Bologna**](http://www.vivibus.it/) Bologna, Italy.
 * [**Singapore Nextride**](https://itunes.apple.com/us/app/nextride-singapore-public/id565103559) from [buUuk](http://www.buuuk.com/) is an iOS application using OTP on the back end.
-* [**BJCTA**](http://www.bjctatripplanner.org) Birmingham-Jefferson Country, Alabama.
-* [**Tel Aviv, Israel**](http://www.tranzmate.co.il) from TranzMate.
 
 ## Prototypes, technical previews, and demos
 
