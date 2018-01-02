@@ -106,19 +106,19 @@ public class NetexLoader {
         netexDaoStack.addFirst(new NetexDao());
         
         // Load global shared files
-        loadFiles(entries.sharedEntries(), zipFile);
+        loadFiles("shared file", entries.sharedEntries(), zipFile);
         mapCurrentNetexDaoIntoOtpTransitObjects();
 
         for (GroupEntries group : entries.groups()) {
             newNetexDaoScope(() -> {
                 // Load shared group files
-                loadFiles(group.sharedEntries(), zipFile);
+                loadFiles("shared group file", group.sharedEntries(), zipFile);
                 mapCurrentNetexDaoIntoOtpTransitObjects();
 
                 for (ZipEntry entry : group.independentEntries()) {
                     newNetexDaoScope(() -> {
                         // Load each independent file in group
-                        loadFile(entry, zipFile);
+                        loadFile("group file", entry, zipFile);
                         mapCurrentNetexDaoIntoOtpTransitObjects();
                     });
                 }
@@ -145,9 +145,9 @@ public class NetexLoader {
         return jaxbContext.createUnmarshaller();
     }
 
-    private void loadFiles(Iterable<ZipEntry> entries, ZipFile zipFile) {
+    private void loadFiles(String fileDescription, Iterable<ZipEntry> entries, ZipFile zipFile) {
         for (ZipEntry entry : entries) {
-            loadFile(entry, zipFile);
+            loadFile(fileDescription, entry, zipFile);
         }
     }
 
@@ -159,9 +159,9 @@ public class NetexLoader {
         }
     }
 
-    private void loadFile(ZipEntry entry, ZipFile zipFile) {
+    private void loadFile(String fileDescription, ZipEntry entry, ZipFile zipFile) {
         try {
-            LOG.info("Loading file " + entry.getName());
+            LOG.info("Loading {}: {}", fileDescription, entry.getName());
             byte[] bytesArray = entryAsBytes(zipFile, entry);
 
 
