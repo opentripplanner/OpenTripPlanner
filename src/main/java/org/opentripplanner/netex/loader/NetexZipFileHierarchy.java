@@ -66,7 +66,10 @@ class NetexZipFileHierarchy {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (isSharedFile(name)) {
+            if(ignoredFile(name)) {
+                LOG.debug("Netex file ignored: {}.", name);
+            }
+            else if (isSharedFile(name)) {
                 sharedEntries.add(entry);
             }
             else if (isGroupEntry(name, config.sharedGroupFilePattern)) {
@@ -79,6 +82,10 @@ class NetexZipFileHierarchy {
                 LOG.warn("Netex file ignored: {}. The file do not match file patterns.", name);
             }
         }
+    }
+
+    private boolean ignoredFile(String name) {
+        return config.ignoreFilePattern.matcher(name).matches();
     }
 
     private boolean isSharedFile(String name) {
