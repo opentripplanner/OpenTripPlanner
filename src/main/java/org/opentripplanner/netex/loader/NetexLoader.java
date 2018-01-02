@@ -239,15 +239,15 @@ public class NetexLoader {
                         .getStopAssignment();
                 for (JAXBElement assignment : assignments) {
                     if (assignment.getValue() instanceof PassengerStopAssignment) {
-                        PassengerStopAssignment passengerStopAssignment = (PassengerStopAssignment) assignment
-                                .getValue();
+                        PassengerStopAssignment passengerStopAssignment =
+                                (PassengerStopAssignment) assignment.getValue();
                         String quayRef = passengerStopAssignment.getQuayRef().getRef();
-                        if (passengerStopAssignment.getQuayRef() != null) {
-                            Quay quay = currentNetexDao().lookupQuayLastVersionById(quayRef);
-                                currentNetexDao().addQuayIdByStopPointRef(
-                                        passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
-                                        quay.getId()
-                                );
+                        Quay quay = currentNetexDao().lookupQuayLastVersionById(quayRef);
+                        if (quay != null) {
+                            currentNetexDao().addQuayIdByStopPointRef(
+                                    passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
+                                    quay.getId()
+                            );
                         } else {
                             LOG.warn("Quay " + quayRef + " not found in stop place file.");
                         }
@@ -439,10 +439,6 @@ public class NetexLoader {
                     Authority authority = (Authority) element.getValue();
                     currentNetexDao().addAuthority(authority);
                 }
-                // TODO TGR - remove this before PR
-                // if (element.getValue() instanceof Operator) {
-                //    currentNetexDao().addOperator((Operator) element.getValue());
-                //}
             }
         }
     }
