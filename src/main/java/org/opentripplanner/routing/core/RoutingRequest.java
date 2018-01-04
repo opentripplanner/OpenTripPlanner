@@ -1171,23 +1171,28 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+        boolean whiteListed = false;
+        boolean whiteListInUse = false;
+
         /* check if agency is whitelisted for this plan */
         if (whiteListedAgencies != null && whiteListedAgencies.size() > 0) {
+            whiteListInUse = true;
             if (whiteListedAgencies.contains(trip.getRoute().getAgency().getId())) {
-                return false;
-            } else {
-                return true;
+                whiteListed = true;
             }
         }
 
         /* check if route is whitelisted for this plan */
         if (whiteListedRoutes != null && !whiteListedRoutes.isEmpty()) {
+            whiteListInUse = true;
             Route route = trip.getRoute();
             if (whiteListedRoutes.matches(route)) {
-                return false;
-            } else {
-                return true;
+                whiteListed = true;
             }
+        }
+
+        if (whiteListInUse && !whiteListed) {
+            return true;
         }
 
         return false;
