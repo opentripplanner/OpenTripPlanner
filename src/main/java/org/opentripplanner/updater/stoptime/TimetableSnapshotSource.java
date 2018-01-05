@@ -39,6 +39,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.SentryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,14 +171,10 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
      * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-<<<<<<< HEAD
-     * 
-=======
      *
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      *
->>>>>>> 7296be8ffd532a13afb0bec263a9f436ab787022
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
@@ -185,6 +182,7 @@ public class TimetableSnapshotSource {
      * @param feedId
      */
     public void applyTripUpdates(final Graph graph, final boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
+        SentryUtilities.setupSentryTimetableSnapshot(graph, fullDataset, feedId, updates,fuzzyTripMatcher != null);
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -201,7 +199,10 @@ public class TimetableSnapshotSource {
 
             LOG.debug("message contains {} trip updates", updates.size());
             int uIndex = 0;
+
             for (TripUpdate tripUpdate : updates) {
+                SentryUtilities.setupSentryTripUpdate(tripUpdate);
+
                 if (fuzzyTripMatcher != null && tripUpdate.hasTrip()) {
                     final TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
                     tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
@@ -257,11 +258,11 @@ public class TimetableSnapshotSource {
                 if (applied) {
                     appliedBlockCount++;
                 } else {
-                    LOG.warn("Failed to apply TripUpdate.");
+                    LOG.debug("Failed to apply TripUpdate.");
                     LOG.trace(" Contents: {}", tripUpdate);
                 }
 
-                if (appliedBlockCount % logFrequency == 0) {
+                if (appliedBlockCount > 0 && appliedBlockCount % logFrequency == 0) {
                     LOG.info("Applied {} trip updates.", appliedBlockCount);
                 }
             }
@@ -740,7 +741,7 @@ public class TimetableSnapshotSource {
      */
     private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
         boolean success = false;
-        
+
         final TripPattern pattern = getPatternForTripId(feedId, tripId);
 
         if (pattern != null) {

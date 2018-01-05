@@ -21,6 +21,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.SentryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
