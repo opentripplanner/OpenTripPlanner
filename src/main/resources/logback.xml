@@ -53,7 +53,7 @@
   <logger name="org.apache.http" level="info" />
   <logger name="com.conveyal" level="info"/>
   <!-- for now disable realtime logging -->
-  <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource" level="off" />
+  <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource" level="warn" />
   <logger name="org.opentripplanner.routing.edgetype.Timetable" level="off" />
   <logger name="org.opentripplanner.routing.trippattern.TripTimes" level="off" />
   <!-- /for now disable realtime logging -->   

@@ -2,6 +2,7 @@ package org.opentripplanner.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.transit.realtime.GtfsRealtime;
 import io.sentry.Sentry;
 import io.sentry.context.Context;
 import io.sentry.event.Event;
@@ -10,18 +11,48 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.index.GraphQlPlanner;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SentryUtilities {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final Logger LOG = LoggerFactory.getLogger(GraphQlPlanner.class);
 
-    static public void setupSentryBeforePlan(RoutingRequest request) {
+    static public void setupSentryTimetableSnapshot(final Graph graph, final boolean fullDataset, final String feedId, List<GtfsRealtime.TripUpdate> updates, boolean hasFuzzyMatcher) {
+        Context sentryContext = Sentry.getContext();
+
+        sentryContext.addExtra("graph buildTime", graph.buildTime);
+        sentryContext.addExtra("feedId", feedId);
+        sentryContext.addExtra("fullDataset", fullDataset);
+        sentryContext.addExtra("hasFuzzyMatcher", hasFuzzyMatcher);
+
+
+    }
+
+    public static void setupSentryTripUpdate(GtfsRealtime.TripUpdate tripUpdate) {
+        Context sentryContext = Sentry.getContext();
+        sentryContext.addExtra("tripUpdate", tripUpdate.toString());
+        sentryContext.addExtra("trip", tripUpdate.getTrip());
+        sentryContext.addExtra("stopTimeUpdateCount", tripUpdate.getStopTimeUpdateCount());
+        sentryContext.addExtra("timestamp", tripUpdate.getTimestamp());
+    }
+
+    static public void setupSentryFromMap(final Map<String, Object> extras) {
+        Context sentryContext = Sentry.getContext();
+
+        for (Map.Entry e : extras.entrySet()) {
+            sentryContext.addExtra(e.getKey().toString(), e.getValue());
+        }
+        System.out.println(sentryContext.getExtra());
+    }
+
+    static public void setupSentryBeforePlan(final RoutingRequest request) {
         Context sentryContext = Sentry.getContext();
         sentryContext.addTag("router", request.routerId);
         sentryContext.addExtra("routerId", request.routerId);
@@ -56,7 +87,7 @@ public final class SentryUtilities {
         }
     }
 
-    static public void setupSentryAfterPlan(RoutingRequest request, TripPlan plan, List<Message> messages) {
+    static public void setupSentryAfterPlan(final RoutingRequest request, final TripPlan plan, final List<Message> messages) {
         Context sentryContext = Sentry.getContext();
         sentryContext.addExtra("resultNumItineraries", plan.itinerary.size());
 
@@ -82,4 +113,6 @@ public final class SentryUtilities {
             Sentry.capture(eventBuilder);
         }
     }
+
+
 }

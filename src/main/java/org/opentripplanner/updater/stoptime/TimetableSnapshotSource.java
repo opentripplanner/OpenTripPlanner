@@ -39,6 +39,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.SentryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,6 +182,7 @@ public class TimetableSnapshotSource {
      * @param feedId
      */
     public void applyTripUpdates(final Graph graph, final boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
+        SentryUtilities.setupSentryTimetableSnapshot(graph, fullDataset, feedId, updates,fuzzyTripMatcher != null);
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -197,7 +199,10 @@ public class TimetableSnapshotSource {
 
             LOG.debug("message contains {} trip updates", updates.size());
             int uIndex = 0;
+
             for (TripUpdate tripUpdate : updates) {
+                SentryUtilities.setupSentryTripUpdate(tripUpdate);
+
                 if (fuzzyTripMatcher != null && tripUpdate.hasTrip()) {
                     final TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
                     tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
@@ -253,11 +258,11 @@ public class TimetableSnapshotSource {
                 if (applied) {
                     appliedBlockCount++;
                 } else {
-                    LOG.warn("Failed to apply TripUpdate.");
+                    LOG.debug("Failed to apply TripUpdate.");
                     LOG.trace(" Contents: {}", tripUpdate);
                 }
 
-                if (appliedBlockCount % logFrequency == 0) {
+                if (appliedBlockCount > 0 && appliedBlockCount % logFrequency == 0) {
                     LOG.info("Applied {} trip updates.", appliedBlockCount);
                 }
             }
@@ -736,7 +741,7 @@ public class TimetableSnapshotSource {
      */
     private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
         boolean success = false;
-        
+
         final TripPattern pattern = getPatternForTripId(feedId, tripId);
 
         if (pattern != null) {
