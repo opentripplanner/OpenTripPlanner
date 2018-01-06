@@ -71,10 +71,15 @@ interact with your local OpenTripPlanner instance. GET requests can now also be 
 
 There are a number of different resources available through the GET API which can return results either in XML or JSON. For starters, you might try one of the following:
 
-- Fetch a list all GTFS routes on the default router: [`http://localhost:8080/otp/routers/default/index/routes`](http://localhost:8080/otp/routers/default/index/routes)
+- A list of all available routers: [http://localhost:8080/otp/routers/default/](http://localhost:8080/otp/routers/default/)
 
-- Fetch a list of all stops on TriMet route 52: [`http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops`](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
+- List all GTFS routes on the default router: [http://localhost:8080/otp/routers/default/index/routes](http://localhost:8080/otp/routers/default/index/routes)
 
-- [All unique sequences of stops on the TriMet Green rail line](http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns)
+- All stops on TriMet route 52 [http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
+
+- All routes passing though TriMet stop 7003: [http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes](http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes)
+
+- All unique sequences of stops on the TriMet Green rail line: [http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes](http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns)
+
 
 More advanced use of the API is discussed [here](Advanced-Usage).
