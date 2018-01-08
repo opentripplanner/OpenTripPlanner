@@ -87,6 +87,9 @@ public class GraphPathFinder {
             return null;
         }
 
+//        options.from = new GenericLocation(30.14165, -97.566003);
+//        options.to = new GenericLocation(30.223611000000002, -97.84027799999998);
+
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
         if (options.rctx == null) {
@@ -129,6 +132,9 @@ public class GraphPathFinder {
         options.maxTransfers = 4;
         // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
+        options.onStreetAlternatives = true;
+        options.numItineraries = 2;
+//        options.remainingStreetsBanPercent = 0.3;
 
         /* In long distance mode, maxWalk has a different meaning than it used to.
          * It's the radius around the origin or destination within which you can walk on the streets.
