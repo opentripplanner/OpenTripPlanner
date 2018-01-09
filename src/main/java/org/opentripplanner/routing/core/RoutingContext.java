@@ -382,7 +382,7 @@ public class RoutingContext implements Cloneable {
                         calendarService, agency.getId()));
                 if (opt.tripDiscoveryMode) {
                     ServiceDate sd = serviceDate;
-                    for (int i = 0; i < 15; i++) {
+                    for (int i = 0; i < 31; i++) {
                         sd = opt.arriveBy ? sd.previous() : sd.next();
                         addIfNotExists(this.serviceDays, new ServiceDay(graph, sd, calendarService, agency.getId()));
                     }
