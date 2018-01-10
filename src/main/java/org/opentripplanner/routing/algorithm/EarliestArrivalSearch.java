@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -39,6 +40,8 @@ public class EarliestArrivalSearch {
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSearch.class);
 
     public int maxDuration = 60 * 60 * 2;
+
+    private SkipEdgeStrategy skipEdgeStrategy;
 
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
@@ -81,6 +84,10 @@ public class EarliestArrivalSearch {
                 continue;
             Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
             for (Edge edge : edges) {
+                if (skipEdgeStrategy != null &&
+                        skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt, options)) {
+                    continue;
+                }
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     if (isWorstTimeExceeded(v, options)) {
                         continue;
@@ -100,6 +107,10 @@ public class EarliestArrivalSearch {
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;
+    }
+
+    public void setSkipEdgeStrategy(SkipEdgeStrategy skipEdgeStrategy) {
+        this.skipEdgeStrategy = skipEdgeStrategy;
     }
 
 }

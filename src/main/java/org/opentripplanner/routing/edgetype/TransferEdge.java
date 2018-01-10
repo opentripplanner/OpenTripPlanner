@@ -86,6 +86,9 @@ public class TransferEdge extends Edge {
         if (s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
+        if (s0.backEdge instanceof PathwayEdge) {
+            return null;
+        }
         if(distance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
