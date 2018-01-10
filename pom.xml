@@ -83,6 +83,9 @@
         <jackson.version>2.5.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aws.version>1.9.39</aws.version>
+        <site_id>developer.onebusaway.org</site_id>
+        <site_deployment_base>scp://developer.onebusaway.org/var/www/sites/developer/modules</site_deployment_base>
+        <site_url>${site_deployment_base}/${project.name}/${project.version}</site_url>
     </properties>
 
     <distributionManagement>
@@ -96,6 +99,10 @@
         <name>Nexus Snapshot Repo</name>
         <url>http://nexus.onebusaway.org/content/repositories/snapshots/</url>
       </snapshotRepository>
+      <site>
+        <id>${site_id}</id>
+        <url>${site_url}</url>
+      </site>
     </distributionManagement>
 
     <build>
@@ -252,6 +259,11 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+            </plugin>
+            <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
                   Commit information is stored in Maven variables, which are then substituted
                   into the properties file. The plugin has a mode to generate a git.properties file,
@@ -356,6 +368,15 @@
                 </configuration>
             </plugin>
         </plugins>
+        <!-- In Maven 3, ssh wagon is no longer enabled by default. Since many of our internal deployments use ssh, we enable
+          it here -->
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>3.0.0</version>
+            </extension>
+        </extensions>
     </build>
 
     <reporting>
