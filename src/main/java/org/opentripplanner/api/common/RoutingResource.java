@@ -372,6 +372,9 @@ public abstract class RoutingResource {
     @QueryParam("carParkCarLegWeight")
     private Double carParkCarLegWeight;
 
+    @QueryParam("heuristicStepsPerMainStep")
+    private Integer heuristicStepsPerMainStep;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -576,6 +579,9 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (heuristicStepsPerMainStep != null)
+            request.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

@@ -361,6 +361,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
+     * The number of heuristic steps per main step when using interleaved bidirectional heuristics. Default 8.
+     */
+
+    public int heuristicStepsPerMainStep = 8;
+
+    /**
      * When true, do a full reversed search to compact the legs of the GraphPath.
      */
     public boolean compactLegsByReversedSearch = true;

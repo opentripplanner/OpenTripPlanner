@@ -68,7 +68,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
     // For each step in the main search, how many steps should the reverse search proceed?
-    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 8; // TODO determine a good value empirically
+    private int HEURISTIC_STEPS_PER_MAIN_STEP; // TODO determine a good value empirically
 
     /** The vertex at which the main search begins. */
     Vertex origin;
@@ -99,6 +99,14 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     // True when the entire transit network has been explored by the reverse search.
     boolean finished = false;
+
+    public InterleavedBidirectionalHeuristic() {
+        this(8);
+    }
+
+    public InterleavedBidirectionalHeuristic(final int heuristicStepsPerMainStep) {
+        HEURISTIC_STEPS_PER_MAIN_STEP = heuristicStepsPerMainStep;
+    }
 
     /**
      * Before the main search begins, the heuristic must search on the streets around the origin and destination.
