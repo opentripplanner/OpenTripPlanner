@@ -18,6 +18,9 @@ public class RouteShort {
     public String color;
     public String agencyName;
 
+    /** use this parameter for bannedRoutes, preferredRoutes, etc in the /plan call */
+    public String paramId;
+
     public RouteShort (Route route) {
         id = route.getId();
         shortName = route.getShortName();
@@ -25,6 +28,7 @@ public class RouteShort {
         mode = GtfsLibrary.getTraverseMode(route).toString();
         color = route.getColor();
         agencyName = route.getAgency().getName();
+        paramId = id.getAgencyId() + "__" + id.getId();
     }
 
     public static List<RouteShort> list (Collection<Route> in) {

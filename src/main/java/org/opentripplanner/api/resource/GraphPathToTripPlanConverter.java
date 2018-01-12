@@ -177,8 +177,8 @@ public abstract class GraphPathToTripPlanConverter {
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
-        itinerary.startTime = makeCalendar(states[0]);
-        itinerary.endTime = makeCalendar(lastState);
+        itinerary.setStartTime(makeCalendar(states[0]));
+        itinerary.setEndTime(makeCalendar(lastState));
 
         calculateTimes(itinerary, states);
 
@@ -311,8 +311,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         Edge[] edges = new Edge[states.length - 1];
 
-        leg.startTime = makeCalendar(states[0]);
-        leg.endTime = makeCalendar(states[states.length - 1]);
+        leg.setStartTime(makeCalendar(states[0]));
+        leg.setEndTime(makeCalendar(states[states.length - 1]));
 
         // Calculate leg distance and fill array of edges
         leg.distance = 0.0;
@@ -455,8 +455,8 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (i + 1 < legsStates.length) {
-                legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
-                legs.get(i).to.departure = legs.get(i + 1).from.departure;
+                legs.get(i + 1).from.setArrival(legs.get(i).to.arrival);
+                legs.get(i).to.setDeparture(legs.get(i + 1).from.departure);
 
                 if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
                     legs.get(i + 1).from = legs.get(i).to;
@@ -656,9 +656,9 @@ public abstract class GraphPathToTripPlanConverter {
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
-        leg.from.arrival = null;
+        leg.from.clearArrival();
         leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
-        leg.to.departure = null;
+        leg.to.clearDeparture();
 
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
@@ -675,7 +675,7 @@ public abstract class GraphPathToTripPlanConverter {
                 if (currentStop == firstStop) continue;
 
                 if (currentStop == previousStop) {                  // Avoid duplication of stops
-                    leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(states[i]);
+                    leg.stop.get(leg.stop.size() - 1).setDeparture(makeCalendar(states[i]));
                     continue;
                 }
 

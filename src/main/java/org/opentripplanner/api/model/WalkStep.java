@@ -121,6 +121,11 @@ public class WalkStep {
     public List<P2<Double>> elevation;
 
     /**
+     * Instruction for this step, as text
+     */
+    public String instructionText;
+
+    /**
      * A list of alerts relevant to this step.
      */
     @XmlElement

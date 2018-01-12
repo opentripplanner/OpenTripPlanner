@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Fare;
 
+import static org.opentripplanner.util.DateUtils.formatDateIso;
+
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
@@ -38,10 +40,21 @@ public class Itinerary {
      * Time that the trip departs.
      */
     public Calendar startTime = null;
+
+    /**
+     * Time that the trip departs, in ISO-8601 format.
+     */
+    public String startTimeFmt;
+
     /**
      * Time that the trip arrives.
      */
     public Calendar endTime = null;
+
+    /**
+     * Time that the trip departs, in ISO-8601 format.
+     */
+    public String endTimeFmt;
 
     /**
      * How much time is spent walking, in seconds.
@@ -142,7 +155,7 @@ public class Itinerary {
         if (timeZone != null) {
             Calendar calendar = Calendar.getInstance(startTimeZone);
             calendar.setTime(startTime.getTime());
-            startTime = calendar;
+            setStartTime(calendar);
             // go back and set timezone for legs prior to first transit
             it = legs.iterator();
             while (it.hasNext()) {
@@ -155,7 +168,17 @@ public class Itinerary {
             }
             calendar = Calendar.getInstance(timeZone);
             calendar.setTime(endTime.getTime());
-            endTime = calendar;
+            setEndTime(calendar);
         }
+    }
+
+    public void setStartTime(Calendar calendar) {
+        startTime = calendar;
+        startTimeFmt = formatDateIso(calendar);
+    }
+
+    public void setEndTime(Calendar calendar) {
+        endTime = calendar;
+        endTimeFmt = formatDateIso(calendar);
     }
 }

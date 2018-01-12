@@ -22,6 +22,8 @@ import org.opentripplanner.util.Constants;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import static org.opentripplanner.util.DateUtils.formatDateIso;
+
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
 */ 
@@ -65,9 +67,19 @@ public class Place {
     public Calendar arrival = null;
 
     /**
+     * The time the rider will arrive at the place, in ISO-8601 format.
+     */
+    public String arrivalFmt = null;
+
+    /**
      * The time the rider will depart the place.
      */
     public Calendar departure = null;
+
+    /**
+     * The time the rider will depart the place, in ISO-8601 format.
+     */
+    public String departureFmt = null;
 
     @XmlAttribute
     @JsonSerialize
@@ -135,7 +147,27 @@ public class Place {
 
     public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
         this(lon, lat, name);
-        this.arrival = arrival;
-        this.departure = departure;
+        setArrival(arrival);
+        setDeparture(departure);
+    }
+
+    public void setArrival(Calendar calendar) {
+        this.arrival = calendar;
+        this.arrivalFmt = formatDateIso(calendar);
+    }
+
+    public void setDeparture(Calendar calendar) {
+        this.departure = calendar;
+        this.departureFmt = formatDateIso(calendar);
+    }
+
+    public void clearArrival() {
+        this.arrival = null;
+        this.arrivalFmt = null;
+    }
+
+    public void clearDeparture() {
+        this.departure = null;
+        this.departureFmt = null;
     }
 }
