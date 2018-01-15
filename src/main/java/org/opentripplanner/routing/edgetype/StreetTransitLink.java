@@ -118,6 +118,18 @@ public class StreetTransitLink extends Edge {
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
+        // Require that if we enter the transit network, we use tranist before leaving.
+        // This forbids shortcuts through the transit network, in the context of pathways -
+        // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
+        // intervening pathways.
+        if (isLeavingTransitNetwork(req)) {
+            if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {
+                return null;
+            }
+        } else {
+            s1.setPreTransitNumBoardings();
+        }
+
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {

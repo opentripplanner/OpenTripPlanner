@@ -839,4 +839,7 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public int getPreTransitNumBoardings() {
+        return stateData.preTransitNumBoardings;
+    }
 }
