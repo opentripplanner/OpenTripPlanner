@@ -432,6 +432,8 @@ public class StateEditor {
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
+        // this state is necessary for no-shortcuts check
+        child.stateData.numBoardings = state.getNumBoardings();
     }
 
     /* PUBLIC GETTER METHODS */
