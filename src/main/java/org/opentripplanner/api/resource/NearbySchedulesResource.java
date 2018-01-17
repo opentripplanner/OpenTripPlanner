@@ -12,16 +12,32 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.resource;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.index.model.StopTimesByStop;
+import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.DateUtils;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
@@ -90,12 +106,87 @@ public class NearbySchedulesResource {
     private int timeRange;
 
     /**
+     * Maximum number of departures to return per TripPattern, per stop
+     */
+    @QueryParam("numberOfDepartures")
+    @DefaultValue("10")
+    private int numberOfDepartures;
+
+    /**
+     * If true, omit non-pickups, i.e. arrival/departures where the vehicle does not pick up passengers
+     */
+    @QueryParam("omitNonPickups")
+    @DefaultValue("false")
+    private boolean omitNonPickups;
+
+    private GraphIndex index;
+
+    private StreetVertexIndexService streetIndex;
+
+    public NearbySchedulesResource(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+        Router router = otpServer.getRouter(routerId);
+        index = router.graph.index;
+        streetIndex = router.graph.streetIndex;
+    }
+
+    /**
      * Return upcoming vehicle arrival/departure times at given stops. Matches stops by lat/lon/radius,
      * and/or by list of stops. Arrival/departure times can be filtered by route and direction.
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q})
     public List<StopTimesByStop> getNearbySchedules() {
-        throw new IllegalArgumentException("Not implemented.");
+
+        // Finding nearby stops is adapted from IndexAPI.getStopsInRadius
+        if (radius > IndexAPI.MAX_STOP_SEARCH_RADIUS){
+            radius = IndexAPI.MAX_STOP_SEARCH_RADIUS;
+        }
+
+        long startTime = getStartTimeSec();
+
+        // TODO stops could also be specified by list (stopsStr) -- see StopMatcher
+        List<TransitStop> stops = getNearbyStops(lat, lon, radius);
+
+        List<StopTimesByStop> ret = new ArrayList<>();
+
+        for (TransitStop tstop : stops) {
+            Stop stop = tstop.getStop();
+            StopTimesByStop stopTimes = new StopTimesByStop(stop);
+            List<StopTimesInPattern> stopTimesPerPattern = index.stopTimesForStop(
+                    stop, startTime, timeRange, numberOfDepartures, omitNonPickups);
+            // TODO filter patterns by routeStr and direction -- see RouteMatcher
+            // TODO sort by arrival time (increasing). Will already be sorted by pattern.
+            for (StopTimesInPattern stip : stopTimesPerPattern) {
+                for (TripTimeShort tt : stip.times) {
+                    stopTimes.addTime(tt);
+                }
+            }
+            ret.add(stopTimes);
+        }
+
+        return ret;
+    }
+
+    private long getStartTimeSec() {
+        if (time != null && date != null) {
+            Date d = DateUtils.toDate(date, time, index.graph.getTimeZone());
+            if (d == null) {
+                throw new IllegalArgumentException("badly formatted time and date");
+            }
+            return d.getTime() / 1000;
+        }
+        return 0; // index.stopTimesForStop will treat this as current time
+    }
+
+    private List<TransitStop> getNearbyStops(double lat, double lon, double radius) {
+        List<TransitStop> stops = new ArrayList<>();
+        Coordinate coord = new Coordinate(lon, lat);
+        for (TransitStop stop : streetIndex.getNearbyTransitStops(coord, radius)) {
+            double distance = SphericalDistanceLibrary.fastDistance(stop.getCoordinate(), coord);
+            if (distance < radius) {
+                stops.add(stop);
+            }
+        }
+        return stops;
     }
 }
