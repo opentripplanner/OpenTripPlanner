@@ -16,6 +16,7 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.apache.commons.lang.StringUtils;
 import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -399,6 +400,32 @@ public abstract class GraphPathToTripPlanConverter {
             } else {
                 previousStep = null;
             }
+
+            // add walk step instructions - adapted from otp.js
+            boolean first = true;
+            for (WalkStep step : walkSteps) {
+                step.instructionText = generateWalkStepInstruction(step, first);
+                first = false;
+            }
+        }
+    }
+
+    private static String generateWalkStepInstruction(WalkStep step, boolean start) {
+        if (step.relativeDirection.isCircle()) {
+            String dir = step.relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE ? "clockwise" : "counterclockwise";
+            return String.format("Take roundabout %s to exit %s on %s",
+                    dir, step.exit, step.streetName);
+        }
+        if (start) {
+            String absDir = StringUtils.lowerCase(step.absoluteDirection.toString());
+            return String.format("Start on %s heading %s", step.streetName, absDir);
+        }
+        String relDir = StringUtils.capitalize(StringUtils.lowerCase(step.relativeDirection.toString()));
+        relDir = relDir.replace("_", " ");
+        if (step.stayOn) {
+            return String.format("%s to continue on %s", relDir, step.streetName);
+        } else {
+            return String.format("%s on to %s", relDir, step.streetName);
         }
     }
 
