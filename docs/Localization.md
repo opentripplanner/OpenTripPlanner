@@ -13,6 +13,7 @@ In OTP we use gettext for localization, for the following reasons:
 In the Javascript UI the [i18next](http://i18next.com) library is used.
 
 Three types of files are used in the OTP localization process:
+
 - The `.pot` file is the message template. It is a starting point for creating new `.po` files.
 - `.po` files are created and edited by translators based on the `.pot` file.
 - `.json` files are generated from the `.po` files for each language.
