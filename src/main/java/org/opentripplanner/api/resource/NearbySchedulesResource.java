@@ -13,12 +13,13 @@
 package org.opentripplanner.api.resource;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.index.model.StopTimesByStop;
 import org.opentripplanner.index.model.StopTimesInPattern;
-import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -37,8 +38,12 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -68,8 +73,8 @@ public class NearbySchedulesResource {
     private Double radius;
 
     /**
-     * list of stops of interest. Should be a comma-separated list in the format MTA:101001,MNR:1, etc. Optional
-     * if lat, lon, and radius are given.
+     * list of stops of interest. Should be a comma-separated list in the format MTA:101001,MNR:1, etc. Ignored
+     * if lat, lon, and radius are given; required otherwise.
      */
     @QueryParam("stops")
     private String stopsStr;
@@ -84,7 +89,7 @@ public class NearbySchedulesResource {
      * direction of interest. Optional. Use GTFS direction_id (1 or 0).
      */
     @QueryParam("direction")
-    private String direction;
+    private Integer direction;
 
     /**
      * date to return arrival/departure times for. Will default to the current date.
@@ -119,6 +124,13 @@ public class NearbySchedulesResource {
     @DefaultValue("false")
     private boolean omitNonPickups;
 
+    /**
+     * If true, group arrivals/departures by parent stop (station), instead of by stop.
+     */
+    @QueryParam("groupByParent")
+    @DefaultValue("true")
+    private boolean groupByParent;
+
     private GraphIndex index;
 
     private StreetVertexIndexService streetIndex;
@@ -135,36 +147,55 @@ public class NearbySchedulesResource {
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q})
-    public List<StopTimesByStop> getNearbySchedules() {
+    public Collection<StopTimesByStop> getNearbySchedules() {
 
-        // Finding nearby stops is adapted from IndexAPI.getStopsInRadius
-        if (radius > IndexAPI.MAX_STOP_SEARCH_RADIUS){
+        if (radius != null && radius > IndexAPI.MAX_STOP_SEARCH_RADIUS){
             radius = IndexAPI.MAX_STOP_SEARCH_RADIUS;
         }
 
         long startTime = getStartTimeSec();
 
-        // TODO stops could also be specified by list (stopsStr) -- see StopMatcher
-        List<TransitStop> stops = getNearbyStops(lat, lon, radius);
+        RouteMatcher routeMatcher = RouteMatcher.parse(routesStr);
 
-        List<StopTimesByStop> ret = new ArrayList<>();
+        List<TransitStop> stops;
+        if (lat != null && lon != null && radius != null) {
+            stops = getNearbyStops(lat, lon, radius);
+        } else if (stopsStr != null) {
+            stops = getStopsFromList(stopsStr);
+        } else {
+            throw new IllegalArgumentException("Must supply lat/lon/radius, or list of stops");
+        }
+
+        // map by parent stop
+        Map<AgencyAndId, StopTimesByStop> ret = new HashMap<>();
 
         for (TransitStop tstop : stops) {
             Stop stop = tstop.getStop();
-            StopTimesByStop stopTimes = new StopTimesByStop(stop);
+            AgencyAndId key = key(stop);
             List<StopTimesInPattern> stopTimesPerPattern = index.stopTimesForStop(
-                    stop, startTime, timeRange, numberOfDepartures, omitNonPickups);
-            // TODO filter patterns by routeStr and direction -- see RouteMatcher
-            // TODO sort by arrival time (increasing). Will already be sorted by pattern.
-            for (StopTimesInPattern stip : stopTimesPerPattern) {
-                for (TripTimeShort tt : stip.times) {
-                    stopTimes.addTime(tt);
-                }
+                    stop, startTime, timeRange, numberOfDepartures, omitNonPickups, routeMatcher, direction);
+            if (stopTimesPerPattern.isEmpty()) {
+                continue;
             }
-            ret.add(stopTimes);
+            StopTimesByStop stopTimes = ret.get(key);
+            if (stopTimes == null) {
+                stopTimes = new StopTimesByStop(stop, groupByParent, stopTimesPerPattern);
+                ret.put(key, stopTimes);
+            } else {
+                stopTimes.addPatterns(stopTimesPerPattern);
+            }
         }
 
-        return ret;
+        return ret.values();
+    }
+
+    private AgencyAndId key(Stop stop) {
+        if (stop.getParentStation() == null || !groupByParent) {
+            return stop.getId();
+        }
+        else {
+            return new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation());
+        }
     }
 
     private long getStartTimeSec() {
@@ -178,6 +209,7 @@ public class NearbySchedulesResource {
         return 0; // index.stopTimesForStop will treat this as current time
     }
 
+    // Finding nearby stops is adapted from IndexAPI.getStopsInRadius
     private List<TransitStop> getNearbyStops(double lat, double lon, double radius) {
         List<TransitStop> stops = new ArrayList<>();
         Coordinate coord = new Coordinate(lon, lat);
@@ -188,5 +220,25 @@ public class NearbySchedulesResource {
             }
         }
         return stops;
+    }
+
+    private List<TransitStop> getStopsFromList(String stopsStr) {
+        List<Stop> stops = new ArrayList<>();
+        for (String st : stopsStr.split(",")) {
+            AgencyAndId id = AgencyAndId.convertFromString(st, ':');
+            Stop stop = index.stopForId.get(id);
+            if (stop == null) {
+                // first try interpreting stop as a parent
+                Collection<Stop> children = index.stopsForParentStation.get(id);
+                if (children.isEmpty()) {
+                    throw new IllegalArgumentException("Unknown stop: " + st);
+                }
+                stops.addAll(children);
+            } else {
+                stops.add(stop);
+            }
+        }
+        return stops.stream().map(index.stopVertexForStop::get)
+                .collect(Collectors.toList());
     }
 }

@@ -25,22 +25,34 @@ public class StopTimesByStop {
 
     private StopShort stop;
 
-    private List<TripTimeShort> times = Lists.newArrayList();
+    private List<StopTimesInPattern> patterns = Lists.newArrayList();
 
-    public StopTimesByStop(Stop stop) {
+    public StopTimesByStop(Stop stop, boolean groupByParent, List<StopTimesInPattern> stopTimesInPattern) {
         this.stop = new StopShort(stop);
+        if (stop.getParentStation() != null && groupByParent) {
+            this.stop.id.setId(stop.getParentStation());
+            this.stop.cluster = null;
+            // TODO we only know lat and lon match because it's an MTA convention
+        }
+        this.patterns = stopTimesInPattern;
     }
 
-    public void addTime(TripTimeShort time) {
-        times.add(time);
-    }
-
+    /**
+     * Stop which these arrival-departures are supplied for. If groupByParent = true, this will be a parent station
+     * (if parent stations are given in GTFS).
+     */
     public StopShort getStop() {
         return stop;
     }
 
-    public List<TripTimeShort> getTimes() {
-        return times;
+    /**
+     * List of groups of arrival-departures, separated out by TripPattern
+     */
+    public List<StopTimesInPattern> getPatterns() {
+        return patterns;
     }
 
+    public void addPatterns(List<StopTimesInPattern> stip) {
+        patterns.addAll(stip);
+    }
 }

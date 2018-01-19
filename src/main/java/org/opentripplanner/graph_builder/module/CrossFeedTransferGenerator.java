@@ -147,7 +147,7 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
             if (thisStop != null) {
                 stops.add(thisStop);
             }
-            for (Stop stop : graph.index.stopsForParentStation.get(id.getId())) {
+            for (Stop stop : graph.index.stopsForParentStation.get(id)) {
                 if (stop.getId().getAgencyId().equals(id.getAgencyId())) {
                     stops.add(stop);
                 }
@@ -177,7 +177,7 @@ public class CrossFeedTransferGenerator implements GraphBuilderModule {
 
         @Override
         public Collection<Stop> getStopsForStation(Stop stop) {
-            return graph.index.stopsForParentStation.get(stop.getId().getId());
+            return graph.index.stopsForParentStation.get(stop.getId());
         }
 
         @Override

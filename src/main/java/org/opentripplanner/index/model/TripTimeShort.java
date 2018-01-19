@@ -1,6 +1,7 @@
 package org.opentripplanner.index.model;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -63,14 +64,17 @@ public class TripTimeShort {
     /** block of arrival/departure */
     public String blockId;
 
-    /** Headsign of this arrival/departure. Uses stopHeadsign if available, otherwise uses tripHeadsign. */
-    public String headsign;
+    /** Headsign associated with this trip. */
+    public String tripHeadsign;
 
     /** arrival time in ISO-8601 format, in timezone of router. Realtime if available.*/
     public String arrivalFmt;
 
     /** departure time in ISO-8601 format, in timezone of router. Realtime if available.*/
     public String departureFmt;
+
+    /** Headsign associated with this stop-time, if given in GTFS. */
+    public String stopHeadsign;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -89,13 +93,16 @@ public class TripTimeShort {
         realtime           = !tt.isScheduled();
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
-        headsign           = tt.getHeadsign(i);
+        tripHeadsign       = tt.trip.getTripHeadsign();
+        stopHeadsign       = tt.hasStopHeadsigns() ? tt.getHeadsign(i) : null;
     }
 
-    public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
+    public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd, TimeZone tz) {
         this(tt, i, stop);
         tripId = tt.trip.getId();
         serviceDay = sd.time(0);
+        arrivalFmt = formatDateIso(serviceDay + realtimeArrival, tz);
+        departureFmt = formatDateIso(serviceDay + realtimeDeparture, tz);
     }
 
     /**
@@ -110,5 +117,4 @@ public class TripTimeShort {
         }
         return out;
     }
-    
 }

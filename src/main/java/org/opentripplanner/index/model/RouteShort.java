@@ -11,11 +11,22 @@ import com.beust.jcommander.internal.Lists;
 
 public class RouteShort {
 
+    /** ID of this route */
     public AgencyAndId id;
+
+    /** Name of route, if given in GTFS. Typically, this name is what user interfaces will display.*/
     public String shortName;
+
+    /** Longer name of route, if given in GTFS */
     public String longName;
+
+    /** Mode of route */
     public String mode;
+
+    /** Color for display, if given in GTFS */
     public String color;
+
+    /** Agency this route is associated with in GTFS. */
     public String agencyName;
 
     /** use this parameter for bannedRoutes, preferredRoutes, etc in the /plan call */

@@ -15,6 +15,7 @@ package org.opentripplanner.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.zone.ZoneRulesException;
@@ -288,6 +289,11 @@ public class DateUtils implements DateConstants {
             LOG.info("Error parsing calendar={} {}", cal, ex);
             return null;
         }
+    }
+
+    public static String formatDateIso(long time, TimeZone tz) {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), tz.toZoneId());
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zdt);
     }
 
     public static Date parseDate(String sdf, String string) {

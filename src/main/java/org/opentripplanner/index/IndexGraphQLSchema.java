@@ -20,7 +20,6 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
 import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -466,9 +465,9 @@ public class IndexGraphQLSchema {
                     .get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-               	.name("headsign")
+               	.name("tripHeadsign")
               	.type(Scalars.GraphQLString)
-              	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+              	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).tripHeadsign)
               	.build())
             .build();
 
@@ -632,7 +631,7 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((TripPattern) environment.getSource()).code)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("headsign")
+                .name("tripHeadsign")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
                 .build())

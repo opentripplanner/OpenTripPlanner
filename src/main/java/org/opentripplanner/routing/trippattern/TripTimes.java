@@ -494,4 +494,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public String getTrack(int stop) {
         return tracks == null ? null : tracks[stop];
     }
+
+    public boolean hasStopHeadsigns() {
+        return headsigns != null;
+    }
 }
