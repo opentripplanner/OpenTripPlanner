@@ -118,15 +118,16 @@ public class StreetTransitLink extends Edge {
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        // Require that if we enter the transit network, we use tranist before leaving.
+        // Require that if we enter the transit network, we use transit before leaving.
         // This forbids shortcuts through the transit network, in the context of pathways -
         // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
         // intervening pathways.
-        if (isLeavingTransitNetwork(req)) {
+        boolean leavingTransit = isLeavingTransitNetwork(req);
+        if (s0.isEverBoarded() && leavingTransit) {
             if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {
                 return null;
             }
-        } else {
+        } else if (!leavingTransit) {
             s1.setPreTransitNumBoardings();
         }
 
