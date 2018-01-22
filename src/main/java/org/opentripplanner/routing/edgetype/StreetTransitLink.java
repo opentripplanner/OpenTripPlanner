@@ -123,7 +123,7 @@ public class StreetTransitLink extends Edge {
         // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
         // intervening pathways.
         boolean leavingTransit = isLeavingTransitNetwork(req);
-        if (s0.isEverBoarded() && leavingTransit) {
+        if (s0.getPreTransitNumBoardings() >= 0 && leavingTransit) {
             if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {
                 return null;
             }
