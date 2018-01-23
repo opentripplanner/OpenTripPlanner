@@ -11,7 +11,7 @@ import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -47,7 +47,7 @@ public class NearbyStopFinder {
     private double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
-    private EarliestArrivalSearch earliestArrivalSearch;
+    private GenericDijkstra streetSearch;
 
     /* Fields used when finding stops without a street network. */
     private StreetVertexIndexService streetIndex;
@@ -69,13 +69,10 @@ public class NearbyStopFinder {
         this.useStreets = useStreets;
         this.radiusMeters = radiusMeters;
         if (useStreets) {
-            earliestArrivalSearch = new EarliestArrivalSearch();
-            // We need to accommodate straight line distance (in meters) but when streets are present we use an
-            // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
-            // but we don't have much of a choice here. Use the default walking speed to convert.
-            earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
+            streetSearch = new GenericDijkstra(new RoutingRequest(TraverseMode.WALK));
+            streetSearch.setSearchTerminationStrategy((v, w, s, spt, opt) -> s.getWalkDistance() > radiusMeters);
             // Don't find transfers that use other transfers
-            earliestArrivalSearch.setSkipEdgeStrategy((o, t, c, edge, s, opt) -> edge instanceof TransferEdge);
+            streetSearch.setSkipEdgeStrategy((o, t, c, edge, s, opt) -> edge instanceof TransferEdge);
         } else {
             // FIXME use the vertex index already in the graph if it exists.
             streetIndex = new StreetVertexIndexServiceImpl(graph);
@@ -94,12 +91,21 @@ public class NearbyStopFinder {
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closestStopForPattern =
                 new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
 
+        // Add ALL station entrances, because there can be cases where some entrances are inaccessible
+        // (wheelchair accessibility, opening/closing times, etc), and station entrances are not
+        // associated with trip patterns.
+        Set<StopAtDistance> stationEntrances = Sets.newHashSet();
+
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
-        for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
+        List<NearbyStopFinder.StopAtDistance> stops = findNearbyStops(vertex);
+        for (NearbyStopFinder.StopAtDistance stopAtDistance : stops) {
             /* Filter out destination stops that are already reachable via pathways or transfers. */
             // FIXME why is the above comment relevant here? how does the next line achieve this?
             TransitStop ts1 = stopAtDistance.tstop;
             if (!ts1.isStreetLinkable()) continue;
+            if (ts1.isEntrance()) {
+                stationEntrances.add(stopAtDistance);
+            }
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);
@@ -109,6 +115,7 @@ public class NearbyStopFinder {
         /* Make a transfer from the origin stop to each destination stop that was the closest stop on any pattern. */
         Set<StopAtDistance> uniqueStops = Sets.newHashSet();
         uniqueStops.addAll(closestStopForPattern.values());
+        uniqueStops.addAll(stationEntrances);
         return uniqueStops;
 
     }
@@ -134,7 +141,7 @@ public class NearbyStopFinder {
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
-        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
+        ShortestPathTree spt = streetSearch.getShortestPathTree(new State(routingRequest));
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {

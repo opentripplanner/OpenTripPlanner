@@ -47,7 +47,7 @@ public class StateData implements Cloneable {
 
     protected int numBoardings;
 
-    protected int preTransitNumBoardings;
+    protected int preTransitNumBoardings = -1;
 
     protected boolean everBoarded;
 

@@ -401,7 +401,7 @@ public class StateEditor {
     }
 
     public void setPreTransitNumBoardings() {
-        cloneStateDataAsNeeded();;
+        cloneStateDataAsNeeded();
         child.stateData.preTransitNumBoardings = child.stateData.numBoardings;
     }
 
