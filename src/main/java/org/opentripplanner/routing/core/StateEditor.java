@@ -264,6 +264,7 @@ public class StateEditor {
     }
 
     public void setEnteredNoThroughTrafficArea() {
+        cloneStateDataAsNeeded();
         child.stateData.enteredNoThroughTrafficArea = true;
     }
     
