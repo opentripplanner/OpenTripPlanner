@@ -668,7 +668,7 @@ public class State implements Cloneable {
 
         while (orig.getBackState() != null) {
             edge = orig.getBackEdge();
-            
+
             if (optimize) {
                 // first board/last alight: figure in wait time in on the fly optimization
                 if (edge instanceof TransitBoardAlight &&
@@ -841,5 +841,9 @@ public class State implements Cloneable {
 
     public int getPreTransitNumBoardings() {
         return stateData.preTransitNumBoardings;
+    }
+
+    public boolean isTransferPermissible() {
+        return stateData.transferPermissible;
     }
 }

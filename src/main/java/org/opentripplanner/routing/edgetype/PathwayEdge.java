@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Pathway;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -44,10 +45,11 @@ public class PathwayEdge extends Edge {
 
     private String pathwayCode;
 
+    private double distance;
+
     public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime, int wheelchairTraversalTime) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
-        this.wheelchairTraversalTime = wheelchairTraversalTime;
         switch (pathwayMode) {
             case Pathway.MODE_LINK:
                 this.pathwayMode = Mode.NONE;
@@ -63,6 +65,11 @@ public class PathwayEdge extends Edge {
                 break;
         }
         this.pathwayCode = pathwayCode;
+        this.distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
+        this.traversalTime = Math.max(traversalTime, (int) Math.round(1.3 * distance));
+        if (wheelchairTraversalTime > 0) {
+            this.wheelchairTraversalTime = Math.max(wheelchairTraversalTime, (int) Math.round(1.3 * distance));
+        }
     }
 
     public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime) {
@@ -76,7 +83,7 @@ public class PathwayEdge extends Edge {
     }
 
     public double getDistance() {
-        return 0;
+        return distance;
     }
     
     public TraverseMode getMode() {

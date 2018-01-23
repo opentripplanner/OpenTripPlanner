@@ -99,6 +99,8 @@ public class StateData implements Cloneable {
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
 
+    protected boolean transferPermissible;
+
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.modes;
         if (modes.getCar())
@@ -119,7 +121,7 @@ public class StateData implements Cloneable {
         }
     }
 
-    public int getNumBooardings(){
+    public int getNumBoardings(){
         return numBoardings;
     }
 
