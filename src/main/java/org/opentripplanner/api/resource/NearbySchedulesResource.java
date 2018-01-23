@@ -37,12 +37,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
@@ -78,6 +74,12 @@ public class NearbySchedulesResource {
      */
     @QueryParam("stops")
     private String stopsStr;
+
+    /**
+     * maximum number of stops to return if lat, lon, and radius are given; Ignored if stops are given;
+     */
+    @QueryParam("maxStops")
+    private Integer maxStops;
 
     /**
      * list of routes of interest. Should be in the format MTASBWY__A,MNR__1, etc. Optional.
@@ -157,19 +159,18 @@ public class NearbySchedulesResource {
 
         RouteMatcher routeMatcher = RouteMatcher.parse(routesStr);
 
-        List<TransitStop> stops;
+        List<TransitStop> transitStops;
         if (lat != null && lon != null && radius != null) {
-            stops = getNearbyStops(lat, lon, radius);
+            transitStops = getNearbyStops(lat, lon, radius);
         } else if (stopsStr != null) {
-            stops = getStopsFromList(stopsStr);
+            transitStops = getStopsFromList(stopsStr);
         } else {
             throw new IllegalArgumentException("Must supply lat/lon/radius, or list of stops");
         }
 
         // map by parent stop
-        Map<AgencyAndId, StopTimesByStop> ret = new HashMap<>();
-
-        for (TransitStop tstop : stops) {
+        Map<AgencyAndId, StopTimesByStop> stopIdAndStopTimesMap = new LinkedHashMap<>();
+        for (TransitStop tstop : transitStops) {
             Stop stop = tstop.getStop();
             AgencyAndId key = key(stop);
             List<StopTimesInPattern> stopTimesPerPattern = index.stopTimesForStop(
@@ -177,16 +178,24 @@ public class NearbySchedulesResource {
             if (stopTimesPerPattern.isEmpty()) {
                 continue;
             }
-            StopTimesByStop stopTimes = ret.get(key);
+            StopTimesByStop stopTimes = stopIdAndStopTimesMap.get(key);
             if (stopTimes == null) {
                 stopTimes = new StopTimesByStop(stop, groupByParent, stopTimesPerPattern);
-                ret.put(key, stopTimes);
+                stopIdAndStopTimesMap.put(key, stopTimes);
             } else {
                 stopTimes.addPatterns(stopTimesPerPattern);
             }
         }
 
-        return ret.values();
+        // check for maxStops
+        if(lat != null && lon != null && radius != null && maxStops != null && maxStops > 0) {
+            return stopIdAndStopTimesMap.entrySet().stream()
+                    .limit(maxStops)
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toList());
+        }
+
+        return stopIdAndStopTimesMap.values();
     }
 
     private AgencyAndId key(Stop stop) {
@@ -211,15 +220,18 @@ public class NearbySchedulesResource {
 
     // Finding nearby stops is adapted from IndexAPI.getStopsInRadius
     private List<TransitStop> getNearbyStops(double lat, double lon, double radius) {
-        List<TransitStop> stops = new ArrayList<>();
+        Map<Double,TransitStop> transitStopsMap = new HashMap<>();
         Coordinate coord = new Coordinate(lon, lat);
-        for (TransitStop stop : streetIndex.getNearbyTransitStops(coord, radius)) {
-            double distance = SphericalDistanceLibrary.fastDistance(stop.getCoordinate(), coord);
+        for (TransitStop tstop : streetIndex.getNearbyTransitStops(coord, radius)) {
+            double distance = SphericalDistanceLibrary.fastDistance(tstop.getCoordinate(), coord);
             if (distance < radius) {
-                stops.add(stop);
+                transitStopsMap.put(distance, tstop);
             }
         }
-        return stops;
+        return transitStopsMap.entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 
     private List<TransitStop> getStopsFromList(String stopsStr) {
