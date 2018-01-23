@@ -76,6 +76,9 @@ public class TripTimeShort {
     /** Headsign associated with this stop-time, if given in GTFS. */
     public String stopHeadsign;
 
+    /** track number, if available */
+    public String trackNumber;
+
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
@@ -95,6 +98,7 @@ public class TripTimeShort {
         blockId            = tt.trip.getBlockId();
         tripHeadsign       = tt.trip.getTripHeadsign();
         stopHeadsign       = tt.hasStopHeadsigns() ? tt.getHeadsign(i) : null;
+        trackNumber        = tt.getTrack(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd, TimeZone tz) {
