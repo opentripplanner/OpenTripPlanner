@@ -854,24 +854,34 @@ public abstract class GraphPathToTripPlanConverter {
 
         State onBikeRentalState = null, offBikeRentalState = null;
 
-        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
-        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
-            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
-            List<Edge> transferEdges = transferEdge.getEdges();
-            if (transferEdges != null) {
-                // Create a new initial state. Some parameters may have change along the way, copy them from the first state
-                StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
-                se.setNonTransitOptionsFromState(states[0]);
-                State s = se.makeState();
-                ArrayList<State> transferStates = new ArrayList<>();
-                transferStates.add(s);
-                for (Edge e : transferEdges) {
-                    s = e.traverse(s);
-                    transferStates.add(s);
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges.
+        // Now that there are pathways, a leg may contain several Pathways and a TransferEdge.
+        List<State> allStates = new ArrayList<>();
+        for (int i = 0; i < states.length; i++) {
+            if (i < states.length - 1 && states[i + 1].getBackEdge() instanceof SimpleTransfer) {
+                if (states[i].getBackEdge() instanceof PathwayEdge) {
+                    allStates.add(states[i]);
                 }
-                states = transferStates.toArray(new State[transferStates.size()]);
+                SimpleTransfer transferEdge = ((SimpleTransfer) states[i + 1].getBackEdge());
+                List<Edge> transferEdges = transferEdge.getEdges();
+                if (transferEdges != null) {
+                    // Create a new initial state. Some parameters may have change along the way, copy them from the first state
+                    StateEditor se = new StateEditor(states[i].getOptions(), transferEdges.get(0).getFromVertex());
+                    se.setNonTransitOptionsFromState(states[i]);
+                    State s = se.makeState();
+                    allStates.add(s);
+                    for (Edge e : transferEdges) {
+                        s = e.traverse(s);
+                        allStates.add(s);
+                    }
+                    i++; // skip next
+                }
+            } else {
+                allStates.add(states[i]);
             }
         }
+
+        states = allStates.toArray(new State[allStates.size()]);
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
