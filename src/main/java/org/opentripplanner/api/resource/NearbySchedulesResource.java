@@ -133,6 +133,22 @@ public class NearbySchedulesResource {
     @DefaultValue("true")
     private boolean groupByParent;
 
+    /**
+     * If true, will increase search radius until at least one stop is returned in the results.
+     */
+    @QueryParam("autoScale")
+    @DefaultValue("false")
+    private boolean autoScale;
+
+    /**
+     * Maximum number of times the autoScale method will run. Will default to 5. Max value is 10.
+     */
+    @QueryParam("autoScaleAttempts")
+    @DefaultValue("5")
+    private int autoScaleAttempts;
+
+    private static int AUTO_SCALE_LIMIT = 10;
+
     private GraphIndex index;
 
     private StreetVertexIndexService streetIndex;
@@ -155,21 +171,65 @@ public class NearbySchedulesResource {
             radius = IndexAPI.MAX_STOP_SEARCH_RADIUS;
         }
 
+        boolean isLatLonSearch = lat != null && lon != null && radius != null;
         long startTime = getStartTimeSec();
 
-        RouteMatcher routeMatcher = RouteMatcher.parse(routesStr);
+        int maxAutoScaleAttempts = getMaxAutoScale();
+        double autoScaleCount = 0;
 
-        List<TransitStop> transitStops;
-        if (lat != null && lon != null && radius != null) {
-            transitStops = getNearbyStops(lat, lon, radius);
-        } else if (stopsStr != null) {
-            transitStops = getStopsFromList(stopsStr);
-        } else {
-            throw new IllegalArgumentException("Must supply lat/lon/radius, or list of stops");
+        Map<AgencyAndId, StopTimesByStop> stopIdAndStopTimesMap;
+
+        do{
+            List<TransitStop> transitStops = getTransitStops(isLatLonSearch, radius);
+            stopIdAndStopTimesMap = getStopTimesByParentStop(transitStops, startTime);
+            if(stopIdAndStopTimesMap.size() == 0 && isLatLonSearch && autoScale){
+                radius += radius * getAutoScaleMultiplier();
+                autoScaleCount++;
+            }
+        }
+        while(stopIdAndStopTimesMap.size() == 0
+                && autoScale
+                && isLatLonSearch
+                && autoScaleCount < maxAutoScaleAttempts);
+
+
+        // check for maxStops
+        if(isLatLonSearch && maxStops != null && maxStops > 0) {
+            return stopIdAndStopTimesMap.entrySet().stream()
+                    .limit(maxStops)
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toList());
         }
 
-        // map by parent stop
+        return stopIdAndStopTimesMap.values();
+    }
+
+    private int getMaxAutoScale(){
+        return autoScaleAttempts <= AUTO_SCALE_LIMIT ? autoScaleAttempts : AUTO_SCALE_LIMIT;
+    }
+
+    private Double getAutoScaleMultiplier(){
+        if(radius < 50)
+            return 0.5;
+        else if(radius < 100)
+            return 0.3;
+        else
+            return 0.2;
+    }
+
+    private List<TransitStop> getTransitStops(boolean isLatLonSearch, Double radius){
+        if (isLatLonSearch) {
+            return getNearbyStops(lat, lon, radius);
+        } else if (stopsStr != null) {
+            return getStopsFromList(stopsStr);
+        } else {
+            throw new IllegalArgumentException("Must supply lat/lon/radius, or list of stops.");
+        }
+    }
+
+    private Map<AgencyAndId, StopTimesByStop> getStopTimesByParentStop(List<TransitStop> transitStops, long startTime){
         Map<AgencyAndId, StopTimesByStop> stopIdAndStopTimesMap = new LinkedHashMap<>();
+        RouteMatcher routeMatcher = RouteMatcher.parse(routesStr);
         for (TransitStop tstop : transitStops) {
             Stop stop = tstop.getStop();
             AgencyAndId key = key(stop);
@@ -187,15 +247,7 @@ public class NearbySchedulesResource {
             }
         }
 
-        // check for maxStops
-        if(lat != null && lon != null && radius != null && maxStops != null && maxStops > 0) {
-            return stopIdAndStopTimesMap.entrySet().stream()
-                    .limit(maxStops)
-                    .map(Map.Entry::getValue)
-                    .collect(Collectors.toList());
-        }
-
-        return stopIdAndStopTimesMap.values();
+        return stopIdAndStopTimesMap;
     }
 
     private AgencyAndId key(Stop stop) {
