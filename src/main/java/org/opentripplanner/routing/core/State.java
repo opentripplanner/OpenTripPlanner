@@ -843,7 +843,10 @@ public class State implements Cloneable {
         return stateData.preTransitNumBoardings;
     }
 
+    /**
+     * Check that transfer is allowed - after transit, or if we've started at a TransitVertex.
+     */
     public boolean isTransferPermissible() {
-        return stateData.transferPermissible;
+        return stateData.transferPermissible || backEdge == null;
     }
 }

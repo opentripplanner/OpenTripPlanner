@@ -902,6 +902,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges.
         // Now that there are pathways, a leg may contain several Pathways and a TransferEdge.
+
         List<State> allStates = new ArrayList<>();
         for (int i = 0; i < states.length; i++) {
             if (i < states.length - 1 && states[i + 1].getBackEdge() instanceof SimpleTransfer) {
@@ -921,10 +922,10 @@ public abstract class GraphPathToTripPlanConverter {
                         allStates.add(s);
                     }
                     i++; // skip next
+                    continue;
                 }
-            } else {
-                allStates.add(states[i]);
             }
+            allStates.add(states[i]);
         }
 
         states = allStates.toArray(new State[allStates.size()]);

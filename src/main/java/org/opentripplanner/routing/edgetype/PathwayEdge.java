@@ -50,6 +50,7 @@ public class PathwayEdge extends Edge {
     public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime, int wheelchairTraversalTime) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
+        this.wheelchairTraversalTime = wheelchairTraversalTime;
         switch (pathwayMode) {
             case Pathway.MODE_LINK:
                 this.pathwayMode = Mode.NONE;
@@ -66,10 +67,6 @@ public class PathwayEdge extends Edge {
         }
         this.pathwayCode = pathwayCode;
         this.distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
-        this.traversalTime = Math.max(traversalTime, (int) Math.round(1.3 * distance));
-        if (wheelchairTraversalTime > 0) {
-            this.wheelchairTraversalTime = Math.max(wheelchairTraversalTime, (int) Math.round(1.3 * distance));
-        }
     }
 
     public PathwayEdge(Vertex fromv, Vertex tov, int pathwayMode, String pathwayCode, int traversalTime) {
