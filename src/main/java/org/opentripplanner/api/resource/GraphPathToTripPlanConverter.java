@@ -263,6 +263,15 @@ public abstract class GraphPathToTripPlanConverter {
 
             Edge edge = states[i + 1].getBackEdge();
 
+            // Ignore spurious transitions when there is a StreetTransitLink followed by walking pathways. TODO does this work with bikes?
+            boolean stationEntrance = (edge instanceof StreetTransitLink) && ((StreetTransitLink) edge).getTransitStop().isEntrance();
+            if (stationEntrance) {
+                do {
+                    i++;
+                } while (i < states.length - 2 && states[i + 2].getBackEdge() instanceof PathwayEdge);
+                continue;
+            }
+
             if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
@@ -411,6 +420,26 @@ public abstract class GraphPathToTripPlanConverter {
     }
 
     private static String generateWalkStepInstruction(WalkStep step, boolean start) {
+        for (Edge e : step.edges) {
+            if (e instanceof PathwayEdge) {
+                PathwayEdge p = (PathwayEdge) e;
+                String relDir = relativeDirStr(step.relativeDirection);
+                String transition = null;
+                if (((TransitStop) p.getToVertex()).isEntrance()) {
+                    transition = "Exit";
+                } else if (((TransitStop) p.getFromVertex()).isEntrance()) {
+                    transition = "Enter";
+                }
+                if (transition != null) {
+                    String instr = transition + " station";
+                    if (p.hasDefinedMode())
+                        instr += " using " + p.getName();
+                    if (relDir != null)
+                        instr += ", " + relDir;
+                    return instr;
+                }
+            }
+        }
         if (step.relativeDirection.isCircle()) {
             String dir = step.relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE ? "clockwise" : "counterclockwise";
             return String.format("Take roundabout %s to exit %s on %s",
@@ -426,6 +455,23 @@ public abstract class GraphPathToTripPlanConverter {
             return String.format("%s to continue on %s", relDir, step.streetName);
         } else {
             return String.format("%s on to %s", relDir, step.streetName);
+        }
+    }
+
+    public static String relativeDirStr(RelativeDirection dir) {
+        switch(dir) {
+            case HARD_LEFT:
+            case LEFT:
+                return "on left";
+            case SLIGHTLY_LEFT:
+                return "slightly left";
+            case SLIGHTLY_RIGHT:
+                return "slightly right";
+            case RIGHT:
+            case HARD_RIGHT:
+                return "on right";
+            default:
+                return null;
         }
     }
 
@@ -854,24 +900,35 @@ public abstract class GraphPathToTripPlanConverter {
 
         State onBikeRentalState = null, offBikeRentalState = null;
 
-        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
-        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
-            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
-            List<Edge> transferEdges = transferEdge.getEdges();
-            if (transferEdges != null) {
-                // Create a new initial state. Some parameters may have change along the way, copy them from the first state
-                StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
-                se.setNonTransitOptionsFromState(states[0]);
-                State s = se.makeState();
-                ArrayList<State> transferStates = new ArrayList<>();
-                transferStates.add(s);
-                for (Edge e : transferEdges) {
-                    s = e.traverse(s);
-                    transferStates.add(s);
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges.
+        // Now that there are pathways, a leg may contain several Pathways and a TransferEdge.
+
+        List<State> allStates = new ArrayList<>();
+        for (int i = 0; i < states.length; i++) {
+            if (i < states.length - 1 && states[i + 1].getBackEdge() instanceof SimpleTransfer) {
+                if (states[i].getBackEdge() instanceof PathwayEdge) {
+                    allStates.add(states[i]);
                 }
-                states = transferStates.toArray(new State[transferStates.size()]);
+                SimpleTransfer transferEdge = ((SimpleTransfer) states[i + 1].getBackEdge());
+                List<Edge> transferEdges = transferEdge.getEdges();
+                if (transferEdges != null) {
+                    // Create a new initial state. Some parameters may have change along the way, copy them from the first state
+                    StateEditor se = new StateEditor(states[i].getOptions(), transferEdges.get(0).getFromVertex());
+                    se.setNonTransitOptionsFromState(states[i]);
+                    State s = se.makeState();
+                    allStates.add(s);
+                    for (Edge e : transferEdges) {
+                        s = e.traverse(s);
+                        allStates.add(s);
+                    }
+                    i++; // skip next
+                    continue;
+                }
             }
+            allStates.add(states[i]);
         }
+
+        states = allStates.toArray(new State[allStates.size()]);
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];

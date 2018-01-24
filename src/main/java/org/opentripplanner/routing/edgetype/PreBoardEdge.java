@@ -64,6 +64,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             s1.incrementTimeInSeconds(options.boardSlack);
             s1.alightTransit();
             s1.setBackMode(getMode());
+            s1.setTransferPermissible();
             return s1.makeState();
         } else {
             /* Traverse forward: apply stop(pair)-specific costs */
@@ -105,6 +106,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());
+            s1.setTransferPermissible();
             return s1.makeState();
         }
     }

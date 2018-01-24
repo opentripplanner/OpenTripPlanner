@@ -264,6 +264,7 @@ public class StateEditor {
     }
 
     public void setEnteredNoThroughTrafficArea() {
+        cloneStateDataAsNeeded();
         child.stateData.enteredNoThroughTrafficArea = true;
     }
     
@@ -405,6 +406,16 @@ public class StateEditor {
         child.stateData.preTransitNumBoardings = child.stateData.numBoardings;
     }
 
+    public void setTransferNotPermissible() {
+        cloneStateDataAsNeeded();
+        child.stateData.transferPermissible = false;
+    }
+
+    public void setTransferPermissible() {
+        cloneStateDataAsNeeded();
+        child.stateData.transferPermissible = true;
+    }
+
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
@@ -424,6 +435,7 @@ public class StateEditor {
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
+        child.stateData.transferPermissible = state.stateData.transferPermissible;
     }
 
     public void setNonTransitOptionsFromState(State state){
@@ -434,6 +446,7 @@ public class StateEditor {
         child.stateData.usingRentedBike = state.isBikeRenting();
         // this state is necessary for no-shortcuts check
         child.stateData.numBoardings = state.getNumBoardings();
+        child.stateData.transferPermissible = state.stateData.transferPermissible;
     }
 
     /* PUBLIC GETTER METHODS */

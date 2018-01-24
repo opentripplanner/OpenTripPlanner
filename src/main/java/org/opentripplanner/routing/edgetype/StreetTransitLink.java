@@ -21,12 +21,13 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+
 import java.util.Locale;
 
 /** 
@@ -123,12 +124,18 @@ public class StreetTransitLink extends Edge {
         // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
         // intervening pathways.
         boolean leavingTransit = isLeavingTransitNetwork(req);
-        if (s0.getPreTransitNumBoardings() >= 0 && leavingTransit) {
+        boolean firstLink = s0.getPreTransitNumBoardings() == 0 && s0.getOptions().rctx.origin instanceof TransitVertex;
+        if (s0.getPreTransitNumBoardings() >= 0 && leavingTransit && !firstLink) {
             if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {
                 return null;
             }
         } else if (!leavingTransit) {
             s1.setPreTransitNumBoardings();
+        }
+
+        // Don't reenter street network following a transfer which has been followed by intervening pathways
+        if (leavingTransit && !s0.isTransferPermissible()) {
+            return null;
         }
 
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
@@ -143,6 +150,7 @@ public class StreetTransitLink extends Edge {
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.setTransferNotPermissible();
         return s1.makeState();
     }
 
@@ -178,6 +186,10 @@ public class StreetTransitLink extends Edge {
 
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+    }
+
+    public TransitStop getTransitStop() {
+        return transitStop;
     }
 
     private boolean isLeavingTransitNetwork(RoutingRequest options) {
