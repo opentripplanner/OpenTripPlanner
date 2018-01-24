@@ -123,6 +123,10 @@ public class PathwayEdge extends Edge {
         return Mode.ELEVATOR.equals(pathwayMode);
     }
 
+    public boolean hasDefinedMode() {
+        return !pathwayMode.equals(Mode.NONE);
+    }
+
     @Override
     public boolean isWheelchairAccessible() {
         return wheelchairTraversalTime >= 0;

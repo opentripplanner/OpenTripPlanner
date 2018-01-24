@@ -188,6 +188,10 @@ public class StreetTransitLink extends Edge {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
 
+    public TransitStop getTransitStop() {
+        return transitStop;
+    }
+
     private boolean isLeavingTransitNetwork(RoutingRequest options) {
         if (options.arriveBy && tov == transitStop) {
             return true;
