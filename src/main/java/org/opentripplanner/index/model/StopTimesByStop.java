@@ -15,8 +15,11 @@ package org.opentripplanner.index.model;
 
 import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.Stop;
-
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.routing.alertpatch.Alert;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Some stopTimes all from the same stop.
@@ -26,6 +29,8 @@ public class StopTimesByStop {
     private StopShort stop;
 
     private List<StopTimesInPattern> patterns = Lists.newArrayList();
+
+    public List<LocalizedAlert> alerts;
 
     public StopTimesByStop(Stop stop, boolean groupByParent, List<StopTimesInPattern> stopTimesInPattern) {
         this.stop = new StopShort(stop);
@@ -54,5 +59,17 @@ public class StopTimesByStop {
 
     public void addPatterns(List<StopTimesInPattern> stip) {
         patterns.addAll(stip);
+    }
+
+    public void addAlert(Alert alert, Locale locale) {
+        if (alerts == null) {
+            alerts = new ArrayList<>();
+        }
+        for (LocalizedAlert a : alerts) {
+            if (a.alert.equals(alert)) {
+                return;
+            }
+        }
+        alerts.add(new LocalizedAlert(alert, locale));
     }
 }

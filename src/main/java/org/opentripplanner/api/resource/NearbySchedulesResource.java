@@ -19,7 +19,10 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.index.model.StopTimesByStop;
 import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -192,7 +195,6 @@ public class NearbySchedulesResource {
                 && isLatLonSearch
                 && autoScaleCount < maxAutoScaleAttempts);
 
-
         // check for maxStops
         if(isLatLonSearch && maxStops != null && maxStops > 0) {
             return stopIdAndStopTimesMap.entrySet().stream()
@@ -238,16 +240,46 @@ public class NearbySchedulesResource {
             if (stopTimesPerPattern.isEmpty()) {
                 continue;
             }
+
             StopTimesByStop stopTimes = stopIdAndStopTimesMap.get(key);
+
             if (stopTimes == null) {
                 stopTimes = new StopTimesByStop(stop, groupByParent, stopTimesPerPattern);
                 stopIdAndStopTimesMap.put(key, stopTimes);
             } else {
                 stopTimes.addPatterns(stopTimesPerPattern);
             }
+            addAlertsToStopTimes(stop, stopTimes);
         }
 
         return stopIdAndStopTimesMap;
+    }
+
+    private void addAlertsToStopTimes(Stop stop, StopTimesByStop stopTimes){
+        Collection<TripPattern> tripPatterns = null;
+        tripPatterns = index.patternsForStop.get(stop);
+
+        if (tripPatterns != null) {
+            for (TripPattern tripPattern : tripPatterns) {
+
+                if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                    continue;
+                }
+                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                        AlertPatch[] alertPatchesBoardEdges = index.graph.getAlertPatches(tripPattern.boardEdges[i]);
+                        AlertPatch[] alertPatchesAlightEdges = index.graph.getAlertPatches(tripPattern.alightEdges[i]);
+
+                        for(AlertPatch alertPatch : alertPatchesBoardEdges){
+                            stopTimes.addAlert(alertPatch.getAlert(), new Locale("en"));
+                        }
+                        for(AlertPatch alertPatch : alertPatchesAlightEdges){
+                            stopTimes.addAlert(alertPatch.getAlert(), new Locale("en"));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private AgencyAndId key(Stop stop) {
@@ -280,6 +312,7 @@ public class NearbySchedulesResource {
                 transitStopsMap.put(distance, tstop);
             }
         }
+
         return transitStopsMap.entrySet().stream()
                 .sorted(Comparator.comparing(Map.Entry::getKey))
                 .map(Map.Entry::getValue)
