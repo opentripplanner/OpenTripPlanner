@@ -15,6 +15,7 @@ import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -72,7 +73,7 @@ public class NearbyStopFinder {
             streetSearch = new GenericDijkstra(new RoutingRequest(TraverseMode.WALK));
             streetSearch.setSearchTerminationStrategy((v, w, s, spt, opt) -> s.getWalkDistance() > radiusMeters);
             // Don't find transfers that use other transfers
-            streetSearch.setSkipEdgeStrategy((o, t, c, edge, s, opt) -> edge instanceof TransferEdge);
+            streetSearch.setSkipEdgeStrategy((o, t, c, edge, s, opt) -> edge instanceof TransferEdge || edge instanceof PathwayEdge);
         } else {
             // FIXME use the vertex index already in the graph if it exists.
             streetIndex = new StreetVertexIndexServiceImpl(graph);

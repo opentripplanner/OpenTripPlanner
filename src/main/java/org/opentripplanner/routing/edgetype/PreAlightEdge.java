@@ -98,6 +98,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             long wait_cost = t0 - alight_before;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());
+            s1.setTransferPermissible();
             return s1.makeState();
         } else {
             /* Forward traversal: not so much to do */
@@ -106,6 +107,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             s1.alightTransit();
             s1.incrementTimeInSeconds(options.alightSlack);
             s1.setBackMode(getMode());
+            s1.setTransferPermissible();
             return s1.makeState();
         }
     }

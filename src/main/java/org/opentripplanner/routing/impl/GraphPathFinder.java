@@ -241,7 +241,7 @@ public class GraphPathFinder {
         List<GraphPath> reversedPaths = new ArrayList<>();
         for(GraphPath newPath : newPaths){
             State targetAcceptedState = options.arriveBy ? newPath.states.getLast().reverse() : newPath.states.getLast();
-            if(targetAcceptedState.stateData.getNumBooardings() < 2) {
+            if(targetAcceptedState.stateData.getNumBoardings() < 2) {
                 reversedPaths.add(newPath);
                 continue;
             }
