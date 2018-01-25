@@ -237,9 +237,6 @@ public class NearbySchedulesResource {
             AgencyAndId key = key(stop);
             List<StopTimesInPattern> stopTimesPerPattern = index.stopTimesForStop(
                     stop, startTime, timeRange, numberOfDepartures, omitNonPickups, routeMatcher, direction);
-            if (stopTimesPerPattern.isEmpty()) {
-                continue;
-            }
 
             StopTimesByStop stopTimes = stopIdAndStopTimesMap.get(key);
 
