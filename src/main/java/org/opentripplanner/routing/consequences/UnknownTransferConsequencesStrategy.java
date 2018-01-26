@@ -13,6 +13,7 @@
 package org.opentripplanner.routing.consequences;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -92,8 +93,12 @@ public class UnknownTransferConsequencesStrategy extends SingleOptionStrategy<Bo
         if (path.getRoutes().size() <= 2) {
             return "";
         }
-        String fromRoute = from.getRoute().getId().getId();
-        String toRoute = to.getRoute().getId().getId();
+        String fromRoute = routeName(from.getRoute());
+        String toRoute = routeName(to.getRoute());
         return " [" + fromRoute + "/" + toRoute + "]";
+    }
+
+    private static String routeName(Route route) {
+        return route.getShortName() != null ? route.getShortName() : route.getLongName();
     }
 }
