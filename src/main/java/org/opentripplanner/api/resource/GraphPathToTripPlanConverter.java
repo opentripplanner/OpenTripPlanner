@@ -412,23 +412,26 @@ public abstract class GraphPathToTripPlanConverter {
 
             // add walk step instructions - adapted from otp.js
             boolean first = true;
+            State nextState = i < legsStates.length - 1 ? legsStates[i + 1][0] : null;
             for (WalkStep step : walkSteps) {
-                step.instructionText = generateWalkStepInstruction(step, first);
+                step.instructionText = generateWalkStepInstruction(step, first, nextState);
                 first = false;
             }
         }
     }
 
-    private static String generateWalkStepInstruction(WalkStep step, boolean start) {
+    private static String generateWalkStepInstruction(WalkStep step, boolean start, State nextState) {
         for (Edge e : step.edges) {
             if (e instanceof PathwayEdge) {
                 PathwayEdge p = (PathwayEdge) e;
                 String relDir = relativeDirStr(step.relativeDirection);
                 String transition = null;
+                String extraInstr = null;
                 if (((TransitStop) p.getToVertex()).isEntrance()) {
                     transition = "Exit";
                 } else if (((TransitStop) p.getFromVertex()).isEntrance()) {
                     transition = "Enter";
+                    extraInstr = getHeadsignInstruction(nextState);
                 }
                 if (transition != null) {
                     String instr = transition + " station";
@@ -436,8 +439,17 @@ public abstract class GraphPathToTripPlanConverter {
                         instr += " using " + p.getName();
                     if (relDir != null)
                         instr += ", " + relDir;
+                    if (extraInstr != null) {
+                        instr += ". " + extraInstr;
+                    }
                     return instr;
                 }
+            }
+            if (e instanceof TransferEdge && nextState != null && nextState.getBackTrip() != null) {
+                Route route = nextState.getBackTrip().getRoute();
+                String routeName = route.getShortName() != null ? route.getShortName() : route.getLongName();
+                String sign = getHeadsignInstruction(nextState);
+                return "Transfer to " + routeName + (sign != null ? ". " + sign : "");
             }
         }
         if (step.relativeDirection.isCircle()) {
@@ -456,6 +468,20 @@ public abstract class GraphPathToTripPlanConverter {
         } else {
             return String.format("%s on to %s", relDir, step.streetName);
         }
+    }
+
+    private static String getHeadsignInstruction(State state) {
+        if (state == null) {
+            return null;
+        }
+        TripTimes tt = state.getTripTimes();
+        if (tt != null && state.backEdge instanceof OnboardEdge) {
+            int stopIndex = ((OnboardEdge) state.backEdge).getStopIndex();
+            if (tt.getHeadsign(stopIndex) != null) {
+                return "Follow signs for " + tt.getHeadsign(stopIndex);
+            }
+        }
+        return null;
     }
 
     public static String relativeDirStr(RelativeDirection dir) {
