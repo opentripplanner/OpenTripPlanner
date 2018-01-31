@@ -357,7 +357,7 @@ public class GraphIndex {
             Vertex vertex = state.getVertex();
             if (vertex instanceof TransitStop) {
                 stopsFound.add(new StopAndDistance(((TransitStop) vertex).getStop(),
-                    (int) state.getElapsedTimeSeconds()));
+                        (int) state.getElapsedTimeSeconds()));
             }
         }
     }
@@ -414,8 +414,8 @@ public class GraphIndex {
      * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
      * @return
      */
-    public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, RouteMatcher routeMatcher, Integer direction) {
-
+    public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups,
+                                                     RouteMatcher routeMatcher, Integer direction, Set<String> bannedAgencies, Set<Integer> bannedRouteTypes) {
         if (startTime == 0) {
             startTime = System.currentTimeMillis() / 1000;
         }
@@ -436,6 +436,15 @@ public class GraphIndex {
             if (direction != null && direction != pattern.directionId) {
                 continue;
             }
+
+            if(bannedRouteTypes != null && bannedRouteTypes.contains(pattern.route.getType())) {
+                continue;
+            }
+
+            if(bannedAgencies != null && bannedAgencies.contains(pattern.route.getAgency().getId())){
+                continue;
+            }
+
 
             // Use the Lucene PriorityQueue, which has a fixed size
             PriorityQueue<TripTimeShort> pq = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
@@ -500,6 +509,10 @@ public class GraphIndex {
             }
         }
         return ret;
+    }
+
+    public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, RouteMatcher routeMatcher, Integer direction) {
+        return stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups, routeMatcher, direction, null, null);
     }
 
     public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
@@ -587,9 +600,9 @@ public class GraphIndex {
     }
 
     /**
-     * Stop clusters can be built in one of two ways, either by geographical proximity, or 
+     * Stop clusters can be built in one of two ways, either by geographical proximity, or
      * according to a parent/child station topology, if it exists.
-     * 
+     *
      * Some challenges faced by DC and Trimet:
      * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
      * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
@@ -602,7 +615,7 @@ public class GraphIndex {
      * stops -- no guessing is reasonable without that information.
      */
     public void clusterStops() {
-    	if (graph.stopClusterMode != null) {
+        if (graph.stopClusterMode != null) {
             switch (graph.stopClusterMode) {
                 case "parentStation":
                     clusterByParentStation();
@@ -617,61 +630,61 @@ public class GraphIndex {
             clusterByProximity();
         }
     }
-  
-    private void clusterByProximity() {	
-    	int psIdx = 0; // unique index for next parent stop
-	    LOG.info("Clustering stops by geographic proximity and name...");
-	    // Each stop without a cluster will greedily claim other stops without clusters.
-	    for (Stop s0 : stopForId.values()) {
-	        if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
-	        String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
-	        StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
-	        // LOG.info("stop {}", s0normalizedName);
-	        // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
-	        Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
-	        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
-	                SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
-	        for (TransitStop ts1 : stopSpatialIndex.query(env)) {
-	            Stop s1 = ts1.getStop();
-	            double geoDistance = SphericalDistanceLibrary.fastDistance(
-	                    s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
-	            if (geoDistance < CLUSTER_RADIUS) {
-	                String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
-	                // LOG.info("   --> {}", s1normalizedName);
-	                // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
-	                if (s1normalizedName.equals(s0normalizedName)) {
-	                    // Create a bidirectional relationship between the stop and its cluster
-	                    cluster.children.add(s1);
-	                    stopClusterForStop.put(s1, cluster);
-	                }
-	            }
-	        }
-	        cluster.computeCenter();
-	        stopClusterForId.put(cluster.id, cluster);
-	    }
+
+    private void clusterByProximity() {
+        int psIdx = 0; // unique index for next parent stop
+        LOG.info("Clustering stops by geographic proximity and name...");
+        // Each stop without a cluster will greedily claim other stops without clusters.
+        for (Stop s0 : stopForId.values()) {
+            if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
+            String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
+            StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
+            // LOG.info("stop {}", s0normalizedName);
+            // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
+            Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
+            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
+                    SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
+            for (TransitStop ts1 : stopSpatialIndex.query(env)) {
+                Stop s1 = ts1.getStop();
+                double geoDistance = SphericalDistanceLibrary.fastDistance(
+                        s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
+                if (geoDistance < CLUSTER_RADIUS) {
+                    String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
+                    // LOG.info("   --> {}", s1normalizedName);
+                    // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
+                    if (s1normalizedName.equals(s0normalizedName)) {
+                        // Create a bidirectional relationship between the stop and its cluster
+                        cluster.children.add(s1);
+                        stopClusterForStop.put(s1, cluster);
+                    }
+                }
+            }
+            cluster.computeCenter();
+            stopClusterForId.put(cluster.id, cluster);
+        }
     }
     private void clusterByParentStation() {
         LOG.info("Clustering stops by parent station...");
-    	for (Stop stop : stopForId.values()) {
-    	    String ps = stop.getParentStation();
-    	    if (ps == null || ps.isEmpty()) {
-    	        continue;
-    	    }
-    	    StopCluster cluster;
-    	    if (stopClusterForId.containsKey(ps)) {
-    	        cluster = stopClusterForId.get(ps);
-    	    } else {
-    	        cluster = new StopCluster(ps, stop.getName());
-    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
+        for (Stop stop : stopForId.values()) {
+            String ps = stop.getParentStation();
+            if (ps == null || ps.isEmpty()) {
+                continue;
+            }
+            StopCluster cluster;
+            if (stopClusterForId.containsKey(ps)) {
+                cluster = stopClusterForId.get(ps);
+            } else {
+                cluster = new StopCluster(ps, stop.getName());
+                Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
                 cluster.setCoordinates(parent.getLat(), parent.getLon());
                 stopClusterForId.put(ps, cluster);
 
-	        }
-    	    cluster.children.add(stop);
-    	    stopClusterForStop.put(stop, cluster);    
-    	}
+            }
+            cluster.children.add(stop);
+            stopClusterForStop.put(stop, cluster);
+        }
     }
-    
+
     public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
         ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);

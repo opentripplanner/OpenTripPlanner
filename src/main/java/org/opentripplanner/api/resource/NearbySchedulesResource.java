@@ -13,6 +13,7 @@
 package org.opentripplanner.api.resource;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.commons.lang.StringUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -21,8 +22,8 @@ import org.opentripplanner.index.model.StopTimesByStop;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -39,7 +40,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
-
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -150,6 +150,40 @@ public class NearbySchedulesResource {
     @DefaultValue("5")
     private int autoScaleAttempts;
 
+    /**
+     * List of agencies that are excluded from the stopTime results
+     */
+    @QueryParam("bannedAgencies")
+    private String bannedAgencies;
+
+    /**
+     * List of route types that are excluded from the stopTime results
+     */
+    @QueryParam("bannedRouteTypes")
+    private String bannedRouteTypes;
+
+    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.
+     * Allowable values (order of modes in set is not significant):
+     * <table class="table">
+     *     <tr><th>mode</th><th>Parameter value</th></tr>
+     *     <tr><td>Walk only</td><td>WALK</td></tr>
+     *     <tr><td>Drive only</td><td>CAR</td></tr>
+     *     <tr><td>Bicycle only</td><td>BICYCLE</td></tr>
+     *     <tr><td>Transit</td><td>TRANSIT,WALK</td></tr>
+     *     <tr><td>Park-and-ride</td><td>CAR_PARK,TRANSIT</td></tr>
+     *     <tr><td>Kiss-and-ride</td><td>CAR,TRANSIT</td></tr>
+     *     <tr><td>Bicycle and transit</td><td>BICYCLE,TRANSIT</td></tr>
+     *     <tr><td>Bicycle and ride</td><td>BICYCLE_PARK,TRANSIT</td></tr>
+     *     <tr><td>Bikeshare</td><td>BICYCLE_RENT</td></tr>
+     *     <tr><td>Bikeshare and transit</td><td>BICYCLE_RENT,TRANSIT</td></tr>
+     * </table>
+     *
+     * In addition, restrict transit usage to a mode by replacing TRANSIT with any subset of the following:
+     * SUBWAY, RAIL, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR, AIRPLANE
+     */
+    @QueryParam("mode")
+    private String mode;
+
     private static int AUTO_SCALE_LIMIT = 10;
 
     private GraphIndex index;
@@ -235,8 +269,19 @@ public class NearbySchedulesResource {
         for (TransitStop tstop : transitStops) {
             Stop stop = tstop.getStop();
             AgencyAndId key = key(stop);
+
+            Set<TraverseMode> modes = getModes();
+            Set<String> bannedAgencies = getBannedAgencies();
+            Set<Integer> bannedRouteTypes = getBannedRouteTypes();
+
+            /* filter by mode */
+            if(modes != null && !stopHasMode(tstop, modes)){
+                continue;
+            }
+
             List<StopTimesInPattern> stopTimesPerPattern = index.stopTimesForStop(
-                    stop, startTime, timeRange, numberOfDepartures, omitNonPickups, routeMatcher, direction);
+                    stop, startTime, timeRange, numberOfDepartures, omitNonPickups, routeMatcher, direction,
+                    bannedAgencies, bannedRouteTypes);
 
             StopTimesByStop stopTimes = stopIdAndStopTimesMap.get(key);
 
@@ -246,8 +291,10 @@ public class NearbySchedulesResource {
             } else {
                 stopTimes.addPatterns(stopTimesPerPattern);
             }
+
             addAlertsToStopTimes(stop, stopTimes);
         }
+
 
         return stopIdAndStopTimesMap;
     }
@@ -335,4 +382,48 @@ public class NearbySchedulesResource {
         return stops.stream().map(index.stopVertexForStop::get)
                 .collect(Collectors.toList());
     }
+
+    private boolean stopHasMode(TransitStop tstop, Set<TraverseMode> modes){
+        for (TraverseMode mode : modes) {
+            if (tstop.getModes().contains(mode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<String> getBannedAgencies() {
+        if (StringUtils.isNotBlank(bannedAgencies))
+            return new HashSet<String>(Arrays.asList(bannedAgencies.split(",")));
+        return null;
+    }
+
+    private Set<Integer> getBannedRouteTypes() {
+        if (StringUtils.isNotBlank(bannedRouteTypes)) {
+            HashSet<Integer> bannedRouteTypesSet = new HashSet<>();
+            for (String bannedRouteType : bannedRouteTypes.split(",")) {
+                bannedRouteTypesSet.add(Integer.parseInt(bannedRouteType));
+            }
+            return bannedRouteTypesSet;
+        }
+        return null;
+    }
+
+    private Set<TraverseMode> getModes(){
+        if(StringUtils.isNotBlank(mode)) {
+            HashSet<TraverseMode> modes = new HashSet<>();
+            String[] elements = mode.split(",");
+            if (elements != null) {
+                for (int i = 0; i < elements.length; i++) {
+                    TraverseMode mode = TraverseMode.valueOf(elements[i].trim());
+                    if (mode != null) {
+                        modes.add(mode);
+                    }
+                }
+                return modes;
+            }
+        }
+        return null;
+    }
+
 }
