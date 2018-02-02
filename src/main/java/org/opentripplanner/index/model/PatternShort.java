@@ -7,9 +7,16 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.beust.jcommander.internal.Lists;
 
+/**
+ * Represents a TripPattern in the API response. TripPattern is a data structure created by OTP to represent
+ * a particular stopping pattern of a route.
+ */
 public class PatternShort {
 
+    /** ID of this TripPattern. This is unique to OTP and should not be displayed to customers. */
     public String id;
+
+    /** Description of this TripPattern. This is unique to OTP and should not be displayed to customers. */
     public String desc;
     
     public PatternShort (TripPattern pattern) {

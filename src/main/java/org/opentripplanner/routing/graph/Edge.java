@@ -216,6 +216,16 @@ public abstract class Edge implements Serializable {
         return 0;
     }
 
+    /**
+     * Wheelchair accessibility defaults to true (since most edges don't represent physical infrastructure)
+     * but subclasses can override.
+     *
+     * @return true if edge is wheelchair accessible
+     */
+    public boolean isWheelchairAccessible() {
+        return true;
+    }
+
     /* SERIALIZATION */
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {

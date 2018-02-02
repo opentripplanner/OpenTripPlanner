@@ -23,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.analyst.core.Tile;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
@@ -31,6 +32,7 @@ import org.opentripplanner.api.parameter.StyleList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 @Path("/analyst/legend.{format}")
 public class LegendResource {
     

@@ -24,5 +24,6 @@ public enum OptimizeType {
     FLAT, /* needs a rewrite */
     GREENWAYS,
     TRIANGLE,
-    TRANSFERS /* obsolete, replaced by the transferPenalty option in Traverse options */
+    TRANSFERS,
+    WALKING /* obsolete, replaced by the transferPenalty option in Traverse options */
 }

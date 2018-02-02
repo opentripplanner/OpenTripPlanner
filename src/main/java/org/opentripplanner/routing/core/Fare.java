@@ -33,12 +33,12 @@ public class Fare {
     /**
      * A mapping from {@link FareType} to {@link Money}.
      */
-    public HashMap<FareType, Money> fare;
+    public Map<FareType, Money> fare;
 
     /**
      * A mapping from {@link FareType} to a list of {@link FareComponent}.
      */
-    public HashMap<FareType, List<FareComponent>> details;
+    public Map<FareType, List<FareComponent>> details;
 
     public Fare() {
         fare = new HashMap<FareType, Money>();

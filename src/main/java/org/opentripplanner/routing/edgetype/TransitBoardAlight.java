@@ -92,6 +92,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             return ((PatternStopVertex) tov).getTripPattern();
         else
             return ((PatternStopVertex) fromv).getTripPattern();
+
     }
                            
     public String getDirection() {
@@ -173,6 +174,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
+
+
             if (boarding) {
                 int boardingTime = options.getBoardTime(this.getPattern().mode);
                 if (boardingTime != 0) {
@@ -180,6 +183,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     s1.incrementTimeInSeconds(boardingTime);
                     s1.incrementWeight(boardingTime * options.waitReluctance);
                 }
+                int bufferTime = s0.getTripTimes().getDepartureBuffer(stopIndex);
+                s1.incrementTimeInSeconds(bufferTime);
+                s1.incrementWeight(bufferTime * options.waitReluctance);
             } else {
                 int alightTime = options.getAlightTime(this.getPattern().mode);
                 if (alightTime != 0) {
@@ -228,7 +234,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             s1.setBackMode(getMode());
             return s1.makeState();
-        } else { 
+        } else {
+
+            // Check to see if we have a preferred starting or ending route when leaving transit
+            if(options.violatesStartRoute(getPattern().route, s0)) {
+                return null;
+            }
+
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
             
             /* Disallow ever re-boarding the same trip pattern. */
@@ -267,9 +279,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
-                // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
-                // However, experiments seem to show very little measurable improvement here (due to cache locality?)
-                // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
+                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding))
+                    continue;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
                 if (tripTimes != null) {
@@ -295,8 +306,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (options.tripIsBanned(trip)) return null;
 
             /* Check if route is preferred by the user. */
-            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
-            
+
+            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route, s0);
+
             /* Compute penalty for non-preferred transfers. */
             int transferPenalty = 0;
             /* If this is not the first boarding, then we are transferring. */
@@ -306,7 +318,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                                    getStop(), s0.getPreviousTrip(), trip, boarding);
                 transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
                                    options.nonpreferredTransferPenalty);
-            }            
+            }
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);

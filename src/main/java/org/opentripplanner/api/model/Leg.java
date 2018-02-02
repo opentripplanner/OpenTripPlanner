@@ -32,6 +32,8 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import static org.opentripplanner.util.DateUtils.formatDateIso;
+
  /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).
@@ -43,12 +45,22 @@ public class Leg {
      * The date and time this leg begins.
      */
     public Calendar startTime = null;
+
+    /**
+     * The date and time this leg begins, in ISO-8601 format.
+     */
+    public String startTimeFmt = null;
     
     /**
      * The date and time this leg ends.
      */
     public Calendar endTime = null;
-    
+
+    /**
+     * The date and time this leg ends, in ISO-8601 format.
+     */
+    public String endTimeFmt = null;
+
     /**
      * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
      * "scheduled time of departure at boarding stop" = startTime - departureDelay
@@ -101,18 +113,30 @@ public class Leg {
     @JsonSerialize
     public String route = "";
 
+    /**
+     * For transit legs, the name of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyName;
 
+    /**
+     * For transit legs, the URL of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyUrl;
 
+    /**
+     * For transit legs, the branding URL of the agency being used.
+     */
     @XmlAttribute
     @JsonSerialize
     public String agencyBrandingUrl;
 
+    /**
+     * For transit legs, offset from GMT of the timezone of the agency being used, in milliseconds.
+     */
     @XmlAttribute
     @JsonSerialize
     public int agencyTimeZoneOffset;
@@ -236,29 +260,49 @@ public class Leg {
     @JsonProperty(value="steps")
     public List<WalkStep> walkSteps;
 
+    /**
+     * A list of alerts relevant to this leg.
+     */
     @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
+     /**
+      * For transit legs, the short name of the route being used.
+      */
     @XmlAttribute
     @JsonSerialize
     public String routeShortName;
 
+     /**
+      * For transit legs, the long name of the route being used.
+      */
     @XmlAttribute
     @JsonSerialize
     public String routeLongName;
 
+     /**
+      * For transit legs, the boarding restriction given in GTFS, if applicable. Allowable values: mustPhone, coordinateWithDriver
+      */
     @XmlAttribute
     @JsonSerialize
     public String boardRule;
 
+     /**
+      * For transit legs, the alight restriction given in GTFS, if applicable. Allowable values: mustPhone, coordinateWithDriver
+      */
     @XmlAttribute
     @JsonSerialize
     public String alightRule;
 
+     /**
+      * True if this leg is a bicycle leg in which the bicycle has been rented.
+      */
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
+
+    public List<Departure> nextDepartures;
 
     /**
      * Whether this leg is a transit leg or not.
@@ -296,10 +340,20 @@ public class Leg {
     public void setTimeZone(TimeZone timeZone) {
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTime(startTime.getTime());
-        startTime = calendar;
+        setStartTime(calendar);
         calendar = Calendar.getInstance(timeZone);
         calendar.setTime(endTime.getTime());
-        endTime = calendar;
+        setEndTime(calendar);
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
+    }
+
+    public void setStartTime(Calendar calendar) {
+        this.startTime = calendar;
+        this.startTimeFmt = formatDateIso(calendar);
+    }
+
+    public void setEndTime(Calendar calendar) {
+        this.endTime = calendar;
+        this.endTimeFmt = formatDateIso(calendar);
     }
 }

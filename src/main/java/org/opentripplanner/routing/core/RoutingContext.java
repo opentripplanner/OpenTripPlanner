@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.Landmark;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -38,6 +39,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -52,6 +54,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -74,12 +77,18 @@ public class RoutingContext implements Cloneable {
 
     public final Vertex toVertex;
 
+    public final List<Vertex> toVertices;
+    public final List<Vertex> fromVertices;
+
     // origin means "where the initial state will be located" not "the beginning of the trip from the user's perspective"
     public final Vertex origin;
+    public final List<Vertex> origins;
 
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
-    
+    public final List<Vertex> targets;
+
+
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
     // TODO(flamholz): figure out a better way.
@@ -242,7 +251,8 @@ public class RoutingContext implements Cloneable {
         else
             this.streetSpeedSnapshot = null;
 
-
+        toVertices = new ArrayList();
+        fromVertices = new ArrayList();
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -265,6 +275,24 @@ public class RoutingContext implements Cloneable {
             else {
                 // normal mode, search for vertices based RoutingRequest and split streets
                 toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
+                if (toVertex == null && graph.landmarksByName.get(opt.to.place) != null) {
+                    expandLandmark(toVertices, opt.to.place);
+                }
+
+                // For requests with multiple possible toPlaces, add them all to the Graph
+                if(opt.toPlaces != null) {
+                    for (int i = 0; i < opt.toPlaces.size(); i++) {
+                        toVertices.add(graph.streetIndex.getVertexForLocation(opt.toPlaces.get(i), opt, true));
+                    }
+                }
+
+                // For requests with multiple possible fromPlaces, add them all to the Graph
+                if(opt.fromPlaces != null) {
+                    for (int i = 0; i < opt.fromPlaces.size(); i++) {
+                        fromVertices.add(graph.streetIndex.getVertexForLocation(opt.fromPlaces.get(i), opt, false));
+                    }
+                }
+
                 if (opt.to.hasEdgeId()) {
                     toBackEdge = graph.getEdgeById(opt.to.edgeId);
                 }
@@ -280,12 +308,16 @@ public class RoutingContext implements Cloneable {
                     if (opt.from.hasEdgeId()) {
                         fromBackEdge = graph.getEdgeById(opt.from.edgeId);
                     }
+                    if (fromVertex == null && graph.landmarksByName.get(opt.from.place) != null) {
+                        expandLandmark(fromVertices, opt.from.place);
+                    }
                 }
             }
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching
             fromVertex = from;
             toVertex = to;
+            //toVertices = toPlaces;
         }
 
         // If the from and to vertices are generated and lie on some of the same edges, we need to wire them
@@ -312,6 +344,9 @@ public class RoutingContext implements Cloneable {
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
+        //Add multiple targets and origins for trips with multiple possible origins/destinations
+        targets = opt.arriveBy ? fromVertices : toVertices;
+        origins = opt.arriveBy ? toVertices : fromVertices;
         transferTable = graph.getTransferTable();
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
@@ -330,6 +365,13 @@ public class RoutingContext implements Cloneable {
         }
     }
 
+    private void expandLandmark(List<Vertex> ret, String name) {
+        Landmark landmark = graph.landmarksByName.get(name);
+        for (TransitStationStop vertex : landmark.getStops()) {
+            ret.add(vertex);
+        }
+    }
+
     /* INSTANCE METHODS */
 
     public void check() {
@@ -337,12 +379,12 @@ public class RoutingContext implements Cloneable {
 
         // check origin present when not doing an arrive-by batch search
         if (!(opt.batch && opt.arriveBy))
-            if (fromVertex == null)
+            if (fromVertex == null && fromVertices.isEmpty())
                 notFound.add("from");
 
         // check destination present when not doing a depart-after batch search
         if (!opt.batch || opt.arriveBy) {
-            if (toVertex == null) {
+            if (toVertex == null && toVertices.isEmpty()) {
                 notFound.add("to");
             }
         }

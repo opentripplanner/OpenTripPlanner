@@ -9,6 +9,7 @@ import org.onebusaway.gtfs.model.Stop;
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 
 public class StopShort {
 
@@ -19,6 +20,8 @@ public class StopShort {
     public double lon;
     public String url;
     public String cluster;
+    public List<LocalizedAlert> alerts;
+    public List<RouteShort> transferRoutes;
 
     /** Distance to the stop when it is returned from a location-based query. */
     @JsonInclude(Include.NON_NULL) public Integer dist;

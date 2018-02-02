@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -66,6 +67,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * 
  * @author laurent
  */
+@Ignore
 @Path("/routers/{routerId}/isochrone")
 public class LIsochrone extends RoutingResource {
 

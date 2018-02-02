@@ -72,13 +72,13 @@ public class TestRouteMatcher extends TestCase {
         assertTrue(matcherR3e.matches(r3));
 
         RouteMatcher nullList = RouteMatcher.parse(null);
-        assertTrue(nullList == RouteMatcher.emptyMatcher());
+        assertTrue(nullList.isEmpty());
 
         RouteMatcher emptyList = RouteMatcher.parse("");
-        assertTrue(emptyList == RouteMatcher.emptyMatcher());
+        assertTrue(emptyList.isEmpty());
 
         RouteMatcher degenerate = RouteMatcher.parse(",,,");
-        assertTrue(degenerate == RouteMatcher.emptyMatcher());
+        assertTrue(degenerate.isEmpty());
 
         boolean thrown = false;
         try {

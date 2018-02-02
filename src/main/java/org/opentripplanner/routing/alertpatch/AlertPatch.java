@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.google.common.collect.Multimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -80,6 +79,9 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
+    /** Whether alert affects routing (only elevator alerts) */
+    private boolean routingConsequence = false;
+
     @XmlElement
     public Alert getAlert() {
         return alert;
@@ -133,13 +135,15 @@ public class AlertPatch implements Serializable {
 
             if (tripPatterns != null) {
                 for (TripPattern tripPattern : tripPatterns) {
+
                     if (direction != null && !direction.equals(tripPattern.getDirection())) {
                         continue;
                     }
-                    if (directionId != -1 && directionId == tripPattern.directionId) {
+                    if (directionId != -1 && directionId != tripPattern.directionId) {
                         continue;
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                             graph.addAlertPatch(tripPattern.boardEdges[i], this);
                             graph.addAlertPatch(tripPattern.alightEdges[i], this);
@@ -162,6 +166,13 @@ public class AlertPatch implements Serializable {
                     graph.addAlertPatch(edge, this);
                     break;
                 }
+            }
+        }
+
+        if (route == null && trip == null && stop == null && this.stop != null) {
+            for (Edge edge : graph.index.pathwayForElevator.get(this.stop.getId())) {
+                routingConsequence = true;
+                graph.addAlertPatch(edge, this);
             }
         }
     }
@@ -223,6 +234,12 @@ public class AlertPatch implements Serializable {
                     graph.removeAlertPatch(edge, this);
                     break;
                 }
+            }
+        }
+
+        if (route == null && trip == null && stop == null && this.stop != null) {
+            for (Edge edge : graph.index.pathwayForElevator.get(this.stop.getId())) {
+                graph.removeAlertPatch(edge, this);
             }
         }
     }
@@ -308,6 +325,10 @@ public class AlertPatch implements Serializable {
 
     public boolean hasTrip() {
         return trip != null;
+    }
+
+    public boolean isRoutingConsequence() {
+        return routingConsequence;
     }
 
     public boolean equals(Object o) {

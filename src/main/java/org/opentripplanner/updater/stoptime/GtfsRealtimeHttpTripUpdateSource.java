@@ -19,6 +19,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import com.google.protobuf.ExtensionRegistry;
+import com.google.transit.realtime.GtfsRealtimeExtensions;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -34,6 +36,8 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
 
+    private static final ExtensionRegistry _extensionRegistry;
+
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
      * previous updates should be disregarded
@@ -46,6 +50,11 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     private String feedId;
 
     private String url;
+
+    static {
+        _extensionRegistry = ExtensionRegistry.newInstance();
+        GtfsRealtimeExtensions.registerExtensions(_extensionRegistry);
+    }
 
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
@@ -67,7 +76,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
             InputStream is = HttpUtils.getData(url);
             if (is != null) {
                 // Decode message
-                feedMessage = FeedMessage.PARSER.parseFrom(is);
+                feedMessage = FeedMessage.PARSER.parseFrom(is, _extensionRegistry);
                 feedEntityList = feedMessage.getEntityList();
                 
                 // Change fullDataset value if this is an incremental update

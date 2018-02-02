@@ -71,7 +71,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             if(alreadyLinked) continue;
             // only connect transit stops that (a) are entrances, or (b) have no associated
             // entrances
-            if (ts.isEntrance() || !ts.hasEntrances()) {
+            if (ts.isStreetLinkable()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!connectVertexToStop(ts, wheelchairAccessible)) {
                     LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());

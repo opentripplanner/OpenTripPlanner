@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
@@ -30,6 +31,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.consequences.ConsequencesStrategy;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
@@ -134,15 +136,26 @@ public class GraphPathFinder {
         // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
+        /*
+         * See what may have impacted your route
+         */
+        ConsequencesStrategy consequencesStrategy = null;
+        boolean findRealtimeConsequences = options.rctx.graph.consequencesStrategy != null && options.findRealtimeConsequences && options.modes.isTransit();
+        if (findRealtimeConsequences) {
+            consequencesStrategy = options.rctx.graph.consequencesStrategy.create(options);
+        }
+
         /* In long distance mode, maxWalk has a different meaning than it used to.
          * It's the radius around the origin or destination within which you can walk on the streets.
          * If no value is provided, max walk defaults to the largest double-precision float.
          * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
+
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
+        List<Alert> realtimeConsequences = Lists.newArrayList();
         while (paths.size() < options.numItineraries) {
             // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
             int timeoutIndex = paths.size();
@@ -174,6 +187,13 @@ public class GraphPathFinder {
                 newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
             }
 
+            if (findRealtimeConsequences) {
+                realtimeConsequences.addAll(consequencesStrategy.getConsequences(newPaths));
+                findRealtimeConsequences = consequencesStrategy.hasAnotherStrategy();
+                consequencesStrategy.postprocess();
+                continue;
+            }
+
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
@@ -184,24 +204,25 @@ public class GraphPathFinder {
                 if (tripIds.isEmpty()) {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
+                } else if (options.hardPathBanning) {
+                    options.banPath(path);
+                }
+                // add consequences
+                path.setRealtimeConsequences(realtimeConsequences);
+
+                double duration = options.useRequestedDateTimeInMaxHours
+                        ? (options.arriveBy ? options.dateTime - path.getStartTime() : path.getEndTime() - options.dateTime)
+                        : path.getDuration();
+
+                if (duration < options.maxHours * 60 * 60) {
+                    paths.add(path);
                 }
             }
-
-            paths.addAll(newPaths.stream()
-                    .filter(path -> {
-                        double duration = options.useRequestedDateTimeInMaxHours
-                            ? options.arriveBy
-                                ? options.dateTime - path.getStartTime()
-                                : path.getEndTime() - options.dateTime
-                            : path.getDuration();
-                        return duration < options.maxHours * 60 * 60;
-                    })
-                    .collect(Collectors.toList()));
 
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        Collections.sort(paths, new PathComparator(options.arriveBy));
+        Collections.sort(paths, options.getPathComparator(options.arriveBy));
         return paths;
     }
 
@@ -220,7 +241,7 @@ public class GraphPathFinder {
         List<GraphPath> reversedPaths = new ArrayList<>();
         for(GraphPath newPath : newPaths){
             State targetAcceptedState = options.arriveBy ? newPath.states.getLast().reverse() : newPath.states.getLast();
-            if(targetAcceptedState.stateData.getNumBooardings() < 2) {
+            if(targetAcceptedState.stateData.getNumBoardings() < 2) {
                 reversedPaths.add(newPath);
                 continue;
             }
@@ -333,6 +354,7 @@ public class GraphPathFinder {
         reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
         reversedOptions.bannedTrips = options.bannedTrips;
+        reversedOptions.unpreferredRoutes = options.unpreferredRoutes;
         return reversedOptions;
     }
 

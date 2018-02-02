@@ -30,6 +30,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -76,6 +77,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     /** The vertex that the main search is working towards. */
     Vertex target;
 
+    /** Or search works towards multiple targets (landmark support) */
+    List<Vertex> targets;
+
     /** All vertices within walking distance of the origin (the vertex at which the main search begins). */
     Set<Vertex> preTransitVertices;
 
@@ -108,7 +112,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     @Override
     public void initialize(RoutingRequest request, long abortTime) {
         Vertex target = request.rctx.target;
-        if (target == this.target) {
+        List<Vertex> targets = request.rctx.targets;
+        if ((target != null && target == this.target || (targets != null && targets == this.targets)) ) {
             LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
             return;
         }
@@ -116,6 +121,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.graph = request.rctx.graph;
         long start = System.currentTimeMillis();
         this.target = target;
+        this.targets = targets;
         this.routingRequest = request;
         request.softWalkLimiting = false;
         request.softPreTransitLimiting = false;
@@ -276,8 +282,28 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // TODO use normal OTP search for this.
         BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
-        State initState = new State(initVertex, rr);
-        pq.insert(initState, 0);
+        if (initVertex != null) {
+            State initState = new State(initVertex, rr);
+            pq.insert(initState, 0);
+        }
+
+        if(fromTarget) {
+            // Add all the targets for trips with multiple possible targets.
+            for (int i = 0; i < rr.rctx.targets.size(); i++) {
+                Vertex anotherVertex = rr.rctx.targets.get(i);
+                State anotherState = new State(anotherVertex, rr);
+                pq.insert(anotherState, 0);
+            }
+        }
+        else{
+            // Add all the origins for trips with multiple possible targets.
+            for (int i = 0; i < rr.rctx.origins.size(); i++) {
+                Vertex anotherVertex = rr.rctx.origins.get(i);
+                State anotherState = new State(anotherVertex, rr);
+                pq.insert(anotherState, 0);
+            }
+        }
+
         while ( ! pq.empty()) {
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 return null;

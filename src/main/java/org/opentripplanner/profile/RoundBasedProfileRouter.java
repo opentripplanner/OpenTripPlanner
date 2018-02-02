@@ -1,11 +1,8 @@
 package org.opentripplanner.profile;
 
-import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,9 +17,7 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import org.geotools.xml.xsi.XSISimpleTypes.Int;
 import org.mapdb.Fun.Tuple2;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.TimeSurface.RangeSet;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -32,12 +27,10 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -46,7 +39,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -256,8 +248,8 @@ public class RoundBasedProfileRouter {
                 
                 // find transfers for the stop
                 for (Edge e : tstop.getOutgoing()) {
-                    if (e instanceof SimpleTransfer) {
-                        SimpleTransfer t = (SimpleTransfer) e;
+                    if (e instanceof TransferEdge) {
+                        TransferEdge t = (TransferEdge) e;
                         int time = (int) (t.getDistance() / request.walkSpeed);
                         accessTimes.add(new Tuple2((TransitStop) e.getToVertex(), time));
                     }

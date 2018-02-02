@@ -36,6 +36,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -90,6 +91,7 @@ import com.vividsolutions.jts.geom.Point;
  * occurs). Putting "@Setter" on all the parameters would allow resource classes to be used outside
  * Jersey.
  */
+@Ignore
 @Path("/routers/{routerId}/simpleIsochrone")
 public class SimpleIsochrone extends RoutingResource {
     

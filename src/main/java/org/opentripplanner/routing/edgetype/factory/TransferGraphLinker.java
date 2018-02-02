@@ -68,8 +68,9 @@ public class TransferGraphLinker {
                             toVertex, distance);
                     break;
                 default:
+                    // used to pass time here, but now TransferEdge will calculate time like SimpleTransfer
                     edge = new TransferEdge(fromVertex,
-                            toVertex, distance, transfer.seconds);
+                            toVertex, distance);
             }
             
             if (edge != null) {

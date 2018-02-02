@@ -1,6 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import com.beust.jcommander.internal.Maps;
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.param.HourMinuteSecond;
@@ -36,6 +37,7 @@ import java.util.Map;
  * A Jersey resource class which exposes OTP profile routing functionality as a web service.
  *
  */
+@Ignore
 @Path("routers/{routerId}/profile")
 public class ProfileResource {
 

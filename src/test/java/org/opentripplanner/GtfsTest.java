@@ -143,12 +143,15 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.setBannedStopsHard(feedId.getId() + ":" + excludedStop);
         }
         routingRequest.setOtherThanPreferredRoutesPenalty(0);
+        routingRequest.setUseUnpreferredStartEndPenalty(0);
         // The walk board cost is set low because it interferes with test 2c1.
         // As long as boarding has a very low cost, waiting should not be "better" than riding
         // since this makes interlining _worse_ than alighting and re-boarding the same line.
         // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
         routingRequest.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
+
+        routingRequest.walkSpeed = 2.0;
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
         TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);

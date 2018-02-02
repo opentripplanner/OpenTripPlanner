@@ -117,4 +117,13 @@ public class StopTransfer implements Serializable {
         // Return transfer time
         return transferTime;
     }
+
+    public boolean hasTripSpecificity() {
+        for (SpecificTransfer transfer : specificTransfers) {
+            if (transfer.hasTripSpecificity()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

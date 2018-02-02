@@ -21,11 +21,14 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+
 import java.util.Locale;
 
 /** 
@@ -89,7 +92,7 @@ public class StreetTransitLink extends Edge {
         }
 
         // Do not re-enter the street network following a transfer.
-        if (s0.backEdge instanceof SimpleTransfer) {
+        if (s0.backEdge instanceof TransferEdge) {
             return null;
         }
 
@@ -107,10 +110,42 @@ public class StreetTransitLink extends Edge {
             return null;
         }
 
+        // check if path is banned
+        if (isLeavingTransitNetwork(req) && req.isPathBanned(s0)) {
+            return null;
+        }
+
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
+
+        // Require that if we enter the transit network, we use transit before leaving.
+        // This forbids shortcuts through the transit network, in the context of pathways -
+        // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
+        // intervening pathways.
+        boolean leavingTransit = isLeavingTransitNetwork(req);
+
+        // Check to see if we have a preferred starting or ending route when leaving transit
+        if(leavingTransit && s0.isEverBoarded()) {
+            if (s0.getOptions().violatesFinalRoute(s0.getLastPattern().route)) {
+                return null;
+            }
+        }
+
+        boolean firstLink = s0.getPreTransitNumBoardings() == 0 && s0.getOptions().rctx.origin instanceof TransitVertex;
+        if (s0.getPreTransitNumBoardings() >= 0 && leavingTransit && !firstLink) {
+            if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {
+                return null;
+            }
+        } else if (!leavingTransit) {
+            s1.setPreTransitNumBoardings();
+        }
+
+        // Don't reenter street network following a transfer which has been followed by intervening pathways
+        if (leavingTransit && !s0.isTransferPermissible()) {
+            return null;
+        }
 
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
@@ -124,6 +159,7 @@ public class StreetTransitLink extends Edge {
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.setTransferNotPermissible();
         return s1.makeState();
     }
 
@@ -161,5 +197,16 @@ public class StreetTransitLink extends Edge {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
 
+    public TransitStop getTransitStop() {
+        return transitStop;
+    }
 
+    private boolean isLeavingTransitNetwork(RoutingRequest options) {
+        if (options.arriveBy && tov == transitStop) {
+            return true;
+        } else if (!options.arriveBy && fromv == transitStop) {
+            return true;
+        }
+        return false;
+    }
 }

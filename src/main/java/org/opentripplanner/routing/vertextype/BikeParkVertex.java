@@ -62,4 +62,9 @@ public class BikeParkVertex extends Vertex {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public boolean shouldLinkToStreet() {
+        return true;
+    }
 }

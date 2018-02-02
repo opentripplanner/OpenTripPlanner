@@ -129,7 +129,7 @@ public class SimpleStreetSplitter {
     /** Link all relevant vertices to the street network */
     public void link () {	
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
+            if (v.shouldLinkToStreet())
                 if (!link(v)) {
                     if (v instanceof TransitStop)
                         LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStop) v)));

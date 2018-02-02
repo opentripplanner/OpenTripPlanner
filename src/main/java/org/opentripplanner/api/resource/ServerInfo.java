@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.resource;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.opentripplanner.common.MavenVersion;
 
 import javax.ws.rs.GET;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+@Ignore
 @Path("/")
 @XmlRootElement 
 public class ServerInfo {
@@ -55,7 +57,7 @@ public class ServerInfo {
     public int nCores = 0;
 
     /* It would make sense to have one object containing maven, git, and hardware subobjects. */
-    
+
     /**
      * Determine the OTP version and CPU type of the running server. This information should not
      * change while the server is up, so it can safely be cached at startup.

@@ -57,10 +57,22 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
+
+        int threadPoolMaxPoolSize = Runtime.getRuntime().availableProcessors();
+        if (System.getProperty("otp.threadPoolMaxPoolSize") != null) {
+            try {
+                threadPoolMaxPoolSize = Integer.parseInt(System.getProperty("otp.threadPoolMaxPoolSize"));
+                LOG.info("Thread pool size override to " + threadPoolMaxPoolSize);
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+        }
         /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(1)
-            .setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+            .setMaxPoolSize(threadPoolMaxPoolSize);
+
+        LOG.info("Thread pool size = " + threadPoolConfig.getMaxPoolSize());
 
         /* HTTP (non-encrypted) listener */
         NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
@@ -94,13 +106,17 @@ public class GrizzlyServer {
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
-        /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
-        CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
-        if (params.disableFileCache) {
-            LOG.info("Disabling HTTP server static file cache.");
-            staticHandler.setFileCacheEnabled(false);
+        if (!params.disableNativeClient) {
+            /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
+            CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
+            if (params.disableFileCache) {
+                LOG.info("Disabling HTTP server static file cache.");
+                staticHandler.setFileCacheEnabled(false);
+            }
+            httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+        } else {
+            LOG.info("disabling native UI");
         }
-        httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
         /*
          * 3. A static content handler to serve local files from the filesystem, under the "local"
@@ -110,7 +126,8 @@ public class GrizzlyServer {
             StaticHttpHandler localHandler = new StaticHttpHandler(
                     params.clientDirectory.getAbsolutePath());
             localHandler.setFileCacheEnabled(false);
-            httpServer.getServerConfiguration().addHttpHandler(localHandler, "/local");
+            httpServer.getServerConfiguration().addHttpHandler(localHandler, params.clientPath);
+            LOG.info("deploying " + params.clientDirectory + " to path " + params.clientPath);
         }
 
         /* 3. Test alternate method (no Jersey). */

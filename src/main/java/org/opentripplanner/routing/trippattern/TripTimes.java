@@ -109,12 +109,20 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private final int[] stopSequences;
 
     /**
+     * Departure buffers, if this trip has any
+     */
+    private final int[] departureBuffers;
+
+    /**
      * The real-time state of this TripTimes.
      */
     private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
+
+    /** Track information, if available */
+    private String[] tracks;
 
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
@@ -126,6 +134,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
+        final int[] departureBuffers = new int[nStops];
+        boolean hasDepartureBuffers = false;
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
@@ -135,7 +145,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             arrivals[s] = st.getArrivalTime() - timeShift;
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
+            if (st.getDepartureBuffer() != -1) {
+                hasDepartureBuffers = true;
+            }
             s++;
+        }
+        if (hasDepartureBuffers) {
+            for (int i = 0; i < stopTimes.size(); i++) {
+                departureBuffers[i] = Math.max(0, stopTimes.get(i).getDepartureBuffer());
+            }
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
@@ -146,6 +164,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+        if (hasDepartureBuffers) {
+            this.departureBuffers = deduplicator.deduplicateIntArray(departureBuffers);
+        } else {
+            this.departureBuffers = null;
+        }
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -161,6 +184,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
+        this.departureBuffers = object.departureBuffers;
     }
 
     /**
@@ -256,6 +280,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
     }
 
+    /** Return the buffer required for boarding at this stop. 0 if no buffer. */
+    public int getDepartureBuffer(final int stop) {
+        return departureBuffers == null ? 0 : departureBuffers[stop];
+    }
+
     /**
      * @return true if this TripTimes represents an unmodified, scheduled trip from a published
      *         timetable or false if it is a updated, cancelled, or otherwise modified one. This
@@ -326,12 +355,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * and transfers with minimum time or forbidden transfers.
      */
     public boolean tripAcceptable(final State state0, final int stopIndex) {
+        return tripAcceptable(state0, stopIndex, true);
+    }
+
+    public boolean tripAcceptable(final State state0, final int stopIndex, boolean checkBannedTrips) {
         final RoutingRequest options = state0.getOptions();
         final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
+        if (checkBannedTrips && banned != null && banned.contains(stopIndex)) {
             return false;
         }
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
+        if (options.wheelchairAccessible && trip.getWheelchairAccessible() == 2) {
             return false;
         }
         // Establish whether we have a rented _or_ owned bicycle.
@@ -449,5 +482,20 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             hasher.putInt(getScheduledArrivalTime(hop + 1));
         }
         return hasher.hash();
+    }
+
+    public void setTrack(int stop, String track) {
+        if (tracks == null) {
+            tracks = new String[getNumStops()];
+        }
+        tracks[stop] = track;
+    }
+
+    public String getTrack(int stop) {
+        return tracks == null ? null : tracks[stop];
+    }
+
+    public boolean hasStopHeadsigns() {
+        return headsigns != null;
     }
 }

@@ -13,11 +13,16 @@
 
 package org.opentripplanner.routing.spt;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -42,6 +47,8 @@ public class GraphPath {
 
     // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
+
+    private List<Alert> realtimeConsequences = Collections.emptyList();
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -158,6 +165,34 @@ public class GraphPath {
         return ret;
     }
 
+    /**
+     * @return all routes boarded in this graph path
+     */
+    public List<AgencyAndId> getRoutes() {
+        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+        Route lastRoute = null;
+        Iterator<State> iter = back ? states.descendingIterator() : states.iterator();
+        while(iter.hasNext()) {
+            State s = iter.next();
+            if (s.getBackEdge() != null && s.getBackTrip() != null) {
+                Route route = s.getBackTrip().getRoute();
+                if (route != null && route != lastRoute) {
+                    ret.add(route.getId());
+                    lastRoute = route;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public String getRoutePatternHash() {
+        StringJoiner hash = new StringJoiner("#");
+        for (AgencyAndId r : getRoutes()) {
+            hash.add(r.toString());
+        }
+        return hash.toString();
+    }
+
     public String toString() {
     	return "GraphPath(nStates=" + states.size() + ")";
     }
@@ -213,4 +248,11 @@ public class GraphPath {
         return rctx;
     }
 
+    public List<Alert> getRealtimeConsequences() {
+        return realtimeConsequences;
+    }
+
+    public void setRealtimeConsequences(List<Alert> realtimeConsequences) {
+        this.realtimeConsequences = realtimeConsequences;
+    }
 }

@@ -16,18 +16,20 @@ package org.opentripplanner.graph_builder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.CrossFeedTransferGenerator;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.LandmarksModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.graph_builder.module.VersionModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -184,8 +186,11 @@ public class GraphBuilder implements Runnable {
         GraphBuilder graphBuilder = new GraphBuilder();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
+        File crossFeedTransfers = null;
+        File landmarks = null;
         JsonNode builderConfig = null;
         JsonNode routerConfig = null;
+        File versionFile = null;
         File demFile = null;
         LOG.info("Searching for graph builder input files in {}", dir);
         if ( ! dir.isDirectory() && dir.canRead()) {
@@ -216,6 +221,18 @@ public class GraphBuilder implements Runnable {
                     } else {
                         LOG.info("Skipping DEM file {}", file);
                     }
+                    break;
+                case TRANSFERS:
+                    LOG.info("Found feed transfers file {}", file);
+                    crossFeedTransfers = file;
+                    break;
+                case LANDMARKS:
+                    LOG.info("Found landmarks file {}", file);
+                    landmarks = file;
+                    break;
+                case VERSION:
+                    LOG.info("Found version file {}", file);
+                    versionFile = file;
                     break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
@@ -267,6 +284,7 @@ public class GraphBuilder implements Runnable {
             }
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
             gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
+            gtfsModule.setIgnoreGtfsTransfers(crossFeedTransfers != null);
             graphBuilder.addModule(gtfsModule);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
@@ -306,8 +324,13 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {
+            // Make transfer edges from feed_transfers.txt
+            if (crossFeedTransfers != null)  {
+                CrossFeedTransferGenerator module = new CrossFeedTransferGenerator(crossFeedTransfers);
+                graphBuilder.addModule(module);
+            }
             // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! builderParams.useTransfersTxt) {
+            if (!builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
             }
@@ -315,6 +338,15 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
+        }
+        if (landmarks != null) {
+            graphBuilder.addModule(new LandmarksModule(landmarks));
+        }
+        if (versionFile != null) {
+            LOG.info("found versionFile=" + versionFile);
+            graphBuilder.addModule(new VersionModule(versionFile));
+        } else {
+            LOG.info("no versionFile found.");
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
@@ -326,7 +358,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, TRANSFERS, LANDMARKS, VERSION, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -342,7 +374,10 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
-            if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
+            if (name.equals("feed_transfers.txt")) return TRANSFERS;
+            if (name.equals("landmarks.json")) return LANDMARKS;
+            if (name.equals("version.json")) return VERSION;
+             if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }
             return OTHER;

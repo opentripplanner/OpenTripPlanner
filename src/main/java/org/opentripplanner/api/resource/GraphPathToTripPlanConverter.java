@@ -16,6 +16,7 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.apache.commons.lang.StringUtils;
 import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -25,7 +26,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -80,6 +80,10 @@ public abstract class GraphPathToTripPlanConverter {
         to.orig = request.to.name;
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
+
+        for (Alert alert : exemplar.getRealtimeConsequences()) {
+            plan.addAlert(alert, requestedLocale);
+        }
 
         // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
         long bestNonTransitTime = Long.MAX_VALUE;
@@ -174,8 +178,8 @@ public abstract class GraphPathToTripPlanConverter {
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
-        itinerary.startTime = makeCalendar(states[0]);
-        itinerary.endTime = makeCalendar(lastState);
+        itinerary.setStartTime(makeCalendar(states[0]));
+        itinerary.setEndTime(makeCalendar(lastState));
 
         calculateTimes(itinerary, states);
 
@@ -259,6 +263,15 @@ public abstract class GraphPathToTripPlanConverter {
 
             Edge edge = states[i + 1].getBackEdge();
 
+            // Ignore spurious transitions when there is a StreetTransitLink followed by walking pathways. TODO does this work with bikes?
+            boolean stationEntrance = (edge instanceof StreetTransitLink) && ((StreetTransitLink) edge).getTransitStop().isEntrance();
+            if (stationEntrance) {
+                do {
+                    i++;
+                } while (i < states.length - 2 && states[i + 2].getBackEdge() instanceof PathwayEdge);
+                continue;
+            }
+
             if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
@@ -308,8 +321,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         Edge[] edges = new Edge[states.length - 1];
 
-        leg.startTime = makeCalendar(states[0]);
-        leg.endTime = makeCalendar(states[states.length - 1]);
+        leg.setStartTime(makeCalendar(states[0]));
+        leg.setEndTime(makeCalendar(states[states.length - 1]));
 
         // Calculate leg distance and fill array of edges
         leg.distance = 0.0;
@@ -337,7 +350,10 @@ public abstract class GraphPathToTripPlanConverter {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
+        if (leg.isTransitLeg()) {
+            addRealTimeData(leg, states);
+            addNextDepartures(leg, states);
+        }
 
         return leg;
     }
@@ -393,6 +409,95 @@ public abstract class GraphPathToTripPlanConverter {
             } else {
                 previousStep = null;
             }
+
+            // add walk step instructions - adapted from otp.js
+            boolean first = true;
+            State nextState = i < legsStates.length - 1 ? legsStates[i + 1][0] : null;
+            for (WalkStep step : walkSteps) {
+                step.instructionText = generateWalkStepInstruction(step, first, nextState);
+                first = false;
+            }
+        }
+    }
+
+    private static String generateWalkStepInstruction(WalkStep step, boolean start, State nextState) {
+        for (Edge e : step.edges) {
+            if (e instanceof PathwayEdge) {
+                PathwayEdge p = (PathwayEdge) e;
+                String relDir = relativeDirStr(step.relativeDirection);
+                String transition = null;
+                String extraInstr = null;
+                if (((TransitStop) p.getToVertex()).isEntrance()) {
+                    transition = "Exit";
+                } else if (((TransitStop) p.getFromVertex()).isEntrance()) {
+                    transition = "Enter";
+                    extraInstr = getHeadsignInstruction(nextState);
+                }
+                if (transition != null) {
+                    String instr = transition + " station";
+                    if (p.hasDefinedMode())
+                        instr += " using " + p.getName();
+                    if (relDir != null)
+                        instr += ", " + relDir;
+                    if (extraInstr != null) {
+                        instr += ". " + extraInstr;
+                    }
+                    return instr;
+                }
+            }
+            if (e instanceof TransferEdge && nextState != null && nextState.getBackTrip() != null) {
+                Route route = nextState.getBackTrip().getRoute();
+                String routeName = route.getShortName() != null ? route.getShortName() : route.getLongName();
+                String sign = getHeadsignInstruction(nextState);
+                return "Transfer to " + routeName + (sign != null ? ". " + sign : "");
+            }
+        }
+        if (step.relativeDirection.isCircle()) {
+            String dir = step.relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE ? "clockwise" : "counterclockwise";
+            return String.format("Take roundabout %s to exit %s on %s",
+                    dir, step.exit, step.streetName);
+        }
+        if (start) {
+            String absDir = StringUtils.lowerCase(step.absoluteDirection.toString());
+            return String.format("Start on %s heading %s", step.streetName, absDir);
+        }
+        String relDir = StringUtils.capitalize(StringUtils.lowerCase(step.relativeDirection.toString()));
+        relDir = relDir.replace("_", " ");
+        if (step.stayOn) {
+            return String.format("%s to continue on %s", relDir, step.streetName);
+        } else {
+            return String.format("%s on to %s", relDir, step.streetName);
+        }
+    }
+
+    private static String getHeadsignInstruction(State state) {
+        if (state == null) {
+            return null;
+        }
+        TripTimes tt = state.getTripTimes();
+        if (tt != null && state.backEdge instanceof OnboardEdge) {
+            int stopIndex = ((OnboardEdge) state.backEdge).getStopIndex();
+            if (tt.getHeadsign(stopIndex) != null) {
+                return "Follow signs for " + tt.getHeadsign(stopIndex);
+            }
+        }
+        return null;
+    }
+
+    public static String relativeDirStr(RelativeDirection dir) {
+        switch(dir) {
+            case HARD_LEFT:
+            case LEFT:
+                return "on left";
+            case SLIGHTLY_LEFT:
+                return "slightly left";
+            case SLIGHTLY_RIGHT:
+                return "slightly right";
+            case RIGHT:
+            case HARD_RIGHT:
+                return "on right";
+            default:
+                return null;
         }
     }
 
@@ -449,8 +554,8 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (i + 1 < legsStates.length) {
-                legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
-                legs.get(i).to.departure = legs.get(i + 1).from.departure;
+                legs.get(i + 1).from.setArrival(legs.get(i).to.arrival);
+                legs.get(i).to.setDeparture(legs.get(i + 1).from.departure);
 
                 if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
                     legs.get(i + 1).from = legs.get(i).to;
@@ -564,6 +669,27 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             }
         }
+
+        Trip trip = states[states.length - 1].getBackTrip();
+        if (trip != null && trip.getNote() != null) {
+            TimetableNote note = trip.getNote();
+            Alert alert = Alert.createSimpleAlerts(note.getTitle(), note.getDesc());
+            leg.addAlert(alert, requestedLocale);
+        }
+
+        if (leg.isTransitLeg()) {
+            TripTimes tt = states[states.length - 1].getTripTimes();
+            Edge firstEdge = states[0].getBackEdge();
+            if (tt != null && firstEdge instanceof TablePatternEdge) {
+                int stopIndex = ((TablePatternEdge) firstEdge).getStopIndex();
+                int bufferSec = tt.getDepartureBuffer(stopIndex);
+                if (bufferSec > 0) {
+                    Alert alert = Alert.createSimpleAlerts("Early departure",
+                            "This vehicle may depart up to " + Math.round(bufferSec / 60) + " minutes earlier than the scheduled time.");
+                    leg.addAlert(alert, requestedLocale);
+                }
+            }
+        }
     }
 
     /**
@@ -629,9 +755,9 @@ public abstract class GraphPathToTripPlanConverter {
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
-        leg.from.arrival = null;
+        leg.from.clearArrival();
         leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
-        leg.to.departure = null;
+        leg.to.clearDeparture();
 
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
@@ -648,7 +774,7 @@ public abstract class GraphPathToTripPlanConverter {
                 if (currentStop == firstStop) continue;
 
                 if (currentStop == previousStop) {                  // Avoid duplication of stops
-                    leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(states[i]);
+                    leg.stop.get(leg.stop.size() - 1).setDeparture(makeCalendar(states[i]));
                     continue;
                 }
 
@@ -723,8 +849,64 @@ public abstract class GraphPathToTripPlanConverter {
             leg.realTime = true;
             if (leg.from.stopIndex != null) {
                 leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
+                leg.from.track = tripTimes.getTrack(leg.from.stopIndex);
             }
-            leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
+            if (leg.to.stopIndex != null) {
+                leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
+                leg.to.track = tripTimes.getTrack(leg.to.stopIndex);
+            }
+        }
+    }
+
+    /**
+     * Add next departures to a {@link Leg}.
+     *
+     * @param leg The leg to add the departures to
+     * @param states The states that go with the leg
+     */
+    private static void addNextDepartures(Leg leg, State[] states) {
+        State state = states[0].getBackState();
+        if (state == null) {
+            // potentially OnBoardDepart itinerary
+            return;
+        }
+        RoutingRequest options = state.getOptions();
+        if (options.nextDepartureWindow <= 0)
+            return;
+        TimeZone tz = options.rctx.graph.getTimeZone();
+        long time = state.getTimeSeconds();
+        int stopIndex;
+        TripPattern pattern;
+        if (states[0].backEdge instanceof TransitBoardAlight) {
+            TransitBoardAlight edge = (TransitBoardAlight) (states[0].backEdge);
+            stopIndex = edge.getStopIndex();
+            pattern = edge.getPattern();
+        } else if (states[0].backEdge instanceof PatternInterlineDwell) {
+            stopIndex = 0;
+            pattern = ((OnboardVertex) state.backEdge.getToVertex()).getTripPattern();
+        } else {
+            LOG.error("Unexpected edge {}", states[0].backEdge);
+            return;
+        }
+        leg.nextDepartures = new ArrayList<>();
+        for (ServiceDay sd : options.rctx.serviceDays) {
+            Timetable timetable = pattern.getUpdatedTimetable(options, sd);
+            if (timetable.temporallyViable(sd, time, -1, true)) {
+                List<TripTimes> sortedTimes = new ArrayList<>(timetable.tripTimes);
+                sortedTimes.sort(Comparator.comparingInt(tt -> tt.getDepartureTime(stopIndex)));
+                for (TripTimes tt : sortedTimes) {
+                    if (!timetable.isTripTimesOk(tt, sd, state, stopIndex, false))
+                        continue;
+                    long deptTime = sd.time(tt.getDepartureTime(stopIndex));
+                    if (deptTime > time) {
+                        if (deptTime > time + options.nextDepartureWindow) {
+                            break;
+                        }
+                        Departure dept = new Departure(tz, sd, tt, stopIndex);
+                        leg.nextDepartures.add(dept);
+                    }
+                }
+            }
         }
     }
 
@@ -744,24 +926,35 @@ public abstract class GraphPathToTripPlanConverter {
 
         State onBikeRentalState = null, offBikeRentalState = null;
 
-        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
-        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
-            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
-            List<Edge> transferEdges = transferEdge.getEdges();
-            if (transferEdges != null) {
-                // Create a new initial state. Some parameters may have change along the way, copy them from the first state
-                StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
-                se.setNonTransitOptionsFromState(states[0]);
-                State s = se.makeState();
-                ArrayList<State> transferStates = new ArrayList<>();
-                transferStates.add(s);
-                for (Edge e : transferEdges) {
-                    s = e.traverse(s);
-                    transferStates.add(s);
+        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges.
+        // Now that there are pathways, a leg may contain several Pathways and a TransferEdge.
+
+        List<State> allStates = new ArrayList<>();
+        for (int i = 0; i < states.length; i++) {
+            if (i < states.length - 1 && states[i + 1].getBackEdge() instanceof SimpleTransfer) {
+                if (states[i].getBackEdge() instanceof PathwayEdge) {
+                    allStates.add(states[i]);
                 }
-                states = transferStates.toArray(new State[transferStates.size()]);
+                SimpleTransfer transferEdge = ((SimpleTransfer) states[i + 1].getBackEdge());
+                List<Edge> transferEdges = transferEdge.getEdges();
+                if (transferEdges != null) {
+                    // Create a new initial state. Some parameters may have change along the way, copy them from the first state
+                    StateEditor se = new StateEditor(states[i].getOptions(), transferEdges.get(0).getFromVertex());
+                    se.setNonTransitOptionsFromState(states[i]);
+                    State s = se.makeState();
+                    allStates.add(s);
+                    for (Edge e : transferEdges) {
+                        s = e.traverse(s);
+                        allStates.add(s);
+                    }
+                    i++; // skip next
+                    continue;
+                }
             }
+            allStates.add(states[i]);
         }
+
+        states = allStates.toArray(new State[allStates.size()]);
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];

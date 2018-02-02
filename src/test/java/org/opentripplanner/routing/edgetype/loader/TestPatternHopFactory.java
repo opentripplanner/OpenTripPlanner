@@ -359,7 +359,7 @@ public class TestPatternHopFactory extends TestCase {
         
         TransitStop e_arrive = (TransitStop) graph.getVertex(feedId + ":E");
         TransitStop f_depart = (TransitStop) graph.getVertex(feedId + ":F");
-        Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
+        Edge edge = new TransferEdge(e_arrive, f_depart, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex(feedId + ":B_depart");
@@ -516,6 +516,7 @@ public class TestPatternHopFactory extends TestCase {
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
         options.transferSlack = (0);
+        options.setUseUnpreferredStartEndPenalty(0);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.dateTime = TestUtils.toSeconds(startTime);
@@ -579,7 +580,8 @@ public class TestPatternHopFactory extends TestCase {
         RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
-        options.setRoutingContext(graph, stop_c, stop_d);  
+        options.setRoutingContext(graph, stop_c, stop_d);
+        options.setUseUnpreferredStartEndPenalty(0);
                 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 

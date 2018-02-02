@@ -16,11 +16,9 @@ package org.opentripplanner.index;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FeedInfo;
@@ -36,15 +34,18 @@ import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.index.model.TransferShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.Landmark;
 import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -76,14 +77,13 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
-
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
-    private static final double MAX_STOP_SEARCH_RADIUS = 5000;
+    public static final double MAX_STOP_SEARCH_RADIUS = 5000;
     private static final String MSG_404 = "FOUR ZERO FOUR";
     private static final String MSG_400 = "FOUR HUNDRED";
 
@@ -304,23 +304,16 @@ public class IndexAPI {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         
         if (stop != null) {
+            Collection<TransferShort> out = Sets.newHashSet();
+
             // get the transfers for the stop
             TransitStop v = index.stopVertexForStop.get(stop);
-            Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
-                @Override
-                public boolean apply(Edge edge) {
-                    return edge instanceof SimpleTransfer;
+            for (Edge edge : v.getOutgoing()) {
+                if (edge instanceof TransferEdge) {
+                    out.add(new TransferShort((TransferEdge) edge));
                 }
-            });
-            
-            Collection<Transfer> out = Collections2.transform(transfers, new Function<Edge, Transfer> () {
-                @Override
-                public Transfer apply(Edge edge) {
-                    // TODO Auto-generated method stub
-                    return new Transfer((SimpleTransfer) edge);
-                }
-            });
-            
+            }
+
             return Response.status(Status.OK).entity(out).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -596,6 +589,29 @@ public class IndexAPI {
         }
     }
 
+    /** Get all landmark names */
+    @GET
+    @Path("/landmarks")
+    public Response getLandmarks() {
+        Set<String> landmarks = index.graph.landmarksByName.keySet();
+        return Response.status(Status.OK).entity(landmarks).build();
+    }
+
+    /** Get all stops associated with a given landmark. */
+    @GET
+    @Path("/landmarks/{landmark}")
+    public Response getLandmarkStops(@PathParam("landmark") String name) {
+        Landmark landmark = index.graph.landmarksByName.get(name);
+        if (landmark == null) {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+        List<StopShort> response = new ArrayList<>();
+        for (TransitStationStop stop : landmark.getStops()) {
+            response.add(new StopShort(stop.getStop()));
+        }
+        return Response.status(Status.OK).entity(response).build();
+    }
+
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -632,19 +648,4 @@ public class IndexAPI {
 //                                @QueryParam("variables") HashMap<String, Object> variables) {
 //        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
 //    }
-
-    /** Represents a transfer from a stop */
-    private static class Transfer {
-        /** The stop we are connecting to */
-        public String toStopId;
-        
-        /** the on-street distance of the transfer (meters) */
-        public double distance;
-        
-        /** Make a transfer from a simpletransfer edge from the graph. */
-        public Transfer(SimpleTransfer e) {
-            toStopId = GtfsLibrary.convertIdToString(((TransitStop) e.getToVertex()).getStopId());
-            distance = e.getDistance();
-        }
-    }
 }

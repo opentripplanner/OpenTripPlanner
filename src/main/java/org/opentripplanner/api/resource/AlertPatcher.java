@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.alertpatch.AlertPatchCreationResponse;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
@@ -35,6 +36,7 @@ import org.opentripplanner.api.model.alertpatch.AlertPatchSet;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.services.AlertPatchService;
 
+@Ignore
 @Path("/patch")
 @XmlRootElement
 public class AlertPatcher {

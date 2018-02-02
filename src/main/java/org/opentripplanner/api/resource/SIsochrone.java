@@ -3,6 +3,7 @@ package org.opentripplanner.api.resource;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
+import com.webcohesion.enunciate.metadata.Ignore;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
@@ -35,6 +36,7 @@ import java.util.*;
  * This is the original Isochrone class provided by Stefan Steineger.
  * Another implementation has been provided by Laurent Grégoire (isochrone2).
  */
+@Ignore
 @Path("/routers/{routerId}/isochroneOld")
 @XmlRootElement
 public class SIsochrone extends RoutingResource {

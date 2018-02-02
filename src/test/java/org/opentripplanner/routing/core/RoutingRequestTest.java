@@ -76,6 +76,6 @@ public class RoutingRequestTest {
         trip.setRoute(route);
         route.setId(agencyAndId);
         route.setAgency(agency);
-        assertEquals(0, routingRequest.preferencesPenaltyForRoute(trip.getRoute()));
+        assertEquals(0, routingRequest.preferencesPenaltyForRoute(trip.getRoute(), null));
     }
 }
