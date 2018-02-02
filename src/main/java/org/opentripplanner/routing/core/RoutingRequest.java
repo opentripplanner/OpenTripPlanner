@@ -1329,8 +1329,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
-        // Add penalty if we have a preferred end that is vioalated
-        boolean isUnpreferredEnd = false;
         if (state != null && preferredEndRoutes != null && !preferredEndRoutes.isEmpty() && !state.isEverBoarded()) {
             if (this.arriveBy) {
                 if (!preferredEndRoutes.matches(route)) {
