@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
@@ -124,6 +125,14 @@ public class StreetTransitLink extends Edge {
         // conceptually it's similar to (s0.backEdge instanceof StreetTransitLink) but with
         // intervening pathways.
         boolean leavingTransit = isLeavingTransitNetwork(req);
+
+        // Check to see if we have a preferred starting or ending route when leaving transit
+        if(leavingTransit && s0.isEverBoarded()) {
+            if (s0.getOptions().violatesFinalRoute(s0.getLastPattern().route)) {
+                return null;
+            }
+        }
+
         boolean firstLink = s0.getPreTransitNumBoardings() == 0 && s0.getOptions().rctx.origin instanceof TransitVertex;
         if (s0.getPreTransitNumBoardings() >= 0 && leavingTransit && !firstLink) {
             if (s0.getNumBoardings() == s0.getPreTransitNumBoardings()) {

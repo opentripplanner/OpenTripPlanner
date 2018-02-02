@@ -1308,14 +1308,37 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /** Check if final route before walking is unpreferred. */
-    public long preferencesPenaltyForFinalRoute(Route route) {
+    public boolean violatesFinalRoute(Route route) {
         if (preferredEndRoutes != null && !this.arriveBy && !preferredEndRoutes.isEmpty() && !preferredEndRoutes.matches(route)){
-            return useUnpreferredStartEndPenalty;
+            return true;
         }
         if (preferredStartRoutes != null && this.arriveBy && !preferredStartRoutes.isEmpty() && !preferredStartRoutes.matches(route)){
-            return useUnpreferredStartEndPenalty;
+            return true;
         }
-        return 0;
+        return false;
+    }
+
+    /** Check if route is preferred according to this request. */
+    public boolean violatesStartRoute(Route route, State state) {
+
+        if (state != null && preferredStartRoutes != null && !preferredStartRoutes.isEmpty() && !state.isEverBoarded()) {
+            if (!this.arriveBy) {
+                if (!preferredStartRoutes.matches(route)) {
+                    return true;
+                }
+            }
+        }
+
+        // Add penalty if we have a preferred end that is vioalated
+        boolean isUnpreferredEnd = false;
+        if (state != null && preferredEndRoutes != null && !preferredEndRoutes.isEmpty() && !state.isEverBoarded()) {
+            if (this.arriveBy) {
+                if (!preferredEndRoutes.matches(route)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** Check if route is preferred according to this request. */

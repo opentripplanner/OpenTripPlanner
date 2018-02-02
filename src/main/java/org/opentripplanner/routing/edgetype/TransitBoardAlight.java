@@ -175,9 +175,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
 
-            // Check to see if we have a preferred starting or ending route when leaving transit
-            long preferences_penalty = options.preferencesPenaltyForFinalRoute(getPattern().route);
-            s1.incrementWeight(preferences_penalty);
 
             if (boarding) {
                 int boardingTime = options.getBoardTime(this.getPattern().mode);
@@ -237,7 +234,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             s1.setBackMode(getMode());
             return s1.makeState();
-        } else { 
+        } else {
+
+            // Check to see if we have a preferred starting or ending route when leaving transit
+            if(options.violatesStartRoute(getPattern().route, s0)) {
+                return null;
+            }
+
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
             
             /* Disallow ever re-boarding the same trip pattern. */
