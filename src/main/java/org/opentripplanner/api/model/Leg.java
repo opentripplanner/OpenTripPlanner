@@ -229,7 +229,10 @@ public class Leg {
      */
     public EncodedPolylineBean legGeometry;
 
-    /**
+    public List<EncodedPolylineBean> interStopGeometry;
+
+
+     /**
      * A series of turn by turn instructions used for walking, biking and driving. 
      */
     @XmlElementWrapper(name = "steps")
