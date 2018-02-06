@@ -153,6 +153,10 @@ public class GraphBuilderParameters {
      */
     public final String outOfAreaMessage;
 
+    /**
+     * Message for trip plan in past
+     */
+    public final String tripPlanInPastMessage;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -188,6 +192,7 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         createFlexTransfers = config.path("createFlexTransfers").asBoolean(false);
         outOfAreaMessage = config.path("outOfAreaMessage").asText("One or more endpoints is out of area.");
+        tripPlanInPastMessage = config.path("tripPlanInPastMessage").asText();
     }
 
 }

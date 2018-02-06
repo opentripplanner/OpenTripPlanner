@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.module.OutOfAreaModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.graph_builder.module.TripPlanInPastModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -328,6 +329,9 @@ public class GraphBuilder implements Runnable {
         }
         if (boundaryFile != null) {
             graphBuilder.addModule(new OutOfAreaModule(boundaryFile, builderParams.outOfAreaMessage));
+        }
+        if (builderParams.tripPlanInPastMessage != null) {
+            graphBuilder.addModule(new TripPlanInPastModule(builderParams.tripPlanInPastMessage));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;

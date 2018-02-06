@@ -35,6 +35,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.notes.PlanNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.*;
@@ -125,8 +126,8 @@ public abstract class GraphPathToTripPlanConverter {
             }
         }
 
-        if (request.rctx.graph.outOfAreaNotesService != null) {
-            addOutOfAreaWarnings(plan, request, requestedLocale);
+        for (PlanNotesService svc : request.rctx.graph.planNotesServices) {
+            addPlanNotes(svc, plan, request, requestedLocale);
         }
 
         request.rctx.debugOutput.finishedRendering();
@@ -1164,8 +1165,8 @@ public abstract class GraphPathToTripPlanConverter {
         return out;
     }
 
-    private static void addOutOfAreaWarnings(TripPlan plan, RoutingRequest request, Locale locale) {
-        for (Alert alert : request.rctx.graph.outOfAreaNotesService.getAlerts(request)) {
+    private static void addPlanNotes(PlanNotesService svc, TripPlan plan, RoutingRequest request, Locale locale) {
+        for (Alert alert : svc.getAlerts(request, plan)) {
             plan.addAlert(alert, locale);
         }
     }

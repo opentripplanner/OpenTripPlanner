@@ -95,4 +95,8 @@ public class DebugOutput {
         renderingTime = finishedRendering - finishedCalculating;
         totalTime = finishedRendering - startedCalculating;
     }
+
+    public long getStartedCalculating() {
+        return startedCalculating;
+    }
 }

@@ -12,10 +12,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.services.notes;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.RoutingRequest;
 
@@ -23,29 +20,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class OutOfAreaNotesService implements Serializable, PlanNotesService {
+public class TripPlanInPastNotesService implements Serializable, PlanNotesService {
 
     private static final long serialVersionUID = 1;
 
-    private Geometry area;
+    private String message;
 
-    private String outOfAreaMessage;
-
-    public void setArea(Geometry area) {
-        this.area = area;
+    public void setMessage(String message) {
+        this.message = message;
     }
-
-    public void setOutOfAreaMessage(String outOfAreaMessage) {
-        this.outOfAreaMessage = outOfAreaMessage;
-    }
-
+    
     @Override
     public Collection<Alert> getAlerts(RoutingRequest request, TripPlan plan) {
-        Point fromPoint = GeometryUtils.getGeometryFactory().createPoint(request.rctx.fromVertex.getCoordinate());
-        Point toPoint = GeometryUtils.getGeometryFactory().createPoint(request.rctx.toVertex.getCoordinate());
         Collection<Alert> alerts = new ArrayList<>();
-        if (!area.contains(fromPoint) || !area.contains(toPoint)) {
-            alerts.add(Alert.createSimpleAlerts(outOfAreaMessage));
+        long maxStartTime = plan.itinerary.stream()
+                .mapToLong(i -> i.startTime.getTimeInMillis())
+                .max().orElse(Long.MAX_VALUE);
+        if (maxStartTime < request.rctx.debugOutput.getStartedCalculating()) {
+            alerts.add(Alert.createSimpleAlerts(message));
         }
         return alerts;
     }
