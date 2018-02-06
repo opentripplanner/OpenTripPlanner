@@ -494,6 +494,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** whether to use trip discovery mode - search farther in future or past for shortest trip */
     public boolean tripDiscoveryMode = false;
 
+    /** Totally exclude walking from trip plan results */
+    public boolean excludeWalking = false;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge

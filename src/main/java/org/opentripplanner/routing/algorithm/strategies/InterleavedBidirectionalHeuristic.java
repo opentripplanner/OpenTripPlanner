@@ -121,6 +121,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         long start = System.currentTimeMillis();
         this.target = target;
         this.routingRequest = request.clone();
+        routingRequest.excludeWalking = false;
         routingRequest.softWalkLimiting = false;
         routingRequest.softPreTransitLimiting = false;
         routingRequest.maxWalkDistance = request.maxWalkDistanceHeuristic;
