@@ -420,7 +420,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useReservationServices = true;
 
     /**
-     * Whether to use eligibility-based services (not in data yet)
+     * Whether to use eligibility-based services
      */
     public boolean useEligibilityServices = true;
 

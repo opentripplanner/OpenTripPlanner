@@ -378,7 +378,7 @@ public abstract class RoutingResource {
     protected Boolean useReservationServices = true;
 
     /**
-     * Whether to use eligibility-based services (not in data yet)
+     * Whether to use eligibility-based services
      */
     @QueryParam("useEligibilityServices")
     protected Boolean useEligibilityServices = true;
