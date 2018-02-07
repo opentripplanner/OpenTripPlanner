@@ -175,12 +175,12 @@ public class PartialPatternHop extends PatternHop {
     }
 
     // is this hop too not-different to care about? for now lets say should be > 50 m shorter than original hop
-    public boolean isTrivial() {
+    public boolean isTrivial(RoutingRequest options) {
         if ((isDeviatedRouteBoard() && getStartVehicleTime() < 5) || (isDeviatedRouteAlight() && getEndVehicleTime() < 5))
             return true;
         double length = SphericalDistanceLibrary.fastLength(getGeometry());
         double parentLength = SphericalDistanceLibrary.fastLength(getOriginalHop().getGeometry());
-        if (length == 0) {
+        if (length == 0 || length < options.minPartialHopLength) {
             return true;
         }
         if (parentLength == 0) {

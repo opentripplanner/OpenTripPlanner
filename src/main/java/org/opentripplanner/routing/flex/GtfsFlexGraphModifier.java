@@ -309,7 +309,7 @@ public abstract class GtfsFlexGraphModifier {
             TemporaryPatternArriveVertex patternArriveVertex = createPatternArriveVertex(rr, originalPatternHop, flagStop);
 
             TemporaryPartialPatternHop newHop = shortenEnd(rr, state, reverseHop, patternArriveVertex, flagStop);
-            if (newHop == null || newHop.isTrivial()) {
+            if (newHop == null || newHop.isTrivial(rr)) {
                 if (newHop != null)
                     newHop.dispose();
                 continue;
@@ -322,7 +322,7 @@ public abstract class GtfsFlexGraphModifier {
         TemporaryPatternArriveVertex patternArriveVertex = createPatternArriveVertex(rr, originalPatternHop, flagStop);
 
         TemporaryPartialPatternHop hop = makeHopNewTo(rr, state, originalPatternHop, patternArriveVertex, flagStop);
-        if (hop == null || hop.isTrivial()) {
+        if (hop == null || hop.isTrivial(rr)) {
             if (hop != null) {
                 hop.dispose();
             }
@@ -344,7 +344,7 @@ public abstract class GtfsFlexGraphModifier {
         TemporaryPatternDepartVertex patternDepartVertex = createPatternDepartVertex(rr, originalPatternHop, flagStop);
 
         TemporaryPartialPatternHop hop = makeHopNewFrom(rr, state, originalPatternHop, patternDepartVertex, flagStop);
-        if (hop == null || hop.isTrivial()) {
+        if (hop == null || hop.isTrivial(rr)) {
             if (hop != null) {
                 hop.dispose();
             }

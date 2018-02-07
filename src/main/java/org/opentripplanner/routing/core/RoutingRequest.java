@@ -497,6 +497,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Totally exclude walking from trip plan results */
     public boolean excludeWalking = false;
 
+    /** Minimum length of partial hop edges */
+    public int minPartialHopLength = 400;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -1022,7 +1025,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
                 && tripDiscoveryMode == other.tripDiscoveryMode
-                && ignoreDrtAdvanceBookMin == other.ignoreDrtAdvanceBookMin;
+                && ignoreDrtAdvanceBookMin == other.ignoreDrtAdvanceBookMin
+                && minPartialHopLength == other.minPartialHopLength;
     }
 
     /**
@@ -1055,7 +1059,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
                 + new Boolean(tripDiscoveryMode).hashCode() * 209477
-                + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 1371;
+                + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 1371
+                + Integer.hashCode(minPartialHopLength) * 15485863;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters

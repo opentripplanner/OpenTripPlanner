@@ -48,7 +48,7 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     }
 
     @Override
-    public boolean isTrivial() {
+    public boolean isTrivial(RoutingRequest options) {
         return false;
     }
 
