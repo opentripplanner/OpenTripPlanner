@@ -94,6 +94,10 @@ public abstract class RoutingResource {
     @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
 
+    /** The maximum distance (in meters) the user is willing to walk - specific to IBH. Defaults to unlimited. */
+    @QueryParam("maxWalkDistanceHeuristic")
+    protected Double maxWalkDistanceHeuristic;
+
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
@@ -468,12 +472,13 @@ public abstract class RoutingResource {
         if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
             request.maxTransferWalkDistance = maxWalkDistance;
-            if (request.maxWalkDistanceHeuristic == Double.MAX_VALUE) {
-                request.maxWalkDistanceHeuristic = Math.max(maxWalkDistance, 1608);
-            }
             if (maxWalkDistance == 0.0) {
                 request.excludeWalking = true;
             }
+        }
+
+        if (maxWalkDistanceHeuristic != null) {
+            request.maxWalkDistanceHeuristic = maxWalkDistanceHeuristic;
         }
 
         if (maxPreTransitTime != null)
