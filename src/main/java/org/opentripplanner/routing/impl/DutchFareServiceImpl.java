@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,18 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DutchFareServiceImpl.class);
 
     public static final int TRANSFER_DURATION = 60 * 35; /* tranfers within 35 min won't require a new base fare */
-
+    
+    @Override
+    protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
+                                   Collection<FareRuleSet> fareRules) {
+        float lowestCost = getLowestCost(fareType, rides, fareRules);
+        if(lowestCost != Float.POSITIVE_INFINITY) {
+            fare.addFare(fareType, getMoney(currency, lowestCost));
+            return true;
+        }
+        return false;
+    }
+ 
     /* The Netherlands has an almost uniform system for electronic ticketing using a NFC-card, branded as OV-chipkaart.
      *
      * To travel through all modes in The Netherlands a uses has two products on their card:
@@ -143,7 +156,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             for (FareRuleSet ruleSet : fareRules) {
                 if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
                     cost -= ruleSet.getFareAttribute().getPrice();
-                    break;
+                    return cost;
                 }
             }
 
