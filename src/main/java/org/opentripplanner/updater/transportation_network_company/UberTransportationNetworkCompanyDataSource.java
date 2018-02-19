@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -28,18 +30,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UberTransportationNetworkCompanyDataSource implements TransportationNetworkCompanyDataSource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UberTransportationNetworkCompanyDataSource.class);
+
     private static final String UBER_API_URL = "https://api.uber.com/v1.2/";
 
-    private String authToken;
+    private String serverToken;
     private String baseUrl;
 
-    public UberTransportationNetworkCompanyDataSource (String authToken) {
-        this.authToken = authToken;
+    public UberTransportationNetworkCompanyDataSource (String serverToken) {
+        this.serverToken = serverToken;
         this.baseUrl = UBER_API_URL;
     }
 
-    public UberTransportationNetworkCompanyDataSource (String authToken, String baseUrl) {
-        this.authToken = authToken;
+    public UberTransportationNetworkCompanyDataSource (String serverToken, String baseUrl) {
+        this.serverToken = serverToken;
         this.baseUrl = baseUrl;
     }
 
@@ -49,11 +54,14 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
         uriBuilder.queryParam("start_latitude", lat);
         uriBuilder.queryParam("start_longitude", lon);
-        URL uberUrl = new URL(uriBuilder.toString());
+        String requestUrl = uriBuilder.toString();
+        URL uberUrl = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
-        connection.setRequestProperty("Authorization", authToken);
+        connection.setRequestProperty("Authorization", "Token " + serverToken);
         connection.setRequestProperty("Accept-Language", "en_US");
         connection.setRequestProperty("Content-Type", "application/json");
+
+        LOG.info("Made request to uber API at following URL: " + requestUrl);
 
         // make request, parse repsonse
         InputStream responseStream = connection.getInputStream();
@@ -64,6 +72,8 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         ArrayList<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
 
         ArrayNode times = (ArrayNode) json.get("times");
+
+        LOG.info("Received " + times.size() + " uber arrival time estimates");
 
         for (final JsonNode time: times) {
             arrivalTimes.add(
@@ -79,7 +89,46 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public EstimatedRideTime getEstimatedRideTime(double startLat, double startLon, double endLat, double endLon) {
-        return null;
+    public EstimatedRideTime getEstimatedRideTime(
+        String productId,
+        double startLatitude,
+        double startLongitude,
+        double endLatitude,
+        double endLongitude
+    ) throws IOException {
+        // prepare request
+        UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
+        uriBuilder.queryParam("start_latitude", startLatitude);
+        uriBuilder.queryParam("start_longitude", startLongitude);
+        uriBuilder.queryParam("end_latitude", endLatitude);
+        uriBuilder.queryParam("end_longitude", endLongitude);
+        String requestUrl = uriBuilder.toString();
+        URL uberUrl = new URL(requestUrl);
+        HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
+        connection.setRequestProperty("Authorization", "Token " + serverToken);
+        connection.setRequestProperty("Accept-Language", "en_US");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        LOG.info("Made request to uber API at following URL: " + requestUrl);
+
+        // make request, parse repsonse
+        InputStream responseStream = connection.getInputStream();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode json = objectMapper.readValue(responseStream, JsonNode.class);
+
+        ArrayNode prices = (ArrayNode) json.get("prices");
+
+        LOG.info("Recieved " + prices.size() + " uber price/time estimates");
+
+        EstimatedRideTime rideTime = null;
+
+        for (final JsonNode price: prices) {
+            if (price.get("product_id").textValue().equals(productId)) {
+                rideTime = new EstimatedRideTime(price.get("duration").asInt());
+                break;
+            }
+        }
+
+        return rideTime;
     }
 }

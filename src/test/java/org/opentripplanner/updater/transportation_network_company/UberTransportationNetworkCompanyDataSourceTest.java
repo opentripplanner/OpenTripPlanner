@@ -17,6 +17,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +28,11 @@ import static org.junit.Assert.assertEquals;
 
 public class UberTransportationNetworkCompanyDataSourceTest {
 
+    private static UberTransportationNetworkCompanyDataSource source = new UberTransportationNetworkCompanyDataSource(
+        "test",
+        "http://localhost:8089/"
+    );
+
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(
         options()
@@ -36,20 +42,15 @@ public class UberTransportationNetworkCompanyDataSourceTest {
 
     @Test
     public void testGetArrivalTimes () throws IOException {
-        // setup mock server to respond to
+        // setup mock server to respond to ride estimate request
         stubFor(
             get(urlPathEqualTo("/estimates/time"))
                 .withQueryParam("start_latitude", equalTo("1.2"))
                 .withQueryParam("start_longitude", equalTo("3.4"))
                 .willReturn(
                     aResponse()
-                        .withBodyFile("uber_estimates.json")
+                        .withBodyFile("uber_arrival_estimates.json")
                 )
-        );
-
-        UberTransportationNetworkCompanyDataSource source = new UberTransportationNetworkCompanyDataSource(
-            "test",
-            "http://localhost:8089/"
         );
 
         List<ArrivalTime> arrivalTimes = source.getArrivalTimes(1.2, 3.4);
@@ -59,5 +60,31 @@ public class UberTransportationNetworkCompanyDataSourceTest {
         assertEquals(arrival.displayName, "POOL");
         assertEquals(arrival.productId, "26546650-e557-4a7b-86e7-6a3942445247");
         assertEquals(arrival.estimatedSeconds, 60);
+    }
+
+    @Test
+    public void testGetEstimatedRideTime () throws IOException  {
+        // setup mock server to respond to estimated ride time request
+        stubFor(
+            get(urlPathEqualTo("/estimates/time"))
+                .withQueryParam("start_latitude", equalTo("1.2"))
+                .withQueryParam("start_longitude", equalTo("3.4"))
+                .withQueryParam("end_latitude", equalTo("1.201"))
+                .withQueryParam("end_longitude", equalTo("3.401"))
+                .willReturn(
+                    aResponse()
+                        .withBodyFile("uber_trip_estimates.json")
+                )
+        );
+
+        EstimatedRideTime rideTime = source.getEstimatedRideTime(
+            "26546650-e557-4a7b-86e7-6a3942445247",
+            1.2,
+            3.4,
+            1.201,
+            3.401
+        );
+
+        assertEquals(rideTime.duration, 1080);
     }
 }

@@ -25,5 +25,5 @@ public interface TransportationNetworkCompanyDataSource {
     List<ArrivalTime> getArrivalTimes(double lat, double lon) throws IOException;
 
     // get the estimated trip time
-    EstimatedRideTime getEstimatedRideTime(double startLat, double startLon, double endLat, double endLon);
+    EstimatedRideTime getEstimatedRideTime(String rideType, double startLat, double startLon, double endLat, double endLon) throws IOException;
 }
