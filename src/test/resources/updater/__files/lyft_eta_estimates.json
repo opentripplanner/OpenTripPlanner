@@ -1,0 +1,22 @@
+{
+  "eta_estimates": [
+    {
+      "display_name": "Lyft Line",
+      "ride_type": "lyft_line",
+      "eta_seconds": 120,
+      "is_valid_estimate": true
+    },
+    {
+      "display_name": "Lyft",
+      "ride_type": "lyft",
+      "eta_seconds": 120,
+      "is_valid_estimate": true
+    },
+    {
+      "display_name": "Lyft Plus",
+      "ride_type": "lyft_plus",
+      "eta_seconds": 660,
+      "is_valid_estimate": true
+    }
+  ]
+}

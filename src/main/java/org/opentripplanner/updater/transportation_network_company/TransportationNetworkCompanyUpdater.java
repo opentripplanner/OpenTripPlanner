@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.transportation_network_company.lyft.LyftTransportationNetworkCompanyDataSource;
+import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 
 public class TransportationNetworkCompanyUpdater implements GraphUpdater {
 
@@ -48,6 +50,11 @@ public class TransportationNetworkCompanyUpdater implements GraphUpdater {
         if (sourceType != null) {
             if (sourceType.equals("uber")) {
                 source = new UberTransportationNetworkCompanyDataSource(config.path("serverToken").asText());
+            } else if (sourceType.equals("lyft")) {
+                source = new LyftTransportationNetworkCompanyDataSource(
+                    config.path("clientId").asText(),
+                    config.path("clientSecret").asText()
+                );
             }
         }
     }

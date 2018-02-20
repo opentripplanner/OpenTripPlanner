@@ -1,0 +1,6 @@
+{
+  "token_type": "Bearer",
+  "access_token": "test_token",
+  "expires_in": 86400,
+  "scope": "public"
+}

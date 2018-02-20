@@ -22,8 +22,14 @@ import java.util.List;
 public interface TransportationNetworkCompanyDataSource {
 
     // get the next arrivals for a specific location
-    List<ArrivalTime> getArrivalTimes(double lat, double lon) throws IOException;
+    List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException;
 
     // get the estimated trip time
-    EstimatedRideTime getEstimatedRideTime(String rideType, double startLat, double startLon, double endLat, double endLon) throws IOException;
+    EstimatedRideTime getEstimatedRideTime(
+        String rideType,
+        double startLatitude,
+        double startLongitude,
+        double endLatitude,
+        double endLongitude
+    ) throws IOException;
 }
