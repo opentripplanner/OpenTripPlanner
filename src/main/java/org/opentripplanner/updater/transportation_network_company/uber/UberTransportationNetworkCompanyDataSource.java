@@ -49,11 +49,11 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public List<ArrivalTime> getArrivalTimes(double lat, double lon) throws IOException {
+    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
-        uriBuilder.queryParam("start_latitude", lat);
-        uriBuilder.queryParam("start_longitude", lon);
+        uriBuilder.queryParam("start_latitude", latitude);
+        uriBuilder.queryParam("start_longitude", longitude);
         String requestUrl = uriBuilder.toString();
         URL uberUrl = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
