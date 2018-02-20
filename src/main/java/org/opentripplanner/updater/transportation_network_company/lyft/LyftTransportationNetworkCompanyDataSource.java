@@ -70,6 +70,7 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
             String userpass = clientId + ":" + clientSecret;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
             connection.setRequestProperty("Authorization", basicAuth);
+            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
             // set request body
             LyftAuthenticationRequestBody authRequest = new LyftAuthenticationRequestBody(
@@ -102,6 +103,7 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Authorization", "Bearer " + getAccessToken());
+        connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
         LOG.info("Made request to lyft API at following URL: " + requestUrl);
 
@@ -147,6 +149,7 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Authorization", "Bearer " + getAccessToken());
+        connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
         LOG.info("Made request to lyft API at following URL: " + requestUrl);
 
