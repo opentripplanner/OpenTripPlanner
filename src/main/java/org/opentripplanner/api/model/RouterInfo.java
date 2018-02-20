@@ -15,28 +15,24 @@ package org.opentripplanner.api.model;
 
 import com.conveyal.geojson.GeometryDeserializer;
 import com.conveyal.geojson.GeometrySerializer;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
-
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
@@ -84,7 +80,12 @@ public class RouterInfo {
         addCenter(graph.getCenter());
         service = graph.getService(BikeRentalStationService.class, false);
         hasParkRide = graph.hasParkRide;
-        travelOptions = TravelOptionsMaker.makeOptions(graph);
+        travelOptions = TravelOptionsMaker.makeOptions(
+            graph.getTransitModes(),
+            graph.hasBikeSharing || getHasBikeSharing(),
+            graph.hasBikeRide || getHasBikePark(),
+            graph.hasParkRide
+        );
     }
 
     public boolean getHasBikeSharing() {
