@@ -22,6 +22,7 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.SearchTimeoutException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -37,6 +38,7 @@ public class PlannerError {
         messages = new HashMap<Class<? extends Exception>, Message> ();
         messages.put(VertexNotFoundException.class,  Message.OUTSIDE_BOUNDS);
         messages.put(PathNotFoundException.class,    Message.PATH_NOT_FOUND);
+        messages.put(SearchTimeoutException.class,    Message.REQUEST_TIMEOUT);
         messages.put(LocationNotAccessible.class,    Message.LOCATION_NOT_ACCESSIBLE);
         messages.put(TransitTimesException.class,    Message.NO_TRANSIT_TIMES);
         messages.put(TrivialPathException.class,     Message.TOO_CLOSE);
