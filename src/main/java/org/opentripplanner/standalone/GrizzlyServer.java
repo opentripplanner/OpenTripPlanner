@@ -75,6 +75,7 @@ public class GrizzlyServer {
         sslConfig.setKeyStorePass("opentrip");
 
         /* Set up a pool of threads to handle incoming HTTP requests. */
+        // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(MIN_THREADS)
             .setMaxPoolSize(getMaxThreads());
