@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,11 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
+    public TransportationNetworkCompany getType() {
+        return TransportationNetworkCompany.UBER;
+    }
+
+    @Override
     public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
@@ -77,6 +83,7 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         for (final UberArrivalEstimate time: response.times) {
             arrivalTimes.add(
                 new ArrivalTime(
+                    TransportationNetworkCompany.UBER,
                     time.product_id,
                     time.localized_display_name,
                     time.estimate

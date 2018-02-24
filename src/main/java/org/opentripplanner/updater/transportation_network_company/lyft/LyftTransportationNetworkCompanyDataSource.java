@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +95,11 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
+    public TransportationNetworkCompany getType() {
+        return TransportationNetworkCompany.LYFT;
+    }
+
+    @Override
     public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "v1/eta");
@@ -121,6 +127,7 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
         for (final LyftArrivalEstimate time: response.eta_estimates) {
             arrivalTimes.add(
                 new ArrivalTime(
+                    TransportationNetworkCompany.LYFT,
                     time.ride_type,
                     time.display_name,
                     time.eta_seconds

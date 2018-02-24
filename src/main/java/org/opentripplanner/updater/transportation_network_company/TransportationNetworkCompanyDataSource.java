@@ -15,11 +15,14 @@ package org.opentripplanner.updater.transportation_network_company;
 
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface TransportationNetworkCompanyDataSource {
+
+    TransportationNetworkCompany getType();
 
     // get the next arrivals for a specific location
     List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException;
