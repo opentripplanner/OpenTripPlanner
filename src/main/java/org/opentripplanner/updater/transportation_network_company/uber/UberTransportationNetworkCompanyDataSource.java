@@ -16,7 +16,7 @@ package org.opentripplanner.updater.transportation_network_company.uber;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public EstimatedRideTime getEstimatedRideTime(
+    public RideEstimate getRideEstimate(
         String productId,
         double startLatitude,
         double startLongitude,
@@ -103,7 +103,7 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         double endLongitude
     ) throws IOException {
         // prepare request
-        UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
+        UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/price");
         uriBuilder.queryParam("start_latitude", startLatitude);
         uriBuilder.queryParam("start_longitude", startLongitude);
         uriBuilder.queryParam("end_latitude", endLatitude);
@@ -123,13 +123,17 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         UberTripTimeEstimateResponse response = mapper.readValue(responseStream, UberTripTimeEstimateResponse.class);
 
+        if (response.prices == null) {
+            return null;
+        }
+
         LOG.info("Recieved " + response.prices.size() + " uber price/time estimates");
 
-        EstimatedRideTime rideTime = null;
+        RideEstimate rideTime = null;
 
         for (final UberTripTimeEstimate price: response.prices) {
             if (price.product_id.equals(productId)) {
-                rideTime = new EstimatedRideTime(price.duration);
+                rideTime = new RideEstimate(price.duration);
                 break;
             }
         }

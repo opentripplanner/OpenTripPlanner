@@ -17,7 +17,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class UberTransportationNetworkCompanyDataSourceTest {
     public void testGetEstimatedRideTime () throws IOException  {
         // setup mock server to respond to estimated ride time request
         stubFor(
-            get(urlPathEqualTo("/estimates/time"))
+            get(urlPathEqualTo("/estimates/price"))
                 .withQueryParam("start_latitude", equalTo("1.2"))
                 .withQueryParam("start_longitude", equalTo("3.4"))
                 .withQueryParam("end_latitude", equalTo("1.201"))
@@ -78,7 +78,7 @@ public class UberTransportationNetworkCompanyDataSourceTest {
                 )
         );
 
-        EstimatedRideTime rideTime = source.getEstimatedRideTime(
+        RideEstimate rideTime = source.getRideEstimate(
             "26546650-e557-4a7b-86e7-6a3942445247",
             1.2,
             3.4,

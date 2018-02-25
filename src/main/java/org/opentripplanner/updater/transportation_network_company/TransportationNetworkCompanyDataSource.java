@@ -14,7 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.transportation_network_company;
 
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public interface TransportationNetworkCompanyDataSource {
     List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException;
 
     // get the estimated trip time
-    EstimatedRideTime getEstimatedRideTime(
+    RideEstimate getRideEstimate(
         String rideType,
         double startLatitude,
         double startLongitude,

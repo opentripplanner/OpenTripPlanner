@@ -13,10 +13,12 @@
 
 package org.opentripplanner.routing.transportation_network_company;
 
+import org.opentripplanner.api.model.Place;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +38,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     }
 
     public List<ArrivalTime> getArrivalTimes(
-        double latitude,
-        double longitude,
+        Place place,
         String companies
     ) throws ExecutionException, InterruptedException {
 
@@ -48,22 +49,7 @@ public class TransportationNetworkCompanyService implements Serializable {
 
         // parse list of tnc companies
         for (String company : companies.split(",")) {
-            TransportationNetworkCompany co = TransportationNetworkCompany.valueOf(company);
-            if (co == null) {
-                throw new UnsupportedOperationException("Transportation Network Company value " +
-                    company +
-                    " is not a valid type"
-                );
-            }
-
-            if (!sources.containsKey(co)) {
-                throw new UnsupportedOperationException("Transportation Network Company value " +
-                    company +
-                    " is not configured in this router"
-                );
-            }
-
-            companiesToRequestFrom.add(sources.get(co));
+            companiesToRequestFrom.add(getTransportationNetworkCompanyDataSource(company));
         }
 
         if (companiesToRequestFrom.size() == 0) {
@@ -80,7 +66,7 @@ public class TransportationNetworkCompanyService implements Serializable {
             tasks.add(new Callable<List<ArrivalTime>>() {
                 public List<ArrivalTime> call() throws Exception {
                     LOG.info("Finding TNC arrival times for " + transportationNetworkCompany.getType());
-                    return transportationNetworkCompany.getArrivalTimes(latitude, longitude);
+                    return transportationNetworkCompany.getArrivalTimes(place.lat, place.lon);
                 }
             });
         }
@@ -95,5 +81,34 @@ public class TransportationNetworkCompanyService implements Serializable {
         pool.shutdown();
 
         return arrivalTimes;
+    }
+
+    public RideEstimate getRideEstimate(
+        String company,
+        String rideType,
+        Place fromPlace,
+        Place toPlace
+    ) throws IOException {
+        TransportationNetworkCompanyDataSource source = getTransportationNetworkCompanyDataSource(company);
+        return source.getRideEstimate(rideType, fromPlace.lat, fromPlace.lon, toPlace.lat, toPlace.lon);
+    }
+
+    private TransportationNetworkCompanyDataSource getTransportationNetworkCompanyDataSource(String company) {
+        TransportationNetworkCompany co = TransportationNetworkCompany.valueOf(company);
+        if (co == null) {
+            throw new UnsupportedOperationException("Transportation Network Company value " +
+                company +
+                " is not a valid type"
+            );
+        }
+
+        if (!sources.containsKey(co)) {
+            throw new UnsupportedOperationException("Transportation Network Company value " +
+                company +
+                " is not configured in this router"
+            );
+        }
+
+        return sources.get(co);
     }
 }

@@ -14,7 +14,7 @@
 package org.opentripplanner.api.model;
 
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,24 +25,24 @@ public class TransportationNetworkCompanyResponse {
 
     private String error;
     private List<ArrivalTime> estimates;
-    private EstimatedRideTime rideTime;
+    private RideEstimate rideEstimate;
 
     @XmlElement(required=false)
     public List<ArrivalTime> getEstimates() {
         return estimates;
     }
 
-    public void setEstimates(List<ArrivalTime> estimates) {
+    public void setEtaEstimates(List<ArrivalTime> estimates) {
         this.estimates = estimates;
     }
 
     @XmlElement(required=false)
-    public EstimatedRideTime getRideTime() {
-        return rideTime;
+    public RideEstimate getRideEstimate() {
+        return rideEstimate;
     }
 
-    public void setRideTime(EstimatedRideTime rideTime) {
-        this.rideTime = rideTime;
+    public void setRideEstimate(RideEstimate rideEstimate) {
+        this.rideEstimate = rideEstimate;
     }
 
     /** The error (if any) that this response raised. */

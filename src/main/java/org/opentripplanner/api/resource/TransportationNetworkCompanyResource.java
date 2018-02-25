@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.resource;
 
+import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.OTPServer;
@@ -35,8 +36,9 @@ public class TransportationNetworkCompanyResource {
     @Context
     OTPServer otpServer;
 
-    @GET @Path("/eta_estimate")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @GET
+    @Path("/eta_estimate")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
     public TransportationNetworkCompanyResponse getEtaEstimates(
         @QueryParam("from") String from,
         @QueryParam("companies") String companies,
@@ -46,60 +48,85 @@ public class TransportationNetworkCompanyResource {
 
         TransportationNetworkCompanyResponse response = new TransportationNetworkCompanyResponse();
 
-        if (companies == null) {
-            response.setError(
-                new UnsupportedOperationException("companies paramater is required")
-            );
-            return response;
+        try {
+            requireParameter(companies, "companies");
+            Place fromPlace = getPlace(from, "from");
+            TransportationNetworkCompanyService service = getService(routerId);
+            response.setEtaEstimates(service.getArrivalTimes(fromPlace, companies));
+        } catch (Exception e) {
+            response.setError(e);
         }
 
-        if (from == null) {
-            response.setError(
-                new UnsupportedOperationException("from paramater is required")
-            );
-            return response;
+        return response;
+    }
+
+    @GET
+    @Path("/ride_estimate")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
+    public TransportationNetworkCompanyResponse getRideEstimate(
+        @QueryParam("from") String from,
+        @QueryParam("to") String to,
+        @QueryParam("company") String company,
+        @QueryParam("rideType") String rideType,
+        @PathParam("routerId") String routerId
+    ) {
+        LOG.info("Received ride_estimate request");
+
+        TransportationNetworkCompanyResponse response = new TransportationNetworkCompanyResponse();
+
+        try {
+            requireParameter(company, "company");
+            requireParameter(rideType, "rideType");
+            Place fromPlace = getPlace(from, "from");
+            Place toPlace = getPlace(to, "to");
+            TransportationNetworkCompanyService service = getService(routerId);
+            response.setRideEstimate(service.getRideEstimate(company, rideType, fromPlace, toPlace));
+        } catch (Exception e) {
+            response.setError(e);
         }
 
-        String[] fields = from.split(",");
+        return response;
+    }
+
+    private Place getPlace(String positionString, String paramName) throws Exception {
+        requireParameter(positionString, paramName);
+
+        String[] fields = positionString.split(",");
         double latitude, longitude;
         try {
             latitude = Double.parseDouble(fields[0]);
             longitude = Double.parseDouble(fields[1]);
         } catch (Exception e) {
-            response.setError(new Exception("Invalid format of from parameter.  Should be `lat,lon`."));
-            return response;
+            throw new Exception("Invalid format of " + paramName + " parameter.  Should be `lat,lon`.");
         }
 
-        try {
-            checkRangeInclusive(latitude,  -90,  90);
-            checkRangeInclusive(longitude, -180, 180);
-        } catch (Exception e) {
-            response.setError(e);
-            return response;
-        }
+        checkRangeInclusive(latitude, -90, 90);
+        checkRangeInclusive(longitude, -180, 180);
 
+        Place place = new Place();
+        place.lat = latitude;
+        place.lon = longitude;
+
+        return place;
+    }
+
+    private TransportationNetworkCompanyService getService(String routerId) {
         Router router = otpServer.getRouter(routerId);
         if (router == null) {
-            response.setError(
-                new UnsupportedOperationException("Unable to find router with id: " + routerId)
-            );
-            return response;
+            throw new UnsupportedOperationException("Unable to find router with id: " + routerId);
         }
 
         TransportationNetworkCompanyService service = router.graph.getService(TransportationNetworkCompanyService.class);
         if (service == null) {
-            response.setError(
-                new UnsupportedOperationException("Unconfigured Transportaiton Network Company service for router with id: " + routerId)
-            );
-            return response;
+            throw new UnsupportedOperationException("Unconfigured Transportaiton Network Company service for router with id: " + routerId);
         }
 
-        try {
-            response.setEstimates(service.getArrivalTimes(latitude, longitude, companies));
-        } catch (Exception e) {
-            response.setError(e);
-        }
-        return response;
+        return service;
     }
 
+    private void requireParameter(String param, String paramName) {
+        if (param == null) {
+            throw new UnsupportedOperationException(paramName + " paramater is required");
+        }
+    }
 }

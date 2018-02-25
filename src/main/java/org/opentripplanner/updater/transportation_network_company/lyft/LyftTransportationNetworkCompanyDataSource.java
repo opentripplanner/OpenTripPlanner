@@ -16,7 +16,7 @@ package org.opentripplanner.updater.transportation_network_company.lyft;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
@@ -139,7 +139,7 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public EstimatedRideTime getEstimatedRideTime(
+    public RideEstimate getRideEstimate(
         String rideType,
         double startLatitude,
         double startLongitude,
@@ -168,11 +168,11 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
 
         LOG.info("Recieved " + response.cost_estimates.size() + " lyft price/time estimates");
 
-        EstimatedRideTime rideTime = null;
+        RideEstimate rideTime = null;
 
         for (final LyftRideEstimate estimate: response.cost_estimates) {
             if (estimate.ride_type.equals(rideType)) {
-                rideTime = new EstimatedRideTime(estimate.estimated_duration_seconds);
+                rideTime = new RideEstimate(estimate.estimated_duration_seconds);
                 break;
             }
         }

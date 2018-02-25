@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.EstimatedRideTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.updater.transportation_network_company.lyft.LyftAuthenticationRequestBody;
 import org.opentripplanner.updater.transportation_network_company.lyft.LyftTransportationNetworkCompanyDataSource;
 
@@ -100,7 +100,7 @@ public class LyftTransportationNetworkCompanyDataSourceTest {
                 )
         );
 
-        EstimatedRideTime rideTime = source.getEstimatedRideTime(
+        RideEstimate rideTime = source.getRideEstimate(
             "lyft",
             1.2,
             3.4,
