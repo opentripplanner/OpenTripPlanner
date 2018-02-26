@@ -17,8 +17,10 @@ package org.opentripplanner.routing.transportation_network_company;
 public class RideEstimate {
 
     public int duration;  // in seconds
+    public String rideType;
 
-    public RideEstimate(int duration) {
+    public RideEstimate(String rideType, int duration) {
         this.duration = duration;
+        this.rideType = rideType;
     }
 }

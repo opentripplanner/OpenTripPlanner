@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
+import org.opentripplanner.updater.transportation_network_company.Position;
+import org.opentripplanner.updater.transportation_network_company.RideEstimateRequest;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LyftTransportationNetworkCompanyDataSource implements TransportationNetworkCompanyDataSource {
+public class LyftTransportationNetworkCompanyDataSource extends TransportationNetworkCompanyDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LyftTransportationNetworkCompanyDataSource.class);
 
@@ -100,11 +102,11 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException {
+    public List<ArrivalTime> queryArrivalTimes(Position request) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "v1/eta");
-        uriBuilder.queryParam("lat", latitude);
-        uriBuilder.queryParam("lng", longitude);
+        uriBuilder.queryParam("lat", request.latitude);
+        uriBuilder.queryParam("lng", request.longitude);
         String requestUrl = uriBuilder.toString();
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -139,19 +141,15 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public RideEstimate getRideEstimate(
-        String rideType,
-        double startLatitude,
-        double startLongitude,
-        double endLatitude,
-        double endLongitude
+    public List<RideEstimate> queryRideEstimates(
+        RideEstimateRequest request
     ) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "v1/cost");
-        uriBuilder.queryParam("start_lat", startLatitude);
-        uriBuilder.queryParam("start_lng", startLongitude);
-        uriBuilder.queryParam("end_lat", endLatitude);
-        uriBuilder.queryParam("end_lng", endLongitude);
+        uriBuilder.queryParam("start_lat", request.startPosition.latitude);
+        uriBuilder.queryParam("start_lng", request.startPosition.longitude);
+        uriBuilder.queryParam("end_lat", request.endPosition.latitude);
+        uriBuilder.queryParam("end_lng", request.endPosition.longitude);
         String requestUrl = uriBuilder.toString();
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -166,21 +164,18 @@ public class LyftTransportationNetworkCompanyDataSource implements Transportatio
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         LyftRideEstimateResponse response = mapper.readValue(responseStream, LyftRideEstimateResponse.class);
 
-        LOG.info("Recieved " + response.cost_estimates.size() + " lyft price/time estimates");
-
-        RideEstimate rideTime = null;
-
-        for (final LyftRideEstimate estimate: response.cost_estimates) {
-            if (estimate.ride_type.equals(rideType)) {
-                rideTime = new RideEstimate(estimate.estimated_duration_seconds);
-                break;
-            }
+        if (response.cost_estimates == null) {
+            throw new IOException("Unrecocginzed response format");
         }
 
-        return rideTime;
-    }
+        LOG.info("Recieved " + response.cost_estimates.size() + " lyft price/time estimates");
 
-    public void authenticate() throws IOException {
-        getAccessToken();
+        List<RideEstimate> estimates = new ArrayList<RideEstimate>();
+
+        for (final LyftRideEstimate estimate: response.cost_estimates) {
+            estimates.add(new RideEstimate(estimate.ride_type, estimate.estimated_duration_seconds));
+        }
+
+        return estimates;
     }
 }

@@ -88,7 +88,7 @@ public class TransportationNetworkCompanyService implements Serializable {
         String rideType,
         Place fromPlace,
         Place toPlace
-    ) throws IOException {
+    ) throws IOException, ExecutionException {
         TransportationNetworkCompanyDataSource source = getTransportationNetworkCompanyDataSource(company);
         return source.getRideEstimate(rideType, fromPlace.lat, fromPlace.lon, toPlace.lat, toPlace.lon);
     }

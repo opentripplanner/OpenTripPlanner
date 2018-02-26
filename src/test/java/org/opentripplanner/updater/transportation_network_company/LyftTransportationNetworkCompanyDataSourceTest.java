@@ -25,6 +25,7 @@ import org.opentripplanner.updater.transportation_network_company.lyft.LyftTrans
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -64,7 +65,7 @@ public class LyftTransportationNetworkCompanyDataSourceTest {
     }
 
     @Test
-    public void testGetArrivalTimes () throws IOException {
+    public void testGetArrivalTimes () throws IOException, ExecutionException {
         // setup mock server to respond to ride estimate request
         stubFor(
             get(urlPathEqualTo("/v1/eta"))
@@ -86,7 +87,7 @@ public class LyftTransportationNetworkCompanyDataSourceTest {
     }
 
     @Test
-    public void testGetEstimatedRideTime () throws IOException  {
+    public void testGetEstimatedRideTime () throws IOException, ExecutionException {
         // setup mock server to respond to estimated ride time request
         stubFor(
             get(urlPathEqualTo("/v1/cost"))

@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
+import org.opentripplanner.updater.transportation_network_company.Position;
+import org.opentripplanner.updater.transportation_network_company.RideEstimateRequest;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UberTransportationNetworkCompanyDataSource implements TransportationNetworkCompanyDataSource {
+public class UberTransportationNetworkCompanyDataSource extends TransportationNetworkCompanyDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(UberTransportationNetworkCompanyDataSource.class);
 
@@ -55,11 +57,11 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException {
+    public List<ArrivalTime> queryArrivalTimes(Position position) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
-        uriBuilder.queryParam("start_latitude", latitude);
-        uriBuilder.queryParam("start_longitude", longitude);
+        uriBuilder.queryParam("start_latitude", position.latitude);
+        uriBuilder.queryParam("start_longitude", position.longitude);
         String requestUrl = uriBuilder.toString();
         URL uberUrl = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
@@ -95,19 +97,15 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
     }
 
     @Override
-    public RideEstimate getRideEstimate(
-        String productId,
-        double startLatitude,
-        double startLongitude,
-        double endLatitude,
-        double endLongitude
+    public List<RideEstimate> queryRideEstimates(
+        RideEstimateRequest request
     ) throws IOException {
         // prepare request
         UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/price");
-        uriBuilder.queryParam("start_latitude", startLatitude);
-        uriBuilder.queryParam("start_longitude", startLongitude);
-        uriBuilder.queryParam("end_latitude", endLatitude);
-        uriBuilder.queryParam("end_longitude", endLongitude);
+        uriBuilder.queryParam("start_latitude", request.startPosition.latitude);
+        uriBuilder.queryParam("start_longitude", request.startPosition.longitude);
+        uriBuilder.queryParam("end_latitude", request.endPosition.latitude);
+        uriBuilder.queryParam("end_longitude", request.endPosition.longitude);
         String requestUrl = uriBuilder.toString();
         URL uberUrl = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
@@ -124,20 +122,17 @@ public class UberTransportationNetworkCompanyDataSource implements Transportatio
         UberTripTimeEstimateResponse response = mapper.readValue(responseStream, UberTripTimeEstimateResponse.class);
 
         if (response.prices == null) {
-            return null;
+            throw new IOException("Unexpected response format");
         }
 
         LOG.info("Recieved " + response.prices.size() + " uber price/time estimates");
 
-        RideEstimate rideTime = null;
+        List<RideEstimate> estimates = new ArrayList<RideEstimate>();
 
         for (final UberTripTimeEstimate price: response.prices) {
-            if (price.product_id.equals(productId)) {
-                rideTime = new RideEstimate(price.duration);
-                break;
-            }
+            estimates.add(new RideEstimate(price.product_id, price.duration));
         }
 
-        return rideTime;
+        return estimates;
     }
 }
