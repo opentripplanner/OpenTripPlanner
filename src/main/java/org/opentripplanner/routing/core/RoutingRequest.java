@@ -446,7 +446,15 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /* Reluctance weights for using TNC service */
     public double transportationNetworkCompanyEnterReluctance = 4000.0;
-    public double driveReluctance = 1.0;
+
+    /*
+     * drivingReluctance is used in TNC requests.
+     * It is set in org.opentripplanner.api.parameter.QualifiedMode.
+     * The driveReluctance is used as a multiplier to add weight to a shortest path search in
+     *   org.opentripplanner.routing.edgetype.StreetEdge.
+     * It is set to -1 to indicate that driving reluctance should not be used in default car routing requests.
+     */
+    public double driveReluctance = -1.0;
 
     /** Saves split edge which can be split on origin/destination search
      *

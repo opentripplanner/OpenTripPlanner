@@ -509,7 +509,10 @@ public class StreetEdge extends Edge implements Cloneable {
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getDistance());
         } else {
-            s1.incrementWeight(time * options.driveReluctance);
+            // check if driveReluctance is defined (ie it is greater than 0)
+            if (options.driveReluctance > 0) {
+                s1.incrementWeight(time * options.driveReluctance);
+            }
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
