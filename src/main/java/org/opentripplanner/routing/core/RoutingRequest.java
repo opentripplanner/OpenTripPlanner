@@ -441,6 +441,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
+    /** Whether or not to use a TNC during part of the trip */
+    public boolean useTransportationNetworkCompany;
+
+    /* Reluctance weights for using TNC service */
+    public double transportationNetworkCompanyEnterReluctance = 4000.0;
+    public double driveReluctance = 1.0;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge

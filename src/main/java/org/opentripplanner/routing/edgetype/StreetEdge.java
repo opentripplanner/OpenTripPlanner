@@ -287,6 +287,33 @@ public class StreetEdge extends Edge implements Cloneable {
 
                 }
             }
+        } else if (options.useTransportationNetworkCompany) {
+            // Irrevocable transition from using hailed car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                s0.isUsingHailedCar()
+                    && !getPermission().allows(TraverseMode.CAR)
+                    && currMode == TraverseMode.CAR
+            ) {
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.setUsingHailedCar(false); // done with TNC use for now
+                    return editor.makeState(); // return only the state with updated TNC usage
+                }
+            }
+            // possible transition to hailing a car
+            else if (
+                !s0.isUsingHailedCar()
+                    && getPermission().allows(TraverseMode.CAR)
+                    && currMode != TraverseMode.CAR
+            ) {
+                editor = doTraverse(s0, options, TraverseMode.CAR);
+                if (editor != null) {
+                    editor.setUsingHailedCar(true); // start of TNC use
+                    editor.incrementWeight(options.transportationNetworkCompanyEnterReluctance);
+                    return editor.makeState(); // return only the state with updated TNC usage
+                }
+            }
         }
         return state;
     }
@@ -481,6 +508,8 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getDistance());
+        } else {
+            s1.incrementWeight(time * options.driveReluctance);
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */

@@ -13,14 +13,14 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -50,6 +50,8 @@ public class StateData implements Cloneable {
     protected boolean everBoarded;
 
     protected boolean usingRentedBike;
+
+    protected boolean usingHailedCar;
 
     protected boolean carParked;
 

@@ -530,6 +530,8 @@ public class SimpleStreetSplitter {
                 // for park and ride we will start in car mode and walk to the end vertex
                 if (endVertex && (options.parkAndRide || options.kissAndRide)) {
                     nonTransitMode = TraverseMode.WALK;
+                } else if (options.useTransportationNetworkCompany) {
+                    nonTransitMode = TraverseMode.WALK;
                 } else {
                     nonTransitMode = TraverseMode.CAR;
                 }

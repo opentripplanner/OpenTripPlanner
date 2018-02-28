@@ -117,6 +117,8 @@ public class StreetTransitLink extends Edge {
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
             if (req.kissAndRide && !s0.isCarParked()) {
                 s1.setCarParked(true);
+            } else if (req.useTransportationNetworkCompany && s0.isUsingHailedCar()) {
+                s1.setUsingHailedCar(false);
             } else {
                 return null;
             }
