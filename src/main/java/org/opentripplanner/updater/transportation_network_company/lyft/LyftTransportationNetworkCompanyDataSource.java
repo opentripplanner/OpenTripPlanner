@@ -59,7 +59,8 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
 
     private String getAccessToken() throws IOException {
         // check if token needs to be obtained
-        if (tokenExpirationTime == null || tokenExpirationTime.after(new Date())) {
+        Date now = new Date();
+        if (tokenExpirationTime == null || now.after(tokenExpirationTime)) {
             // token needs to be obtained
             LOG.info("Requesting new lyft access token");
 
@@ -88,7 +89,7 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
             LyftAuthenticationResponse response = mapper.readValue(responseStream, LyftAuthenticationResponse.class);
             accessToken = response.access_token;
             tokenExpirationTime = new Date();
-            tokenExpirationTime.setTime(tokenExpirationTime.getTime() + response.expires_in - 60);
+            tokenExpirationTime.setTime(tokenExpirationTime.getTime() + (response.expires_in - 60) * 1000);
 
             LOG.info("Received new lyft access token");
         }
@@ -116,28 +117,39 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
         LOG.info("Made request to lyft API at following URL: " + requestUrl);
 
         // make request, parse repsonse
-        InputStream responseStream = connection.getInputStream();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        LyftArrivalEstimateResponse response = mapper.readValue(responseStream, LyftArrivalEstimateResponse.class);
-
-        // serialize into Arrival Time objects
-        ArrayList<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
-
-        LOG.info("Received " + response.eta_estimates.size() + " lyft arrival time estimates");
-
-        for (final LyftArrivalEstimate time: response.eta_estimates) {
-            arrivalTimes.add(
-                new ArrivalTime(
-                    TransportationNetworkCompany.LYFT,
-                    time.ride_type,
-                    time.display_name,
-                    time.eta_seconds
-                )
+        if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+            LyftArrivalEstimateResponse response = mapper.readValue(
+                connection.getInputStream(),
+                LyftArrivalEstimateResponse.class
             );
-        }
 
-        return arrivalTimes;
+            // serialize into Arrival Time objects
+            ArrayList<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
+
+            LOG.info("Received " + response.eta_estimates.size() + " lyft arrival time estimates");
+
+            for (final LyftArrivalEstimate time: response.eta_estimates) {
+                arrivalTimes.add(
+                    new ArrivalTime(
+                        TransportationNetworkCompany.LYFT,
+                        time.ride_type,
+                        time.display_name,
+                        time.eta_seconds
+                    )
+                );
+            }
+
+            return arrivalTimes;
+        } else {
+            LyftError error = mapper.readValue(connection.getErrorStream(), LyftError.class);
+            if (error.error.equals("no_service_in_area") || error.error.equals("ridetype_unavailable_in_region")) {
+                return new ArrayList<ArrivalTime>();
+            }
+            LOG.error(error.toString());
+            throw new IOException("received an error from the Lyft API");
+        }
     }
 
     @Override
