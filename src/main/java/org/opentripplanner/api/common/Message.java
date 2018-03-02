@@ -12,9 +12,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.common;
 
-import java.util.Locale;
-
 import org.opentripplanner.util.Properties;
+
+import java.util.Locale;
 
 /**
  * The purpose of Messages is to read supply Message.properties to underlying calling code...
@@ -36,6 +36,7 @@ public enum Message {
     GEOCODE_FROM_TO_NOT_FOUND(460),
     TOO_CLOSE(409),
     LOCATION_NOT_ACCESSIBLE(470),
+    TRANSPORTATION_NETWORK_COMPANY_UNAVAILABLE(480),
 
     GEOCODE_FROM_AMBIGUOUS(340),
     GEOCODE_TO_AMBIGUOUS(350),

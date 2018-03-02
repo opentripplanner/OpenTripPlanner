@@ -34,15 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -455,6 +447,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * It is set to -1 to indicate that driving reluctance should not be used in default car routing requests.
      */
     public double driveReluctance = -1.0;
+
+    public String companies;
 
     /** Saves split edge which can be split on origin/destination search
      *
@@ -1246,5 +1240,9 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public void setTransportationNetworkCompanies(String companies) {
+        this.companies = companies;
     }
 }

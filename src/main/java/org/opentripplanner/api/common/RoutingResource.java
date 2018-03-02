@@ -13,7 +13,16 @@
 
 package org.opentripplanner.api.common;
 
-import java.util.*;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -22,18 +31,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.opentripplanner.util.ResourceBundleSingleton;
+import java.util.*;
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -362,6 +360,12 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /*
+     * A comma separated list of TNC companies to use in the routing request
+     */
+    @QueryParam("companies")
+    protected String companies;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -593,6 +597,9 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (companies != null)
+            request.setTransportationNetworkCompanies(companies);
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
