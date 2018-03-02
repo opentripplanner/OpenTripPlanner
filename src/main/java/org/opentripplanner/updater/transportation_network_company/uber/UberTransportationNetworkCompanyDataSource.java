@@ -130,7 +130,13 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
         List<RideEstimate> estimates = new ArrayList<RideEstimate>();
 
         for (final UberTripTimeEstimate price: response.prices) {
-            estimates.add(new RideEstimate(price.product_id, price.duration));
+            estimates.add(new RideEstimate(
+                price.currency_code,
+                price.duration,
+                price.high_estimate,
+                price.low_estimate,
+                price.product_id
+            ));
         }
 
         return estimates;

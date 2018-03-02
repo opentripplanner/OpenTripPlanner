@@ -171,23 +171,42 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
         LOG.info("Made request to lyft API at following URL: " + requestUrl);
 
         // make request, parse repsonse
-        InputStream responseStream = connection.getInputStream();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        LyftRideEstimateResponse response = mapper.readValue(responseStream, LyftRideEstimateResponse.class);
 
-        if (response.cost_estimates == null) {
-            throw new IOException("Unrecocginzed response format");
+        if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+            InputStream responseStream = connection.getInputStream();
+            LyftRideEstimateResponse response = mapper.readValue(responseStream, LyftRideEstimateResponse.class);
+
+            if (response.cost_estimates == null) {
+                throw new IOException("Unrecocginzed response format");
+            }
+
+            LOG.info("Recieved " + response.cost_estimates.size() + " lyft price/time estimates");
+
+            List<RideEstimate> estimates = new ArrayList<RideEstimate>();
+
+            for (final LyftRideEstimate estimate: response.cost_estimates) {
+                estimates.add(new RideEstimate(
+                    estimate.currency,
+                    estimate.estimated_duration_seconds,
+                    // Lyft's esimated cost is in the "minor" unit, so the following
+                    // may not work in countries that don't have 100 minor units per major unit
+                    // see https://en.wikipedia.org/wiki/ISO_4217#Treatment_of_minor_currency_units_(the_"exponent")
+                    estimate.estimated_cost_cents_max / 100,
+                    estimate.estimated_cost_cents_min / 100,
+                    estimate.ride_type
+                ));
+            }
+
+            return estimates;
+        } else {
+            LyftError error = mapper.readValue(connection.getErrorStream(), LyftError.class);
+            LOG.error(error.toString());
+            if (error.error_description != null) {
+                throw new IOException(error.error_description);
+            }
+            throw new IOException("received an error from the Lyft API");
         }
-
-        LOG.info("Recieved " + response.cost_estimates.size() + " lyft price/time estimates");
-
-        List<RideEstimate> estimates = new ArrayList<RideEstimate>();
-
-        for (final LyftRideEstimate estimate: response.cost_estimates) {
-            estimates.add(new RideEstimate(estimate.ride_type, estimate.estimated_duration_seconds));
-        }
-
-        return estimates;
     }
 }
