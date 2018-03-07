@@ -8,12 +8,14 @@ public class MqttGtfsRealtimeUpdaterParameters implements MqttGtfsRealtimeUpdate
   private final String topic;
   private final String feedId;
   private final int qos;
+  private final boolean fuzzyTripMatching;
 
   public MqttGtfsRealtimeUpdaterParameters(NodeAdapter c) {
     url = c.asText("url");
     topic = c.asText("topic");
     feedId = c.asText("feedId", null);
     qos = c.asInt("qos", 0);
+    fuzzyTripMatching = c.asBoolean("fuzzyTripMatching", false);
   }
 
   public String getUrl() {
@@ -30,5 +32,9 @@ public class MqttGtfsRealtimeUpdaterParameters implements MqttGtfsRealtimeUpdate
 
   public int getQos() {
     return qos;
+  }
+
+  public boolean getFuzzyTripMatching() {
+    return fuzzyTripMatching;
   }
 }

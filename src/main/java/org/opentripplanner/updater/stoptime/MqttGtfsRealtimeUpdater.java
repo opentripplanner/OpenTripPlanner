@@ -9,9 +9,11 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     private final int qos;
 
+    private final boolean fuzzyTripMatching;
+
     private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
 
     MemoryPersistence persistence = new MemoryPersistence();
@@ -61,6 +65,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         topic = parameters.getTopic();
         feedId = parameters.getFeedId();
         qos = parameters.getQos();
+        fuzzyTripMatching = parameters.getFuzzyTripMatching();
     }
 
     @Override
@@ -71,7 +76,13 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void setup(Graph graph) throws Exception {
         // Only create a realtime data snapshot source if none exists already
-        graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+        TimetableSnapshotSource snapshotSource =
+            graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+
+        // Set properties of realtime data snapshot source
+        if (fuzzyTripMatching) {
+            snapshotSource.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+        }
     }
 
     @Override
@@ -163,5 +174,6 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         String getTopic();
         String getFeedId();
         int getQos();
+        boolean getFuzzyTripMatching();
     }
 }
