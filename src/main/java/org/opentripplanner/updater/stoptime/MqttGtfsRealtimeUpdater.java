@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +48,13 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     private int qos;
 
+    private boolean fuzzyTripMatching;
+
     private String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
 
     MemoryPersistence persistence = new MemoryPersistence();
+
+    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     private MqttClient client;
 
@@ -58,6 +63,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         topic = config.path("topic").asText();
         feedId = config.path("feedId").asText("");
         qos = config.path("qos").asInt(0);
+        fuzzyTripMatching = config.path("fuzzyTripMatching").asBoolean(false);
     }
 
     @Override public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -70,6 +76,11 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             if (graph.timetableSnapshotSource == null) {
                 TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
                 // Add snapshot source to graph
+
+                if (fuzzyTripMatching) {
+                    this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+                    snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
+                }
                 graph.timetableSnapshotSource = (snapshotSource);
             }
         });
