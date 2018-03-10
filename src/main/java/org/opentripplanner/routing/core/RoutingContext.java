@@ -20,7 +20,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
@@ -31,7 +30,6 @@ import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -39,8 +37,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
@@ -351,48 +347,6 @@ public class RoutingContext implements Cloneable {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
-        }
-        if (opt.useTransportationNetworkCompany) {
-            // make sure there the requested TNC provider has vehicles available at from location
-
-            if (opt.companies == null) {
-                LOG.warn(
-                    "Unable to verify availability of Transportation Network Company service because " +
-                        "`companies` option is not set"
-                );
-                return;
-            }
-
-            TransportationNetworkCompanyService service = graph.getService(TransportationNetworkCompanyService.class);
-            if (service == null) {
-                throw new UnsupportedOperationException(
-                    "Unconfigured Transportaiton Network Company service for router with id: " + opt.routerId
-                );
-            } else {
-                List<ArrivalTime> arrivalEstimates = new ArrayList<>();
-
-                try {
-                    arrivalEstimates = service.getArrivalTimes(
-                        new Place(
-                            fromVertex.getLon(),
-                            fromVertex.getLat(),
-                            fromVertex.getName()
-                        ),
-                        opt.companies
-                    );
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LOG.warn(
-                        "Unable to verify availability of Transportation Network Company service due to error: " +
-                            e.getMessage()
-                    );
-                    return;
-                }
-
-                if (arrivalEstimates.size() == 0) {
-                    throw new TransportationNetworkCompanyAvailabilityException();
-                }
-            }
         }
     }
 

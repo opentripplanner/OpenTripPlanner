@@ -90,6 +90,7 @@ public class GraphPathFinder {
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
         if (options.rctx == null) {
+            // This call will also set the start and end vertices
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
         }

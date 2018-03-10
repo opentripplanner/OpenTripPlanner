@@ -14,10 +14,15 @@
 package org.opentripplanner.api.common;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -598,8 +603,86 @@ public abstract class RoutingResource {
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
 
-        if (companies != null)
+
+
+        /**
+         * If using Transportation Network Companies, make sure service exists and add time to departure time if needed
+         */
+        if (this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
+            if (companies == null) {
+                throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
+            }
+
             request.setTransportationNetworkCompanies(companies);
+
+            long now = (new Date()).getTime() / 1000;
+            long departureTimeWindow = 3600;
+            long timeSeconds = request.dateTime;
+            if (
+                    this.arriveBy == false &&
+                    timeSeconds < now + departureTimeWindow &&
+                    timeSeconds > now - departureTimeWindow
+                ) {
+                TransportationNetworkCompanyService service =
+                    router.graph.getService(TransportationNetworkCompanyService.class);
+                if (service == null) {
+                    LOG.error("Unconfigured Transportaiton Network Company service for router with id: " + routerId);
+                    throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
+                }
+
+                LOG.info("heeyyyyyyy");
+                LOG.info(String.valueOf(request.from.lat) + "," + String.valueOf(request.from.lng));
+
+                List<ArrivalTime> arrivalEstimates = new ArrayList<>();
+
+                try {
+                    arrivalEstimates = service.getArrivalTimes(
+                        new Place(
+                            request.from.lng,
+                            request.from.lat,
+                            request.from.name
+                        ),
+                        companies
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new UnsupportedOperationException(
+                        "Unable to verify availability of Transportation Network Company service due to error: " +
+                            e.getMessage()
+                    );
+                }
+
+                String[] acceptedRideTypes = {
+                    "lyft", // standard lyft pickup
+                    "a6eef2e1-c99a-436f-bde9-fefb9181c0b0" // uberX
+                };
+
+                // iterate through results and find earliest ETA of an acceptable ride type
+                int earliestEta = 999999;
+                for (ArrivalTime arrivalEstimate : arrivalEstimates) {
+                    for (String rideType : acceptedRideTypes) {
+                        if (arrivalEstimate.productId.equals(rideType) &&
+                            arrivalEstimate.estimatedSeconds < earliestEta
+                            ) {
+                            earliestEta = arrivalEstimate.estimatedSeconds;
+                            break;
+                        }
+                    }
+                }
+
+                if (earliestEta == 999999) {
+                    // no acceptable ride types found
+                    throw new TransportationNetworkCompanyAvailabilityException();
+                }
+
+                long earliestRideBeginTime = now + earliestEta;
+                if (earliestRideBeginTime > timeSeconds) {
+                    // update time to reflect earliest possible departure time in a TNC
+                    LOG.info("updated time to reflect earliest TNC eta");
+                    request.setDateTime(new Date(earliestRideBeginTime * 1000));
+                }
+            }
+        }
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
