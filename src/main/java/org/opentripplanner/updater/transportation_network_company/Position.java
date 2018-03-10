@@ -15,6 +15,10 @@ package org.opentripplanner.updater.transportation_network_company;
 
 import java.util.Objects;
 
+/**
+ * This class is used for approximating a position.
+ * It is used so that numerous TNC requests with very similar coordinates can be assumed to be the same.
+ */
 public class Position {
     public double latitude;
     public double longitude;
@@ -52,6 +56,6 @@ public class Position {
     }
 
     public int intVal (double d) {
-        return (int) d * 10000;
+        return (int) (d * 10000);
     }
 }
