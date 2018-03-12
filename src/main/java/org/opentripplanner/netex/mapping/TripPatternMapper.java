@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
+import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
+
 class TripPatternMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
@@ -37,7 +41,7 @@ class TripPatternMapper {
 
     private String currentHeadsign;
 
-    public void mapTripPattern(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao) {
+    void mapTripPattern(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao) {
         TripMapper tripMapper = new TripMapper();
 
         List<Trip> trips = new ArrayList<>();
@@ -154,8 +158,21 @@ class TripPatternMapper {
                 passingTime.getArrivalDayOffset()));
 
         if (stopPoint != null) {
-            stopTime.setDropOffType(isFalse(stopPoint.isForAlighting()) ? 1 : 0);
-            stopTime.setPickupType(isFalse(stopPoint.isForBoarding()) ? 1 : 0);
+            if (isFalse(stopPoint.isForAlighting())) {
+                stopTime.setDropOffType(PICKDROP_NONE);
+            } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
+                stopTime.setDropOffType(PICKDROP_COORDINATE_WITH_DRIVER);
+            } else {
+                stopTime.setDropOffType(PICKDROP_SCHEDULED);
+            }
+
+            if (isFalse(stopPoint.isForBoarding())) {
+                stopTime.setPickupType(PICKDROP_NONE);
+            } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
+                stopTime.setPickupType(PICKDROP_COORDINATE_WITH_DRIVER);
+            } else {
+                stopTime.setPickupType(PICKDROP_SCHEDULED);
+            }
         }
 
         if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
