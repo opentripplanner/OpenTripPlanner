@@ -7,15 +7,19 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 public class RouteMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);
 
-    private TransportModeMapper transportModeMapper = new TransportModeMapper();
-    private AgencyMapper agencyMapper = new AgencyMapper();
+    private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
+    private final TransportModeMapper transportModeMapper = new TransportModeMapper();
+    private final AgencyMapper agencyMapper = new AgencyMapper();
 
     org.opentripplanner.model.Route mapRoute(Line line, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao, String timeZone){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
@@ -49,6 +53,16 @@ public class RouteMapper {
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
         otpRoute.setType(transportModeMapper.getTransportMode(line.getTransportMode(), line.getTransportSubmode()));
+
+        if (line.getPresentation() != null) {
+            PresentationStructure presentation = line.getPresentation();
+            if (presentation.getColour() != null) {
+                otpRoute.setColor(hexBinaryAdapter.marshal(presentation.getColour()));
+            }
+            if (presentation.getTextColour() != null) {
+                otpRoute.setTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
+            }
+        }
 
         return otpRoute;
     }
