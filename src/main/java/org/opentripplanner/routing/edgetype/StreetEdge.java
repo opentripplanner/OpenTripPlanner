@@ -295,9 +295,14 @@ public class StreetEdge extends Edge implements Cloneable {
                     && !getPermission().allows(TraverseMode.CAR)
                     && currMode == TraverseMode.CAR
             ) {
+                // Make sure travel distance in car is greater than minimum distance
+                if (s0.transportationNetworkCompanyDriveDistance <
+                    options.minimumTransportationNetworkCompanyDistance) {
+                    return null;
+                }
                 editor = doTraverse(s0, options, TraverseMode.WALK);
                 if (editor != null) {
-                    editor.setUsingHailedCar(false); // done with TNC use for now
+                    editor.alightHailedCar(); // done with TNC use for now
                     return editor.makeState(); // return only the state with updated TNC usage
                 }
             }
@@ -307,11 +312,33 @@ public class StreetEdge extends Edge implements Cloneable {
                     && getPermission().allows(TraverseMode.CAR)
                     && currMode != TraverseMode.CAR
             ) {
-                editor = doTraverse(s0, options, TraverseMode.CAR);
-                if (editor != null) {
-                    editor.setUsingHailedCar(true); // start of TNC use
-                    editor.incrementWeight(options.transportationNetworkCompanyEnterReluctance);
-                    return editor.makeState(); // return only the state with updated TNC usage
+                // forbid boarding too many times or
+                // boarding a transportation network company a 2nd time if transit has not yet been used
+                if (s0.stateData.getNumTransportationNetworkCompanyBoardings() ==
+                    options.maximumTransportationNetworkCompanyBoardings ||
+                    (s0.stateData.getNumTransportationNetworkCompanyBoardings() == 1
+                        && !s0.isEverBoarded())
+                    ) {
+                    return state;
+                }
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    editorCar.boardHailedCar(getDistance()); // start of TNC use
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
                 }
             }
         }
@@ -512,6 +539,9 @@ public class StreetEdge extends Edge implements Cloneable {
             // check if driveReluctance is defined (ie it is greater than 0)
             if (options.driveReluctance > 0) {
                 s1.incrementWeight(time * options.driveReluctance);
+            }
+            if (s0.isUsingHailedCar()) {
+                s1.incrementTransportationNetworkCompanyDistance(getDistance());
             }
         }
 

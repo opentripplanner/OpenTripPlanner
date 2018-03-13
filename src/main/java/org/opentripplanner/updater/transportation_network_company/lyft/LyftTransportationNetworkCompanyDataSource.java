@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
         this.clientSecret = clientSecret;
     }
 
+    // intended for use during testing
     public LyftTransportationNetworkCompanyDataSource(String baseUrl, String clientId, String clientSecret) {
         this.baseUrl = baseUrl;
         this.clientId = clientId;
@@ -145,7 +147,7 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
         } else {
             LyftError error = mapper.readValue(connection.getErrorStream(), LyftError.class);
             if (error.error.equals("no_service_in_area") || error.error.equals("ridetype_unavailable_in_region")) {
-                return new ArrayList<ArrivalTime>();
+                return Collections.emptyList();
             }
             LOG.error(error.toString());
             throw new IOException("received an error from the Lyft API");

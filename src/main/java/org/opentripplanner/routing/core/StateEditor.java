@@ -246,6 +246,11 @@ public class StateEditor {
         setEverBoarded(true);
     }
 
+    public void incrementTransportationNetworkCompanyDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.transportationNetworkCompanyDriveDistance += distance;
+    }
+
     /* Basic Setters */
 
     public void setTripTimes(TripTimes tripTimes) {
@@ -532,6 +537,23 @@ public class StateEditor {
         return child.hasEnteredNoThruTrafficArea();
     }
 
+    public void alightHailedCar() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void boardHailedCar(double initialEdgeDistance) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = true;
+        child.stateData.nonTransitMode = TraverseMode.CAR;
+        child.stateData.numTransportationNetworkCompanyBoardings++;
+        child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
+    }
+
+    /**
+     * Used only in State.optimizeOrReverse
+     */
     public void setUsingHailedCar(boolean usingHailedCar) {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = usingHailedCar;

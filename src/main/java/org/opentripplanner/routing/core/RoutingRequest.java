@@ -436,9 +436,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether or not to use a TNC during part of the trip */
     public boolean useTransportationNetworkCompany;
 
-    /* Reluctance weights for using TNC service */
-    public double transportationNetworkCompanyEnterReluctance = 4000.0;
-
     /*
      * drivingReluctance is used in TNC requests.
      * It is set in org.opentripplanner.api.parameter.QualifiedMode.
@@ -447,6 +444,18 @@ public class RoutingRequest implements Cloneable, Serializable {
      * It is set to -1 to indicate that driving reluctance should not be used in default car routing requests.
      */
     public double driveReluctance = -1.0;
+
+    /**
+     * A mimum travel distance for a ride in a transportation network company.
+     * Units in meters, default is 0.5 miles.
+     */
+    public double minimumTransportationNetworkCompanyDistance = 804.672;
+
+    /**
+     * The maximum amount of times in an itinerary that a transportation network company can be hailed.
+     * Default is 2
+     */
+    public int maximumTransportationNetworkCompanyBoardings = 2;
 
     public String companies;
 

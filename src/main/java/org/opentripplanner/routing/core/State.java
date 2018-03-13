@@ -58,6 +58,9 @@ public class State implements Cloneable {
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
 
+    // The current distance traveled in a transportation network company vehicle
+    public double transportationNetworkCompanyDriveDistance;
+
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
     
@@ -125,11 +128,11 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         } else if (options.useTransportationNetworkCompany) {
-            this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK ;
         }
         this.walkDistance = 0;
         this.preTransitTime = 0;
+        this.transportationNetworkCompanyDriveDistance = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new AgencyAndId[0];
     }
