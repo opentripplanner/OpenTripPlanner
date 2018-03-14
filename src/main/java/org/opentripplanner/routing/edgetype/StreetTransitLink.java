@@ -86,6 +86,10 @@ public class StreetTransitLink extends Edge {
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
         }
+        // Do not detour through a TransitStop when traversing the street network
+        if (s0.getVertex() instanceof TransitStop && s0.backEdge instanceof StreetTransitLink) {
+            return null;
+        }
 
         RoutingRequest req = s0.getOptions();
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
