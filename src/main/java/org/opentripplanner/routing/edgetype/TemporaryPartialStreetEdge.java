@@ -2,7 +2,9 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -10,6 +12,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -66,6 +69,73 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     @Override
     public boolean isPartial() {
         return true;
+    }
+
+    /**
+     * Return a subset of the parent elevation profile.
+     */
+    @Override
+    public PackedCoordinateSequence getElevationProfile() {
+        PackedCoordinateSequence parentElev = parentEdge.getElevationProfile();
+        if (parentElev == null) return null;
+
+        // Compute the linear-reference bounds of the partial edge as fractions of the parent edge
+        LocationIndexedLine line = new LocationIndexedLine(parentEdge.getGeometry());
+        double startFraction =line.indexOf(this.getGeometry().getStartPoint().getCoordinate()).getSegmentFraction();
+        double endFraction = line.indexOf(this.getGeometry().getEndPoint().getCoordinate()).getSegmentFraction();
+        if (endFraction == 0) endFraction = 1;
+
+        double parentDistance = parentEdge.getDistance();
+        double distanceAdjust = this.getDistance() / ((endFraction - startFraction) * parentDistance);
+
+        // Iterate through each entry of the elevation profile for the full parent edge
+        Coordinate parentElevCoords[] = parentElev.toCoordinateArray();
+        List<Coordinate> partialElevCoords = new LinkedList<>();
+        boolean inPartialEdge = false;
+        double startOffset = startFraction * parentDistance;
+        for (int i = 1; i < parentElevCoords.length; i++) {
+            // compute the fraction range covered by this entry in the elevation profile
+            double x1 = parentElevCoords[i - 1].x;
+            double x2 = parentElevCoords[i].x;
+            double y1 = parentElevCoords[i - 1].y;
+            double y2 = parentElevCoords[i].y;
+            double f1 = x1 / parentDistance;
+            double f2 = x2 / parentDistance;
+            if (f2 > 1) f2 = 1;
+
+            // Check if the partial edge begins in current section of the elevation profile
+            if (startFraction >= f1 && startFraction < f2) {
+                // Compute and add the interpolated elevation coordinate
+                double pct = (startFraction - f1) / (f2 - f1);
+                double x = x1 + pct * (x2 - x1);
+                double y = y1 + pct * (y2 - y1);
+                partialElevCoords.add(new Coordinate((x - startOffset) * distanceAdjust, y));
+
+                // We are now "in" the partial-edge portion of the parent edge
+                inPartialEdge = true;
+            }
+
+            // Check if the partial edge ends in current section of the elevation profile
+            if (endFraction >= f1 && endFraction < f2) {
+                // Compute and add the interpolated elevation coordinate
+                double pct = (endFraction - f1) / (f2 - f1);
+                double x = x1 + pct * (x2 - x1);
+                double y = y1 + pct * (y2 - y1);
+                partialElevCoords.add(new Coordinate((x - startOffset) * distanceAdjust, y));
+
+                // This is the end of the partial edge, so we can end the iteration
+                break;
+            }
+
+            if (inPartialEdge) {
+                Coordinate c = new Coordinate((x2 - startOffset) * distanceAdjust, y2);
+                partialElevCoords.add(c);
+            }
+
+        }
+
+        Coordinate coords[] = partialElevCoords.toArray(new Coordinate[partialElevCoords.size()]);
+        return new PackedCoordinateSequence.Double(coords);
     }
 
     /**
