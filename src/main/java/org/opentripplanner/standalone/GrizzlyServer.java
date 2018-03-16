@@ -23,7 +23,9 @@ import javax.ws.rs.core.Application;
 public class GrizzlyServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(GrizzlyServer.class);
-    
+
+    private static final int MIN_THREADS = 4;
+
     static {
         // Remove existing handlers attached to the j.u.l root logger
         SLF4JBridgeHandler.removeHandlersForRootLogger();  // (since SLF4J 1.6.5)
@@ -39,6 +41,21 @@ public class GrizzlyServer {
     public GrizzlyServer (CommandLineParameters params, OTPServer server) {
         this.params = params;
         this.server = server;
+    }
+
+    /** OTP is CPU-bound, so we want roughly as many worker threads as we have cores, subject to some constraints. */
+    private int getMaxThreads() {
+        int maxThreads = Runtime.getRuntime().availableProcessors();
+        LOG.info("Java reports that this machine has {} available processors.", maxThreads);
+        if (params.maxThreads != null) {
+            maxThreads = params.maxThreads;
+        }
+        if (maxThreads < MIN_THREADS) {
+            // Some machines apparently report 1 processor even when they have 8.
+            maxThreads = MIN_THREADS;
+        }
+        LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
+        return maxThreads;
     }
 
     /**
@@ -57,14 +74,14 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
-        /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
+        /* Set up a pool of threads to handle incoming HTTP requests. */
+        // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
-            .setCorePoolSize(1)
-            .setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+            .setCorePoolSize(MIN_THREADS)
+            .setMaxPoolSize(getMaxThreads());
 
         /* HTTP (non-encrypted) listener */
         NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
-        // OTP is CPU-bound, we don't want more threads than cores. TODO: We should switch to async handling.
         httpListener.setSecure(false);
 
         /* HTTPS listener */
@@ -102,10 +119,7 @@ public class GrizzlyServer {
         }
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
-        /*
-         * 3. A static content handler to serve local files from the filesystem, under the "local"
-         * path.
-         */
+        /* 3. A static content handler to serve local files from the filesystem, under the "local" path. */
         if (params.clientDirectory != null) {
             StaticHttpHandler localHandler = new StaticHttpHandler(
                     params.clientDirectory.getAbsolutePath());
@@ -113,7 +127,7 @@ public class GrizzlyServer {
             httpServer.getServerConfiguration().addHttpHandler(localHandler, "/local");
         }
 
-        /* 3. Test alternate method (no Jersey). */
+        /* 3. Test alternate HTTP handling without Jersey. */
         // As in servlets, * is needed in base path to identify the "rest" of the path.
         // GraphService gs = (GraphService) iocFactory.getComponentProvider(GraphService.class).getInstance();
         // Graph graph = gs.getGraph();

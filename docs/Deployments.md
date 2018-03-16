@@ -10,7 +10,9 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 * **New York State** The State Department of Transportation's [transit trip planner](http://511ny.org/tripplanner/default.aspx) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 * **Los Angeles, California** The new [metro.net trip planner](https://www.metro.net/).
 * **Boston, Massachusetts** The [Massachusetts Bay Transportation Authority trip planner](https://www.mbta.com/trip-planner).
+* **Seattle, Washington** The [Sound Transit Trip Planner](https://www.soundtransit.org/tripplanner)
 * **Arlington, Virginia** The [commute planning site](http://www.carfreeatoz.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
+* [**Piemonte Region, Italy**](https://map.muoversinpiemonte.it/#planner) and the [**City of Torino**](https://www.muoversiatorino.it/) built on OpenTripPlanner by [5T](http://www.5t.torino.it/).
 * [**Valencia, Spain**](http://www.emtvalencia.es/geoportal/?lang=en_otp) from the Municipal Transport Company of Valencia S.A.U.
 * [**Grenoble, France**](http://www.metromobilite.fr/) from SMTC, Grenoble Alpes métropole, l'État Français, the Rhône-alpes region, the Isère council and the City of Grenoble.
 * **Rennes, France** where the STAR network provides an OTP client for [iOS](https://itunes.apple.com/us/app/starbusmetro/id899970416?mt=8), [Android](https://play.google.com/store/apps/details?id=com.bookbeo.starbusmetro), Windows Phone et Web.
