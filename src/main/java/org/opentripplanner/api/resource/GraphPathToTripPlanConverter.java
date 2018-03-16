@@ -1022,7 +1022,7 @@ public abstract class GraphPathToTripPlanConverter {
                         step.elevation = s;
                     }
                 }
-                distance += edge.getDistance();
+                if (!createdNewStep) distance += edge.getDistance();
 
             }
 
