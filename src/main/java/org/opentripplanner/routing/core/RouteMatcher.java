@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.HashSet;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.common.model.T2;
@@ -40,6 +41,8 @@ public class RouteMatcher implements Cloneable, Serializable {
     private HashSet<String> routeNames = new HashSet<String>();
 
     private static RouteMatcher EMPTY_MATCHER = new RouteMatcher();
+
+    private boolean containsNames = false;
 
     private RouteMatcher() {
     }
@@ -107,6 +110,9 @@ public class RouteMatcher implements Cloneable, Serializable {
         }
         if (n == 0)
             return emptyMatcher();
+
+        retval.containsNames= !CollectionUtils.isEmpty(retval.agencyIdAndRouteNames) || !CollectionUtils.isEmpty(retval.routeNames);
+
         return retval;
     }
 
@@ -115,12 +121,15 @@ public class RouteMatcher implements Cloneable, Serializable {
             return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
-        String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
-        if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getAgencyId(),
-                routeName)))
-            return true;
-        if (routeNames.contains(routeName))
-            return true;
+
+        if (containsNames) {
+            String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
+            if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getAgencyId(),
+                                                                             routeName)))
+                return true;
+            if (routeNames.contains(routeName))
+                return true;
+        }
         return false;
     }
 
