@@ -606,7 +606,11 @@ public abstract class RoutingResource {
 
 
         /**
-         * If using Transportation Network Companies, make sure service exists and add time to departure time if needed
+         * If using Transportation Network Companies, make sure service exists at origin.
+         * This is not a future-proof solution as TNC coverage areas could be different in the future.
+         *
+         * Also, if "depart at" and leaving soonish,
+         * save earliest departure time for use when boarding first TNC
          */
         if (this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
             if (companies == null) {
@@ -615,6 +619,56 @@ public abstract class RoutingResource {
 
             request.setTransportationNetworkCompanies(companies);
 
+            TransportationNetworkCompanyService service =
+                router.graph.getService(TransportationNetworkCompanyService.class);
+            if (service == null) {
+                LOG.error("Unconfigured Transportaiton Network Company service for router with id: " + routerId);
+                throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
+            }
+
+            List<ArrivalTime> arrivalEstimates;
+
+            try {
+                arrivalEstimates = service.getArrivalTimes(
+                    new Place(
+                        request.from.lng,
+                        request.from.lat,
+                        request.from.name
+                    ),
+                    companies
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new UnsupportedOperationException(
+                    "Unable to verify availability of Transportation Network Company service due to error: " +
+                        e.getMessage()
+                );
+            }
+
+            String[] acceptedRideTypes = {
+                "lyft", // standard lyft pickup
+                "a6eef2e1-c99a-436f-bde9-fefb9181c0b0" // uberX
+            };
+
+            // iterate through results and find earliest ETA of an acceptable ride type
+            int earliestEta = 999999;
+            for (ArrivalTime arrivalEstimate : arrivalEstimates) {
+                for (String rideType : acceptedRideTypes) {
+                    if (arrivalEstimate.productId.equals(rideType) &&
+                        arrivalEstimate.estimatedSeconds < earliestEta
+                        ) {
+                        earliestEta = arrivalEstimate.estimatedSeconds;
+                        break;
+                    }
+                }
+            }
+
+            if (earliestEta == 999999) {
+                // no acceptable ride types found
+                throw new TransportationNetworkCompanyAvailabilityException();
+            }
+
+            // store the earliest ETA if planning a "depart at" trip that begins soonish
             long now = (new Date()).getTime() / 1000;
             long departureTimeWindow = 3600;
             long timeSeconds = request.dateTime;
@@ -623,63 +677,11 @@ public abstract class RoutingResource {
                     timeSeconds < now + departureTimeWindow &&
                     timeSeconds > now - departureTimeWindow
                 ) {
-                TransportationNetworkCompanyService service =
-                    router.graph.getService(TransportationNetworkCompanyService.class);
-                if (service == null) {
-                    LOG.error("Unconfigured Transportaiton Network Company service for router with id: " + routerId);
-                    throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
-                }
-
-                LOG.info("heeyyyyyyy");
-                LOG.info(String.valueOf(request.from.lat) + "," + String.valueOf(request.from.lng));
-
-                List<ArrivalTime> arrivalEstimates = new ArrayList<>();
-
-                try {
-                    arrivalEstimates = service.getArrivalTimes(
-                        new Place(
-                            request.from.lng,
-                            request.from.lat,
-                            request.from.name
-                        ),
-                        companies
-                    );
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new UnsupportedOperationException(
-                        "Unable to verify availability of Transportation Network Company service due to error: " +
-                            e.getMessage()
-                    );
-                }
-
-                String[] acceptedRideTypes = {
-                    "lyft", // standard lyft pickup
-                    "a6eef2e1-c99a-436f-bde9-fefb9181c0b0" // uberX
-                };
-
-                // iterate through results and find earliest ETA of an acceptable ride type
-                int earliestEta = 999999;
-                for (ArrivalTime arrivalEstimate : arrivalEstimates) {
-                    for (String rideType : acceptedRideTypes) {
-                        if (arrivalEstimate.productId.equals(rideType) &&
-                            arrivalEstimate.estimatedSeconds < earliestEta
-                            ) {
-                            earliestEta = arrivalEstimate.estimatedSeconds;
-                            break;
-                        }
-                    }
-                }
-
-                if (earliestEta == 999999) {
-                    // no acceptable ride types found
-                    throw new TransportationNetworkCompanyAvailabilityException();
-                }
-
                 long earliestRideBeginTime = now + earliestEta;
                 if (earliestRideBeginTime > timeSeconds) {
                     // update time to reflect earliest possible departure time in a TNC
                     LOG.info("updated time to reflect earliest TNC eta");
-                    request.setDateTime(new Date(earliestRideBeginTime * 1000));
+                    request.earliestTransportationNetworkCompanyPickupAtOrigin = new Date(earliestRideBeginTime * 1000);
                 }
             }
         }

@@ -551,6 +551,20 @@ public class StateEditor {
             child.stateData.hasHailedCarPostTransit = true;
         } else {
             child.stateData.hasHailedCarPreTransit = true;
+
+            // add initial wait time if departing now from origin
+            RoutingRequest options = child.getContext().opt;
+            if (!options.arriveBy &&
+                options.earliestTransportationNetworkCompanyPickupAtOrigin != null) {
+                // increment the time to the exact time of the earliest pickup time
+                // if it is later than the current graph search time
+                incrementTimeInMilliseconds(
+                    Math.max(
+                        0,
+                        (int) (options.earliestTransportationNetworkCompanyPickupAtOrigin.getTime() - child.time)
+                    )
+                );
+            }
         }
         child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
     }
