@@ -452,12 +452,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double minimumTransportationNetworkCompanyDistance = 804.672;
 
-    /**
-     * The maximum amount of times in an itinerary that a transportation network company can be hailed.
-     * Default is 2
-     */
-    public int maximumTransportationNetworkCompanyBoardings = 2;
-
     public String companies;
 
     /** Saves split edge which can be split on origin/destination search

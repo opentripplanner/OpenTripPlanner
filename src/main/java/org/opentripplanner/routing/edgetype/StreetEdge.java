@@ -308,16 +308,11 @@ public class StreetEdge extends Edge implements Cloneable {
                     && getPermission().allows(TraverseMode.CAR)
                     && currMode != TraverseMode.CAR
             ) {
-                // perform extra checks to prevent entering a tnc vehicle if:
-                // - boarding too many times
-                // - boarding a transportation network company a 2nd time if transit has not yet been used
+                // perform extra checks to prevent entering a tnc vehicle if a car has already been
+                // hailed in the pre or post transit part of trip
                 Vertex toVertex = options.rctx.toVertex;
-                int numTransportationNetworkCompanyBoardings = s0.stateData.getNumTransportationNetworkCompanyBoardings();
-                if (numTransportationNetworkCompanyBoardings ==
-                    options.maximumTransportationNetworkCompanyBoardings ||
-                    (numTransportationNetworkCompanyBoardings == 1
-                        && !s0.isEverBoarded())
-                    ) {
+                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                    (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
                     return state;
                 }
 

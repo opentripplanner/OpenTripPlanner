@@ -53,7 +53,8 @@ public class StateData implements Cloneable {
 
     protected boolean usingHailedCar;
 
-    protected int numTransportationNetworkCompanyBoardings = 0;
+    protected boolean hasHailedCarPostTransit = false;
+    protected boolean hasHailedCarPreTransit = false;
 
     protected boolean carParked;
 
@@ -125,7 +126,7 @@ public class StateData implements Cloneable {
         return numBoardings;
     }
 
-    public int getNumTransportationNetworkCompanyBoardings() {
-        return numTransportationNetworkCompanyBoardings;
-    }
+    public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
+
+    public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
 }

@@ -547,7 +547,11 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = true;
         child.stateData.nonTransitMode = TraverseMode.CAR;
-        child.stateData.numTransportationNetworkCompanyBoardings++;
+        if (child.isEverBoarded()) {
+            child.stateData.hasHailedCarPostTransit = true;
+        } else {
+            child.stateData.hasHailedCarPreTransit = true;
+        }
         child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
     }
 
