@@ -73,6 +73,11 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        // Does one state represent using a hailed car and the other represent walking before/after car hailing?
+        if (a.isUsingHailedCar() != b.isUsingHailedCar()) {
+            return false;
+        }
+
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
         if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
             if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
