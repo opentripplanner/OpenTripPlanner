@@ -121,8 +121,6 @@ public class StateData implements Cloneable {
         }
     }
 
-    public TraverseMode getBackMode() { return backMode; }
-
     public int getNumBooardings(){
         return numBoardings;
     }
