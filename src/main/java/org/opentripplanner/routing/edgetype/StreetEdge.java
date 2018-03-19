@@ -23,13 +23,9 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
@@ -312,15 +308,19 @@ public class StreetEdge extends Edge implements Cloneable {
                     && getPermission().allows(TraverseMode.CAR)
                     && currMode != TraverseMode.CAR
             ) {
-                // forbid boarding too many times or
-                // boarding a transportation network company a 2nd time if transit has not yet been used
-                if (s0.stateData.getNumTransportationNetworkCompanyBoardings() ==
+                // perform extra checks to prevent entering a tnc vehicle if:
+                // - boarding too many times
+                // - boarding a transportation network company a 2nd time if transit has not yet been used
+                Vertex toVertex = options.rctx.toVertex;
+                int numTransportationNetworkCompanyBoardings = s0.stateData.getNumTransportationNetworkCompanyBoardings();
+                if (numTransportationNetworkCompanyBoardings ==
                     options.maximumTransportationNetworkCompanyBoardings ||
-                    (s0.stateData.getNumTransportationNetworkCompanyBoardings() == 1
+                    (numTransportationNetworkCompanyBoardings == 1
                         && !s0.isEverBoarded())
                     ) {
                     return state;
                 }
+
                 StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
                 StateEditor editorNonCar = doTraverse(s0, options, currMode);
                 if (editorCar != null) {
@@ -536,9 +536,12 @@ public class StreetEdge extends Edge implements Cloneable {
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getDistance());
         } else {
-            // check if driveReluctance is defined (ie it is greater than 0)
-            if (options.driveReluctance > 0) {
-                s1.incrementWeight(time * options.driveReluctance);
+            // check if driveTimeReluctance is defined (ie it is greater than 0)
+            if (options.driveTimeReluctance > 0) {
+                s1.incrementWeight(time * options.driveTimeReluctance);
+            }
+            if (options.driveDistanceReluctance > 0) {
+                s1.incrementWeight(getDistance() * options.driveDistanceReluctance);
             }
             if (s0.isUsingHailedCar()) {
                 s1.incrementTransportationNetworkCompanyDistance(getDistance());
