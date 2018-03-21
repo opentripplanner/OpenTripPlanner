@@ -13,19 +13,19 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 import java.util.Locale;
 
 /** 
@@ -117,6 +117,13 @@ public class StreetTransitLink extends Edge {
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
             if (req.kissAndRide && !s0.isCarParked()) {
                 s1.setCarParked(true);
+            } else if (req.useTransportationNetworkCompany && s0.isUsingHailedCar()) {
+                if (s0.transportationNetworkCompanyDriveDistance > req.minimumTransportationNetworkCompanyDistance) {
+                    s1.alightHailedCar();
+                } else {
+                    // haven't gone far enough to warrant a ride, do not proceed
+                    return null;
+                }
             } else {
                 return null;
             }

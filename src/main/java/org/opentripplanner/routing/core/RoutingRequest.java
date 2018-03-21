@@ -34,15 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -440,6 +432,31 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
+
+    /** Whether or not to use a TNC during part of the trip */
+    public boolean useTransportationNetworkCompany;
+
+    /*
+     * driving reluctances are used in TNC requests.
+     * It is set in org.opentripplanner.api.parameter.QualifiedMode.
+     * The driveTimeReluctance is used as a multiplier to add weight to a shortest path search in
+     *   org.opentripplanner.routing.edgetype.StreetEdge.
+     * It is set to -1 to indicate that driving reluctance should not be used in default car routing requests.
+     */
+    public double driveTimeReluctance = -1.0;
+    public double driveDistanceReluctance = -1.0;
+
+    /**
+     * A mimum travel distance for a ride in a transportation network company.
+     * Units in meters, default is 0.5 miles.
+     */
+    public double minimumTransportationNetworkCompanyDistance = 804.672;
+
+    // we store the earliest pickup time here and add it upon the first boarding
+    // this way, a graph search can proceed and give walking a time advantage
+    public Date earliestTransportationNetworkCompanyPickupAtOrigin = null;
+
+    public String companies;
 
     /** Saves split edge which can be split on origin/destination search
      *
@@ -1231,5 +1248,15 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public void setTransportationNetworkCompanies(String companies) {
+        this.companies = companies;
+    }
+
+    public void setEarliestTransportationNetworkCompanyPickupAtOrigin(
+        Date earliestTransportationNetworkCompanyPickupAtOrigin
+    ) {
+        this.earliestTransportationNetworkCompanyPickupAtOrigin = earliestTransportationNetworkCompanyPickupAtOrigin;
     }
 }

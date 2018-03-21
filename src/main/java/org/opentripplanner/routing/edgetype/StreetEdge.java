@@ -23,13 +23,9 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
@@ -298,6 +294,59 @@ public class StreetEdge extends Edge implements Cloneable {
 
                 }
             }
+        } else if (options.useTransportationNetworkCompany) {
+            // Irrevocable transition from using hailed car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                s0.isUsingHailedCar()
+                    && !getPermission().allows(TraverseMode.CAR)
+                    && currMode == TraverseMode.CAR
+            ) {
+                // Make sure travel distance in car is greater than minimum distance
+                if (s0.transportationNetworkCompanyDriveDistance <
+                    options.minimumTransportationNetworkCompanyDistance) {
+                    return null;
+                }
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.alightHailedCar(); // done with TNC use for now
+                    return editor.makeState(); // return only the state with updated TNC usage
+                }
+            }
+            // possible transition to hailing a car
+            else if (
+                !s0.isUsingHailedCar()
+                    && getPermission().allows(TraverseMode.CAR)
+                    && currMode != TraverseMode.CAR
+            ) {
+                // perform extra checks to prevent entering a tnc vehicle if a car has already been
+                // hailed in the pre or post transit part of trip
+                Vertex toVertex = options.rctx.toVertex;
+                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                    (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                    return state;
+                }
+
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    editorCar.boardHailedCar(getDistance()); // start of TNC use
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
+                }
+            }
         }
         return state;
     }
@@ -493,6 +542,17 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getDistance());
+        } else {
+            // check if driveTimeReluctance is defined (ie it is greater than 0)
+            if (options.driveTimeReluctance > 0) {
+                s1.incrementWeight(time * options.driveTimeReluctance);
+            }
+            if (options.driveDistanceReluctance > 0) {
+                s1.incrementWeight(getDistance() * options.driveDistanceReluctance);
+            }
+            if (s0.isUsingHailedCar()) {
+                s1.incrementTransportationNetworkCompanyDistance(getDistance());
+            }
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */

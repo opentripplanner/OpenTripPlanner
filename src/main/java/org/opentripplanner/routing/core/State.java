@@ -13,10 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Set;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -27,6 +23,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.Set;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -58,6 +57,9 @@ public class State implements Cloneable {
 
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
+
+    // The current distance traveled in a transportation network company vehicle
+    public double transportationNetworkCompanyDriveDistance;
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
@@ -125,9 +127,12 @@ public class State implements Cloneable {
             this.stateData.bikeParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
+        } else if (options.useTransportationNetworkCompany) {
+            this.stateData.nonTransitMode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK ;
         }
         this.walkDistance = 0;
         this.preTransitTime = 0;
+        this.transportationNetworkCompanyDriveDistance = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new AgencyAndId[0];
     }
@@ -262,6 +267,8 @@ public class State implements Cloneable {
     public boolean isBikeRenting() {
         return stateData.usingRentedBike;
     }
+
+    public boolean isUsingHailedCar() { return stateData.usingHailedCar; }
     
     public boolean isCarParked() {
         return stateData.carParked;
@@ -345,6 +352,13 @@ public class State implements Cloneable {
 
     public double getWeightDelta() {
         return this.weight - backState.weight;
+    }
+
+    public double getTransportationNetworkCompanyDistanceDelta() {
+        if (backState != null)
+            return Math.abs(this.transportationNetworkCompanyDriveDistance - backState.transportationNetworkCompanyDriveDistance);
+        else
+            return 0;
     }
 
     public void checkNegativeWeight() {
@@ -482,6 +496,7 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.usingHailedCar = stateData.usingHailedCar;
         return newState;
     }
 
@@ -712,16 +727,21 @@ public class State implements Cloneable {
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
+                editor.incrementTransportationNetworkCompanyDistance(orig.getTransportationNetworkCompanyDistanceDelta());
                 
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
 
-                if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
+                State origBackState = orig.getBackState();
+
+                if (orig.isBikeRenting() != origBackState.isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
-                if (orig.isCarParked() != orig.getBackState().isCarParked())
+                if (orig.isCarParked() != origBackState.isCarParked())
                     editor.setCarParked(!orig.isCarParked());
-                if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+                if (orig.isBikeParked() != origBackState.isBikeParked())
                     editor.setBikeParked(!orig.isBikeParked());
+                if (orig.isUsingHailedCar() != origBackState.isUsingHailedCar())
+                    editor.setUsingHailedCar(!orig.isUsingHailedCar());
 
                 editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 
@@ -833,5 +853,4 @@ public class State implements Cloneable {
     public boolean hasEnteredNoThruTrafficArea() {
         return stateData.enteredNoThroughTrafficArea;
     }
-
 }

@@ -13,10 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -26,6 +22,10 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
@@ -244,6 +244,11 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
         setEverBoarded(true);
+    }
+
+    public void incrementTransportationNetworkCompanyDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.transportationNetworkCompanyDriveDistance += distance;
     }
 
     /* Basic Setters */
@@ -532,4 +537,48 @@ public class StateEditor {
         return child.hasEnteredNoThruTrafficArea();
     }
 
+    public void alightHailedCar() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void boardHailedCar(double initialEdgeDistance) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = true;
+        child.stateData.nonTransitMode = TraverseMode.CAR;
+        if (child.isEverBoarded()) {
+            child.stateData.hasHailedCarPostTransit = true;
+        } else {
+            child.stateData.hasHailedCarPreTransit = true;
+
+            // add initial wait time if departing now from origin
+            RoutingRequest options = child.getContext().opt;
+            if (!options.arriveBy &&
+                options.earliestTransportationNetworkCompanyPickupAtOrigin != null) {
+                // increment the time to the exact time of the earliest pickup time
+                // if it is later than the current graph search time
+                incrementTimeInMilliseconds(
+                    Math.max(
+                        0,
+                        (int) (options.earliestTransportationNetworkCompanyPickupAtOrigin.getTime() - child.time)
+                    )
+                );
+            }
+        }
+        child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
+    }
+
+    /**
+     * Used only in State.optimizeOrReverse
+     */
+    public void setUsingHailedCar(boolean usingHailedCar) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = usingHailedCar;
+        if (usingHailedCar) {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
 }
