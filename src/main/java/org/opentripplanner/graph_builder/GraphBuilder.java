@@ -280,7 +280,9 @@ public class GraphBuilder implements Runnable {
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
         // which need to be handled even when there's no transit.
-        graphBuilder.addModule(new StreetLinkerModule());
+        StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
+        streetLinkerModule.setAddExtraEdgesToAreas(builderParams.areaVisibility);
+        graphBuilder.addModule(streetLinkerModule);
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         if (builderParams.elevationBucket != null) {
