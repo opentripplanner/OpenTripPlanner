@@ -51,6 +51,9 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public State traverse(State s0) {
+        if (!s0.getOptions().modes.contains(TraverseMode.WALK)) {
+            return null;
+        }
         // Forbid taking shortcuts composed of two transfers in a row
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
