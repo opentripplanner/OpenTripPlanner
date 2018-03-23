@@ -61,14 +61,13 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         try {
             station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
             station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
-            if (!node.path("operative").asText().equals("true") ||
-                node.path("style").asText().equals("Station off") ||
-                node.path("style").asText().equals("Station closed")) {
-                station.bikesAvailable = 0;
-                station.spacesAvailable = 0;
-            } else {
+            if (node.path("operative").asText().equals("true") &&
+                node.path("style").asText().equals("Station on")) {
                 station.bikesAvailable = node.path("avl_bikes").asInt();
                 station.spacesAvailable = node.path("free_slots").asInt();
+            } else {
+                station.bikesAvailable = 0;
+                station.spacesAvailable = 0;
             }
             return station;
         } catch (NumberFormatException e) {
