@@ -713,11 +713,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime.getTime() / 1000;
+        if (dateTime == null) throw new IllegalArgumentException("Date or time parameter is invalid.");
+        else this.dateTime = dateTime.getTime() / 1000;
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
+
         setDateTime(dateObject);
     }
 
