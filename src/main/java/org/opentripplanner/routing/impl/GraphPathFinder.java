@@ -261,6 +261,8 @@ public class GraphPathFinder {
             Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
             RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
                     toTransVertex, transitStopTime, remainingWeightHeuristic);
+            // Limit reverse search to the same number of legs as the original result
+            reversedMainRequest.maxTransfers = newPath.getTrips().size() - 1;
             aStar.getShortestPathTree(reversedMainRequest, timeout);
 
             List<GraphPath> newRevPaths = aStar.getPathsToTarget();
