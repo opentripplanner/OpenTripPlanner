@@ -748,7 +748,7 @@ public abstract class GraphPathToTripPlanConverter {
         if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
             SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
             List<Edge> transferEdges = transferEdge.getEdges();
-            if (transferEdges != null) {
+            if (transferEdges != null && transferEdges.size() > 0) {
                 // Create a new initial state. Some parameters may have change along the way, copy them from the first state
                 StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
                 se.setNonTransitOptionsFromState(states[0]);
