@@ -1,3 +1,4 @@
+
 /* This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
@@ -66,11 +67,9 @@ public class TestBikeRentalStationSource extends TestCase {
         BikeRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
         assertEquals("B05", fake.id);
+        assertEquals("Station off", fake.state);
         assertEquals(24.0, fake.x);
         assertEquals(60.0, fake.y);
-        // operative: false overrides available bikes and slots
-        assertEquals(0, fake.spacesAvailable);
-        assertEquals(0, fake.bikesAvailable);
 
         BikeRentalStation foo = rentalStations.get(2);
         assertEquals("Foo", foo.name.toString());
