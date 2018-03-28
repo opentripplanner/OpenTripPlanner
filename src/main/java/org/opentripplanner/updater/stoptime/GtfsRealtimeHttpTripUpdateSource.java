@@ -16,8 +16,10 @@ package org.opentripplanner.updater.stoptime;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.graph.Graph;
@@ -47,9 +49,14 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
 
     private String url;
 
+    private Map<String ,String> httpHeaders;
+
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         String url = config.path("url").asText();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode headersMap = config.path("headers");
+        this.httpHeaders = mapper.convertValue(headersMap, Map.class);
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
@@ -64,7 +71,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
         List<TripUpdate> updates = null;
         fullDataset = true;
         try {
-            InputStream is = HttpUtils.getData(url);
+            InputStream is = HttpUtils.getData(url, httpHeaders);
             if (is != null) {
                 // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);

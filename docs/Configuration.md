@@ -474,6 +474,10 @@ connect to a network resource is the `url` field.
             "type": "real-time-alerts",
             "frequencySec": 30,
             "url": "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+            "headers": {
+              "Authorization": "Bearer plain",
+              "API-KEY": "optional-key"
+            },
             "feedId": "TriMet"
         },
 
@@ -525,6 +529,10 @@ connect to a network resource is the `url` field.
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             "sourceType": "gtfs-http",
             "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+            "headers": {
+              "Authorization": "Bearer plain",
+              "API-KEY": "optional-key"
+            },
             "feedId": "TriMet"
         },
 
