@@ -13,7 +13,7 @@
          "name" : "B05 Fake",
          "operative" : false,
          "coordinates" : "60, 24",
-         "style" : "Station on",
+         "style" : "Station off",
          "avl_bikes" : 5,
          "free_slots" : 5,
          "total_slots" : 5
