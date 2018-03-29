@@ -362,6 +362,12 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /**
+     * If request date is invalid, apply the provided strategy to come up with a valid date.
+     */
+    @QueryParam("invalidDateStrategy")
+    protected String invalidDateStrategy;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -389,6 +395,11 @@ public abstract class RoutingResource {
 
         if (toPlace != null)
             request.setToString(toPlace);
+
+        // NOTE: This query parameter dictates how OTP handles a bad date/time value. It must be set on the request
+        // before setDateTime is called, otherwise the strategy will not be applied.
+        if (invalidDateStrategy != null)
+            request.invalidDateStrategy = invalidDateStrategy;
 
         {
             //FIXME: move into setter method on routing request
