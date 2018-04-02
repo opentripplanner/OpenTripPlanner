@@ -57,7 +57,7 @@ public class QualifiedMode implements Serializable {
             } else if (this.qualifiers.contains(Qualifier.HAIL)) {
                 req.useTransportationNetworkCompany = true;
                 req.driveTimeReluctance = 1.75;
-                req.driveDistanceReluctance = 0.05;
+                req.driveDistanceReluctance = 0.2;
             } else {
                 req.kissAndRide = true;
             }
