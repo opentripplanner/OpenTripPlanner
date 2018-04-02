@@ -39,17 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dynamic bike park updater which encapsulate one BikeParkDataSource.
- * 
- * Usage example ('fietsstalling' name is an example) in the file 'Graph.properties':
- * 
- * <pre>
- * fietsstalling.type = bike-park
- * fietsstalling.frequencySec = 600
- * fietsstalling.sourceType = kml-placemarks
- * fietsstalling.url = http://host.tld/fietsstalling.kml
- * </pre>
- * 
+ * Graph updater that dynamically sets availability information on bike parking lots.
+ * This updater fetches data from a single BikeParkDataSource.
+ *
  * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
  * (https://goabout.com/).
  * 
