@@ -15,27 +15,23 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Created by demory on 3/14/17.
+ * Created by demory on 2017-03-14.
  */
 public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
-    private static final Logger log = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
 
     private GbfsStationDataSource stationSource;
     private GbfsStationStatusDataSource stationStatusSource;
     private GbfsFloatingBikeDataSource floatingBikeSource;
 
     private String baseUrl;
-    private String apiKey;
 
     public GbfsBikeRentalDataSource () {
         stationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
         floatingBikeSource = new GbfsFloatingBikeDataSource();
     }
-
-    //private boolean read
-
 
     public void setBaseUrl (String url) {
         baseUrl = url;
@@ -52,12 +48,14 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     @Override
     public List<BikeRentalStation> getStations() {
-        Map<String, BikeRentalStation> statusLookup = new HashMap<>();
 
+        // Index all the station status entries on their station ID.
+        Map<String, BikeRentalStation> statusLookup = new HashMap<>();
         for (BikeRentalStation station : stationStatusSource.getStations()) {
             statusLookup.put(station.id, station);
         }
 
+        // Iterate over all known stations, and if we have any status information add it to those station objects.
         for (BikeRentalStation station : stationSource.getStations()) {
             if (!statusLookup.containsKey(station.id)) continue;
             BikeRentalStation status = statusLookup.get(station.id);
@@ -65,6 +63,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             station.spacesAvailable = status.spacesAvailable;
         }
 
+        // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
         List<BikeRentalStation> stations = new LinkedList<>(stationSource.getStations());
         stations.addAll(floatingBikeSource.getStations());
         return stations;

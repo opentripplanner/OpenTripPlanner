@@ -53,9 +53,8 @@ public class GraphUpdaterManager {
     private static String DEFAULT_ROUTER_ID = "(default)";
     
     /**
-     * Thread factory used to create new threads.
+     * Thread factory used to create new threads, giving them more human-readable names including the routerId.
      */
-    
     private ThreadFactory threadFactory;
 
     /**
@@ -63,28 +62,30 @@ public class GraphUpdaterManager {
      * but never simultaneous writes. We ensure this policy is respected by having a single writer
      * thread, which sequentially executes all graph updater tasks. Each task is a runnable that is
      * scheduled with the ExecutorService to run at regular intervals.
+     * FIXME in reality we're not using scheduleAtFixedInterval. We're scheduling for immediate execution from separate threads that sleep in a loop.
      */
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     /**
-     * Pool with updaters
+     * A pool of threads on which the updaters will run.
+     * This creates a pool that will auto-scale up to any size (maximum pool size is MAX_INT).
+     * FIXME The polling updaters occupy an entire thread, sleeping in between polling operations.
      */
     private ExecutorService updaterPool = Executors.newCachedThreadPool();
 
     /**
-     * List with updaters to be able to free resources TODO: is this list necessary?
+     * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
      */
-    List<GraphUpdater> updaterList = new ArrayList<GraphUpdater>();
+    List<GraphUpdater> updaterList = new ArrayList<>();
 
     /**
-     * Parent graph of this manager
+     * The Graph that will be updated.
      */
     Graph graph;
 
     /**
-     * Constructor
-     * 
-     * @param graph is parent graph of manager
+     * Constructor.
+     * @param graph is the Graph that will be updated.
      */
     public GraphUpdaterManager(Graph graph) {
         this.graph = graph;
@@ -139,19 +140,16 @@ public class GraphUpdaterManager {
      */
     public void addUpdater(final GraphUpdater updater) {
         updaterList.add(updater);
-        updaterPool.execute(new Runnable() {
-            @Override
-            public void run() {
+        updaterPool.execute(() -> {
+            try {
+                updater.setup();
                 try {
-                    updater.setup();
-                    try {
-                        updater.run();
-                    } catch (Exception e) {
-                        LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
-                    }
+                    updater.run();
                 } catch (Exception e) {
-                    LOG.error("Error while setting up updater {}:", updater.getClass().getName(), e);
+                    LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
                 }
+            } catch (Exception e) {
+                LOG.error("Error while setting up updater {}:", updater.getClass().getName(), e);
             }
         });
     }
@@ -187,15 +185,11 @@ public class GraphUpdaterManager {
 
     private Future<?> executeReturningFuture(final GraphWriterRunnable runnable) {
         // TODO: check for high water mark?
-        Future<?> future = scheduler.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    runnable.run(graph);
-                } catch (Exception e) {
-                    LOG.error("Error while running graph writer {}:", runnable.getClass().getName(),
-                            e);
-                }
+        Future<?> future = scheduler.submit(() -> {
+            try {
+                runnable.run(graph);
+            } catch (Exception e) {
+                LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
         });
         return future;

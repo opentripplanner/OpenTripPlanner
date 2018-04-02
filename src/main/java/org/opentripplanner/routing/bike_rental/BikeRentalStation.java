@@ -83,6 +83,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @XmlTransient
     public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
 
+    /**
+     * FIXME nonstandard definition of equals, relying on only the station field.
+     * We should probably be keying collections on station ID rather than the station object with nonstandard equals.
+     */
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
             return false;

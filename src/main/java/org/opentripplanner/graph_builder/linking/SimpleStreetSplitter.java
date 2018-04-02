@@ -88,9 +88,9 @@ public class SimpleStreetSplitter {
     private final boolean destructiveSplitting;
 
     /**
-     * Construct a new SimpleStreetSplitter. Be aware that only one SimpleStreetSplitter should be
-     * active on a graph at any given time.
-     * @param graph
+     * Construct a new SimpleStreetSplitter.
+     * NOTE: Only one SimpleStreetSplitter should be active on a graph at any given time.
+     *
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
      * @param transitStopIndex Index of all transitStops which is generated in {@link org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl}
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
@@ -104,8 +104,7 @@ public class SimpleStreetSplitter {
         //We build a spatial index if it isn't provided
         if (hashGridSpatialIndex == null) {
             // build a nice private spatial index, since we're adding and removing edges
-            idx = new HashGridSpatialIndex<Edge>();
-
+            idx = new HashGridSpatialIndex<>();
             for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
                 idx.insert(se.getGeometry(), se);
             }

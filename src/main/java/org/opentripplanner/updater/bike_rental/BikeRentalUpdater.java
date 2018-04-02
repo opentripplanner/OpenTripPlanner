@@ -40,17 +40,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource.
- * 
- * Usage example ('bike1' name is an example) in the file 'Graph.properties':
- * 
- * <pre>
- * bike1.type = bike-rental
- * bike1.frequencySec = 60
- * bike1.networks = V3,V3N
- * bike1.sourceType = jcdecaux
- * bike1.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
- * </pre>
+ * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
  */
 public class BikeRentalUpdater extends PollingGraphUpdater {
 
@@ -137,12 +127,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         linker = new SimpleStreetSplitter(graph);
 
         // Adding a bike rental station service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                service = graph.getService(BikeRentalStationService.class, true);
-            }
-        });
+        updaterManager.executeBlocking(graph -> service = graph.getService(BikeRentalStationService.class, true));
     }
 
     @Override
@@ -174,8 +159,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
-            Set<String> defaultNetworks = new HashSet<String>(Arrays.asList(network));
+            Set<BikeRentalStation> stationSet = new HashSet<>();
+            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
