@@ -277,7 +277,8 @@ public class SimpleStreetSplitter {
                 double distanceDegreesLatitude = distances.get(candidateEdges.get(0).getId());
                 int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
                 if (distanceMeters > WARNING_DISTANCE_METERS) {
-                    LOG.warn(graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStop)vertex, distanceMeters)));
+                    // Registering an annotation but not logging because tests produce thousands of these warnings.
+                    graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStop)vertex, distanceMeters));
                 }
             }
 
