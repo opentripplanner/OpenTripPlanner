@@ -155,12 +155,13 @@ public class SimpleStreetSplitter {
 
         Envelope env = new Envelope(vertex.getCoordinate());
 
-        // local equirectangular projection
+        // Perform a simple local equirectangular projection, so distances are expressed in degrees latitude.
         final double xscale = Math.cos(vertex.getLat() * Math.PI / 180);
 
+        // Expand more in the longitude direction than the latitude direction to account for converging meridians.
         env.expandBy(radiusDeg / xscale, radiusDeg);
 
-        double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
+        final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
         final TraverseModeSet traverseModeSet;
         if (traverseMode == TraverseMode.BICYCLE) {
@@ -182,16 +183,16 @@ public class SimpleStreetSplitter {
                 edge.getToVertex().getIncoming().contains(edge))
             .collect(Collectors.toList());
 
-        // make a map of distances
+        // Make a map of distances to all edges.
         final TIntDoubleMap distances = new TIntDoubleHashMap();
-
         for (StreetEdge e : candidateEdges) {
             distances.put(e.getId(), distance(vertex, e, xscale));
         }
 
-        // sort the list
+        // Sort the list.
         Collections.sort(candidateEdges, (o1, o2) -> {
             double diff = distances.get(o1.getId()) - distances.get(o2.getId());
+            // A Comparator must return an integer but our distances are doubles.
             if (diff < 0)
                 return -1;
             if (diff > 0)
@@ -200,7 +201,7 @@ public class SimpleStreetSplitter {
         });
 
         if (!candidateEdges.isEmpty() && vertex instanceof TransitStop) {
-            int distance = (int)SphericalDistanceLibrary.degreesToMeters(distances.get(candidateEdges.get(0).getId()));
+            int distance = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distances.get(candidateEdges.get(0).getId()));
             if (distance > MIN_SNAP_DISTANCE_WARNING) {
                 LOG.info(String.format(graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStop)vertex, distance))));
             }
@@ -208,13 +209,13 @@ public class SimpleStreetSplitter {
 
         // find the closest candidate edges
         if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg) {
-            //We only link to stops if we are searching for origin/destination and for that we need transitStopIndex
+            // We only link to stops if we are searching for origin/destination and for that we need transitStopIndex.
             if (destructiveSplitting || transitStopIndex == null) {
                 return false;
             }
             LOG.debug("No street edge was found for {}", vertex);
-            //we search for closest stops (since this is only used in origin/destination linking if no edges were found)
-            //in same way as closest edges are found
+            // We search for closest stops (since this is only used in origin/destination linking if no edges were found)
+            // in the same way the closest edges are found.
             List<TransitStop> candidateStops = new ArrayList<>();
             transitStopIndex.query(env).forEach(candidateStop ->
                 candidateStops.add((TransitStop) candidateStop)
@@ -241,8 +242,7 @@ public class SimpleStreetSplitter {
                 return false;
             } else {
                 List<TransitStop> bestStops = Lists.newArrayList();
-
-                // add stops until there is a break of epsilon meters.
+                // Add stops until there is a break of epsilon meters.
                 // we do this to enforce determinism. if there are a lot of stops that are all extremely close to each other,
                 // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
                 // fall just inside or beyond the cutoff depending on floating-point operations.
@@ -251,7 +251,7 @@ public class SimpleStreetSplitter {
                     bestStops.add(candidateStops.get(i++));
                 } while (i < candidateStops.size() &&
                     stopDistances.get(candidateStops.get(i).getIndex()) - stopDistances
-                        .get(candidateStops.get(i - 1).getIndex()) < duplicateDeg);
+                        .get(candidateStops.get(i - 1).getIndex()) < DUPLICATE_WAY_EPSILON_DEGREES);
 
                 for (TransitStop stop: bestStops) {
                     LOG.debug("Linking vertex to stop: {}", stop.getName());
@@ -273,7 +273,7 @@ public class SimpleStreetSplitter {
                 bestEdges.add(candidateEdges.get(i++));
             } while (i < candidateEdges.size() &&
                 distances.get(candidateEdges.get(i).getId()) - distances
-                    .get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
+                    .get(candidateEdges.get(i - 1).getId()) < DUPLICATE_WAY_EPSILON_DEGREES);
 
             for (StreetEdge edge : bestEdges) {
                 link(vertex, edge, xscale, options);
@@ -458,12 +458,13 @@ public class SimpleStreetSplitter {
 
     /** projected distance from stop to edge, in latitude degrees */
     private static double distance (Vertex tstop, StreetEdge edge, double xscale) {
-        // use JTS internal tools wherever possible
+        // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
+        // for the actual distance calculations.
         LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
         return transformed.distance(geometryFactory.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
     }
 
-    /** projected distance from stop to edge, in latitude degrees */
+    /** projected distance from stop to another stop, in latitude degrees */
     private static double distance (Vertex tstop, Vertex tstop2, double xscale) {
         // use JTS internal tools wherever possible
         return new Coordinate(tstop.getLon() * xscale, tstop.getLat()).distance(new Coordinate(tstop2.getLon() * xscale, tstop2.getLat()));
