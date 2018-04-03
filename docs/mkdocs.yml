@@ -11,3 +11,25 @@ theme: readthedocs
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
 # This list organizes them into categories and controls the order.
+pages:
+- Home: 'index.md'
+- About:
+    - Governance: 'Governance.md'
+    - History: 'History.md'
+    - Deployments: 'Deployments.md'
+    - Changelog: 'Changelog.md'
+- Tutorials: 
+    - Basic: 'Basic-Usage.md'
+    - Advanced: 'Advanced-Usage.md'
+- 'Usage Guides':
+    - 'Getting OTP': 'Getting-OTP.md'
+    - Configuration: 'Configuration.md'
+    - Analyst: 'Analyst.md'
+    - Scripting: 'Scripting.md'
+    - Security: 'Security.md'
+    - Troubleshooting: 'Troubleshooting-Routing.md'
+- Development:
+    - "Developers' Guide": 'Developers-Guide.md'
+    - Architecture: 'Architecture.md'
+    - Localization: 'Localization.md'
+    - Bibliography: 'Bibliography.md'
