@@ -1,10 +1,8 @@
-# Routing
+# Routing Bibliography
 
 This is a list of articles, dissertations, and books that have inspired and informed both the existing OTP routing engine and some ongoing experiments.
 
-Currently, OTP uses a single time-dependent (as opposed to time-expanded) graph that contains both street and transit networks. Walk-only and bicycle-only trips are generally planned using the A* algorithm with a Euclidean heuristic. Walk+Transit or Bike+Transit trips are planned using Multiobjective A* and the Tung-Chew heuristic (a graph grown backward from the destination providing a lower bound on aggregate weight) for queue ordering.
-
-Please feel free to add references or summaries!
+Currently, OTP uses a single time-dependent (as opposed to time-expanded) graph that contains both street and transit networks. Walk-only and bicycle-only trips are generally planned using the A-star algorithm with a Euclidean heuristic. Walk+Transit or Bike+Transit trips are planned using A-star with the Tung-Chew heuristic (i.e. a graph grown backward from the destination providing a lower bound on aggregate weight) for queue ordering. Currently we are performing single-variable generalized cost optimization, which is not ideal. We should be performing Pareto optimization on at least two variables (generalized cost and time) but will need to do some optimizations and check performance.
 
 ## Path Search Speedup Techniques
 
@@ -88,7 +86,6 @@ Speed-Up Techniques for Dijkstra’s Algorithm. (2008)
 - Bast, Carlsson, Eigenwillig, Geisberger Harrelson, Raychev, and Viger. Fast Routing in Very Large Public Transportation Networks Using Transfer Patterns. (2010)
 <BR>http://ad.informatik.uni-freiburg.de/files/transferpatterns.pdf/at_download/file
 
-
 ## Timetable-based routing
 
 - Schulz, Frank. Timetable Information and Shortest Paths. (2005, dissertation)
@@ -136,9 +133,7 @@ Speed-Up Techniques for Dijkstra’s Algorithm. (2008)
 <BR>"In this work, we present a novel algorithm for the one-to-all profile-search problem in public transportation networks. It answers the question for all fastest connections between a given station S and any other station at any time of the day in a single query... two interesting questions arise for time-dependent route planning: compute the best connection for a given departure time and the computation of all best connections during a given time interval (e. g., a whole day). The former is called a time-query, while the latter is called a proﬁle-query."
 <BR>http://www.ecompass-project.eu/sites/default/files/ECOMPASS-TR-021.pdf
 
-
-
-# Analytics
+# Analysis Bibliography
 
 This is a list of articles about non-passenger-facing applications of multi-modal routing engines (including OTP) in urban planning, public policy, economics, geography etc.
 
