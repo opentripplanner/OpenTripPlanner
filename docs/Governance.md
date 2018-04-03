@@ -1,6 +1,18 @@
 # Project Governance
 
-OpenTripPlanner is a member project of the [Software Freedom Conservancy](https://sfconservancy.org/members/current/). Development of OpenTripPlanner is managed by a steering committee which makes decisions by simple majority vote. The current members of this steering committee are (in alphabetical order): Andrew Byrd, Matthew Conway, David Emory, Laurent Grégoire, Jasper Hartong, Tuukka Hastrup, Frank Purcell, and David Turner.
+OpenTripPlanner is a member project of the [Software Freedom Conservancy](https://sfconservancy.org/members/current/). Development of OpenTripPlanner is managed by a steering committee which makes decisions by simple majority vote. The current members of this steering committee are (in alphabetical order):
+
+|Name | Affiliation |
+|-----|-------------|
+| Sean Barbeau      | University of South Florida |
+| Torbjørn Barslett | Ruter Oslo |
+| Andrew Byrd       | Conveyal |
+| David Emory       | Conveyal |
+| Laurent Grégoire  | Mecatran |
+| Jasper Hartong    | PlannerStack Foundation |
+| Tuukka Hastrup    | Helsingin Seudun Liikenne |
+| Frank Purcell     | TriMet |
+| David Turner      | ex-OpenPlans |
 
 The steering committee holds a quarterly video conference on the first Thursday of June, September, December, and March. An agenda is prepared as a collaborative document in advance of each quarterly meeting. These meetings are held at 9AM US Pacific time because we have members in the US Pacific, US Eastern, and Central European time zones.
 
