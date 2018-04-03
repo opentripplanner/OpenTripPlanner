@@ -34,5 +34,5 @@ The following OTP-based services are presented as production-quality deployments
 
 The following OTP-based services are demonstrations or prototypes. Caveats/disclaimers may apply regarding their use for actual on-the-ground trip planning; consult individual sites for details.
 
-* [**Athens, Greece**](http://zee.gr/bus/) Athens Public Transport Planner ([description](http://entropy.disconnect.me.uk/2012/01/athens-public-transport-planner.html))
+* [**Athens, Greece**](http://zee.gr/bus/) Athens Public Transport Planner.
 * [**Canberra, Austrailia**](http://bus.lambdacomplex.org/tripPlanner.php) Action Busses, etc.
