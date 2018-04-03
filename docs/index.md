@@ -7,8 +7,6 @@ _This documentation is targeted primarily at the OTP development community and m
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
 
-[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
-
 **Latest Updates**
 
  * **Version 1.2 was released on 18 August 2017.**
