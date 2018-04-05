@@ -68,15 +68,13 @@ OTP's built-in web server will run by default on ports 8080 and 8081. If by any 
 
 ## Other simple requests
 
-There are a number of different resources available through the HTTP API. Besides trip planning, OTP can also look up information about transit routes and stops from the GTFS you loaded. For example:
+There are a number of different resources available through the HTTP API. Besides trip planning, OTP can also look up information about transit routes and stops from the GTFS you loaded and return this information as JSON. For example:
 
 - Get a list of all available routers: [http://localhost:8080/otp/routers/default/](http://localhost:8080/otp/routers/default/)
 
-- Get a list all GTFS routes on the default router: [http://localhost:8080/otp/routers/default/index/routes]
-(http://localhost:8080/otp/routers/default/index/routes)
+- Get a list all GTFS routes on the default router: [http://localhost:8080/otp/routers/default/index/routes](http://localhost:8080/otp/routers/default/index/routes)
 
-- Find all stops on TriMet route 52: [http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops]
-(http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
+- Find all stops on TriMet route 52: [http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops](http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
 - Find all routes passing though TriMet stop ID 7003: [http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes](http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes)
 
