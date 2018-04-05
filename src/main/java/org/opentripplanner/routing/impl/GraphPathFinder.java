@@ -113,6 +113,9 @@ public class GraphPathFinder {
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
             reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
+        } else if (options.useTransportationNetworkCompany) {
+            heuristic = new EuclideanRemainingWeightHeuristic();
+            reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
