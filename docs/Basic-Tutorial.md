@@ -61,7 +61,7 @@ where `/home/username/otp` should be the directory where you put your input file
 The graph build operation should take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you have an OpenTripPlanner server running locally and can open [http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
 interact with your local OpenTripPlanner instance.
 
-This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your local machine at [http://localhost:8080/](http://localhost:8080/). It can be informative to watch the HTTP requests and responses being generated using the developer tools in your web browser.
+This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your local machine. It can be informative to watch the HTTP requests and responses being generated using the developer tools in your web browser.
 
 OTP's built-in web server will run by default on ports 8080 and 8081. If by any chance some other software is already using those port numbers, you can specify different port numbers with switches like `--port 8801 --securePort 8802`.
 
@@ -70,14 +70,17 @@ OTP's built-in web server will run by default on ports 8080 and 8081. If by any 
 
 There are a number of different resources available through the HTTP API. Besides trip planning, OTP can also look up information about transit routes and stops from the GTFS you loaded. For example:
 
-- Get a list of all available routers: [http://localhost:8080/otp/routers/default/]
+- Get a list of all available routers: [http://localhost:8080/otp/routers/default/](http://localhost:8080/otp/routers/default/)
 
 - Get a list all GTFS routes on the default router: [http://localhost:8080/otp/routers/default/index/routes]
+(http://localhost:8080/otp/routers/default/index/routes)
 
 - Find all stops on TriMet route 52: [http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops]
+(http://localhost:8080/otp/routers/default/index/routes/TriMet:52/stops)
 
-- Find all routes passing though TriMet stop ID 7003: [http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes]
+- Find all routes passing though TriMet stop ID 7003: [http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes](http://localhost:8080/otp/routers/default/index/stops/TriMet:7003/routes)
 
-- Return all unique sequences of stops on the TriMet Green rail line: [http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns]
+
+- Return all unique sequences of stops on the TriMet Green rail line: [http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns](http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns)
 
 We refer to this as the Index API. It is also documented [in the OTP HTTP API docs](http://dev.opentripplanner.org/apidoc/1.0.0/resource_IndexAPI.html).
