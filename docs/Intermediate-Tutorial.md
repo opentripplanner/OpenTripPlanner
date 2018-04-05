@@ -1,4 +1,4 @@
-# Advanced Usage of OpenTripPlanner
+# Intermediate Usage of OpenTripPlanner
 This page follows up on [basic usage](Basic-Usage.md) with more detailed examples of OpenTripPlanner functionality. It is not an exhaustive list but should serve to demonstrate some useful applications. 
 
 
