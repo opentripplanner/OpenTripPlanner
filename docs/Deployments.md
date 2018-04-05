@@ -28,11 +28,3 @@ The following OTP-based services are presented as production-quality deployments
 * **The Netherlands (nationwide)** [Plannerstack Foundation](http://www.plannerstack.org/) provides national scale trip planning APIs using OTP and other open source trip planners, based on [OpenOV's extremely detailed open data](http://gtfs.openov.nl/) including minutely real-time updates for every vehicle in the country.
 * [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android) by CUTR-USF and Vreixo González can find itineraries on many different OTP servers via a service discovery mechanism.
 * [**ViviBus Bologna**](http://www.vivibus.it/) Bologna, Italy.
-* [**Singapore Nextride**](https://itunes.apple.com/us/app/nextride-singapore-public/id565103559) from [buUuk](http://www.buuuk.com/) is an iOS application using OTP on the back end.
-
-## Prototypes, technical previews, and demos
-
-The following OTP-based services are demonstrations or prototypes. Caveats/disclaimers may apply regarding their use for actual on-the-ground trip planning; consult individual sites for details.
-
-* [**Athens, Greece**](http://zee.gr/bus/) Athens Public Transport Planner.
-* [**Canberra, Austrailia**](http://bus.lambdacomplex.org/tripPlanner.php) Action Busses, etc.
