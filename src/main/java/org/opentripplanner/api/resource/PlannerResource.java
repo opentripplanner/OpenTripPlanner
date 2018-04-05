@@ -132,8 +132,8 @@ public class PlannerResource extends RoutingResource {
                     sb.append(path.getTrips().size());
                     sb.append(' ');
                 }
+                router.requestLogger.info(sb.toString());
             }
-            router.requestLogger.info(sb.toString());
         }
         return response;
     }
