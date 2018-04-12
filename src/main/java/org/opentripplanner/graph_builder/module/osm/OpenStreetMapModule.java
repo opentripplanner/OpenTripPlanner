@@ -1108,8 +1108,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             street.setCarSpeed(carSpeed);
 
             if (OSMFilter.getPlatformClass(way) == StreetEdge.CLASS_TRAIN_PLATFORM) {
-                String platformRef = way.getTag("ref");
-                if (platformRef != null) {
+                if (way.hasTag("ref")) {
                     street.setRef(way.getTag("ref"));
                 }
             }
