@@ -54,11 +54,9 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely close to the street
@@ -189,18 +187,31 @@ public class SimpleStreetSplitter {
         } else {
             traverseModeSet = new TraverseModeSet(traverseMode);
         }
+
+        List<StreetEdge> walkableEdges = idx.query(env).stream()
+                .filter(streetEdge -> streetEdge instanceof StreetEdge)
+                .map(edge -> (StreetEdge) edge)
+                // note: not filtering by radius here as distance calculation is expensive
+                // we do that below.
+                .filter(edge -> edge.canTraverse(traverseModeSet) &&
+                        // only link to edges still in the graph.
+                        edge.getToVertex().getIncoming().contains(edge))
+                .collect(Collectors.toList());
+
+        Stream<StreetEdge> edgeStream = walkableEdges.stream();
+        if (vertex instanceof TransitStop) {
+            String code = ((TransitStop)vertex).getStopCode();
+            Optional<StreetEdge> hasMatchingEdges = walkableEdges.stream().filter(edge -> edgeStopCodeEquals(code, edge)).findAny();
+            if (hasMatchingEdges.isPresent()) {
+                edgeStream = edgeStream.filter(edge -> edgeStopCodeEquals(code, edge));
+            }
+        }
+
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
-        List<StreetEdge> candidateEdges = idx.query(env).stream()
-            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
-            .map(edge -> (StreetEdge) edge)
-            // note: not filtering by radius here as distance calculation is expensive
-            // we do that below.
-            .filter(edge -> edge.canTraverse(traverseModeSet) &&
-                // only link to edges still in the graph.
-                edge.getToVertex().getIncoming().contains(edge))
+        List<StreetEdge> candidateEdges = edgeStream
             .collect(Collectors.toList());
 
         // make a map of distances
@@ -302,6 +313,10 @@ public class SimpleStreetSplitter {
 
             return true;
         }
+    }
+
+    private static boolean edgeStopCodeEquals(String code, StreetEdge edge) {
+        return edge.getRef() != null && edge.getRef().equals(code);
     }
 
     // Link to all vertices in area/platform

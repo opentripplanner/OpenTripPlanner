@@ -1107,6 +1107,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     permissions, back);
             street.setCarSpeed(carSpeed);
 
+            if (OSMFilter.getPlatformClass(way) == StreetEdge.CLASS_TRAIN_PLATFORM) {
+                String platformRef = way.getTag("ref");
+                if (platformRef != null) {
+                    street.setRef(way.getTag("ref"));
+                }
+            }
+
             String highway = way.getTag("highway");
             int cls;
             if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {

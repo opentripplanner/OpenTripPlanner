@@ -45,9 +45,9 @@ import java.util.Locale;
 
 /**
  * This represents a street segment.
- * 
+ *
  * @author novalis
- * 
+ *
  */
 public class StreetEdge extends Edge implements Cloneable {
 
@@ -97,8 +97,10 @@ public class StreetEdge extends Edge implements Cloneable {
     protected float bicycleSafetyFactor;
 
     private int[] compactGeometry;
-    
+
     private I18NString name;
+
+    private String ref;
 
     private StreetTraversalPermission permission;
 
@@ -106,7 +108,7 @@ public class StreetEdge extends Edge implements Cloneable {
     public long wayId;
 
     private int streetClass = CLASS_OTHERPATH;
-    
+
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
@@ -323,7 +325,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis());
-        
+
         double time = getDistance() / speed;
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
@@ -463,11 +465,11 @@ public class StreetEdge extends Edge implements Cloneable {
 
                 realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
                         traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
-                        (float) speed);                
+                        (float) speed);
             } else {
                 // In case this is a temporary edge not connected to an IntersectionVertex
                 LOG.debug("Not computing turn cost for edge {}", this);
-                realTurnCost = 0; 
+                realTurnCost = 0;
             }
 
             if (!traverseMode.isDriving()) {
@@ -478,7 +480,7 @@ public class StreetEdge extends Edge implements Cloneable {
             roundedTime += turnTime;
             weight += options.turnReluctance * realTurnCost;
         }
-        
+
 
         if (walkingBike || TraverseMode.BICYCLE.equals(traverseMode)) {
             if (!(backWalkingBike || TraverseMode.BICYCLE.equals(backMode))) {
@@ -506,7 +508,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 } else return null;
             }
         }
-        
+
         /* Apply a strategy for avoiding walking too far, either soft (weight increases) or hard limiting (pruning). */
         if (s1.weHaveWalkedTooFar(options)) {
 
@@ -524,7 +526,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         s1.incrementTimeInSeconds(roundedTime);
-        
+
         s1.incrementWeight(weight);
 
         return s1;
@@ -554,7 +556,7 @@ public class StreetEdge extends Edge implements Cloneable {
     private double calculateCarSpeed(RoutingRequest options) {
         return getCarSpeed();
     }
-    
+
     /**
      * Calculate the speed appropriately given the RoutingRequest and traverseMode and the current wall clock time.
      * Note: this is not strictly symmetrical, because in a forward search we get the speed based on the
@@ -616,7 +618,7 @@ public class StreetEdge extends Edge implements Cloneable {
     public String toString() {
         return "StreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
                 + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
-                + " permission=" + this.getPermission() + ")";
+                + " permission=" + this.getPermission() + " ref=" + this.getRef() + ")";
     }
 
     @Override
@@ -627,7 +629,7 @@ public class StreetEdge extends Edge implements Cloneable {
             throw new RuntimeException(e);
         }
     }
-    
+
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
         for (TurnRestriction turnRestriction : getTurnRestrictions(state.getOptions().rctx.graph)) {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
@@ -670,6 +672,15 @@ public class StreetEdge extends Edge implements Cloneable {
 	public void setName(I18NString name) {
 		this.name = name;
 	}
+
+
+    public String getRef() {
+        return this.ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
 
 	public LineString getGeometry() {
 		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
@@ -790,7 +801,7 @@ public class StreetEdge extends Edge implements Cloneable {
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
-    
+
     /** calculate the length of this street segement from its geometry */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;
