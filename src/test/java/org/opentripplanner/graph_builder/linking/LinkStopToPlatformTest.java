@@ -28,6 +28,8 @@ public class LinkStopToPlatformTest {
 
     private Graph _graph;
 
+    private Stop stop = new Stop();
+
     @Before
     public void before() {
 
@@ -53,16 +55,20 @@ public class LinkStopToPlatformTest {
         edges.add(createAreaEdge(vertices.get(3), vertices.get(4), areaEdgeList, "edge 4"));
         edges.add(createAreaEdge(vertices.get(4), vertices.get(0), areaEdgeList, "edge 5"));
 
-        edges.add(createAreaEdge(vertices.get(1), vertices.get(0), areaEdgeList, "edge 6"));
+        AreaEdge refEdge = createAreaEdge(vertices.get(1), vertices.get(0), areaEdgeList, "edge 6");
+        refEdge.setRef("0001");
+        edges.add(refEdge);
+
         edges.add(createAreaEdge(vertices.get(2), vertices.get(1), areaEdgeList, "edge 7"));
         edges.add(createAreaEdge(vertices.get(3), vertices.get(2), areaEdgeList, "edge 8"));
         edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
         edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-        Stop stop = new Stop();
+
         stop.setId(new AgencyAndId("TestAgency", "TestStop"));
         stop.setLon(10.22213);
         stop.setLat(59.13545);
+
 
         TransitStop transitStop = new TransitStop(_graph, stop);
     }
@@ -72,6 +78,7 @@ public class LinkStopToPlatformTest {
      */
     @Test
     public void testLinkStopWithoutExtraEdges() {
+        stop.setCode(null);
         SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
         splitter.link();
 
@@ -80,11 +87,22 @@ public class LinkStopToPlatformTest {
 
     @Test
     public void testLinkStopWithExtraEdges() {
+        stop.setCode(null);
         SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
         splitter.setAddExtraEdgesToAreas(true);
         splitter.link();
 
         assertEquals(38, _graph.getEdges().size());
+    }
+
+
+    @Test
+    public void testLinkStopWithStopCodeWithoutExtraEdgess() {
+        stop.setCode("0001");
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
+        splitter.link();
+
+        assertEquals(13, _graph.getEdges().size());
     }
 
     private AreaEdge createAreaEdge(IntersectionVertex v1, IntersectionVertex v2, AreaEdgeList area, String nameString) {
