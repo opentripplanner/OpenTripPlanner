@@ -52,6 +52,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonSerialize
     public boolean isFloatingBike = false;
 
+    @XmlAttribute
+    @JsonSerialize
+    public String state = ""; // additional state info: on, off, closed, etc
+
     /**
      * List of compatible network names. Null (default) to be compatible with all.
      */

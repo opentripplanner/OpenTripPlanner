@@ -51,19 +51,16 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      * </pre>
      */
     public BikeRentalStation makeStation(JsonNode node) {
+        // TODO: final winter maintenance value not known yet
         BikeRentalStation station = new BikeRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
+        station.state = node.path("style").asText();
         try {
             station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
             station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
-            if (!node.path("operative").asText().equals("true")) {
-                station.bikesAvailable = 0;
-                station.spacesAvailable = 0;
-            } else {
-                station.bikesAvailable = node.path("avl_bikes").asInt();
-                station.spacesAvailable = node.path("free_slots").asInt();
-            }
+            station.bikesAvailable = node.path("avl_bikes").asInt();
+            station.spacesAvailable = node.path("free_slots").asInt();
             return station;
         } catch (NumberFormatException e) {
             // E.g. coordinates is empty
