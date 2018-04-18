@@ -208,6 +208,7 @@ public class GraphQlPlanner {
         callWith.argument("banned.stopsHard", request::setBannedStopsHard);
         callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
         callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
+        callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
             request.transferPenalty += 1800;
