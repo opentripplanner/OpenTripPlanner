@@ -659,6 +659,12 @@ public class IndexGraphQLSchema {
                 .description("Tuning parameter for the search algorithm.")
                 .type(Scalars.GraphQLInt)
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("compactLegsByReversedSearch")
+                .description("Whether legs should be compacted by performing a reversed search. Experimental argument, will be removed!.")
+                .type(Scalars.GraphQLBoolean)
+                .defaultValue(true)
+                .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
             .build();
 
