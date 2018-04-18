@@ -228,7 +228,9 @@ public class GraphIndex {
                 tripForId.put(trip.getId(), trip);
             }
             for (Stop stop: pattern.getStops()) {
-                patternsForStop.put(stop, pattern);
+                if (!patternsForStop.containsEntry(stop, pattern)) {
+                    patternsForStop.put(stop, pattern);
+                }
             }
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
@@ -839,7 +841,10 @@ public class GraphIndex {
 
         final List<TripTimeShort> result = new ArrayList<>();
         while(ret.size()>0) {
-            result.add(0, ret.pop());
+            TripTimeShort tripTimeShort = ret.pop();
+            if (!result.contains(tripTimeShort)) {
+                result.add(0, tripTimeShort);
+            }
         }
         
         return result; 
@@ -872,7 +877,7 @@ public class GraphIndex {
             ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
             int sidx = 0;
             for (Stop currStop : pattern.stopPattern.stops) {
-                if (currStop == stop) {
+                if (currStop.equals(stop)) {
                     if(omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
                     for (TripTimes t : tt.tripTimes) {
                         if (!sd.serviceRunning(t.serviceCode)) continue;
@@ -1040,7 +1045,9 @@ public class GraphIndex {
                             response.put("message", error.getMessage());
                             response.put("locations", error.getLocations());
                             response.put("errorType", error.getErrorType());
-                            response.put("stack", sw.toString());
+                            // Convert stack trace to propr format
+                            Stream<StackTraceElement> stack = Arrays.stream(((ExceptionWhileDataFetching) error).getException().getStackTrace());
+                            response.put("stack", stack.map(StackTraceElement::toString).collect(Collectors.toList()));
                             return response;
                         } else {
                             return error;

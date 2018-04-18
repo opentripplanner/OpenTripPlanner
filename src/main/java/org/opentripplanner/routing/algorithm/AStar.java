@@ -368,16 +368,14 @@ public class AStar {
     }
 
     public List<GraphPath> getPathsToTarget() {
-        if (runState == null) {
+        if (runState == null || runState.targetAcceptedStates == null) {
             return Collections.emptyList();
         }
 
         final List<GraphPath> ret = new LinkedList<>();
-        if (runState != null && runState.targetAcceptedStates != null) {
-            for (final State s : runState.targetAcceptedStates) {
-                if (s.isFinal()) {
-                    ret.add(new GraphPath(s, true));
-                }
+        for (State s : runState.targetAcceptedStates) {
+            if (s.isFinal()) {
+                ret.add(new GraphPath(s, true));
             }
         }
         return ret;

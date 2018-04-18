@@ -499,7 +499,7 @@ public class TestPatternHopFactory extends TestCase {
         spt = aStar.getShortestPathTree(options);
         
         time.add(Calendar.HOUR, 1);
-        time.add(Calendar.SECOND, 1); //for the StreetTransitLink
+        time.add(Calendar.SECOND, 0); //for the StreetTransitLink (set to 0 seconds now)
         path = spt.getPath(split_d, false);
         assertNotNull(path);
         assertEquals(TestUtils.toSeconds(time), path.getEndTime());

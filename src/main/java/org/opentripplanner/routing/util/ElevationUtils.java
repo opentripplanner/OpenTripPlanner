@@ -34,6 +34,8 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
+    private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
+
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
         double trueLength = 0;
@@ -66,12 +68,13 @@ public class ElevationUtils {
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
+        double slopeWalkEffectiveLength = 0;
         double[] lengths = getLengthsFromElevation(elev);
         double trueLength = lengths[0];
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
             log.error("Too small edge, returning neutral slope costs.");
-            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false);
+            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
         }
         double lengthMultiplier = trueLength / flatLength;
         for (int i = 0; i < coordinates.length - 1; ++i) {
@@ -103,19 +106,20 @@ public class ElevationUtils {
                             * slope_or_zero * slope_or_zero);
             slopeWorkCost += energy;
             double slopeSpeedCoef = slopeSpeedCoefficient(slope, coordinates[i].y);
-            slopeSpeedEffectiveLength += hypotenuse / slopeSpeedCoef;
+            slopeSpeedEffectiveLength += run / slopeSpeedCoef;
             // assume that speed and safety are inverses
             double safetyCost = hypotenuse * (slopeSpeedCoef - 1) * 0.25;
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
+            slopeWalkEffectiveLength += run * getSlopeWalkEffectiveLengthFactor(run, rise);
         }
         /*
          * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
          * length of the street edge which is the flat one.
          */
         return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
-                slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
+                slopeSafetyCost, maxSlope, lengthMultiplier, flattened, slopeWalkEffectiveLength * walkParA / flatLength);
     }
 
     /** constants for slope computation */
@@ -295,8 +299,31 @@ public class ElevationUtils {
         }
         double costs = 0;
         double h = maxSlope * verticalDistance;
-        costs = (walkParA * verticalDistance) + (  walkParC * (h * h) / verticalDistance); 
+        costs = (walkParA * verticalDistance) + (  walkParC * (h * h) / verticalDistance);
+        if (maxSlope != 0) {
+            int i = 0;
+        }
+
         return  costs;
+    }
+
+    /**
+     * http://mtntactical.com/research/walking-uphill-10-grade-cuts-speed-13not-12/
+     *
+     * "A 10% grade incline cuts your speed by 1/3 (33%)"
+     *
+     * Speed(at_grade) = speed(horizontal) * e ^ (-4 * slope)
+     */
+
+    public static double getSlopeWalkEffectiveLengthFactor(double run, double rise) {
+        double slopeWalkSpeedFactor;
+        if (run > 0 && rise > 0) {
+            slopeWalkSpeedFactor = 1 / Math.exp(-4 * (rise/run));
+        } else {
+            slopeWalkSpeedFactor = 1;
+        }
+        slopeWalkSpeedFactor = Math.min(slopeWalkSpeedFactor, MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
+        return slopeWalkSpeedFactor;
     }
 
     public static PackedCoordinateSequence getPartialElevationProfile(

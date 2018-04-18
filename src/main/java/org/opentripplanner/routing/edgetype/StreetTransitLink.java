@@ -36,7 +36,7 @@ import java.util.Locale;
 public class StreetTransitLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    static final int STL_TRAVERSE_COST = 1;
+    static final int STL_TRAVERSE_COST = 0;
 
     private boolean wheelchairAccessible;
 
