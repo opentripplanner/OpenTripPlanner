@@ -9,6 +9,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 * **Portland, Oregon** TriMet is the agency that originally started the OpenTripPlanner project. Their [Regional Trip Planner](http://ride.trimet.org) is based on OTP and provides about 40,000 trip plans on a typical weekday.
 * **New York State** The State Department of Transportation's [transit trip planner](https://511ny.org/#TransitRegion-1) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 * **Los Angeles, California** The new [metro.net trip planner](https://www.metro.net/).
+* **Atlanta, Georgia** The Metropolitan Atlanta Rapid Transit Authority's (MARTA) [trip planner](http://itsmarta.com/planatrip.aspx) and the Atlanta region's transit information hub [atltransit.org](https://atltransit.org/) both use OTP to power their website trip planners.
 * **Boston, Massachusetts** The [Massachusetts Bay Transportation Authority trip planner](https://www.mbta.com/trip-planner).
 * **Seattle, Washington** The [Sound Transit Trip Planner](https://www.soundtransit.org/tripplanner)
 * **Arlington, Virginia** The [commute planning site](http://www.carfreeatoz.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
@@ -20,7 +21,6 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 * **Trento Province, Italy** - [ViaggiaTrento](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento) and [ViaggiaRovereto](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto)
   were implemented as part of the [SmartCampus Project](http://www.smartcampuslab.it), a research project founded by [TrentoRise](http://trentorise.eu), [UNITN](http://www.unitn.it), and [FBK](http://www.fbk.eu).
 * **University of South Florida** (Tampa, Florida). The [USF Maps App](https://maps.usf.edu/) is a responsive web application for that helps university students, staff, and visitors find their way around the campus using multiple modes of transportation, including the USF Bull Runner campus shuttle, Share-A-Bull bike share, and pedestrian pathways. Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
-* **Atlanta, Georgia** The Metropolitan Atlanta Rapid Transit Authority's (MARTA) [trip planner](http://itsmarta.com/planatrip.aspx) and the Atlanta region's transit information hub [atltransit.org](https://atltransit.org/) both use OTP to power their website trip planners.
 
 ## Independent Production
 
