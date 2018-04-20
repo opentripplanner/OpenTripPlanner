@@ -83,7 +83,7 @@ public class AlertsUpdateHandler {
                     bestStartTime = realStart;
                 }
                 final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
-                if (end > lastEndTime) {
+                if (end < Long.MAX_VALUE && end > lastEndTime) {
                     lastEndTime = end;
                 }
                 periods.add(new TimePeriod(start, end));
