@@ -415,7 +415,21 @@ updated from minute to minute.
 departure times for the remainder of the trip.
 
 - **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
-or position relative to their scheduled stops.
+or position relative to their scheduled stops. The data from the updater is exposed in the /vehicle_positions endpoint as a list of vehicles.
+
+The format of the data looks like this: 
+```XML
+<vehicles>
+    <id>1331</id>
+    <agencyId>USF Bull Runner</agencyId>
+    <lat>28.067890167236328</lat>
+    <lon>-82.41658020019531</lon>
+    <bearing>270.0</bearing>
+    <routeId>A</routeId>
+    <lastUpdate>1473996577562</lastUpdate>
+    <occupancyStatus>MANY_SEATS_AVAILABLE</occupancyStatus>
+</vehicles>
+```
 
 ### Bicycle rental systems
 
@@ -527,6 +541,15 @@ connect to a network resource is the `url` field.
             "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
             "feedId": "TriMet"
         },
+
+        // Vehicle Positions (GTFS-RT)
+        {
+            type: "vehicle-position-updater",
+            frequencySec: 5,
+            defaultAgencyId: "USF Bull Runner",
+            sourceType: "gtfs-http",
+            url: "http://mobullity.forest.usf.edu:8088/vehicle-positions"
+        }
 
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
