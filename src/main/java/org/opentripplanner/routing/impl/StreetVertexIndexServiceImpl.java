@@ -336,22 +336,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
                                        boolean endVertex) {
+
+        if(loc.hasVertexId()) {
+            Vertex vertex = graph.getVertex(loc.vertexId);
+            if(vertex != null) {
+                return vertex;
+            }
+        }
+
         Coordinate c = loc.getCoordinate();
         if (c != null) {
             //return getClosestVertex(loc, options, endVertex);
             return simpleStreetSplitter.getClosestVertex(loc, options, endVertex);
         }
 
-        // No Coordinate available.
-        String place = loc.place;
-        if (place == null) {
-            return null;
-        }
-
-        // did not match lat/lon, interpret place as a vertex label.
-        // this should probably only be used in tests,
-        // though it does allow routing from stop to stop.
-        return graph.getVertex(place);
+        // No Coordinate or vertex available.
+        return null;
     }
 
     @Override

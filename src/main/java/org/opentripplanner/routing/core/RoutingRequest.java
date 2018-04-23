@@ -361,9 +361,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
+     * The number of heuristic steps per main step when using interleaved bidirectional heuristics. Default 8.
+     */
+
+    public int heuristicStepsPerMainStep = 8;
+
+    /**
      * When true, do a full reversed search to compact the legs of the GraphPath.
      */
-    public boolean compactLegsByReversedSearch = true;
+    public boolean compactLegsByReversedSearch = false;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
@@ -1302,7 +1308,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Set allowed fare zones
-     * @param split
+     * @param zones
      */
     public void setZoneIdSet(ZoneIdSet zones) {
         this.zones = zones; 

@@ -136,6 +136,7 @@ public class TestIntermediatePlaces {
         RoutingRequest request = new RoutingRequest(modes);
         request.setDateTime("2016-04-20", "13:00", timeZone);
         request.setArriveBy(arriveBy);
+        request.maxTransfers = 4;
         request.from = from;
         request.to = to;
         for (GenericLocation intermediateLocation : via) {

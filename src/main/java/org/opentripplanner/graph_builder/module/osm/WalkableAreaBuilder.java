@@ -443,6 +443,12 @@ public class WalkableAreaBuilder {
                 street.setHasBogusName(true);
             }
 
+            if (OSMFilter.getPlatformClass(areaEntity) == StreetEdge.CLASS_TRAIN_PLATFORM) {
+                if (areaEntity.hasTag("ref")) {
+                    street.setRef(areaEntity.getTag("ref"));
+                }
+            }
+
             if (areaEntity.isTagFalse("wheelchair")) {
                 street.setWheelchairAccessible(false);
             }

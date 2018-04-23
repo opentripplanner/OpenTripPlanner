@@ -1,5 +1,13 @@
 package org.opentripplanner.index;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetchingEnvironment;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -35,7 +43,6 @@ public class GraphQlPlanner {
 
     private GraphIndex index;
 
-
     public GraphQlPlanner(GraphIndex index) {
         this.index = index;
     }
@@ -61,7 +68,10 @@ public class GraphQlPlanner {
         try {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
             plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
-
+            // Add timeout message even if paths are found and no exception thrown
+            if (request.rctx.debugOutput.timedOut) {
+                messages.add(Message.REQUEST_TIMEOUT);
+            }
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
             if (!PlannerError.isPlanningError(e.getClass())) {
@@ -197,6 +207,8 @@ public class GraphQlPlanner {
         callWith.argument("banned.stops", request::setBannedStops);
         callWith.argument("banned.stopsHard", request::setBannedStopsHard);
         callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
+        callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
+        callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
             request.transferPenalty += 1800;
@@ -217,7 +229,7 @@ public class GraphQlPlanner {
             String ticketTypes = environment.getArgument("ticketTypes");
             request.setZoneIdSet(ZoneIdSet.create(index, ticketTypes));
             //TODO should we increase max walk distance?
-            //request.setMaxWalkDistance(request.getMaxWalkDistance()*2); 
+            //request.setMaxWalkDistance(request.getMaxWalkDistance()*2);
         } else {
             request.setZoneIdSet(new ZoneIdSet());
         }

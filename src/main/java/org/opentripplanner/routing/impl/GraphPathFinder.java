@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.SearchTimeoutException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -116,21 +117,14 @@ public class GraphPathFinder {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
             // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
-            heuristic = new InterleavedBidirectionalHeuristic();
-            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
+            heuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
+            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
             reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
-
-        /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see
-         * itineraries with far more transfers. We do not expect transfer limiting to improve
-         * search times on the LongDistancePathService, so we set it to the maximum we ever expect
-         * to see. Because people may use either the traditional path services or the 
-         * LongDistancePathService, we do not change the global default but override it here. */
-        options.maxTransfers = 4;
         // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
@@ -171,7 +165,11 @@ public class GraphPathFinder {
 
             // Do a full reversed search to compact the legs
             if(options.compactLegsByReversedSearch){
-                newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+                try {
+                    newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+                } catch (Exception e) {
+                    LOG.warn("CompactLegsByReversedSearch failed on request: " + originalReq.toString());
+                }
             }
 
             // Find all trips used in this path and ban them for the remaining searches
@@ -261,6 +259,8 @@ public class GraphPathFinder {
             Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
             RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
                     toTransVertex, transitStopTime, remainingWeightHeuristic);
+            // Limit reverse search to the same number of legs as the original result
+            reversedMainRequest.maxTransfers = newPath.getTrips().size() - 1;
             aStar.getShortestPathTree(reversedMainRequest, timeout);
 
             List<GraphPath> newRevPaths = aStar.getPathsToTarget();
@@ -277,9 +277,8 @@ public class GraphPathFinder {
                     }
                     GraphPath joinedPath = joinPaths(concatenatedPaths, false);
 
-                    if( (joinedPath != null) &&
-                        ((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
-                         (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000))) {
+                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() >= options.dateTime * 1000) ||
+                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() <= options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
                             for (AgencyAndId tripId : joinedPath.getTrips()) {
@@ -331,7 +330,6 @@ public class GraphPathFinder {
         reversedOptions.setRoutingContext(router.graph, fromVertex, toVertex);
         reversedOptions.dominanceFunction = new DominanceFunction.MinimumWeight();
         reversedOptions.rctx.remainingWeightHeuristic = remainingWeightHeuristic;
-        reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
         reversedOptions.bannedTrips = options.bannedTrips;
         return reversedOptions;
@@ -385,7 +383,12 @@ public class GraphPathFinder {
         if (paths == null || paths.size() == 0) {
             LOG.debug("Path not found: " + request.from + " : " + request.to);
             request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
-            throw new PathNotFoundException();
+            if (request.rctx.debugOutput.timedOut) {
+                throw new SearchTimeoutException();
+            }
+            else {
+                throw new PathNotFoundException();
+            }
         }
 
         return paths;
@@ -469,12 +472,11 @@ public class GraphPathFinder {
                     Collections.reverse(paths);
                 }
                 GraphPath joinedPath = joinPaths(paths, true);
-                if (joinedPath != null) {
-                    time = (request.arriveBy
-                            ? joinedPath.getEndTime() - 60
-                            : joinedPath.getStartTime() + 60);
-                    completePaths.add(joinedPath);
-                }
+                time = (request.arriveBy
+                    ? joinedPath.getEndTime() - 60
+                    : joinedPath.getStartTime() + 60);
+                completePaths.add(joinedPath);
+
             }
             request.setRoutingContext(router.graph);
             request.rctx.debugOutput = debugOutput;
@@ -484,7 +486,7 @@ public class GraphPathFinder {
         }
     }
 
-    private static GraphPath joinPaths(List<GraphPath> paths, boolean addSwitching) {
+    private static GraphPath joinPaths(List<GraphPath> paths, Boolean addLegsSwitchingEdges) {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
         Vertex lastVertex = lastState.getVertex();
@@ -494,20 +496,19 @@ public class GraphPathFinder {
 
         for (GraphPath path : paths.subList(1, paths.size())) {
             lastState = newPath.states.getLast();
-            if (addSwitching == true) {
-                // add a leg-switching state
+            // add a leg-switching state
+            if (addLegsSwitchingEdges) {
                 LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
                 lastState = legSwitchingEdge.traverse(lastState);
-                if (lastState == null)
-                    return null;
                 newPath.edges.add(legSwitchingEdge);
-                newPath.states.add(lastState);
             }
+            newPath.states.add(lastState);
             // add the next subpath
             for (Edge e : path.edges) {
                 lastState = e.traverse(lastState);
-                if (lastState == null)
-                    return null;
+                if (lastState==null){
+                    LOG.warn("About to add null lastState to newPath. This may cause nullPointer in next iteration? Caused by traversing edge: " + e);
+                }
                 newPath.edges.add(e);
                 newPath.states.add(lastState);
             }

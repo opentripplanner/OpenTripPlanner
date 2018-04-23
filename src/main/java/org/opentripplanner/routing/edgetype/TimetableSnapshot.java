@@ -18,6 +18,10 @@ import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.onebusaway.gtfs.model.Trip;
+
+import com.google.common.base.Preconditions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,18 +144,72 @@ public class TimetableSnapshot {
     public Timetable resolve(TripPattern pattern, ServiceDate serviceDate) {
         SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
 
-        if(sortedTimetables != null && serviceDate != null) {
-            for(Timetable timetable : sortedTimetables) {
-                if (timetable != null && timetable.isValidFor(serviceDate)) {
-                    LOG.trace("returning modified timetable");
-                    return timetable;
+        if (sortedTimetables != null && serviceDate != null) {
+            Timetable lastAdded = resolveLastAdded(pattern, serviceDate);
+            if (lastAdded != null) {
+                for (Timetable timetable : sortedTimetables) {
+
+                    if (timetable != null && timetable.tripTimes != null && timetable.isValidFor(serviceDate)) {
+
+                        for (TripTimes tripTime : timetable.tripTimes) {
+                            if (!lastAdded.tripTimes.contains(tripTime)) {
+                                lastAdded.tripTimes.add(tripTime);
+                            }
+                        }
+                    }
+                }
+                lastAdded.finish();
+                return lastAdded;
+            } else {
+                for (Timetable timetable : sortedTimetables) {
+                    if (timetable != null && timetable.isValidFor(serviceDate)) {
+                        LOG.trace("returning modified timetable");
+                        return timetable;
+                    }
                 }
             }
         }
 
         return pattern.scheduledTimetable;
     }
-    
+
+    /**
+     * Returns an updated timetable for the specified pattern if one is available in this snapshot,
+     * or the originally scheduled timetable if there are no updates in this snapshot.
+     */
+    private Timetable resolveLastAdded(TripPattern pattern, ServiceDate serviceDate) {
+
+        Set<TripPattern> updatedPatterns = new HashSet<>();
+        List<Trip> trips = pattern.getTrips();
+        for (Trip trip : trips) {
+            TripPattern lastAddedTripPattern = getLastAddedTripPattern(trip.getId().getAgencyId(), trip.getId().getId(), serviceDate);
+            if (lastAddedTripPattern != null) {
+                updatedPatterns.add(lastAddedTripPattern);
+            }
+        }
+        Timetable lastAddedTimetable = null;
+        if (!updatedPatterns.isEmpty()) {
+            for (TripPattern updatedPattern : updatedPatterns) {
+                if (updatedPattern.scheduledTimetable != null && updatedPattern.scheduledTimetable.isValidFor(serviceDate)) {
+                    if (updatedPattern.scheduledTimetable.tripTimes != null) {
+                        for (TripTimes tripTime : updatedPattern.scheduledTimetable.tripTimes) {
+                            if (!tripTime.isCanceled() & !tripTime.isScheduled()) {
+                                LOG.trace("returning modified timetable");
+                                if (lastAddedTimetable == null) {
+                                    lastAddedTimetable = new Timetable(updatedPattern.scheduledTimetable, serviceDate);
+
+                                } else {
+                                    lastAddedTimetable.addTripTimes(tripTime);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return lastAddedTimetable;
+    }
+
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
      * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of

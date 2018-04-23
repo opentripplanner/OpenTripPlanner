@@ -36,7 +36,7 @@ import java.util.Locale;
 public class StreetTransitLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    static final int STL_TRAVERSE_COST = 1;
+    static final int STL_TRAVERSE_COST = 0;
 
     private boolean wheelchairAccessible;
 
@@ -84,6 +84,10 @@ public class StreetTransitLink extends Edge {
     public State traverse(State s0) {
         // Do not re-enter the street network following a transfer.
         if (s0.backEdge instanceof SimpleTransfer) {
+            return null;
+        }
+        // Do not detour through a TransitStop when traversing the street network
+        if (s0.getVertex() instanceof TransitStop && s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
 

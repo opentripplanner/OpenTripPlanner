@@ -94,6 +94,12 @@ public class Timetable implements Serializable {
         this.serviceDate = null;
     }
 
+    /** Construct an empty Timetable with a specified serviceDate. */
+    public Timetable(TripPattern pattern, ServiceDate serviceDate) {
+        this.pattern = pattern;
+        this.serviceDate = serviceDate;
+    }
+
     /**
      * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified timetable.
      */
@@ -158,6 +164,7 @@ public class Timetable implements Serializable {
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
         for (TripTimes tt : tripTimes) {
             if (tt.isCanceled()) continue;
+            if ((tt.getNumStops() <= stopIndex)) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
@@ -270,24 +277,32 @@ public class Timetable implements Serializable {
         // Concatenate raw TripTimes and those referenced from FrequencyEntries
         List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
         for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
-        for (TripTimes tt : allTripTimes) {
-            for (int h = 0; h < nHops; ++h) {
-                int dt = tt.getDwellTime(h);
-                if (minDwellTimes[h] > dt) {
-                    minDwellTimes[h] = dt;
-                }
-                int rt = tt.getRunningTime(h);
-                if (minRunningTimes[h] > rt) {
-                    minRunningTimes[h] = rt;
-                }
-            }
-        }
-        /* Find the time range over which this timetable is active. Allows departure search optimizations. */
+
         minTime = Integer.MAX_VALUE;
         maxTime = Integer.MIN_VALUE;
+
+        for (TripTimes tt : allTripTimes) {
+            if (tt.getNumStops() == nStops) {
+                for (int h = 0; h < nHops; ++h) {
+                    int dt = tt.getDwellTime(h);
+                    if (minDwellTimes[h] > dt) {
+                        minDwellTimes[h] = dt;
+                    }
+                    int rt = tt.getRunningTime(h);
+                    if (minRunningTimes[h] > rt) {
+                        minRunningTimes[h] = rt;
+                    }
+                }
+                minTime = Math.min(minTime, tt.getDepartureTime(0));
+                maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
+            }
+        }
+
         for (TripTimes tt : tripTimes) {
-            minTime = Math.min(minTime, tt.getDepartureTime(0));
-            maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
+            if (tt.getNumStops() == nStops) {
+                minTime = Math.min(minTime, tt.getDepartureTime(0));
+                maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
+            }
         }
         // Slightly repetitive code.
         // Again it seems reasonable to have a shared interface between FrequencyEntries and normal TripTimes.
@@ -307,6 +322,16 @@ public class Timetable implements Serializable {
             ret += 1;
         }
         return -1;
+    }
+
+    /** @return the matching Trip in this particular Timetable */
+    public Trip getTrip(AgencyAndId tripId) {
+        for (TripTimes tt : tripTimes) {
+            if (tt.trip.getId().equals(tripId)) {
+                return tt.trip;
+            }
+        }
+        return null;
     }
 
     /** @return the index of TripTimes for this trip ID in this particular Timetable, ignoring AgencyIds. */

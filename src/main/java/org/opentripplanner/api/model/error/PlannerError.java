@@ -22,6 +22,7 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.SearchTimeoutException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -37,13 +38,21 @@ public class PlannerError {
         messages = new HashMap<Class<? extends Exception>, Message> ();
         messages.put(VertexNotFoundException.class,  Message.OUTSIDE_BOUNDS);
         messages.put(PathNotFoundException.class,    Message.PATH_NOT_FOUND);
+        messages.put(SearchTimeoutException.class,    Message.REQUEST_TIMEOUT);
         messages.put(LocationNotAccessible.class,    Message.LOCATION_NOT_ACCESSIBLE);
         messages.put(TransitTimesException.class,    Message.NO_TRANSIT_TIMES);
         messages.put(TrivialPathException.class,     Message.TOO_CLOSE);
         messages.put(GraphNotFoundException.class,   Message.GRAPH_UNAVAILABLE);
         messages.put(IllegalArgumentException.class, Message.BOGUS_PARAMETER);
     }
-    
+    private static Map<String, Message> stopNotFoundMessages;
+    static {
+        stopNotFoundMessages = new HashMap<String, Message> ();
+        stopNotFoundMessages.put("vertices not found: [from]",  Message.GEOCODE_FROM_NOT_FOUND);
+        stopNotFoundMessages.put("vertices not found: [to]",    Message.GEOCODE_TO_NOT_FOUND);
+        stopNotFoundMessages.put("vertices not found: [from, to]",    Message.GEOCODE_FROM_TO_NOT_FOUND);
+    }
+
     public int    id;
     public String msg;
     public Message message;
@@ -58,6 +67,11 @@ public class PlannerError {
     public PlannerError(Exception e) {
         this();
         message = messages.get(e.getClass());
+        if (stopNotFoundMessages.containsKey(e.getMessage())) {
+            message = stopNotFoundMessages.get(e.getMessage());
+        }
+
+
         if (message == null) {
             LOG.error("exception planning trip: ", e);
             message = Message.SYSTEM_ERROR;
