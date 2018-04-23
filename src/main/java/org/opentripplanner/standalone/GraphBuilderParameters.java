@@ -2,17 +2,23 @@ package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.Collection;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * These are parameters that when changed, necessitate a Graph rebuild.
  * They are distinct from the RouterParameters which can be applied to a pre-built graph or on the fly at runtime.
  * Eventually both classes may be initialized from the same config file so make sure there is no overlap
  * in the JSON keys used.
- *
+ * <p>
  * These used to be command line parameters, but there were getting to be too many of them and besides, we want to
  * allow different graph builder configuration for each Graph.
  * <p>
@@ -21,7 +27,10 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class GraphBuilderParameters {
 
-    public static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
+    private static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
+    private static final String CULUSTER_MODE_PARENT_STATION = "parentStation";
+    private static final String CLUSTER_MODE_PROXIMITY = "proximity";
+    private static final List<String> CLUSTER_MODES = asList(CULUSTER_MODE_PARENT_STATION, CLUSTER_MODE_PROXIMITY);
 
     /**
      * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
@@ -53,6 +62,16 @@ public class GraphBuilderParameters {
      * Create direct transfers between the constituent stops of each parent station.
      */
     public final boolean stationTransfers;
+
+    /**
+     * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
+     * according to a parent/child station topology, if it exists.
+     * <ul>
+     * <li>"parentStation" See {@link GraphIndex#clusterByParentStation()}</li>
+     * <li>"proximity" See {@link GraphIndex#clusterByProximityAndName()}. This is the default value.</li>
+     * </ul>
+     */
+    public final String stopClusterMode;
 
     /**
      * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -102,7 +121,7 @@ public class GraphBuilderParameters {
      * A custom OSM namer to use.
      */
     public final CustomNamer customNamer;
-    
+
     /**
      * Custom OSM way properties
      */
@@ -127,13 +146,13 @@ public class GraphBuilderParameters {
      * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
      */
     public int maxInterlineDistance = 200;
-    
+
     /**
      * This field indicates the pruning threshold for islands without stops.
      * Any such island under this size will be pruned.
      */
     public final int pruningThresholdIslandWithoutStops;
-    
+
     /**
      * This field indicates the pruning threshold for islands with stops.
      * Any such island under this size will be pruned.
@@ -169,6 +188,7 @@ public class GraphBuilderParameters {
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
+        stopClusterMode = valueOf(config, "stopClusterMode", CLUSTER_MODE_PROXIMITY, CLUSTER_MODES);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
@@ -192,4 +212,13 @@ public class GraphBuilderParameters {
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
     }
 
+
+    static String valueOf(JsonNode config, String propertyName, String defaultValue, Collection<String> legalValues) {
+        String value = config.path(propertyName).asText(defaultValue);
+        for (String legalValue : legalValues) {
+            if (value.equals(legalValue)) return value;
+        }
+        throw new IllegalArgumentException("The graph build parameter " + propertyName
+                + " value '" + value + "' is not in legal. Expected one of " + legalValues + ".");
+    }
 }

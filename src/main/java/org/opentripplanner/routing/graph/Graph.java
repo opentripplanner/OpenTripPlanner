@@ -203,7 +203,7 @@ public class Graph implements Serializable {
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
     
-    /** How should we cluster stops? */
+    /** How should we cluster stops? By 'proximity' or 'ParentStation' */
     public String stopClusterMode = "proximity";
 
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
