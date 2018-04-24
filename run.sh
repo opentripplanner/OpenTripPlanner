@@ -16,6 +16,7 @@ function build_graph {
   FILE=$2
   echo "building graph..."
   DIR="graphs"
+  rm -rf $DIR
   mkdir -p $DIR
   unzip -o -d $DIR $FILE
   mv $DIR/router-$GRAPHNAME $DIR/$GRAPHNAME
