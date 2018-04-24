@@ -64,7 +64,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
             return station;
         } catch (NumberFormatException e) {
             // E.g. coordinates is empty
-            log.warn("Error parsing bike rental station " + station.id, e);
+            log.info("Error parsing bike rental station " + station.id, e);
             return null;
         }
     }
