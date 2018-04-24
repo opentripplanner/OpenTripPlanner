@@ -2,16 +2,15 @@ package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
- import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.profile.StopClusterMode;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * These are parameters that when changed, necessitate a Graph rebuild.
@@ -28,9 +27,6 @@ import static java.util.Arrays.asList;
 public class GraphBuilderParameters {
 
     private static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
-    private static final String CULUSTER_MODE_PARENT_STATION = "parentStation";
-    private static final String CLUSTER_MODE_PROXIMITY = "proximity";
-    private static final List<String> CLUSTER_MODES = asList(CULUSTER_MODE_PARENT_STATION, CLUSTER_MODE_PROXIMITY);
 
     /**
      * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
@@ -71,7 +67,7 @@ public class GraphBuilderParameters {
      * <li>"proximity" See {@link GraphIndex#clusterByProximityAndName()}. This is the default value.</li>
      * </ul>
      */
-    public final String stopClusterMode;
+    public final StopClusterMode stopClusterMode;
 
     /**
      * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -188,7 +184,7 @@ public class GraphBuilderParameters {
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
-        stopClusterMode = valueOf(config, "stopClusterMode", CLUSTER_MODE_PROXIMITY, CLUSTER_MODES);
+        stopClusterMode = enumValueOf(config, "stopClusterMode", StopClusterMode.proximity);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
@@ -213,12 +209,16 @@ public class GraphBuilderParameters {
     }
 
 
-    static String valueOf(JsonNode config, String propertyName, String defaultValue, Collection<String> legalValues) {
-        String value = config.path(propertyName).asText(defaultValue);
-        for (String legalValue : legalValues) {
-            if (value.equals(legalValue)) return value;
+    @SuppressWarnings("unchecked")
+    static <T extends Enum<T>> T enumValueOf(JsonNode config, String propertyName, T defaultValue) {
+        String valueAsString = config.path(propertyName).asText(defaultValue.name());
+        try {
+            return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
         }
-        throw new IllegalArgumentException("The graph build parameter " + propertyName
-                + " value '" + value + "' is not in legal. Expected one of " + legalValues + ".");
+        catch (IllegalArgumentException ignore) {
+            List<? extends Enum> legalValues = Arrays.asList(defaultValue.getClass().getEnumConstants());
+            throw new IllegalArgumentException("The graph build parameter " + propertyName
+                    + " value '" + valueAsString + "' is not in legal. Expected one of " + legalValues + ".");
+        }
     }
 }

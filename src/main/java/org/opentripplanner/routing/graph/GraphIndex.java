@@ -39,6 +39,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -557,18 +558,9 @@ public class GraphIndex {
      * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
      * according to a parent/child station topology, if it exists.
      */
-    public void clusterStops() {
-    	if (graph.stopClusterMode != null) {
-            switch (graph.stopClusterMode) {
-                case "parentStation":
-                    clusterByParentStation();
-                    break;
-                case "proximity":
-                    clusterByProximityAndName();
-                    break;
-                default:
-                    clusterByProximityAndName();
-            }
+    private void clusterStops() {
+    	if (graph.stopClusterMode == StopClusterMode.parentStation) {
+            clusterByParentStation();
         } else {
             clusterByProximityAndName();
         }
