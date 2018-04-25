@@ -35,7 +35,7 @@ from geojson import Point
 from json import encoder
 
 # To avoid long float numbers for lat/lng
-encoder.FLOAT_REPR = lambda o: format(o, '3.6f')
+encoder.FLOAT_REPR = lambda o: format(o, '.6f')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('gbfs_dir', type=str, help='The path to the GBFS directory.')
@@ -66,24 +66,19 @@ def create_status(system_id):
     return {
         "station_id": system_id,
         "num_bikes_available": 0,
-        "num_bikes_disabled": 0,
-        "num_docks_available": 10,
-        "is_installed": 1,
-        "is_renting": 0,
-        "is_returning": 1,
+        "num_docks_available": 1000,
         "last_reported": int(time.time())
-
     }
 
 
-def create_station(lon, lat, system_id):
+def create_station(lng, lat, system_id):
     return {
         'station_id': system_id,
         'name': system_id,
         'region_id': "region_391",
-        'lon': lon,
+        'lon': lng,
         'lat': lat,
-        'address': system_id
+        'address': "%3.5f,%3.5f" % (lng, lat)
     }
 
 
@@ -100,26 +95,32 @@ def generate_fake_stations():
 
     station_data = json.load(open(station_info_filename))
     stations = station_data['data']['stations']
-    statuses_data = json.load(open(station_status_filename))
-    statuses = statuses_data['data']['stations']
+    status_data = json.load(open(station_status_filename))
+    statuses = status_data['data']['stations']
 
     system_id = get_system_id(gbfs_dir)
     features = []
     i = 0
     for lng in get_lng_linspace():
         for lat in get_lat_linspace():
-            system_id = system_id + "%d" % i
+            sid = system_id + ("_%d" % i)
             features.append(Feature(geometry=Point((lng, lat))))
-            stations.append(create_station(lng, lat, system_id))
-            statuses.append(create_status(system_id))
+            stations.append(create_station(lng, lat, sid))
+            statuses.append(create_status(sid))
             i += 1
 
+    # Set the last_update times
+    last_update = int(time.time())
+    station_data['last_updated'] = last_update
+    status_data['last_updated'] = last_update
+
+    # Save the generated data in files
     time_str = time.strftime("%Y%m%d-%H%M%S")
     with open(str.replace(station_info_filename, '.json', '_%s.json' % time_str), 'w') as outfile:
-        json.dump(stations, outfile, indent=2, sort_keys=True)
+        json.dump(station_data, outfile, indent=2, sort_keys=True)
 
     with open(str.replace(station_status_filename, '.json', '_%s.json' % time_str), 'w') as outfile:
-        json.dump(statuses_data, outfile, indent=2, sort_keys=True)
+        json.dump(status_data, outfile, indent=2, sort_keys=True)
 
     with open(str.replace(gbfs_dir + '/stations-geojson.json', '.json', '_%s.json' % time_str),
               'w') as outfile:
