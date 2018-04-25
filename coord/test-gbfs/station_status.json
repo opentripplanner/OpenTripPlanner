@@ -1,0 +1,98 @@
+{
+  "last_updated": 1524602320,
+  "ttl": 180,
+  "data": {
+    "stations": [
+      {
+        "station_id": "hub_3514",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3515",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3516",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3517",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3518",
+        "num_bikes_available": 1,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 1,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3519",
+        "num_bikes_available": 1,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 1,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3520",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "hub_3521",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      },
+      {
+        "station_id": "mahmood",
+        "num_bikes_available": 0,
+        "num_bikes_disabled": 0,
+        "num_docks_available": 2,
+        "is_installed": 1,
+        "is_renting": 1,
+        "is_returning": 1,
+        "last_reported": 1524602320
+      }
+    ]
+  }
+}
