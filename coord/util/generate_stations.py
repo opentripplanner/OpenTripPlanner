@@ -69,7 +69,7 @@ def create_status(system_id):
         "num_bikes_disabled": 0,
         "num_docks_available": 10,
         "is_installed": 1,
-        "is_renting": 1,
+        "is_renting": 0,
         "is_returning": 1,
         "last_reported": int(time.time())
 
