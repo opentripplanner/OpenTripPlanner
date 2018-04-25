@@ -133,6 +133,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup() throws InterruptedException, ExecutionException {
+        while (graph.getVertices() == null) {
+            LOG.warn("Graph has no vertices. Sleeping 5 sec");
+            Thread.sleep(5000);
+        }
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
 
