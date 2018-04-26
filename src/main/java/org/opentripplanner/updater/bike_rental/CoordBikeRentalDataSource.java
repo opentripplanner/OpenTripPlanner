@@ -1,17 +1,13 @@
 package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
-import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
 
 public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
@@ -21,7 +17,7 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     private CoordBikeDataSource stationSource;
     private CoordFakeStationDataSource fakeSource;
 
-    public CoordBikeRentalDataSource () {
+    public CoordBikeRentalDataSource() {
         // TODO(danieljy): Set this from configuration.
         stationSource = new CoordBikeDataSource();
         stationSource.setUrl("https://api.coord.co/v1/bike/location?latitude=38.9072&longitude=-77.0369&radius_km=10&access_key=");
@@ -49,14 +45,14 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
      * from the JSON coming in from the update source.
      */
     @Override
-    public void configure (Graph graph, JsonNode jsonNode) {
+    public void configure(Graph graph, JsonNode jsonNode) {
         // This allows conifguration from the router-config.json.
         // TODO(danieljy): Implement this.
     }
 
     class CoordBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public CoordBikeDataSource () {
+        public CoordBikeDataSource() {
             super("features");
         }
 
@@ -69,17 +65,18 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
             BikeRentalStation brstation = new BikeRentalStation();
             brstation.id = stationNode.path("id").toString();
             brstation.name = new NonLocalizedString(stationNode.path("id").toString());
-            brstation.x =  coordinateIterator.next().asDouble();
-            brstation.y =  coordinateIterator.next().asDouble();
+            brstation.x = coordinateIterator.next().asDouble();
+            brstation.y = coordinateIterator.next().asDouble();
 
             JsonNode numBikes = properties.get("num_bikes_available");
             JsonNode numDocks = properties.get("num_docks_available");
             JsonNode isReturning = properties.get("is_returning");
+            JsonNode isRenting = properties.get("is_renting");
 
             brstation.bikesAvailable = numBikes != null ? numBikes.asInt() : 0;
             brstation.spacesAvailable = numDocks != null ? numDocks.asInt() : 0;
             brstation.allowDropoff = isReturning != null ? isReturning.asBoolean() : false;
-            // TODO(danieljy): Update with allowPickup once Mahmood adds this in.
+            brstation.allowPickup = isRenting != null ? isRenting.asBoolean() : false;
 
             // TODO(danieljy): I don't think this is used in the codebase as is, but we should use the info so that
             // we don't have to fake end locations.
@@ -95,7 +92,7 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
 
     class CoordFakeStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public CoordFakeStationDataSource () {
+        public CoordFakeStationDataSource() {
             super("data/stations");
         }
 
@@ -106,11 +103,11 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
             brstation.id = stationNode.path("station_id").toString();
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
-            brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
+            brstation.name = new NonLocalizedString(stationNode.path("name").asText());
             brstation.allowDropoff = true;
             brstation.bikesAvailable = 0;
             brstation.spacesAvailable = Integer.MAX_VALUE;
-            // brstation.allowPickup = false;
+            brstation.allowPickup = false;
 
             // Add all the DC dockless networks.
             brstation.networks = new HashSet<>(Arrays.asList("JumpDC", "MobikeDC", "SpinDC"));

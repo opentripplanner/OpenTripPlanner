@@ -27,13 +27,13 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     private String baseUrl;
 
-    public GbfsBikeRentalDataSource () {
+    public GbfsBikeRentalDataSource() {
         stationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
         floatingBikeSource = new GbfsFloatingBikeDataSource();
     }
 
-    public void setBaseUrl (String url) {
+    public void setBaseUrl(String url) {
         baseUrl = url;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
         stationSource.setUrl(baseUrl + "station_information.json");
@@ -61,6 +61,8 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             BikeRentalStation status = statusLookup.get(station.id);
             station.bikesAvailable = status.bikesAvailable;
             station.spacesAvailable = status.spacesAvailable;
+            station.allowDropoff = status.allowDropoff;
+            station.allowPickup = status.allowPickup;
         }
 
         // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
@@ -74,7 +76,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
      * from the JSON coming in from the update source.
      */
     @Override
-    public void configure (Graph graph, JsonNode jsonNode) {
+    public void configure(Graph graph, JsonNode jsonNode) {
         String url = jsonNode.path("url").asText(); // path() returns MissingNode not null.
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
@@ -84,7 +86,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationDataSource () {
+        public GbfsStationDataSource() {
             super("data/stations");
         }
 
@@ -95,15 +97,14 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             brstation.id = stationNode.path("station_id").toString();
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
-            brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
-
+            brstation.name = new NonLocalizedString(stationNode.path("name").asText());
             return brstation;
         }
     }
 
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationStatusDataSource () {
+        public GbfsStationStatusDataSource() {
             super("data/stations");
         }
 
@@ -115,13 +116,15 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
 
+            JsonNode isRenting = stationNode.path("is_renting");
+            brstation.allowPickup = isRenting != null ? isRenting.asBoolean() : true;
             return brstation;
         }
     }
 
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsFloatingBikeDataSource () {
+        public GbfsFloatingBikeDataSource() {
             super("data/bikes");
         }
 
