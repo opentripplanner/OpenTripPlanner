@@ -163,6 +163,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
+
+            Set<BikeRentalStationVertex> badVertices = new HashSet<>();
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
@@ -183,8 +185,23 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     if (station.allowDropoff)
                         new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
+                    // Update the station metadata.
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
+                    // vertex.set (station.allowPickup);
+
+                    // And re-link it to the graph if it's location has changed.
+                    if (station.x != vertex.getX() || station.y != vertex.getY()) {
+                        // The station/bike has changed location, so make sure we re-index it.
+                        LOG.info("{} has moved to a new location, re-adding to graph.", station);
+                        if (graph.containsVertex(vertex)) {
+                            graph.removeVertexAndEdges(vertex);
+                        }
+                        if (!linker.link(vertex)) {
+                            // the toString includes the text "Bike rental station"
+                            LOG.warn("{} not near any streets; it will not be usable.", station);
+                        }
+                    }
                 }
             }
             /* remove existing stations that were not present in the update */
