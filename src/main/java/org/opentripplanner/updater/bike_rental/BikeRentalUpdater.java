@@ -36,8 +36,6 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -104,6 +102,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
                 source = new GbfsBikeRentalDataSource();
+            } else if (sourceType.equals("coord")) {
+                source = new CoordBikeRentalDataSource();
             }
         }
 
@@ -161,6 +161,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
+
+            Set<BikeRentalStationVertex> badVertices = new HashSet<>();
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
@@ -180,9 +182,28 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     new RentABikeOnEdge(vertex, vertex, station.networks);
                     if (station.allowDropoff)
                         new RentABikeOffEdge(vertex, vertex, station.networks);
+                } else if (station.x != vertex.getX() || station.y != vertex.getY()) {
+                    LOG.warn("{} has changed, re-graphing", station);
+
+                    // First remove the old one.
+                    if (graph.containsVertex(vertex)) {
+                        graph.removeVertexAndEdges(vertex);
+                    }
+                    // Next, create a new vertex.
+                    vertex = new BikeRentalStationVertex(graph, station);
+                    if (!linker.link(vertex)) {
+                        // the toString includes the text "Bike rental station"
+                        LOG.warn("{} not near any streets; it will not be usable.", station);
+                    }
+                    verticesByStation.put(station, vertex);
+                    new RentABikeOnEdge(vertex, vertex, station.networks);
+                    if (station.allowDropoff)
+                        new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
+                    // Update the station metadata.
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
+                    vertex.setPickupAllowed(station.allowPickup);
                 }
             }
             /* remove existing stations that were not present in the update */
