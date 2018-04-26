@@ -23,7 +23,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -505,7 +505,7 @@ public abstract class RoutingResource {
         if (bannedAgencies != null)
             request.setBannedAgencies(bannedAgencies);
 
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
+        HashMap<FeedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
@@ -565,10 +565,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = AgencyAndId.convertFromString(startTransitStopId);
+            request.startingTransitStopId = FeedId.convertFromString(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = AgencyAndId.convertFromString(startTransitTripId);
+            request.startingTransitTripId = FeedId.convertFromString(startTransitTripId);
 
         if (clampInitialWait != null)
             request.clampInitialWait = clampInitialWait;
@@ -604,12 +604,12 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    private HashMap<FeedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }
         
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
+        HashMap<FeedId, BannedStopSet> bannedTripMap = new HashMap<FeedId, BannedStopSet>();
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {
             // TODO this apparently allows banning stops within a trip with integers. Why?
@@ -617,7 +617,7 @@ public abstract class RoutingResource {
             if (parts.length < 2) continue; // throw exception?
             String agencyIdString = parts[0];
             String tripIdString = parts[1];
-            AgencyAndId tripId = new AgencyAndId(agencyIdString, tripIdString);
+            FeedId tripId = new FeedId(agencyIdString, tripIdString);
             BannedStopSet bannedStops;
             if (parts.length == 2) {
                 bannedStops = BannedStopSet.ALL;

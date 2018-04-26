@@ -32,17 +32,17 @@ public final class ServiceCalendarDate implements Serializable {
 
     public static final int EXCEPTION_TYPE_REMOVE = 2;
 
-    private AgencyAndId serviceId;
+    private FeedId serviceId;
 
     private ServiceDate date;
 
     private int exceptionType;
 
-    public AgencyAndId getServiceId() {
+    public FeedId getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(AgencyAndId serviceId) {
+    public void setServiceId(FeedId serviceId) {
         this.serviceId = serviceId;
     }
 

@@ -15,7 +15,7 @@ package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 
 public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
@@ -23,7 +23,7 @@ public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
     @Override
     public Stop unmarshal(AgencyAndIdType arg) throws Exception {
         throw new UnsupportedOperationException(
-                "We presently serialize stops as AgencyAndId, and thus cannot deserialize them");
+                "We presently serialize stops as FeedId, and thus cannot deserialize them");
     }
 
     @Override
@@ -31,7 +31,7 @@ public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
         if (arg == null) {
             return null;
         }
-        AgencyAndId id = arg.getId();
+        FeedId id = arg.getId();
         return new AgencyAndIdType(id.getAgencyId(), id.getId());
     }
 

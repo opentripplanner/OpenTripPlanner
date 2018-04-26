@@ -12,14 +12,14 @@ public interface OtpTransitService {
 
     Collection<ServiceCalendar> getAllCalendars();
 
-    ServiceCalendar getCalendarForServiceId(AgencyAndId serviceId);
+    ServiceCalendar getCalendarForServiceId(FeedId serviceId);
 
     Collection<ServiceCalendarDate> getAllCalendarDates();
 
-    List<ServiceCalendarDate> getCalendarDatesForServiceId(AgencyAndId serviceId);
+    List<ServiceCalendarDate> getCalendarDatesForServiceId(FeedId serviceId);
 
     /** @return all ids for both Calendars and CalendarDates merged into on list without duplicates */
-    List<AgencyAndId> getAllServiceIds();
+    List<FeedId> getAllServiceIds();
 
     Collection<FareAttribute> getAllFareAttributes();
 
@@ -35,11 +35,11 @@ public interface OtpTransitService {
 
     Collection<ShapePoint> getAllShapePoints();
 
-    List<ShapePoint> getShapePointsForShapeId(AgencyAndId shapeId);
+    List<ShapePoint> getShapePointsForShapeId(FeedId shapeId);
 
     Collection<Stop> getAllStops();
 
-    Stop getStopForId(AgencyAndId id);
+    Stop getStopForId(FeedId id);
 
     Collection<StopTime> getAllStopTimes();
 
@@ -53,7 +53,7 @@ public interface OtpTransitService {
 
     Collection<Trip> getAllTrips();
 
-    List<String> getTripAgencyIdsReferencingServiceId(AgencyAndId serviceId);
+    List<String> getTripAgencyIdsReferencingServiceId(FeedId serviceId);
 
     List<Stop> getStopsForStation(Stop station);
 }

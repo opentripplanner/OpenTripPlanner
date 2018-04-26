@@ -16,7 +16,7 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -141,10 +141,10 @@ public class GraphPath {
         return states.getLast().getVertex();
     }
 
-    /** @return A list containing one AgencyAndId (trip_id) for each vehicle boarded in this path,
+    /** @return A list containing one trip_id for each vehicle boarded in this path,
      * in the chronological order they are boarded. */
-    public List<AgencyAndId> getTrips() {
-        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+    public List<FeedId> getTrips() {
+        List<FeedId> ret = new LinkedList<FeedId>();
         Trip lastTrip = null;
         for (State s : states) {
             if (s.getBackEdge() != null) {

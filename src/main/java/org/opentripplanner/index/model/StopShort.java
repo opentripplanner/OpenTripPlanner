@@ -3,7 +3,7 @@ package org.opentripplanner.index.model;
 import java.util.Collection;
 import java.util.List;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 
 import com.beust.jcommander.internal.Lists;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 public class StopShort {
 
-    public AgencyAndId id;
+    public FeedId id;
     public String code;
     public String name;
     public double lat;

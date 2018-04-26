@@ -3,12 +3,12 @@ package org.opentripplanner.analyst.scenario;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -344,22 +344,22 @@ public class TimetableFilterTest extends TestCase {
         route.setShortName("T");
         route.setLongName("TEST");
         route.setAgency(agency);
-        route.setId(new AgencyAndId(agency.getId(), "TEST"));
+        route.setId(new FeedId(agency.getId(), "TEST"));
 
         metro = new Route();
         metro.setType(com.conveyal.gtfs.model.Route.SUBWAY);
         metro.setShortName("M");
         metro.setLongName("METRO");
         metro.setAgency(agency);
-        metro.setId(new AgencyAndId(agency.getId(), "METRO"));
+        metro.setId(new FeedId(agency.getId(), "METRO"));
 
         trip = new Trip();
         trip.setRoute(route);
-        trip.setId(new AgencyAndId(agency.getId(), "TRIP"));
+        trip.setId(new FeedId(agency.getId(), "TRIP"));
 
         trip2 = new Trip();
         trip2.setRoute(route);
-        trip2.setId(new AgencyAndId(agency.getId(), "TRIP2"));
+        trip2.setId(new FeedId(agency.getId(), "TRIP2"));
 
 
         stops = new Stop[4];
@@ -368,7 +368,7 @@ public class TimetableFilterTest extends TestCase {
             Stop s = new Stop();
             s.setLat(-122.123);
             s.setLon(37.363 + i * 0.001);
-            s.setId(new AgencyAndId(agency.getId(), "" + i));
+            s.setId(new FeedId(agency.getId(), "" + i));
             stops[i] = s;
         }
 
@@ -389,7 +389,7 @@ public class TimetableFilterTest extends TestCase {
 
         metroTrip = new Trip();
         metroTrip.setRoute(metro);
-        metroTrip.setId(new AgencyAndId(agency.getId(), "TRIP"));
+        metroTrip.setId(new FeedId(agency.getId(), "TRIP"));
 
         stopTimes = makeStopTimes(metroTrip);
         sp = new StopPattern(stopTimes);

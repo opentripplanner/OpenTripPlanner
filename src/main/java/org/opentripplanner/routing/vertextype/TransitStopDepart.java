@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.graph.Graph;
@@ -34,7 +34,7 @@ public class TransitStopDepart extends OffboardVertex {
     }
 
     @Override
-    public AgencyAndId getStopId() {
+    public FeedId getStopId() {
         return stopVertex.getStopId();
     }
 }

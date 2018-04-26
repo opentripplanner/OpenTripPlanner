@@ -15,7 +15,7 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 
 public class TestRouteMatcher extends TestCase {
@@ -23,16 +23,16 @@ public class TestRouteMatcher extends TestCase {
     public void testRouteMatcher() {
 
         Route r1 = new Route();
-        r1.setId(new AgencyAndId("A1", "42"));
+        r1.setId(new FeedId("A1", "42"));
         r1.setShortName("R1");
         Route r2 = new Route();
-        r2.setId(new AgencyAndId("A1", "43"));
+        r2.setId(new FeedId("A1", "43"));
         r2.setShortName("R2");
         Route r1b = new Route();
-        r1b.setId(new AgencyAndId("A2", "42"));
+        r1b.setId(new FeedId("A2", "42"));
         r1b.setShortName("R1");
         Route r3 = new Route();
-        r3.setId(new AgencyAndId("A1", "44"));
+        r3.setId(new FeedId("A1", "44"));
         r3.setShortName("R3_b");
 
         RouteMatcher emptyMatcher = RouteMatcher.emptyMatcher();
@@ -89,7 +89,7 @@ public class TestRouteMatcher extends TestCase {
         assertTrue(thrown);
         
         Route r1c = new Route();
-        r1c.setId(new AgencyAndId("A_1", "R_42"));
+        r1c.setId(new FeedId("A_1", "R_42"));
         r1c.setShortName("R_42");
 
         RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");

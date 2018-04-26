@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -35,8 +35,8 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     private Graph graph;
 
     private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
-    private ListMultimap<AgencyAndId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
-    private ListMultimap<AgencyAndId, AlertPatch> patchesByStop = LinkedListMultimap.create();
+    private ListMultimap<FeedId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
+    private ListMultimap<FeedId, AlertPatch> patchesByStop = LinkedListMultimap.create();
 
     public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
@@ -48,7 +48,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getStopPatches(AgencyAndId stop) {
+    public Collection<AlertPatch> getStopPatches(FeedId stop) {
         List<AlertPatch> result = patchesByStop.get(stop);
         if (result == null) {
             result = Collections.emptyList();
@@ -57,7 +57,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getRoutePatches(AgencyAndId route) {
+    public Collection<AlertPatch> getRoutePatches(FeedId route) {
         List<AlertPatch> result = patchesByRoute.get(route);
         if (result == null) {
             result = Collections.emptyList();
@@ -75,11 +75,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
         alertPatch.apply(graph);
         alertPatches.put(alertPatch.getId(), alertPatch);
 
-        AgencyAndId stop = alertPatch.getStop();
+        FeedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.put(stop, alertPatch);
         }
-        AgencyAndId route = alertPatch.getRoute();
+        FeedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.put(route, alertPatch);
         }
@@ -119,11 +119,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     private void expire(AlertPatch alertPatch) {
-        AgencyAndId stop = alertPatch.getStop();
+        FeedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.remove(stop, alertPatch);
         }
-        AgencyAndId route = alertPatch.getRoute();
+        FeedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.remove(route, alertPatch);
         }

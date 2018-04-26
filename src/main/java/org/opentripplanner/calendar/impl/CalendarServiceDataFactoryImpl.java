@@ -18,7 +18,7 @@
 package org.opentripplanner.calendar.impl;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -64,7 +64,7 @@ public class CalendarServiceDataFactoryImpl {
     public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(OtpTransitService transitService) {
         return (new CalendarServiceDataFactoryImpl(transitService) {
             @Override void addDatesForLocalizedServiceId(
-                    AgencyAndId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data
+                    FeedId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data
             ) {
                 // Skip creation of datesForLocalizedServiceId
             }
@@ -81,11 +81,11 @@ public class CalendarServiceDataFactoryImpl {
 
         setTimeZonesForAgencies(data);
 
-        List<AgencyAndId> serviceIds = transitService.getAllServiceIds();
+        List<FeedId> serviceIds = transitService.getAllServiceIds();
 
         int index = 0;
 
-        for (AgencyAndId serviceId : serviceIds) {
+        for (FeedId serviceId : serviceIds) {
 
             index++;
 
@@ -111,7 +111,7 @@ public class CalendarServiceDataFactoryImpl {
     }
 
     void addDatesForLocalizedServiceId (
-            AgencyAndId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data) {
+            FeedId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data) {
         List<String> tripAgencyIds = transitService.getTripAgencyIdsReferencingServiceId(serviceId);
         Set<TimeZone> timeZones = new HashSet<>();
         for (String tripAgencyId : tripAgencyIds) {
@@ -130,7 +130,7 @@ public class CalendarServiceDataFactoryImpl {
         }
     }
 
-    private Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId,
+    private Set<ServiceDate> getServiceDatesForServiceId(FeedId serviceId,
             TimeZone serviceIdTimeZone) {
         Set<ServiceDate> activeDates = new HashSet<>();
         ServiceCalendar c = transitService.getCalendarForServiceId(serviceId);

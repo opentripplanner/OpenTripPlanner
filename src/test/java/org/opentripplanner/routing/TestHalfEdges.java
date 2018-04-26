@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
@@ -119,13 +119,13 @@ public class TestHalfEdges {
         s1.setName("transitVertex 1");
         s1.setLon(-74.005);
         s1.setLat(40.0099999);
-        s1.setId(new AgencyAndId("A", "fleem station"));
+        s1.setId(new FeedId("A", "fleem station"));
 
         Stop s2 = new Stop();
         s2.setName("transitVertex 2");
         s2.setLon(-74.002);
         s2.setLat(40.0099999);
-        s2.setId(new AgencyAndId("A", "morx station"));
+        s2.setId(new FeedId("A", "morx station"));
 
         station1 = new TransitStop(graph, s1);
         station2 = new TransitStop(graph, s2);

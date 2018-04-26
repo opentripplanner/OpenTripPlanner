@@ -20,7 +20,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -252,7 +252,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new AgencyAndId(
+                .dataFetcher(environment -> index.stopForId.get(new FeedId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
                     ((Stop) environment.getSource()).getParentStation())))
                 .build())
@@ -320,7 +320,7 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
-                    try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
+                    try {  // TODO: Add our own scalar types for at least serviceDate and FeedId
                         return index.getStopTimesForStop(
                             (Stop) environment.getSource(),
                             ServiceDate.parseString(environment.getArgument("date")),

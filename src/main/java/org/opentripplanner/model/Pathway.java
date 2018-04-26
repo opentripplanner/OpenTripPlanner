@@ -15,13 +15,13 @@
  */
 package org.opentripplanner.model;
 
-public final class Pathway extends IdentityBean<AgencyAndId> {
+public final class Pathway extends IdentityBean<FeedId> {
 
     private static final long serialVersionUID = -2404871423254094109L;
 
     private static final int MISSING_VALUE = -999;
 
-    private AgencyAndId id;
+    private FeedId id;
 
     private int pathwayType;
 
@@ -34,12 +34,12 @@ public final class Pathway extends IdentityBean<AgencyAndId> {
     private int wheelchairTraversalTime = MISSING_VALUE;
 
     @Override
-    public AgencyAndId getId() {
+    public FeedId getId() {
         return id;
     }
 
     @Override
-    public void setId(AgencyAndId id) {
+    public void setId(FeedId id) {
         this.id = id;
     }
 

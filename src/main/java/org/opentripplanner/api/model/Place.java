@@ -17,8 +17,8 @@ import java.util.Calendar;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
-import org.opentripplanner.model.AgencyAndId;
-import org.opentripplanner.util.Constants; 
+import org.opentripplanner.model.FeedId;
+import org.opentripplanner.util.Constants;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -35,7 +35,7 @@ public class Place {
     /** 
      * The ID of the stop. This is often something that users don't care about.
      */
-    public AgencyAndId stopId = null;
+    public FeedId stopId = null;
 
     /** 
      * The "code" of the stop. Depending on the transit agency, this is often

@@ -22,7 +22,7 @@ import java.util.TimeZone;
 
 import com.beust.jcommander.internal.Lists;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -298,7 +298,7 @@ public class Timetable implements Serializable {
     }
 
     /** @return the index of TripTimes for this trip ID in this particular Timetable */
-    public int getTripIndex(AgencyAndId tripId) {
+    public int getTripIndex(FeedId tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
@@ -561,7 +561,7 @@ public class Timetable implements Serializable {
     
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
-    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+    public void setServiceCodes (Map<FeedId, Integer> serviceCodes) {
         for (TripTimes tt : this.tripTimes) {
             tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }

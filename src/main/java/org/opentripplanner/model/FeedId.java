@@ -18,7 +18,7 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 
-public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
+public class FeedId implements Serializable, Comparable<FeedId> {
 
     public static final char ID_SEPARATOR = '_';
 
@@ -28,11 +28,11 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
 
     private String id;
 
-    public AgencyAndId() {
+    public FeedId() {
 
     }
 
-    public AgencyAndId(String agencyId, String id) {
+    public FeedId(String agencyId, String id) {
         this.agencyId = agencyId;
         this.id = id;
     }
@@ -57,7 +57,7 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
         return this.agencyId != null && this.id != null;
     }
 
-    public int compareTo(AgencyAndId o) {
+    public int compareTo(FeedId o) {
         int c = this.agencyId.compareTo(o.agencyId);
         if (c == 0)
             c = this.id.compareTo(o.id);
@@ -66,17 +66,17 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
 
     /**
      * Given an id of the form "agencyId_entityId", parses into a
-     * {@link AgencyAndId} id object.
+     * {@link FeedId} id object.
      *
      * @param value id of the form "agencyId_entityId"
      * @return an id object
      */
-    public static AgencyAndId convertFromString(String value, char separator) {
+    public static FeedId convertFromString(String value, char separator) {
         int index = value.indexOf(separator);
         if (index == -1) {
             throw new IllegalStateException("invalid agency-and-id: " + value);
         } else {
-            return new AgencyAndId(value.substring(0, index), value.substring(index + 1));
+            return new FeedId(value.substring(0, index), value.substring(index + 1));
         }
     }
 
@@ -91,9 +91,9 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof AgencyAndId))
+        if (!(obj instanceof FeedId))
             return false;
-        AgencyAndId other = (AgencyAndId) obj;
+        FeedId other = (FeedId) obj;
         if (!agencyId.equals(other.agencyId))
             return false;
         if (!id.equals(other.id))
@@ -112,31 +112,31 @@ public class AgencyAndId implements Serializable, Comparable<AgencyAndId> {
 
     /**
      * Given an id of the form "agencyId_entityId", parses into a
-     * {@link AgencyAndId} id object.
+     * {@link FeedId} id object.
      *
      * @param value id of the form "agencyId_entityId"
      * @return an id object
      * @throws IllegalArgumentException if the id cannot be parsed
      */
-    public static AgencyAndId convertFromString(String value) throws IllegalArgumentException {
+    public static FeedId convertFromString(String value) throws IllegalArgumentException {
         if (value == null || value.isEmpty())
             return null;
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
             throw new IllegalArgumentException("invalid agency-and-id: " + value);
         } else {
-            return new AgencyAndId(value.substring(0, index), value.substring(index + 1));
+            return new FeedId(value.substring(0, index), value.substring(index + 1));
         }
     }
 
     /**
-     * Given an {@link AgencyAndId} object, creates a string representation of the
+     * Given an {@link FeedId} object, creates a string representation of the
      * form "agencyId_entityId"
      *
      * @param aid an id object
      * @return a string representation of the form "agencyId_entityId"
      */
-    public static String convertToString(AgencyAndId aid) {
+    public static String convertToString(FeedId aid) {
         if (aid == null)
             return null;
         return aid.getAgencyId() + ID_SEPARATOR + aid.getId();

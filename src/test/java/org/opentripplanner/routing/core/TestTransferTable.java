@@ -15,7 +15,7 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -28,36 +28,36 @@ public class TestTransferTable extends TestCase {
     public void testTransferTable() {
         // Setup from stop
         Stop fromStop = new Stop();
-        fromStop.setId(new AgencyAndId("A1", "S1"));
+        fromStop.setId(new FeedId("A1", "S1"));
         
         // Setup to stop
         Stop toStop = new Stop();
-        toStop.setId(new AgencyAndId("A1", "S2"));
+        toStop.setId(new FeedId("A1", "S2"));
         
         // Setup to stop parent
         Stop toStopParent = new Stop();
-        toStopParent.setId(new AgencyAndId("A1", "S3"));
+        toStopParent.setId(new FeedId("A1", "S3"));
         toStop.setParentStation("S3");
         
         // Setup from trip with route
         Route fromRoute = new Route();
-        fromRoute.setId(new AgencyAndId("A1", "R1"));
+        fromRoute.setId(new FeedId("A1", "R1"));
         Trip fromTrip = new Trip();
-        fromTrip.setId(new AgencyAndId("A1", "T1"));
+        fromTrip.setId(new FeedId("A1", "T1"));
         fromTrip.setRoute(fromRoute);
         
         // Setup to trip with route
         Route toRoute = new Route();
-        toRoute.setId(new AgencyAndId("A1", "R2"));
+        toRoute.setId(new FeedId("A1", "R2"));
         Trip toTrip = new Trip();
-        toTrip.setId(new AgencyAndId("A1", "T2"));
+        toTrip.setId(new FeedId("A1", "T2"));
         toTrip.setRoute(toRoute);
         
         // Setup second to trip with route
         Route toRoute2 = new Route();
-        toRoute2.setId(new AgencyAndId("A1", "R3"));
+        toRoute2.setId(new FeedId("A1", "R3"));
         Trip toTrip2 = new Trip();
-        toTrip2.setId(new AgencyAndId("A1", "T3"));
+        toTrip2.setId(new FeedId("A1", "T3"));
         toTrip2.setRoute(toRoute2);
         
         // Create transfer table

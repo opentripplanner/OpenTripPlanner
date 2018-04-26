@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.opentripplanner.model.AgencyAndId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
@@ -143,7 +142,6 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         TripTimes oldTripTimes = state0.getTripTimes();
         int arrivalTime;
         int departureTime;
-        AgencyAndId tripId = state0.getTripId();
 
         if (options.arriveBy) {
             // traversing backward

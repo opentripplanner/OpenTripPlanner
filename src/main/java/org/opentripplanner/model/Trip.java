@@ -15,15 +15,15 @@
  */
 package org.opentripplanner.model;
 
-public final class Trip extends IdentityBean<AgencyAndId> {
+public final class Trip extends IdentityBean<FeedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private AgencyAndId id;
+    private FeedId id;
 
     private Route route;
 
-    private AgencyAndId serviceId;
+    private FeedId serviceId;
 
     private String tripShortName;
 
@@ -35,7 +35,7 @@ public final class Trip extends IdentityBean<AgencyAndId> {
 
     private String blockId;
 
-    private AgencyAndId shapeId;
+    private FeedId shapeId;
 
     private int wheelchairAccessible = 0;
 
@@ -68,11 +68,11 @@ public final class Trip extends IdentityBean<AgencyAndId> {
         this.fareId = obj.fareId;
     }
 
-    public AgencyAndId getId() {
+    public FeedId getId() {
         return id;
     }
 
-    public void setId(AgencyAndId id) {
+    public void setId(FeedId id) {
         this.id = id;
     }
 
@@ -84,11 +84,11 @@ public final class Trip extends IdentityBean<AgencyAndId> {
         this.route = route;
     }
 
-    public AgencyAndId getServiceId() {
+    public FeedId getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(AgencyAndId serviceId) {
+    public void setServiceId(FeedId serviceId) {
         this.serviceId = serviceId;
     }
 
@@ -132,11 +132,11 @@ public final class Trip extends IdentityBean<AgencyAndId> {
         this.blockId = blockId;
     }
 
-    public AgencyAndId getShapeId() {
+    public FeedId getShapeId() {
         return shapeId;
     }
 
-    public void setShapeId(AgencyAndId shapeId) {
+    public void setShapeId(FeedId shapeId) {
         this.shapeId = shapeId;
     }
 

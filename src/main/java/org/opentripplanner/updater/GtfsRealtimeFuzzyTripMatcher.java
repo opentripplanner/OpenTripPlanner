@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.util.TimeToStringConverter;
 import org.opentripplanner.model.Trip;
@@ -40,7 +40,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
             return trip;
         }
 
-        AgencyAndId routeId = new AgencyAndId(feedId, trip.getRouteId());
+        FeedId routeId = new FeedId(feedId, trip.getRouteId());
         int time = TimeToStringConverter.parseHH_MM_SS(trip.getStartTime());
         ServiceDate date;
         try {

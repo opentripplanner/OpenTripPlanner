@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 
@@ -65,11 +65,11 @@ public class TripType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId id;
+    FeedId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId serviceId;
+    FeedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
@@ -81,7 +81,7 @@ public class TripType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId routeId;
+    FeedId routeId;
 
     @XmlAttribute
     @JsonSerialize
@@ -93,7 +93,7 @@ public class TripType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId shapeId;
+    FeedId shapeId;
 
     @XmlAttribute
     @JsonSerialize

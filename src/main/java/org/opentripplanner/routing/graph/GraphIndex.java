@@ -22,7 +22,7 @@ import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -82,10 +82,10 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
-    public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
+    public final Map<FeedId, Stop> stopForId = Maps.newHashMap();
+    public final Map<FeedId, Trip> tripForId = Maps.newHashMap();
+    public final Map<FeedId, Route> routeForId = Maps.newHashMap();
+    public final Map<FeedId, String> serviceForId = Maps.newHashMap();
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
@@ -99,7 +99,7 @@ public class GraphIndex {
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
-    private final Map<AgencyAndId,Integer> serviceCodes;
+    private final Map<FeedId,Integer> serviceCodes;
 
     /* Full-text search extensions */
     public LuceneIndex luceneIndex;
@@ -357,7 +357,7 @@ public class GraphIndex {
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
-        for (AgencyAndId serviceId : calendarService.getServiceIdsOnDate(date)) {
+        for (FeedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
             if (n < 0) continue;
             services.set(n);
@@ -558,7 +558,7 @@ public class GraphIndex {
      * according to a parent/child station topology, if it exists.
      * 
      * Some challenges faced by DC and Trimet:
-     * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
+     * FIXME OBA parentStation field is a string, not an FeedId, so it has no agency/feed scope
      * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
      * However Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
      *
@@ -629,7 +629,7 @@ public class GraphIndex {
     	        cluster = stopClusterForId.get(ps);
     	    } else {
     	        cluster = new StopCluster(ps, stop.getName());
-    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
+    	        Stop parent = graph.parentStopById.get(new FeedId(stop.getId().getAgencyId(), ps));
                 cluster.setCoordinates(parent.getLat(), parent.getLon());
                 stopClusterForId.put(ps, cluster);
 
@@ -659,7 +659,7 @@ public class GraphIndex {
      * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
      * Note that if the same agency ID is defined in several feeds, this will return one of them
      * at random. That is obviously not the right behavior. The problem is that agencies are
-     * not currently keyed on an AgencyAndId object, but on separate feedId and id Strings.
+     * not currently keyed on an FeedId object, but on separate feedId and id Strings.
      * A real fix will involve replacing or heavily modifying the OBA GTFS loader, which is now
      * possible since we have forked it.
      */

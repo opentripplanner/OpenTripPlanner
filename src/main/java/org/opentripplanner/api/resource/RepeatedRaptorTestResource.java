@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import org.joda.time.LocalDate;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
@@ -64,7 +64,7 @@ public class RepeatedRaptorTestResource {
             Collection<Stop> originStops = new ArrayList<>();
             if (fromStopString != null) {
                 String[] fields = fromStopString.split(":");
-                originStops.add(graph.index.stopForId.get(new AgencyAndId(fields[0], fields[1])));
+                originStops.add(graph.index.stopForId.get(new FeedId(fields[0], fields[1])));
             } else {
                 originStops = graph.index.stopForId.values();
             }

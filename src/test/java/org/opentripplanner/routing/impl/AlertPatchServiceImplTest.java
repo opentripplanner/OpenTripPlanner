@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
@@ -44,8 +44,8 @@ public class AlertPatchServiceImplTest {
     }
 
     private TestAlertPatch[] alerts;
-    private AgencyAndId testStop = new AgencyAndId("A", "A");
-    private AgencyAndId testRoute = new AgencyAndId("B", "B");
+    private FeedId testStop = new FeedId("A", "A");
+    private FeedId testRoute = new FeedId("B", "B");
 
     @Before
     public void setup() {

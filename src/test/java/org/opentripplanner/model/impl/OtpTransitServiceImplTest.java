@@ -18,12 +18,13 @@ package org.opentripplanner.model.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
@@ -33,7 +34,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
 
@@ -49,11 +49,11 @@ import static org.junit.Assert.assertEquals;
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";
 
-    private static final AgencyAndId SERVICE_ALLDAYS_ID = new AgencyAndId(FEED_ID, "alldays");
+    private static final FeedId SERVICE_ALLDAYS_ID = new FeedId(FEED_ID, "alldays");
 
-    private static final AgencyAndId SERVICE_WEEKDAYS_ID = new AgencyAndId(FEED_ID, "weekdays");
+    private static final FeedId SERVICE_WEEKDAYS_ID = new FeedId(FEED_ID, "weekdays");
 
-    private static final AgencyAndId STATION_ID = new AgencyAndId(FEED_ID, "station");
+    private static final FeedId STATION_ID = new FeedId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
     private static OtpTransitService subject;
@@ -209,7 +209,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopForId() {
-        Stop stop = subject.getStopForId(new AgencyAndId("Z", "P"));
+        Stop stop = subject.getStopForId(new FeedId("Z", "P"));
         assertEquals("<Stop Z_P>", stop.toString());
     }
 
@@ -232,7 +232,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetShapePointsForShapeId() {
-        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new AgencyAndId("Z", "5"));
+        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new FeedId("Z", "5"));
         assertEquals("[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
                 shapePoints.stream().map(OtpTransitServiceImplTest::toString).collect(toList()).toString());
     }
@@ -246,7 +246,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetAllServiceIds() {
-        List<AgencyAndId> serviceIds = subject.getAllServiceIds();
+        List<FeedId> serviceIds = subject.getAllServiceIds();
 
         assertEquals(2, serviceIds.size());
         assertEquals("Z_alldays", first(serviceIds).toString());
@@ -268,7 +268,7 @@ public class OtpTransitServiceImplTest {
 
     private static FareAttribute createFareAttribute() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new AgencyAndId(agency.getId(), "FA"));
+        fa.setId(new FeedId(agency.getId(), "FA"));
         FareRule rule = new FareRule();
         rule.setFare(fa);
         return fa;
@@ -276,7 +276,7 @@ public class OtpTransitServiceImplTest {
 
     private static FareRule createFareRule() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new AgencyAndId(agency.getId(), "FA"));
+        fa.setId(new FeedId(agency.getId(), "FA"));
         FareRule rule = new FareRule();
         rule.setOriginId("Zone A");
         rule.setContainsId("Zone B");
@@ -286,7 +286,7 @@ public class OtpTransitServiceImplTest {
     }
 
 
-    private static ServiceCalendarDate createAServiceCalendarDateExclution(AgencyAndId serviceId) {
+    private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedId serviceId) {
         ServiceCalendarDate date = new ServiceCalendarDate();
         date.setServiceId(serviceId);
         date.setDate(new ServiceDate(2017, 8, 31));

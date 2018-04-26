@@ -15,13 +15,13 @@
  */
 package org.opentripplanner.model;
 
-public final class Route extends IdentityBean<AgencyAndId> {
+public final class Route extends IdentityBean<FeedId> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
 
-    private AgencyAndId id;
+    private FeedId id;
 
     private Agency agency;
 
@@ -50,11 +50,11 @@ public final class Route extends IdentityBean<AgencyAndId> {
 
     private String brandingUrl;
 
-    public AgencyAndId getId() {
+    public FeedId getId() {
         return id;
     }
 
-    public void setId(AgencyAndId id) {
+    public void setId(FeedId id) {
         this.id = id;
     }
 

@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.Date;
 import java.util.Set;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -128,7 +128,7 @@ public class State implements Cloneable {
         this.walkDistance = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
-        stateData.routeSequence = new AgencyAndId[0];
+        stateData.routeSequence = new FeedId[0];
     }
 
     /**
@@ -229,7 +229,7 @@ public class State implements Cloneable {
         return activeTime;            
     }
 
-    public AgencyAndId getTripId() {
+    public FeedId getTripId() {
         return stateData.tripId;
     }
 
@@ -241,7 +241,7 @@ public class State implements Cloneable {
         return stateData.zone;
     }
 
-    public AgencyAndId getRoute() {
+    public FeedId getRoute() {
         return stateData.route;
     }
 
@@ -500,8 +500,8 @@ public class State implements Cloneable {
 
     // symmetric prefix check
     public boolean routeSequencePrefix (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedId[] rs0 = this.stateData.routeSequence;
+        FeedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1)
             return true;
         int n = rs0.length < rs1.length ? rs0.length : rs1.length;
@@ -513,11 +513,11 @@ public class State implements Cloneable {
 
     // symmetric subset check
     public boolean routeSequenceSubsetSymmetric (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedId[] rs0 = this.stateData.routeSequence;
+        FeedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1)
             return true;
-        AgencyAndId[] shorter, longer;
+        FeedId[] shorter, longer;
         if (rs0.length < rs1.length) {
             shorter = rs0;
             longer  = rs1;
@@ -526,9 +526,9 @@ public class State implements Cloneable {
             longer  = rs0;
         }
         /* bad complexity, but these are tiny arrays */
-        for (AgencyAndId ais : shorter) {
+        for (FeedId ais : shorter) {
             boolean match = false;
-            for (AgencyAndId ail : longer) {
+            for (FeedId ail : longer) {
                 if (ais == ail) {
                     match = true;
                     break;
@@ -541,14 +541,14 @@ public class State implements Cloneable {
 
     // subset check: is this a subset of that?
     public boolean routeSequenceSubset (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedId[] rs0 = this.stateData.routeSequence;
+        FeedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1) return true;
         if (rs0.length > rs1.length) return false;
         /* bad complexity, but these are tiny arrays */
-        for (AgencyAndId r0 : rs0) {
+        for (FeedId r0 : rs0) {
             boolean match = false;
-            for (AgencyAndId r1 : rs1) {
+            for (FeedId r1 : rs1) {
                 if (r0 == r1) {
                     match = true;
                     break;

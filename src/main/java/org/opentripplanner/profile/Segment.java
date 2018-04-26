@@ -37,7 +37,7 @@ public class Segment {
         }
     }
 
-    // Use AgencyAndId instead of String to get both since we are now multi-feed
+    // Use FeedId instead of String to get both since we are now multi-feed
     public String from;
     public String to;
     public int walkTime;

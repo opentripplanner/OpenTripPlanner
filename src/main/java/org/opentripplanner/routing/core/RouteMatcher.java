@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -31,7 +31,7 @@ public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
 
     /* Set of full matching route ids (agency ID + route ID) */
-    private HashSet<AgencyAndId> agencyAndRouteIds = new HashSet<AgencyAndId>();
+    private HashSet<FeedId> agencyAndRouteIds = new HashSet<FeedId>();
 
     /* Set of full matching route code/names (agency ID + route code/name) */
     private HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
@@ -94,7 +94,7 @@ public class RouteMatcher implements Cloneable, Serializable {
                 routeId = null;
             if (agencyId != null && routeId != null && routeName == null) {
                 // Case 1: specified agency ID and route ID but no route name
-                retval.agencyAndRouteIds.add(new AgencyAndId(agencyId, routeId));
+                retval.agencyAndRouteIds.add(new FeedId(agencyId, routeId));
             } else if (agencyId != null && routeName != null && routeId == null) {
                 // Case 2: specified agency ID and route name but no route ID
                 retval.agencyIdAndRouteNames.add(new T2<String, String>(agencyId, routeName));
@@ -126,8 +126,8 @@ public class RouteMatcher implements Cloneable, Serializable {
 
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        for (AgencyAndId agencyAndId : agencyAndRouteIds) {
-            builder.append(agencyAndId.getAgencyId() + "__" + agencyAndId.getId());
+        for (FeedId feedId : agencyAndRouteIds) {
+            builder.append(feedId.getAgencyId() + "__" + feedId.getId());
             builder.append(",");
         }
         for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {

@@ -30,14 +30,14 @@ import java.util.TimeZone;
 
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -96,7 +96,7 @@ public class OnBoardDepartServiceImplTest {
         LineString geometry = new LineString(coordinateSequence, geometryFactory);
         ArrayList<Edge> hops = new ArrayList<Edge>(2);
         RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, arrive);
-        AgencyAndId agencyAndId = new AgencyAndId("Agency", "ID");
+        FeedId feedId = new FeedId("Agency", "ID");
         Agency agency = new Agency();
         Route route = new Route();
         ArrayList<StopTime> stopTimes = new ArrayList<StopTime>(3);
@@ -110,12 +110,12 @@ public class OnBoardDepartServiceImplTest {
 
         routingContext.serviceDays =
                 new ArrayList<ServiceDay>(Collections.singletonList(serviceDay));
-        agency.setId(agencyAndId.getAgencyId());
-        route.setId(agencyAndId);
+        agency.setId(feedId.getAgencyId());
+        route.setId(feedId);
         route.setAgency(agency);
-        stopDepart.setId(agencyAndId);
-        stopDwell.setId(agencyAndId);
-        stopArrive.setId(agencyAndId);
+        stopDepart.setId(feedId);
+        stopDwell.setId(feedId);
+        stopArrive.setId(feedId);
         stopDepartTime.setStop(stopDepart);
         stopDepartTime.setDepartureTime(0);
         stopDwellTime.setArrivalTime(20);
@@ -126,7 +126,7 @@ public class OnBoardDepartServiceImplTest {
         stopTimes.add(stopDepartTime);
         stopTimes.add(stopDwellTime);
         stopTimes.add(stopArriveTime);
-        trip.setId(agencyAndId);
+        trip.setId(feedId);
         trip.setTripHeadsign("The right");
         trip.setRoute(route);
 
@@ -149,7 +149,7 @@ public class OnBoardDepartServiceImplTest {
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        routingRequest.startingTransitTripId = agencyAndId;
+        routingRequest.startingTransitTripId = feedId;
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(9);
 
         patternHop0.setGeometry(geometry);
@@ -201,7 +201,7 @@ public class OnBoardDepartServiceImplTest {
         when(station1.getY()).thenReturn(coordinates[1].y);
 
         RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, arrive);
-        AgencyAndId agencyAndId = new AgencyAndId("Agency", "ID");
+        FeedId feedId = new FeedId("Agency", "ID");
         Agency agency = new Agency();
         Route route = new Route();
         ArrayList<StopTime> stopTimes = new ArrayList<StopTime>(2);
@@ -213,18 +213,18 @@ public class OnBoardDepartServiceImplTest {
 
         routingContext.serviceDays =
                 new ArrayList<ServiceDay>(Collections.singletonList(serviceDay));
-        agency.setId(agencyAndId.getAgencyId());
-        route.setId(agencyAndId);
+        agency.setId(feedId.getAgencyId());
+        route.setId(feedId);
         route.setAgency(agency);
-        stopDepart.setId(new AgencyAndId("Station", "0"));
-        stopArrive.setId(new AgencyAndId("Station", "1"));
+        stopDepart.setId(new FeedId("Station", "0"));
+        stopArrive.setId(new FeedId("Station", "1"));
         stopDepartTime.setStop(stopDepart);
         stopDepartTime.setDepartureTime(0);
         stopArriveTime.setArrivalTime(10);
         stopArriveTime.setStop(stopArrive);
         stopTimes.add(stopDepartTime);
         stopTimes.add(stopArriveTime);
-        trip.setId(agencyAndId);
+        trip.setId(feedId);
         trip.setRoute(route);
 
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -240,7 +240,7 @@ public class OnBoardDepartServiceImplTest {
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        routingRequest.startingTransitTripId = agencyAndId;
+        routingRequest.startingTransitTripId = feedId;
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(10);
         when(graph.getVertex("Station_0")).thenReturn(station0);
         when(graph.getVertex("Station_1")).thenReturn(station1);
@@ -275,7 +275,7 @@ public class OnBoardDepartServiceImplTest {
         ArrayList<Edge> hops = new ArrayList<Edge>(2);
         RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, arrive);
         Agency agency = new Agency();
-        AgencyAndId agencyAndId = new AgencyAndId("Agency", "ID");
+        FeedId feedId = new FeedId("Agency", "ID");
         Route route = new Route();
         ArrayList<StopTime> stopTimes = new ArrayList<StopTime>(2);
         StopTime stopDepartTime = new StopTime();
@@ -288,12 +288,12 @@ public class OnBoardDepartServiceImplTest {
 
         routingContext.serviceDays =
                 new ArrayList<ServiceDay>(Collections.singletonList(serviceDay));
-        agency.setId(agencyAndId.getAgencyId());
-        route.setId(agencyAndId);
+        agency.setId(feedId.getAgencyId());
+        route.setId(feedId);
         route.setAgency(agency);
-        stopDepart.setId(new AgencyAndId("Station", "0"));
-        stopDwell.setId(new AgencyAndId("Station", "1"));
-        stopArrive.setId(new AgencyAndId("Station", "2"));
+        stopDepart.setId(new FeedId("Station", "0"));
+        stopDwell.setId(new FeedId("Station", "1"));
+        stopArrive.setId(new FeedId("Station", "2"));
         stopDepartTime.setStop(stopDepart);
         stopDepartTime.setDepartureTime(0);
         stopDwellTime.setArrivalTime(20);
@@ -304,7 +304,7 @@ public class OnBoardDepartServiceImplTest {
         stopTimes.add(stopDepartTime);
         stopTimes.add(stopDwellTime);
         stopTimes.add(stopArriveTime);
-        trip.setId(agencyAndId);
+        trip.setId(feedId);
         trip.setRoute(route);
 
         TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -326,7 +326,7 @@ public class OnBoardDepartServiceImplTest {
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        routingRequest.startingTransitTripId = agencyAndId;
+        routingRequest.startingTransitTripId = feedId;
         when(graph.getVertex("Station_0")).thenReturn(station0);
         when(graph.getVertex("Station_1")).thenReturn(station1);
         when(graph.getVertex("Station_2")).thenReturn(station2);

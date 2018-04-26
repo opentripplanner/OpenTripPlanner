@@ -16,7 +16,7 @@
  */
 package org.opentripplanner.calendar.impl;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
@@ -42,12 +42,12 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Set<AgencyAndId> getServiceIds() {
+    public Set<FeedId> getServiceIds() {
         return data.getServiceIds();
     }
 
     @Override
-    public Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId) {
+    public Set<ServiceDate> getServiceDatesForServiceId(FeedId serviceId) {
         Set<ServiceDate> dates = new HashSet<>();
         CalendarServiceData allData = getData();
         List<ServiceDate> serviceDates = allData.getServiceDatesForServiceId(serviceId);
@@ -57,7 +57,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Set<AgencyAndId> getServiceIdsOnDate(ServiceDate date) {
+    public Set<FeedId> getServiceIdsOnDate(ServiceDate date) {
         return data.getServiceIdsForDate(date);
     }
 

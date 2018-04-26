@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * 
  * Any two trips with the same stops in the same order, and that operate on the same days, can be
  * combined using a TripPattern to simplify the graph. This saves memory and reduces search
- * complexity since we only consider the trip that departs soonest for each pattern. AgencyAndId
+ * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * 
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key for a TripPattern.

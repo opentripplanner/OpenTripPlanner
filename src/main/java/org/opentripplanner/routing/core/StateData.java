@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -35,7 +35,7 @@ public class StateData implements Cloneable {
     // which trip index inside a pattern
     protected TripTimes tripTimes;
 
-    protected AgencyAndId tripId;
+    protected FeedId tripId;
     
     protected Trip previousTrip;
 
@@ -43,7 +43,7 @@ public class StateData implements Cloneable {
 
     protected String zone;
 
-    protected AgencyAndId route;
+    protected FeedId route;
 
     protected int numBoardings;
 
@@ -59,7 +59,7 @@ public class StateData implements Cloneable {
 
     protected long lastAlightedTime;
 
-    protected AgencyAndId[] routeSequence;
+    protected FeedId[] routeSequence;
 
     protected HashMap<Object, Object> extensions;
 

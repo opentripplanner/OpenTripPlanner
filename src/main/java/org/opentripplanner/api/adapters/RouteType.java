@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -59,17 +59,17 @@ public class RouteType {
         }
     }
     
-    public AgencyAndId getId(){
+    public FeedId getId(){
         return this.id;
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId id;
+    FeedId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId serviceId;
+    FeedId serviceId;
 
     @XmlAttribute
     @JsonSerialize

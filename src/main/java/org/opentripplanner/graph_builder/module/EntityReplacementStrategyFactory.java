@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
@@ -46,7 +46,7 @@ public class EntityReplacementStrategyFactory {
 
       while ((line = reader.readLine()) != null) {
         String[] tokens = line.split("\\s+");
-        List<AgencyAndId> ids = new ArrayList<AgencyAndId>();
+        List<FeedId> ids = new ArrayList<FeedId>();
         for (String token : tokens)
           ids.add(GtfsLibrary.convertIdFromString(token));
         for (int i = 1; i < ids.size(); i++)

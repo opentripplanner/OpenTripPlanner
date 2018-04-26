@@ -16,16 +16,16 @@
  */
 package org.opentripplanner.routing.edgetype.factory;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 
 class ShapeSegmentKey {
-    private AgencyAndId shapeId;
+    private FeedId shapeId;
 
     private double shapeDistanceFrom;
 
     private double shapeDistanceTo;
 
-    public ShapeSegmentKey(AgencyAndId shapeId, double shapeDistanceFrom, double shapeDistanceTo) {
+    public ShapeSegmentKey(FeedId shapeId, double shapeDistanceFrom, double shapeDistanceTo) {
         this.shapeId = shapeId;
         this.shapeDistanceFrom = shapeDistanceFrom;
         this.shapeDistanceTo = shapeDistanceTo;

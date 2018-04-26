@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.common.model.P2;
 
@@ -26,18 +26,18 @@ public class FareRuleSet implements Serializable {
     private static final long serialVersionUID = 7218355718876553028L;
 
     private String agency = null;
-    private Set<AgencyAndId> routes;
+    private Set<FeedId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
     private FareAttribute fareAttribute;
-    private Set<AgencyAndId> trips;
+    private Set<FeedId> trips;
     
     public FareRuleSet(FareAttribute fareAttribute) {
         this.fareAttribute = fareAttribute;
-        routes = new HashSet<AgencyAndId>();
+        routes = new HashSet<FeedId>();
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
-        trips = new HashSet<AgencyAndId>();
+        trips = new HashSet<FeedId>();
     }
 
     public void setAgency(String agency) {
@@ -61,11 +61,11 @@ public class FareRuleSet implements Serializable {
         contains.add(containsId);
     }
     
-    public void addRoute(AgencyAndId route) {
+    public void addRoute(FeedId route) {
         routes.add(route);
     }
     
-    public Set<AgencyAndId> getRoutes() {
+    public Set<FeedId> getRoutes() {
     	return routes;
     }
 
@@ -77,16 +77,16 @@ public class FareRuleSet implements Serializable {
         return agency != null;
     }
 
-    public void addTrip(AgencyAndId trip) {
+    public void addTrip(FeedId trip) {
     	trips.add(trip);
     }
     
-    public Set<AgencyAndId> getTrips() {
+    public Set<FeedId> getTrips() {
     	return trips;
     }
     
     public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
-            Set<AgencyAndId> routesVisited, Set<AgencyAndId> tripsVisited) {
+                           Set<FeedId> routesVisited, Set<FeedId> tripsVisited) {
         //check for matching agency
         if (agency != null) {
             if (agencies.size() != 1 || !agencies.contains(agency))

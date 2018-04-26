@@ -15,13 +15,13 @@
  */
 package org.opentripplanner.model;
 
-public final class FareAttribute extends IdentityBean<AgencyAndId> {
+public final class FareAttribute extends IdentityBean<FeedId> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
 
-    private AgencyAndId id;
+    private FeedId id;
 
     private float price;
 
@@ -56,12 +56,12 @@ public final class FareAttribute extends IdentityBean<AgencyAndId> {
     }
 
     @Override
-    public AgencyAndId getId() {
+    public FeedId getId() {
         return id;
     }
 
     @Override
-    public void setId(AgencyAndId id) {
+    public void setId(FeedId id) {
         this.id = id;
     }
 

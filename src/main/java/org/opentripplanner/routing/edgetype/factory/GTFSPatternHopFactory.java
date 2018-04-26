@@ -30,7 +30,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Pathway;
@@ -145,7 +145,7 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
  */
 class BlockIdAndServiceId {
     public String blockId;
-    public AgencyAndId serviceId;
+    public FeedId serviceId;
 
     BlockIdAndServiceId(Trip trip) {
         this.blockId = trip.getBlockId();
@@ -296,9 +296,9 @@ public class GTFSPatternHopFactory {
     
     private Map<ShapeSegmentKey, LineString> _geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
 
-    private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
+    private Map<FeedId, LineString> _geometriesByShapeId = new HashMap<FeedId, LineString>();
 
-    private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
+    private Map<FeedId, double[]> _distancesByShapeId = new HashMap<FeedId, double[]>();
     
     private FareServiceFactory fareServiceFactory;
 
@@ -345,7 +345,7 @@ public class GTFSPatternHopFactory {
         clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
-        for (AgencyAndId serviceId : _transitService.getAllServiceIds()) {
+        for (FeedId serviceId : _transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
@@ -617,7 +617,7 @@ public class GTFSPatternHopFactory {
      * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
      */
     private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        AgencyAndId shapeId = trip.getShapeId();
+        FeedId shapeId = trip.getShapeId();
         
         // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
         LineString[] geoms = new LineString[stopTimes.size() - 1];
@@ -1121,7 +1121,7 @@ public class GTFSPatternHopFactory {
     }
 
     
-    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1) {
+    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedId shapeId, StopTime st0, StopTime st1) {
 
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
@@ -1199,7 +1199,7 @@ public class GTFSPatternHopFactory {
         return true;
     }
 
-    private LineString getSegmentGeometry(Graph graph, AgencyAndId shapeId,
+    private LineString getSegmentGeometry(Graph graph, FeedId shapeId,
             LocationIndexedLine locationIndexedLine, LinearLocation startIndex,
             LinearLocation endIndex, double startDistance, double endDistance, 
             StopTime st0, StopTime st1) {
@@ -1234,7 +1234,7 @@ public class GTFSPatternHopFactory {
      * which cause JTS location indexed line to return a segment location of NaN, 
      * which we do not want.
      */
-    private List<ShapePoint> getUniqueShapePointsForShapeId(AgencyAndId shapeId) {
+    private List<ShapePoint> getUniqueShapePointsForShapeId(FeedId shapeId) {
         List<ShapePoint> points = _transitService.getShapePointsForShapeId(shapeId);
         ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
         ShapePoint last = null;
@@ -1258,7 +1258,7 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private LineString getLineStringForShapeId(AgencyAndId shapeId) {
+    private LineString getLineStringForShapeId(FeedId shapeId) {
 
         LineString geometry = _geometriesByShapeId.get(shapeId);
 
@@ -1300,7 +1300,7 @@ public class GTFSPatternHopFactory {
         return geometry;
     }
 
-    private double[] getDistanceForShapeId(AgencyAndId shapeId) {
+    private double[] getDistanceForShapeId(FeedId shapeId) {
         getLineStringForShapeId(shapeId);
         return _distancesByShapeId.get(shapeId);
     }
@@ -1385,7 +1385,7 @@ public class GTFSPatternHopFactory {
                 Vertex stopVertex = context.stationStopNodes.get(stop);
 
                 String agencyId = stop.getId().getAgencyId();
-                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+                FeedId parentStationId = new FeedId(agencyId, parentStation);
 
                 Stop parentStop = _transitService.getStopForId(parentStationId);
                 Vertex parentStopVertex = context.stationStopNodes.get(parentStop);
@@ -1430,7 +1430,7 @@ public class GTFSPatternHopFactory {
             if (parentStation != null) {
                 TransitStop stopVertex = (TransitStop) context.stationStopNodes.get(stop);
                 String agencyId = stop.getId().getAgencyId();
-                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+                FeedId parentStationId = new FeedId(agencyId, parentStation);
                 Stop parentStop = _transitService.getStopForId(parentStationId);
                 if(context.stationStopNodes.get(parentStop) instanceof TransitStation) {
                     TransitStation parentStopVertex = (TransitStation)

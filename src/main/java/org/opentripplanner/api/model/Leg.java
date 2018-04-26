@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -138,7 +138,7 @@ public class Leg {
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
      */
-    public AgencyAndId routeId = null;
+    public FeedId routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
@@ -188,7 +188,7 @@ public class Leg {
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
-    public AgencyAndId tripId = null;
+    public FeedId tripId = null;
     
     /**
      * For transit legs, the service date of the trip.

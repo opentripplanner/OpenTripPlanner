@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.T2;
@@ -125,12 +125,12 @@ public class TestBanning extends TestCase {
                 if (path == null || spt == null)
                     break; // No path found
                 // List of used [trip,stop index] in the path
-                Set<T2<AgencyAndId, BannedStopSet>> usedTripDefs = new HashSet<T2<AgencyAndId, BannedStopSet>>();
+                Set<T2<FeedId, BannedStopSet>> usedTripDefs = new HashSet<T2<FeedId, BannedStopSet>>();
                 for (State s : path.states) {
                     if (s.getBackEdge() instanceof TransitBoardAlight) {
                         TransitBoardAlight tbae = (TransitBoardAlight) s.getBackEdge();
                         int boardingStopIndex = tbae.getStopIndex();
-                        AgencyAndId tripId = s.getTripId();
+                        FeedId tripId = s.getTripId();
                         BannedStopSet stopSet;
                         if (partial) {
                             stopSet = new BannedStopSet();
@@ -139,11 +139,11 @@ public class TestBanning extends TestCase {
                             stopSet = BannedStopSet.ALL;
                         }
                         if (tripId != null)
-                            usedTripDefs.add(new T2<AgencyAndId, BannedStopSet>(tripId, stopSet));
+                            usedTripDefs.add(new T2<FeedId, BannedStopSet>(tripId, stopSet));
                     }
                 }
                 // Used trips should not contains a banned trip
-                for (T2<AgencyAndId, BannedStopSet> usedTripDef : usedTripDefs) {
+                for (T2<FeedId, BannedStopSet> usedTripDef : usedTripDefs) {
                     BannedStopSet bannedStopSet = options.bannedTrips.get(usedTripDef.first);
                     if (bannedStopSet != null) {
                         for (Integer stopIndex : usedTripDef.second) {
@@ -154,9 +154,9 @@ public class TestBanning extends TestCase {
                 if (usedTripDefs.size() == 0)
                     break; // Not a transit trip, no sense to ban trip any longer
                 // Pick a random used trip + stop set to ban
-                List<T2<AgencyAndId, BannedStopSet>> usedTripDefsList = new ArrayList<T2<AgencyAndId, BannedStopSet>>(
+                List<T2<FeedId, BannedStopSet>> usedTripDefsList = new ArrayList<T2<FeedId, BannedStopSet>>(
                         usedTripDefs);
-                T2<AgencyAndId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
+                T2<FeedId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
                         .nextInt(usedTripDefs.size()));
                 options.bannedTrips.put(tripDefToBan.first, tripDefToBan.second);
             }

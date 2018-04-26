@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
@@ -64,7 +64,7 @@ public class ServiceDay implements Serializable {
         this.midnight = d.getTime() / 1000;
         serviceIdsRunning = new BitSet(cs.getServiceIds().size());
         
-        for (AgencyAndId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
+        for (FeedId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
             int n = graph.serviceCodes.get(serviceId);
             if (n < 0)
                 continue;

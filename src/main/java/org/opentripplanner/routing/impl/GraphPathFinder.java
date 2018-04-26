@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -177,8 +177,8 @@ public class GraphPathFinder {
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
-                List<AgencyAndId> tripIds = path.getTrips();
-                for (AgencyAndId tripId : tripIds) {
+                List<FeedId> tripIds = path.getTrips();
+                for (FeedId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
                 if (tripIds.isEmpty()) {
@@ -281,7 +281,7 @@ public class GraphPathFinder {
                             (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
-                            for (AgencyAndId tripId : joinedPath.getTrips()) {
+                            for (FeedId tripId : joinedPath.getTrips()) {
                                 options.banTrip(tripId);
                             }
                         }

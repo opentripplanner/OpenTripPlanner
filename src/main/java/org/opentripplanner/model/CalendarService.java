@@ -24,14 +24,14 @@ public interface CalendarService {
     /**
      * @return the set of all service ids used in the data set
      */
-    Set<AgencyAndId> getServiceIds();
+    Set<FeedId> getServiceIds();
 
     /**
      * @param serviceId the target service id
      * @return the set of all service dates for which the specified service id is
      *         active
      */
-    Set<ServiceDate> getServiceDatesForServiceId(AgencyAndId serviceId);
+    Set<ServiceDate> getServiceDatesForServiceId(FeedId serviceId);
 
     /**
      * Determine the set of service ids that are active on the specified service
@@ -41,7 +41,7 @@ public interface CalendarService {
      * @return the set of service ids that are active on the specified service
      * date
      */
-    Set<AgencyAndId> getServiceIdsOnDate(ServiceDate date);
+    Set<FeedId> getServiceIdsOnDate(ServiceDate date);
 
     /**
      * Returns the instantiated {@link TimeZone} for the specified agency id

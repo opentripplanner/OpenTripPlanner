@@ -15,20 +15,20 @@ package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 
-public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, AgencyAndId> {
+public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedId> {
 
     @Override
-    public AgencyAndId unmarshal(AgencyAndIdType arg) throws Exception {
+    public FeedId unmarshal(AgencyAndIdType arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        return new AgencyAndId(arg.agency, arg.id);
+        return new FeedId(arg.agency, arg.id);
     }
 
     @Override
-    public AgencyAndIdType marshal(AgencyAndId arg) throws Exception {
+    public AgencyAndIdType marshal(FeedId arg) throws Exception {
         if (arg == null) {
             return null;
         }

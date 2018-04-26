@@ -31,7 +31,7 @@ public final class ServiceCalendar implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private AgencyAndId serviceId;
+    private FeedId serviceId;
 
     private int monday;
 
@@ -51,11 +51,11 @@ public final class ServiceCalendar implements Serializable {
 
     private ServiceDate endDate;
 
-    public AgencyAndId getServiceId() {
+    public FeedId getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(AgencyAndId serviceId) {
+    public void setServiceId(FeedId serviceId) {
         this.serviceId = serviceId;
     }
 

@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
@@ -36,18 +36,18 @@ import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class TripTimesTest {
-    private static final AgencyAndId tripId = new AgencyAndId("agency", "testtrip");
+    private static final FeedId tripId = new FeedId("agency", "testtrip");
 
-    private static final AgencyAndId stop_a = new AgencyAndId("agency", "A"); // 0
-    private static final AgencyAndId stop_b = new AgencyAndId("agency", "B"); // 1
-    private static final AgencyAndId stop_c = new AgencyAndId("agency", "C"); // 2
-    private static final AgencyAndId stop_d = new AgencyAndId("agency", "D"); // 3
-    private static final AgencyAndId stop_e = new AgencyAndId("agency", "E"); // 4
-    private static final AgencyAndId stop_f = new AgencyAndId("agency", "F"); // 5
-    private static final AgencyAndId stop_g = new AgencyAndId("agency", "G"); // 6
-    private static final AgencyAndId stop_h = new AgencyAndId("agency", "H"); // 7
+    private static final FeedId stop_a = new FeedId("agency", "A"); // 0
+    private static final FeedId stop_b = new FeedId("agency", "B"); // 1
+    private static final FeedId stop_c = new FeedId("agency", "C"); // 2
+    private static final FeedId stop_d = new FeedId("agency", "D"); // 3
+    private static final FeedId stop_e = new FeedId("agency", "E"); // 4
+    private static final FeedId stop_f = new FeedId("agency", "F"); // 5
+    private static final FeedId stop_g = new FeedId("agency", "G"); // 6
+    private static final FeedId stop_h = new FeedId("agency", "H"); // 7
 
-    private static final AgencyAndId[] stops =
+    private static final FeedId[] stops =
         {stop_a, stop_b, stop_c, stop_d, stop_e, stop_f, stop_g, stop_h};
 
     private static final TripTimes originalTripTimes;

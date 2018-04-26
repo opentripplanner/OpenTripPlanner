@@ -16,7 +16,7 @@ package org.opentripplanner.routing.edgetype.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -41,7 +41,7 @@ public class TransferGraphLinker {
     
     public void run() {
         // Create a mapping from StopId to StopVertices
-        Map<AgencyAndId, TransitStationStop> stopNodes = new HashMap<AgencyAndId, TransitStationStop>();
+        Map<FeedId, TransitStationStop> stopNodes = new HashMap<FeedId, TransitStationStop>();
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStationStop) {
                 TransitStationStop transitStationStop = (TransitStationStop) v;

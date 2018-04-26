@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -32,7 +32,7 @@ public abstract class TransitVertex extends Vertex {
     }
 
     /** Get the stop at which this TransitVertex is located */
-    public AgencyAndId getStopId() {
+    public FeedId getStopId() {
         return stop.getId();
     }
 

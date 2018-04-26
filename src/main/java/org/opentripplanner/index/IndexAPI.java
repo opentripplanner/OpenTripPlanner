@@ -22,7 +22,7 @@ import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -169,7 +169,7 @@ public class IndexAPI {
    @GET
    @Path("/stops/{stopId}")
    public Response getStop (@PathParam("stopId") String stopIdString) {
-       AgencyAndId stopId = GtfsLibrary.convertIdFromString(stopIdString);
+       FeedId stopId = GtfsLibrary.convertIdFromString(stopIdString);
        Stop stop = index.stopForId.get(stopId);
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
@@ -246,7 +246,7 @@ public class IndexAPI {
    @GET
    @Path("/stops/{stopId}/patterns")
    public Response getPatternsForStop (@PathParam("stopId") String stopIdString) {
-       AgencyAndId id = GtfsLibrary.convertIdFromString(stopIdString);
+       FeedId id = GtfsLibrary.convertIdFromString(stopIdString);
        Stop stop = index.stopForId.get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Collection<TripPattern> patterns = index.patternsForStop.get(stop);
@@ -354,7 +354,7 @@ public class IndexAPI {
    @GET
    @Path("/routes/{routeId}")
    public Response getRoute (@PathParam("routeId") String routeIdString) {
-       AgencyAndId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+       FeedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            return Response.status(Status.OK).entity(route).build();
@@ -367,7 +367,7 @@ public class IndexAPI {
    @GET
    @Path("/routes/{routeId}/patterns")
    public Response getPatternsForRoute (@PathParam("routeId") String routeIdString) {
-       AgencyAndId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+       FeedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
@@ -381,7 +381,7 @@ public class IndexAPI {
    @GET
    @Path("/routes/{routeId}/stops")
    public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
-       AgencyAndId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+       FeedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            Set<Stop> stops = Sets.newHashSet();
@@ -399,7 +399,7 @@ public class IndexAPI {
    @GET
    @Path("/routes/{routeId}/trips")
    public Response getTripsForRoute (@PathParam("routeId") String routeIdString) {
-       AgencyAndId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+       FeedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            List<Trip> trips = Lists.newArrayList();
@@ -420,7 +420,7 @@ public class IndexAPI {
    @GET
    @Path("/trips/{tripId}")
    public Response getTrip (@PathParam("tripId") String tripIdString) {
-       AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+       FeedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            return Response.status(Status.OK).entity(trip).build();
@@ -432,7 +432,7 @@ public class IndexAPI {
    @GET
    @Path("/trips/{tripId}/stops")
    public Response getStopsForTrip (@PathParam("tripId") String tripIdString) {
-       AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+       FeedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            TripPattern pattern = index.patternForTrip.get(trip);
@@ -446,7 +446,7 @@ public class IndexAPI {
     @GET
     @Path("/trips/{tripId}/semanticHash")
     public Response getSemanticHashForTrip (@PathParam("tripId") String tripIdString) {
-        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        FeedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
         Trip trip = index.tripForId.get(tripId);
         if (trip != null) {
             TripPattern pattern = index.patternForTrip.get(trip);
@@ -460,7 +460,7 @@ public class IndexAPI {
     @GET
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
-       AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+       FeedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            TripPattern pattern = index.patternForTrip.get(trip);
@@ -476,7 +476,7 @@ public class IndexAPI {
     @GET
     @Path("/trips/{tripId}/geometry")
     public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
-        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        FeedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
         Trip trip = index.tripForId.get(tripId);
         if (trip != null) {
             TripPattern tripPattern = index.patternForTrip.get(trip);

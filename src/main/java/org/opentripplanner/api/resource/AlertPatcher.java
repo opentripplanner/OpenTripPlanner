@@ -28,7 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.api.model.alertpatch.AlertPatchCreationResponse;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.model.alertpatch.AlertPatchSet;
@@ -54,7 +54,7 @@ public class AlertPatcher {
             @QueryParam("id") String id) {
 
         AlertPatchResponse response = new AlertPatchResponse();
-        Collection<AlertPatch> alertPatches = alertPatchService.getStopPatches(new AgencyAndId(agency, id));
+        Collection<AlertPatch> alertPatches = alertPatchService.getStopPatches(new FeedId(agency, id));
         for (AlertPatch alertPatch : alertPatches) {
             response.addAlertPatch(alertPatch);
         }
@@ -75,7 +75,7 @@ public class AlertPatcher {
 
         AlertPatchResponse response = new AlertPatchResponse();
         Collection<AlertPatch> alertPatches =
-                alertPatchService.getRoutePatches(new AgencyAndId(agency, id));
+                alertPatchService.getRoutePatches(new FeedId(agency, id));
         for (AlertPatch alertPatch : alertPatches) {
             response.addAlertPatch(alertPatch);
         }
@@ -95,7 +95,7 @@ public class AlertPatcher {
                 return response;
             }
 
-            final AgencyAndId route = alertPatch.getRoute();
+            final FeedId route = alertPatch.getRoute();
             if (route != null && route.getId().equals("")) {
                 response.status = "Every route patch must have a route id";
                 return response;

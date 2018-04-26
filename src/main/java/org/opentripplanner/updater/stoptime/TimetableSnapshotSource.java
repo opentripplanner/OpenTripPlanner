@@ -23,13 +23,13 @@ import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -576,9 +576,9 @@ public class TimetableSnapshotSource {
             route = new Route();
             // Use route id of trip descriptor if available
             if (tripUpdate.getTrip().hasRouteId()) {
-                route.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getRouteId()));
+                route.setId(new FeedId(feedId, tripUpdate.getTrip().getRouteId()));
             } else {
-                route.setId(new AgencyAndId(feedId, tripId));
+                route.setId(new FeedId(feedId, tripId));
             }
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
@@ -591,11 +591,11 @@ public class TimetableSnapshotSource {
 
         final Trip trip = new Trip();
         // TODO: which Agency ID to use? Currently use feed id.
-        trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
+        trip.setId(new FeedId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
 
         // Find service ID running on this service date
-        final Set<AgencyAndId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+        final Set<FeedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
         if (serviceIds.isEmpty()) {
             // No service id exists: return error for now
             LOG.warn("ADDED trip has service date for which no service id is available, skipping.");
@@ -836,7 +836,7 @@ public class TimetableSnapshotSource {
             return false;
         } else {
             // Check whether service date is served by trip
-            final Set<AgencyAndId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+            final Set<FeedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
             if (!serviceIds.contains(trip.getServiceId())) {
                 // TODO: should we support this and change service id of trip?
                 LOG.warn("MODIFIED trip has a service date that is not served by trip, skipping.");
@@ -943,7 +943,7 @@ public class TimetableSnapshotSource {
      * @return trip pattern or null if no trip pattern was found
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
+        Trip trip = graphIndex.tripForId.get(new FeedId(feedId, tripId));
         TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }
@@ -956,7 +956,7 @@ public class TimetableSnapshotSource {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = graphIndex.routeForId.get(new AgencyAndId(feedId, routeId));
+        Route route = graphIndex.routeForId.get(new FeedId(feedId, routeId));
         return route;
     }
 
@@ -968,7 +968,7 @@ public class TimetableSnapshotSource {
      * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
+        Trip trip = graphIndex.tripForId.get(new FeedId(feedId, tripId));
         return trip;
     }
 
@@ -980,7 +980,7 @@ public class TimetableSnapshotSource {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = graphIndex.stopForId.get(new AgencyAndId(feedId, stopId));
+        Stop stop = graphIndex.stopForId.get(new FeedId(feedId, stopId));
         return stop;
     }
 

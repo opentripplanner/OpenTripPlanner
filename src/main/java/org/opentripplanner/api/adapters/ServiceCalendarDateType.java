@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.ServiceCalendarDate;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @XmlRootElement(name = "CalendarDate")
 public class ServiceCalendarDateType {
 
-    public ServiceCalendarDateType(AgencyAndId serviceId, long date, int exceptionType) {
+    public ServiceCalendarDateType(FeedId serviceId, long date, int exceptionType) {
         this.serviceId = serviceId;
         this.date = date;
         this.exceptionType = exceptionType;
@@ -62,7 +62,7 @@ public class ServiceCalendarDateType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    AgencyAndId serviceId;
+    FeedId serviceId;
 
     @XmlAttribute
     @JsonSerialize

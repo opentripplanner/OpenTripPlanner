@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 
@@ -30,22 +30,22 @@ public class SpecificTransfer implements Serializable {
     /**
      * Route id of arriving trip. Is allowed to be null. Is ignored when fromTripId is not null.
      */
-    final private AgencyAndId fromRouteId;
+    final private FeedId fromRouteId;
         
     /**
      * Route id of departing trip. Is allowed to be null. Is ignored when toTripId is not null.
      */
-    final private AgencyAndId toRouteId;
+    final private FeedId toRouteId;
     
     /**
      * Trip id of arriving trip. Is allowed to be null.
      */
-    final private AgencyAndId fromTripId;
+    final private FeedId fromTripId;
     
     /**
      * Trip id of departing trip. Is allowed to be null.
      */
-    final private AgencyAndId toTripId;
+    final private FeedId toTripId;
     
     /**
      * Value indicating the minimum transfer time in seconds. May contain special (negative) values which meaning
@@ -53,7 +53,7 @@ public class SpecificTransfer implements Serializable {
      */
     final int transferTime;
     
-    public SpecificTransfer(AgencyAndId fromRouteId, AgencyAndId toRouteId, AgencyAndId fromTripId, AgencyAndId toTripId, int transferTime) {
+    public SpecificTransfer(FeedId fromRouteId, FeedId toRouteId, FeedId fromTripId, FeedId toTripId, int transferTime) {
         this.fromRouteId = fromRouteId;
         this.toRouteId = toRouteId;
         this.fromTripId = fromTripId;

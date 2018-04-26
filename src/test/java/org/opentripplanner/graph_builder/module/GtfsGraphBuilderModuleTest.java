@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.IdentityBean;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.MockGtfs;
@@ -58,13 +58,13 @@ public class GtfsGraphBuilderModuleTest {
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
+        Trip trip = graph.index.tripForId.get(new FeedId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.UNKNOWN,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
+                BikeAccess.fromTrip(withId(trips, new FeedId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
+                BikeAccess.fromTrip(withId(trips, new FeedId(feedId.getId(), "t1"))));
     }
 
     @Test
@@ -87,13 +87,13 @@ public class GtfsGraphBuilderModuleTest {
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
+        Trip trip = graph.index.tripForId.get(new FeedId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
+                BikeAccess.fromTrip(withId(trips, new FeedId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.NOT_ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
+                BikeAccess.fromTrip(withId(trips, new FeedId(feedId.getId(), "t1"))));
     }
 
     private MockGtfs getSimpleGtfs() throws IOException {

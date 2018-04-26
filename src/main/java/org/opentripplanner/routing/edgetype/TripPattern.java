@@ -22,16 +22,16 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -542,7 +542,7 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public void dumpServices() {
-        Set<AgencyAndId> services = Sets.newHashSet();
+        Set<FeedId> services = Sets.newHashSet();
         for (Trip trip : this.trips) {
             services.add(trip.getServiceId());
         }
@@ -564,7 +564,7 @@ public class TripPattern implements Cloneable, Serializable {
      * but we need a reference to the Graph or at least the codes map. This could also be
      * placed in the hop factory itself.
      */
-    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+    public void setServiceCodes (Map<FeedId, Integer> serviceCodes) {
         services = new BitSet();
         for (Trip trip : trips) {
             services.set(serviceCodes.get(trip.getServiceId()));
@@ -598,7 +598,7 @@ public class TripPattern implements Cloneable, Serializable {
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
         Multimap<String, TripPattern> patternsForRoute = HashMultimap.create();
         for (TripPattern pattern : tripPatterns) {
-            AgencyAndId routeId = pattern.route.getId();
+            FeedId routeId = pattern.route.getId();
             String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();

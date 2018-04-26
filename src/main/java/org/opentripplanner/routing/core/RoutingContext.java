@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
@@ -88,7 +88,7 @@ public class RoutingContext implements Cloneable {
     // public final Calendar calendar;
     public final CalendarService calendarService;
 
-    public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
+    public final Map<FeedId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<FeedId, Set<ServiceDate>>();
 
     public RemainingWeightHeuristic remainingWeightHeuristic;
 

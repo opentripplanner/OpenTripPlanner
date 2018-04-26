@@ -16,15 +16,15 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.Set;
 
-import org.opentripplanner.model.AgencyAndId;
+import org.opentripplanner.model.FeedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 public interface AlertPatchService {
     Collection<AlertPatch> getAllAlertPatches();
 
-    Collection<AlertPatch> getStopPatches(AgencyAndId stop);
+    Collection<AlertPatch> getStopPatches(FeedId stop);
 
-    Collection<AlertPatch> getRoutePatches(AgencyAndId route);
+    Collection<AlertPatch> getRoutePatches(FeedId route);
 
     void apply(AlertPatch alertPatch);
 
