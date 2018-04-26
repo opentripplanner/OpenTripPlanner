@@ -19,22 +19,28 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     private static final Logger LOG = LoggerFactory.getLogger(CoordBikeRentalDataSource.class);
 
     private CoordBikeDataSource stationSource;
+    private CoordFakeStationDataSource fakeSource;
 
     public CoordBikeRentalDataSource () {
+        // TODO(danieljy): Set this from configuration.
         stationSource = new CoordBikeDataSource();
         stationSource.setUrl("https://api.coord.co/v1/bike/location?latitude=38.9072&longitude=-77.0369&radius_km=10&access_key=");
+
+        fakeSource = new CoordFakeStationDataSource();
+        fakeSource.setUrl("file:coord/test-gbfs/fake_stations.json");
     }
 
 
     @Override
     public boolean update() {
-        return stationSource.update();
+        return stationSource.update() && fakeSource.update();
     }
 
     @Override
     public List<BikeRentalStation> getStations() {
         // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
         List<BikeRentalStation> stations = new LinkedList<>(stationSource.getStations());
+        stations.addAll(fakeSource.getStations());
         return stations;
     }
 
@@ -82,6 +88,32 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
 
             // Set the system ID as the network.
             brstation.networks = new HashSet<>(Arrays.asList(properties.path("system_id").asText()));
+
+            return brstation;
+        }
+    }
+
+    class CoordFakeStationDataSource extends GenericJsonBikeRentalDataSource {
+
+        public CoordFakeStationDataSource () {
+            super("data/stations");
+        }
+
+        @Override
+        public BikeRentalStation makeStation(JsonNode stationNode) {
+            BikeRentalStation brstation = new BikeRentalStation();
+
+            brstation.id = stationNode.path("station_id").toString();
+            brstation.x = stationNode.path("lon").asDouble();
+            brstation.y = stationNode.path("lat").asDouble();
+            brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
+            brstation.allowDropoff = true;
+            brstation.bikesAvailable = 0;
+            brstation.spacesAvailable = Integer.MAX_VALUE;
+            // brstation.allowPickup = false;
+
+            // Add all the DC dockless networks.
+            brstation.networks = new HashSet<>(Arrays.asList("JumpDC", "MobikeDC", "SpinDC"));
 
             return brstation;
         }
