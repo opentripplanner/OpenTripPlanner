@@ -11,7 +11,7 @@
             "type": "bike-rental",
             "frequencySec": 60,
             "sourceType": "gbfs",
-            "url": "http://gbfs-server:10000/"
+            "url": "http://localhost:10000/"
         }
     ]
 }
