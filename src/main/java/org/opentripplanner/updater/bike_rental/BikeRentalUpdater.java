@@ -36,8 +36,6 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -188,7 +186,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     // Update the station metadata.
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
-                    // vertex.set (station.allowPickup);
+                    vertex.setPickupAllowed(station.allowPickup);
 
                     // And re-link it to the graph if it's location has changed.
                     if (station.x != vertex.getX() || station.y != vertex.getY()) {

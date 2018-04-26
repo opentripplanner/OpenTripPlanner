@@ -64,10 +64,11 @@ def get_system_id(gbfs_dir):
 
 def create_status(system_id):
     return {
-        "station_id": system_id,
-        "num_bikes_available": 0,
-        "num_docks_available": 1000,
-        "last_reported": int(time.time())
+        'station_id': system_id,
+        'num_bikes_available': 0,
+        'num_docks_available': 1000,
+        'last_reported': int(time.time()),
+        'is_renting': 0
     }
 
 
