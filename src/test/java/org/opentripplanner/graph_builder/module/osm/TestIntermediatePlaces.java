@@ -139,6 +139,7 @@ public class TestIntermediatePlaces {
         request.maxTransfers = 4;
         request.from = from;
         request.to = to;
+        request.compactLegsByReversedSearch = false;
         for (GenericLocation intermediateLocation : via) {
             request.addIntermediatePlace(intermediateLocation);
         }
