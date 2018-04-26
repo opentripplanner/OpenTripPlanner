@@ -10,8 +10,7 @@
         {
             "type": "bike-rental",
             "frequencySec": 60,
-            "sourceType": "gbfs",
-            "url": "http://localhost:10000/"
+            "sourceType": "coord"
         }
     ]
 }
