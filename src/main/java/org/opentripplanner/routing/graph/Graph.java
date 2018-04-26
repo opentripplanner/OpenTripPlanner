@@ -753,7 +753,7 @@ public class Graph implements Serializable {
             // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();
+            graph.vertices = new ConcurrentHashMap<String, Vertex>();
             
             for (Edge e : edges) {
                 graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
