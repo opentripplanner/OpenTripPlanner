@@ -162,7 +162,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             Set<BikeRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
 
-            Set<BikeRentalStationVertex> badVertices = new HashSet<>();
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {

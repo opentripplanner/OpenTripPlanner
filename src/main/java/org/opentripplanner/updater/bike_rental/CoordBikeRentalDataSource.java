@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -8,6 +9,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.*;
 
 public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
@@ -17,13 +19,34 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     private CoordBikeDataSource stationSource;
     private CoordFakeStationDataSource fakeSource;
 
-    public CoordBikeRentalDataSource () {
+    public CoordBikeRentalDataSource () throws Exception {
 
         final String accessKey = System.getenv("COORD_API_KEY");
+        final String apiHost = System.getenv("API_BIKE_SERVICE_HOST");
+        final String apiPort = System.getenv("API_BIKE_SERVICE_PORT");
+        final String apiScheme = accessKey == null ? "http" : "https";
 
-        // TODO(danieljy): Set this from configuration.
+        if (apiHost == null || apiPort == null) {
+            throw new IllegalArgumentException(
+                    "CoordBikeRentalDataSource requires API_BIKE_SERVICE_{HOST,PORT} environment variables " +
+                            "to initialize!");
+        }
+
+        final URI uri = new URIBuilder()
+                .setScheme(apiScheme)
+                .setHost(apiHost)
+                .setPort(Integer.parseInt(apiPort))
+                .setPath("/v1/bike/location")
+                .addParameter("latitude", "38.9072")
+                .addParameter("longitude", "-77.0369")
+                .addParameter("radius_km", "15")
+                .addParameter("access_key", accessKey)
+                .build();
+        final String uriString = uri.toString();
+        LOG.info("Using url {}", uriString);
+
         stationSource = new CoordBikeDataSource();
-        stationSource.setUrl("https://api.coord.co/v1/bike/location?latitude=38.9072&longitude=-77.0369&radius_km=10&access_key="+accessKey);
+        stationSource.setUrl(uriString);
 
         fakeSource = new CoordFakeStationDataSource();
         fakeSource.setUrl("file:coord/test-gbfs/fake_stations.json");
