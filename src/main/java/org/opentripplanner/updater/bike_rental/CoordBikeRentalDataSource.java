@@ -26,6 +26,12 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
         final String apiPort = System.getenv("API_BIKE_SERVICE_PORT");
         final String apiScheme = accessKey == null ? "http" : "https";
 
+        if (apiHost == null || apiPort == null) {
+            throw new IllegalArgumentException(
+                    "CoordBikeRentalDataSource requires API_BIKE_SERVICE_{HOST,PORT} environment variables " +
+                            "to initialize!");
+        }
+
         final URI uri = new URIBuilder()
                 .setScheme(apiScheme)
                 .setHost(apiHost)
