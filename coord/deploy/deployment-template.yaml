@@ -41,16 +41,18 @@ spec:
                   '-Xmx4G',
                   '-jar',
                   'otp-1.3.0-SNAPSHOT-shaded.jar',
-                  '--build',
-                  'dc'
-                  ]
+                  '--server',
+                  '--basePath',
+                  'base',
+                  '--router',
+                  'dc']
         ports:
         - containerPort: 8080
         livenessProbe:
           httpGet:
             path: "/"
             port: 8080
-          initialDelaySeconds: 1200
+          initialDelaySeconds: 300
           periodSeconds: 10
           timeoutSeconds: 2
           failureThreshold: 2
@@ -58,7 +60,7 @@ spec:
           httpGet:
             path: '/otp/routers/default/plan?fromPlace=38.91828427307541%2C-77.0005989074707&toPlace=38.90011780426885%2C-77.003173828125&mode=TRANSIT%2CWALK%2CBICYCLE_RENT&maxWalkDistance=5000'
             port: 8080
-          initialDelaySeconds: 1200
+          initialDelaySeconds: 300
           periodSeconds: 20
           timeoutSeconds: 5
           failureThreshold: 1
