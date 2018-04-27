@@ -24,7 +24,7 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
         final String accessKey = System.getenv("COORD_API_KEY");
         final String apiHost = System.getenv("API_BIKE_SERVICE_HOST");
         final String apiPort = System.getenv("API_BIKE_SERVICE_PORT");
-        final String apiScheme = accessKey == "" ? "http" : "https";
+        final String apiScheme = accessKey == null ? "http" : "https";
 
         final URI uri = new URIBuilder()
                 .setScheme(apiScheme)
