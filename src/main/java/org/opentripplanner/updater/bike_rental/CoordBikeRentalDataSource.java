@@ -17,10 +17,13 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     private CoordBikeDataSource stationSource;
     private CoordFakeStationDataSource fakeSource;
 
-    public CoordBikeRentalDataSource() {
+    public CoordBikeRentalDataSource () {
+
+        final String accessKey = System.getenv("COORD_API_KEY");
+
         // TODO(danieljy): Set this from configuration.
         stationSource = new CoordBikeDataSource();
-        stationSource.setUrl("https://api.coord.co/v1/bike/location?latitude=38.9072&longitude=-77.0369&radius_km=10&access_key=");
+        stationSource.setUrl("https://api.coord.co/v1/bike/location?latitude=38.9072&longitude=-77.0369&radius_km=10&access_key="+accessKey);
 
         fakeSource = new CoordFakeStationDataSource();
         fakeSource.setUrl("file:coord/test-gbfs/fake_stations.json");
