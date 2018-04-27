@@ -34,6 +34,8 @@ public class BikeRentalStationVertex extends Vertex {
 
     private int spacesAvailable;
 
+    private boolean pickupAllowed;
+
     private String id;
     
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
@@ -43,6 +45,7 @@ public class BikeRentalStationVertex extends Vertex {
         this.setId(station.id);
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
+        this.setPickupAllowed(station.allowPickup);
     }
 
     public int getBikesAvailable() {
@@ -67,5 +70,13 @@ public class BikeRentalStationVertex extends Vertex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isPickupAllowed() {
+        return pickupAllowed;
+    }
+
+    public void setPickupAllowed(boolean pickupAllowed) {
+        this.pickupAllowed = pickupAllowed;
     }
 }
