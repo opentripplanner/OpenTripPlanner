@@ -9,8 +9,13 @@ RUN mkdir -p base/graphs/dc
 ADD coord/otp-base/graphs/dc/router-config.json base/graphs/dc/router-config.json
 ADD coord/otp-base/graphs/dc/Graph.obj base/graphs/dc/Graph.obj
 
+# Add fake locations.
+RUN mkdir -p coord/test-gbfs
+ADD coord/test-gbfs/* coord/test-gbfs/
+
 # Add router.
 ADD target/otp-1.3.0-SNAPSHOT-shaded.jar otp-1.3.0-SNAPSHOT-shaded.jar
+
 
 # Expose the backend.
 EXPOSE 8080

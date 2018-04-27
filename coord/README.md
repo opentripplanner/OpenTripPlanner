@@ -1,15 +1,34 @@
 # Coord OTP.
 
+## Installing maven.
+
+`brew install maven`
+
+## Setup, must happen at least once (and potentially for any changes in graph building algorithm).
+
+`./coord/setup.sh`
+
+## To build
+
+`mvn package -Dmaven.test.skip=true`
+
 ## To run locally
 
-Run a fake GBFS feed (http://localhost:10000) and the frontend (http://localhost:9000) in one terminal:
+First: `export COORD_API_KEY=<valid_api_key>`
 
-`./coord/run-helpers.sh`
+Next: `./coord/run-otp.sh`
 
-Run the actual OTP server in another. OTP only needs to restarted to reload the transit or road
-networks or for configuration changes. Restarts take time (minutes), so avoid them if possible!
+Note that OTP only needs to restarted if the graph has been rebuilt (previous setup) or for
+configuration changes. Restarts take time (minutes), so avoid them if possible!
 
-`./coord/run-otp.sh`
+
+Also note that if you are running from within an IDE, you must the following environment variables:
+
+```bash
+export COORD_API_KEY=<>
+export API_BIKE_SERVICE_HOST="api.coord.co"
+export API_BIKE_SERVICE_PORT="443"
+```
 
 ## To generate fake bike stations (hubs)
 
@@ -18,3 +37,4 @@ networks or for configuration changes. Restarts take time (minutes), so avoid th
     -76.921291 38.85160659 38.940585 150 150
 ```
 which generates bike stations within the given boundary and a point every 150m.
+
