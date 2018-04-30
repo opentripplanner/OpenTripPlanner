@@ -220,6 +220,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
 
+    /** Only use these bike networks. If null, use all of them. If empty, ignore all bike networks.*/
+    public HashSet<String> bikeNetworks;
+
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
@@ -673,6 +676,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+    }
+
+    public void setBikeNetworks(String s) {
+        if (s != null && !s.equals(""))
+            bikeNetworks = new HashSet<>(Arrays.asList(s.split(",")));
     }
 
     public final static int MIN_SIMILARITY = 1000;

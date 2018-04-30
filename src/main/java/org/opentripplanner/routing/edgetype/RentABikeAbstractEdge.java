@@ -63,6 +63,15 @@ public abstract class RentABikeAbstractEdge extends Edge {
             return null;
         }
 
+        /*
+         * Check bikeNetworks if specific bike networks are requested.
+         */
+        if (options.bikeNetworks != null &&
+            !options.bikeNetworks.isEmpty() &&
+            Sets.intersection(vertex.networks, options.bikeNetworks).isEmpty()) {
+            return null;
+        }
+
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost
                 : options.bikeRentalPickupCost);
