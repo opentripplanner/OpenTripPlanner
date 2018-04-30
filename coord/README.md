@@ -30,11 +30,16 @@ export API_BIKE_SERVICE_HOST="api.coord.co"
 export API_BIKE_SERVICE_PORT="443"
 ```
 
-## To generate fake bike stations (hubs)
+## To generate fake bike drop-off stations
 
 ```bash
 ./coord/util/generate_stations.py /tmp/gbfs -77.05759048 \
     -76.921291 38.85160659 38.940585 150 150
 ```
 which generates bike stations within the given boundary and a point every 150m.
+```bash
+./coord/util/generate_stations.py -h
+```
+to see the parameter description.
+
 
