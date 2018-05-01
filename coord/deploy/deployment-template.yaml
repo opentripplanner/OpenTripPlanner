@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+_aliases:
+  - &prod_image us.gcr.io/${PROJECT}/otp:${SWL_DEPLOY_TAG}
+  - &staging_image us.gcr.io/${PROJECT}/otp:${SWL_DEPLOY_COMMIT_SHA}
+  - &local_image us.gcr.io/${PROJECT}/otp:${SWL_DEPLOY_COMMIT_SHA}
+  - &app_name otp
+
+metadata:
+  name: *app_name
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      name: *app_name
+      labels:
+        app: *app_name
+        # Note that version must stay stable so that the replace command knows
+        # to actually tie the new replicaset with the older one, and eventually
+        # scale down the old replicaset.
+        version: "1"
+    spec:
+      # Any changes in this section will cause a new replicaset to perform a
+      # rolling update of the onemap.
+      containers:
+      - name: *app_name
+        image: *${SWL_DEPLOY_ENV}_image
+        _dockerfile: ../../Dockerfile
+        command: ['java',
+                  '-Xmx4G',
+                  '-jar',
+                  'otp-1.3.0-SNAPSHOT-shaded.jar',
+                  '--build', 'base/graphs/dc',
+                  '--inMemory',
+                  ]
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: "/"
+            port: 8080
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 2
+        readinessProbe:
+          httpGet:
+            path: '/otp/routers/default/plan?fromPlace=38.91828427307541%2C-77.0005989074707&toPlace=38.90011780426885%2C-77.003173828125&mode=TRANSIT%2CWALK%2CBICYCLE_RENT&maxWalkDistance=5000'
+            port: 8080
+          initialDelaySeconds: 300
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 1
+        resources:
+          requests:
+            cpu: 500m

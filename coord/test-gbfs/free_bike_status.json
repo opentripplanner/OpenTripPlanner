@@ -1,0 +1,674 @@
+{
+  "last_updated": 1524602327,
+  "ttl": 180,
+  "data": {
+    "bikes": [
+      {
+        "bike_id": "bike_16503",
+        "name": "JUMP DC-0200",
+        "lon": -76.96826666666666,
+        "lat": 38.92384666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "77%"
+      },
+      {
+        "bike_id": "bike_18898",
+        "name": "JUMP DC-0777",
+        "lon": -77.01599166666666,
+        "lat": 38.89539833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "39%"
+      },
+      {
+        "bike_id": "bike_16519",
+        "name": "JUMP DC-0172",
+        "lon": -77.08446833333333,
+        "lat": 38.889448333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18909",
+        "name": "JUMP DC-0788",
+        "lon": -77.08052333333333,
+        "lat": 38.923195,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "47%"
+      },
+      {
+        "bike_id": "bike_18833",
+        "name": "JUMP DC-0710",
+        "lon": -76.94633666666667,
+        "lat": 38.893975,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "74%"
+      },
+      {
+        "bike_id": "bike_18850",
+        "name": "JUMP DC-0690",
+        "lon": -76.99612666666667,
+        "lat": 38.901536666666665,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18888",
+        "name": "JUMP DC-0767",
+        "lon": -76.996045,
+        "lat": 38.887035,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "91%"
+      },
+      {
+        "bike_id": "bike_16524",
+        "name": "JUMP DC-0209",
+        "lon": -77.073705,
+        "lat": 38.961955,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "51%"
+      },
+      {
+        "bike_id": "bike_18836",
+        "name": "JUMP DC-0713",
+        "lon": -76.99030666666667,
+        "lat": 38.89551,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_16527",
+        "name": "JUMP DC-0212",
+        "lon": -77.02552166666666,
+        "lat": 38.88346833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "89%"
+      },
+      {
+        "bike_id": "bike_16492",
+        "name": "JUMP DC-0179",
+        "lon": -77.020715,
+        "lat": 38.884928333333335,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "51%"
+      },
+      {
+        "bike_id": "bike_18828",
+        "name": "JUMP DC-0705",
+        "lon": -77.03795666666667,
+        "lat": 38.915598333333335,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "73%"
+      },
+      {
+        "bike_id": "bike_16528",
+        "name": "JUMP DC-0215",
+        "lon": -77.054565,
+        "lat": 38.909440000000004,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "98%"
+      },
+      {
+        "bike_id": "bike_18823",
+        "name": "JUMP DC-0700",
+        "lon": -77.06828666666667,
+        "lat": 38.916513333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "49%"
+      },
+      {
+        "bike_id": "bike_16603",
+        "name": "JUMP DC-0237",
+        "lon": -77.057555,
+        "lat": 38.924135,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "77%"
+      },
+      {
+        "bike_id": "bike_18874",
+        "name": "JUMP DC-0833",
+        "lon": -77.074595,
+        "lat": 38.93678,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "66%"
+      },
+      {
+        "bike_id": "bike_18933",
+        "name": "JUMP DC-0812",
+        "lon": -77.03858333333334,
+        "lat": 38.90582333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "94%"
+      },
+      {
+        "bike_id": "bike_15855",
+        "name": "JUMP DC-0020",
+        "lon": -77.04128166666666,
+        "lat": 38.92895333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "59%"
+      },
+      {
+        "bike_id": "bike_18903",
+        "name": "JUMP DC-0782",
+        "lon": -77.05538666666666,
+        "lat": 38.93004,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "96%"
+      },
+      {
+        "bike_id": "bike_18879",
+        "name": "JUMP DC-0838",
+        "lon": -77.08574,
+        "lat": 38.94557833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "72%"
+      },
+      {
+        "bike_id": "bike_16501",
+        "name": "JUMP DC-0188",
+        "lon": -77.03204666666667,
+        "lat": 38.916261666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "74%"
+      },
+      {
+        "bike_id": "bike_18876",
+        "name": "JUMP DC-0835",
+        "lon": -77.01589833333334,
+        "lat": 38.97495333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "38%"
+      },
+      {
+        "bike_id": "bike_16633",
+        "name": "JUMP DC-0225",
+        "lon": -77.04656,
+        "lat": 38.913288333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "79%"
+      },
+      {
+        "bike_id": "bike_16515",
+        "name": "JUMP DC-0190",
+        "lon": -77.02791333333333,
+        "lat": 38.962408333333336,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "73%"
+      },
+      {
+        "bike_id": "bike_18848",
+        "name": "JUMP DC-0693",
+        "lon": -77.05025833333333,
+        "lat": 38.896861666666666,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "63%"
+      },
+      {
+        "bike_id": "bike_18825",
+        "name": "JUMP DC-0702",
+        "lon": -77.04345166666667,
+        "lat": 38.900545,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "93%"
+      },
+      {
+        "bike_id": "bike_18884",
+        "name": "JUMP DC-0843",
+        "lon": -77.02427666666667,
+        "lat": 38.886535,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "48%"
+      },
+      {
+        "bike_id": "bike_16618",
+        "name": "JUMP DC-0253",
+        "lon": -77.04072666666667,
+        "lat": 38.89917,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "60%"
+      },
+      {
+        "bike_id": "bike_16530",
+        "name": "JUMP DC-0207",
+        "lon": -76.98558833333334,
+        "lat": 38.865895,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "40%"
+      },
+      {
+        "bike_id": "bike_18855",
+        "name": "JUMP DC-0691",
+        "lon": -77.01783166666667,
+        "lat": 38.87732666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "61%"
+      },
+      {
+        "bike_id": "bike_16627",
+        "name": "JUMP DC-0217",
+        "lon": -77.06390666666667,
+        "lat": 38.944091666666665,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "64%"
+      },
+      {
+        "bike_id": "bike_18872",
+        "name": "JUMP DC-0831",
+        "lon": -76.99644333333333,
+        "lat": 38.88721666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18851",
+        "name": "JUMP DC-0696",
+        "lon": -77.06779333333333,
+        "lat": 38.904605,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "54%"
+      },
+      {
+        "bike_id": "bike_18820",
+        "name": "JUMP DC-0688",
+        "lon": -77.02596333333334,
+        "lat": 38.907441666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "95%"
+      },
+      {
+        "bike_id": "bike_18911",
+        "name": "JUMP DC 0790",
+        "lon": -76.995135,
+        "lat": 38.900373333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "80%"
+      },
+      {
+        "bike_id": "bike_16520",
+        "name": "JUMP DC-0171",
+        "lon": -77.07456666666667,
+        "lat": 38.912106666666666,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "74%"
+      },
+      {
+        "bike_id": "bike_16533",
+        "name": "JUMP DC-0203",
+        "lon": -77.03041833333333,
+        "lat": 38.96447333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "65%"
+      },
+      {
+        "bike_id": "bike_18927",
+        "name": "JUMP DC-0806",
+        "lon": -77.00307833333333,
+        "lat": 38.92720166666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "51%"
+      },
+      {
+        "bike_id": "bike_18821",
+        "name": "JUMP DC-0689",
+        "lon": -76.981725,
+        "lat": 38.95582,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "57%"
+      },
+      {
+        "bike_id": "bike_16534",
+        "name": "JUMP DC-0206",
+        "lon": -76.99637833333334,
+        "lat": 38.882796666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "44%"
+      },
+      {
+        "bike_id": "bike_16602",
+        "name": "JUMP DC-0236",
+        "lon": -77.06768,
+        "lat": 38.91684166666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "86%"
+      },
+      {
+        "bike_id": "bike_18912",
+        "name": "JUMP DC-0791",
+        "lon": -77.05521833333333,
+        "lat": 38.89729333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18908",
+        "name": "JUMP DC-0787",
+        "lon": -77.06919666666667,
+        "lat": 38.90766833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "61%"
+      },
+      {
+        "bike_id": "bike_18873",
+        "name": "JUMP DC-0832",
+        "lon": -77.04685166666667,
+        "lat": 38.89845666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18871",
+        "name": "JUMP DC-0830",
+        "lon": -77.048335,
+        "lat": 38.901725,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "68%"
+      },
+      {
+        "bike_id": "bike_18844",
+        "name": "JUMP DC-0721",
+        "lon": -77.04991833333334,
+        "lat": 38.90586,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "71%"
+      },
+      {
+        "bike_id": "bike_16504",
+        "name": "JUMP DC-0204 ",
+        "lon": -77.02612833333333,
+        "lat": 38.897726666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_16521",
+        "name": "JUMP DC-0169 ",
+        "lon": -77.05755833333333,
+        "lat": 38.95938666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "97%"
+      },
+      {
+        "bike_id": "bike_16496",
+        "name": "JUMP DC-0183",
+        "lon": -76.96389333333333,
+        "lat": 38.934821666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "33%"
+      },
+      {
+        "bike_id": "bike_18925",
+        "name": "JUMP DC-0804",
+        "lon": -77.09855333333333,
+        "lat": 38.931493333333336,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "50%"
+      },
+      {
+        "bike_id": "bike_18877",
+        "name": "JUMP DC-0836",
+        "lon": -76.98259,
+        "lat": 38.870575,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "89%"
+      },
+      {
+        "bike_id": "bike_18840",
+        "name": "JUMP DC-0846",
+        "lon": -77.03637166666667,
+        "lat": 38.927458333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "40%"
+      },
+      {
+        "bike_id": "bike_18843",
+        "name": "JUMP DC-0720",
+        "lon": -77.04249833333333,
+        "lat": 38.91777666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "80%"
+      },
+      {
+        "bike_id": "bike_18891",
+        "name": "JUMP DC-0770",
+        "lon": -77.00208833333333,
+        "lat": 38.91473833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "71%"
+      },
+      {
+        "bike_id": "bike_16497",
+        "name": "JUMP DC-0184",
+        "lon": -77.017605,
+        "lat": 38.87521666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "60%"
+      },
+      {
+        "bike_id": "bike_18824",
+        "name": "JUMP DC-0701",
+        "lon": -76.99555,
+        "lat": 38.92847166666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "47%"
+      },
+      {
+        "bike_id": "bike_18866",
+        "name": "JUMP DC-0825",
+        "lon": -77.00102833333334,
+        "lat": 38.84684166666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "56%"
+      },
+      {
+        "bike_id": "bike_18904",
+        "name": "JUMP DC-0783",
+        "lon": -76.99777833333333,
+        "lat": 38.928731666666664,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "64%"
+      },
+      {
+        "bike_id": "bike_16525",
+        "name": "JUMP DC-0211",
+        "lon": -77.01508666666666,
+        "lat": 38.883156666666665,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "54%"
+      },
+      {
+        "bike_id": "bike_18934",
+        "name": "JUMP DC-0813",
+        "lon": -77.00891833333333,
+        "lat": 38.872591666666665,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_18827",
+        "name": "JUMP DC-0704",
+        "lon": -76.95873166666667,
+        "lat": 38.890618333333336,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "83%"
+      },
+      {
+        "bike_id": "bike_18875",
+        "name": "JUMP DC-0834",
+        "lon": -77.02237,
+        "lat": 38.963275,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "75%"
+      },
+      {
+        "bike_id": "bike_16598",
+        "name": "JUMP DC-0232",
+        "lon": -77.02171333333334,
+        "lat": 38.88623333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      },
+      {
+        "bike_id": "bike_16523",
+        "name": "JUMP DC-0167",
+        "lon": -77.00233166666666,
+        "lat": 38.82219666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "87%"
+      },
+      {
+        "bike_id": "bike_16626",
+        "name": "JUMP DC-0228",
+        "lon": -77.03351,
+        "lat": 38.96411666666667,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "51%"
+      },
+      {
+        "bike_id": "bike_18920",
+        "name": "JUMP DC-0799",
+        "lon": -77.05394166666666,
+        "lat": 38.961328333333334,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "65%"
+      },
+      {
+        "bike_id": "bike_16601",
+        "name": "JUMP DC-0235",
+        "lon": -77.02411666666667,
+        "lat": 38.90947333333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "57%"
+      },
+      {
+        "bike_id": "bike_16509",
+        "name": "JUMP DC-0196",
+        "lon": -76.94640333333334,
+        "lat": 38.89398833333333,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "88%"
+      },
+      {
+        "bike_id": "bike_18915",
+        "name": "JUMP DC-0794",
+        "lon": -77.05926166666667,
+        "lat": 38.90798,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "34%"
+      },
+      {
+        "bike_id": "bike_18899",
+        "name": "JUMP DC-0778",
+        "lon": -76.97476833333333,
+        "lat": 38.927755,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "50%"
+      },
+      {
+        "bike_id": "bike_18896",
+        "name": "JUMP DC-0775",
+        "lon": -76.99486833333333,
+        "lat": 38.883451666666666,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "57%"
+      },
+      {
+        "bike_id": "bike_16512",
+        "name": "JUMP DC-0201",
+        "lon": -76.95892666666667,
+        "lat": 38.890535,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "62%"
+      },
+      {
+        "bike_id": "bike_18858",
+        "name": "JUMP DC-0817",
+        "lon": -77.2203833333333,
+        "lat": 38.911278333333335,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "94%"
+      },
+      {
+        "bike_id": "bike_18830",
+        "name": "JUMP DC-0707",
+        "lon": -77.00069833333333,
+        "lat": 38.88865,
+        "is_reserved": 0,
+        "is_disabled": 0,
+        "jump_ebike_battery_level": "100%"
+      }
+    ]
+  }
+}
