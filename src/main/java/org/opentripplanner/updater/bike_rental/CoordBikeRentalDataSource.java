@@ -49,7 +49,7 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
         stationSource.setUrl(uriString);
 
         fakeSource = new CoordFakeStationDataSource();
-        fakeSource.setUrl("file:coord/test-gbfs/fake_stations.json");
+        fakeSource.setUrl("file:coord/bike/fake_stations.json");
     }
 
 
@@ -119,24 +119,34 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     class CoordFakeStationDataSource extends GenericJsonBikeRentalDataSource {
 
         public CoordFakeStationDataSource() {
-            super("data/stations");
+            super("features");
         }
 
         @Override
         public BikeRentalStation makeStation(JsonNode stationNode) {
-            BikeRentalStation brstation = new BikeRentalStation();
+            JsonNode properties = stationNode.path("properties");
+            JsonNode coordinates = stationNode.path("geometry").path("coordinates");
+            Iterator<JsonNode> coordinateIterator = coordinates.iterator();
 
-            brstation.id = stationNode.path("station_id").toString();
-            brstation.x = stationNode.path("lon").asDouble();
-            brstation.y = stationNode.path("lat").asDouble();
-            brstation.name = new NonLocalizedString(stationNode.path("name").asText());
+            BikeRentalStation brstation = new BikeRentalStation();
+            brstation.id = properties.path("station_id").toString();
+            brstation.name = new NonLocalizedString(stationNode.path("station_id").toString());
+            brstation.x = coordinateIterator.next().asDouble();
+            brstation.y = coordinateIterator.next().asDouble();
+
             brstation.allowDropoff = true;
             brstation.bikesAvailable = 0;
             brstation.spacesAvailable = Integer.MAX_VALUE;
             brstation.allowPickup = false;
 
-            // Add all the DC dockless networks.
-            brstation.networks = new HashSet<>(Arrays.asList("JumpDC", "MobikeDC", "SpinDC"));
+
+            // Set all appropriate system_ids.
+            brstation.networks = new HashSet<>();
+            JsonNode systemIds = properties.path("system_ids");
+            Iterator<JsonNode> systemIdIterator = systemIds.iterator();
+            while (systemIdIterator.hasNext()) {
+                brstation.networks.add(systemIdIterator.next().asText());
+            }
 
             return brstation;
         }
