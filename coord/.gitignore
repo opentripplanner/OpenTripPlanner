@@ -1,0 +1,4 @@
+.*
+otp-base/graphs/dc/*
+!otp-base/graphs/dc/router-config.json
+!/.gitignore
