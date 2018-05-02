@@ -1,6 +1,6 @@
 {
     "routingDefaults": {
-        "numItineraries": 6,
+        "numItineraries": 3,
         "walkSpeed": 2.0,
         "stairsReluctance": 4.0,
         "carDropoffTime": 240
