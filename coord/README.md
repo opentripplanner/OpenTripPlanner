@@ -41,4 +41,10 @@ which generates bike stations within the given boundary and a point every 100m.
 ```
 to see the parameter description.
 
+## To visualize all fake bike locations
+
+cd coord/bike && python -m http.server 9000
+
+
+
 
