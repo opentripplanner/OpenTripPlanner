@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 """
-This script reads GBFS files and generates fake bike stations (hubs).
+This script generates fake dropoffs within the coverage area of bike systems.
 
 usage: generate_stations.py [-h]
-                        gbfs_dir lng_min lng_max lat_min lat_max lat_meters
-                        lng_meters
+                            lng_min lng_max lat_min lat_max lat_meters
+                            lng_meters
 
 positional arguments:
-  gbfs_dir    The path to the GBFS directory.
   lng_min     The minimum longitude.
   lng_max     The maximum longitude.
   lat_min     The minimum latitude.
@@ -18,8 +17,6 @@ positional arguments:
 
 optional arguments:
   -h, --help  show this help message and exit
-
-
 """
 
 import argparse
@@ -27,18 +24,23 @@ import geojson
 import geopy.distance
 import json
 import numpy as np
-import time
+import os
+import sys
+import urllib.request
 
 from geojson import Feature
 from geojson import FeatureCollection
-from geojson import Point
 from json import encoder
+from shapely.geometry import shape
+from shapely.geometry import Point
+
+# depending on your version, use: from shapely.geometry import shape, Point
+
 
 # To avoid long float numbers for lat/lng
 encoder.FLOAT_REPR = lambda o: format(o, '.6f')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('gbfs_dir', type=str, help='The path to the GBFS directory.')
 parser.add_argument('lng_min', type=float, help='The minimum longitude.')
 parser.add_argument('lng_max', type=float, help='The maximum longitude.')
 parser.add_argument('lat_min', type=float, help='The minimum latitude.')
@@ -51,83 +53,117 @@ parser.add_argument('lng_meters', type=int,
                     default=200)
 args = parser.parse_args()
 
+# Map of bike system ID to its boundary polygon (a shapely geometry obj which is a MultiPolygon)
+BikeToPolygon = {}
 
-def get_system_id(gbfs_dir):
-    """Reads the GBFS system ID from system_information.json
 
-    :param gbfs_dir: path to a GBFS folder
-    :return: string, system_id
+def create_station(lng, lat, station_id, system_ids):
+    return {
+        'lon': round(lng, 6),
+        'lat': round(lat, 6),
+        'station_id': "fake_dropoff_%d" % + station_id,
+        'system_ids': system_ids
+    }
+
+
+def load_polygons_by_system(system_id):
+    """Calls Coord's Bike API to get the polygons of the system.
+
+    :param system_id: string, the ID of a bike system
+    :return: a shapely geometry obj
     """
-    system = json.load(open(gbfs_dir + '/system_information.json'))
-    return system['data']['system_id']
+
+    response = urllib.request.urlopen("https://api.coord.co/v1/bike/system/%s?access_key=%s" % (
+        system_id, os.environ['COORD_API_KEY'])).read()
+    json_resp = json.loads(response)
+    if json_resp['geometry']:
+        return shape(json_resp['geometry'])
+    return None
 
 
-def create_status(system_id):
-    return {
-        'station_id': system_id,
-        'num_bikes_available': 0,
-        'num_docks_available': 1000,
-        'last_reported': int(time.time()),
-        'is_renting': 0
-    }
+def get_dockless_bike_system_ids():
+    """ Returns Coord's dockless bike system IDs in the given area.
+
+        We currently don't have an endpoint that returns `systems`,
+        so we have to do an area search and find them.
+    :return: a list of string, system_ids
+    """
+    lat = args.lat_min + (args.lat_max - args.lat_min) / 2
+    lng = args.lng_min + (args.lng_max - args.lng_min) / 2
+    url = "https://api.coord.co/v1/bike/location?access_key=%s" \
+          "&latitude=%3.4f&longitude=%3.4f&radius_km=3" % (os.environ['COORD_API_KEY'], lat, lng)
+
+    response = urllib.request.urlopen(url).read()
+    json_resp = json.loads(response)
+    system_ids = set()
+    if json_resp['features'] is None:
+        print("Cannot fetch bike system IDs at lng/lat: %3.5f,%3.5f from Coord API: %s" % (
+            lng, lat, json_resp))
+        sys.exit(0)
+
+    for feature in json_resp['features']:
+        sid = feature['properties']["system_id"]
+        # We only generate fake dropoffs for dockless bikes, so skip the docked ones.
+        if sid == 'CapitalBikeShare':
+            # TODO(mahmood): remove this after the API can return docked/dockless status
+            continue
+        system_ids.add(sid)
+
+    return list(system_ids)
 
 
-def create_station(lng, lat, system_id):
-    return {
-        'station_id': system_id,
-        'name': system_id,
-        'region_id': "region_391",
-        'lon': lng,
-        'lat': lat,
-        'address': "%3.5f,%3.5f" % (lng, lat)
-    }
+def load_polygons():
+    """Loads the polygons of all bikes systems available in an area."""
+
+    global BikeToPolygon
+    default_system = None
+    systems_without_geom = []
+    for s in get_dockless_bike_system_ids():
+        geom = load_polygons_by_system(s)
+        print("Loading geom for %s " % s, end='')
+        if geom:
+            print("\u2713")  # print a check mark
+            BikeToPolygon[s] = geom
+            default_system = s
+        else:
+            print("\u274c")  # print a cross
+            systems_without_geom.append(s)
+
+    if default_system is None or BikeToPolygon[default_system] is None:
+        raise Exception("No geometry found for any bike system in the area.")
+
+    # Use the default geom for systems without geometry.
+    for sid in systems_without_geom:
+        BikeToPolygon[sid] = BikeToPolygon[default_system]
+        print("Using %s's geometry for %s." % (default_system, sid))
+
+
+def get_system_ids_by_location(lng, lat):
+    point = Point(lng, lat)
+    system_ids = []
+    for sid, polygon in BikeToPolygon.items():
+        if polygon.contains(point):
+            system_ids.append(sid)
+    return system_ids
 
 
 def generate_fake_stations():
-    """Generate fake stations.
-
-        It keeps the original stations and adds fake ones to it.
-        It also keeps a copy of the original files with `.old` appended.
-        It generates a geojson file of all stations.
-    """
-    gbfs_dir = args.gbfs_dir
-    station_info_filename = gbfs_dir + '/station_information.json'
-    station_status_filename = gbfs_dir + '/station_status.json'
-
-    station_data = json.load(open(station_info_filename))
-    stations = station_data['data']['stations']
-    status_data = json.load(open(station_status_filename))
-    statuses = status_data['data']['stations']
-
-    system_id = get_system_id(gbfs_dir)
+    """Generate fake stations as a GeoJSON file."""
     features = []
     i = 0
     for lng in get_lng_linspace():
         for lat in get_lat_linspace():
-            sid = system_id + ("_%d" % i)
-            features.append(Feature(geometry=Point((lng, lat))))
-            stations.append(create_station(lng, lat, sid))
-            statuses.append(create_status(sid))
-            i += 1
+            system_ids = get_system_ids_by_location(lng, lat)
+            if len(system_ids) > 0:
+                features.append(Feature(
+                    geometry=Point((lng, lat)),
+                    properties=create_station(lng, lat, i, system_ids)))
+                i += 1
 
-    # Set the last_update times
-    last_update = int(time.time())
-    station_data['last_updated'] = last_update
-    status_data['last_updated'] = last_update
-
-    # Save the generated data in files
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    with open(str.replace(station_info_filename, '.json', '_%s.json' % time_str), 'w') as outfile:
-        json.dump(station_data, outfile, indent=2, sort_keys=True)
-
-    with open(str.replace(station_status_filename, '.json', '_%s.json' % time_str), 'w') as outfile:
-        json.dump(status_data, outfile, indent=2, sort_keys=True)
-
-    with open(str.replace(gbfs_dir + '/stations-geojson.json', '.json', '_%s.json' % time_str),
-              'w') as outfile:
+    with open('fake_stations.json', 'w') as outfile:
         geojson.dump(FeatureCollection(features), outfile, indent=2, sort_keys=True)
 
-    print('Total # of stations:', len(stations))
+    print('Total # of stations:', len(features))
 
 
 def get_lat_linspace():
@@ -159,6 +195,7 @@ def get_lng_linspace():
 
 
 def main():
+    load_polygons()
     generate_fake_stations()
 
 
