@@ -39,7 +39,7 @@ public abstract class Edge implements Serializable {
     /**
      * Generates globally unique edge IDs.
      */
-    private static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
+    public static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
 
     /**
      * Identifier of the edge. Negative means not set.

@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.graph;
 
 
+import com.conveyal.r5.util.ExpandingMMFBytez;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -104,10 +105,10 @@ public class Graph implements Serializable {
 
     private boolean debugData = true;
 
-    // TODO this would be more efficient if it was just an array.
+    // TODO this would be more efficient if it was just an array or a List.
     private transient Map<Integer, Vertex> vertexById;
 
-    private transient Map<Integer, Edge> edgeById;
+    private Edge[] edgeById;
 
     public transient StreetVertexIndexService streetIndex;
 
@@ -219,7 +220,7 @@ public class Graph implements Serializable {
 
     public Graph() {
         this.vertices = new ConcurrentHashMap<String, Vertex>();
-        this.edgeById = new ConcurrentHashMap<Integer, Edge>();
+        this.edgeById = new Edge[0];
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
 
@@ -263,7 +264,9 @@ public class Graph implements Serializable {
 
             turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
-            edgeById.remove(e.getId());
+            if (e.getId() < edgeById.length) {
+                edgeById[e.getId()] = null;
+            }
 
             if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
 
@@ -325,7 +328,7 @@ public class Graph implements Serializable {
      * @return
      */
     public Edge getEdgeById(int id) {
-        return edgeById.get(id);
+        return edgeById[id];
     }
 
     /**
@@ -594,7 +597,7 @@ public class Graph implements Serializable {
      */
     private void addEdgesToIndex(Collection<Edge> es) {
         for (Edge e : es) {
-            this.edgeById.put(e.getId(), e);
+            this.edgeById[e.getId()] = e;
         }
     }
     
@@ -616,15 +619,16 @@ public class Graph implements Serializable {
         }
 
         // Create map from edge ids to edges.
-        this.edgeById = new HashMap<Integer, Edge>();
-        for (Vertex v : vertices) {
-            // TODO(flamholz): this check seems superfluous.
-            if (v == null) {
-                continue;
+        if (edgeById == null || edgeById.length == 0) {
+            this.edgeById = new Edge[Edge.idGenerator.getId(null)]; // HACK to get the highest edge index.
+            for (Vertex v : vertices) {
+                // TODO(flamholz): this check seems superfluous.
+                if (v == null) {
+                    continue;
+                }
+                // Assumes that all the edges appear in at least one outgoing edge list.
+                addEdgesToIndex(v.getOutgoing());
             }
-
-            // Assumes that all the edges appear in at least one outgoing edge list.
-            addEdgesToIndex(v.getOutgoing());
         }
     }
 
@@ -725,7 +729,24 @@ public class Graph implements Serializable {
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
     }
-    
+
+    public static Graph loadFromFSTMMF (File file) {
+        try {
+            Graph graph = ExpandingMMFBytez.readObjectFromFile(file, Graph.class);
+            graph.vertices = new HashMap<>();
+            for (Edge e : graph.edgeById) {
+                if (e == null) continue; // Some edges are removed by pruning.
+                graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+                graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
+            }
+            LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            graph.index(new DefaultStreetVertexIndexFactory());
+            return graph;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Loading which allows you to specify StreetVertexIndexFactory and inject other implementation.
      * @param in
@@ -812,8 +833,7 @@ public class Graph implements Serializable {
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
-                new FileOutputStream(file)));
+        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
         try {
             save(out);
             out.close();
@@ -1052,7 +1072,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

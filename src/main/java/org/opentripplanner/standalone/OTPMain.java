@@ -23,10 +23,12 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.FstMmapGraphSource;
 import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.scripting.impl.BSFOTPScript;
 import org.opentripplanner.scripting.impl.OTPScript;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up an OTP server
@@ -181,12 +184,7 @@ public class OTPMain {
      */
     public void makeGraphService () {
         graphService = new GraphService(params.autoReload);
-        InputStreamGraphSource.FileFactory graphSourceFactory =
-                new InputStreamGraphSource.FileFactory(params.graphDirectory);
-        graphService.graphSourceFactory = graphSourceFactory;
-        if (params.graphDirectory != null) {
-            graphSourceFactory.basePath = params.graphDirectory;
-        }
+        graphService.graphSourceFactory = new FstMmapGraphSource.Factory(params.graphDirectory);
     }
 
     /**

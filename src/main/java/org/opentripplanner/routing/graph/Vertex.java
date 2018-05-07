@@ -55,7 +55,11 @@ public abstract class Vertex implements Serializable, Cloneable {
     private final double x;
 
     private final double y;
-    
+
+    // The edges leading out of each vertex are transient to avoid stack overflows during serialization.
+    // These have been observed with both Java built-in serialization and the FST drop-in replacement.
+    // This is because the serialization process ends up doing a depth-first search of the entire graph.
+
     private transient Edge[] incoming = new Edge[0];
 
     private transient Edge[] outgoing = new Edge[0];

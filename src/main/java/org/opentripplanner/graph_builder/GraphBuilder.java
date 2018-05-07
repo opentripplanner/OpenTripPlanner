@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder;
 
+import com.conveyal.r5.util.ExpandingMMFBytez;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -159,7 +160,9 @@ public class GraphBuilder implements Runnable {
         graph.summarizeBuilderAnnotations();
         if (serializeGraph) {
             try {
-                graph.save(graphFile);
+                graph.rebuildVertexAndEdgeIndices();
+                ExpandingMMFBytez.writeObjectToFile(graphFile, graph);
+                // graph.save(graphFile);
             } catch (Exception ex) {
                 throw new IllegalStateException(ex);
             }
