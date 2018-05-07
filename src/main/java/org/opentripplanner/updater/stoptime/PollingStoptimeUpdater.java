@@ -115,7 +115,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
-        LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec, updateSource);
+        LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
 
     @Override

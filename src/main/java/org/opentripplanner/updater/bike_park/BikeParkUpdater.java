@@ -92,7 +92,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.graph = graph;
         this.source = source;
-        LOG.info("Creating bike-park updater running every {} seconds : {}", frequencySec, source);
+        LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
     @Override

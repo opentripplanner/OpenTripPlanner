@@ -81,7 +81,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
-        LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
+        LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
 
     @Override

@@ -37,7 +37,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     /**
      * Construct superclass
      *
-     * @param JSON path to get from enclosing elements to nested rental list.
+     * @param jsonPath JSON path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
      *
      */
@@ -102,10 +102,9 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         return true;
     }
 
-    private void parseJSON(InputStream dataStream) throws JsonProcessingException, IllegalArgumentException,
-      IOException {
+    private void parseJSON(InputStream dataStream) throws IllegalArgumentException, IOException {
 
-        ArrayList<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
+        ArrayList<BikeRentalStation> out = new ArrayList<>();
 
         String rentalString = convertStreamToString(dataStream);
 
@@ -125,6 +124,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         }
 
         for (int i = 0; i < rootNode.size(); i++) {
+            // TODO can we use foreach? for (JsonNode node : rootNode) ...
             JsonNode node = rootNode.get(i);
             if (node == null) {
                 continue;
