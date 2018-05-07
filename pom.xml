@@ -790,12 +790,11 @@
             <artifactId>traffic-engine</artifactId>
             <version>0.2</version>
         </dependency>
-
-        <!-- r5 is needed only so that we can delegate Analyst work to it -->
+        <!-- R5 may eventually be an alternate routing option within OTP, and provides Graph serialization. -->
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-simple</artifactId>
