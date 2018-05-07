@@ -328,7 +328,11 @@ public class Graph implements Serializable {
      * @return
      */
     public Edge getEdgeById(int id) {
-        return edgeById[id];
+        if (id < edgeById.length) {
+            return edgeById[id];
+        } else {
+            return null;
+        }
     }
 
     /**
