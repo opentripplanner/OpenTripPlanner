@@ -18,6 +18,8 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
+import java.util.Set;
+
 /**
  * A vertex for a bike rental station.
  * It is connected to the streets by a StreetBikeRentalLink.
@@ -34,15 +36,24 @@ public class BikeRentalStationVertex extends Vertex {
 
     private int spacesAvailable;
 
+    private boolean pickupAllowed;
+
     private String id;
-    
+
+    /**
+     * List of compatible network names. Null (default) to be compatible with all.
+     */
+    public Set<String> networks;
+
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.x, station.y,
                 station.name);
         this.setId(station.id);
+        this.networks = station.networks;
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
+        this.setPickupAllowed(station.allowPickup);
     }
 
     public int getBikesAvailable() {
@@ -67,5 +78,13 @@ public class BikeRentalStationVertex extends Vertex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isPickupAllowed() {
+        return pickupAllowed;
+    }
+
+    public void setPickupAllowed(boolean pickupAllowed) {
+        this.pickupAllowed = pickupAllowed;
     }
 }
