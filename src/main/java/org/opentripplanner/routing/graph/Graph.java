@@ -118,7 +118,7 @@ public class Graph implements Serializable {
 
     private transient SampleFactory sampleFactory;
 
-    public final Deduplicator deduplicator = new Deduplicator();
+    public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
@@ -135,8 +135,6 @@ public class Graph implements Serializable {
     private Collection<String> feedIds = new HashSet<>();
 
     private Map<String, FeedInfo> feedInfoForId = new HashMap<>();
-
-    private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
 
@@ -157,9 +155,6 @@ public class Graph implements Serializable {
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
-
-    /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
-    public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
 
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
