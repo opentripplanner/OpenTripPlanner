@@ -119,34 +119,27 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
-        // Create a realtime data snapshot source and wait for runnable to be executed
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                // Only create a realtime data snapshot source if none exists already
-                TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
-                if (snapshotSource == null) {
-                    snapshotSource = new TimetableSnapshotSource(graph);
-                    // Add snapshot source to graph
-                    graph.timetableSnapshotSource = (snapshotSource);
-                }
-
-                // Set properties of realtime data snapshot source
-                if (logFrequency != null) {
-                    snapshotSource.logFrequency = (logFrequency);
-                }
-                if (maxSnapshotFrequency != null) {
-                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
-                }
-                if (purgeExpiredData != null) {
-                    snapshotSource.purgeExpiredData = (purgeExpiredData);
-                }
-                if (fuzzyTripMatcher != null) {
-                    snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
-                }
-            }
-        });
+    public void setup(Graph graph) {
+        // Only create a realtime data snapshot source if none exists already
+        TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
+        if (snapshotSource == null) {
+            snapshotSource = new TimetableSnapshotSource(graph);
+            // Add snapshot source to graph
+            graph.timetableSnapshotSource = (snapshotSource);
+        }
+        // Set properties of realtime data snapshot source
+        if (logFrequency != null) {
+            snapshotSource.logFrequency = (logFrequency);
+        }
+        if (maxSnapshotFrequency != null) {
+            snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+        }
+        if (purgeExpiredData != null) {
+            snapshotSource.purgeExpiredData = (purgeExpiredData);
+        }
+        if (fuzzyTripMatcher != null) {
+            snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
+        }
     }
 
     /**

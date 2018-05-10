@@ -54,8 +54,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private BikeRentalDataSource source;
 
-    private Graph graph;
-
     private SimpleStreetSplitter linker;
 
     private BikeRentalStationService service;
@@ -115,19 +113,22 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
-        this.graph = graph;
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", pollingPeriodSeconds, source);
+        if (pollingPeriodSeconds <= 0) {
+            LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
+        } else {
+            LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
+        }
+
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
-
         // Adding a bike rental station service needs a graph writer runnable
-        updaterManager.executeBlocking(graph -> service = graph.getService(BikeRentalStationService.class, true));
+        service = graph.getService(BikeRentalStationService.class, true);
     }
 
     @Override

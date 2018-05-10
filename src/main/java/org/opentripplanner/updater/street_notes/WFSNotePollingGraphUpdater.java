@@ -102,7 +102,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Setup the WFS data source and add the DynamicStreetNotesSource to the graph
      */
     @Override
-    public void setup() throws IOException, FactoryException {
+    public void setup(Graph graph) throws IOException, FactoryException {
         LOG.info("Setup WFS polling updater");
         HashMap<String, Object> connectionParameters = new HashMap<>();
         connectionParameters.put(WFSDataStoreFactory.URL.key, url);
@@ -110,7 +110,6 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         query = new Query(featureType); // Read only single feature type from the source
         query.setCoordinateSystem(CRS.decode("EPSG:4326", true)); // Get coordinates in WGS-84
         featureSource = data.getFeatureSource(featureType);
-
         graph.streetNotesService.addNotesSource(notesSource);
     }
 

@@ -48,18 +48,15 @@ public abstract class GraphUpdaterConfigurator {
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
     public static void setupGraph(Graph graph, JsonNode mainConfig) {
-        // Create a updater manager for this graph
-        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
         // TODO figure out how & when we will use embedded config in absence of main config.
         JsonNode embeddedConfig = null; // graph.routerConfig;
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
-        
-        // Apply configuration
-        // FIXME why are we returning the same updatermanager object that has been modified ? this method could just create it.
-        updaterManager = applyConfigurationToGraph(graph, updaterManager, mainConfig);
+
+        // Create a updater manager for this graph, and create updaters according to the JSON configuration.
+        GraphUpdaterManager updaterManager = createManagerFromConfig(graph, mainConfig);
 
         // Stop the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
@@ -72,12 +69,12 @@ public abstract class GraphUpdaterConfigurator {
     }
 
     /**
-     * @param graph
-     * @param updaterManager is the graph updater manager to which all updaters should be added
-     * @return reference to the same updaterManager as was given as input
+     * @param graph the graph that will be modified by these updaters
+     * @return a GraphUpdaterManager containing all the created updaters
      */
-    private static GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, JsonNode config) {
+    private static GraphUpdaterManager createManagerFromConfig(Graph graph, JsonNode config) {
 
+        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
         for (JsonNode configItem : config.path("updaters")) {
 
             // For each sub-node, determine which kind of updater is being created.
@@ -113,27 +110,27 @@ public abstract class GraphUpdaterConfigurator {
                 }
             }
 
-            // Configure and activate the new updater.
-            try {
-                // Check whether no updater type was found
-                if (updater == null) {
-                    LOG.error("Unknown updater type: " + type);
-                } else {
-                    // Add manager as parent
+            if (updater == null) {
+                LOG.error("Unknown updater type: " + type);
+            } else {
+                try {
+                    // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
+                    // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
                     updater.setGraphUpdaterManager(updaterManager);
-                    // Configure updater if found and necessary
-                    if (updater instanceof JsonConfigurable) {
-                        ((JsonConfigurable) updater).configure(graph, configItem);
-                    }
-                    // Add graph updater to manager
+                    // All GraphUpdaters are JsonConfigurable - send them their config information.
+                    updater.configure(graph, configItem);
+                    // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
+                    updater.setup(graph);
+                    // Add graph updater to manager.
                     updaterManager.addUpdater(updater);
-                    LOG.info ("Configured GraphUpdater: {}", updater);
+                    LOG.info("Configured GraphUpdater: {}", updater);
+                } catch (Exception e) {
+                    LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
                 }
-            } catch (Exception e) {
-                LOG.error("Can't configure: " + configItem.asText(), e);
-                // Continue on to the next node
             }
         }
+        // Now that all the updaters are configured, kick them all off in their own threads.
+        updaterManager.startUpdaters();
         return updaterManager;
     }
 
