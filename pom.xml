@@ -424,6 +424,11 @@
             <url>https://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
+          <id>sonatype-oss</id>
+          <name>Sonatype OSS</name>
+          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
             <url>https://maven.conveyal.com/</url>
