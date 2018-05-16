@@ -1,3 +1,4 @@
+
 /* This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
@@ -15,7 +16,6 @@ package org.opentripplanner.graph_builder.module;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,9 +95,8 @@ public class GtfsModule implements GraphBuilderModule {
 
         MultiCalendarServiceImpl service = new MultiCalendarServiceImpl();
         GtfsStopContext stopContext = new GtfsStopContext();
-        
-        try {
-            for (GtfsBundle gtfsBundle : gtfsBundles) {
+
+        for (GtfsBundle gtfsBundle : gtfsBundles) {
                 // apply global defaults to individual GTFSBundles (if globals have been set)
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
                     gtfsBundle.cacheDirectory = cacheDirectory;
@@ -126,13 +125,10 @@ public class GtfsModule implements GraphBuilderModule {
                 }
                 if (gtfsBundle.linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
-                } 
+                }
                 if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
 
         // We need to save the calendar service data so we can use it later
@@ -149,9 +145,8 @@ public class GtfsModule implements GraphBuilderModule {
      * Private Methods
      ****/
 
-    private void loadBundle(GtfsBundle gtfsBundle, Graph graph, GtfsMutableRelationalDao dao)
-            throws IOException {
-
+    private void loadBundle(GtfsBundle gtfsBundle, Graph graph, GtfsMutableRelationalDao dao) {
+      try {
         StoreImpl store = new StoreImpl(dao);
         store.open();
         LOG.info("reading {}", gtfsBundle.toString());
@@ -225,8 +220,12 @@ public class GtfsModule implements GraphBuilderModule {
         for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
             pathway.getId().setAgencyId(reader.getDefaultAgencyId());
         }
-
         store.close();
+      } catch(Exception e) {
+          String msg=e.getMessage();
+          System.out.println(msg);
+          throw new RuntimeException(e);
+      }
 
     }
 
