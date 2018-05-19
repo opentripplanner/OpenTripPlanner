@@ -1,6 +1,5 @@
-<img src="otplogo.png" align="middle">
-<h1 align="center">OpenTripPlanner</h1>
-<hr>
+![OTP Logo](otplogo.png)
+# OpenTripPlanner
 
 _This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
 
