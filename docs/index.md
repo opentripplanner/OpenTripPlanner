@@ -1,4 +1,4 @@
-<img src="https://github.com/opentripplanner/OpenTripPlanner/wiki/Home/otp_logo_wiki.png" align="right"/>
+<img src="otplogo.png" align="left"/>
 
 ## OpenTripPlanner
 _This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
