@@ -26,6 +26,8 @@ import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -50,6 +52,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -130,6 +133,8 @@ public class Graph implements Serializable {
 
     private Collection<String> feedIds = new HashSet<>();
 
+    private Map<String, FeedInfo> feedInfoForId = new HashMap<>();
+
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
@@ -200,6 +205,12 @@ public class Graph implements Serializable {
     
     /** How should we cluster stops? */
     public String stopClusterMode = "proximity";
+
+    /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
+    public Double ellipsoidToGeoidDifference = 0.0;
+
+    /** Parent stops **/
+    public Map<AgencyAndId, Stop> parentStopById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -899,11 +910,19 @@ public class Graph implements Serializable {
         return agenciesForFeedId.get(feedId);
     }
 
+    public FeedInfo getFeedInfo(String feedId) {
+        return feedInfoForId.get(feedId);
+    }
+
     public void addAgency(String feedId, Agency agency) {
         Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
         this.agenciesForFeedId.put(feedId, agencies);
         this.feedIds.add(feedId);
+    }
+
+    public void addFeedInfo(FeedInfo info) {
+        this.feedInfoForId.put(info.getId().toString(), info);
     }
 
     /**

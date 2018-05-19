@@ -346,14 +346,16 @@ public class StateEditor {
         child.stateData.everBoarded = true;
     }
 
-    public void setBikeRenting(boolean bikeRenting) {
+    public void beginVehicleRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = bikeRenting;
-        if (bikeRenting) {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
-        } else {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
-        }
+        child.stateData.usingRentedBike = true;
+        child.stateData.nonTransitMode = vehicleMode;
+    }
+
+    public void doneVehicleRenting() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
     }
 
     /**
@@ -419,6 +421,14 @@ public class StateEditor {
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
+    }
+
+    public void setNonTransitOptionsFromState(State state){
+        cloneStateDataAsNeeded();
+        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.carParked = state.isCarParked();
+        child.stateData.bikeParked = state.isBikeParked();
+        child.stateData.usingRentedBike = state.isBikeRenting();
     }
 
     /* PUBLIC GETTER METHODS */

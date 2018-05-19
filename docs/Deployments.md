@@ -2,47 +2,30 @@
 
 ## Official Production
 
-Following are known deployments of OTP in an agency-sponsored production capacity.
+The following are known deployments of OTP in a government- or agency-sponsored production capacity:
 
-* **New York State** Department of Transportation's 511 [transit trip planner](http://511ny.org/tripplanner/default.aspx) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
-* **Arlington, Virginia**'s [commute planning site](http://www.carfreeatoz.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
-* **Portland, Oregon, USA** TriMet [Regional Trip Planner](http://ride.trimet.org), the agency originally behind OpenTripPlanner.
-* The **Helsinki** Regional Transport Authority (HSL) [trip planner](https://digitransit.fi/en/) based on OpenTripPlanner is in public beta as of spring 2016. Source code for their new UI is [available on Github](https://github.com/HSLdevcom/digitransit-ui).
+* **Finland (nationwide)** The [Helsinki Regional Transport Authority](https://www.reittiopas.fi/), the [Finnish Transport Agency](https://opas.matka.fi/), and other [Finnish cities](https://waltti.fi/?lang=en) have collaborated to create [Digitransit](https://digitransit.fi/en/), providing OTP-based trip planners, APIs, open data, Docker containers and open source code. Each member organisation runs its own instance of a shared codebase and deployment environment. Their source code is available [on Github](https://github.com/HSLdevcom/), including a [new custom UI](https://github.com/HSLdevcom/digitransit-ui). This system also has a strong real-time component.
+* **Norway (nationwide)** Ruter provides a [journey planner for the Oslo region](https://ruter.no/). It has been in production since January 2016 and serves around 200,000 users per day. Since November 2017, Entur has also prodvided a [nation-wide journey planner](https://en-tur.no/) which consumes schedule data in the EU standard NeTEx format with SIRI realtime updates.
+* **Portland, Oregon** TriMet is the agency that originally started the OpenTripPlanner project. Their [Regional Trip Planner](http://ride.trimet.org) is based on OTP and provides about 40,000 trip plans on a typical weekday.
+* **New York State** The State Department of Transportation's [transit trip planner](https://511ny.org/#TransitRegion-1) provides itineraries for public transit systems throughout the state in a single unified OTP instance.
+* **Los Angeles, California** The new [metro.net trip planner](https://www.metro.net/).
+* **Atlanta, Georgia** The Metropolitan Atlanta Rapid Transit Authority's (MARTA) [trip planner](http://itsmarta.com/planatrip.aspx) and the Atlanta region's transit information hub [atltransit.org](https://atltransit.org/) both use OTP to power their website trip planners.
+* **Boston, Massachusetts** The [Massachusetts Bay Transportation Authority trip planner](https://www.mbta.com/trip-planner).
+* **Seattle, Washington** The [Sound Transit Trip Planner](https://www.soundtransit.org/tripplanner)
+* **Arlington, Virginia** The [commute planning site](http://www.carfreeatoz.com/) for the Washington, DC metropolitan area depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of profile routing.
+* [**Piemonte Region, Italy**](https://map.muoversinpiemonte.it/#planner) and the [**City of Torino**](https://www.muoversiatorino.it/) built on OpenTripPlanner by [5T](http://www.5t.torino.it/).
 * [**Valencia, Spain**](http://www.emtvalencia.es/geoportal/?lang=en_otp) from the Municipal Transport Company of Valencia S.A.U.
 * [**Grenoble, France**](http://www.metromobilite.fr/) from SMTC, Grenoble Alpes métropole, l'État Français, the Rhône-alpes region, the Isère council and the City of Grenoble.
 * **Rennes, France** where the STAR network provides an OTP client for [iOS](https://itunes.apple.com/us/app/starbusmetro/id899970416?mt=8), [Android](https://play.google.com/store/apps/details?id=com.bookbeo.starbusmetro), Windows Phone et Web.
-* [**Poznań, Poland**](http://ztm.poznan.pl/planer) from Urban Transport Authority of Poznań (ZTM Poznan).
-* [**Lublin, Poland**](http://lublin.iplaner.pl) from ZTM Lublin.
-* [**Adelaide, Australia**](http://jp.adelaidemetro.com.au/opentripplanner-webapp/) the Adelaide Metro Journey Planner.
-* **Trento Province, Italy** -- <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento" target="_blank">ViaggiaTrento</a> and <a href="https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto" target="_blank">ViaggiaRovereto</a> 
-  - Implemented as part of <a href="http://www.smartcampuslab.it" target="_blank">SmartCampus Project</a>, the research project founded by <a href="http://trentorise.eu" target="_blank">TrentoRise</a>, <a href="http://www.unitn.it" target="_blank">UNITN</a>, and <a href="http://www.fbk.eu" target="_blank">FBK.</a>
-* [**Oslo, Norway**](http://ruter.no/reiseplanlegger/) Ruter's travel planner for Southeastern Norway.
-* [**USF Maps App (Tampa, FL, USA)**](https://maps.usf.edu/) - A responsive web application for the University of South Florida (USF) that helps students, staff, and visitors find their way around the Tampa, Florida campus using multiple modes of transportation, including the USF Bull Runner campus shuttle, Share-A-Bull bike share, and pedestrian pathways.  Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
+* [**Poznań, Poland**](http://ztm.poznan.pl/#planner) from Urban Transport Authority of Poznań (ZTM Poznan).
+* **Trento Province, Italy** - [ViaggiaTrento](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento) and [ViaggiaRovereto](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto)
+  were implemented as part of the [SmartCampus Project](http://www.smartcampuslab.it), a research project founded by [TrentoRise](http://trentorise.eu), [UNITN](http://www.unitn.it), and [FBK](http://www.fbk.eu).
+* **University of South Florida** (Tampa, Florida). The [USF Maps App](https://maps.usf.edu/) is a responsive web application for that helps university students, staff, and visitors find their way around the campus using multiple modes of transportation, including the USF Bull Runner campus shuttle, Share-A-Bull bike share, and pedestrian pathways. Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
 
-## Unofficial Production
+## Independent Production
 
-The following OTP-based services are presented as production-quality deployments, but are not backed by an official transportation authority. OTP has also been used by several popular multi-city smartphone applications in their start-up phase before developing proprietary technology.
+The following OTP-based services are presented as production-quality deployments, but are not backed by an official transportation authority or government. OTP is also known to be used on the back end of several popular multi-city mobile trip planning applications.
 
-* [**ViviBus Bologna**](http://bologna.vivibus.it) Bologna, Italy.
-* [**Singapore Nextride**](https://itunes.apple.com/us/app/nextride-singapore-public/id565103559) from [buUuk](http://www.buuuk.com/) is an iOS application, with the default [web-based OTP client](http://map.nextride.sg/) also available.
-* [**BJCTA**](http://www.bjctatripplanner.org) Birmingham-Jefferson Country, Alabama.
-* [**Tel Aviv, Israel**](http://www.tranzmate.co.il) from TranzMate.
-
-## Multi-region clients
-* [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android) by CUTR-USF and Vreixo González. Can find itineraries on many different OTP servers via a service discovery mechanism.
-
-## Prototypes, technical previews, and demos
-
-The following OTP-based services are demonstrations or prototypes. Caveats/disclaimers may apply regarding their use for actual on-the-ground trip planning; consult individual sites for details.
-
-* [**The Netherlands**](http://opentripplanner.nl/index.html) Nationwide coverage from [OpenOV](http://openov.nl/) demonstrating integration of real-time data.
-* [**Marseille Métropole**](http://62.210.125.178/demo/master/marseille/) Experimental client-side isochrone rendering and accessibility calculations.
-* [**Tampa, Florida, USA**](http://opentripplanner.usf.edu/) University of South Florida's (USF) Center for Urban Transportation Research (CUTR) demo. Implemented as part of a [research project](http://www.locationaware.usf.edu/ongoing-research/open-transit-data/) under the Florida Department of Transportation and National Center for Transit Research. [Enabling Cost-Effective Multimodal Trip Planners through Open Transit Data](http://www.nctr.usf.edu/2011/05/enabling-cost-effective-multimodal-trip-planners-through-open-transit-data-2/).
-* [**TransportesPúblicos.pt**](http://transportespublicos.pt) Portugal.
-* [**A Coruña, Spain**](http://galadriel.dc.fi.udc.es:8080/opentripplanner-webapp/) University of A Coruña.
-* [**Budapest, Hungary**](http://otp.flaktack.net) by [flaktack](https://github.com/flaktack).
-* [**Athens, Greece**](http://zee.gr/bus/) Athens Public Transport Planner ([description](http://entropy.disconnect.me.uk/2012/01/athens-public-transport-planner.html))
-* [**South Africa**](http://app.fromA2B.co.za) fromA2B Gauteng Public Transport Planner.
-* [**London, UK**](http://london.optitrans.net/) from Opti-Trans.
-* [**Canberra, Austrailia**](http://bus.lambdacomplex.org/tripPlanner.php) Action Busses, etc.
-* [**Helsinki**](http://dev.hsl.fi/navigator-proto/) With an interesting real-time interface.
+* **The Netherlands (nationwide)** [Plannerstack Foundation](http://www.plannerstack.org/) provides national scale trip planning APIs using OTP and other open source trip planners, based on [OpenOV's extremely detailed open data](http://gtfs.openov.nl/) including minutely real-time updates for every vehicle in the country.
+* [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android) by CUTR-USF and Vreixo González can find itineraries on many different OTP servers via a service discovery mechanism.
+* [**ViviBus Bologna**](http://www.vivibus.it/) Bologna, Italy.

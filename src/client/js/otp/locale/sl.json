@@ -103,7 +103,7 @@
     ],
     "We're sorry. The trip planner is temporarily unavailable. Please try again later.": "Opravičujemo se. Daljinar trenutno ni na voljo. Prosimo poskusite kasneje.",
     "Trip is not possible.  You might be trying to plan a trip outside the map data boundary.": "Pot ni mogoča. Mogoče poskušate načrtovati pot izven meja karte.",
-    "Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway).": "Pot ni mogoča. Do začetne ali končne točke ni mogoče varno priti (na primer), mogoče začenjate na lokalni cesti, ki je povezana samo na avtocesto.",
+    "No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible.": "Pot ni mogoča. Do začetne ali končne točke ni mogoče varno priti (na primer), mogoče začenjate na lokalni cesti, ki je povezana samo na avtocesto.",
     "No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose.": "Podatki o voznih redih niso na voljo. Mogoče je datum preveč v preteklosti ali prihodnosti ali pa javni prevoz ne obstaja za pot, ki jo načrtujete.",
     "The trip planner is taking way too long to process your request. Please try again later.": "Daljinar potrebuje preveč časa za obdelavo vašega zahtevka. Prosimo poskusite znova kasneje.",
     "The request has errors that the server is not willing or able to process.": "Zahtevek ima napake, ki jih strežnik ne more obdelati.",

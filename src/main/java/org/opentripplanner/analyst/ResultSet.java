@@ -59,7 +59,7 @@ public class ResultSet implements Serializable{
     public ResultSet(SampleSet samples, TimeSurface surface){
         this(samples, surface, false, false);
     }
-    
+
     /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, optionally including times. */
     public ResultSet(SampleSet samples, TimeSurface surface, boolean includeTimes, boolean includeIsochrones){
         id = samples.pset.id + "_" + surface.id;
@@ -71,11 +71,11 @@ public class ResultSet implements Serializable{
 
         if (includeTimes)
             this.times = times;
-        
+
         if (includeIsochrones)
             buildIsochrones(surface);
     }
-    
+
     private void buildIsochrones(TimeSurface surface) {
         List<IsochroneData> id = SurfaceResource.getIsochronesAccumulative(surface, 5, 24);
         this.isochrones = new IsochroneData[id.size()];
@@ -97,7 +97,7 @@ public class ResultSet implements Serializable{
     public ResultSet (TimeSurface surface) {
         buildIsochrones(surface);
     }
-    
+
     /** Build a new ResultSet directly from times at point features, optionally including histograms or interpolating isochrones */
     public ResultSet(int[] times, PointSet targets, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         if (includeTimes)
@@ -110,8 +110,8 @@ public class ResultSet implements Serializable{
             buildIsochrones(times, targets);
     }
 
-    /** 
-     * Given an array of travel times to reach each point in the supplied pointset, make a histogram of 
+    /**
+     * Given an array of travel times to reach each point in the supplied pointset, make a histogram of
      * travel times to reach each separate category of points (i.e. "property") within the pointset.
      * Each new histogram object will be stored as a part of this result set keyed on its property/category.
      */
@@ -121,18 +121,18 @@ public class ResultSet implements Serializable{
 
     /**
      * Sum the values of specified categories at all time limits within the
-     * bounds of the search. If no categories are specified, sum all categories. 
+     * bounds of the search. If no categories are specified, sum all categories.
      */
     public long sum (String... categories) {
         return sum((Integer) null, categories);
     }
-    
+
     /**
      * Sum the values of the specified categories up to the time limit specified
      * (in seconds). If no categories are specified, sum all categories.
      */
     public long sum(Integer timeLimit, String... categories) {
-        
+
         if (categories.length == 0)
             categories = histograms.keySet().toArray(new String[histograms.keySet().size()]);
 
@@ -159,25 +159,25 @@ public class ResultSet implements Serializable{
 
     /**
      * Serialize this ResultSet to the given output stream as a JSON document, when the pointset is not available.
-     * TODO: explain why and when that would happen 
+     * TODO: explain why and when that would happen
      */
     public void writeJson(OutputStream output) {
         writeJson(output, null);
     }
 
-    /** 
+    /**
      * Serialize this ResultSet to the given output stream as a JSON document.
      * properties: a list of the names of all the pointSet properties for which we have histograms.
      * data: for each property, a histogram of arrival times.
      */
     public void writeJson(OutputStream output, PointSet ps) {
         try {
-            JsonFactory jsonFactory = new JsonFactory(); 
+            JsonFactory jsonFactory = new JsonFactory();
 
             JsonGenerator jgen = jsonFactory.createGenerator(output);
             jgen.setCodec(new ObjectMapper());
 
-            jgen.writeStartObject(); {	
+            jgen.writeStartObject(); {
 
                 if(ps == null) {
                     jgen.writeObjectFieldStart("properties"); {
@@ -201,6 +201,12 @@ public class ResultSet implements Serializable{
                     }
                 }
                 jgen.writeEndObject();
+
+                if (times != null) {
+                    jgen.writeArrayFieldStart("times");
+                    for (int t : times) jgen.writeNumber(t);
+                    jgen.writeEndArray();
+                }
             }
             jgen.writeEndObject();
 
@@ -214,17 +220,17 @@ public class ResultSet implements Serializable{
     public void writeIsochrones(JsonGenerator jgen) throws IOException {
         if (this.isochrones == null)
             return;
-        
+
         FeatureJSON fj = new FeatureJSON();
         FeatureCollection fc = LIsochrone.makeContourFeatures(Arrays.asList(isochrones));
-        
+
         StringWriter sw = new StringWriter();
         fj.writeFeatureCollection(fc, sw);
         // TODO cludge
         String json = sw.toString();
         jgen.writeRaw(json.substring(1, json.length() - 1));
     }
-    
+
     /** A set of result sets from profile routing: min, avg, max */;
     public static class RangeSet implements Serializable {
         public static final long serialVersionUID = 1L;

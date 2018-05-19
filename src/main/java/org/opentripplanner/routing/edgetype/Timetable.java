@@ -497,16 +497,16 @@ public class Timetable implements Serializable {
                 }
             }
             if (update != null) {
-                LOG.error("Part of a TripUpdate object could not be applied successfully.");
+                LOG.error("Part of a TripUpdate object could not be applied successfully to trip {}.", tripId);
                 return null;
             }
         }
         if (!newTimes.timesIncreasing()) {
-            LOG.error("TripTimes are non-increasing after applying GTFS-RT delay propagation.");
+            LOG.error("TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {}.", tripId);
             return null;
         }
 
-        LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
+        LOG.debug("A valid TripUpdate object was applied to trip {} using the Timetable class update method.", tripId);
         return newTimes;
     }
 
