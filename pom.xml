@@ -251,9 +251,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
+                <version>2.21.0</version>
                 <configuration>
-                    <argLine>-Xmx2G</argLine>
+                    <argLine>-Xmx3G</argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
@@ -569,7 +569,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
