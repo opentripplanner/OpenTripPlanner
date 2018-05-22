@@ -730,7 +730,6 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
-        //new DirectTransferGenerator().buildGraph(this, null);
     }
     
     /**
@@ -1092,5 +1091,4 @@ public class Graph implements Serializable {
     public long getTransitServiceEnds() {
         return transitServiceEnds;
     }
-
 }

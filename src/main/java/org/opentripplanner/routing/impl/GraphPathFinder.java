@@ -241,8 +241,6 @@ public class GraphPathFinder {
             throw e;
         }
 
-
-
         // Detect and report that most obnoxious of bugs: path reversal asymmetry.
         // Removing paths might result in an empty list, so do this check before the empty list check.
         if (paths != null) {

@@ -570,9 +570,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return timepoints.get(stopIndex);
     }
 
-
-
-
     /**
      * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.
      * Use hops rather than stops because:
