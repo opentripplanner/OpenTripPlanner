@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
 import org.opentripplanner.api.model.*;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,30 +37,31 @@ public abstract class TripPlanFilter {
     /**
      * Generates an optimized trip plan from original plan
      */
-    public static TripPlan filterPlan(TripPlan plan) {
+    public static TripPlan filterPlan(TripPlan plan, RoutingRequest request) {
         List<ItinerarySummary> summaries = new LinkedList<>();
         long bestNonTransitTime = Long.MAX_VALUE;
 
-        LOG.info("Filtering ...\n");
+        LOG.debug("Filtering ...\n");
 
         for (Itinerary i : plan.itinerary) {
-            summaries.add(new ItinerarySummary(i));
-            if(i.transfers == 0 && i.walkTime < bestNonTransitTime) {
+            ItinerarySummary s = new ItinerarySummary(i);
+            summaries.add(s);
+            if(!s.hasTransit && i.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = i.walkTime;
             }
-            LOG.info("summary: transit, walk, transfers " +
-                     String.valueOf(i.transitTime) + " " +
+            LOG.info("summary: transit, walk, flight " +
+                     String.valueOf(s.regularTransitTime) + " " +
                      String.valueOf(i.walkTime) + " " +
-                     String.valueOf(i.transfers) + " "
+                     String.valueOf(s.flightTime)
                      );
         }
 
         for (ItinerarySummary summary : summaries) {
-            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
-            // do not include in plan
-            Itinerary i = summary.i;
-            if(i.transfers > 0 && i.walkTime > bestNonTransitTime) {
+            // If this is a transit option whose walk/bike time is greater than
+            // that of the walk/bike-only option, do not include in plan
+            if(summary.hasTransit && summary.i.walkTime > bestNonTransitTime) {
                 summary.remove = true;
+                LOG.info("remove summary");
             }
         }
 
@@ -77,11 +80,12 @@ public abstract class TripPlanFilter {
 class ItinerarySummary {
     public Itinerary i;
     public boolean remove = false;
+    public boolean hasTransit = false;
     public long duration;
     public long startTime = 0;
     public long endTime = 0;
     public long walkTime = 0;
-    public long transitTime = 0;
+    public long regularTransitTime = 0;
     public long flightTime = 0;
 
     public ItinerarySummary(Itinerary itin) {
@@ -91,10 +95,12 @@ class ItinerarySummary {
         while (it.hasNext()) {
             Leg leg = it.next();
             if (leg.isTransitLeg()) {
-                this.transitTime += leg.getDuration();
-                TripPlanFilter.LOG.info("leg TransitTime: " + String.valueOf(leg.getDuration()));
-            } else {
-                this.walkTime += leg.getDuration();
+                this.hasTransit = true;
+                if (leg.mode.equals(TraverseMode.AIRPLANE.toString())) {
+                    this.flightTime += leg.getDuration();
+                } else {
+                    this.regularTransitTime += leg.getDuration();
+                }
             }
         }
     }
