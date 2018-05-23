@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.*;
+import org.opentripplanner.api.resource.TripPlanFilter;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -82,25 +83,14 @@ public abstract class GraphPathToTripPlanConverter {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
-        long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
-            if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
-                bestNonTransitTime = itinerary.walkTime;
-            }
-            itineraries.add(itinerary);
-        }
-
-        // Filter and add itineraries to plan
-        for (Itinerary itinerary : itineraries) {
-            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
-            // do not include in plan
-            if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
-
             plan.addItinerary(itinerary);
         }
+
+        plan = TripPlanFilter.filterPlan(plan, request);
 
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
