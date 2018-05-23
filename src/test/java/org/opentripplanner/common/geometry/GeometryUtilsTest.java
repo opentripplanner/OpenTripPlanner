@@ -13,8 +13,8 @@
 
 package org.opentripplanner.common.geometry;
 
-import static org.junit.Assert.assertEquals;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 
@@ -24,7 +24,13 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class GeometryUtilsTest {
+
+    private static final double tolerance = 0.000001;
+
     @Test
     public final void testSplitGeometryAtFraction() {
         Coordinate[] coordinates = new Coordinate[4];
@@ -217,5 +223,22 @@ public class GeometryUtilsTest {
         sequence = coordinateSequenceFactory.create(referenceCoordinates[8][1]);
         geometry = new LineString(sequence, geometryFactory);
         assertEquals(geometry, results[8][1]);
+    }
+
+    @Test
+    public void testWkt() {
+        String wkt = "POLYGON((1.0 2.0,3.0 -4.0,-1.0 2.0, 1.0 2.0))";
+        Geometry geom = GeometryUtils.parseWkt(wkt);
+        assertTrue(geom instanceof Polygon);
+        Coordinate[] coords = geom.getCoordinates();
+        assertEquals(4, coords.length);
+        assertEquals(1.0, coords[0].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[0].getOrdinate(1), tolerance);
+        assertEquals(3.0, coords[1].getOrdinate(0), tolerance);
+        assertEquals(-4.0, coords[1].getOrdinate(1), tolerance);
+        assertEquals(-1.0, coords[2].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[2].getOrdinate(1), tolerance);
+        assertEquals(1.0, coords[3].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[3].getOrdinate(1), tolerance);
     }
 }
