@@ -101,6 +101,25 @@ public abstract class GraphPathToTripPlanConverter {
             // do not include in plan
             if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
 
+            // Confirm minTransitDistance is satisfied, if present
+            if (request.minTransitDistance != null) {
+                double totalDistance = 0, transitDistance = 0;
+                for (Leg leg : itinerary.legs) {
+                    totalDistance += leg.distance;
+                    if (leg.isTransitLeg()) transitDistance += leg.distance;
+                }
+
+                // Handle percentage case
+                // TODO: handle number formatting errors
+                if (request.minTransitDistance.endsWith("%")) {
+                    double pctTransit = transitDistance / totalDistance;
+                    double minPct = Double.parseDouble(request.minTransitDistance.substring(0, request.minTransitDistance.length() - 1)) / 100;
+                    if (pctTransit < minPct) continue;
+                }
+
+                // TODO: handle explicit distance case
+            }
+
             plan.addItinerary(itinerary);
         }
 

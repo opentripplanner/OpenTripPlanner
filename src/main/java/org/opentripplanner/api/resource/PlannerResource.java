@@ -81,7 +81,13 @@ public class PlannerResource extends RoutingResource {
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
             TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
-            response.setPlan(plan);
+
+            // Check for empty plan after filtering
+            if(plan.itinerary.isEmpty()) {
+                // TODO: more descriptive message?
+                response.setError(new PlannerError());
+            }
+            else response.setPlan(plan);
 
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);

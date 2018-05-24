@@ -458,6 +458,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String companies;
 
+    public String minTransitDistance;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -978,7 +980,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && minTransitDistance == other.minTransitDistance;
     }
 
     /**
