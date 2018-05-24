@@ -14,6 +14,7 @@ package org.opentripplanner.routing.flex;
 
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.api.model.BoardAlightType;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -37,11 +38,13 @@ public class VermontFlexRoutingTest {
         assertEquals(1, rides.size());
         Ride ride = rides.get(0);
         assertEquals("1382", ride.getRoute().getId());
+        assertEquals(BoardAlightType.FLAG_STOP, ride.getBoardType());
+        assertEquals(BoardAlightType.FLAG_STOP, ride.getBoardType());
     }
 
-    private GraphPath getPathToDestination(String from, String to,
-                                           String date, String time) {
+    private GraphPath getPathToDestination(String from, String to, String date, String time) {
         RoutingRequest options = new RoutingRequest();
+        // defaults in vermont router-config.json
         options.maxWalkDistance = 804;
         options.maxWalkDistanceHeuristic = 5000;
         options.callAndRideReluctance = 3.0;
@@ -49,6 +52,8 @@ public class VermontFlexRoutingTest {
         options.tripDiscoveryMode = true;
         options.waitAtBeginningFactor = 0;
         options.transferPenalty = 600;
+        // for testing
+        options.ignoreDrtAdvanceBookMin = true;
         options.setDateTime(date, time, graph.getTimeZone());
         options.setFromString(from);
         options.setToString(to);
