@@ -38,10 +38,15 @@ public abstract class TripPlanFilter {
      * Generates an optimized trip plan from original plan
      */
     public static TripPlan filterPlan(TripPlan plan, RoutingRequest request) {
+        if (request.itineraryFiltering < 0.01) { // no more effect at this level
+            return plan;
+        }
+
         List<ItinerarySummary> summaries = new LinkedList<>();
         long bestNonTransitTime = Long.MAX_VALUE;
-        double filtering = 1.5; // coeff: how much worse routes are dropped
         double tolerance = 120; // minimal significant time loss in seconds
+
+        double filtering = 1 + 1/request.itineraryFiltering;
         double base1 = tolerance / filtering; // allowed decrease
         double base2 = tolerance * filtering; // minimal increase for dropping
 

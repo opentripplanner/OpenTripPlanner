@@ -169,6 +169,7 @@ public class GraphQlPlanner {
         callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
         callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
         callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
+        callWith.argument("itineraryFiltering", request::setItineraryFiltering);
         callWith.argument("walkReluctance", request::setWalkReluctance);
         callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
