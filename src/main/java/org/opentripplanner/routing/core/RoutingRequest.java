@@ -463,6 +463,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** If request date is invalid, apply the provided strategy to come up with a valid date. */
     public String invalidDateStrategy;
 
+    public String minTransitDistance;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -1011,7 +1013,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && invalidDateStrategy.equals(other.invalidDateStrategy);
+                && invalidDateStrategy.equals(other.invalidDateStrategy)
+                && minTransitDistance == other.minTransitDistance;
     }
 
     /**
