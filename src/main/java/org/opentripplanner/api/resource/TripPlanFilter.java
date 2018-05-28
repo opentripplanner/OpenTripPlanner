@@ -41,16 +41,16 @@ public abstract class TripPlanFilter {
         if (request.itineraryFiltering < 0.01) { // no more effect at this level
             return plan;
         }
+        LOG.debug("Filtering with factor " + String.valueOf(request.itineraryFiltering));
 
         List<ItinerarySummary> summaries = new LinkedList<>();
         long bestNonTransitTime = Long.MAX_VALUE;
-        double tolerance = 120; // minimal significant time loss in seconds
+        double tolerance = 90; // minimal significant time loss in seconds
 
-        double filtering = 1 + 1/request.itineraryFiltering;
-        double base1 = tolerance / filtering; // allowed decrease
-        double base2 = tolerance * filtering; // minimal increase for dropping
-
-        LOG.debug("Filtering ...\n");
+        double filtering = 1 + 1/request.itineraryFiltering; // range starts from 1
+        double fullItinFiltering = Math.sqrt(filtering); // for comparing total itinerary duration
+        double base1 = tolerance/filtering; // allowed decrease
+        double base2 = 2*tolerance*filtering; // minimal increase for dropping
 
         // Collect the required summary info
         for (Itinerary i : plan.itinerary) {
@@ -59,11 +59,6 @@ public abstract class TripPlanFilter {
             if(!s.hasTransit && i.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = i.walkTime;
             }
-            LOG.info("summary: walk, transit, fly " +
-                     String.valueOf(s.regularTransitTime) + " " +
-                     String.valueOf(i.walkTime) + " " +
-                     String.valueOf(s.flightTime)
-                     );
         }
 
         // Filter 1: transit option whose walk/bike time is greater than
@@ -71,7 +66,7 @@ public abstract class TripPlanFilter {
         for (ItinerarySummary summary : summaries) {
             if(summary.hasTransit && summary.i.walkTime > bestNonTransitTime) {
                 summary.remove = true;
-                LOG.info("remove summary, rule 1");
+                LOG.debug("remove summary with unnecessary transit leg");
             }
         }
 
@@ -88,20 +83,26 @@ public abstract class TripPlanFilter {
                     poor.endTime >= good.endTime && // arrives later
                     poor.i.transfers >= good.i.transfers && // does not reduce transfers
                     // check that all modes are at least almost as good
-                    poor.i.walkTime + base1 > good.i.walkTime && // does not add much walking
-                    poor.regularTransitTime + base1 > good.regularTransitTime && // does not add much transit
-                    poor.flightTime + base1 > good.flightTime && // does not add much flying
+                    poor.i.walkTime + base1 > good.i.walkTime && // does not reduce much walking
+                    poor.flightTime + base1 > good.flightTime && // does not reduce much flying. Keeps train vs flight!
+                    // note: filtered item may have less transit time because transit is preferred over walking!
                     // check if some mode is considerably worse
-                    (  poor.i.walkTime > filtering*good.i.walkTime + base2 || // much more walking
-                       poor.regularTransitTime > filtering*good.regularTransitTime + base2 || // much more transit
-                       poor.flightTime > filtering*good.flightTime + base2 // much more flying
-                    )
+                    (   poor.i.walkTime > filtering*good.i.walkTime + base2 || // much more walking
+                        poor.regularTransitTime > filtering*good.regularTransitTime + base2 || // much more transit
+                        poor.flightTime > filtering*good.flightTime + base2 // much more flying
+                    ) &&
+                    // time increase in total itinerary duration must also be significant
+                    // i.e. 5 min walk increase does not matter if trip takes an hour
+                    poor.i.duration > fullItinFiltering*good.i.duration
                 ) {
                   poor.remove = true;
-                  LOG.info("remove summary by rule 2:  walk, transit, fly = " +
-                     String.valueOf(poor.i.walkTime) + " " +
-                     String.valueOf(poor.regularTransitTime) + " " +
-                     String.valueOf(poor.flightTime)
+                  LOG.debug("remove itinerary: \n walk=" +
+                      String.valueOf(poor.i.walkTime) + " transit=" +
+                      String.valueOf(poor.regularTransitTime) + " fly=" +
+                      String.valueOf(poor.flightTime) + " poor \n walk=" + 
+                      String.valueOf(good.i.walkTime) + " transit=" +
+                      String.valueOf(good.regularTransitTime) + " fly=" +
+                      String.valueOf(good.flightTime) + " good"
                   );
                 }
             }
@@ -123,10 +124,8 @@ class ItinerarySummary {
     public Itinerary i;
     public boolean remove = false;
     public boolean hasTransit = false;
-    public long duration;
     public long startTime = 0;
     public long endTime = 0;
-    public long walkTime = 0;
     public long regularTransitTime = 0;
     public long flightTime = 0;
 
