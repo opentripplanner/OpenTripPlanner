@@ -29,7 +29,6 @@ import com.google.common.collect.Sets;
 import graphql.ExceptionWhileDataFetching;
 import graphql.GraphQLError;
 import graphql.schema.GraphQLSchema;
-import graphql.schema.validation.ValidationError;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
