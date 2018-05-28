@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import graphql.ExceptionWhileDataFetching;
 import graphql.GraphQLError;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.validation.ValidationError;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,6 +38,9 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import io.sentry.Sentry;
 import io.sentry.context.Context;
+import io.sentry.event.Event;
+import io.sentry.event.EventBuilder;
+
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -1045,7 +1049,7 @@ public class GraphIndex {
                             response.put("message", error.getMessage());
                             response.put("locations", error.getLocations());
                             response.put("errorType", error.getErrorType());
-                            // Convert stack trace to propr format
+                            // Convert stack trace to proper format
                             Stream<StackTraceElement> stack = Arrays.stream(((ExceptionWhileDataFetching) error).getException().getStackTrace());
                             response.put("stack", stack.map(StackTraceElement::toString).collect(Collectors.toList()));
                             return response;
@@ -1055,10 +1059,18 @@ public class GraphIndex {
                     })
                     .collect(Collectors.toList()));
 
-            for (GraphQLError error :executionResult.getErrors()) {
-                Sentry.getContext().addExtra("message",error.getMessage());
-                Sentry.getContext().addExtra("errorType",error.getErrorType());
-                Sentry.capture(((ExceptionWhileDataFetching) error).getException());
+            for (GraphQLError error : executionResult.getErrors()) {
+                Sentry.getContext().addExtra("message", error.getMessage());
+                Sentry.getContext().addExtra("errorType", error.getErrorType());
+                if (error instanceof ExceptionWhileDataFetching) {
+                	Sentry.capture(((ExceptionWhileDataFetching) error).getException());	
+                } else {
+                	EventBuilder builder = new EventBuilder()
+            			.withMessage(error.toString())
+            			.withLevel(Event.Level.ERROR)
+            			.withLogger(LOG.getName());
+                	Sentry.capture(builder);
+                }
             }
         }
         if (executionResult.getData() != null) {
