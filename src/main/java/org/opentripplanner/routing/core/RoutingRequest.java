@@ -475,12 +475,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Filtering sensitivity. Value 0 disables filtering. The higher the value,
      * the easier less good routes get filtered from response.
-     * Recommended value range is 0.2 - 2. Value 1 means that if an itinerary is twice as worse
+     * Recommended value range is 0.2 - 5. Value 1 means that if an itinerary is twice as worse
      * than another one in some respect (say 100% more walking), it will be filtered.
-     * Value 0.5 filters 200% worse itineraries and value 2 defines 50% filtering level i.e.
-     * level = 100%/sensitivity
+     * Value 0.5 filters 200% worse itineraries and value 2 defines 50% filtering level.
+     * Value 5 filters 20% worse routes.
+     * So, filter level = 100%/sensitivity
      */
-    public double itineraryFiltering = 0;
+    public double itineraryFiltering = 0; // off by default
 
     /* CONSTRUCTORS */
 
