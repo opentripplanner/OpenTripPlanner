@@ -16,6 +16,7 @@ package org.opentripplanner.api.resource;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.ListIterator;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -66,7 +67,7 @@ public abstract class TripPlanFilter {
         for (ItinerarySummary summary : summaries) {
             if(summary.hasTransit && summary.i.walkTime > bestNonTransitTime) {
                 summary.remove = true;
-                LOG.debug("remove summary with unnecessary transit leg");
+                LOG.debug("remove itinerary with unnecessary transit leg");
             }
         }
 
@@ -104,6 +105,40 @@ public abstract class TripPlanFilter {
                       String.valueOf(good.regularTransitTime) + " fly=" +
                       String.valueOf(good.flightTime) + " good"
                   );
+                }
+            }
+        }
+
+        // Filter 3: remove identical non-transit itineraries
+        // which show up in via point bike routing
+        Iterator<ItinerarySummary> i1= summaries.iterator();
+        while (i1.hasNext()) {
+            ItinerarySummary s1 = i1.next();
+            if (s1.hasTransit)
+                continue;
+            ListIterator<ItinerarySummary> i2 = summaries.listIterator(summaries.size());
+            while (i2.hasPrevious()) {
+                // iterate only the tail from the end to the i1 current pos
+                ItinerarySummary s2 = i2.previous();
+                if (s2 == s1)
+                    break;
+                if (s2.hasTransit || Math.abs(s1.i.duration - s2.i.duration) > 1)
+                    continue;
+                if (s1.i.legs.size() != s2.i.legs.size())
+                    continue;
+
+                Iterator<Leg> legs1 = s1.i.legs.iterator();
+                Iterator<Leg> legs2 = s2.i.legs.iterator();
+                while (legs1.hasNext() && legs2.hasNext()) {
+                    Leg leg1 = legs1.next();
+                    Leg leg2 = legs2.next();
+                    if (
+                      leg1.mode.equals(leg2.mode) &&
+                      Math.abs(leg1.getDuration() - leg2.getDuration()) < 1
+                    ) {
+                        s2.remove = true;
+                        LOG.debug("remove duplicate non-transit itinerary");
+                    }
                 }
             }
         }
