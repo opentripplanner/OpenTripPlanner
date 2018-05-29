@@ -1062,13 +1062,13 @@ public class GraphIndex {
                 Sentry.getContext().addExtra("message", error.getMessage());
                 Sentry.getContext().addExtra("errorType", error.getErrorType());
                 if (error instanceof ExceptionWhileDataFetching) {
-                	Sentry.capture(((ExceptionWhileDataFetching) error).getException());	
+                    Sentry.capture(((ExceptionWhileDataFetching) error).getException());
                 } else {
-                	EventBuilder builder = new EventBuilder()
-            			.withMessage(error.toString())
-            			.withLevel(Event.Level.ERROR)
-            			.withLogger(LOG.getName());
-                	Sentry.capture(builder);
+                    EventBuilder builder = new EventBuilder()
+                        .withMessage(error.toString())
+                        .withLevel(Event.Level.ERROR)
+                        .withLogger(LOG.getName());
+                    Sentry.capture(builder);
                 }
             }
         }
