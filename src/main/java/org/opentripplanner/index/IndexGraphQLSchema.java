@@ -2893,7 +2893,7 @@ public class IndexGraphQLSchema {
                         .dataFetcher(env -> ((WalkStep)env.getSource()).lon)
                         .build())
                     .field(GraphQLFieldDefinition.newFieldDefinition()
-                            .name("lat")
+                        .name("lat")
                         .description("The latitude of the start of the step.")
                         .type(Scalars.GraphQLFloat)
                         .dataFetcher(env -> ((WalkStep)env.getSource()).lat)
