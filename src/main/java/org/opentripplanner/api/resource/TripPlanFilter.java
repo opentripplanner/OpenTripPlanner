@@ -43,6 +43,7 @@ public abstract class TripPlanFilter {
             return plan;
         }
         LOG.debug("Filtering with factor " + String.valueOf(request.itineraryFiltering));
+        LOG.debug("Itinerary count = " + String.valueOf(plan.itinerary.size()));
 
         List<ItinerarySummary> summaries = new LinkedList<>();
         long bestNonTransitTime = Long.MAX_VALUE;
@@ -67,7 +68,7 @@ public abstract class TripPlanFilter {
         for (ItinerarySummary summary : summaries) {
             if(summary.hasTransit && summary.i.walkTime > bestNonTransitTime) {
                 summary.remove = true;
-                LOG.debug("remove itinerary with unnecessary transit leg");
+                LOG.debug("remove itinerary #{} with unnecessary transit leg", summaries.indexOf(summary));
             }
         }
 
@@ -97,13 +98,14 @@ public abstract class TripPlanFilter {
                     poor.i.duration > fullItinFiltering*good.i.duration
                 ) {
                   poor.remove = true;
-                  LOG.debug("remove itinerary: \n walk=" +
+                  LOG.debug("remove itinerary #{}: \n walk=" +
                       String.valueOf(poor.i.walkTime) + " transit=" +
                       String.valueOf(poor.regularTransitTime) + " fly=" +
                       String.valueOf(poor.flightTime) + " poor \n walk=" + 
                       String.valueOf(good.i.walkTime) + " transit=" +
                       String.valueOf(good.regularTransitTime) + " fly=" +
-                      String.valueOf(good.flightTime) + " good"
+                      String.valueOf(good.flightTime) + " good",
+                      summaries.indexOf(poor)
                   );
                 }
             }
@@ -122,23 +124,28 @@ public abstract class TripPlanFilter {
                 ItinerarySummary s2 = i2.previous();
                 if (s2 == s1)
                     break;
-                if (s2.hasTransit || Math.abs(s1.i.duration - s2.i.duration) > 1)
+                if (s2.remove || s2.hasTransit || Math.abs(s1.i.duration - s2.i.duration) > 1)
                     continue;
                 if (s1.i.legs.size() != s2.i.legs.size())
                     continue;
 
                 Iterator<Leg> legs1 = s1.i.legs.iterator();
                 Iterator<Leg> legs2 = s2.i.legs.iterator();
+                boolean remove = true;
                 while (legs1.hasNext() && legs2.hasNext()) {
                     Leg leg1 = legs1.next();
                     Leg leg2 = legs2.next();
                     if (
-                      leg1.mode.equals(leg2.mode) &&
-                      Math.abs(leg1.getDuration() - leg2.getDuration()) < 1
+                      !leg1.mode.equals(leg2.mode) ||
+                      Math.abs(leg1.getDuration() - leg2.getDuration()) > 1
                     ) {
-                        s2.remove = true;
-                        LOG.debug("remove duplicate non-transit itinerary");
+                        remove=false;
+                        break;
                     }
+                }
+                if (remove) {
+                    s2.remove = true;
+                    LOG.debug("remove duplicate non-transit itinerary #{}", summaries.indexOf(s2));
                 }
             }
         }
