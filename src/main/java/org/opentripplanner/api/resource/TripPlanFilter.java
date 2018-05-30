@@ -84,7 +84,7 @@ public abstract class TripPlanFilter {
                 if (
                     (!good.hasTransit || // comparing start and end time makes sense only if transit is used
                      (poor.startTime <= good.startTime && poor.endTime >= good.endTime)) && // leaves earlier and  arrives later
-                    poor.i.transfers >= good.i.transfers && // does not reduce transfers
+                    poor.i.legs.size() >= good.i.legs.size() && // does not simplify the route
                     // check that all modes are at least almost as good
                     poor.i.walkTime + base1 > good.i.walkTime && // does not reduce much walking
                     poor.flightTime + base1 > good.flightTime && // does not reduce much flying. Keeps train vs flight!
