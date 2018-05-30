@@ -81,8 +81,9 @@ public abstract class TripPlanFilter {
             for (ItinerarySummary good : summaries) {
                 if (poor == good)
                     continue;
-                if (poor.startTime <= good.startTime && // leaves earlier
-                    poor.endTime >= good.endTime && // arrives later
+                if (
+                    (!good.hasTransit || // comparing start and end time makes sense only if transit is used
+                     (poor.startTime <= good.startTime && poor.endTime >= good.endTime)) && // leaves earlier and  arrives later
                     poor.i.transfers >= good.i.transfers && // does not reduce transfers
                     // check that all modes are at least almost as good
                     poor.i.walkTime + base1 > good.i.walkTime && // does not reduce much walking
@@ -101,7 +102,7 @@ public abstract class TripPlanFilter {
                   LOG.debug("remove itinerary #{}: \n walk=" +
                       String.valueOf(poor.i.walkTime) + " transit=" +
                       String.valueOf(poor.regularTransitTime) + " fly=" +
-                      String.valueOf(poor.flightTime) + " poor \n walk=" + 
+                      String.valueOf(poor.flightTime) + " poor \n walk=" +
                       String.valueOf(good.i.walkTime) + " transit=" +
                       String.valueOf(good.regularTransitTime) + " fly=" +
                       String.valueOf(good.flightTime) + " good",
