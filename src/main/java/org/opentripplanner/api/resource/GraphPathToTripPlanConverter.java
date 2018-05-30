@@ -101,8 +101,9 @@ public abstract class GraphPathToTripPlanConverter {
             // do not include in plan
             if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
 
-            // Confirm minTransitDistance is satisfied, if present
-            if (request.minTransitDistance != null) {
+            // If this is a transit option and minTransitDistance is specified, do not include in plan if the
+            // itinerary's total transit distance is less than minTransitDistance
+            if (itinerary.transitTime > 0 && request.minTransitDistance != null) {
                 double totalDistance = 0, transitDistance = 0;
                 for (Leg leg : itinerary.legs) {
                     totalDistance += leg.distance;
