@@ -372,6 +372,9 @@ public abstract class RoutingResource {
     @QueryParam("carParkCarLegWeight")
     private Double carParkCarLegWeight;
 
+    @QueryParam("itineraryFiltering")
+    private Double itineraryFiltering;
+
     @QueryParam("heuristicStepsPerMainStep")
     private Integer heuristicStepsPerMainStep;
 
@@ -422,7 +425,11 @@ public abstract class RoutingResource {
         if(carParkCarLegWeight != null) {
             request.setCarParkCarLegWeight(carParkCarLegWeight);
         }
-        
+
+        if(itineraryFiltering != null) {
+            request.setItineraryFiltering(itineraryFiltering);
+        }
+
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 
