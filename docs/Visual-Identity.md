@@ -1,6 +1,10 @@
 #OpenTripPlanner Visual Identity
 
-Here is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
+This is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
+
+![OTP Logo](otp-logo.svg)
+
+Here is a link to this SVG logo as a [downloadable file](otp-logo.svg). This is the raw SVG XML source code:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -17,8 +21,6 @@ Here is the OpenTripPlanner logo in scalable vector format, with knockout transp
 	l21.712,14.775L92.222,85.667z"/>
 </svg>
 ```
-
-Here is a link to the same SVG logo as a [downloadable file](otp-logo.svg).
 
 This concept behind this logo design was "infinite roads". Besides the clear references to movement and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T and P. This design is more geometric and austere than our previous logo, which makes it readily recognizable in a crowd of small app icons, bookmarks, or favicons. It also channels the high modern logos and 1970s supergraphics that were the visual style of public transport for a generation.
 
