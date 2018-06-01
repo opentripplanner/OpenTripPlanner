@@ -21,6 +21,8 @@ Here is the OpenTripPlanner logo in scalable vector format:
 
 This concept behind this logo design was named "infinite roads". Besides the clear references to movement and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T and P. This design is more geometric and austere than our previous logo, which makes it readily recognizable in a crowd of small app icons, bookmarks, or favicons. It also channels the high modern logos and 1970s supergraphics that were the visual style of public transport for a generation.
 
+The color of the logo in the RGB colorspace is `#2179BF`.
+
 Here is a link to the same data as a [file you can download](otp-logo.svg).
 
 The name of the OpenTripPlanner project is written in CamelCase: capital letters at the beginning of each word, with no spaces between the words. For the logotype we do not strictly adhere to a standard typeface. The OTP website just uses the CSS declarations `font: 30pt helvetica, sans-serif; font-weight: bold;`.
