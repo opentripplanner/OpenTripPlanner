@@ -1,6 +1,6 @@
 #OpenTripPlanner Visual Identity
 
-Here is the OpenTripPlanner logo in scalable vector format:
+Here is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
