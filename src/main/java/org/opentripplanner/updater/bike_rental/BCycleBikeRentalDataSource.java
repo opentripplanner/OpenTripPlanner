@@ -13,12 +13,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.HashSet;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashSet;
 
 
 /**
@@ -26,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * @see GenericJsonBikeRentalDataSource
  */
-public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class BCycleBikeRentalDataSource extends GenericJsonBikeStationDataSource {
 
     private String networkName;
 
@@ -47,7 +46,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
         BikeRentalStation brstation = new BikeRentalStation();
 
-        brstation.networks = new HashSet<String>();
+        brstation.networks = new HashSet<>();
         brstation.networks.add(this.networkName);
 
         brstation.id = kioskNode.path("Id").toString();

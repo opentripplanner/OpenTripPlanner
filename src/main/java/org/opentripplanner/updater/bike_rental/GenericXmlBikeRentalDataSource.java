@@ -13,12 +13,8 @@
 
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.bike_rental.BikeRentalRegion;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -26,28 +22,29 @@ import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericXmlBikeRentalDataSource.class);
 
     private String url;
 
-    List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
+    List<BikeRentalStation> stations = new ArrayList<>();
 
     private XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
     public GenericXmlBikeRentalDataSource(String path) {
-        xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
+        xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader.setPath(path);
-        xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikeRentalStation>() {
-            @Override
-            public BikeRentalStation build(Map<String, String> attributes) {
-                /* TODO Do not make this class abstract, but instead make the client
-                 * provide itself the factory?
-                 */
-                return makeStation(attributes);
-            }
+        xmlDownloader.setDataFactory(attributes -> {
+            /* TODO Do not make this class abstract, but instead make the client
+             * provide itself the factory?
+             */
+            return makeStation(attributes);
         });
     }
 
@@ -67,6 +64,11 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     @Override
     public synchronized List<BikeRentalStation> getStations() {
         return stations;
+    }
+
+    @Override
+    public synchronized List<BikeRentalRegion> getRegions() {
+        return new ArrayList<>();
     }
 
     public void setReadAttributes(boolean readAttributes) {

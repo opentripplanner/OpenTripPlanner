@@ -48,6 +48,7 @@ public class StateEditorTest {
         state.stateData.carParked = true;
         state.stateData.bikeParked = true;
         state.stateData.usingRentedBike = false;
+        state.stateData.isFloatingBike = false;
         state.stateData.nonTransitMode = TraverseMode.WALK;
 
         StateEditor se = new StateEditor(request, null);
@@ -57,5 +58,6 @@ public class StateEditorTest {
         assertEquals(true, updatedState.isCarParked());
         assertEquals(true, updatedState.isBikeParked());
         assertEquals(false, updatedState.isBikeRenting());
+        assertEquals(false, updatedState.isFloatingBike());
     }
 }

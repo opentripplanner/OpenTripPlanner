@@ -46,7 +46,7 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         //linker.createLinkage();
         
         SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
-        splitter.link();
+        splitter.linkAllStationsToGraph();
         
         // don't split streets
         //SampleStopLinker linker = new SampleStopLinker(graph);

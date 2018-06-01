@@ -13,18 +13,48 @@
 
 package org.opentripplanner.common.geometry;
 
-import static org.junit.Assert.assertEquals;
-
+import com.vividsolutions.jts.geom.*;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.model.P2;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import static org.junit.Assert.assertEquals;
 
 public class GeometryUtilsTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+
+    @Test
+    public final void testConvertGeoJsonToJtsGeometry() throws UnsupportedGeometryException {
+
+        { // Should convert Point correctly
+            double lng1 = -77.1111;
+            double lat1 = 38.1111;
+            org.geojson.Point p1 = new org.geojson.Point(lng1, lat1);
+            Point geometry = (Point) GeometryUtils.convertGeoJsonToJtsGeometry(p1);
+            assertEquals(lng1, geometry.getX(), 0.0001);
+            assertEquals(lat1, geometry.getY(), 0.0001);
+        }
+
+        { // Should convert LineString correctly
+            double lng1 = -77.1111;
+            double lat1 = 38.1111;
+            double lng2 = -77.2222;
+            double lat2 = 38.2222;
+            org.geojson.LngLatAlt a1 = new org.geojson.LngLatAlt(lng1, lat1);
+            org.geojson.LngLatAlt a2 = new org.geojson.LngLatAlt(lng2, lat2);
+            org.geojson.LineString lineString = new org.geojson.LineString(a1, a2);
+            LineString geometry = (LineString) GeometryUtils.convertGeoJsonToJtsGeometry(lineString);
+            assertEquals(lng1, geometry.getCoordinateN(0).x, 0.0001);
+            assertEquals(lat1, geometry.getCoordinateN(0).y, 0.0001);
+            assertEquals(lng2, geometry.getCoordinateN(1).x, 0.0001);
+            assertEquals(lat2, geometry.getCoordinateN(1).y, 0.0001);
+        }
+    }
+
     @Test
     public final void testSplitGeometryAtFraction() {
         Coordinate[] coordinates = new Coordinate[4];

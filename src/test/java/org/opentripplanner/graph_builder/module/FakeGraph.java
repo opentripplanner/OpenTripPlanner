@@ -554,7 +554,7 @@ public class FakeGraph {
     /** link the stops in the graph */
     public static void link (Graph g) {
         SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
-        linker.link();
+        linker.linkAllStationsToGraph();
     }
 
 }

@@ -201,12 +201,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int bikeSwitchCost;
 
     /** Time to rent a bike */
-    public int bikeRentalPickupTime = 60;
+    public int bikeRentalPickupTime = 30;
 
     /**
      * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    public int bikeRentalPickupCost = 120;
+    public int bikeRentalPickupCost = 30;
 
     /** Time to drop-off a rented bike */
     public int bikeRentalDropoffTime = 30;
@@ -219,6 +219,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
+
+    /** Only use these bike networks. If null, use all of them. If empty, ignore all bike networks.*/
+    public HashSet<String> bikeNetworks;
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
@@ -239,7 +242,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double waitReluctance = 1.0;
 
-    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding) */
+    /** The lower this number is, the less waiting time on the platform is considered, which means that later trips can
+     *  beat sooner trips of the same duration (excluding the initial wait time). */
     public double waitAtBeginningFactor = 0.4;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
@@ -673,6 +677,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+    }
+
+    public void setBikeNetworks(String s) {
+        if (s != null && !s.equals(""))
+            bikeNetworks = new HashSet<>(Arrays.asList(s.split(",")));
     }
 
     public final static int MIN_SIMILARITY = 1000;

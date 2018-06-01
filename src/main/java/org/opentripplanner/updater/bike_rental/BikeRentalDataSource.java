@@ -13,9 +13,10 @@
 
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.List;
-
+import org.opentripplanner.routing.bike_rental.BikeRentalRegion;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+
+import java.util.List;
 
 /**
  * TODO clarify thread safety.
@@ -33,5 +34,9 @@ public interface BikeRentalDataSource {
      * @return a List of all currently known bike rental stations. The updater will use this to update the Graph.
      */
     List<BikeRentalStation> getStations();
-    
+
+    /**
+     * @return a List of all currently known bike rental regions. The updater will use this to update the Graph.
+     */
+    List<BikeRentalRegion> getRegions();
 }

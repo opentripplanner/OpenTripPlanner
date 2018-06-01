@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @link https://developer.jcdecaux.com
  * @see BikeRentalDataSource
  */
-public class JCDecauxBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class JCDecauxBikeRentalDataSource extends GenericJsonBikeStationDataSource {
 
     public JCDecauxBikeRentalDataSource() {
         super("");

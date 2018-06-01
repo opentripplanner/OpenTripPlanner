@@ -100,6 +100,7 @@ public class GraphPathFinder {
         }
 
         // Without transit, we'd just just return multiple copies of the same on-street itinerary.
+        // TODO(mahmood): why? what if it's a car routing? or if we want multiple bike routes?
         if (!options.modes.isTransit()) {
             options.numItineraries = 1;
         }

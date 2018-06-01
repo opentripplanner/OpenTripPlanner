@@ -346,9 +346,10 @@ public class StateEditor {
         child.stateData.everBoarded = true;
     }
 
-    public void beginVehicleRenting(TraverseMode vehicleMode) {
+    public void beginVehicleRenting(TraverseMode vehicleMode, boolean isFloatingBike) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = true;
+        child.stateData.isFloatingBike = isFloatingBike;
         child.stateData.nonTransitMode = vehicleMode;
     }
 
@@ -419,6 +420,7 @@ public class StateEditor {
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.isFloatingBike = state.stateData.isFloatingBike;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
@@ -429,6 +431,7 @@ public class StateEditor {
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
+        child.stateData.isFloatingBike = state.isFloatingBike();
     }
 
     /* PUBLIC GETTER METHODS */
@@ -527,7 +530,7 @@ public class StateEditor {
 
     public void setBikeRentalNetwork(Set<String> networks) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalNetworks = networks;
+        child.stateData.currentlyRentedBikes = networks;
     }
 
     public boolean hasEnteredNoThroughTrafficArea() {

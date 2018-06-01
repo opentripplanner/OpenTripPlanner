@@ -26,6 +26,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+
+import java.util.HashSet;
 import java.util.Locale;
 
 /** 
@@ -81,6 +83,14 @@ public class StreetTransitLink extends Edge {
         return this.getName();
     }
 
+    /**
+     *
+     * @return true if the link connects a street vertex to a transit stop, false if it's the reverse (transit to street).
+     */
+    private boolean isEnteringTransit() {
+        return tov instanceof TransitStop;
+    }
+
     public State traverse(State s0) {
 
         // Forbid taking shortcuts composed of two street-transit links in a row. Also avoids spurious leg transitions.
@@ -101,17 +111,25 @@ public class StreetTransitLink extends Edge {
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
         }
-        if (s0.isBikeRenting()) {
-            // Forbid taking a rented bike on any transit.
-            // TODO Check this condition, does this always make sense?
-            return null;
-        }
 
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
+        // Check if there is a rental bike and if it can be dropped off.
+        // Forbid a rental bike on any transit.
+        if (isEnteringTransit() && s0.isBikeRenting()) {
+            if (s0.isFloatingBike() && s0.isFloatingBikeDropOffAllowed()) {
+                // Drop off the bike here
+                s1.setBikeParked(true);
+                // TODO(mahmood): add `incrementWeight` and `incrementTimeInSeconds` as cost of drop off
+                s1.doneVehicleRenting();
+                s1.setBikeRentalNetwork(new HashSet<>());
+            } else {
+                return null;
+            }
+        }
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {

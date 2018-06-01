@@ -8,7 +8,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class UIPBikeRentalDataSource extends GenericJsonBikeStationDataSource {
 
     private String baseURL = null;
 
@@ -47,7 +47,7 @@ public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
         List<BikeRentalStation> stations = super.getStations();
 
         // update stations with availability info
-        super.stations = new ArrayList<>();
+        super.items = new ArrayList<>();
         if(baseURL == null){
             baseURL = getUrl();
         }
@@ -57,7 +57,7 @@ public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
         }
 
         List<BikeRentalStation> stationsAvailability = super.getStations();
-        super.stations = mergeStationInfo(stations, stationsAvailability);
+        super.items = mergeStationInfo(stations, stationsAvailability);
         setUrl(baseURL);
         return true;
     }

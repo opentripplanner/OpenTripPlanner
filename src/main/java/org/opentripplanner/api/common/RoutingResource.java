@@ -237,6 +237,11 @@ public abstract class RoutingResource {
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
     
+    /** The comma-separated list of requested bike networks. If null, all bike networks will be taken into account.
+     * If empty, all bike networks will be ignored. */
+    @QueryParam("bikeNetworks")
+    protected String bikeNetworks;
+
     /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
@@ -504,6 +509,9 @@ public abstract class RoutingResource {
 
         if (bannedAgencies != null)
             request.setBannedAgencies(bannedAgencies);
+
+        if (bikeNetworks != null)
+            request.setBikeNetworks(bikeNetworks);
 
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
         if (bannedTripMap != null)

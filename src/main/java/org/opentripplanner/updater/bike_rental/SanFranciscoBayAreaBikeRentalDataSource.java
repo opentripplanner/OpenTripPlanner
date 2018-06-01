@@ -25,7 +25,7 @@ import java.util.HashSet;
  *
  * @see GenericJsonBikeRentalDataSource
  */
-public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeStationDataSource {
 
     private String networkName;
 

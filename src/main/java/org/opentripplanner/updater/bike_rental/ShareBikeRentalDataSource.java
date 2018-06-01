@@ -12,7 +12,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 
-public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class ShareBikeRentalDataSource extends GenericJsonBikeStationDataSource {
 
 	private static final Logger log = LoggerFactory.getLogger(ShareBikeRentalDataSource.class);
 

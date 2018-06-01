@@ -19,6 +19,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
+import java.util.Set;
+
 /**
  * A vertex for a bike rental station.
  * It is connected to the streets by a StreetBikeRentalLink.
@@ -36,18 +38,32 @@ public class BikeRentalStationVertex extends Vertex {
 
     private int spacesAvailable;
 
+    private boolean pickupAllowed;
+    /**
+     * isFloatingBike denotes whether a bike is dockless or not.
+     */
+    public final boolean isFloatingBike;
+
     private String id;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean isCarStation;
 
+    /**
+     * List of compatible network names. Null (default) to be compatible with all.
+     */
+    public Set<String> networks;
+
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.x, station.y, station.name);
         this.setId(station.id);
+        this.networks = station.networks;
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
+        this.setPickupAllowed(station.allowPickup);
+        this.isFloatingBike = station.isFloatingBike;
     }
 
     public int getBikesAvailable() {
@@ -83,4 +99,11 @@ public class BikeRentalStationVertex extends Vertex {
          return isCarStation ? TraverseMode.CAR : TraverseMode.BICYCLE;
     }
 
+    public boolean isPickupAllowed() {
+        return pickupAllowed;
+    }
+
+    public void setPickupAllowed(boolean pickupAllowed) {
+        this.pickupAllowed = pickupAllowed;
+    }
 }

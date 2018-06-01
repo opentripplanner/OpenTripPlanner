@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class DateUtils implements DateConstants {
     private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
     private static final int SANITY_CHECK_CUTOFF_YEAR = 1000;
+
+    private static final Pattern INT_PATTERN = Pattern.compile("\\d+");
 
     /**
      * Returns a Date object based on input date & time parameters Defaults to today / now (when
@@ -92,39 +95,50 @@ public class DateUtils implements DateConstants {
 
     /**
      * Returns H,M,S
-     * @param time
+     *
+     * @param time a String representing time of day
+     *             valid formats: "hh:mm", "hh:mm:ss", "hh:mmAM", "hh:mm:ssAM", "hh:mm:ss AM"
+     *             The input also can be a string of an integer value between 0 and 86399; seconds past midnight;
      * @return
      */
-    private static int[] parseTime(String time) {
+    static int[] parseTime(String time) {
+
+        // If the input is a string representation of an integer, consider it seconds past midnight
+        if (time != null && INT_PATTERN.matcher(time).matches()) {
+            int secondsPastMidnight = getIntegerFromString(time);
+            if (secondsPastMidnight > 86399) { // secondsPastMidnight must be less than 24 x 3600 seconds
+                return null;
+            }
+            return new int[]{secondsPastMidnight / 3600, (secondsPastMidnight % 3600) / 60, secondsPastMidnight % 60};
+        }
+
         int[] retVal = null;
 
         boolean amPm = false;
         int addHours = 0;
-        int hour = 0, min = 0, sec = 0;
+        int hour, min, sec = 0;
         try {
             String[] hms = time.toUpperCase().split(":");
+            final int end = hms.length - 1;
+            if (hms.length > 1) {
+                if (hms[end].endsWith("PM") || hms[end].endsWith("AM")) {
+                    amPm = true;
 
-            // if we don't have a colon sep string, assume string is int and represents seconds past
-            // midnight
-            if (hms.length < 2) {
-                int secondsPastMidnight = getIntegerFromString(time);
-                retVal = new int[] { secondsPastMidnight / 3600, (secondsPastMidnight % 3600) / 60, secondsPastMidnight % 60 };
-            }
+                    if (hms[end].contains("PM"))
+                        addHours = 12;
 
-            if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
-                amPm = true;
-
-                if (hms[1].contains("PM"))
-                    addHours = 12;
-
-                int suffex = hms[1].lastIndexOf(' ');
-                if (suffex < 1) {
-                    suffex = hms[1].lastIndexOf("AM");
-                    if (suffex < 1) {
-                        suffex = hms[1].lastIndexOf("PM");
+                    int suffix = hms[end].lastIndexOf(' ');
+                    if (suffix < 1) {
+                        suffix = hms[end].lastIndexOf("AM");
+                        if (suffix < 1) {
+                            suffix = hms[end].lastIndexOf("PM");
+                        }
                     }
+                    hms[end] = hms[end].substring(0, suffix);
                 }
-                hms[1] = hms[1].substring(0, suffex);
+                if (hms.length == 3) {
+                    sec = Integer.parseInt(trim(hms[end]));
+                }
             }
 
             int h = Integer.parseInt(trim(hms[0]));
@@ -133,14 +147,10 @@ public class DateUtils implements DateConstants {
             hour = h + addHours;
 
             min = Integer.parseInt(trim(hms[1]));
-            if (hms.length > 2) {
-                sec = Integer.parseInt(trim(hms[2]));
-            }
 
-            retVal = new int[] {hour, min, sec};
+            retVal = new int[]{hour, min, sec};
         } catch (Exception e) {
             LOG.info(time + " didn't parse", e);
-            retVal = null;
         }
 
         return retVal;

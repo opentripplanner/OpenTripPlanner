@@ -13,17 +13,18 @@
 
 package org.opentripplanner.routing.bike_rental;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.opentripplanner.routing.bike_park.BikePark;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class BikeRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
     private Set<BikeRentalStation> bikeRentalStations = new HashSet<>();
+
+    /* bikeRentalRegions is a map of bike network name to its service area. */
+    private Map<String, BikeRentalRegion> bikeRentalRegions = new HashMap<>();
 
     private Set<BikePark> bikeParks = new HashSet<>();
 
@@ -39,6 +40,14 @@ public class BikeRentalStationService implements Serializable {
 
     public void removeBikeRentalStation(BikeRentalStation bikeRentalStation) {
         bikeRentalStations.remove(bikeRentalStation);
+    }
+
+    public Map<String, BikeRentalRegion> getBikeRentalRegions() {
+        return bikeRentalRegions;
+    }
+
+    public void addBikeRentalRegion(BikeRentalRegion bikeRentalRegion) {
+        bikeRentalRegions.put(bikeRentalRegion.network, bikeRentalRegion);
     }
 
     public Collection<BikePark> getBikeParks() {
