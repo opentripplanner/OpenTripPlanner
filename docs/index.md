@@ -1,4 +1,4 @@
-![OTP Logo](otplogo.png)
+![OTP Logo](otp-logo.svg)
 # OpenTripPlanner
 
 _This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
