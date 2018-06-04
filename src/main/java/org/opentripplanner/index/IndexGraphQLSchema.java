@@ -29,7 +29,9 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -2879,6 +2881,51 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((Leg) environment.getSource()).intermediatePlace)
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("steps")
+                .type(new GraphQLList(GraphQLObjectType.newObject()
+                    .name("step")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("distance")
+                        .description("The distance in meters that this step takes.")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(env -> ((WalkStep)env.getSource()).distance)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("lon")
+                        .description("The longitude of the start of the step.")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(env -> ((WalkStep)env.getSource()).lon)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("lat")
+                        .description("The latitude of the start of the step.")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(env -> ((WalkStep)env.getSource()).lat)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("elevationProfile")
+                        .description("The elevation profile as a list of { distance, elevation } values.")
+                        .type(new GraphQLList(GraphQLObjectType.newObject()
+                            .name("elevationProfileComponent")
+                            .field(GraphQLFieldDefinition.newFieldDefinition()
+                                .name("distance")
+                                .description("The distance from the start of the step, in meters.")
+                                .type(Scalars.GraphQLFloat)
+                                .dataFetcher(env -> ((P2<Double>)env.getSource()).first)
+                                .build())
+                            .field(GraphQLFieldDefinition.newFieldDefinition()
+                                .name("elevation")
+                                .description("The elevation at this distance, in meters.")
+                                .type(Scalars.GraphQLFloat)
+                                .dataFetcher(env -> ((P2<Double>)env.getSource()).second)
+                                .build())
+                            .build()))
+                        .dataFetcher(env -> ((WalkStep)env.getSource()).elevation)
+                        .build())
+                    .build()))
+                .dataFetcher(new PropertyDataFetcher("walkSteps"))
+                .build())
             .build();
 
         GraphQLObjectType fareType = GraphQLObjectType.newObject()
@@ -2994,6 +3041,18 @@ public class IndexGraphQLSchema {
                     }).collect(Collectors.toList());
                     return results;
                 })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("elevationGained")
+                .description("How much elevation is gained, in total, over the course of the trip, in meters.")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(env -> ((Itinerary)env.getSource()).elevationGained)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("elevationLost")
+                .description("How much elevation is lost, in total, over the course of the trip, in meters.")
+                .type(Scalars.GraphQLFloat)
+                .dataFetcher(env -> ((Itinerary)env.getSource()).elevationLost)
                 .build())
             .build();
 
