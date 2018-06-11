@@ -689,6 +689,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("language")
+                .description("Two-letter language code (ISO 639-1)");
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey())
                 .build())
@@ -716,16 +717,19 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
+		.description("Route affected by the disruption")
                 .type(routeType)
                 .dataFetcher(environment -> index.routeForId.get(((AlertPatch) environment.getSource()).getRoute()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trip")
+		.description("Trip affected by the disruption")
                 .type(tripType)
                 .dataFetcher(environment -> index.tripForId.get(((AlertPatch) environment.getSource()).getTrip()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
+		.description("Stop affected by the disruption")
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId.get(((AlertPatch) environment.getSource()).getStop()))
                 .build())
@@ -784,7 +788,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("effectiveStartDate")
                 .type(Scalars.GraphQLLong)
-                .description("When this alert comes into effect")
+                .description("Time when this alert comes into effect. Format: Unix timestamp in seconds")
                 .dataFetcher(environment -> {
                     Alert alert = ((AlertPatch) environment.getSource()).getAlert();
                     return alert.effectiveStartDate != null ? alert.effectiveStartDate.getTime() / 1000 : null;
@@ -793,7 +797,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("effectiveEndDate")
                 .type(Scalars.GraphQLLong)
-                .description("When this alert is not in effect anymore")
+                .description("Time when this alert is not in effect anymore. Format: Unix timestamp in seconds")
                 .dataFetcher(environment -> {
                     Alert alert = ((AlertPatch) environment.getSource()).getAlert();
                     return alert.effectiveEndDate != null ? alert.effectiveEndDate.getTime() / 1000 : null;
@@ -894,6 +898,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
+		    .description("If true, only those stoptimes which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
@@ -1004,6 +1009,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopTimesForPattern")
+		.description("Returns timetable of the specified pattern at this stop");
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
@@ -1028,6 +1034,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
+		    .description("If true, only those stoptimes which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
@@ -1114,7 +1121,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
-                .description("Returns all stops that are childen of this station (Only applicable for locationType = 1)")
+                .description("Returns all stops that are children of this station (Only applicable for locationType = 1)")
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment -> index.stopsForParentStation.get(((Stop) environment.getSource()).getId()))
                 .build())
@@ -1181,10 +1188,11 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesForPatterns")
+		.description("Returns list of stoptimes (arrivals and departures) at this stop, grouped by patterns")
                 .type(new GraphQLList(stoptimesInPatternType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time");
+		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time")
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0L) // Default value is current time
                     .build())
@@ -1200,6 +1208,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
+		    .description("If true, only those stoptimes which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
@@ -1230,10 +1239,11 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesWithoutPatterns")
+		.description("Returns list of stoptimes (arrivals and departures) at this stop")
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time");
+		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time")
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0L) // Default value is current time
                     .build())
@@ -1249,6 +1259,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
+		    .description("If true, only those stoptimes which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
@@ -1287,6 +1298,7 @@ public class IndexGraphQLSchema {
 
         stoptimeType = GraphQLObjectType.newObject()
             .name("Stoptime")
+	    .description("Time of arrival and/or departure at a stop")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
@@ -1295,14 +1307,14 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("scheduledArrival")
-		.description("Scheduled arrival time. Format: seconds since midnight of the departure date");
+		.description("Scheduled arrival time. Format: seconds since midnight of the departure date")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).scheduledArrival)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtimeArrival")
-		.description("Realtime prediction of arrival time. Format: seconds since midnight of the departure date");
+		.description("Realtime prediction of arrival time. Format: seconds since midnight of the departure date")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).realtimeArrival)
@@ -1334,6 +1346,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("timepoint")
+		.description("true, if this stop is used as a time equalization stop. false otherwise.")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).timepoint)
                 .build())
@@ -1381,6 +1394,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("headsign")
+		.description("Headsign of the trip on this stop.")
               	.type(Scalars.GraphQLString)
               	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
               	.build())
@@ -1494,7 +1508,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDate")
-		    .description("Date for which stoptimes are returned. Format: YYYYMMDD");
+		    .description("Date for which stoptimes are returned. Format: YYYYMMDD")
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
@@ -1591,6 +1605,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("code")
+		.description("id of the pattern");
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> ((TripPattern) environment.getSource()).code)
                 .build())
@@ -1612,7 +1627,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDate")
-		    .description("Return trips of the pattern active on this date. Format: YYYYMMDD");
+		    .description("Return trips of the pattern active on this date. Format: YYYYMMDD")
                     .type(Scalars.GraphQLString)
                     .build())
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
@@ -2211,8 +2226,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByRadius")
-                .description(
-                    "Get all stops within the specified radius from a location. The returned type has two fields stop and distance")
+                .description("Get all stops within the specified radius from a location. The returned type has two fields stop and distance")
                 .type(relay.connectionType("stopAtDistance",
                     relay.edgeType("stopAtDistance", stopAtDistanceType, null, new ArrayList<>()),
                     new ArrayList<>()))
@@ -2228,7 +2242,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("radius")
-                    .description("Radius (in meters) to search for from the specified location")
+                    .description("Radius (in meters) to search for from the specified location. Note that this is walking distance along streets and paths rather than a geographic distance.")
                     .type(Scalars.GraphQLInt)
                     .build())
                 .argument(GraphQLArgument.newArgument()
@@ -2275,7 +2289,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("maxDistance")
-                    .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
+                    .description("Maximum distance (in meters) to search for from the specified location. Note that this is walking distance along streets and paths rather than a geographic distance. Default is 2000m")
                     .defaultValue(2000)
                     .type(Scalars.GraphQLInt)
                     .build())
