@@ -436,12 +436,12 @@ public class IndexGraphQLSchema {
             .type(planType)
             .argument(GraphQLArgument.newArgument()
                 .name("date")
-                .description("Date of departure or arrival in format YYYY-MM-DD. Default value: current date");
+                .description("Date of departure or arrival in format YYYY-MM-DD. Default value: current date")
                 .type(Scalars.GraphQLString)
 		.build())
             .argument(GraphQLArgument.newArgument()
                 .name("time")
-		.description("Time of departure or arrival in format hh:mm:ss. Default value: current time");
+		.description("Time of departure or arrival in format hh:mm:ss. Default value: current time")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -689,7 +689,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("language")
-                .description("Two-letter language code (ISO 639-1)");
+                .description("Two-letter language code (ISO 639-1)")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey())
                 .build())
@@ -1009,7 +1009,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopTimesForPattern")
-		.description("Returns timetable of the specified pattern at this stop");
+		.description("Returns timetable of the specified pattern at this stop")
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
@@ -1018,7 +1018,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-		    .description("Return  departures after this time. Format: Unix timestamp in seconds. Default value: current time");
+		    .description("Return  departures after this time. Format: Unix timestamp in seconds. Default value: current time")
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0l) // Default value is current time
                     .build())
@@ -1326,14 +1326,14 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("scheduledDeparture")
-		.description("Scheduled departure time. Format: seconds since midnight of the departure date");
+		.description("Scheduled departure time. Format: seconds since midnight of the departure date")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).scheduledDeparture)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtimeDeparture")
-		.description("Realtime prediction of departure time. Format: seconds since midnight of the departure date");
+		.description("Realtime prediction of departure time. Format: seconds since midnight of the departure date")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).realtimeDeparture)
@@ -1376,7 +1376,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
-		.description("Departure date of the trip. Format: Unix timestamp (local time) in seconds.");
+		.description("Departure date of the trip. Format: Unix timestamp (local time) in seconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).serviceDay)
                 .build())
@@ -1429,7 +1429,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("activeDates")
-		.description("List of dates when this trip is in service. Format: YYYYMMDD");
+		.description("List of dates when this trip is in service. Format: YYYYMMDD")
                 .type(new GraphQLList(Scalars.GraphQLString))
                 .dataFetcher(environment -> index.graph.getCalendarService()
                     .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
@@ -1605,7 +1605,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("code")
-		.description("id of the pattern");
+		.description("id of the pattern")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> ((TripPattern) environment.getSource()).code)
                 .build())
