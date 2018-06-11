@@ -436,10 +436,12 @@ public class IndexGraphQLSchema {
             .type(planType)
             .argument(GraphQLArgument.newArgument()
                 .name("date")
+                .description("Date of departure or arrival in format YYYY-MM-DD. Default value: current date");
                 .type(Scalars.GraphQLString)
-                .build())
+		.build())
             .argument(GraphQLArgument.newArgument()
                 .name("time")
+		.description("Time of departure or arrival in format hh:mm:ss. Default value: current time");
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -874,7 +876,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
-                    .description("What is the start time for the times. Default is to use current time. (0)")
+                    .description("Return rows departing after this time. Time format: Unix timestamp in seconds. Default is to use current time. (0)")
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0L) // Default value is current time
                     .build())
@@ -1010,6 +1012,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
+		    .description("Return  departures after this time. Format: Unix timestamp in seconds. Default value: current time");
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0l) // Default value is current time
                     .build())
@@ -1181,6 +1184,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimesInPatternType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
+		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time");
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0L) // Default value is current time
                     .build())
@@ -1229,6 +1233,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("startTime")
+		    .description("Return departures after this time. Format: Unix timestamp in seconds. Default value: current time");
                     .type(Scalars.GraphQLLong)
                     .defaultValue(0L) // Default value is current time
                     .build())
@@ -1290,12 +1295,14 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("scheduledArrival")
+		.description("Scheduled arrival time. Format: seconds since midnight of the departure date");
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).scheduledArrival)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtimeArrival")
+		.description("Realtime prediction of arrival time. Format: seconds since midnight of the departure date");
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).realtimeArrival)
@@ -1307,12 +1314,14 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("scheduledDeparture")
+		.description("Scheduled departure time. Format: seconds since midnight of the departure date");
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).scheduledDeparture)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtimeDeparture")
+		.description("Realtime prediction of departure time. Format: seconds since midnight of the departure date");
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).realtimeDeparture)
@@ -1354,6 +1363,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
+		.description("Departure date of the trip. Format: Unix timestamp (local time) in seconds.");
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).serviceDay)
                 .build())
@@ -1405,6 +1415,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("activeDates")
+		.description("List of dates when this trip is in service. Format: YYYYMMDD");
                 .type(new GraphQLList(Scalars.GraphQLString))
                 .dataFetcher(environment -> index.graph.getCalendarService()
                     .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
@@ -1483,6 +1494,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDate")
+		    .description("Date for which stoptimes are returned. Format: YYYYMMDD");
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
@@ -1600,6 +1612,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDate")
+		    .description("Return trips of the pattern active on this date. Format: YYYYMMDD");
                     .type(Scalars.GraphQLString)
                     .build())
                 .type(new GraphQLList(new GraphQLNonNull(tripType)))
@@ -2692,13 +2705,13 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("arrivalTime")
-                .description("The time the rider will arrive at the place.")
+                .description("The time the rider will arrive at the place. Format: Unix timestamp in milliseconds.")
                 .type(new GraphQLNonNull(Scalars.GraphQLLong))
                 .dataFetcher(environment -> ((Place)environment.getSource()).arrival.getTime().getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("departureTime")
-                .description("The time the rider will depart the place.")
+                .description("The time the rider will depart the place. Format: Unix timestamp in milliseconds.")
                 .type(new GraphQLNonNull(Scalars.GraphQLLong))
                 .dataFetcher(environment -> ((Place)environment.getSource()).departure.getTime().getTime())
                 .build())
@@ -2759,13 +2772,13 @@ public class IndexGraphQLSchema {
             .name("Leg")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("startTime")
-                .description("The date and time this leg begins.")
+                .description("The date and time this leg begins. Format: Unix timestamp in milliseconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).startTime.getTime().getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("endTime")
-                .description("The date and time this leg ends.")
+                .description("The date and time this leg ends. Format: Unix timestamp in milliseconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).endTime.getTime().getTime())
                 .build())
@@ -2855,7 +2868,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDate")
-                .description("For transit legs, the serviceDate. For non-transit legs, null.")
+                .description("For transit legs, the service date of the trip. Format: YYYYMMDD. For non-transit legs, null.")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).serviceDate)
                 .build())
@@ -2983,13 +2996,13 @@ public class IndexGraphQLSchema {
             .name("Itinerary")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("startTime")
-                .description("Time that the trip departs.")
+                .description("Time that the trip departs. Format: Unix timestamp in milliseconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Itinerary)environment.getSource()).startTime.getTime().getTime())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("endTime")
-                .description("Time that the trip arrives.")
+                .description("Time that the trip arrives. Format: Unix timestamp in milliseconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((Itinerary)environment.getSource()).endTime.getTime().getTime())
                 .build())
@@ -3060,7 +3073,7 @@ public class IndexGraphQLSchema {
             .name("Plan")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("date")
-                .description("The time and date of travel")
+                .description("The time and date of travel. Format: Unix timestamp in milliseconds.")
                 .type(Scalars.GraphQLLong)
                 .dataFetcher(environment -> ((TripPlan) ((Map)environment.getSource()).get("plan")).date.getTime())
                 .build())
