@@ -2517,7 +2517,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
-                .description("Get a single pattern based on its id")
+                .description("Get a single pattern based on its id (format is AgencyId:RouteId:DirectionId:Variant)")
                 .type(patternType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
