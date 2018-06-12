@@ -968,6 +968,7 @@ public class IndexGraphQLSchema {
 
         clusterType = GraphQLObjectType.newObject()
             .name("Cluster")
+	    .description("Cluster is a list of stops grouped by name and proximity")
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
@@ -997,6 +998,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
+		.description("List of stops in the cluster")
                 .type(new GraphQLList(new GraphQLNonNull(stopType)))
                 .dataFetcher(environment -> ((StopCluster) environment.getSource()).children)
                 .build())
