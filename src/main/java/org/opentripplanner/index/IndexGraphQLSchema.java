@@ -841,6 +841,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
+		.description("Walking distance to the stop along streets and paths")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).distance)
                 .build())
@@ -940,6 +941,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
+		.description("Walking distance to the place along streets and paths")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).distance)
                 .build())
@@ -2226,7 +2228,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByRadius")
-                .description("Get all stops within the specified radius from a location. The returned type has two fields stop and distance")
+                .description("Get all stops within the specified radius from a location. The returned type is a Relay connection (see https://facebook.github.io/relay/graphql/connections.htm). The stopAtDistance type has two values: stop and distance.")
                 .type(relay.connectionType("stopAtDistance",
                     relay.edgeType("stopAtDistance", stopAtDistanceType, null, new ArrayList<>()),
                     new ArrayList<>()))
@@ -2273,7 +2275,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("nearest")
                 .description(
-                    "Get all places (stops, stations, etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
+                    "Get all places (stops, stations, etc. with coordinates) within the specified radius from a location. The returned type is a Relay connection (see https://facebook.github.io/relay/graphql/connections.htm). The placeAtDistance type has two fields: place and distance. The search is done by walking so the distance is according to the network of walkable streets and paths.")
                 .type(relay.connectionType("placeAtDistance",
                     relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
                     new ArrayList<>()))
