@@ -698,7 +698,7 @@ public class IndexGraphQLSchema {
         alertType = GraphQLObjectType.newObject()
             .name("Alert")
             .withInterface(nodeInterface)
-            .description("Simple alert")
+            .description("Alert of a current or upcoming disruption in public transportation")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
@@ -735,20 +735,20 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
-                .description("Get all patterns for this alert")
+                .description("Patterns affected by the disruption")
                 .type(new GraphQLList(patternType))
                 .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertHeaderText")
                 .type(Scalars.GraphQLString)
-                .description("Header of alert if it exists")
+                .description("Header of the alert, if available")
                 .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertHeaderText)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertHeaderTextTranslations")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
-                .description("Headers of alert in all different translations available notnull")
+                .description("Header of the alert in all different available languages notnull")
                 .dataFetcher(environment -> {
                     AlertPatch alertPatch = environment.getSource();
                     Alert alert = alertPatch.getAlert();
@@ -762,13 +762,13 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertDescriptionText")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
-                .description("Long description of alert notnull")
+                .description("Long description of the alert notnull")
                 .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertDescriptionText)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertDescriptionTextTranslations")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
-                .description("Long descriptions of alert in all different translations available notnull")
+                .description("Long descriptions of the alert in all different available languages notnull")
                 .dataFetcher(environment -> {
                     AlertPatch alertPatch = environment.getSource();
                     Alert alert = alertPatch.getAlert();
