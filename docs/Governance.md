@@ -8,7 +8,6 @@ OpenTripPlanner is a member project of the [Software Freedom Conservancy](https:
 | Torbjørn Barslett | Ruter Oslo |
 | Andrew Byrd       | Conveyal |
 | David Emory       | Conveyal |
-| Laurent Grégoire  | Mecatran |
 | Jasper Hartong    | PlannerStack Foundation |
 | Tuukka Hastrup    | Helsingin Seudun Liikenne |
 | Frank Purcell     | TriMet |
