@@ -446,7 +446,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("from")
-                .description("The geographical location where the itinerary begings")
+                .description("The geographical location where the itinerary begins")
                 .type(coordinateInputType)
                 .build())
             .argument(GraphQLArgument.newArgument()
