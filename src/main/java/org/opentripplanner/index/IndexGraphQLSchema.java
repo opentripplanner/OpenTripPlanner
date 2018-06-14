@@ -1415,6 +1415,7 @@ public class IndexGraphQLSchema {
 
         tripType = GraphQLObjectType.newObject()
             .name("Trip")
+	    .description("Trip is a occurance of a route at specific time.")
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
@@ -1431,6 +1432,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
+		.description("The route the trip is running on")
                 .type(new GraphQLNonNull(routeType))
                 .dataFetcher(environment -> ((Trip) environment.getSource()).getRoute())
                 .build())
@@ -1457,6 +1459,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("tripHeadsign")
+		.description("Headsign of the vehicle when running on this trip")
                 .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1487,6 +1490,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
+		.description("The pattern the trip is running on")
                 .type(patternType)
                 .dataFetcher(
                     environment -> index.patternForTrip.get(environment.getSource()))
@@ -1505,6 +1509,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimes")
+		.description("List of times when this trip arrives to or departs from a stop")
                 .type(new GraphQLList(stoptimeType))
                 .dataFetcher(environment -> TripTimeShort.fromTripTimes(
                     index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable,
@@ -1569,7 +1574,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")
-                .description("Get all alerts active for the trip")
+                .description("List of alerts which have an effect on this trip")
                 .type(new GraphQLList(alertType))
                 .dataFetcher(dataFetchingEnvironment -> index.getAlertsForTrip(
                     dataFetchingEnvironment.getSource()))
