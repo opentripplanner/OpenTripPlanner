@@ -6,7 +6,9 @@ OpenTripPlanner is a member project of the [Software Freedom Conservancy](https:
 |-----|-------------|
 | Sean Barbeau      | University of South Florida |
 | Torbjørn Barslett | Ruter Oslo |
+| Sheldon Brown     | Cambridge Systematics |
 | Andrew Byrd       | Conveyal |
+| Drew Dara-Abrams  | Interline |
 | David Emory       | Conveyal |
 | Jasper Hartong    | PlannerStack Foundation |
 | Tuukka Hastrup    | Helsingin Seudun Liikenne |
