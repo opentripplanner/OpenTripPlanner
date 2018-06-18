@@ -136,7 +136,7 @@ public class ConstantsForTests {
             g.updateTransitFeedValidity(csd);
             g.hasTransit = true;
 
-            new DirectTransferGenerator().buildGraph(g, new HashMap<>());
+            new DirectTransferGenerator(2000).buildGraph(g, new HashMap<>());
 
             new StreetLinkerModule().buildGraph(g, new HashMap<>());
 
