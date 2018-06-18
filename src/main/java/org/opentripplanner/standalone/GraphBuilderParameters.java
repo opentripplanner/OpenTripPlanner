@@ -102,7 +102,7 @@ public class GraphBuilderParameters {
      * A custom OSM namer to use.
      */
     public final CustomNamer customNamer;
-
+    
     /**
      * Custom OSM way properties
      */

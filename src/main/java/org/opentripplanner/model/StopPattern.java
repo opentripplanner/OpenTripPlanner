@@ -66,7 +66,7 @@ public class StopPattern implements Serializable {
                    Arrays.equals(this.pickups,  that.pickups) && 
                    Arrays.equals(this.dropoffs, that.dropoffs) &&
                    Arrays.equals(this.continuousPickup, that.continuousPickup) &&
-                    Arrays.equals(this.continuousDropOff, that.continuousDropOff) &&
+                   Arrays.equals(this.continuousDropOff, that.continuousDropOff) &&
                    Arrays.equals(this.serviceAreas, that.serviceAreas);
         } else {
             return false;

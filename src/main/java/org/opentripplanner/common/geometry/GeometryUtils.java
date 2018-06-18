@@ -13,15 +13,7 @@
 
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
@@ -29,18 +21,13 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.GeodeticCalculator;
-import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GeometryUtils {
@@ -199,24 +186,6 @@ public class GeometryUtils {
         }
 
         throw new UnsupportedGeometryException(geoJsonGeom.getClass().toString());
-    }
-
-    public static double getLengthInMeters(LineString lineString) {
-        GeodeticCalculator calculator = new GeodeticCalculator(WGS84_XY);
-        double length = 0d;
-        try {
-            for (int i = 0; i < lineString.getCoordinates().length - 1; i++) {
-                Coordinate fromCoord = lineString.getCoordinates()[i];
-                Coordinate toCoord = lineString.getCoordinates()[i + 1];
-                calculator.setStartingPosition(JTS.toDirectPosition(fromCoord, WGS84_XY));
-                calculator.setDestinationPosition(JTS.toDirectPosition(toCoord, WGS84_XY));
-                double incrementalDistance = calculator.getOrthodromicDistance();
-                length += incrementalDistance;
-            }
-        }catch (TransformException tfe){
-            throw new RuntimeException(tfe.getMessage());
-        }
-        return length;
     }
 
     private static Coordinate[] convertPath(List<LngLatAlt> path) {

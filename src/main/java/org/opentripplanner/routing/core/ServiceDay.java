@@ -35,7 +35,7 @@ import org.opentripplanner.routing.graph.Graph;
 public class ServiceDay implements Serializable {
     private static final long serialVersionUID = -1206371243806996680L;
 
-    public long midnight;
+    protected long midnight;
     protected ServiceDate serviceDate;
     protected BitSet serviceIdsRunning;
 
