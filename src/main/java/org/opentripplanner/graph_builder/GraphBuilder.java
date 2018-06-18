@@ -18,7 +18,6 @@ import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
-import org.opentripplanner.graph_builder.module.FlexDirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -28,7 +27,6 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -311,9 +309,6 @@ public class GraphBuilder implements Runnable {
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
-                if (hasOSM && builderParams.createFlexTransfers) {
-                    graphBuilder.addModule(new FlexDirectTransferGenerator());
-                }
             }
         }
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
