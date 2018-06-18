@@ -421,10 +421,11 @@ public class GraphPathFinder {
                 int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
 
                 while (0 < placeIndex && placeIndex < places.size()) {
+                    GenericLocation currentPlace = places.get(placeIndex - 1);
                     RoutingRequest intermediateRequest = request.clone();
                     intermediateRequest.setNumItineraries(1);
                     intermediateRequest.dateTime = time;
-                    intermediateRequest.from = places.get(placeIndex - 1);
+                    intermediateRequest.from = currentPlace;
                     intermediateRequest.to = places.get(placeIndex);
                     intermediateRequest.rctx = null;
 
@@ -464,8 +465,8 @@ public class GraphPathFinder {
                     GraphPath path = partialPaths.get(0);
                     paths.add(path);
                     time = (request.arriveBy
-                        ? path.getStartTime() - request.transferSlack
-                        : path.getEndTime() + request.transferSlack);
+                        ? path.getStartTime() - request.transferSlack - currentPlace.locationSlack
+                        : path.getEndTime() + request.transferSlack + currentPlace.locationSlack);
                     placeIndex += (request.arriveBy ? -1 : +1);
                 }
                 if (request.arriveBy) {
@@ -486,6 +487,7 @@ public class GraphPathFinder {
         }
     }
 
+    // TODO: implement support for not removing all wait times
     private static GraphPath joinPaths(List<GraphPath> paths, Boolean addLegsSwitchingEdges) {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
