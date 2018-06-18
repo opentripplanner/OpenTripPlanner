@@ -471,6 +471,18 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double carParkCarLegWeight = 1;
 
+
+    /**
+     * Filtering sensitivity. Value 0 disables filtering. The higher the value,
+     * the easier less good routes get filtered from response.
+     * Recommended value range is 0.2 - 5. Value 1 means that if an itinerary is twice as worse
+     * than another one in some respect (say 100% more walking), it will be filtered.
+     * Value 0.5 filters 200% worse itineraries and value 2 defines 50% filtering level.
+     * Value 5 filters 20% worse routes.
+     * So, filter level = 100%/sensitivity
+     */
+    public double itineraryFiltering = 0; // off by default
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
@@ -987,7 +999,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && this.carParkCarLegWeight == other.carParkCarLegWeight;
+                && this.carParkCarLegWeight == other.carParkCarLegWeight
+                && itineraryFiltering == other.itineraryFiltering;
     }
 
     /**
@@ -1019,7 +1032,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
-                + new Double(carParkCarLegWeight).hashCode();
+                + new Double(carParkCarLegWeight).hashCode()
+                + new Double(itineraryFiltering).hashCode()*17;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1129,10 +1143,16 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
         }
     }
-    
+
     public void setCarParkCarLegWeight(double carParkCarLegWeight) {
         if(carParkCarLegWeight>0) {
             this.carParkCarLegWeight = carParkCarLegWeight;
+        }
+    }
+
+    public void setItineraryFiltering(double itineraryFiltering) {
+        if(itineraryFiltering>=0) {
+            this.itineraryFiltering = itineraryFiltering;
         }
     }
 
