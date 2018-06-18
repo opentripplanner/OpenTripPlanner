@@ -76,7 +76,6 @@ import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -397,10 +396,6 @@ public class GTFSPatternHopFactory {
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
             List<StopTime> stopTimes = new ArrayList<StopTime>(_dao.getStopTimesForTrip(trip));
-
-            if (hasDemandService(stopTimes)) {
-                addDemandService(graph, trip, stopTimes.get(0), stopTimes.get(1));
-            }
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
@@ -1582,18 +1577,5 @@ public class GTFSPatternHopFactory {
             AgencyAndId id = new AgencyAndId(_feedId.getId(), entry.getKey());
             graph.areasById.put(id, entry.getValue());
         }
-    }
-
-    private boolean hasDemandService(List<StopTime> stopTimes) {
-        if (stopTimes.size() != 2)
-            return false;
-        StopTime st0 = stopTimes.get(0);
-        StopTime st1 = stopTimes.get(1);
-        return st0.getStartServiceArea() != null
-                && st0.getStartServiceArea().equals(st1.getEndServiceArea());
-    }
-
-    private void addDemandService(Graph graph, Trip trip, StopTime st0, StopTime st1) {
-        graph.demandResponseServices.add(new DemandResponseService(trip, st0, st1));
     }
 }

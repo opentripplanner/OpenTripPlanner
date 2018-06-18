@@ -60,7 +60,6 @@ import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -69,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -110,7 +108,6 @@ public class GraphIndex {
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
     public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
     public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
-    public final Map<AgencyAndId, DemandResponseService> demandResponseServicesForId = Maps.newHashMap();
     public final Map<AgencyAndId, Geometry> areasById = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
@@ -206,13 +203,6 @@ public class GraphIndex {
 
         LOG.info("initializing hops-for-edge map...");
         initializeHopsForEdgeMap();
-
-        if (graph.demandResponseServices != null) {
-            LOG.info("initializing demand services....");
-            for (DemandResponseService service : graph.demandResponseServices) {
-                demandResponseServicesForId.put(service.getRoute().getId(), service);
-            }
-        }
 
         LOG.info("Initializing areas....");
         if (graph.areasById != null) {

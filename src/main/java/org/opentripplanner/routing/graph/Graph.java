@@ -47,14 +47,12 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.flex.DemandResponseService;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -216,9 +214,6 @@ public class Graph implements Serializable {
 
     /** Whether to use flex modes */
     public boolean useFlexService = false;
-
-    /** Available demand-based services */
-    public List<DemandResponseService> demandResponseServices = new ArrayList<>();
 
     /** Areas for flex service */
     public Map<AgencyAndId, Geometry> areasById = new HashMap<>();
