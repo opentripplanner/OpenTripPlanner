@@ -55,12 +55,6 @@ public abstract class GraphPathToTripPlanConverter {
     private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
 
     /**
-     * Number of meters to shift boarding/alighting areas for partial hops relative to PatternHop geometry
-     * Needed for flag stops UI.
-     */
-    private static final double PARTIAL_HOP_OFFSET = 5;
-
-    /**
      * Generates a TripPlan from a set of paths
      */
     public static TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
@@ -740,14 +734,11 @@ public abstract class GraphPathToTripPlanConverter {
             place.boardAlightType = BoardAlightType.DEFAULT;
             if (edge instanceof PartialPatternHop) {
                 PartialPatternHop hop = (PartialPatternHop) edge;
-                boolean reverse = !state.getOptions().driveOnRight;
                 if (hop.hasBoardArea() && !endOfLeg) {
-                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getBoardArea(), PARTIAL_HOP_OFFSET, reverse);
-                    place.flagStopArea = PolylineEncoder.createEncodings(geom);
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getBoardArea());
                 }
                 if (hop.hasAlightArea() && endOfLeg) {
-                    Geometry geom = GeometryUtils.shiftLineByPerpendicularVector((LineString) hop.getAlightArea(), PARTIAL_HOP_OFFSET, reverse);
-                    place.flagStopArea = PolylineEncoder.createEncodings(geom);
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getAlightArea());
                 }
                 if ((endOfLeg && hop.isFlagStopAlight()) || (!endOfLeg && hop.isFlagStopBoard())) {
                     place.boardAlightType = BoardAlightType.FLAG_STOP;
