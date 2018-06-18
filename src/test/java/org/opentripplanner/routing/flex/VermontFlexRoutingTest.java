@@ -106,24 +106,6 @@ public class VermontFlexRoutingTest {
         assertEquals(BoardAlightType.DEVIATED, ride2.getAlightType());
     }
 
-    //http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.950726%2C-72.20020299999999&toPlace=44.9495839%2C-72.137541&date=06%2F11%2F2018&time=4%3A00%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&flagStopBufferSize=50&useReservationServices=false&useEligibilityServices=false&=
-    //No require reservation services
-    public void testDeviatedFixedRouteOffIfNoReservationServices() {
-        RoutingRequest options = buildRequest("44.950726,-72.20020299999999", "44.9495839,-72.137541",
-                "2018-05-23", "4:00pm");
-
-        options.useReservationServices = false;
-        options.useEligibilityServices = false;
-
-        GraphPath path = getPathToDestination(options);
-        List<Ride> rides = Ride.createRides(path);
-        assertEquals(1, rides.size());
-        Ride ride = rides.get(0);
-        assertEquals("1383", ride.getRoute().getId());
-        assertEquals(BoardAlightType.DEFAULT, ride.getBoardType());
-        assertEquals(BoardAlightType.DEFAULT, ride.getAlightType());
-    }
-
     private RoutingRequest buildRequest(String from, String to, String date, String time)
     {
         RoutingRequest options = new RoutingRequest();
@@ -142,12 +124,12 @@ public class VermontFlexRoutingTest {
         options.setToString(to);
         options.setRoutingContext(graph);
 
-        return BuildRoutingRequest(from, to, date, time, MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_HEURISTIC,
+        return buildRoutingRequest(from, to, date, time, MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_HEURISTIC,
                 CALL_AND_RIDE_RELUCTANCE, WALK_RELUCTANCE, TRIP_DISCOVERY_MODE, WAIT_AT_BEGINNING_FACTOR,
                 TRANSFER_PENALTY, IGNORE_DRT_ADVANCE_MIN_BOOKING);
     }
 
-    private RoutingRequest BuildRoutingRequest(String from, String to, String date, String time, int maxWalkDistance,
+    private RoutingRequest buildRoutingRequest(String from, String to, String date, String time, int maxWalkDistance,
                                                int maxWalkDistanceHeuristic, double callAndRideReluctance,
                                                double walkReluctance, boolean tripDiscoveryMode,
                                                double waitAtBeginningFactor, int transferPenalty,
