@@ -208,11 +208,7 @@ public class GraphPathFinder {
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        if (options.tripDiscoveryMode) {
-            paths.sort(new DurationComparator());
-        } else {
-            paths.sort(new PathComparator(options.arriveBy));
-        }
+        paths.sort(new PathComparator(options.arriveBy));
 
         return paths;
     }

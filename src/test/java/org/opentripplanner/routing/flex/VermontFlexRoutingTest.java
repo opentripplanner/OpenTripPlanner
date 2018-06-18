@@ -27,14 +27,13 @@ import static org.junit.Assert.*;
 public class VermontFlexRoutingTest {
 
     private Graph graph = ConstantsForTests.getInstance().getVermontGraph();
-    private int MAX_WALK_DISTANCE = 804;
-    private int MAX_WALK_DISTANCE_HEURISTIC = 5000;
-    private double CALL_AND_RIDE_RELUCTANCE = 3.0;
-    private double WALK_RELUCTANCE = 3.0;
-    private boolean TRIP_DISCOVERY_MODE = true;
-    private double WAIT_AT_BEGINNING_FACTOR = 0;
-    private int TRANSFER_PENALTY = 600;
-    private boolean IGNORE_DRT_ADVANCE_MIN_BOOKING = true;
+    private static final int MAX_WALK_DISTANCE = 804;
+    private static final int MAX_WALK_DISTANCE_HEURISTIC = 5000;
+    private static final double CALL_AND_RIDE_RELUCTANCE = 3.0;
+    private static final double WALK_RELUCTANCE = 3.0;
+    private static final double WAIT_AT_BEGINNING_FACTOR = 0;
+    private static final int TRANSFER_PENALTY = 600;
+    private static final boolean IGNORE_DRT_ADVANCE_MIN_BOOKING = true;
 
     // http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.42145960616986%2C-72.01937198638917&toPlace=44.427773287332464%2C-72.0120351442025&date=05%2F23%2F2018&time=1%3A37%20PM&mode=TRANSIT%2CWALK&numItineraries=3&wheelchairAccessible=false&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true
     // Flag stop on both sides, on Jay-Lyn (route 1382)
@@ -91,7 +90,7 @@ public class VermontFlexRoutingTest {
     public void testFlagStopToRegularStopEndingInDeviatedFixedRoute() {
         GraphPath path = getPathToDestination(
                 buildRequest("44.8091683,-72.20580269999999", "44.94985671536269,-72.13708877563478",
-                        "2018-05-23", "4:00pm")
+                        "2018-06-13", "9:30am")
         );
         List<Ride> rides = Ride.createRides(path);
         assertEquals(2, rides.size());
@@ -114,7 +113,6 @@ public class VermontFlexRoutingTest {
         options.maxWalkDistanceHeuristic = MAX_WALK_DISTANCE_HEURISTIC;
         options.callAndRideReluctance = CALL_AND_RIDE_RELUCTANCE;
         options.walkReluctance = WALK_RELUCTANCE;
-        options.tripDiscoveryMode = TRIP_DISCOVERY_MODE;
         options.waitAtBeginningFactor = WAIT_AT_BEGINNING_FACTOR;
         options.transferPenalty = TRANSFER_PENALTY;
         // for testing
@@ -125,13 +123,13 @@ public class VermontFlexRoutingTest {
         options.setRoutingContext(graph);
 
         return buildRoutingRequest(from, to, date, time, MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_HEURISTIC,
-                CALL_AND_RIDE_RELUCTANCE, WALK_RELUCTANCE, TRIP_DISCOVERY_MODE, WAIT_AT_BEGINNING_FACTOR,
+                CALL_AND_RIDE_RELUCTANCE, WALK_RELUCTANCE, WAIT_AT_BEGINNING_FACTOR,
                 TRANSFER_PENALTY, IGNORE_DRT_ADVANCE_MIN_BOOKING);
     }
 
     private RoutingRequest buildRoutingRequest(String from, String to, String date, String time, int maxWalkDistance,
                                                int maxWalkDistanceHeuristic, double callAndRideReluctance,
-                                               double walkReluctance, boolean tripDiscoveryMode,
+                                               double walkReluctance,
                                                double waitAtBeginningFactor, int transferPenalty,
                                                boolean ignoreDrtAdvanceMinBooking) {
         RoutingRequest options = new RoutingRequest();
@@ -140,7 +138,6 @@ public class VermontFlexRoutingTest {
         options.maxWalkDistanceHeuristic = maxWalkDistanceHeuristic;
         options.callAndRideReluctance = callAndRideReluctance;
         options.walkReluctance = walkReluctance;
-        options.tripDiscoveryMode = tripDiscoveryMode;
         options.waitAtBeginningFactor = waitAtBeginningFactor;
         options.transferPenalty = transferPenalty;
 

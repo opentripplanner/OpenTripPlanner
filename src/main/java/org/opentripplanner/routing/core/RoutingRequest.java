@@ -491,9 +491,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean enterStationsWithCar = false;
 
-    /** whether to use trip discovery mode - search farther in future or past for shortest trip */
-    public boolean tripDiscoveryMode = false;
-
     /** Totally exclude walking from trip plan results */
     public boolean excludeWalking = false;
 
@@ -1024,7 +1021,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && tripDiscoveryMode == other.tripDiscoveryMode
                 && ignoreDrtAdvanceBookMin == other.ignoreDrtAdvanceBookMin
                 && minPartialHopLength == other.minPartialHopLength;
     }
@@ -1058,7 +1054,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
-                + new Boolean(tripDiscoveryMode).hashCode() * 209477
                 + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 1371
                 + Integer.hashCode(minPartialHopLength) * 15485863;
         if (batch) {
@@ -1300,10 +1295,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
-    }
-
-    public void setTripDiscoveryMode(boolean tripDiscoveryMode) {
-        this.tripDiscoveryMode = tripDiscoveryMode;
     }
 
     public void resetClockTime() {
