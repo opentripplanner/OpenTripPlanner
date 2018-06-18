@@ -59,8 +59,9 @@ public class TestWayPropertySet extends TestCase {
      */
     @Test
     public void testCarSpeeds () {
+       WayPropertySet wps = new WayPropertySet();
        DefaultWayPropertySetSource source = new DefaultWayPropertySetSource();
-       WayPropertySet wps = source.getWayPropertySet();
+       source.populateProperties(wps);
        
        OSMWithTags way;
        

@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -105,13 +106,24 @@ public class IndexAPI {
         streetIndex = router.graph.streetIndex;
     }
 
-   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
-   @Context UriInfo uriInfo;
+    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
+    @Context UriInfo uriInfo;
 
     @GET
     @Path("/feeds")
     public Response getFeeds() {
         return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
+    }
+
+    @GET
+    @Path("/feeds/{feedId}")
+    public Response getFeedInfo(@PathParam("feedId") String feedId) {
+        FeedInfo feedInfo = index.feedInfoForId.get(feedId);
+        if (feedInfo == null) {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        } else {
+            return Response.status(Status.OK).entity(feedInfo).build();
+        }
     }
 
    /** Return a list of all agencies in the graph. */
@@ -256,10 +268,11 @@ public class IndexAPI {
     public Response getStoptimesForStop (@PathParam("stopId") String stopIdString,
                                          @QueryParam("startTime") long startTime,
                                          @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
-                                         @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures) {
+                                         @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
+                                         @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures)).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
     }
 
     /**
@@ -269,7 +282,8 @@ public class IndexAPI {
     @GET
     @Path("/stops/{stopId}/stoptimes/{date}")
     public Response getStoptimesForStopAndDate (@PathParam("stopId") String stopIdString,
-                                                @PathParam("date") String date) {
+                                                @PathParam("date") String date,
+                                                @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         ServiceDate sd;
@@ -280,7 +294,7 @@ public class IndexAPI {
             return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
         }
 
-        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd);
+        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups);
         return Response.status(Status.OK).entity(ret).build();
     }
     
@@ -546,23 +560,34 @@ public class IndexAPI {
 
     // TODO include pattern ID for each trip in responses
 
-    /** List basic information about all service IDs. */
+    /**
+     * List basic information about all service IDs.
+     * This is a placeholder endpoint and is not implemented yet.
+     */
     @GET
     @Path("/services")
     public Response getServices() {
-        index.serviceForId.values(); // TODO complete
+        // TODO complete: index.serviceForId.values();
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
+    /**
+     * List details about a specific service ID including which dates it runs on. Replaces the old /calendar.
+     * This is a placeholder endpoint and is not implemented yet.
+     */
     @GET
     @Path("/services/{serviceId}")
     public Response getServices(@PathParam("serviceId") String serviceId) {
-        index.serviceForId.get(serviceId); // TODO complete
+        // TODO complete: index.serviceForId.get(serviceId);
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    /** Return all clusters of stops. */
+    /**
+     * Return all clusters of stops.
+     * A cluster is not the same thing as a GTFS parent station.
+     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
+     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
+     */
     @GET
     @Path("/clusters")
     public Response getAllStopClusters () {
@@ -572,7 +597,12 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(scl).build();
     }
 
-    /** Return a cluster of stops by its ID. */
+    /**
+     * Return a cluster of stops by its ID.
+     * A cluster is not the same thing as a GTFS parent station.
+     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
+     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
+     */
     @GET
     @Path("/clusters/{clusterId}")
     public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
@@ -641,13 +671,6 @@ public class IndexAPI {
     public Response getGraphQL (String query) {
         return index.getGraphQLResponse(query, new HashMap<>(), null);
     }
-
-//    @GET
-//    @Path("/graphql")
-//    public Response getGraphQL (@QueryParam("query") String query,
-//                                @QueryParam("variables") HashMap<String, Object> variables) {
-//        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
-//    }
 
     /** Represents a transfer from a stop */
     private static class Transfer {

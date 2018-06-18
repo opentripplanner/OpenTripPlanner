@@ -115,6 +115,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The maximum duration of a returned itinerary, in hours. */
     public double maxHours = Double.MAX_VALUE;
 
+    /** Whether maxHours limit should consider wait/idle time between the itinerary and the requested arrive/depart time. */
+    public boolean useRequestedDateTimeInMaxHours = false;
+
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
@@ -349,6 +352,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.
      */
     public boolean reverseOptimizeOnTheFly = false;
+
+    /**
+     * When true, do a full reversed search to compact the legs of the GraphPath.
+     */
+    public boolean compactLegsByReversedSearch = false;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where

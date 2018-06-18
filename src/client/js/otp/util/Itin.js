@@ -305,4 +305,18 @@ otp.util.Itin = {
     getRouteShortReference : function(routeData) {
         return routeData.routeShortName || routeData.id.id;
     },
+
+    /**
+     * Takes an agency/stop ID in one of two representations ('agency:id' string
+     * or { agencyId, id } object) and returns it as the object form.
+     */
+    getStopIdObj : function (stopId) {
+      if(stopId.agencyId && stopId.id) return stopId
+      var parts = stopId.split(':')
+      return {
+        'agencyId': parts.shift(),
+        'id': parts.join(':')
+      }
+    }
+
 }

@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  * @see ExampleGraphUpdater
- * @see GraphUpdaterConfigurator.applyConfigurationToGraph
  */
 public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
@@ -56,7 +55,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
         url = config.path("url").asText();
-        LOG.info("Configured example polling updater: frequencySec={} and url={}", frequencySec, url);
+        LOG.info("Configured example polling updater: frequencySec={} and url={}", pollingPeriodSeconds, url);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
@@ -68,7 +67,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
     // Here the updater can be initialized.
     @Override
-    public void setup() {
+    public void setup(Graph graph) {
         LOG.info("Setup example polling updater");
     }
 

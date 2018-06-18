@@ -91,6 +91,10 @@ public class OtpsRoutingRequest {
         req.maxWalkDistance = maxWalkDistance;
     }
 
+    public void setMaxTransferWalkDistance(double maxTransferWalkDistance) {
+        req.maxTransferWalkDistance = maxTransferWalkDistance;
+    }
+
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         req.wheelchairAccessible = wheelchairAccessible;
     }
@@ -117,5 +121,9 @@ public class OtpsRoutingRequest {
 
     public void setBannedRoutes(String routeSpecList) {
         req.bannedRoutes = RouteMatcher.parse(routeSpecList);
+    }
+
+    public void setMaxTransfers(int maxTransfers) {
+        req.maxTransfers = maxTransfers;
     }
 }

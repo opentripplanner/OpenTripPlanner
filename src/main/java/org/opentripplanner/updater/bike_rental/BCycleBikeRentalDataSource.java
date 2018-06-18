@@ -31,7 +31,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
     private String networkName;
 
     public BCycleBikeRentalDataSource(String apiKey, String networkName) {
-        super("", apiKey);
+        super("", "ApiKey",apiKey);
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {

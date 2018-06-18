@@ -100,9 +100,12 @@ otp.widgets.transit.StopViewerWidget =
             this_.times = [];
             // rearrange stoptimes, flattening and sorting;
             _.each(data, function(stopTime){
-                //extract routeId from pattern.id, which is in the form of agency_d:route_id:direction_id:count
+                // extract routeId from pattern.id, which is in the form of agency_id:route_id:direction_id:count
                 var parts = stopTime.pattern.id.split(":");
-                var routeId = parts[0] + ":" + parts[1];
+                // Route ID is the only part that may contain colons : popping direction_id and count from array
+                var count = parts.pop();
+                var directionId = parts.pop();
+                var routeId = parts.join(':');
                 _.each(stopTime.times,function(time){
                     if (time.stopIndex === time.stopCount - 1) return;
                     var pushTime = {};

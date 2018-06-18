@@ -38,6 +38,11 @@ public class StopCluster {
         this.name = name;
     }
 
+    public void setCoordinates(double lat, double lon){
+        this.lat = lat;
+        this.lon = lon;
+    }
+
     public void computeCenter() {
         double lonSum = 0, latSum = 0;
         for (Stop stop : children) {

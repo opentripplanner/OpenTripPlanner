@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -75,6 +76,11 @@ public class GraphBuilderParameters {
     public final boolean areaVisibility;
 
     /**
+     * Link unconnected entries to public transport platforms.
+     */
+    public final boolean platformEntriesLinking;
+
+    /**
      * Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.
      */
     public final boolean matchBusRoutesToStreets;
@@ -96,6 +102,11 @@ public class GraphBuilderParameters {
      * A custom OSM namer to use.
      */
     public final CustomNamer customNamer;
+
+    /**
+     * Custom OSM way properties
+     */
+    public final WayPropertySetSource wayPropertySet;
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
@@ -142,6 +153,11 @@ public class GraphBuilderParameters {
     public final boolean banDiscouragedBiking;
 
     /**
+     * Transfers up to this length in meters will be pre-calculated and included in the Graph.
+     */
+    public final double maxTransferDistance;
+
+    /**
      * Whether to run FlexDirectTransferGenerator to create flex transfers. This can take a long
      * time and is only necessary if flex routing is used and there are not designated transfer
      * points.
@@ -154,9 +170,7 @@ public class GraphBuilderParameters {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-
     public GraphBuilderParameters(JsonNode config) {
-
         htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
@@ -166,11 +180,13 @@ public class GraphBuilderParameters {
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
+        platformEntriesLinking = config.path("platformEntriesLinking").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
+        wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
@@ -180,6 +196,7 @@ public class GraphBuilderParameters {
         pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
+        maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         createFlexTransfers = config.path("createFlexTransfers").asBoolean(false);
     }
 
