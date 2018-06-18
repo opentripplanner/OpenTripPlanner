@@ -149,16 +149,6 @@ public class GraphBuilderParameters {
     public final boolean createFlexTransfers;
 
     /**
-     * Message for out of area
-     */
-    public final String outOfAreaMessage;
-
-    /**
-     * Message for trip plan in past
-     */
-    public final String tripPlanInPastMessage;
-
-    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -191,8 +181,6 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         createFlexTransfers = config.path("createFlexTransfers").asBoolean(false);
-        outOfAreaMessage = config.path("outOfAreaMessage").asText("One or more endpoints is out of area.");
-        tripPlanInPastMessage = config.path("tripPlanInPastMessage").asText();
     }
 
 }
