@@ -42,6 +42,8 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     private boolean flattened;
 
+    private float slopeWalkSpeedFactor = 1.0f;
+
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
@@ -72,6 +74,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         slopeWorkFactor = (float)costs.slopeWorkFactor;
         maxSlope = (float)costs.maxSlope;
         flattened = costs.flattened;
+        slopeWalkSpeedFactor = (float)costs.slopeWalkSpeedFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
         bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
@@ -102,6 +105,9 @@ public class StreetWithElevationEdge extends StreetEdge {
     public double getSlopeWorkCostEffectiveLength() {
         return slopeWorkFactor * getDistance();
     }
+
+    @Override
+    public double getSlopeWalkSpeedEffectiveLength() { return slopeWalkSpeedFactor * getDistance(); }
 
     @Override
     public String toString() {

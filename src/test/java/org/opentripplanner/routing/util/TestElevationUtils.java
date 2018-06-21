@@ -40,4 +40,11 @@ public class TestElevationUtils extends TestCase {
 		assertEquals(1.00992634231424500668, costs.lengthMultiplier);
 	}
 
+	public void testSlopeWalkEffectiveLengthFactor() {
+		assertEquals(2.22, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 20), 0.01);
+		assertEquals(1.22, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 5), 0.01);
+		assertEquals(1.00, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 0));
+		// No slope cost for negative slopes
+		assertEquals(1.00, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, -5));
+	}
 }
