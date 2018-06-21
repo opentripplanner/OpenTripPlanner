@@ -403,7 +403,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double callAndRideReluctance = 2.0;
 
     /**
-     * Total time we can spend on call-n-ride legs
+     * Total time we can spend on call-n-ride legs. After an itinerary is found, this value is
+     * reduced to min(duration - options.reduceCallAndRideSeconds, duration * reduceCallAndRideRatio)
      */
     public int maxCallAndRideSeconds = Integer.MAX_VALUE;
 
@@ -483,7 +484,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean longDistance = false;
 
     /** Should traffic congestion be considered when driving? */
-    public boolean useTraffic = false;
+    public boolean useTraffic = true;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
@@ -619,8 +620,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
     }
-
-
 
     /**
      * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
@@ -1029,8 +1028,18 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
+                && flagStopExtraPenalty == other.flagStopExtraPenalty
+                && deviatedRouteExtraPenalty == other.deviatedRouteExtraPenalty
+                && callAndRideReluctance == other.callAndRideReluctance
+                && reduceCallAndRideSeconds == other.reduceCallAndRideSeconds
+                && reduceCallAndRideRatio == other.reduceCallAndRideRatio
+                && flagStopBufferSize == other.flagStopBufferSize
+                && useReservationServices == other.useReservationServices
+                && useEligibilityServices == other.useEligibilityServices
                 && ignoreDrtAdvanceBookMin == other.ignoreDrtAdvanceBookMin
-                && minPartialHopLength == other.minPartialHopLength;
+                && excludeWalking == other.excludeWalking
+                && minPartialHopLength == other.minPartialHopLength
+                && clockTimeSec == other.clockTimeSec;
     }
 
     /**
@@ -1062,8 +1071,19 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169
-                + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 1371
-                + Integer.hashCode(minPartialHopLength) * 15485863;
+                + Integer.hashCode(flagStopExtraPenalty) * 179424691
+                + Integer.hashCode(deviatedRouteExtraPenalty) *  7424299
+                + Double.hashCode(callAndRideReluctance) * 86666621
+                + Integer.hashCode(maxCallAndRideSeconds) * 9994393
+                + Integer.hashCode(reduceCallAndRideSeconds) * 92356763
+                + Double.hashCode(reduceCallAndRideRatio) *  171157957
+                + Double.hashCode(flagStopBufferSize) * 803989
+                + Boolean.hashCode(useReservationServices) * 92429033
+                + Boolean.hashCode(useEligibilityServices) * 7916959
+                + Boolean.hashCode(ignoreDrtAdvanceBookMin) * 179992387
+                + Boolean.hashCode(excludeWalking) * 989684221
+                + Integer.hashCode(minPartialHopLength) * 15485863
+                + Long.hashCode(clockTimeSec) * 833389;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
