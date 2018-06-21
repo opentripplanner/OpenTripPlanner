@@ -324,6 +324,10 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets) (Park bicycle at Public transit station and take a
     //transit
+    "CAR_PICKUP,WALK,TRANSIT"          : _tr('Ride and Kiss'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets) (Park bicycle at Public transit station and take a
+    //transit
     "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
     //uncomment only if bike rental exists in a map
     // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
