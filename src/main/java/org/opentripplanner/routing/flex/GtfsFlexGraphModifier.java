@@ -376,7 +376,7 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     private void addStateToPatternHopStateMap(Edge edge, State s, Map<PatternHop, State> patternHopStateMap) {
-        Collection<PatternHop> hops = graph.index.getHopsForEdge(edge);
+        Collection<PatternHop> hops = graph.flexIndex.getHopsForEdge(edge);
         for(PatternHop hop : hops){
             if(patternHopStateMap.containsKey(hop)){
                 State oldState = patternHopStateMap.get(hop);

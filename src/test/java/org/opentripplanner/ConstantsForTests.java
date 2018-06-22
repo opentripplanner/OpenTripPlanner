@@ -104,7 +104,7 @@ public class ConstantsForTests {
     public Graph getVermontGraph() {
         if (vermontGraph == null) {
             vermontGraph = getGraph(VERMONT_OSM, VERMONT_GTFS);
-            vermontGraph.useFlexService = true;
+            vermontGraph.setUseFlexService(true);
         }
         return vermontGraph;
     }

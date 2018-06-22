@@ -16,8 +16,10 @@ import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.BoardAlightType;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 
 import java.util.List;
@@ -49,6 +51,7 @@ public class VermontFlexRoutingTest {
         assertEquals("1382", ride.getRoute().getId());
         assertEquals(BoardAlightType.FLAG_STOP, ride.getBoardType());
         assertEquals(BoardAlightType.FLAG_STOP, ride.getAlightType());
+        checkFare(path);
     }
 
 
@@ -66,6 +69,7 @@ public class VermontFlexRoutingTest {
         assertEquals("7415", ride.getRoute().getId());
         assertEquals(BoardAlightType.DEVIATED, ride.getBoardType());
         assertEquals(BoardAlightType.DEVIATED, ride.getBoardType());
+        checkFare(path);
     }
 
     //http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.950950106914135%2C-72.20008850097658&toPlace=44.94985671536269%2C-72.13708877563478&date=06%2F11%2F2018&time=4%3A00%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&wheelchairAccessible=false&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true&=
@@ -82,6 +86,7 @@ public class VermontFlexRoutingTest {
         assertEquals("1383", ride.getRoute().getId());
         assertEquals(BoardAlightType.DEVIATED, ride.getBoardType());
         assertEquals(BoardAlightType.DEVIATED, ride.getAlightType());
+        checkFare(path);
     }
 
     // http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.8091683%2C-72.20580269999999&toPlace=44.94985671536269%2C-72.13708877563478&date=06%2F11%2F2018&time=4%3A00%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true
@@ -103,6 +108,7 @@ public class VermontFlexRoutingTest {
         assertEquals("1383", ride2.getRoute().getId());
         assertEquals(BoardAlightType.DEFAULT, ride2.getBoardType());
         assertEquals(BoardAlightType.DEVIATED, ride2.getAlightType());
+        checkFare(path);
     }
 
     private RoutingRequest buildRequest(String from, String to, String date, String time)
@@ -167,5 +173,11 @@ public class VermontFlexRoutingTest {
         return astar.getPathsToTarget().iterator().next();
     }
 
-
+    private void checkFare(GraphPath path) {
+        // test fare calculated correctly
+        FareService fareService = graph.getService(FareService.class);
+        Fare cost = fareService.getCost(path);
+        assertNotNull(cost);
+        assertEquals("920", cost.getDetails(Fare.FareType.regular).iterator().next().fareId.getId());
+    }
 }

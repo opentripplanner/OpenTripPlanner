@@ -5,7 +5,6 @@ import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
@@ -39,7 +37,6 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.module.map.StreetMatcher;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -53,10 +50,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -71,9 +65,7 @@ import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.TreeMap;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -106,8 +98,6 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
-    public final Multimap<Edge, TripPattern> patternsForEdge = HashMultimap.create();
-    public final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
     public final Map<AgencyAndId, Geometry> areasById = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
@@ -172,9 +162,6 @@ public class GraphIndex {
             stopSpatialIndex.insert(envelope, stopVertex);
         }
 
-
-        LOG.info("Finished processing street edges for trip patterns...");
-
         for (TripPattern pattern : patternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.route, pattern);
@@ -200,9 +187,6 @@ public class GraphIndex {
                 new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
                         new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
                 )));
-
-        LOG.info("initializing hops-for-edge map...");
-        initializeHopsForEdgeMap();
 
         LOG.info("Initializing areas....");
         if (graph.areasById != null) {
@@ -725,118 +709,6 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
-    }
-
-    private void initializeHopsForEdgeMap() {
-        if (!graph.hasStreets) {
-            LOG.info("Cannot initialize hop-to-street-edge map; graph does not have streets loaded.");
-            return;
-        }
-        StreetMatcher matcher = new StreetMatcher(graph);
-        LOG.info("Finding corresponding street edges for trip patterns...");
-        for (TripPattern pattern : patternForId.values()) {
-            if (pattern.hasFlexService()) {
-                LOG.debug("Matching {}", pattern);
-                if (pattern.geometry != null) {
-                    List<Edge> edges = matcher.match(pattern.geometry);
-                    if (edges == null || edges.isEmpty()) {
-                        LOG.warn("Could not match to street network: {}", pattern);
-                    } else {
-                        for (Edge e : edges) {
-                            patternsForEdge.put(e, pattern);
-                        }
-                    }
-                }
-
-                for(PatternHop patternHop : pattern.getPatternHops()) {
-                    List<Edge> edges;
-                    if (patternHop.getGeometry() == null) {
-                        continue;
-                    }
-                    if (isSinglePoint(patternHop.getGeometry())) {
-                        Coordinate pt = patternHop.getGeometry().getCoordinate();
-                        edges = findClosestEdges(pt);
-                    }
-                    else {
-                        edges = matcher.match(patternHop.getGeometry());
-                    }
-
-                    if (edges == null || edges.isEmpty()) {
-                        LOG.warn("Could not match to street network: {}", pattern);
-                        continue;
-                    }
-                    for (Edge e : edges) {
-                        hopsForEdge.put(e, patternHop);
-                    }
-
-                    // do the reverse, since we are walking and can go the other way.
-                    edges = matcher.match(patternHop.getGeometry().reverse());
-                    if (edges == null || edges.isEmpty()) {
-                        continue;
-                    }
-                    for (Edge e : edges) {
-                        hopsForEdge.put(e, patternHop);
-                    }
-                }
-            }
-        }
-    }
-
-    public Collection<PatternHop> getHopsForEdge(Edge e) {
-        if (e instanceof TemporaryPartialStreetEdge) {
-            e = ((TemporaryPartialStreetEdge) e).getParentEdge();
-        }
-        return hopsForEdge.get(e);
-    }
-
-    public Collection<TripPattern> getPatternsForEdge(Edge e) {
-        return patternsForEdge.get(e);
-    }
-
-    // TODO: move this
-    private List<Edge> findClosestEdges(Coordinate pointLocation) {
-        if (graph.streetIndex == null)
-            return Collections.emptyList();
-
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
-
-        Envelope env = new Envelope(pointLocation);
-
-        // local equirectangular projection
-        double lat = pointLocation.getOrdinate(1);
-        final double xscale = Math.cos(lat * Math.PI / 180);
-
-        env.expandBy(radiusDeg / xscale, radiusDeg);
-
-        Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(env);
-        if (edges.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Map<Double, List<StreetEdge>> edgeDistanceMap = new TreeMap<>();
-        for(Edge edge : edges){
-            if(edge instanceof StreetEdge){
-                LineString line = edge.getGeometry();
-                double dist = SphericalDistanceLibrary.fastDistance(pointLocation, line);
-                double roundOff = (double) Math.round(dist * 100) / 100;
-                if(!edgeDistanceMap.containsKey(roundOff))
-                    edgeDistanceMap.put(roundOff, new ArrayList<>());
-                edgeDistanceMap.get(roundOff).add((StreetEdge) edge);
-            }
-        }
-
-        List<Edge> closestEdges = edgeDistanceMap.values().iterator().next()
-                .stream().map(e -> (Edge) e).collect(Collectors.toList());
-        return closestEdges;
-    }
-
-    private boolean isSinglePoint(LineString line) {
-        Coordinate coord = line.getCoordinate();
-        for (int i = 0; i < line.getNumPoints(); i++) {
-            if (!coord.equals(line.getCoordinateN(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     // Heuristic for deciding if trip is call-n-ride, only used for transfer and banning rules

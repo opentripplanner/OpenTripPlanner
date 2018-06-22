@@ -47,6 +47,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.flex.FlexIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -112,6 +113,8 @@ public class Graph implements Serializable {
     public transient StreetVertexIndexService streetIndex;
 
     public transient GraphIndex index;
+
+    public transient FlexIndex flexIndex;
 
     private transient GeometryIndex geomIndex;
 
@@ -730,6 +733,10 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
+        if (useFlexService ) {
+            this.flexIndex = new FlexIndex();
+            flexIndex.init(this);
+        }
     }
     
     /**
@@ -1098,5 +1105,14 @@ public class Graph implements Serializable {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public void setUseFlexService(boolean useFlexService) {
+        // when passing in graph from memory, router config had not loaded when "index()" called
+        if (useFlexService && !this.useFlexService) {
+            this.flexIndex = new FlexIndex();
+            flexIndex.init(this);
+        }
+        this.useFlexService = useFlexService;
     }
 }
