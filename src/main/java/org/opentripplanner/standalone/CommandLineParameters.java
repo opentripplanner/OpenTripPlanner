@@ -61,6 +61,12 @@ public class CommandLineParameters implements Cloneable {
             description = "Pass the graph to the server in-memory after building it, without saving to disk.")
     public boolean inMemory;
 
+    @Parameter(names = { "--skipTransit" }, description = "Only build graph from OSM data and elevation module. All transit data is skipped.")
+    public boolean skipTransit = false;
+
+    @Parameter(names = { "--loadBaseGraph" }, description = "Load baseGraph.obj and build transit data on top.")
+    public boolean loadBaseGraph = false;
+
     @Parameter(names = {"--preFlight"},
             description = "Pass the graph to the server in-memory after building it, and saving to disk.")
     public boolean preFlight;
