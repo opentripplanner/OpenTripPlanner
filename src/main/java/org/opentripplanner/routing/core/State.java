@@ -273,6 +273,20 @@ public class State implements Cloneable {
     }
 
     /**
+     * Returns the last street edge traversed by scanning the backEdge of the state chain backward.
+     * @param state a State
+     */
+    private StreetEdge getLastSeenStreetEdge(State state) {
+        if (state == null) {
+            return null;
+        }
+        if (state.backEdge instanceof StreetEdge) {
+            return (StreetEdge) state.backEdge;
+        }
+        return getLastSeenStreetEdge(state.backState);
+    }
+
+    /**
      * Returns true if:
      *    - There is no region defined for at least one of the currently taken bikes,
      *      or
@@ -285,26 +299,10 @@ public class State implements Cloneable {
             return false;
         }
 
-        // Find which street edge is the one we are at;
-        StreetEdge theEdge = null;
-        if (backEdge instanceof StreetEdge) {
-            theEdge = (StreetEdge) backEdge;
-        } else if (backEdge instanceof TemporaryPartialStreetEdge) {
-            theEdge = ((TemporaryPartialStreetEdge) backEdge).getParentEdge();
-        } else if (backEdge instanceof TemporaryFreeEdge) {
-            for (Edge edge : backEdge.getFromVertex().getIncoming()) {
-                if (edge instanceof TemporaryPartialStreetEdge) {
-                    theEdge = ((TemporaryPartialStreetEdge) edge).getParentEdge();
-                    break;
-                } else if (edge instanceof StreetEdge) {
-                    theEdge = (StreetEdge) edge;
-                    break;
-                }
-            }
-        }
-
+        // Find which street edge is the one we are at
+        StreetEdge theEdge = getLastSeenStreetEdge(this);
         if (theEdge == null) {
-            LOG.warn("isFloatingBikeDropOffAllowed(): The edge type is not supported.");
+            LOG.warn("isFloatingBikeDropOffAllowed(): Could not find the last seen StreetEdge.");
             return false;
         }
 
@@ -775,10 +773,12 @@ public class State implements Cloneable {
 
                 if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
                     editor.doneVehicleRenting();
-                } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting() &&
+                        orig.vertex instanceof BikeRentalStationVertex) {
+                    // The orig.vertex can be TransitStop, hence the type checking.
                     editor.beginVehicleRenting(
-                      ((BikeRentalStationVertex)orig.vertex).getVehicleMode(),
-                      orig.getBackState().isFloatingBike());
+                            ((BikeRentalStationVertex) orig.vertex).getVehicleMode(),
+                            orig.getBackState().isFloatingBike());
                 }
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
@@ -793,7 +793,7 @@ public class State implements Cloneable {
                 //EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
                 //copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
-            
+
             orig = orig.getBackState();
         }
 

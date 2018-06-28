@@ -116,11 +116,8 @@ public abstract class GenericJsonBikeRentalDataSource<T> implements JsonConfigur
                 throw new IllegalArgumentException("Could not find jSON elements " + jsonParsePath);
               }
         }
-
         if (rootNode.getNodeType() == JsonNodeType.ARRAY) {
-            // TODO can we use foreach? for (JsonNode node : rootNode) ...
-            for (int i = 0; i < rootNode.size(); i++) {
-                JsonNode node = rootNode.get(i);
+            for (JsonNode node: rootNode) {
                 if (node == null) {
                     continue;
                 }

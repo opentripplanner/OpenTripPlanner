@@ -262,11 +262,6 @@ public abstract class GraphPathToTripPlanConverter {
 
             if (backMode == null || forwardMode == null) continue;
 
-            if (backMode == TraverseMode.USE_FORWARD_MODE) {
-                // When backMode is USE_FORWARD_MODE, it means it can be replaced by the forwardMode.
-                backMode = forwardMode;
-            }
-
             Edge edge = states[i + 1].getBackEdge();
 
             if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {

@@ -68,7 +68,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     private String network = "default";
 
     // processedRegions is a set of bike network names. It keeps track of regions that are already
-    // apply to the graph, so we don't apply them again.
+    // applied to the graph, so we don't apply them again.
     private Set<String> processedRegions = new HashSet<>();
 
     @Override
@@ -129,7 +129,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
         if (pollingPeriodSeconds <= 0) {
-            LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
+            LOG.info("Creating bike-rental updater running only once (non-polling): {}", source);
         } else {
             LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
         }

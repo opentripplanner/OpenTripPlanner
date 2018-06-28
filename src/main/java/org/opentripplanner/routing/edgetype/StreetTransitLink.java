@@ -123,7 +123,6 @@ public class StreetTransitLink extends Edge {
             if (s0.isFloatingBike() && s0.isFloatingBikeDropOffAllowed()) {
                 // Drop off the bike here
                 s1.setBikeParked(true);
-                // TODO(mahmood): add `incrementWeight` and `incrementTimeInSeconds` as cost of drop off
                 s1.doneVehicleRenting();
                 s1.setBikeRentalNetwork(new HashSet<>());
             } else {

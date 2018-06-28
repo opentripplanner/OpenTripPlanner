@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +31,42 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
+/**
+ * Coord Bike Share API Documentation: https://coord.co/docs/bike
+ *
+ * CoordBikeRentalDataSource is a datasource that connects to Coord's Bike Share API.
+ *
+ * To set up the datasource:
+ *   1. Add an updater in the 'router-config.json' file (see the example below).
+ *   2. Set the COORD_API_KEY environment variable.
+ *
+ * For example to get all the bike data for Washington DC, use the following config:
+ *
+ *     {
+ *       "updaters": [
+ *         {
+ *           "type": "bike-rental",
+ *           "frequencySec": 60,
+ *           "sourceType": "coord",
+ *           "scheme": "https",
+ *           "host": "api.coord.co",
+ *           "port": 443,
+ *           "locations": [
+ *             {
+ *               "name": "dc",
+ *               "lat": 38.9072,
+ *               "lng": -77.0369,
+ *               "radius_km": 45.0
+ *             }
+ *           ]
+ *         }
+ *       ]
+ *     }
+ *
+ * To get your Coord API key:
+ *    - Visit www.coord.co
+ *    - Create an account, login, and find your key in your profile.
+ */
 public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoordBikeRentalDataSource.class);
@@ -76,12 +125,6 @@ public class CoordBikeRentalDataSource implements BikeRentalDataSource, JsonConf
     public List<BikeRentalRegion> getRegions() {
         final Map<String, BikeRentalRegion> regions = new HashMap<>();
         regionSources.forEach(s -> s.getRegions().forEach(r -> regions.put(r.network, r)));
-
-        if (regions.containsKey("JumpDC")) {
-            // TODO(mahmood): Fix this hard-coded line when SpinDC gets its own geometry
-            // SpinDC does not have a geometry at the moment, we use JumpDC's geom for SpinDC"
-            regions.put("SpinDC", new BikeRentalRegion("SpinDC", regions.get("JumpDC").geometry));
-        }
         return new ArrayList<>(regions.values());
     }
 

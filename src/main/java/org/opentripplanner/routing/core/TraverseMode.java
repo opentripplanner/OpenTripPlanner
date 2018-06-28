@@ -26,15 +26,9 @@ public enum TraverseMode {
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
     TRANSIT, LEG_SWITCH,
-    AIRPLANE, USE_FORWARD_MODE;
+    AIRPLANE;
 
-    // Note: USE_FORWARD_MODE is an auxiliary traverse mode. It's meant to be used for the cases where
-    // the traverse mode of the current state has to be equal to the traverse mode of the next state, but
-    // the next one is not determined yet.
-    // As an example: when traversing StreetBikeRentalLink (bike station to street), the traverse mode has
-    // to be the same as the traverse mode of the connected street edge.
-
-    private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
+    private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap =
             new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
 
     public static Set<TraverseMode> internSet (Set<TraverseMode> modeSet) {

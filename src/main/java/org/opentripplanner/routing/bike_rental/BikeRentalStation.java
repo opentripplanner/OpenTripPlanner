@@ -14,16 +14,15 @@
 package org.opentripplanner.routing.bike_rental;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serializable;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.ResourceBundleSingleton;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Set;
 
 public class BikeRentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;

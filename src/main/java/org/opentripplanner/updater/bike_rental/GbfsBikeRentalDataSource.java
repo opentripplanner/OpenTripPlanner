@@ -3,7 +3,6 @@ package org.opentripplanner.updater.bike_rental;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalRegion;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.NonLocalizedString;

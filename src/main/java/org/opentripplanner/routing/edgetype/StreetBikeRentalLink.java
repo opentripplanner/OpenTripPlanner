@@ -35,18 +35,14 @@ public class StreetBikeRentalLink extends Edge {
 
     private BikeRentalStationVertex bikeRentalStationVertex;
 
-    private final boolean isEnteringStation;
-
     public StreetBikeRentalLink(StreetVertex fromv, BikeRentalStationVertex tov) {
         super(fromv, tov);
         bikeRentalStationVertex = tov;
-        isEnteringStation = true;
     }
 
     public StreetBikeRentalLink(BikeRentalStationVertex fromv, StreetVertex tov) {
         super(fromv, tov);
         bikeRentalStationVertex = fromv;
-        isEnteringStation = false;
     }
 
     public String getDirection() {
@@ -86,15 +82,7 @@ public class StreetBikeRentalLink extends Edge {
         //assume bike rental stations are more-or-less on-street
         s1.incrementTimeInSeconds(1);
         s1.incrementWeight(1);
-        if (isEnteringStation) {
-            s1.setBackMode(s0.getBackMode());
-        } else {
-            // The backMode's here has to match with the next state's traverse mode.
-            // As we don't know what the next traverse mode is yet, we set it to USE_FORWARD_MODE to postpone
-            // this decision to the future. Later, when the trip plan is being built we will use this auxiliary
-            // traverse mode to properly build trip legs.
-            s1.setBackMode(TraverseMode.USE_FORWARD_MODE);
-        }
+        s1.setBackMode(s0.getNonTransitMode());
         return s1.makeState();
     }
 

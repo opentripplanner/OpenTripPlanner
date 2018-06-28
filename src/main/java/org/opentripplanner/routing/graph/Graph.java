@@ -256,10 +256,6 @@ public class Graph implements Serializable {
      * @param e The edge to be removed
      */
     public void removeEdge(Edge e) {
-        // TODO(mahmood): merge edges connected with SplitterVertex
-        // if (e.tov instanceof SplitterVertex || e.fromv instanceof SplitterVertex) {
-        //      do merge edges
-        // }
         if (e != null) {
             synchronized (alertPatches) {   // This synchronization is somewhat silly because this
                 alertPatches.remove(e);     // method isn't thread-safe anyway, but it is consistent

@@ -13,9 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Set;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -24,9 +23,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
-import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.LineString;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Renting or dropping off a rented bike edge.
@@ -64,9 +62,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
             return null;
         }
 
-        /*
-         * Check bikeNetworks if specific bike networks are requested.
-         */
+        // Check bikeNetworks if specific bike networks are requested.
         if (options.bikeNetworks != null &&
             !options.bikeNetworks.isEmpty() &&
             Sets.intersection(vertex.networks, options.bikeNetworks).isEmpty()) {
@@ -80,7 +76,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
                 : options.bikeRentalPickupTime);
         s1.beginVehicleRenting(((BikeRentalStationVertex)fromv).getVehicleMode(), vertex.isFloatingBike);
         s1.setBikeRentalNetwork(networks);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
         return s1b;
     }
@@ -103,7 +99,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime
                 : options.bikeRentalDropoffTime);
         s1e.doneVehicleRenting();
-        s1e.setBackMode(TraverseMode.LEG_SWITCH);
+        s1e.setBackMode(TraverseMode.WALK);
         State s1 = s1e.makeState();
         return s1;
     }
