@@ -417,6 +417,9 @@ public class GTFSPatternHopFactory {
 
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
+
+            // there is a multi mapping between stopPattern and tripPattern
+            // so a stopPattern can be associated with more than 1 tripPatterns
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
@@ -539,6 +542,8 @@ public class GTFSPatternHopFactory {
         /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
         ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
 
+        // TODO: Transperth doesnt use block_id in trips.txt
+        // so it might be ok to remove this
         LOG.info("Finding interlining trips based on block IDs.");
         for (TripPattern pattern : tripPatterns) {
             Timetable timetable = pattern.scheduledTimetable;
@@ -962,8 +967,10 @@ public class GTFSPatternHopFactory {
 
             //add a vertex representing the stop
             if (locationType == 1) {
+                // create a new vertex and add it to the graph
                 context.stationStopNodes.put(stop, new TransitStation(graph, stop));
             } else {
+                // create a new vertex and add it to the graph
                 TransitStop stopVertex = new TransitStop(graph, stop);
                 context.stationStopNodes.put(stop, stopVertex);
                 if (locationType != 2) {
@@ -980,6 +987,9 @@ public class GTFSPatternHopFactory {
                     stopVertex.departVertex = depart;
 
                     // Add edges from arrive to stop and stop to depart
+                    // see {@link Edge} for details on how arrive, depart
+                    // and stopVertex add these edges to their incoming
+                    // and outgoing edge collections
                     new PreAlightEdge(arrive, stopVertex);
                     new PreBoardEdge(stopVertex, depart);
                 }

@@ -25,6 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -362,6 +363,11 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /**
+     * If 1, include school bus routes in the search.
+     */
+    @QueryParam("includeSchoolBus")
+    private int includeSchoolBus;
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -593,6 +599,20 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (includeSchoolBus == 1) {
+            // check routing modes
+            QualifiedMode busMode = new QualifiedMode("BUS");
+            if (!modes.qModes.contains(busMode)) {
+                // include bus mode
+                // school routes can be filtered out later
+                modes.qModes.add(busMode);
+                request.schoolBusOnly = true;
+                modes.applyToRoutingRequest(request);
+                request.setModes(request.modes);
+            }
+            request.includeSchoolBus = includeSchoolBus;
+        }
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

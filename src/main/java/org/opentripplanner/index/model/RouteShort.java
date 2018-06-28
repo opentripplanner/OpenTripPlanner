@@ -14,17 +14,27 @@ public class RouteShort {
     public AgencyAndId id;
     public String shortName;
     public String longName;
+    public String desc;
     public String mode;
     public String color;
+    public String textColor;
     public String agencyName;
+    public String agencyId;
+    public String url;
+    public int schoolOnly;
 
     public RouteShort (Route route) {
         id = route.getId();
         shortName = route.getShortName();
         longName = route.getLongName();
+        desc = route.getDesc();
         mode = GtfsLibrary.getTraverseMode(route).toString();
         color = route.getColor();
+        textColor = route.getTextColor();
         agencyName = route.getAgency().getName();
+        agencyId = route.getAgency().getId();
+        url = route.getUrl();
+        schoolOnly = route.getSchoolOnly();
     }
 
     public static List<RouteShort> list (Collection<Route> in) {

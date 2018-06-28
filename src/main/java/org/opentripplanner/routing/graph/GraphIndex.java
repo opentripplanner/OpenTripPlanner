@@ -2,11 +2,11 @@ package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.util.BitSet;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Calendar;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -37,6 +37,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.index.model.TimetableForTrip;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
@@ -485,6 +486,93 @@ public class GraphIndex {
         return ret;
     }
 
+    /**
+     * Get timetable for the trip and its related future trips on a given service date.
+     * @param trip Trip object
+     * @param sd ServiceDate object
+     * @param numberOfDepartures number of returned trips
+     * @return
+     */
+    public List<TimetableForTrip> getTimetableForTrip (Trip trip, ServiceDate sd, int numberOfDepartures) {
+        TripPattern pattern = patternForTrip.get(trip);
+        TimetableSnapshot snapshot = null;
+        if (graph.timetableSnapshotSource != null) {
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
+        // resolve timetable for the date
+        Timetable timetable = snapshot != null ?
+            snapshot.resolve(pattern, sd) :
+            pattern.scheduledTimetable;
+        ServiceDay serviceDay = new ServiceDay(graph, sd, calendarService, pattern.route.getAgency().getId());
+        return TripTimeShort.fromTimetable(timetable, trip, numberOfDepartures, serviceDay);
+    }
+
+    /**
+     * Get route timetable (both inbound and outbound) for a given date.
+     * @param Route route object
+     * @param startTime Departure time to search from (in seconds)
+     * @param timeRange period to search from startTime (in seconds)
+     * @param numberOfDepartures number of returned trips
+     * @param omitNonPickups whether to omit non-pickup trips
+     * @return
+     */
+    public List<TimetableForTrip> getTimetableForRoute (Route route, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis() / 1000;
+        }
+        Date date = new Date(startTime * 1000);
+        PriorityQueue<TimetableForTrip> pq = new PriorityQueue<TimetableForTrip> (numberOfDepartures) {
+            @Override
+            protected boolean lessThan (TimetableForTrip t1, TimetableForTrip t2) {
+                return 
+                (t1.serviceDay + t1.triptimes.get(0).realtimeDeparture) >
+                (t2.serviceDay + t2.triptimes.get(0).realtimeDeparture);
+            }
+        };
+           
+        // get trip patterns associated with the route
+        Collection<TripPattern> patterns = patternsForRoute.get(route);
+        // retrieve the timetable snapshot
+        TimetableSnapshot snapshot = null;
+        if (graph.timetableSnapshotSource != null) {
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
+        // construct 3 service dates for trips spanning across dates
+        ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
+
+        for (TripPattern pattern : patterns) {
+            for (ServiceDate serviceDate : serviceDates) {
+                 ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
+
+                 // resolve timetable for the date
+                 Timetable timetable = snapshot != null ?
+                    snapshot.resolve(pattern, serviceDate) :
+                    pattern.scheduledTimetable;
+                 
+                 if (!timetable.temporallyViable(sd, startTime, timeRange, true)) continue;
+
+                 int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
+
+                 for (TripTimes tt : timetable.tripTimes) {
+                     if (!sd.serviceRunning(tt.serviceCode)) continue;
+
+                     // compare the departure time of the 1st stop of the trip
+                     // with requested starting time
+                     if (tt.getDepartureTime(0) != -1 && tt.getDepartureTime(0) >= secondsSinceMidnight) {
+                         pq.insertWithOverflow(
+                             new TimetableForTrip(timetable, tt, sd)
+                         );
+                     }
+                 }
+            }
+        }
+
+        List<TimetableForTrip> ret = Lists.newArrayList();
+        while (pq.size() != 0) {
+            ret.add(0, pq.pop());
+        }
+        return ret;
+    }
     /**
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
      * timetables for a single day.

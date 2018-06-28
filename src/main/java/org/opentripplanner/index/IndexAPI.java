@@ -412,8 +412,27 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
-   
+
+    /** Return timetable for a route. A route might contain different patterns */
+   @GET
+   @Path("/routes/{routeId}/timetable")
+   public Response getTimetableForRoute (
+       @PathParam("routeId") String routeIdString,
+       @QueryParam("startTime") @DefaultValue("0") long startTime,
+       @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
+       @QueryParam("numberOfDepartures") @DefaultValue("10") int numberOfDepartures
+    ) {
+        AgencyAndId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+        Route route = index.routeForId.get(routeId);
+        if (route == null) {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        } else {
+            return Response.status(Status.OK).entity(
+                index.getTimetableForRoute(route, startTime, timeRange, numberOfDepartures, true)
+            ).build();
+        }
+   }
+
     // Not implemented, results would be too voluminous.
     // @Path("/trips")
 
@@ -457,7 +476,7 @@ public class IndexAPI {
         }
     }
 
-    @GET
+   @GET
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
@@ -466,10 +485,34 @@ public class IndexAPI {
            TripPattern pattern = index.patternForTrip.get(trip);
            // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
            Timetable table = index.currentUpdatedTimetableForTripPattern(pattern);
-           return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
+            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
        } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
+   }
+
+   @GET
+   @Path("/trips/{tripId}/timetable")
+   public Response getTimetableForTrip (
+       @PathParam("tripId") String tripIdString,
+       @QueryParam("date") String date,
+       @QueryParam("numberOfDepartures") @DefaultValue("10") int numberOfDepartures
+       ) {
+       AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+       Trip trip = index.tripForId.get(tripId);
+       if (trip == null) {
+           return Response.status(Status.NOT_FOUND).entity(MSG_400).build();
+       }
+       ServiceDate sd;
+       try {
+           sd = ServiceDate.parseString(date);
+       }
+       catch (ParseException e){
+           return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+       }
+       return Response.status(Status.OK).entity(
+           index.getTimetableForTrip(trip, sd, numberOfDepartures)
+       ).build();
    }
 
     /** Return geometry for the trip as a packed coordinate sequence */

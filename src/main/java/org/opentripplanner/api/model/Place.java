@@ -105,6 +105,13 @@ public class Place {
     public String bikeShareId;
 
     /**
+     * Whether the place is a timepoint.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public boolean timePoint;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */
