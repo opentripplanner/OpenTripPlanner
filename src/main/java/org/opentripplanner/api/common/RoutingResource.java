@@ -77,15 +77,20 @@ public abstract class RoutingResource {
     /** The date that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("date")
     protected String date;
-    
+
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time")
     protected String time;
-    
+
+    /** The timezone in which the date & time in the query should be interpreted */
+    @QueryParam("timeZone")
+    protected String timeZone;
+
+
     /** Whether the trip should depart or arrive at the specified date and time. */
     @QueryParam("arriveBy")
     protected Boolean arriveBy;
-    
+
     /** Whether the trip must be wheelchair accessible. */
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
@@ -392,8 +397,10 @@ public abstract class RoutingResource {
 
         {
             //FIXME: move into setter method on routing request
-            TimeZone tz;
-            tz = router.graph.getTimeZone();
+            TimeZone defaultTz;
+            defaultTz = router.graph.getTimeZone();
+            if(timeZone != null) defaultTz =  TimeZone.getTimeZone(timeZone);
+            LOG.debug("using default timezone " + defaultTz.toString());
             if (date == null && time != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", time);
                 try {
@@ -402,15 +409,15 @@ public abstract class RoutingResource {
                     XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
                     GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                        gregCal.setTimeZone(tz);
+                        gregCal.setTimeZone(defaultTz);
                     }
                     Date d2 = gregCal.getTime();
                     request.setDateTime(d2);
                 } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(date, time, tz);
+                    request.setDateTime(date, time, defaultTz);
                 }
             } else {
-                request.setDateTime(date, time, tz);
+                request.setDateTime(date, time, defaultTz);
             }
         }
 
