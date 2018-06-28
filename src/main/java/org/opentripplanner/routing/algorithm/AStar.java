@@ -24,10 +24,12 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.*;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -157,7 +159,7 @@ public class AStar {
 
         // get the lowest-weight state in the queue
         runState.u = runState.pq.extract_min();
-        
+
         // check that this state has not been dominated
         // and mark vertex as visited
         if (!runState.spt.visit(runState.u)) {
@@ -184,6 +186,22 @@ public class AStar {
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.
             for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
                 // Could be: for (State v : traverseEdge...)
+               
+                if (v.getVertex() instanceof PatternDepartVertex) {
+                    PatternDepartVertex stateVertex = (PatternDepartVertex) v.getVertex();
+                    if (stateVertex.getTripPattern().mode == TraverseMode.BUS) {
+                        // only include school bus routes
+                        if (runState.options.schoolBusOnly &&
+                            stateVertex.getTripPattern().route.getSchoolOnly() == 0){
+                            break;  
+                        }
+                        // exclude school bus routes
+                        if (runState.options.includeSchoolBus == 0 &&
+                            stateVertex.getTripPattern().route.getSchoolOnly() == 1){
+                            break;
+                        }    
+                    }
+                }
 
                 if (traverseVisitor != null) {
                     traverseVisitor.visitEdge(edge, v);
@@ -226,7 +244,7 @@ public class AStar {
                         traverseVisitor.visitEnqueue(v);
                     //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
                     runState.pq.insert(v, estimate);
-                } 
+                }
             }
         }
         

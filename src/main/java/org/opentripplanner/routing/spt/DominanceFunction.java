@@ -96,7 +96,10 @@ public abstract class DominanceFunction implements Serializable {
     public static class MinimumWeight extends DominanceFunction {
         /** Return true if the first state has lower weight than the second state. */
         @Override
-        public boolean betterOrEqual (State a, State b) { return a.weight <= b.weight; }
+        public boolean betterOrEqual (State a, State b) {
+            final double EPSILON = 0;
+            return a.weight <= (b.weight + EPSILON);
+        }
     }
 
     /**
@@ -119,7 +122,8 @@ public abstract class DominanceFunction implements Serializable {
 
         @Override
         protected boolean betterOrEqual(State a, State b) {
-            return a.getWalkDistance() <= b.getWalkDistance(); 
+            final double EPSILON = 0;
+            return a.getWalkDistance() <= (b.getWalkDistance() + EPSILON); 
         }
 
     }

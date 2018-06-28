@@ -1,0 +1,68 @@
+@startuml
+class Agency {
+  agency_id
+  agency_name
+  agency_fare_url
+}
+Agency "1" <-- "many" Routes: operated by
+
+class Stops {
+  stop_id
+  stop_code
+  stop_name
+  stop_lat
+  stop_lon
+  zone_id
+  location_type
+  parent_station
+}
+
+class Routes {
+  route_id
+  agency_id
+  route_short_name
+  route_type
+  route_sort_order
+}
+
+class Calendar {
+  service_id
+  mon/tues/wed/thurs
+  start_date
+  end_date
+}
+
+class Trips {
+  route_id
+  service_id
+  trip_id
+  trip_short_name
+  trip_headsign
+  direction_id
+  block_id
+  shape_id
+  wheelchair_accessible
+}
+Routes "1" <-- "many" Trips: belongs to
+Calendar "1" <-- "many" Trips: runs on
+Shapes "1" <-- "many" Trips: uses style
+
+class StopTimes {
+  trip_id
+  arrival_time
+  departure_time
+  stop_id
+  stop_sequence
+  stop_headsign
+  pickup_type
+  drop_off_type
+  shape_dist_travel
+  timepoint
+}
+Stops <-- StopTimes
+Trips <-- StopTimes
+
+class Transfers
+
+class Shapes
+@enduml

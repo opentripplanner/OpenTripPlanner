@@ -695,6 +695,7 @@ public abstract class GraphPathToTripPlanConverter {
             if (endOfLeg) place.stopIndex++;
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
+                place.timePoint = tripTimes.isTimepoint(place.stopIndex);
             }
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
