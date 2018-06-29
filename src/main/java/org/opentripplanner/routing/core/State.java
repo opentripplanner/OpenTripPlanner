@@ -268,6 +268,8 @@ public class State implements Cloneable {
         return stateData.usingRentedBike;
     }
 
+    public boolean isCarRenting() { return stateData.usingRentedCar; }
+
     public boolean isUsingHailedCar() { return stateData.usingHailedCar; }
     
     public boolean isCarParked() {
@@ -655,6 +657,8 @@ public class State implements Cloneable {
         return stateData.bikeRentalNetworks;
     }
 
+    public Set<String> getCarRentalNetworks() { return stateData.carRentalNetworks; }
+
     /**
      * Reverse the path implicit in the given state, re-traversing all edges in the opposite
      * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
@@ -853,4 +857,5 @@ public class State implements Cloneable {
     public boolean hasEnteredNoThruTrafficArea() {
         return stateData.enteredNoThroughTrafficArea;
     }
+
 }

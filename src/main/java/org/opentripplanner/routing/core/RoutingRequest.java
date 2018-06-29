@@ -212,6 +212,32 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
 
+    /** Time to get on and off your own car */
+    public int carSwitchTime;
+
+    /** Cost of getting on and off your own car */
+    public int carSwitchCost;
+
+    /** Time to rent a car */
+    public int carRentalPickupTime = 120;
+
+    /**
+     * Cost of renting a car. The cost is a bit more than actual time to model the associated cost and trouble.
+     */
+    public int carRentalPickupCost = 120;
+
+    /** Time to drop-off a rented car */
+    public int carRentalDropoffTime = 120;
+
+    /** Cost of dropping-off a rented car */
+    public int carRentalDropoffCost = 30;
+
+    /** Time to park a car */
+    public int carParkTime = 120;
+
+    /** Cost of parking a car. */
+    public int carParkCost = 120;
+
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
@@ -328,6 +354,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
     public boolean useBikeRentalAvailabilityInformation = false;
+
+    /**
+     * Whether or not car rental availability information will be used to plan bike rental trips
+     */
+    public boolean useCarRentalAvailabilityInformation = false;
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.

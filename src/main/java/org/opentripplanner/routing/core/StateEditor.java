@@ -581,4 +581,19 @@ public class StateEditor {
             child.stateData.nonTransitMode = TraverseMode.WALK;
         }
     }
+
+    public void setCarRenting(boolean carRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = carRenting;
+        if (carRenting) {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
+
+    public void setCarRentalNetwork(Set<String> networks) {
+        cloneStateDataAsNeeded();
+        child.stateData.carRentalNetworks = networks;
+    }
 }

@@ -18,14 +18,27 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
@@ -36,8 +49,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * This represents a street segment.
@@ -117,6 +132,11 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    /**
+     * A set of car networks where this edge is located inside their service regions.
+     */
+    private Set<String> carNetworks;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -967,5 +987,23 @@ public class StreetEdge extends Edge implements Cloneable {
             return ((SplitterVertex) tov).nextNodeId;
         else
             return -1;
+    }
+
+    public boolean addCarNetwork(String carNetwork) {
+        if (carNetworks == null) {
+            synchronized (this) {
+                if (carNetworks == null) {
+                    carNetworks = new HashSet<>();
+                }
+            }
+        }
+        return carNetworks.add(carNetwork);
+    }
+
+    public boolean containsCarNetwork(String carNetwork) {
+        if (carNetworks == null){
+            return false;
+        }
+        return carNetworks.contains(carNetwork);
     }
 }

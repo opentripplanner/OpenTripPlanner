@@ -1,0 +1,65 @@
+{
+  "maxGlobalVersion": 810645992,
+  "locationId": 11,
+  "locationName": "portland",
+  "vehicles": [{
+    "vin": "TEST1",
+    "plate": "TEST1",
+    "geoCoordinate": {
+      "latitude": 45.47517085,
+      "longitude": -122.64797026
+    },
+    "fuelLevel": 96,
+    "address": "6623 SE 17th Ave, Portland, OR 97202, USA",
+    "locationAlias": "portland",
+    "locationId": 11,
+    "buildSeries": "X156",
+    "fuelType": "GASOLINE",
+    "primaryColor": "696U",
+    "secondaryColor": "696O",
+    "charging": false,
+    "freeForRental": true,
+    "hardwareVersion": "HW3",
+    "globalVersion": 809381367
+  }, {
+    "vin": "TEST2",
+    "plate": "TEST2",
+    "geoCoordinate": {
+      "latitude": 0.0,
+      "longitude": 0.0
+    },
+    "fuelLevel": 0,
+    "address": "",
+    "locationAlias": "",
+    "locationId": 11,
+    "parkingId": "",
+    "attributes": [],
+    "buildSeries": "",
+    "fuelType": "",
+    "primaryColor": "",
+    "secondaryColor": "",
+    "charging": false,
+    "freeForRental": false,
+    "hardwareVersion": "",
+    "globalVersion": 808276121
+  }, {
+    "vin": "TEST3",
+    "plate": "TEST3",
+    "geoCoordinate": {
+      "latitude": 45.47966057,
+      "longitude": -122.58215835
+    },
+    "fuelLevel": 76,
+    "address": "7923 SE Woodstock Blvd, Portland, OR 97206, USA",
+    "locationAlias": "portland",
+    "locationId": 11,
+    "buildSeries": "C117",
+    "fuelType": "GASOLINE",
+    "primaryColor": "650U",
+    "secondaryColor": "650O",
+    "charging": false,
+    "freeForRental": true,
+    "hardwareVersion": "HW3",
+    "globalVersion": 810625844
+  }]
+}
