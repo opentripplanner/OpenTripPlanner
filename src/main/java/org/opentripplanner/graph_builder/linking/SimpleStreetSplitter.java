@@ -18,13 +18,14 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
-import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
+import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -391,6 +393,8 @@ public class SimpleStreetSplitter {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to);
+        } else if (from instanceof CarRentalStationVertex) {
+            makeCarRentalLinkEdges((CarRentalStationVertex) from, to);
         }
     }
 
@@ -441,6 +445,20 @@ public class SimpleStreetSplitter {
 
         new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
         new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
+    }
+
+    /** Make link edges for car rental */
+    private void makeCarRentalLinkEdges (CarRentalStationVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Car rental edges are created with non destructive splitting!");
+        }
+        for (StreetCarRentalLink scrl : Iterables.filter(from.getOutgoing(), StreetCarRentalLink.class)) {
+            if (scrl.getToVertex() == to)
+                return;
+        }
+
+        new StreetCarRentalLink(from, to);
+        new StreetCarRentalLink(to, from);
     }
 
     /** Make link edges for bike rental */
@@ -528,10 +546,12 @@ public class SimpleStreetSplitter {
             TraverseModeSet modes = options.modes;
             if (modes.getCar())
                 // for park and ride we will start in car mode and walk to the end vertex
-                // tnc routing also starts using walk before hailing a car
+                // tnc routing and car rental also starts using walk before hailing/renting a car
                 if (
-                    (endVertex && (options.parkAndRide || options.kissAndRide)) ||
-                        options.useTransportationNetworkCompany
+                    (endVertex &&
+                        (options.parkAndRide || options.kissAndRide)) ||
+                        options.useTransportationNetworkCompany ||
+                        options.allowCarRental
                 ) {
                     nonTransitMode = TraverseMode.WALK;
                 } else {

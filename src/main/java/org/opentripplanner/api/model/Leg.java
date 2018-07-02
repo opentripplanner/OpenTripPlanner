@@ -256,6 +256,10 @@ public class Leg {
 
      @XmlAttribute
      @JsonSerialize
+     public Boolean rentedCar;
+
+     @XmlAttribute
+     @JsonSerialize
      public Boolean hailedCar;
 
     /**

@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.car_rental;
 
-import org.opentripplanner.routing.car_park.CarPark;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,8 +28,6 @@ public class CarRentalStationService implements Serializable {
 
     private Set<CarRentalStation> carRentalStations = new HashSet<CarRentalStation>();
 
-    private Set<CarPark> carParks = new HashSet<CarPark>();
-
     public Collection<CarRentalStation> getCarRentalStations() {
         return carRentalStations;
     }
@@ -44,20 +40,6 @@ public class CarRentalStationService implements Serializable {
 
     public void removeCarRentalStation(CarRentalStation carRentalStation) {
         carRentalStations.remove(carRentalStation);
-    }
-
-    public Collection<CarPark> getCarParks() {
-        return carParks;
-    }
-
-    public void addCarPark(CarPark carPark) {
-        // Remove old reference first, as adding will be a no-op if already present
-        carParks.remove(carPark);
-        carParks.add(carPark);
-    }
-
-    public void removeCarPark(CarPark carPark) {
-        carParks.remove(carPark);
     }
 
     public Map<String, CarRentalRegion> getCarRentalRegions() {

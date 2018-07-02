@@ -53,6 +53,9 @@ public class StateData implements Cloneable {
 
     protected boolean usingRentedCar;
 
+    protected boolean hasRentedCarPostTransit = false;
+    protected boolean hasRentedCarPreTransit = false;
+
     protected boolean usingHailedCar;
 
     protected boolean hasHailedCarPostTransit = false;
@@ -133,4 +136,8 @@ public class StateData implements Cloneable {
     public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
 
     public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
+
+    public boolean hasRentedCarPostTransit() { return hasRentedCarPostTransit; }
+
+    public boolean hasRentedCarPreTransit() { return hasRentedCarPreTransit; }
 }

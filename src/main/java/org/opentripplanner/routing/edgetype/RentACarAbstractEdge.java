@@ -46,14 +46,9 @@ public abstract class RentACarAbstractEdge extends Edge {
     protected State traverseRent(State s0) {
         RoutingRequest options = s0.getOptions();
         /*
-         * If we already have a car (rented or own) we won't go any faster by having a second one.
+         * To rent a car, we need to have car rental allowed in request.
          */
-        if (!s0.getNonTransitMode().equals(TraverseMode.WALK))
-            return null;
-        /*
-         * To rent a car, we need to have BICYCLE in allowed modes.
-         */
-        if (!options.modes.contains(TraverseMode.BICYCLE))
+        if (!options.allowCarRental)
             return null;
 
         CarRentalStationVertex dropoff = (CarRentalStationVertex) tov;
@@ -62,11 +57,14 @@ public abstract class RentACarAbstractEdge extends Edge {
         }
 
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.arriveBy ? options.carRentalDropoffCost
-                : options.carRentalPickupCost);
-        s1.incrementTimeInSeconds(options.arriveBy ? options.carRentalDropoffTime
-                : options.carRentalPickupTime);
-        s1.setCarRenting(true);
+        if (options.arriveBy) {
+            s1.incrementWeight(options.carRentalDropoffCost);
+            s1.incrementTimeInSeconds(options.carRentalDropoffTime);
+        } else {
+            s1.incrementWeight(options.carRentalPickupCost);
+            s1.incrementTimeInSeconds(options.carRentalPickupTime);
+        }
+        s1.boardRentedCar(0);
         s1.setCarRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
@@ -78,7 +76,9 @@ public abstract class RentACarAbstractEdge extends Edge {
         /*
          * To dropoff a car, we need to have rented one.
          */
-        if (!s0.isCarRenting() || !hasCompatibleNetworks(networks, s0.getCarRentalNetworks()))
+        if (!s0.isCarRenting())
+            return null;
+        if (!s0.isCarRentalDropoffAllowed())
             return null;
         CarRentalStationVertex pickup = (CarRentalStationVertex) tov;
         if (options.useCarRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
@@ -86,11 +86,14 @@ public abstract class RentACarAbstractEdge extends Edge {
         }
 
         StateEditor s1e = s0.edit(this);
-        s1e.incrementWeight(options.arriveBy ? options.carRentalPickupCost
-                : options.carRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.arriveBy ? options.carRentalPickupTime
-                : options.carRentalDropoffTime);
-        s1e.setCarRenting(false);
+        if (options.arriveBy) {
+            s1e.incrementWeight(options.carRentalPickupCost);
+            s1e.incrementTimeInSeconds(options.carRentalPickupTime);
+        } else {
+            s1e.incrementWeight(options.carRentalDropoffCost);
+            s1e.incrementTimeInSeconds(options.carRentalDropoffTime);
+        }
+        s1e.alightRentedCar();
         s1e.setBackMode(TraverseMode.WALK);
         State s1 = s1e.makeState();
         return s1;
