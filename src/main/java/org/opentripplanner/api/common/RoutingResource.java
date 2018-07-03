@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -171,6 +172,42 @@ public abstract class RoutingResource {
     /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
+
+    /** The weight of TRAM traverse mode. Values over 1 add cost to tram travel and values under 1 decrease cost */
+    @QueryParam("tramWeight")
+    protected Double tramWeight;
+
+    /** The weight of SUBWAY traverse mode. Values over 1 add cost to subway travel and values under 1 decrease cost */
+    @QueryParam("subwayWeight")
+    protected Double subwayWeight;
+
+    /** The weight of RAIL traverse mode. Values over 1 add cost to rail travel and values under 1 decrease cost */
+    @QueryParam("railWeight")
+    protected Double railWeight;
+
+    /** The weight of BUS traverse mode. Values over 1 add cost to bus travel and values under 1 decrease cost */
+    @QueryParam("busWeight")
+    protected Double busWeight;
+
+    /** The weight of FERRY traverse mode. Values over 1 add cost to ferry travel and values under 1 decrease cost */
+    @QueryParam("ferryWeight")
+    protected Double ferryWeight;
+
+    /** The weight of CABLE_CAR traverse mode. Values over 1 add cost to cable car travel and values under 1 decrease cost */
+    @QueryParam("cableCarWeight")
+    protected Double cableCarWeight;
+
+    /** The weight of GONDOLA traverse mode. Values over 1 add cost to gondola travel and values under 1 decrease cost */
+    @QueryParam("gondolaWeight")
+    protected Double gondolaWeight;
+
+    /** The weight of FUNICULAR traverse mode. Values over 1 add cost to funicular travel and values under 1 decrease cost */
+    @QueryParam("funicularWeight")
+    protected Double funicularWeight;
+
+    /** The weight of AIRPLANE traverse mode. Values over 1 add cost to airplane travel and values under 1 decrease cost */
+    @QueryParam("airplaneWeight")
+    protected Double airplaneWeight;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -529,6 +566,42 @@ public abstract class RoutingResource {
         if (modes != null) {
             modes.applyToRoutingRequest(request);
             request.setModes(request.modes);
+        }
+
+        if (tramWeight != null) {
+            request.setModeWeight(TraverseMode.TRAM, tramWeight);
+        }
+
+        if (subwayWeight != null) {
+            request.setModeWeight(TraverseMode.SUBWAY, subwayWeight);
+        }
+
+        if (railWeight != null) {
+            request.setModeWeight(TraverseMode.RAIL, railWeight);
+        }
+
+        if (busWeight != null) {
+            request.setModeWeight(TraverseMode.BUS, busWeight);
+        }
+
+        if (ferryWeight != null) {
+            request.setModeWeight(TraverseMode.FERRY, ferryWeight);
+        }
+
+        if (cableCarWeight != null) {
+            request.setModeWeight(TraverseMode.CABLE_CAR, cableCarWeight);
+        }
+
+        if (gondolaWeight != null) {
+            request.setModeWeight(TraverseMode.GONDOLA, gondolaWeight);
+        }
+
+        if (funicularWeight != null) {
+            request.setModeWeight(TraverseMode.FUNICULAR, funicularWeight);
+        }
+
+        if (airplaneWeight != null) {
+            request.setModeWeight(TraverseMode.AIRPLANE, airplaneWeight);
         }
 
         if (request.allowBikeRental && bikeSpeed == null) {
