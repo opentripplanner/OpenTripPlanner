@@ -1339,6 +1339,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("arrivalDelay")
+		.description("The offset from the scheduled arrival time in seconds. Negative values indicate that the trip is running ahead of schedule.")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).arrivalDelay)
                 .build())
@@ -1358,6 +1359,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("departureDelay")
+		.description("The offset from the scheduled departure time in seconds. Negative values indicate that the trip is running ahead of schedule")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(
                     environment -> ((TripTimeShort) environment.getSource()).departureDelay)
