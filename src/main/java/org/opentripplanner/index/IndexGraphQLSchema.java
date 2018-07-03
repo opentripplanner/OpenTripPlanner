@@ -2618,6 +2618,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStations")
+		.description("Get all bike rental stations in the graph")
                 .type(new GraphQLList(bikeRentalStationType))
                 .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
                         index.graph.getService(BikeRentalStationService.class) != null
@@ -2626,6 +2627,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeRentalStation")
+		.description("Get a single bike rental station based on its id")
                 .type(bikeRentalStationType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
@@ -2642,6 +2644,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikeParks")
+		.description("Get all bike parks in the graph")
                 .type(new GraphQLList(bikeParkType))
                 .dataFetcher(dataFetchingEnvironment -> new ArrayList<>(
                         index.graph.getService(BikeRentalStationService.class) != null
@@ -2650,6 +2653,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikePark")
+		.description("Get a single bike park based on its id")
                 .type(bikeParkType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
@@ -2666,6 +2670,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("carParks")
+		.description("Get all car parks in the graph")
                 .type(new GraphQLList(carParkType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
@@ -2688,6 +2693,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("carPark")
+		.description("Get a single car park based on its id")
                 .type(carParkType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
