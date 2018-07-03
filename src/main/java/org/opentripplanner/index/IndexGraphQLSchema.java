@@ -1913,6 +1913,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("realtime")
+		.description("If true, values of `bikesAvailable` and `spacesAvailable` are updated from a real-time source. If false, values of `bikesAvailable` and `spacesAvailable` are always the total capacity divided by two.")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).realTimeData)
                 .build())
