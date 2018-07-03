@@ -707,6 +707,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("feed")
+		.description("The feed in which this alert was published")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getFeedId())
                 .build())
@@ -2599,6 +2600,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(alertType))
                 .argument(GraphQLArgument.newArgument()
                     .name("feeds")
+		    .description("Only return alerts in these feeds")
                     .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
                     .build())
                 .dataFetcher(environment -> environment.getArgument("feeds") != null
