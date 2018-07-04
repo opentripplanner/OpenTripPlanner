@@ -143,6 +143,7 @@ public class Router {
             }
         }
 
+        // modeWeights should be used as the parameter name everywhere
         final JsonNode modeWeights = config.get("modeWeight");
         if (modeWeights != null && modeWeights.isObject()) {
             graph.modeWeights = new EnumMap<>(TraverseMode.class);
@@ -152,7 +153,7 @@ public class Router {
                 }
             }
         }
-  
+
         JsonNode alightTimes = config.get("alightTimes");
         if (alightTimes != null && alightTimes.isObject()) {
             graph.alightTimes = new EnumMap<>(TraverseMode.class);
