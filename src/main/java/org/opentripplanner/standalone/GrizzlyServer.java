@@ -48,9 +48,9 @@ public class GrizzlyServer {
      */
     private int getMaxThreads() {
         int maxThreads = Runtime.getRuntime().availableProcessors();
+        LOG.info("Java reports that this machine has {} available processors.", maxThreads);
         // Testing shows increased throughput up to 1.25x as many threads as cores
         maxThreads *= 1.25;
-        LOG.info("Java reports that this machine has {} available processors.", maxThreads);
         if (params.maxThreads != null) {
             maxThreads = params.maxThreads;
         }
