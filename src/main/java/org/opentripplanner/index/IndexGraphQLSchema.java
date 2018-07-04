@@ -1140,6 +1140,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
+		.description("Description of the stop, usually a street name")
                 .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1156,6 +1157,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
+		.description("The station which this stop is part of (or null if this stop is not part of a station)")
                 .type(stopType)
                 .dataFetcher(environment -> ((Stop) environment.getSource()).getParentStation() != null ?
                     index.stationForId.get(new AgencyAndId(
@@ -1164,6 +1166,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairBoarding")
+		.description("Whether wheelchair boarding is possible for at least some of vehicles on this stop")
                 .type(wheelchairBoardingEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1186,6 +1189,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
+		.description("The cluster which this stop is part of")
                 .type(clusterType)
                 .dataFetcher(environment -> index.stopClusterForStop.get(environment.getSource()))
                 .build())
@@ -1208,11 +1212,13 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
+		.description("Patterns which pass through this stop")
                 .type(new GraphQLList(patternType))
                 .dataFetcher(environment -> index.patternsForStop.get(environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("transfers")               //TODO: add max distance as parameter?
+		.description("List of nearby stops which can be used for transfers")
                 .type(new GraphQLList(stopAtDistanceType))
                 .dataFetcher(environment -> index.stopVertexForStop
                     .get(environment.getSource())
