@@ -148,8 +148,19 @@ public class SimpleStreetSplitter {
         return link(vertex, TraverseMode.WALK, null);
     }
 
-    /** Link this vertex into the graph */
+    // Link this vertex to the graph assuming use of one mode
     public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
+        final TraverseModeSet traverseModeSet;
+        if (traverseMode == TraverseMode.BICYCLE) {
+            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
+        } else {
+            traverseModeSet = new TraverseModeSet(traverseMode);
+        }
+        return link(vertex, traverseModeSet, options);
+    }
+
+    /** Link this vertex into the graph */
+    public boolean link(Vertex vertex, TraverseModeSet traverseModeSet, RoutingRequest options) {
         // find nearby street edges
         // TODO: we used to use an expanding-envelope search, which is more efficient in
         // dense areas. but first let's see how inefficient this is. I suspect it's not too
@@ -165,12 +176,6 @@ public class SimpleStreetSplitter {
 
         double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
-        final TraverseModeSet traverseModeSet;
-        if (traverseMode == TraverseMode.BICYCLE) {
-            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
-        } else {
-            traverseModeSet = new TraverseModeSet(traverseMode);
-        }
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
@@ -541,19 +546,24 @@ public class SimpleStreetSplitter {
             coord, new NonLocalizedString(name), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
+        boolean linkWithSingleMode = true;
+        TraverseModeSet linkingModeSet = null;
+
         //It can be null in tests
         if (options != null) {
             TraverseModeSet modes = options.modes;
             if (modes.getCar())
                 // for park and ride we will start in car mode and walk to the end vertex
-                // tnc routing and car rental also starts using walk before hailing/renting a car
-                if (
-                    (endVertex &&
-                        (options.parkAndRide || options.kissAndRide)) ||
-                        options.useTransportationNetworkCompany ||
-                        options.allowCarRental
+                if ((endVertex && (options.parkAndRide || options.kissAndRide))
                 ) {
                     nonTransitMode = TraverseMode.WALK;
+                }
+                // tnc routing and car rental it would be possible to walk or drive
+                else if (options.useTransportationNetworkCompany || options.allowCarRental) {
+                    linkWithSingleMode = false;
+                    if(!link(closest, new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR), options)) {
+                        LOG.warn("Couldn't link {}", location);
+                    }
                 } else {
                     nonTransitMode = TraverseMode.CAR;
                 }
@@ -563,7 +573,7 @@ public class SimpleStreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!link(closest, nonTransitMode, options)) {
+        if (linkWithSingleMode && !link(closest, nonTransitMode, options)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;

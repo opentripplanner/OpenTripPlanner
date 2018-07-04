@@ -280,29 +280,6 @@ public class AStar {
                 if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
                     continue;
                 }
-                if (runState.options.useTransportationNetworkCompany) {
-                    if (runState.u.isUsingHailedCar() &&
-                        runState.u.transportationNetworkCompanyDriveDistance <
-                            runState.options.minimumTransportationNetworkCompanyDistance
-                        ) {
-                        // too short final TNC leg
-                        continue;
-                    }
-                    if (!runState.u.isEverBoarded()) {
-                        // not yet boarded transit
-                        continue;
-                    }
-                }
-                if (runState.options.allowCarRental) {
-                    if (!runState.u.isEverBoarded()) {
-                        // not yet boarded transit
-                        continue;
-                    }
-                    if (runState.u.isCarRenting() && !runState.u.isCarRentalDropoffAllowed()) {
-                        // floating car rental dropoff not allowed at end of journey for some reason
-                        continue;
-                    }
-                }
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();

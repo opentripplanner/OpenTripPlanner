@@ -120,7 +120,7 @@ public class StreetTransitLink extends Edge {
                 s1.setCarParked(true);
             } else if (req.useTransportationNetworkCompany && s0.isUsingHailedCar()) {
                 // check to see if transit may be used after using hailed car
-                if (s0.transportationNetworkCompanyDriveDistance > req.minimumTransportationNetworkCompanyDistance) {
+                if (s0.isTNCStopAllowed()) {
                     s1.alightHailedCar();
                 } else {
                     // haven't gone far enough to warrant a ride, do not proceed

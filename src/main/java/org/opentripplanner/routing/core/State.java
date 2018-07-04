@@ -307,6 +307,14 @@ public class State implements Cloneable {
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
+        boolean tncOK = !stateData.opt.useTransportationNetworkCompany || (
+            isEverBoarded() &&
+            (!isUsingHailedCar() || isTNCStopAllowed())
+        );
+        boolean carRentingOk = !stateData.opt.allowCarRental || (
+            isEverBoarded() &&
+            (!isCarRenting() || isCarRentalDropoffAllowed())
+        );
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
@@ -316,7 +324,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && tncOK && carRentingOk;
     }
 
     public Stop getPreviousStop() {
@@ -886,12 +894,33 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public boolean isTNCStopAllowed() {
+        // Make sure travel distance in car is greater than minimum distance
+        if (this.transportationNetworkCompanyDriveDistance <
+            this.stateData.opt.minimumTransportationNetworkCompanyDistance) {
+            return false;
+        }
+
+        // see if street edge forbids parking
+        StreetEdge theEdge = getLastSeenStreetEdge(this);
+        if (!theEdge.getTNCStopSuitability())
+            return false;
+
+        return true;
+    }
+
     public boolean isCarRentalDropoffAllowed() {
         // Make sure travel distance in car is greater than minimum distance
         if (this.carRentalDriveDistance <
             this.stateData.opt.minimumCarRentalDistance) {
             return false;
         }
+
+        // see if street edge forbids parking
+        StreetEdge theEdge = getLastSeenStreetEdge(this);
+        if (!theEdge.getFloatingCarDropoffSuitability())
+            return false;
+
         // User has specified in routing request they intend to keep car even if dropping off outside car rental region
         //   (if regions are defined)
         if (this.stateData.opt.allowCarRentalDropoffOutsideCarRentalRegion) {
@@ -899,7 +928,6 @@ public class State implements Cloneable {
         }
 
         // allowed for final dropoff as a floating car within a compatible car rental region
-        StreetEdge theEdge = getLastSeenStreetEdge(this);
         CarRentalStationService carService = getContext().graph.getService(CarRentalStationService.class);
         for (String network : stateData.carRentalNetworks) {
             boolean hasRegionDefined = carService.getCarRentalRegions().get(network) != null;

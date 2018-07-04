@@ -138,6 +138,12 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private Set<String> carNetworks;
 
+    // whether or not this street is a good place to board or alight a TNC vehicle
+    private boolean suitableForTNCStop = true;
+
+    // whether or not this street is a good place to dropoff a floating car rental
+    private boolean suitableForFloatingCarRentalDropoff = true;
+
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
@@ -311,9 +317,7 @@ public class StreetEdge extends Edge implements Cloneable {
                     && !getPermission().allows(TraverseMode.CAR)
                     && currMode == TraverseMode.CAR
             ) {
-                // Make sure travel distance in car is greater than minimum distance
-                if (s0.transportationNetworkCompanyDriveDistance <
-                    options.minimumTransportationNetworkCompanyDistance) {
+                if (!s0.isTNCStopAllowed()) {
                     return null;
                 }
                 editor = doTraverse(s0, options, TraverseMode.WALK);
@@ -860,6 +864,22 @@ public class StreetEdge extends Edge implements Cloneable {
 	public void setCarSpeed(float carSpeed) {
 		this.carSpeed = carSpeed;
 	}
+
+	public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
+
+	public Set<String> getCarNetworks() { return carNetworks; }
+
+    public void setTNCStopSuitability(boolean isSuitable) {
+        this.suitableForTNCStop = isSuitable;
+    }
+
+    public boolean getTNCStopSuitability() { return suitableForTNCStop; }
+
+    public void setFloatingCarDropoffSuitability(boolean isSuitable) {
+        this.suitableForFloatingCarRentalDropoff = isSuitable;
+    }
+
+    public boolean getFloatingCarDropoffSuitability() { return suitableForFloatingCarRentalDropoff; }
 
 	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
