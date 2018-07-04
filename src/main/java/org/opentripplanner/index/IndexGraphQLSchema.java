@@ -1553,10 +1553,12 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairAccessible")
+		.description("Whether the vehicle running this trip can be boarded by a wheelchair")
                 .type(wheelchairBoardingEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikesAllowed")
+		.description("Whether bikes are allowed on board the vehicle running this trip")
                 .type(bikesAllowedEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1631,6 +1633,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
+		.description("List of coordinates of this trip's route")
                 .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
                 .dataFetcher(environment -> {
                     LineString geometry = index.patternForTrip
