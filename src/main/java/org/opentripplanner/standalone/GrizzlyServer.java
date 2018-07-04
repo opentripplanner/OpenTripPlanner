@@ -43,9 +43,13 @@ public class GrizzlyServer {
         this.server = server;
     }
 
-    /** OTP is CPU-bound, so we want roughly as many worker threads as we have cores, subject to some constraints. */
+    /**
+     * OTP is CPU-bound, so we want roughly as many worker threads as we have cores, subject to some constraints.
+     */
     private int getMaxThreads() {
         int maxThreads = Runtime.getRuntime().availableProcessors();
+        // Testing shows increased throughput up to 1.25x as many threads as cores
+        maxThreads *= 1.25;
         LOG.info("Java reports that this machine has {} available processors.", maxThreads);
         if (params.maxThreads != null) {
             maxThreads = params.maxThreads;
@@ -74,11 +78,15 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
-        /* Set up a pool of threads to handle incoming HTTP requests. */
+        // Set up a pool of threads to handle incoming HTTP requests.
+        // According to the Grizzly docs, setting the core and max pool size equal with no queue limit
+        // will use a more efficient fixed-size thread pool implementation.
         // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
+        int nHandlerThreads = getMaxThreads();
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
-            .setCorePoolSize(MIN_THREADS)
-            .setMaxPoolSize(getMaxThreads());
+            .setCorePoolSize(nHandlerThreads)
+            .setMaxPoolSize(nHandlerThreads)
+            .setQueueLimit(-1);
 
         /* HTTP (non-encrypted) listener */
         NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
