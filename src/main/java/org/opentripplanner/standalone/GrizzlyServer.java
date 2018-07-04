@@ -53,6 +53,7 @@ public class GrizzlyServer {
         maxThreads *= 1.25;
         if (params.maxThreads != null) {
             maxThreads = params.maxThreads;
+            LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
         }
         if (maxThreads < MIN_THREADS) {
             // Some machines apparently report 1 processor even when they have 8.
