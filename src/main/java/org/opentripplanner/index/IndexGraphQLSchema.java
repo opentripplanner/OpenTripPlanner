@@ -1114,6 +1114,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
+		.description("Stop id in format FeedId:StopId")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
                     GtfsLibrary.convertIdToString(((Stop) environment.getSource()).getId()))
@@ -2483,7 +2484,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
-                .description("Get a single stop based on its id (format is Agency:StopId)")
+                .description("Get a single stop based on its id (format is FeedId:StopId)")
                 .type(stopType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
