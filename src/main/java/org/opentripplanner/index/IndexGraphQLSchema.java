@@ -2292,7 +2292,13 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
+                    .description("Deprecated, use argument `feeds` instead")
                     .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .description("List of feed ids from which stops are returned")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
                     .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
@@ -2302,8 +2308,9 @@ public class IndexGraphQLSchema {
                             environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
-                    .filter(stop -> environment.getArgument("agency") == null || stop.getId()
-                        .getAgencyId().equalsIgnoreCase(environment.getArgument("agency")))
+                    .filter(stop -> (environment.getArgument("agency") == null && environment.getArgument("feeds") == null) ||
+                        stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("agency")) || (environment.getArgument("feeds") instanceof List && ((List)environment.getArgument("feeds")).contains(stop.getId().getAgencyId()))
+                    )
                     .collect(Collectors.toList()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2329,7 +2336,13 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
+                    .description("Deprecated, use argument `feeds` instead")
                     .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .description("List of feed ids from which stops are returned")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
@@ -2340,9 +2353,9 @@ public class IndexGraphQLSchema {
                             environment.getArgument("lon"),
                             environment.getArgument("radius"))
                             .stream()
-                            .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                                stopAndDistance.stop.getId().getAgencyId()
-                                    .equalsIgnoreCase(environment.getArgument("agency")))
+                            .filter(stopAndDistance -> (environment.getArgument("agency") == null && environment.getArgument("feeds") == null) ||
+                                stopAndDistance.stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("agency")) || (environment.getArgument("feeds") instanceof List && ((List)environment.getArgument("feeds")).contains(stopAndDistance.stop.getId().getAgencyId()))
+                            )
                             .sorted(Comparator.comparing(s -> s.distance))
                             .collect(Collectors.toList());
                     } catch (VertexNotFoundException e) {
