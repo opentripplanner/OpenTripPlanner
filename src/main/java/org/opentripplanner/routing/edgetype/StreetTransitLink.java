@@ -97,10 +97,12 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+
         if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
         }
+
         if (s0.isBikeRenting()) {
             // Forbid taking a rented bike on any transit.
             // TODO Check this condition, does this always make sense?

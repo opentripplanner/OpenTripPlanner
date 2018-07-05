@@ -22,6 +22,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+
 public class TransitStop extends TransitStationStop {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitStop.class);
@@ -101,4 +103,5 @@ public class TransitStop extends TransitStationStop {
     public boolean isStreetLinkable() {
         return isEntrance() || !hasEntrances();
     }
+
 }

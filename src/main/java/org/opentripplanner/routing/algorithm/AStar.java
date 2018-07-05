@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.*;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -176,7 +177,14 @@ public class AStar {
             System.out.println("   vertex " + runState.u_vertex);
 
         runState.nVisited += 1;
-        
+
+        // Ugly hack: pretend that transit stop vertices have no edges when they serve modes we are not using.
+        // This entirely avoids all transfers and pattern boarding for these stops, e.g. when searching by rail only.
+        if (runState.u_vertex instanceof TransitStop) {
+            if (!((TransitStop)runState.u_vertex).getModes().intersects(runState.options.modes)) {
+                return false;
+            }
+        }
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 

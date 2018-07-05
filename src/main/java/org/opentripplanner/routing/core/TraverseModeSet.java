@@ -326,6 +326,10 @@ public class TraverseModeSet implements Cloneable, Serializable {
         return (modes & modeMask) != 0;
     }
 
+    public boolean intersects(TraverseModeSet other) {
+        return (modes & other.modes) != 0;
+    }
+
     public String toString() {
         StringBuilder out = new StringBuilder();
         for (TraverseMode mode : TraverseMode.values()) {
