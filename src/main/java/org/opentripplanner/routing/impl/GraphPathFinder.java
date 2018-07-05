@@ -116,8 +116,8 @@ public class GraphPathFinder {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
             // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
-            heuristic = new InterleavedBidirectionalHeuristic();
-            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
+            heuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
+            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
             reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();

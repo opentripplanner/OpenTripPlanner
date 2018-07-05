@@ -447,6 +447,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     private StreetEdge splitEdge = null;
 
+    // Allow tuning the ratio of backward to forward search steps.
+    // TODO determine a good default value empirically
+    public int heuristicStepsPerMainStep = 8;
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */

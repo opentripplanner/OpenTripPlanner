@@ -125,8 +125,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State state0) {
         return traverse(state0, 0);
     }
-    
-    
+
     /**
      * NOTE: We do not need to check the pickup/drop off type. TransitBoardAlight edges are simply
      * not created for pick/drop type 1 (no pick/drop).
