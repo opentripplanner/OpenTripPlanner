@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -23,13 +24,20 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     private String baseUrl;
 
+    private String networkName;
+
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource () {
+    public GbfsBikeRentalDataSource (String networkName) {
         stationInformationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
         floatingBikeSource = new GbfsFloatingBikeDataSource();
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "GBFS";
+        }
     }
 
     public void setBaseUrl (String url) {
@@ -71,6 +79,11 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
         List<BikeRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
         stations.addAll(floatingBikeSource.getStations());
+
+        // Set identical network ID on all stations
+        Set<String> networkIdSet = Sets.newHashSet(this.networkName);
+        for (BikeRentalStation station : stations) station.networks = networkIdSet;
+
         return stations;
     }
 
