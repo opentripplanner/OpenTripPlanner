@@ -100,6 +100,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     // True when the entire transit network has been explored by the reverse search.
     boolean finished = false;
 
+    public InterleavedBidirectionalHeuristic() {
+        this(8);
+    }
+
     public InterleavedBidirectionalHeuristic(int heuristicStepsPerMainStep) {
         this.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
     }
