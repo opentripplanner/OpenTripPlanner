@@ -1486,7 +1486,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("headsign")
-		.description("Headsign of the trip on this stop.")
+		.description("Headsign of the trip on this stop. Trip headsigns can change during the trip (e.g. on routes which run on loops), so this value should be used instead of `tripHeadsign` to display the headsign relevant to the user. ")
               	.type(Scalars.GraphQLString)
               	.dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
               	.build())
