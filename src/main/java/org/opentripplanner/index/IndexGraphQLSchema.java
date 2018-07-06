@@ -1008,6 +1008,7 @@ public class IndexGraphQLSchema {
 
         stoptimesInPatternType = GraphQLObjectType.newObject()
             .name("StoptimesInPattern")
+	    .description("Stoptimes grouped by pattern")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
                 .type(patternType)
