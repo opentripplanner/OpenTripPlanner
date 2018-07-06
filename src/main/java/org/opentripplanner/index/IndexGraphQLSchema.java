@@ -1079,6 +1079,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
+		    .description("Id of the pattern")
                     .type(Scalars.GraphQLString)
                     .defaultValue(null)
                     .build())
