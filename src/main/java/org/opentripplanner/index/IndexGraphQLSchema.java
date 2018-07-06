@@ -1451,6 +1451,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pickupType")
+		.description("Whether the vehicle can be boarded at this stop. This field can also be used to indicate if boarding is possible only with special arrangements.")
                 .type(pickupDropoffTypeEnum)
                 .dataFetcher(environment -> index.patternForTrip
                     .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
@@ -1458,6 +1459,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("dropoffType")
+		.description("Whether the vehicle can be disembarked at this stop. This field can also be used to indicate if disembarkation is possible only with special arrangements.")
                 .type(pickupDropoffTypeEnum)
                 .dataFetcher(environment -> index.patternForTrip
                     .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
