@@ -38,6 +38,28 @@ public class DrtTravelTimeTest extends TestCase {
         assertEquals(1800d, tt.process(600));
     }
 
+    public void testTwoDigitConstant() {
+        DrtTravelTime tt = DrtTravelTime.fromSpec("1t+12");
+        assertEquals(1d, tt.getCoefficient());
+        assertEquals(720d, tt.getConstant());
+        assertEquals(1320d, tt.process(600));
+    }
+
+    public void testDecimalsEverywhere() {
+        DrtTravelTime tt = DrtTravelTime.fromSpec("3.0t+5.00");
+        assertEquals(3.0, tt.getCoefficient());
+        assertEquals(300.0, tt.getConstant());
+        assertEquals(2100d, tt.process(600));
+    }
+
+    public void testLarge() {
+        DrtTravelTime tt = DrtTravelTime.fromSpec("2880.0");
+        assertEquals(0.0, tt.getCoefficient());
+        assertEquals(172800d, tt.getConstant());
+        assertEquals(172800d, tt.process(20));
+        assertEquals(172800d, tt.process(88));
+    }
+
     public void testBadSpec() {
         try {
             DrtTravelTime.fromSpec("not to spec");

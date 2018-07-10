@@ -21,7 +21,7 @@ public class DrtTravelTime implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Pattern PATTERN = Pattern.compile(
-            "(?<onlyConstant>^[0-9.]+$)|(^(?<coefficient>[0-9.]+)t(\\+(?<constant>[0-9.]))?$)");
+            "(?<onlyConstant>^[0-9.]+$)|(^(?<coefficient>[0-9.]+)t(\\+(?<constant>[0-9.]+))?$)");
 
     static final String ERROR_MSG = "Invalid DRT formula. Valid forms are: 3, 4t, 2.5t+5";
 
