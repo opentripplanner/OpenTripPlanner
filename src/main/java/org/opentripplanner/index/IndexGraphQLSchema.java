@@ -2826,7 +2826,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("points")
-                .description("The encoded points of the polyline.")
+                .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
                 .build())
