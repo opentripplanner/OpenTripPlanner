@@ -245,7 +245,7 @@ public class Timetable implements Serializable {
         }
         TripTimes bestTrip = null;
         Stop currentStop = pattern.getStop(stopIndex);
-        int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        long bestTime = boarding ? Long.MAX_VALUE : Long.MIN_VALUE;
         boolean useClockTime = !s0.getOptions().ignoreDrtAdvanceBookMin;
         long clockTime = s0.getOptions().clockTimeSec;
         for (TripTimes tt : tripTimes) {
@@ -255,13 +255,13 @@ public class Timetable implements Serializable {
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
             if (boarding) {
-                int depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime, serviceDay, useClockTime, clockTime);
+                long depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime, serviceDay, useClockTime, clockTime);
                 if (depTime >= adjustedTime && depTime < bestTime && inBounds(depTime)) {
                     bestTrip = tt;
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, directTime, serviceDay, useClockTime, clockTime);
+                long arvTime = tt.getCallAndRideAlightTime(stopIndex, adjustedTime, directTime, serviceDay, useClockTime, clockTime);
                 if (arvTime < 0) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime && inBounds(arvTime)) {
                     bestTrip = tt;
@@ -273,7 +273,7 @@ public class Timetable implements Serializable {
         return bestTrip;
     }
 
-    private boolean inBounds(int time) {
+    private boolean inBounds(long time) {
         return time >= minTime && time <= maxTime;
     }
 

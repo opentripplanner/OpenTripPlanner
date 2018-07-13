@@ -17,7 +17,7 @@ public class TripShort {
     public Integer direction;
     public String drtMaxTravelTime;
     public String drtAvgTravelTime;
-    public Integer drtAdvanceBookMin;
+    public Double drtAdvanceBookMin;
 
     // INCLUDE start and end time, pattern and route in detail version
     
