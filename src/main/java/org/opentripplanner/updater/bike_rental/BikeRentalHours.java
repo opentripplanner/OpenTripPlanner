@@ -32,7 +32,7 @@ public class BikeRentalHours {
     // These times actually do necessarily have a timezone attached via the required GBFS file system_information.json
     // but OTP does not yet read that file. So we'll have to make the usual one-time-zone assumption.
     LocalTime startTime;
-    LocalTime endTime; // Note: we do not yet support times > 24 hours.
+    LocalTime endTime; // FIXME: the spec requires supporting times > 24 hours, up to 48 hours.
 
     public static BikeRentalHours fromJsonNode (JsonNode jsonNode) {
         BikeRentalHours rentalHours = new BikeRentalHours();
