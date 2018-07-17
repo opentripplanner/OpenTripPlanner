@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
@@ -40,7 +41,9 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private Stop begin, end;
 
-    private RequestStops requestStops;
+    private RequestStops requestPickup;
+
+    private RequestStops requestDropoff;
 
     private double serviceAreaRadius;
 
@@ -50,23 +53,25 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestStops, double serviceAreaRadius, Geometry serviceArea, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestPickup, RequestStops requestDropoff, double serviceAreaRadius, Geometry serviceArea, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
         if (setInPattern)
             getPattern().setPatternHop(stopIndex, this);
-        this.requestStops = requestStops;
+        this.requestPickup = requestPickup;
+        this.requestDropoff = requestDropoff;
         this.serviceAreaRadius = serviceAreaRadius;
         this.serviceArea = serviceArea;
     }
 
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, double serviceAreaRadius, Geometry serviceArea) {
-        this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup, continuousDropoff), serviceAreaRadius, serviceArea, true);
+        this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup),
+                RequestStops.fromGtfs(continuousDropoff), serviceAreaRadius, serviceArea, true);
     }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 0, 0, 0d, null);
+        this(from, to, begin, end, stopIndex, 1, 1, 0d, null);
     }
 
     // made more accurate
@@ -202,12 +207,16 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return stopIndex;
     }
 
-    public RequestStops getRequestStops() {
-        return requestStops;
+    public RequestStops getRequestPickup() {
+        return requestPickup;
+    }
+
+    public RequestStops getRequestDropoff() {
+        return requestDropoff;
     }
 
     public boolean hasFlagStopService() {
-        return !requestStops.equals(RequestStops.NONE);
+        return requestPickup.allowed() || requestDropoff.allowed();
     }
 
     public boolean hasFlexService() {
@@ -215,7 +224,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     public boolean canRequestService(boolean boarding) {
-        return boarding ? requestStops.pickUp() : requestStops.dropOff();
+        return boarding ? requestPickup.allowed() : requestDropoff.allowed();
     }
 
     public double getServiceAreaRadius() {
@@ -231,21 +240,22 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     private enum RequestStops {
-        NONE, PICKUP, DROPOFF, BOTH;
-        private static RequestStops fromGtfs(int continuousPickup, int continuousDropoff) {
-            if (continuousDropoff > 0 && continuousPickup > 0)
-                return BOTH;
-            else if (continuousDropoff > 0)
-                return DROPOFF;
-            else if (continuousPickup > 0)
-                return PICKUP;
-            return NONE;
+        NO, YES, PHONE, COORDINATE_WITH_DRIVER;
+        private static RequestStops fromGtfs(int value) {
+            switch(value) {
+                case 0:
+                    return YES;
+                case 1:
+                    return NO;
+                case 2:
+                    return PHONE;
+                case 3:
+                    return COORDINATE_WITH_DRIVER;
+            }
+            return NO;
         }
-        private boolean pickUp() {
-            return this.equals(PICKUP) || this.equals(BOTH);
-        }
-        private boolean dropOff() {
-            return this.equals(DROPOFF) || this.equals(BOTH);
+        boolean allowed() {
+            return this != NO;
         }
     }
 }

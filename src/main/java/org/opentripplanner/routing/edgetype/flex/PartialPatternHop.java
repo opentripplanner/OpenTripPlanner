@@ -56,7 +56,7 @@ public class PartialPatternHop extends PatternHop {
     // constructor for flag stops
     // this could be merged into deviated-route service constructor
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestPickup(), hop.getRequestDropoff(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
         this.endIndex = endIndex;
@@ -69,7 +69,7 @@ public class PartialPatternHop extends PatternHop {
     // constructor for deviated-route service
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
                              LineString startGeometry, int startVehicleTime, LineString endGeometry, int endVehicleTime, double buffer) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestPickup(), hop.getRequestDropoff(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
 
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         this.startIndex = startIndex;
@@ -109,7 +109,7 @@ public class PartialPatternHop extends PatternHop {
 
     // pass-thru for TemporaryDirectPatternHop
     public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
-        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestStops(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
+        super(from, to, fromStop, toStop, hop.getStopIndex(), hop.getRequestPickup(), hop.getRequestDropoff(), hop.getServiceAreaRadius(), hop.getServiceArea(), false);
         this.originalHop = hop;
     }
 
