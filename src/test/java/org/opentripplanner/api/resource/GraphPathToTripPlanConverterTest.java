@@ -112,7 +112,7 @@ public class GraphPathToTripPlanConverterTest {
     private static final double SOUTH = OCTANT * 4;
     private static final double EPSILON = 1e-1;
 
-    private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
+    private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CET");
 
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
