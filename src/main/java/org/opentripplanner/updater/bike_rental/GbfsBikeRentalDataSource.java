@@ -9,6 +9,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -21,6 +22,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     private GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
     private GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
     private GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
+    private GbfsSystemHoursDataSource systemHoursDataSource;
 
     private String baseUrl;
 
@@ -33,6 +35,8 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         stationInformationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
         floatingBikeSource = new GbfsFloatingBikeDataSource();
+        systemHoursDataSource = new GbfsSystemHoursDataSource();
+
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {
@@ -46,6 +50,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         stationInformationSource.setUrl(baseUrl + "station_information.json");
         stationStatusSource.setUrl(baseUrl + "station_status.json");
         floatingBikeSource.setUrl(baseUrl + "free_bike_status.json");
+        systemHoursDataSource.setUrl(baseUrl + "system_hours.json");
     }
 
     @Override
@@ -55,6 +60,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         updatesFound |= stationStatusSource.update();
         // This floating-bikes file is optional, and does not appear in all GBFS feeds.
         updatesFound |= floatingBikeSource.update();
+        // This system hours file is optional, and does not appear in all GBFS feeds.
+        updatesFound |= systemHoursDataSource.update();
+        // FIXME we are repeatedly polling all these URLs even if they're not declared to be present in gbfs.json
         // Return true if ANY of the sub-updaters found any updates.
         return updatesFound;
     }
@@ -160,5 +168,52 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
+    }
+
+    /**
+     * This is ugly because unlike the others, it does not return a list of rental station information.
+     * It returns global opening hours information about all the stations.
+     * For the time being I'm making this extend GenericJsonBikeRentalDataSource so it reuses
+     * the HTTP/local file fetching code, JSON decoding, etc. but those methods are closely coupled to the
+     * decoding of individual station representations. Those methods should eventually be pulled out and
+     * made into more reuseable static methods that are not so closely tied to the decoding of stations.
+     *
+     * This updater is also a little strange in that instead of returning a list of new objects, it
+     * updates its own internal field that contains the operating hours, and provides methods to check
+     * the contents of that list.
+     */
+    class GbfsSystemHoursDataSource extends GenericJsonBikeRentalDataSource {
+
+        List<GbfsRentalHours> rentalHoursList;
+
+        public GbfsSystemHoursDataSource() {
+            super("data/rental_hours");
+        }
+
+        @Override
+        public void processNodes(JsonNode rootNode) {
+            List<GbfsRentalHours> newRentalHoursList = new ArrayList<>();
+            for (JsonNode node : rootNode) {
+                newRentalHoursList.add(GbfsRentalHours.fromJsonNode(node));
+            }
+            // Atomic replace of the full list of hours, so as not to confuse other instance methods.
+            synchronized (this) {
+                rentalHoursList = newRentalHoursList;
+            }
+        }
+
+        @Override
+        public BikeRentalStation makeStation(JsonNode rentalStationNode) {
+            // This method should never be called in this class's implementation of processNodes.
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isSystemActive(LocalDateTime dateTime, boolean isSystemMember) {
+            for (GbfsRentalHours rentalHours : rentalHoursList) {
+                if (rentalHours.matches(dateTime, isSystemMember)) return true;
+            }
+            return false;
+        }
+
     }
 }
