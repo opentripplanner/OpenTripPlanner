@@ -65,15 +65,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         if (options.useBikeRentalAvailabilityInformation && dropoff.getBikesAvailable() == 0) {
             return null;
         }
-
-        // GBFS hours of operation are in fact in a specific timezone, so ideally the epoch instant should be
-        // interpreted within the isSystemActive method. This is ugly - we convert to the graph's default timezone.
-        LocalDateTime stateLocalDateTime = Instant.ofEpochMilli(s0.getTimeInMillis())
-                .atZone(options.rctx.graph.getTimeZone().toZoneId()).toLocalDateTime();
-        if (!((BikeRentalStationVertex)tov).isSystemActive(stateLocalDateTime, true)) {
+        if (stationInactive(s0)) {
             return null;
         }
-
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
         s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
@@ -82,6 +76,16 @@ public abstract class RentABikeAbstractEdge extends Edge {
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
         return s1b;
+    }
+
+    // GBFS hours of operation are in fact in a specific timezone, so ideally the epoch instant should be
+    // interpreted within the isSystemActive method. This is ugly - we convert to the graph's default timezone.
+    // Because these bike rental edges are loop edges, we know the from and to vertices are the same
+    // bike rental station vertex and can grab either one.
+    private boolean stationInactive(State state) {
+        LocalDateTime stateLocalDateTime = Instant.ofEpochMilli(state.getTimeInMillis())
+                .atZone(state.getOptions().rctx.graph.getTimeZone().toZoneId()).toLocalDateTime();
+        return !((BikeRentalStationVertex)fromv).isSystemActive(stateLocalDateTime, true);
     }
 
     protected State traverseDropoff(State s0) {
@@ -95,7 +99,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         if (options.useBikeRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
             return null;
         }
-
+        if (stationInactive(s0)) {
+            return null;
+        }
         StateEditor s1e = s0.edit(this);
         s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
         s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
@@ -144,4 +150,5 @@ public abstract class RentABikeAbstractEdge extends Edge {
             return true; // Always a match
         return !Sets.intersection(stationNetworks, rentedNetworks).isEmpty();
     }
+
 }
