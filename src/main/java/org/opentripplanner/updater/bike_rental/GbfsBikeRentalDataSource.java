@@ -92,6 +92,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         Set<String> networkIdSet = Sets.newHashSet(this.networkName);
         for (BikeRentalStation station : stations) station.networks = networkIdSet;
 
+        // Set identical opening hours on all stations within this system
+        for (BikeRentalStation station : stations) station.rentalHoursList = systemHoursDataSource.rentalHoursList;
+
         return stations;
     }
 
@@ -172,7 +175,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     /**
      * This is ugly because unlike the others, it does not return a list of rental station information.
-     * It returns global opening hours information about all the stations.
+     * It assembles some global opening hours information about all the stations in the system.
      * For the time being I'm making this extend GenericJsonBikeRentalDataSource so it reuses
      * the HTTP/local file fetching code, JSON decoding, etc. but those methods are closely coupled to the
      * decoding of individual station representations. Those methods should eventually be pulled out and
@@ -184,7 +187,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
      */
     class GbfsSystemHoursDataSource extends GenericJsonBikeRentalDataSource {
 
-        List<GbfsRentalHours> rentalHoursList;
+        List<BikeRentalHours> rentalHoursList = null;
 
         public GbfsSystemHoursDataSource() {
             super("data/rental_hours");
@@ -192,9 +195,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
         @Override
         public void processNodes(JsonNode rootNode) {
-            List<GbfsRentalHours> newRentalHoursList = new ArrayList<>();
+            List<BikeRentalHours> newRentalHoursList = new ArrayList<>();
             for (JsonNode node : rootNode) {
-                newRentalHoursList.add(GbfsRentalHours.fromJsonNode(node));
+                newRentalHoursList.add(BikeRentalHours.fromJsonNode(node));
             }
             // Atomic replace of the full list of hours, so as not to confuse other instance methods.
             synchronized (this) {
@@ -206,13 +209,6 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         public BikeRentalStation makeStation(JsonNode rentalStationNode) {
             // This method should never be called in this class's implementation of processNodes.
             throw new UnsupportedOperationException();
-        }
-
-        public boolean isSystemActive(LocalDateTime dateTime, boolean isSystemMember) {
-            for (GbfsRentalHours rentalHours : rentalHoursList) {
-                if (rentalHours.matches(dateTime, isSystemMember)) return true;
-            }
-            return false;
         }
 
     }

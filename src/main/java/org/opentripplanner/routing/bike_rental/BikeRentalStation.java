@@ -15,6 +15,7 @@ package org.opentripplanner.routing.bike_rental;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.updater.bike_rental.BikeRentalHours;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
@@ -84,6 +86,17 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonIgnore
     @XmlTransient
     public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
+
+    /**
+     * Currently we don't have anywhere to store information about bike rental systems, only individual stations.
+     * Although GBFS defines hours of operation at the system level, we have to reference them from each station
+     * unless we want to make the data model more complex. However we don't want these hours being serialized into
+     * API responses... or do we?
+     * When null or empty no hours of operation have been defined, and we assume the station is always active.
+     */
+    @JsonIgnore
+    @XmlTransient
+    public List<BikeRentalHours> rentalHoursList = null;
 
     /**
      * FIXME nonstandard definition of equals, relying on only the station field.

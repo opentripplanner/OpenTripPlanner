@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -20,22 +19,25 @@ import java.util.Locale;
  *
  * Created by abyrd on 2018-07-17
  */
-public class GbfsRentalHours {
+public class BikeRentalHours {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GbfsRentalHours.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalHours.class);
 
     private static final DateTimeFormatter shortDayFormatter = new DateTimeFormatterBuilder().parseCaseInsensitive().
             appendPattern("EEE").toFormatter(Locale.ENGLISH);
 
-    EnumSet<GBFSUserType> userTypes = EnumSet.noneOf(GBFSUserType.class);
+    EnumSet<BikeShareUserType> userTypes = EnumSet.noneOf(BikeShareUserType.class);
     EnumSet<DayOfWeek> days = EnumSet.noneOf(DayOfWeek.class);
+
+    // These times actually do necessarily have a timezone attached via the required GBFS file system_information.json
+    // but OTP does not yet read that file. So we'll have to make the usual one-time-zone assumption.
     LocalTime startTime;
     LocalTime endTime; // Note: we do not yet support times > 24 hours.
 
-    public static GbfsRentalHours fromJsonNode (JsonNode jsonNode) {
-        GbfsRentalHours rentalHours = new GbfsRentalHours();
+    public static BikeRentalHours fromJsonNode (JsonNode jsonNode) {
+        BikeRentalHours rentalHours = new BikeRentalHours();
         for (JsonNode userTypeNode : jsonNode.path("user_types")) {
-            rentalHours.userTypes.add(GBFSUserType.valueOf(userTypeNode.asText().toUpperCase()));
+            rentalHours.userTypes.add(BikeShareUserType.valueOf(userTypeNode.asText().toUpperCase()));
         }
         for (JsonNode dayNode : jsonNode.path("days")) {
             TemporalAccessor temporalAccessor = shortDayFormatter.parse(dayNode.asText());
@@ -48,12 +50,13 @@ public class GbfsRentalHours {
 
     /**
      * Check whether the given local DateTime falls within the time and days specified by this
-     * GbfsRentalHours instance.
+     * BikeRentalHours instance.
+     * TODO handle time zones (when OTP as a whole handles time zones properly)
      */
     public boolean matches (LocalDateTime localDateTime, boolean isSystemMember) {
         DayOfWeek dayOfWeek = localDateTime.getDayOfWeek();
         LocalTime localTime = localDateTime.toLocalTime();
-        GBFSUserType userType = isSystemMember ? GBFSUserType.MEMBER : GBFSUserType.NONMEMBER;
+        BikeShareUserType userType = isSystemMember ? BikeShareUserType.MEMBER : BikeShareUserType.NONMEMBER;
         return userTypes.contains(userType) && days.contains(dayOfWeek)
                 && localTime.isAfter(startTime) && localTime.isBefore(endTime);
     }

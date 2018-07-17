@@ -18,6 +18,10 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.updater.bike_rental.BikeRentalHours;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * A vertex for a bike rental station.
@@ -41,6 +45,13 @@ public class BikeRentalStationVertex extends Vertex {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean isCarStation;
 
+    /**
+     * The hours that this station is in operation.
+     * GBFS defines hours of operation at the system level, but we store information on a per-station level.
+     * When null or empty no hours of operation have been defined, and we assume the station is always active.
+     */
+    private List<BikeRentalHours> rentalHoursList = null;
+
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.x, station.y, station.name);
@@ -48,6 +59,7 @@ public class BikeRentalStationVertex extends Vertex {
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
+        this.rentalHoursList = station.rentalHoursList;
     }
 
     public int getBikesAvailable() {
@@ -81,6 +93,20 @@ public class BikeRentalStationVertex extends Vertex {
      */
     public TraverseMode getVehicleMode () {
          return isCarStation ? TraverseMode.CAR : TraverseMode.BICYCLE;
+    }
+
+    /**
+     * Determines whether this station can be used by a member or non-member at the given date and time.
+     */
+    public boolean isSystemActive(LocalDateTime dateTime, boolean isSystemMember) {
+        // If no specific hours of operation were set, we assume the system is always active.
+        if (rentalHoursList == null || rentalHoursList.isEmpty()) {
+            return true;
+        }
+        for (BikeRentalHours rentalHours : rentalHoursList) {
+            if (rentalHours.matches(dateTime, isSystemMember)) return true;
+        }
+        return false;
     }
 
 }
