@@ -130,7 +130,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     private DrtTravelTime avgTravelTime;
 
-    private int advanceBookMin = 0;
+    private double advanceBookMin = 0;
 
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
@@ -328,7 +328,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public int getCallAndRideBoardTime(int stop, long currTime, ServiceDay sd, boolean useClockTime, long startClockTime) {
         int ret = (int) Math.min(Math.max(currTime, getDepartureTime(stop)), getArrivalTime(stop + 1));
         if (useClockTime) {
-            int clockTime = sd.secondsSinceMidnight(startClockTime) + (trip.getDrtAdvanceBookMin() * 60);
+            int clockTime = (int) (sd.secondsSinceMidnight(startClockTime) + Math.round(trip.getDrtAdvanceBookMin() * 60.0));
             if (ret >= clockTime) {
                 return ret;
             } else if (clockTime < getArrivalTime(stop + 1)) {
@@ -345,7 +345,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         currTime -= travelTime;
         int startOfService = (int) Math.min(Math.max(currTime, getDepartureTime(stop - 1)), getArrivalTime(stop));
         if (useClockTime) {
-            int clockTime = sd.secondsSinceMidnight(startClockTime) + (trip.getDrtAdvanceBookMin() * 60);
+            int clockTime = (int) (sd.secondsSinceMidnight(startClockTime) + Math.round(trip.getDrtAdvanceBookMin() * 60));
             if (startOfService >= clockTime) {
                 // do nothing
             } else if (clockTime < getArrivalTime(stop)) {

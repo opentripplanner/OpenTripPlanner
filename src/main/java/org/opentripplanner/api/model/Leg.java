@@ -276,7 +276,7 @@ public class Leg {
     /* advanced book min if this is a DRT leg */
     @XmlAttribute
     @JsonSerialize
-    public int drtAdvanceBookMin;
+    public double drtAdvanceBookMin;
 
      /* include DRT pickup/dropoff messages if applicable */
      @XmlAttribute

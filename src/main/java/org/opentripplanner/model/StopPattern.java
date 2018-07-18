@@ -127,14 +127,10 @@ public class StopPattern implements Serializable {
             pickups[i] = stopTime.getPickupType();
             dropoffs[i] = stopTime.getDropOffType();
 
-            // continuous stops can be empty (-1), which means 0 for the first stoptime, and the previous value for subsequent stop times.
-            if (i == 0) {
-                continuousPickup[i] = stopTime.getContinuousPickup() == -1 ? 0 : stopTime.getContinuousPickup();
-                continuousDropOff[i] = stopTime.getContinuousDropOff() == -1 ? 0 : stopTime.getContinuousDropOff();
-            } else {
-                continuousPickup[i] = stopTime.getContinuousPickup() == -1 ? continuousPickup[i-1] : stopTime.getContinuousPickup();
-                continuousDropOff[i] = stopTime.getContinuousDropOff() == -1 ? continuousDropOff[i-1] : stopTime.getContinuousDropOff();
-            }
+            // continuous stops can be empty, which means 1 (no continuous stopping behavior)
+            continuousPickup[i] = stopTime.getContinuousPickup() == StopTime.MISSING_VALUE ? 1 : stopTime.getContinuousPickup();
+            continuousDropOff[i] = stopTime.getContinuousDropOff() == StopTime.MISSING_VALUE ? 1 : stopTime.getContinuousDropOff();
+
 
             if (stopTime.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
                 lastServiceAreaRadius = stopTime.getStartServiceAreaRadius();
