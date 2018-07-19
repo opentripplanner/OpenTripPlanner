@@ -679,7 +679,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("startTransitStopId")
-                .description("A transit stop that this trip must start from")
+                .description("This argument has currently no effect on which itineraries are returned. ~~A transit stop that this trip must start from~~")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
