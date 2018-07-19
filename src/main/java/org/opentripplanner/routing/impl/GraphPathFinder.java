@@ -113,7 +113,7 @@ public class GraphPathFinder {
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
             reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
-        } else if (options.useTransportationNetworkCompany) {
+        } else if (options.useTransportationNetworkCompany || options.allowCarRental) {
             heuristic = new EuclideanRemainingWeightHeuristic();
             reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {

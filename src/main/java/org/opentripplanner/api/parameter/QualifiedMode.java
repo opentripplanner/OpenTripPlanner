@@ -58,6 +58,10 @@ public class QualifiedMode implements Serializable {
                 req.useTransportationNetworkCompany = true;
                 req.driveTimeReluctance = 1.75;
                 req.driveDistanceReluctance = 0.2;
+            } else if (this.qualifiers.contains(Qualifier.RENT)) {
+                req.allowCarRental = true;
+                req.driveTimeReluctance = 1.75;
+                req.driveDistanceReluctance = 0.2;
             } else {
                 req.kissAndRide = true;
             }

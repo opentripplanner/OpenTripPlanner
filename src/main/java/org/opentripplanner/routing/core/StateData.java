@@ -51,6 +51,11 @@ public class StateData implements Cloneable {
 
     protected boolean usingRentedBike;
 
+    protected boolean usingRentedCar;
+
+    protected boolean hasRentedCarPostTransit = false;
+    protected boolean hasRentedCarPreTransit = false;
+
     protected boolean usingHailedCar;
 
     protected boolean hasHailedCarPostTransit = false;
@@ -99,6 +104,8 @@ public class StateData implements Cloneable {
 
     public Set<String> bikeRentalNetworks;
 
+    public Set<String> carRentalNetworks;
+
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
 
@@ -129,4 +136,8 @@ public class StateData implements Cloneable {
     public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
 
     public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
+
+    public boolean hasRentedCarPostTransit() { return hasRentedCarPostTransit; }
+
+    public boolean hasRentedCarPreTransit() { return hasRentedCarPreTransit; }
 }

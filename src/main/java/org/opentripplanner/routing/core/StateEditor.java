@@ -251,6 +251,11 @@ public class StateEditor {
         child.transportationNetworkCompanyDriveDistance += distance;
     }
 
+    public void incrementCarRentalDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.carRentalDriveDistance += distance;
+    }
+
     /* Basic Setters */
 
     public void setTripTimes(TripTimes tripTimes) {
@@ -569,6 +574,24 @@ public class StateEditor {
         child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
     }
 
+    public void alightRentedCar() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedCar = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void boardRentedCar(double initialEdgeDistance) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedCar = true;
+        child.stateData.nonTransitMode = TraverseMode.CAR;
+        if (child.isEverBoarded()) {
+            child.stateData.hasRentedCarPostTransit = true;
+        } else {
+            child.stateData.hasRentedCarPreTransit = true;
+        }
+        child.carRentalDriveDistance = initialEdgeDistance;
+    }
+
     /**
      * Used only in State.optimizeOrReverse
      */
@@ -580,5 +603,20 @@ public class StateEditor {
         } else {
             child.stateData.nonTransitMode = TraverseMode.WALK;
         }
+    }
+
+    public void setCarRenting(boolean carRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = carRenting;
+        if (carRenting) {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
+
+    public void setCarRentalNetwork(Set<String> networks) {
+        cloneStateDataAsNeeded();
+        child.stateData.carRentalNetworks = networks;
     }
 }

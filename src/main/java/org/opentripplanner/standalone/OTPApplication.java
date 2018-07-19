@@ -76,6 +76,7 @@ public class OTPApplication extends Application {
             SimpleIsochrone.class,
             TileService.class,
             BikeRental.class,
+            CarRental.class,
             LIsochrone.class,
             ExternalGeocoderResource.class,
             TimeGridWs.class,

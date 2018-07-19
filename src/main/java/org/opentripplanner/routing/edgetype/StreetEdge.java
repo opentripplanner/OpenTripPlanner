@@ -18,14 +18,27 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
@@ -36,9 +49,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This represents a street segment.
@@ -127,6 +142,18 @@ public class StreetEdge extends Edge implements Cloneable {
      *  enables on-the-fly recalculation of walk comfort scores for testing/calibration purposes.
      */
     private Map<String, String> osmTags;
+
+    /**
+     * A set of car networks where this edge is located inside their service regions.
+     */
+    private Set<String> carNetworks;
+
+    // whether or not this street is a good place to board or alight a TNC vehicle
+    private boolean suitableForTNCStop = true;
+
+    // whether or not this street is a good place to dropoff a floating car rental
+    private boolean suitableForFloatingCarRentalDropoff = true;
+
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -302,9 +329,7 @@ public class StreetEdge extends Edge implements Cloneable {
                     && !getPermission().allows(TraverseMode.CAR)
                     && currMode == TraverseMode.CAR
             ) {
-                // Make sure travel distance in car is greater than minimum distance
-                if (s0.transportationNetworkCompanyDriveDistance <
-                    options.minimumTransportationNetworkCompanyDistance) {
+                if (!s0.isTNCStopAllowed()) {
                     return null;
                 }
                 editor = doTraverse(s0, options, TraverseMode.WALK);
@@ -345,6 +370,25 @@ public class StreetEdge extends Edge implements Cloneable {
                         // if the non-car state is non traversable or something, return just the car state
                         return editorCar.makeState();
                     }
+                }
+            }
+        } else if (options.allowCarRental) {
+            // Irrevocable transition from using rented car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                s0.isCarRenting()
+                    && !getPermission().allows(TraverseMode.CAR)
+                    && currMode == TraverseMode.CAR
+                ) {
+
+                // Make sure car rental dropoff is allowed at this location
+                if (!s0.isCarRentalDropoffAllowed()) {
+                    return null;
+                }
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.alightRentedCar(); // done with car rental use for now
+                    return editor.makeState(); // return only the state with updated rental car usage
                 }
             }
         }
@@ -552,6 +596,9 @@ public class StreetEdge extends Edge implements Cloneable {
             }
             if (s0.isUsingHailedCar()) {
                 s1.incrementTransportationNetworkCompanyDistance(getDistance());
+            }
+            if (s0.isCarRenting()) {
+                s1.incrementCarRentalDistance(getDistance());
             }
         }
 
@@ -839,6 +886,22 @@ public class StreetEdge extends Edge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
+	public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
+
+	public Set<String> getCarNetworks() { return carNetworks; }
+
+    public void setTNCStopSuitability(boolean isSuitable) {
+        this.suitableForTNCStop = isSuitable;
+    }
+
+    public boolean getTNCStopSuitability() { return suitableForTNCStop; }
+
+    public void setFloatingCarDropoffSuitability(boolean isSuitable) {
+        this.suitableForFloatingCarRentalDropoff = isSuitable;
+    }
+
+    public boolean getFloatingCarDropoffSuitability() { return suitableForFloatingCarRentalDropoff; }
+
 	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
@@ -996,5 +1059,22 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public void setOsmTags(Map<String, String> osmTags) {
         this.osmTags = osmTags;
+
+    public boolean addCarNetwork(String carNetwork) {
+        if (carNetworks == null) {
+            synchronized (this) {
+                if (carNetworks == null) {
+                    carNetworks = new HashSet<>();
+                }
+            }
+        }
+        return carNetworks.add(carNetwork);
+    }
+
+    public boolean containsCarNetwork(String carNetwork) {
+        if (carNetworks == null){
+            return false;
+        }
+        return carNetworks.contains(carNetwork);
     }
 }

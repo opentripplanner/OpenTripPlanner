@@ -214,6 +214,32 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
 
+    /** Time to get on and off your own car */
+    public int carSwitchTime;
+
+    /** Cost of getting on and off your own car */
+    public int carSwitchCost;
+
+    /** Time to rent a car */
+    public int carRentalPickupTime = 120;
+
+    /**
+     * Cost of renting a car. The cost is a bit more than actual time to model the associated cost and trouble.
+     */
+    public int carRentalPickupCost = 120;
+
+    /** Time to drop-off a rented car */
+    public int carRentalDropoffTime = 120;
+
+    /** Cost of dropping-off a rented car */
+    public int carRentalDropoffCost = 30;
+
+    /** Time to park a car */
+    public int carParkTime = 120;
+
+    /** Cost of parking a car. */
+    public int carParkCost = 120;
+
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
@@ -332,6 +358,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
+     * Whether or not car rental availability information will be used to plan bike rental trips
+     */
+    public boolean useCarRentalAvailabilityInformation = false;
+
+    /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
      */
     public long clampInitialWait = -1;
@@ -412,6 +443,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
     public boolean allowBikeRental = false;
+    public boolean allowCarRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
@@ -454,6 +486,12 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double minimumTransportationNetworkCompanyDistance = 804.672;
 
+    /**
+     * A mimum travel distance for a ride in a car rental.
+     * Units in meters, default is 0.5 miles.
+     */
+    public double minimumCarRentalDistance = 804.672;
+
     // we store the earliest pickup time here and add it upon the first boarding
     // this way, a graph search can proceed and give walking a time advantage
     public Date earliestTransportationNetworkCompanyPickupAtOrigin = null;
@@ -464,6 +502,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String invalidDateStrategy;
 
     public String minTransitDistance;
+
+    // setting of allowing a dropoff anywhere regardless of a compatible car rental region
+    //  (ie planning a trip with a rental car with the intent to keep the car and drive it later)
+    public boolean allowCarRentalDropoffOutsideCarRentalRegion = false;
 
     /** Saves split edge which can be split on origin/destination search
      *

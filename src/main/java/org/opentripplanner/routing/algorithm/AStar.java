@@ -280,19 +280,6 @@ public class AStar {
                 if (runState.options.onlyTransitTrips && !runState.u.isEverBoarded()) {
                     continue;
                 }
-                if (runState.options.useTransportationNetworkCompany) {
-                    if (runState.u.isUsingHailedCar() &&
-                        runState.u.transportationNetworkCompanyDriveDistance <
-                            runState.options.minimumTransportationNetworkCompanyDistance
-                        ) {
-                        // too short final TNC leg
-                        continue;
-                    }
-                    if (!runState.u.isEverBoarded()) {
-                        // not yet boarded transit
-                        continue;
-                    }
-                }
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
