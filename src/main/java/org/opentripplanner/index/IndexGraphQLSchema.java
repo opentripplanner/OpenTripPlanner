@@ -59,6 +59,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.GraphIndex.PlaceAndDistance;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -1596,6 +1597,54 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> TripTimeShort.fromTripTimes(
                     index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable,
                     environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureStoptime")
+                .description("Departure time from the first stop")
+                .type(stoptimeType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .description("Date for which the departure time is returned. Format: YYYYMMDD")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Timetable timetable = index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable;
+                        TripTimes triptimes = timetable.getTripTimes(environment.getSource());
+                        return new TripTimeShort(triptimes,
+                                0,
+                                timetable.pattern.getStop(0),
+                                environment.getArgument("serviceDate") == null
+                                        ? null : new ServiceDay(index.graph, ServiceDate.parseString(environment.getArgument("serviceDate")), index.graph.getCalendarService(), ((Trip)environment.getSource()).getRoute().getAgency().getId()));
+                    } catch (ParseException e) {
+                        //Invalid date format
+                        return null;
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalStoptime")
+                .description("Arrival time to the final stop")
+                .type(stoptimeType)
+                .argument(GraphQLArgument.newArgument()
+                        .name("serviceDate")
+                        .description("Date for which the arrival time is returned. Format: YYYYMMDD")
+                        .type(Scalars.GraphQLString)
+                        .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Timetable timetable = index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable;
+                        TripTimes triptimes = timetable.getTripTimes(environment.getSource());
+                        return new TripTimeShort(triptimes,
+                                triptimes.getNumStops() - 1,
+                                timetable.pattern.getStop(triptimes.getNumStops() - 1),
+                                environment.getArgument("serviceDate") == null
+                                        ? null : new ServiceDay(index.graph, ServiceDate.parseString(environment.getArgument("serviceDate")), index.graph.getCalendarService(), ((Trip)environment.getSource()).getRoute().getAgency().getId()));
+                    } catch (ParseException e) {
+                        //Invalid date format
+                        return null;
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesForDate")
