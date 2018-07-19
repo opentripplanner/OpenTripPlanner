@@ -1059,6 +1059,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public void setOsmTags(Map<String, String> osmTags) {
         this.osmTags = osmTags;
+    }
 
     public boolean addCarNetwork(String carNetwork) {
         if (carNetworks == null) {
