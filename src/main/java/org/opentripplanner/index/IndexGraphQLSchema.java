@@ -634,7 +634,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("batch")
-                .description("When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.")
+                .description("This argument has no use for itinerary planning and will be removed later. ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
