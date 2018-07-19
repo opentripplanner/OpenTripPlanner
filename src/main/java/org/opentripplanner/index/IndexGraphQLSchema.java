@@ -689,7 +689,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("claimInitialWait")
-                .description("The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.")
+                .description("~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~ No effect on itinerary planning, adjust argument `time` instead.")
                 .type(Scalars.GraphQLLong)
                 .build())
             .argument(GraphQLArgument.newArgument()
