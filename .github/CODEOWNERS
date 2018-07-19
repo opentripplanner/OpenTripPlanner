@@ -1,0 +1,8 @@
+# See https://help.github.com/articles/about-codeowners/
+
+# By default, the Project Leadership Committee (PLC) team is required to approve PR merges
+* @opentripplanner/plc
+
+# PLC approval also required for docs changes for now
+# TODO: reduce acceptance requirements or expand to a larger team
+docs/* @opentripplanner/plc
