@@ -167,7 +167,9 @@ public class AlertsUpdateHandler {
             + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
             + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
             + (informed.hasTrip() && informed.getTrip().hasDirectionId() ?
-                informed.getTrip().hasDirectionId() : " null ") + " "
+                informed.getTrip().getDirectionId() : " null ") + " "
+            + (informed.hasTrip() && informed.getTrip().hasRouteId() ?
+                informed.getTrip().getRouteId() : " null ") + " "
             + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
             + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
             + (informed.hasTrip() && informed.getTrip().hasTripId() ?
