@@ -71,6 +71,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         // Set data source type from config JSON
         String sourceType = config.path("sourceType").asText();
         String apiKey = config.path("apiKey").asText();
+        // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
+        // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
         String networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
@@ -101,7 +103,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             } else if (sourceType.equals("uip-bike")) {
                 source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource();
+                source = new GbfsBikeRentalDataSource(networkName);
             }
         }
 
