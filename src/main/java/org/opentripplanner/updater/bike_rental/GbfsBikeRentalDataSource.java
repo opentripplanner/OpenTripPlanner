@@ -1,18 +1,14 @@
 package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.api.resource.BikeRental;
+import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
-import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -22,33 +18,45 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
 
-    private GbfsStationDataSource stationSource;
-    private GbfsStationStatusDataSource stationStatusSource;
-    private GbfsFloatingBikeDataSource floatingBikeSource;
+    private GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
+    private GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
+    private GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
 
     private String baseUrl;
+
+    private String networkName;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource () {
-        stationSource = new GbfsStationDataSource();
+    public GbfsBikeRentalDataSource (String networkName) {
+        stationInformationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
         floatingBikeSource = new GbfsFloatingBikeDataSource();
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "GBFS";
+        }
     }
 
     public void setBaseUrl (String url) {
         baseUrl = url;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
-        stationSource.setUrl(baseUrl + "station_information.json");
+        stationInformationSource.setUrl(baseUrl + "station_information.json");
         stationStatusSource.setUrl(baseUrl + "station_status.json");
-        // FIXME this is not a required file - it's only for systems with floating bikes
         floatingBikeSource.setUrl(baseUrl + "free_bike_status.json");
     }
 
     @Override
     public boolean update() {
-        return stationSource.update() && stationStatusSource.update() && floatingBikeSource.update();
+        // These first two GBFS files are required.
+        boolean updatesFound = stationInformationSource.update();
+        updatesFound |= stationStatusSource.update();
+        // This floating-bikes file is optional, and does not appear in all GBFS feeds.
+        updatesFound |= floatingBikeSource.update();
+        // Return true if ANY of the sub-updaters found any updates.
+        return updatesFound;
     }
 
     @Override
@@ -61,7 +69,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
 
         // Iterate over all known stations, and if we have any status information add it to those station objects.
-        for (BikeRentalStation station : stationSource.getStations()) {
+        for (BikeRentalStation station : stationInformationSource.getStations()) {
             if (!statusLookup.containsKey(station.id)) continue;
             BikeRentalStation status = statusLookup.get(station.id);
             station.bikesAvailable = status.bikesAvailable;
@@ -69,8 +77,13 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
 
         // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
-        List<BikeRentalStation> stations = new LinkedList<>(stationSource.getStations());
+        List<BikeRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
         stations.addAll(floatingBikeSource.getStations());
+
+        // Set identical network ID on all stations
+        Set<String> networkIdSet = Sets.newHashSet(this.networkName);
+        for (BikeRentalStation station : stations) station.networks = networkIdSet;
+
         return stations;
     }
 
