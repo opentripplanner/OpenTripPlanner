@@ -1,10 +1,12 @@
 To be completed by pull request submitter:
 
-- [ ] link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug; use [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) (e.g., `closes #45`)
-- [ ] check the [roadmap](https://github.com/orgs/opentripplanner/projects/1) for this feature or bug -- if it is not already on the roadmap, PLC will discuss further
+- [ ] **issue**: Link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug. Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's description (e.g., `closes #45`).
+- [ ] **roadmap**: Check the [roadmap](https://github.com/orgs/opentripplanner/projects/1) for this feature or bug. If it is not already on the roadmap, PLC will discuss as part of the review process.
+- [ ] **tests**: Have you added relevant test coverage? Are all the tests passing on [the continuous integration service (Travis CI)](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Developers-Guide.md#continuous-integration)?
+- [ ] **formatting**: Have you followed the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Developers-Guide.md#code-style)? 
 
 To be completed by @opentripplanner/plc:
 
 - [ ] reviews and approvals by 2 members, ideally from different organizations
-- [ ] _before merging:_ add a bullet point to the [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Changelog.md) with description and link to the linked issue
-- [ ] _after merging:_ update the relevant card on the [roadmap](https://github.com/orgs/opentripplanner/projects/1)
+- [ ] **before merging**: add a bullet point to the [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Changelog.md) with description and link to the linked issue
+- [ ] **after merging**: update the relevant card on the [roadmap](https://github.com/orgs/opentripplanner/projects/1)
