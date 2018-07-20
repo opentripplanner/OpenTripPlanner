@@ -335,11 +335,11 @@ public abstract class RoutingResource {
     @QueryParam("batch")
     protected Boolean batch;
 
-    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
+    /** A transit stop required to be the first stop in the search (AgencyId:StopId) */
     @QueryParam("startTransitStopId")
     protected String startTransitStopId;
 
-    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId:TripId) */
     @QueryParam("startTransitTripId")
     protected String startTransitTripId;
 
