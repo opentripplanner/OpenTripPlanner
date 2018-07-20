@@ -39,17 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dynamic bike park updater which encapsulate one BikeParkDataSource.
- * 
- * Usage example ('fietsstalling' name is an example) in the file 'Graph.properties':
- * 
- * <pre>
- * fietsstalling.type = bike-park
- * fietsstalling.frequencySec = 600
- * fietsstalling.sourceType = kml-placemarks
- * fietsstalling.url = http://host.tld/fietsstalling.kml
- * </pre>
- * 
+ * Graph updater that dynamically sets availability information on bike parking lots.
+ * This updater fetches data from a single BikeParkDataSource.
+ *
  * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
  * (https://goabout.com/).
  * 
@@ -100,21 +92,15 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.graph = graph;
         this.source = source;
-        LOG.info("Creating bike-park updater running every {} seconds : {}", frequencySec, source);
+        LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
-
         // Adding a bike park station service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                bikeService = graph.getService(BikeRentalStationService.class, true);
-            }
-        });
+        bikeService = graph.getService(BikeRentalStationService.class, true);
     }
 
     @Override

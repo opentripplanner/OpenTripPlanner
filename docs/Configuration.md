@@ -177,6 +177,9 @@ a DEM in unprojected coordinates make sure that the axis order is (longitude, la
 (latitude, longitude). Unfortunately there is no reliable standard for WGS84 axis order, so OTP uses the same axis
 order as the above-mentioned SRTM data, which is also the default for the popular Proj4 library.
 
+DEM files(USGS DEM) is not supported by OTP, but can be converted to GeoTIFF with tools like [GDAL](http://www.gdal.org/). 
+Use `gdal_merge.py -o merged.tiff *.dem` to merge a set of `dem` files into one `tif` file.
+
 
 ## Fares configuration
 
