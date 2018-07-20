@@ -31,6 +31,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.SentryUtilities;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,8 +265,8 @@ public class GraphQlPlanner {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
-        callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = AgencyAndId.convertFromString(v));
-        callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = AgencyAndId.convertFromString(v));
+        callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = GtfsLibrary.convertIdFromString(v));
+        callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = GtfsLibrary.convertIdFromString(v));
         callWith.argument("clamInitialWait", (Long v) -> request.clampInitialWait = v);
         callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
