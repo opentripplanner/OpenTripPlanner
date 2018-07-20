@@ -82,7 +82,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
                 // Local file probably, try standard java
                 data = url2.openStream();
             }
-
+            // TODO handle optional GBFS files, where it's not warning-worthy that they don't exist.
             if (data == null) {
                 log.warn("Failed to get data from url " + url);
                 return false;
