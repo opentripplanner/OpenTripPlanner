@@ -1,6 +1,6 @@
-<img src="https://github.com/opentripplanner/OpenTripPlanner/wiki/Home/otp_logo_wiki.png" align="right"/>
+![OTP Logo](otp-logo.svg)
+# OpenTripPlanner
 
-## OpenTripPlanner
 _This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
 
 **OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). The code is under active development with a variety of [deployments](Deployments) around the world.

@@ -54,8 +54,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private BikeRentalDataSource source;
 
-    private Graph graph;
-
     private SimpleStreetSplitter linker;
 
     private BikeRentalStationService service;
@@ -73,6 +71,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         // Set data source type from config JSON
         String sourceType = config.path("sourceType").asText();
         String apiKey = config.path("apiKey").asText();
+        // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
+        // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
         String networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
@@ -103,7 +103,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             } else if (sourceType.equals("uip-bike")) {
                 source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource();
+                source = new GbfsBikeRentalDataSource(networkName);
             }
         }
 
@@ -115,19 +115,22 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
-        this.graph = graph;
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec, source);
+        if (pollingPeriodSeconds <= 0) {
+            LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
+        } else {
+            LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
+        }
+
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
-
         // Adding a bike rental station service needs a graph writer runnable
-        updaterManager.executeBlocking(graph -> service = graph.getService(BikeRentalStationService.class, true));
+        service = graph.getService(BikeRentalStationService.class, true);
     }
 
     @Override

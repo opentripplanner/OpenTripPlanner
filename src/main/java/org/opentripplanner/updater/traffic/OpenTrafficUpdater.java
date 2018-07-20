@@ -92,10 +92,8 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup() throws Exception {
-        graphUpdaterManager.execute(graph -> {
-            graph.streetSpeedSource = new StreetSpeedSnapshotSource();
-        });
+    public void setup(Graph graph) {
+        graph.streetSpeedSource = new StreetSpeedSnapshotSource();
     }
 
     @Override

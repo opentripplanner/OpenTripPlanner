@@ -71,22 +71,8 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     // Here the updater can be initialized.
     @Override
-    public void setup() {
+    public void setup(Graph graph) {
         LOG.info("Setup example updater");
-        
-        // Execute anonymous graph writer runnable and wait for its termination
-        try {
-            updaterManager.executeBlocking(new GraphWriterRunnable() {
-                @Override
-                public void run(Graph graph) {
-                    LOG.info("Anonymous graph writer {} runnable is run on the "
-                            + "graph writer scheduler.", this.hashCode());
-                    // Do some writing to the graph here
-                }
-            });
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        }
     }
 
     // This is where the updater thread receives updates and applies them to the graph.

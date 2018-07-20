@@ -76,12 +76,12 @@ public class GraphUpdaterManager {
     /**
      * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
      */
-    List<GraphUpdater> updaterList = new ArrayList<>();
+    private List<GraphUpdater> updaterList = new ArrayList<>();
 
     /**
      * The Graph that will be updated.
      */
-    Graph graph;
+    private Graph graph;
 
     /**
      * Constructor.
@@ -140,18 +140,6 @@ public class GraphUpdaterManager {
      */
     public void addUpdater(final GraphUpdater updater) {
         updaterList.add(updater);
-        updaterPool.execute(() -> {
-            try {
-                updater.setup();
-                try {
-                    updater.run();
-                } catch (Exception e) {
-                    LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
-                }
-            } catch (Exception e) {
-                LOG.error("Error while setting up updater {}:", updater.getClass().getName(), e);
-            }
-        });
     }
 
     /**
@@ -162,41 +150,34 @@ public class GraphUpdaterManager {
      * @param runnable is a graph writer runnable
      */
     public void execute(GraphWriterRunnable runnable) {
-        executeReturningFuture(runnable);
-    }
-
-    /**
-     * This is another method to use to modify the graph from the updaters. It behaves like execute,
-     * but blocks until the runnable has been executed. This might be particularly useful in the 
-     * setup method of an updater.
-     * 
-     * @param runnable is a graph writer runnable
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @see GraphUpdaterManager.execute
-     */
-    public void executeBlocking(GraphWriterRunnable runnable) throws InterruptedException,
-            ExecutionException {
-        Future<?> future = executeReturningFuture(runnable);
-        // Ask for result of future. Will block and return null when runnable is successfully
-        // finished, throws otherwise
-        future.get();
-    }
-
-    private Future<?> executeReturningFuture(final GraphWriterRunnable runnable) {
-        // TODO: check for high water mark?
-        Future<?> future = scheduler.submit(() -> {
+        scheduler.submit(() -> {
             try {
                 runnable.run(graph);
             } catch (Exception e) {
                 LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
         });
-        return future;
     }
 
     public int size() {
         return updaterList.size();
+    }
+
+    /**
+     * This should be called only once at startup to kick off every updater in its own thread, and only after all
+     * the updaters have had their setup methods called.
+     */
+    public void startUpdaters() {
+        for (GraphUpdater updater : updaterList) {
+            LOG.info("Starting new thread for updater {}", updater.toString());
+            updaterPool.execute(() -> {
+                try {
+                    updater.run();
+                } catch (Exception e) {
+                    LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
+                }
+            });
+        }
     }
 
     /**
