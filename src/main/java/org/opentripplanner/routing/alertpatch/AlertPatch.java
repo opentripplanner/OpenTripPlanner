@@ -136,7 +136,7 @@ public class AlertPatch implements Serializable {
                     if (direction != null && !direction.equals(tripPattern.getDirection())) {
                         continue;
                     }
-                    if (directionId != -1 && directionId == tripPattern.directionId) {
+                    if (directionId != -1 && directionId != tripPattern.directionId) {
                         continue;
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
