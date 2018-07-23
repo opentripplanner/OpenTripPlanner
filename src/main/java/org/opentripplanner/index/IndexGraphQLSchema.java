@@ -724,7 +724,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("compactLegsByReversedSearch")
-                .description("Whether legs should be compacted by performing a reversed search. Experimental argument, will be removed!.")
+                .description("Whether legs should be compacted by performing a reversed search. **Experimental argument, will be removed!**")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
