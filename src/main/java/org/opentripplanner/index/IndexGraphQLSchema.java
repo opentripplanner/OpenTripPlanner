@@ -709,7 +709,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("locale")
-                .description("Locale for returned text")
+                .description("Two-letter language code (ISO 639-1) used for returned text. **Note:** only part of the data has translations available and names of stops and POIs are returned in their default language. Due to missing translations, it is sometimes possible that returned text uses a mixture of two languages.")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
