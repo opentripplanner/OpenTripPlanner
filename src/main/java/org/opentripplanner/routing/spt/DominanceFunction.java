@@ -53,8 +53,9 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // A TimedTransferEdge cannot be trusted to dominate another state, since its resulting state can be invalidated
-        // when checking the specificity of a transfer
+        // A TimedTransferEdge might be invalidated later, when we have boarded the next trip and have all the information
+        // we need to check the specificity. We do not want states that might be invalidated to dominate other valid
+        // states.
         if ((a.backEdge instanceof TimedTransferEdge) || (b.backEdge instanceof TimedTransferEdge)) {
             return false;
         }
