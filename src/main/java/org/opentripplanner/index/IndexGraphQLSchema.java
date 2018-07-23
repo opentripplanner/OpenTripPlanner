@@ -714,7 +714,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                  .name("ticketTypes")
-                 .description("Allowed ticket types")
+                 .description("A comma-separated list of allowed ticket types.")
                  .type(Scalars.GraphQLString)
                  .build())
             .argument(GraphQLArgument.newArgument()
