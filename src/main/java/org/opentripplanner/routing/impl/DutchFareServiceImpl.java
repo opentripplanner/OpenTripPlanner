@@ -190,7 +190,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             return cost;
         }
 
-        if (entranceFee) cost += 89f; /* TODO: Configurable? */
+        if (entranceFee) cost += 90f; /* TODO: Configurable? */
 
         return cost;
     }
