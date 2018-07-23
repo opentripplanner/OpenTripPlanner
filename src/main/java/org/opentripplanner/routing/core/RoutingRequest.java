@@ -623,15 +623,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setPreferredAgencies(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             preferredAgencies = Sets.newHashSet(s.split(","));
+        }
     }
 
     public void setPreferredRoutes(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             preferredRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             preferredRoutes = RouteMatcher.emptyMatcher();
+        }
     }
     
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
@@ -640,33 +643,40 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setUnpreferredAgencies(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             unpreferredAgencies = Sets.newHashSet(s.split(","));
+        }
     }
     
     public void setUnpreferredRoutes(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             unpreferredRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             unpreferredRoutes = RouteMatcher.emptyMatcher();
+        }
     }
 
     public void setBannedRoutes(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             bannedRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             bannedRoutes = RouteMatcher.emptyMatcher();
+        }
     }
 
     public void setWhiteListedRoutes(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             whiteListedRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             whiteListedRoutes = RouteMatcher.emptyMatcher();
+        }
     }
 
     public void setBannedStops(String s) {
-        if (s != null && !s.equals("")) {
+        if (!s.isEmpty()) {
             bannedStops = StopMatcher.parse(s);
         }
         else {
@@ -675,7 +685,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setBannedStopsHard(String s) {
-        if (s != null && !s.equals("")) {
+        if (!s.isEmpty()) {
             bannedStopsHard = StopMatcher.parse(s);
         }
         else {
@@ -684,13 +694,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setBannedAgencies(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             bannedAgencies = Sets.newHashSet(s.split(","));
+        }
     }
 
     public void setWhiteListedAgencies(String s) {
-        if (s != null && !s.equals(""))
+        if (!s.isEmpty()) {
             whiteListedAgencies = Sets.newHashSet(s.split(","));
+        }
     }
 
     public final static int MIN_SIMILARITY = 1000;
