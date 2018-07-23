@@ -236,7 +236,6 @@ public abstract class RoutingResource {
     /**
      * Functions the same as bannnedRoutes, except only the listed routes are allowed.
      */
-
     @QueryParam("whiteListedRoutes")
     protected String whiteListedRoutes;
     
@@ -247,7 +246,6 @@ public abstract class RoutingResource {
     /**
      * Functions the same as banned agencies, except only the listed agencies are allowed.
      */
-
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
     
