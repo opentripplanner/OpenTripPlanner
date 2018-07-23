@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -624,7 +624,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setPreferredAgencies(String s) {
         if (s != null && !s.equals(""))
-            preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+            preferredAgencies = Sets.newHashSet(s.split(","));
     }
 
     public void setPreferredRoutes(String s) {
@@ -641,7 +641,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setUnpreferredAgencies(String s) {
         if (s != null && !s.equals(""))
-            unpreferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+            unpreferredAgencies = Sets.newHashSet(s.split(","));
     }
     
     public void setUnpreferredRoutes(String s) {
@@ -685,12 +685,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
-            bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+            bannedAgencies = Sets.newHashSet(s.split(","));
     }
 
     public void setWhiteListedAgencies(String s) {
         if (s != null && !s.equals(""))
-            whiteListedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+            whiteListedAgencies = Sets.newHashSet(s.split(","));
     }
 
     public final static int MIN_SIMILARITY = 1000;
