@@ -1604,7 +1604,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("serviceDate")
-                    .description("Date for which the departure time is returned. Format: YYYYMMDD")
+                    .description("Date for which the departure time is returned. Format: YYYYMMDD. If this argument is not used, field `serviceDay` in the stoptime will have a value of 0.")
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
@@ -1628,7 +1628,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLNonNull(stoptimeType))
                 .argument(GraphQLArgument.newArgument()
                         .name("serviceDate")
-                        .description("Date for which the arrival time is returned. Format: YYYYMMDD")
+                        .description("Date for which the arrival time is returned. Format: YYYYMMDD. If this argument is not used, field `serviceDay` in the stoptime will have a value of 0.")
                         .type(Scalars.GraphQLString)
                         .build())
                 .dataFetcher(environment -> {
