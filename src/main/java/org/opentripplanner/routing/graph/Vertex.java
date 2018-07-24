@@ -19,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -42,7 +43,7 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
 
-    private static int maxIndex = 0;
+    private static AtomicInteger idGenerator = new AtomicInteger();
 
     private int index;
     
@@ -67,7 +68,7 @@ public abstract class Vertex implements Serializable, Cloneable {
         this.label = label;
         this.x = x;
         this.y = y;
-        this.index = maxIndex  ++;
+        this.index = idGenerator.incrementAndGet();
         // null graph means temporary vertex
         if (g != null)
             g.addVertex(this);
@@ -265,7 +266,7 @@ public abstract class Vertex implements Serializable, Cloneable {
     }
 
     public static int getMaxIndex() {
-        return maxIndex;
+        return idGenerator.get();
     }
 
 
@@ -280,7 +281,7 @@ public abstract class Vertex implements Serializable, Cloneable {
         in.defaultReadObject();
         this.incoming = new Edge[0];
         this.outgoing = new Edge[0];
-        index = maxIndex++;
+        index = idGenerator.incrementAndGet();
     }
 
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
