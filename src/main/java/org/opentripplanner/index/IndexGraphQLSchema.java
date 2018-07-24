@@ -704,7 +704,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("disableRemainingWeightHeuristic")
-                .description("If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service. Default value: false.")
+                .description("Only useful for testing and troubleshooting. ~~If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service. Default value: false.~~")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
