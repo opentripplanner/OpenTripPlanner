@@ -18,8 +18,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.util.IncrementingIdGenerator;
-import org.opentripplanner.routing.util.UniqueIdGenerator;
 
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
@@ -27,6 +25,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;
@@ -39,7 +38,7 @@ public abstract class Edge implements Serializable {
     /**
      * Generates globally unique edge IDs.
      */
-    private static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
+    private static final AtomicInteger idGenerator = new AtomicInteger();
 
     /**
      * Identifier of the edge. Negative means not set.
@@ -59,7 +58,7 @@ public abstract class Edge implements Serializable {
 
         this.fromv = v1;
         this.tov = v2;
-        this.id = idGenerator.getId(this);
+        this.id = idGenerator.incrementAndGet();
 
         // if (! vertexTypesValid()) {
         // throw new IllegalStateException(this.getClass() +
