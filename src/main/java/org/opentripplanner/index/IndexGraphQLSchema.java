@@ -539,7 +539,7 @@ public class IndexGraphQLSchema {
                     .build())
             .argument(GraphQLArgument.newArgument()
                     .name("itineraryFiltering")
-                    .description("How easily bad itineraries are filtered. Default value: 0.")
+                    .description("How easily bad itineraries are filtered from results. Value 0 (default) disables filtering. Itineraries are filtered if they are worse than another one in some respect (e.g. more walking) by more than the percentage of filtering level, which is calculated by dividing 100% by the value of this argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).")
                     .type(Scalars.GraphQLFloat)
                     .build())
             .argument(GraphQLArgument.newArgument()
