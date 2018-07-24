@@ -301,15 +301,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         maxWeightSeen = weight;
                     }
                 }
-                if (!stopReached) {
-                    stopReached = true;
-                    rr.softWalkLimiting = false;
-                    rr.softPreTransitLimiting = false;
-                    if (s.walkDistance > rr.maxWalkDistance) {
-                        // Add 300 meters in order to search for nearby stops
-                        rr.maxWalkDistance = s.walkDistance + 300;
-                    }
-                }
                 if (!initialStop) continue;
             }
             // We don't test whether we're on an instanceof StreetVertex here because some other vertex types
