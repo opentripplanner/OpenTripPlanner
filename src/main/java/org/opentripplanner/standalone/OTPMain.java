@@ -108,8 +108,11 @@ public class OTPMain {
         if (params.build != null) {
             GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build); // TODO multiple directories
             if (graphBuilder != null) {
-                if (params.loadBaseGraph) {
-                    graphBuilder.setBaseGraph(GraphBuilder.BASE_GRAPH_FILENAME, params.build);
+                // Load any existing graphs
+                if (graphBuilder.isBaseGraphSet()) {
+                    LOG.info("Loading base graph. If you want to build a graph from scratch, remove baseGraph.obj from" +
+                            " graph directory.");
+                    graphBuilder.loadBaseGraph();
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
                 }
