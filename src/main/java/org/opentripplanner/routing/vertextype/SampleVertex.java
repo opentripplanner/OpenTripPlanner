@@ -48,7 +48,7 @@ public class SampleVertex extends StreetVertex implements TemporaryVertex  {
 
     @Override
     public String getLabel () {
-        return "sample-" + getIndex();
+        return "sample";
     }
 
 }

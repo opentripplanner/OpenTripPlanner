@@ -949,19 +949,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         buttonPanel.add(annotationButton);
 
         JButton findEdgeByIdButton = new JButton("Find edge ID");
-        findEdgeByIdButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String edgeIdStr = (String) JOptionPane.showInputDialog(frame, "Edge ID",
-                        JOptionPane.PLAIN_MESSAGE);
-                Integer edgeId = Integer.parseInt(edgeIdStr);
-                Edge edge = getGraph().getEdgeById(edgeId);
-                if (edge != null) {
-                    showGraph.highlightEdge(edge);
-                    showGraph.highlightVertex(edge.getFromVertex());
-                } else {
-                    System.out.println("Found no edge with ID " + edgeIdStr);
-                }
-            }
+        findEdgeByIdButton.addActionListener(e -> {
+            throw new UnsupportedOperationException("Edges no longer have integer IDs.");
         });
         buttonPanel.add(findEdgeByIdButton);
         

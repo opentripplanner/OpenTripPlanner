@@ -62,14 +62,6 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
     }
     
     /**
-     * Have the ID of their parent.
-     */
-    @Override
-    public int getId() {
-        return parentEdge.getId();
-    }
-    
-    /**
      * Have the inbound angle of  their parent.
      */
     @Override

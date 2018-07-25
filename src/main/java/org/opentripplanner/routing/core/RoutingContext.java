@@ -292,13 +292,10 @@ public class RoutingContext implements Cloneable {
         // up along those edges so that we don't get odd circuitous routes for really short trips.
         // TODO(flamholz): seems like this might be the wrong place for this code? Can't find a better one.
         //
-        if (fromVertex instanceof TemporaryStreetLocation &&
-                toVertex instanceof TemporaryStreetLocation) {
+        if (fromVertex instanceof TemporaryStreetLocation && toVertex instanceof TemporaryStreetLocation) {
             TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
             TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
-            Set<StreetEdge> overlap = overlappingStreetEdges(fromStreetVertex,
-                    toStreetVertex);
-
+            Set<StreetEdge> overlap = overlappingStreetEdges(fromStreetVertex, toStreetVertex);
             for (StreetEdge pse : overlap) {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }

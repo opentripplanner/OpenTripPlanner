@@ -69,10 +69,6 @@ public class PropagatedTimesStore {
 
     private static final Random random = new Random();
 
-    public PropagatedTimesStore(Graph graph, ProfileRequest req) {
-        this(graph, req, Vertex.getMaxIndex());
-    }
-
     public PropagatedTimesStore(Graph graph, ProfileRequest req, int size) {
         this.graph = graph;
         this.req = req;

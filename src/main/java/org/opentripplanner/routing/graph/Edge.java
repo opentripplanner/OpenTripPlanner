@@ -36,16 +36,6 @@ public abstract class Edge implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    /**
-     * Generates globally unique edge IDs.
-     */
-    private static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
-
-    /**
-     * Identifier of the edge. Negative means not set.
-     */
-    private int id;
-
     protected Vertex fromv;
 
     protected Vertex tov;
@@ -56,16 +46,8 @@ public abstract class Edge implements Serializable {
                     v1, v2);
             throw new IllegalStateException(err);
         }
-
         this.fromv = v1;
         this.tov = v2;
-        this.id = idGenerator.getId(this);
-
-        // if (! vertexTypesValid()) {
-        // throw new IllegalStateException(this.getClass() +
-        // " constructed with bad vertex types");
-        // }
-
         fromv.addOutgoing(this);
         tov.addIncoming(this);
     }
@@ -188,9 +170,6 @@ public abstract class Edge implements Serializable {
     }
 
     public String toString() {
-        if (id >= 0) {
-            return String.format("%s:%s (%s -> %s)", getClass().getName(), id, fromv, tov);
-        }
         return String.format("%s (%s -> %s)", getClass().getName(), fromv, tov);
     }
 
@@ -276,8 +255,4 @@ public abstract class Edge implements Serializable {
         }
     }
     
-    public int getId(){
-    	return this.id;
-    }
-
 }
