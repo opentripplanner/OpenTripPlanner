@@ -1080,7 +1080,7 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
 		    .description("Id of the pattern")
-                    .type(Scalars.GraphQLString)
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .defaultValue(null)
                     .build())
                 .argument(GraphQLArgument.newArgument()
