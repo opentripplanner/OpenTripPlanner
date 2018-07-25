@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.common;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.ws.rs.PathParam;
@@ -390,13 +391,16 @@ public abstract class RoutingResource {
         if (toPlace != null)
             request.setToString(toPlace);
 
-        {
+            String codeUsed = "N/A";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+            try {
             //FIXME: move into setter method on routing request
             TimeZone tz;
             tz = router.graph.getTimeZone();
             if (date == null && time != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", time);
                 try {
+                    codeUsed = "XMLGreCal";
                     // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
                     DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
                     XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
@@ -406,12 +410,23 @@ public abstract class RoutingResource {
                     }
                     Date d2 = gregCal.getTime();
                     request.setDateTime(d2);
+                    codeUsed = "XMLGreCal";
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
+                    codeUsed = "DateUtils (XML Ex)";
                 }
             } else {
+                codeUsed = "DateUtils";
                 request.setDateTime(date, time, tz);
             }
+            System.err.printf("%-24s | %-12s | %-20s | %-20s | OK%n", date, time, sdf.format(new Date(request.dateTime*1000)), codeUsed);
+        }
+        catch (Throwable t) {
+            if(t instanceof IllegalArgumentException) {
+                t.printStackTrace();
+            }
+            System.err.printf("%-24s | %-12s | %-20s | %-20s | %s%n", date, time, sdf.format(new Date(request.dateTime*1000)), codeUsed, t.getClass().getSimpleName());
+            throw t;
         }
 
         if (wheelchair != null)
