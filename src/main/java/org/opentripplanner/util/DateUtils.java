@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +30,24 @@ import org.slf4j.LoggerFactory;
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g)
  * @date October 20, 2009
  */
-public class DateUtils implements DateConstants {
+public final class DateUtils implements DateConstants {
 
     private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
     private static final int SANITY_CHECK_CUTOFF_YEAR = 1000;
+
+    private static final DateUtilsTimeFactory DEFAULT_TIME_FACTORY = new DateUtilsTimeFactory() {};
+
+    /**
+     * The timeFactory enable injecting a fixed time factory when testing this class.
+     * If not changed, the default implementation is used.
+     */
+    private static DateUtilsTimeFactory timeFactory = DEFAULT_TIME_FACTORY;
+
+    /**
+     * This is a static utility class, a private constructor prevent instantiation.
+     */
+    private DateUtils() { }
 
     /**
      * Returns a Date object based on input date & time parameters Defaults to today / now (when
@@ -46,13 +60,14 @@ public class DateUtils implements DateConstants {
         //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
         LOG.debug("Parsing date {} and time {}", date, time);
         LOG.debug( "using timezone {}", tz);
-        Date retVal = new Date();
+        Date retVal = timeFactory.newDate();
+
         if (date != null) {
             Date d = parseDate(date, tz);
             if (d == null) {
                 return null; //unparseable date
             }
-            Calendar cal = new GregorianCalendar(tz);
+            Calendar cal = timeFactory.newGregorianCalendar(tz);
             cal.setTime(d);
             boolean timed = false;
             if (time != null) {
@@ -67,7 +82,7 @@ public class DateUtils implements DateConstants {
             }
             if (!timed) {
                 //assume t = now
-                Calendar today = new GregorianCalendar();
+                Calendar today = timeFactory.newGregorianCalendar();
                 cal.set(Calendar.HOUR_OF_DAY, today.get(Calendar.HOUR_OF_DAY));
                 cal.set(Calendar.MINUTE, today.get(Calendar.MINUTE));
                 cal.set(Calendar.SECOND, today.get(Calendar.SECOND));
@@ -77,7 +92,7 @@ public class DateUtils implements DateConstants {
         } else if (time != null) {
             int[] hms = parseTime (time);
             if (hms != null) {
-                Calendar cal = new GregorianCalendar(tz);
+                Calendar cal = timeFactory.newGregorianCalendar(tz);
 
                 cal.set(Calendar.HOUR_OF_DAY, hms[0]);
                 cal.set(Calendar.MINUTE, hms[1]);
@@ -147,7 +162,7 @@ public class DateUtils implements DateConstants {
     }
 
     // TODO: could be replaced with Apache's DateFormat.parseDate ???
-    static public Date parseDate(String input, TimeZone tz) {
+    static Date parseDate(String input, TimeZone tz) {
         Date retVal = null;
         try {
             String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
@@ -173,7 +188,7 @@ public class DateUtils implements DateConstants {
                     sdf.setTimeZone(tz);
                     retVal = DateUtils.parseDate(sdf, newString);
                     if (retVal != null) {
-                        Calendar cal = new GregorianCalendar(tz);
+                        Calendar cal = timeFactory.newGregorianCalendar(tz);
                         cal.setTime(retVal);
                         int year = cal.get(Calendar.YEAR);
                         if (year >= SANITY_CHECK_CUTOFF_YEAR) {
@@ -189,7 +204,7 @@ public class DateUtils implements DateConstants {
         return retVal;
     }
 
-    public static int getIntegerFromString(String input) {
+    private static int getIntegerFromString(String input) {
         try {
             return new Integer(input);
         } catch (Exception e) {
@@ -197,57 +212,7 @@ public class DateUtils implements DateConstants {
         }
     }
 
-    /**
-     * Converts time in seconds to a <code>String</code> in the format h:mm.
-     * 
-     * @param time
-     *            the time in seconds.
-     * @return a <code>String</code> representing the time in the format h:mm
-     */
-    public static String secondsToString(int time) {
-        return secondsToString(time, false);
-    }
-
-    public static String secondsToString(int time, boolean withAmPm) {
-        if (time < 0)
-            return null;
-
-        String minutesStr = secondsToMinutes(time);
-        String hoursStr = secondsToHour(time);
-        String amPmStr = withAmPm ? getAmPm(time) : "";
-
-        return hoursStr + ":" + minutesStr + amPmStr;
-    }
-
-    public static String secondsToHour(int time) {
-        if (time < 0)
-            return null;
-        int hours = (time / 3600) % 12;
-        String hoursStr = hours == 0 ? "12" : hours + "";
-        return hoursStr;
-    }
-
-    public static String secondsToMinutes(int time) {
-        if (time < 0)
-            return null;
-
-        int minutes = (time / 60) % 60;
-        String minutesStr = (minutes < 10 ? "0" : "") + minutes;
-        return minutesStr;
-    }
-
-    public static String getAmPm(int time) {
-        return getAmPm(time, AM, PM);
-    }
-
-    public static String getAmPm(int time, String am, String pm) {
-        if (time % 86400 >= 43200)
-            return pm;
-        else
-            return am;
-    }
-
-    public static String trim(String str) {
+    private static String trim(String str) {
         String retVal = str;
         try {
             retVal = str.trim();
@@ -258,28 +223,7 @@ public class DateUtils implements DateConstants {
         return retVal;
     }
 
-    public static String formatDate(String sdfFormat, Date date, TimeZone tz) {
-        return formatDate(sdfFormat, date, null, tz);
-    }
-
-    public static String formatDate(String sdfFormat, Date date, String defValue, TimeZone tz) {
-        String retVal = defValue;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(sdfFormat);
-            sdf.setTimeZone(tz);
-            retVal = sdf.format(date);
-        } catch (Exception e) {
-            retVal = defValue;
-        }
-
-        return retVal;
-    }
-
-    public static Date parseDate(String sdf, String string) {
-        return parseDate(new SimpleDateFormat(sdf), string);
-    }
-
-    public synchronized static Date parseDate(SimpleDateFormat sdf, String string) {
+    private synchronized static Date parseDate(SimpleDateFormat sdf, String string) {
         sdf.setLenient(false);
         try {
             return sdf.parse(string);
@@ -288,11 +232,51 @@ public class DateUtils implements DateConstants {
         }
         return null;
     }
-    
+
     public static long absoluteTimeout(double relativeTimeoutSeconds) {
         if (relativeTimeoutSeconds <= 0)
             return Long.MAX_VALUE;
         else
             return System.currentTimeMillis() + (long)(relativeTimeoutSeconds * 1000.0);
+    }
+
+
+    /**
+     * The time used to generate new date and times is fixed at the provided time for the duration of the provided
+     * method call. This method is ment for TEST purposes only.
+     * <p>
+     * This method is <b>not tread safe</b>; hence running test in parallel is not safe.
+     *
+     * @param fixedTimeUtcMillis the fixed time used to create all Date and Calendars in DateUtils.
+     * @param methodCall the method for which fixed time constraint apply.
+     */
+    static void withFixedTime(final long fixedTimeUtcMillis, Runnable methodCall) {
+        try {
+            timeFactory = new FixedTimeFactory(fixedTimeUtcMillis);
+            methodCall.run();
+        }
+        finally {
+            timeFactory = DEFAULT_TIME_FACTORY;
+        }
+    }
+
+    private interface DateUtilsTimeFactory {
+        default Date              newDate()                         { return new Date(); }
+        default GregorianCalendar newGregorianCalendar()            { return new GregorianCalendar(); }
+        default GregorianCalendar newGregorianCalendar(TimeZone tz) { return new GregorianCalendar(tz); }
+    }
+
+    private static class FixedTimeFactory implements DateUtilsTimeFactory {
+        private long fixedTimeUtcMillis;
+        FixedTimeFactory(long fixedTimeUtcMillis)                 {  this.fixedTimeUtcMillis = fixedTimeUtcMillis; }
+        @Override public Date newDate()                           { return new Date(fixedTimeUtcMillis); }
+        @Override public GregorianCalendar newGregorianCalendar() { return withFixedTime(new GregorianCalendar()); }
+        @Override public GregorianCalendar newGregorianCalendar(TimeZone tz) {
+            return withFixedTime(new GregorianCalendar(tz));
+        }
+        private GregorianCalendar withFixedTime(GregorianCalendar cal) {
+            cal.setTime(newDate());
+            return cal;
+        }
     }
 }
