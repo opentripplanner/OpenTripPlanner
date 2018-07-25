@@ -103,42 +103,44 @@ public class PlannerResource extends RoutingResource {
                 request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
             }
         }
+        if (request != null && router != null) {
 
-        /* Populate up the elevation metadata */
-        response.elevationMetadata = new ElevationMetadata();
-        response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
-        response.elevationMetadata.geoidElevation = request.geoidElevation;
+            /* Populate up the elevation metadata */
+            response.elevationMetadata = new ElevationMetadata();
+            response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
+            response.elevationMetadata.geoidElevation = request.geoidElevation;
 
-        /* Log this request if such logging is enabled. */
-        if (request != null && router != null && router.requestLogger != null) {
-            StringBuilder sb = new StringBuilder();
-            String clientIpAddress = grizzlyRequest.getRemoteAddr();
-            //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-            sb.append(clientIpAddress);
-            sb.append(' ');
-            sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
-            sb.append(' ');
-            sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
-            sb.append(' ');
-            sb.append(request.modes.getAsStr());
-            sb.append(' ');
-            sb.append(request.from.lat);
-            sb.append(' ');
-            sb.append(request.from.lng);
-            sb.append(' ');
-            sb.append(request.to.lat);
-            sb.append(' ');
-            sb.append(request.to.lng);
-            sb.append(' ');
-            if (paths != null) {
-                for (GraphPath path : paths) {
-                    sb.append(path.getDuration());
-                    sb.append(' ');
-                    sb.append(path.getTrips().size());
-                    sb.append(' ');
+            /* Log this request if such logging is enabled. */
+            if (router.requestLogger != null) {
+                StringBuilder sb = new StringBuilder();
+                String clientIpAddress = grizzlyRequest.getRemoteAddr();
+                //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                sb.append(clientIpAddress);
+                sb.append(' ');
+                sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
+                sb.append(' ');
+                sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
+                sb.append(' ');
+                sb.append(request.modes.getAsStr());
+                sb.append(' ');
+                sb.append(request.from.lat);
+                sb.append(' ');
+                sb.append(request.from.lng);
+                sb.append(' ');
+                sb.append(request.to.lat);
+                sb.append(' ');
+                sb.append(request.to.lng);
+                sb.append(' ');
+                if (paths != null) {
+                    for (GraphPath path : paths) {
+                        sb.append(path.getDuration());
+                        sb.append(' ');
+                        sb.append(path.getTrips().size());
+                        sb.append(' ');
+                    }
                 }
+                router.requestLogger.info(sb.toString());
             }
-            router.requestLogger.info(sb.toString());
         }
         return response;
     }
