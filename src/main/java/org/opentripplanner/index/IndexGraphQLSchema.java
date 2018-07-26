@@ -687,7 +687,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("startTransitTripId")
-                .description("ID of the trip on which the itinerary starts. This argument can be used to plan itineraries when the user is already onboard a vehicle. When using this argument, arguments `time` and `from` should be set based on a vehicle position message received from the vehicle running the specified trip.  **Note:** this argument does not take into account the timetable of the trip (and therefore arguments `time` and `from` must be used correctly to get meaningful itineraries).")
+                .description("ID of the trip on which the itinerary starts. This argument can be used to plan itineraries when the user is already onboard a vehicle. When using this argument, arguments `time` and `from` should be set based on a vehicle position message received from the vehicle running the specified trip.  **Note:** this argument only takes into account the route and estimated travel time of the trip (and therefore arguments `time` and `from` must be used correctly to get meaningful itineraries).")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
