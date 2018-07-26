@@ -170,16 +170,16 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 stationSet.add(station);
                 CarRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
-                    vertex = new CarRentalStationVertex(graph, station);
-                    if (!linker.link(vertex)) {
-                        // the toString includes the text "Car rental station"
-                        LOG.warn("{} not near any streets; it will not be usable.", station);
+                    makeVertex(graph, station);
+                } else if (station.x != vertex.getX() || station.y != vertex.getY()) {
+                    LOG.info("{} has changed, re-graphing", station);
+
+                    // First remove the old one.
+                    if (graph.containsVertex(vertex)) {
+                        graph.removeVertexAndEdges(vertex);
                     }
-                    verticesByStation.put(station, vertex);
-                    if (station.allowPickup)
-                        new RentACarOnEdge(vertex, vertex, station.networks);
-                    if (station.allowDropoff)
-                        new RentACarOffEdge(vertex, vertex, station.networks);
+
+                    makeVertex(graph, station);
                 } else {
                     vertex.setCarsAvailable(station.carsAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
@@ -204,6 +204,20 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 verticesByStation.remove(station);
             }
         }
+
+        private void makeVertex(Graph graph, CarRentalStation station) {
+            CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
+            if (!linker.link(vertex)) {
+                // the toString includes the text "Car rental station"
+                LOG.warn("{} not near any streets; it will not be usable.", station);
+            }
+            verticesByStation.put(station, vertex);
+            if (station.allowPickup)
+                new RentACarOnEdge(vertex, vertex, station.networks);
+            if (station.allowDropoff)
+                new RentACarOffEdge(vertex, vertex, station.networks);
+        }
+
         public void applyRegions(Graph graph) {
             // Adding car service regions to all edges of the network.
             LOG.info("Applying {} rental car regions.", regions.size());
