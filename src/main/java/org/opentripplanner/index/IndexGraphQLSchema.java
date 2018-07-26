@@ -59,6 +59,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.GraphIndex.PlaceAndDistance;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -1083,7 +1084,7 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
 		    .description("Id of the pattern")
-                    .type(Scalars.GraphQLString)
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .defaultValue(null)
                     .build())
                 .argument(GraphQLArgument.newArgument()
@@ -1599,6 +1600,54 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> TripTimeShort.fromTripTimes(
                     index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable,
                     environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureStoptime")
+                .description("Departure time from the first stop")
+                .type(new GraphQLNonNull(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("serviceDate")
+                    .description("Date for which the departure time is returned. Format: YYYYMMDD. If this argument is not used, field `serviceDay` in the stoptime will have a value of 0.")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Timetable timetable = index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable;
+                        TripTimes triptimes = timetable.getTripTimes(environment.getSource());
+                        return new TripTimeShort(triptimes,
+                                0,
+                                timetable.pattern.getStop(0),
+                                environment.getArgument("serviceDate") == null
+                                        ? null : new ServiceDay(index.graph, ServiceDate.parseString(environment.getArgument("serviceDate")), index.graph.getCalendarService(), ((Trip)environment.getSource()).getRoute().getAgency().getId()));
+                    } catch (ParseException e) {
+                        //Invalid date format
+                        return null;
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalStoptime")
+                .description("Arrival time to the final stop")
+                .type(new GraphQLNonNull(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                        .name("serviceDate")
+                        .description("Date for which the arrival time is returned. Format: YYYYMMDD. If this argument is not used, field `serviceDay` in the stoptime will have a value of 0.")
+                        .type(Scalars.GraphQLString)
+                        .build())
+                .dataFetcher(environment -> {
+                    try {
+                        Timetable timetable = index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable;
+                        TripTimes triptimes = timetable.getTripTimes(environment.getSource());
+                        return new TripTimeShort(triptimes,
+                                triptimes.getNumStops() - 1,
+                                timetable.pattern.getStop(triptimes.getNumStops() - 1),
+                                environment.getArgument("serviceDate") == null
+                                        ? null : new ServiceDay(index.graph, ServiceDate.parseString(environment.getArgument("serviceDate")), index.graph.getCalendarService(), ((Trip)environment.getSource()).getRoute().getAgency().getId()));
+                    } catch (ParseException e) {
+                        //Invalid date format
+                        return null;
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimesForDate")
@@ -2324,22 +2373,22 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("minLat")
 		    .description("Southern bound of the bounding box")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("minLon")
 	 	    .description("Western bound of the bounding box")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("maxLat")
 		    .description("Northern bound of the bounding box")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("maxLon")
 		    .description("Eastern bound of the bounding box")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
@@ -2366,17 +2415,17 @@ public class IndexGraphQLSchema {
                 .argument(GraphQLArgument.newArgument()
                     .name("lat")
                     .description("Latitude of the location")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("lon")
                     .description("Longitude of the location")
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("radius")
                     .description("Radius (in meters) to search for from the specified location. Note that this is walking distance along streets and paths rather than a geographic distance.")
-                    .type(Scalars.GraphQLInt)
+                    .type(new GraphQLNonNull(Scalars.GraphQLInt))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
