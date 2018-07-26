@@ -641,7 +641,8 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modes")
-                .description("The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.")
+                //This should probably be an enum type
+                .description(String.format("A comma-separated list of transport modes that the user is willing to use. Default value: `WALK,TRANSIT`. List of possible values: %s", Arrays.toString(TraverseMode.values())))
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
