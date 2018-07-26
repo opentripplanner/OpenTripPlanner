@@ -722,7 +722,7 @@ public class IndexGraphQLSchema {
                  .build())
             .argument(GraphQLArgument.newArgument()
                 .name("heuristicStepsPerMainStep")
-                .description("Tuning parameter for the search algorithm.")
+                .description("Tuning parameter for the search algorithm, mainly useful for testing.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
