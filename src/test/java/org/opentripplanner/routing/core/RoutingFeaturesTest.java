@@ -30,11 +30,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.util.TestUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 public class RoutingFeaturesTest extends TestCase {
 
@@ -44,7 +46,7 @@ public class RoutingFeaturesTest extends TestCase {
 
     @Override
     public void setUp() {
-        GraphBuilder graphBuilder = new GraphBuilder();
+        GraphBuilder graphBuilder = new GraphBuilder(new File(""), mock(GraphBuilderParameters.class));
 
         List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
         OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(new File(ConstantsForTests.OSLO_MINIMAL_OSM));
