@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
@@ -25,6 +24,7 @@ import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -703,6 +703,9 @@ public class State implements Cloneable {
                         return unoptimized.reverse();
                 }
             }
+            // Not reverse-optimizing, so we don't re-traverse the edges backward.
+            // Instead we just replicate all the states, and replicate the deltas between the state's incremental fields.
+            // TODO determine whether this is really necessary, and whether there's a more maintainable way to do this.
             else {
                 StateEditor editor = ret.edit(edge);
                 // note the distinction between setFromState and setBackState
@@ -716,8 +719,11 @@ public class State implements Cloneable {
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
 
-                if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
-                    editor.setBikeRenting(!orig.isBikeRenting());
+                if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+                    editor.doneVehicleRenting();
+                } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                    editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                }
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
                 if (orig.isBikeParked() != orig.getBackState().isBikeParked())

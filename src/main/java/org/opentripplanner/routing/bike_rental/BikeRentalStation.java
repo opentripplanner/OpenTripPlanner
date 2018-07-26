@@ -47,10 +47,12 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @XmlAttribute
     @JsonSerialize
     public boolean allowDropoff = true;
-
     @XmlAttribute
     @JsonSerialize
     public boolean isFloatingBike = false;
+    @XmlAttribute
+    @JsonSerialize
+    public boolean isCarStation = false;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.
@@ -83,6 +85,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @XmlTransient
     public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
 
+    /**
+     * FIXME nonstandard definition of equals, relying on only the station field.
+     * We should probably be keying collections on station ID rather than the station object with nonstandard equals.
+     */
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
             return false;

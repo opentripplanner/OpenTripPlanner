@@ -20,6 +20,7 @@ import org.onebusaway.csv_entities.CsvInputSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Represent a feed id in a GTFS feed.
@@ -76,13 +77,14 @@ public class GtfsFeedId {
             try {
                 if (source.hasResource("feed_info.txt")) {
                     InputStream feedInfoInputStream = source.getResource("feed_info.txt");
-                    StringWriter writer = new StringWriter();
-                    IOUtils.copy(feedInfoInputStream, writer, "UTF-8");
-                    String feedInfoCsv = writer.toString();
-                    CsvReader result = CsvReader.parse(feedInfoCsv);
-                    result.readHeaders();
-                    result.readRecord();
-                    this.id = result.get("feed_id");
+                    try {
+	                    CsvReader result = new CsvReader(feedInfoInputStream, StandardCharsets.UTF_8);
+	                    result.readHeaders();
+	                    result.readRecord();
+	                    this.id = result.get("feed_id");
+                    } finally {
+                    	feedInfoInputStream.close();
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
