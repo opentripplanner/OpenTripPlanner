@@ -2,8 +2,6 @@ package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.profile.StopClusterMode;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
@@ -58,16 +56,6 @@ public class GraphBuilderParameters {
      * Create direct transfers between the constituent stops of each parent station.
      */
     public final boolean stationTransfers;
-
-    /**
-     * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
-     * according to a parent/child station topology, if it exists.
-     * <ul>
-     * <li>"parentStation" See {@link GraphIndex#clusterByParentStation()}</li>
-     * <li>"proximity" See {@link GraphIndex#clusterByProximityAndName()}. This is the default value.</li>
-     * </ul>
-     */
-    public final StopClusterMode stopClusterMode;
 
     /**
      * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -184,7 +172,6 @@ public class GraphBuilderParameters {
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
-        stopClusterMode = enumValueOf(config, "stopClusterMode", StopClusterMode.proximity);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);

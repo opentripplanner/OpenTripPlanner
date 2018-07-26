@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.graph;
 
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -31,15 +30,12 @@ import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.analyst.core.GeometryIndex;
-import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -107,10 +103,6 @@ public class Graph implements Serializable {
     public transient StreetVertexIndexService streetIndex;
 
     public transient GraphIndex index;
-
-    private transient GeometryIndex geomIndex;
-
-    private transient SampleFactory sampleFactory;
 
     public final Deduplicator deduplicator = new Deduplicator();
 
@@ -198,9 +190,6 @@ public class Graph implements Serializable {
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
     
-    /** How should we cluster stops? By 'proximity' or 'ParentStation' */
-    public StopClusterMode stopClusterMode = StopClusterMode.proximity;
-
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
     public Double ellipsoidToGeoidDifference = 0.0;
 
@@ -941,23 +930,6 @@ public class Graph implements Serializable {
 
     public WorldEnvelope getEnvelope() {
         return this.envelope;
-    }
-
-    // lazy-init geom index on an as needed basis
-    public GeometryIndex getGeomIndex() {
-    	
-    	if(this.geomIndex == null)
-    		this.geomIndex = new GeometryIndex(this);
-    	
-    	return this.geomIndex;
-    }
-
-    // lazy-init sample factor on an as needed basis
-    public SampleFactory getSampleFactory() {
-        if(this.sampleFactory == null)
-            this.sampleFactory = new SampleFactory(this);
-
-        return this.sampleFactory;	
     }
 
     /**

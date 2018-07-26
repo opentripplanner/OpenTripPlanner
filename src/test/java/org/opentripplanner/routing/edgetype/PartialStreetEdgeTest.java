@@ -70,7 +70,6 @@ public class PartialStreetEdgeTest {
         assertFalse(pEdge.isBack());
         assertFalse(pEdge.isReverseOf(e1));
         assertTrue(pEdge.isReverseOf(e1Reverse));
-        assertEquals(e1.getId(), pEdge.getId());
         assertEquals(e1.getPermission(), pEdge.getPermission());
         assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
     }

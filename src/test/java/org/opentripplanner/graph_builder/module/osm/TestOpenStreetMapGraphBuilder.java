@@ -148,11 +148,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertFalse(iv7.trafficLight);
         assertFalse(iv8.trafficLight);
         
-        Set<P2<Integer>> edgeEndpoints = new HashSet<P2<Integer>>();
+        Set<P2<Vertex>> edgeEndpoints = new HashSet<>();
         for (StreetEdge se : gg.getStreetEdges()) {
-            P2<Integer> endpoints = new P2<Integer>(se.getFromVertex().getIndex(),
-                    se.getToVertex().getIndex());
-            
+            P2<Vertex> endpoints = new P2<>(se.getFromVertex(), se.getToVertex());
             // Check that we don't get any duplicate edges on this small graph.
             if (edgeEndpoints.contains(endpoints)) {
                 assertFalse(true);

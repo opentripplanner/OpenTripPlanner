@@ -8,13 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Calendar;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -29,19 +26,11 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.profile.ProfileTransfer;
-import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.profile.StopClusterMode;
-import org.opentripplanner.profile.StopNameNormalizer;
-import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -95,19 +84,10 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
-    public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
-    public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
     private final Map<AgencyAndId,Integer> serviceCodes;
-
-    /* Full-text search extensions */
-    public LuceneIndex luceneIndex;
-
-    /* Separate transfers for profile routing */
-    public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
-    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -116,9 +96,6 @@ public class GraphIndex {
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
     public GraphQL graphQL;
-
-    /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
-    private transient StopTreeCache stopTreeCache = null;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -187,123 +164,6 @@ public class GraphIndex {
         LOG.info("Done indexing graph.");
     }
 
-    /**
-     * Stop clustering is slow to perform and only used in profile routing for the moment.
-     * Therefore it is not done automatically, and any method requiring stop clusters should call this method
-     * to ensure that the necessary indexes are lazy-initialized.
-     */
-    public synchronized void clusterStopsAsNeeded() {
-        if (stopClusterSpatialIndex == null) {
-            clusterStops();
-            LOG.info("Creating a spatial index for stop clusters.");
-            stopClusterSpatialIndex = new HashGridSpatialIndex<>();
-            for (StopCluster cluster : stopClusterForId.values()) {
-                Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
-                stopClusterSpatialIndex.insert(envelope, cluster);
-            }
-        }
-    }
-
-    private void analyzeServices() {
-        // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
-        // TODO catalog days of the week and exceptions for each service day.
-        // Make a table of which services are running on each calendar day.
-        // Really the calendarService should be entirely replaced with a set
-        // of simple indexes in GraphIndex.
-    }
-
-    /** Get all trip patterns running through any stop in the given stop cluster. */
-    private Set<TripPattern> patternsForStopCluster(StopCluster sc) {
-        Set<TripPattern> tripPatterns = Sets.newHashSet();
-        for (Stop stop : sc.children) tripPatterns.addAll(patternsForStop.get(stop));
-        return tripPatterns;
-    }
-
-    /**
-     * Initialize transfer data needed for profile routing.
-     * Find the best transfers between each pair of patterns that pass near one another.
-     */
-    public void initializeProfileTransfers() {
-        transfersFromStopCluster = HashMultimap.create();
-        final double TRANSFER_RADIUS = 500.0; // meters
-        Map<P2<TripPattern>, ProfileTransfer.GoodTransferList> transfers = Maps.newHashMap();
-        LOG.info("Finding transfers between clusters...");
-        for (StopCluster sc0 : stopClusterForId.values()) {
-            Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
-            // Accounts for area-like (rather than point-like) nature of clusters
-            Map<StopCluster, Double> nearbyStopClusters = findNearbyStopClusters(sc0, TRANSFER_RADIUS);
-            for (StopCluster sc1 : nearbyStopClusters.keySet()) {
-                double distance = nearbyStopClusters.get(sc1);
-                Set<TripPattern> tripPatterns1 = patternsForStopCluster(sc1);
-                for (TripPattern tp0 : tripPatterns0) {
-                    for (TripPattern tp1 : tripPatterns1) {
-                        if (tp0 == tp1) continue;
-                        P2<TripPattern> pair = new P2<TripPattern>(tp0, tp1);
-                        ProfileTransfer.GoodTransferList list = transfers.get(pair);
-                        if (list == null) {
-                            list = new ProfileTransfer.GoodTransferList();
-                            transfers.put(pair, list);
-                        }
-                        list.add(new ProfileTransfer(tp0, tp1, sc0, sc1, (int)distance));
-                    }
-                }
-            }
-        }
-        /* Now filter the transfers down to eliminate long series of transfers in shared trunks. */
-        LOG.info("Filtering out long series of transfers on trunks shared between patterns.");
-        for (P2<TripPattern> pair : transfers.keySet()) {
-            ProfileTransfer.GoodTransferList list = transfers.get(pair);
-            TripPattern fromPattern = pair.first; // TODO consider using second (think of express-local transfers in NYC)
-            Map<StopCluster, ProfileTransfer> transfersByFromCluster = Maps.newHashMap();
-            for (ProfileTransfer transfer : list.good) {
-                transfersByFromCluster.put(transfer.sc1, transfer);
-            }
-            List<ProfileTransfer> retainedTransfers = Lists.newArrayList();
-            boolean inSeries = false; // true whenever a transfer existed for the last stop in the stop pattern
-            for (Stop stop : fromPattern.stopPattern.stops) {
-                StopCluster cluster = this.stopClusterForStop.get(stop);
-                //LOG.info("stop {} cluster {}", stop, cluster.id);
-                ProfileTransfer transfer = transfersByFromCluster.get(cluster);
-                if (transfer == null) {
-                    inSeries = false;
-                    continue;
-                }
-                if (inSeries) continue;
-                // Keep this transfer: it's not preceded by another stop with a transfer in this stop pattern
-                retainedTransfers.add(transfer);
-                inSeries = true;
-            }
-            //LOG.info("patterns {}, {} transfers", pair, retainedTransfers.size());
-            for (ProfileTransfer tr : retainedTransfers) {
-                transfersFromStopCluster.put(tr.sc1, tr);
-                //LOG.info("   {}", tr);
-            }
-        }
-        /*
-         * for (Stop stop : transfersForStop.keys()) { System.out.println("STOP " + stop); for
-         * (Transfer transfer : transfersForStop.get(stop)) { System.out.println("    " +
-         * transfer.toString()); } }
-         */
-        LOG.info("Done finding transfers.");
-    }
-
-    /**
-     * Find transfer candidates for profile routing.
-     * TODO replace with an on-street search using the existing profile router functions.
-     */
-    public Map<StopCluster, Double> findNearbyStopClusters (StopCluster sc, double radius) {
-        Map<StopCluster, Double> ret = Maps.newHashMap();
-        Envelope env = new Envelope(new Coordinate(sc.lon, sc.lat));
-        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(radius, sc.lat),
-                SphericalDistanceLibrary.metersToDegrees(radius));
-        for (StopCluster cluster : stopClusterSpatialIndex.query(env)) {
-            // TODO this should account for area-like nature of clusters. Use size of bounding boxes.
-            double distance = SphericalDistanceLibrary.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
-            if (distance < radius) ret.put(cluster, distance);
-        }
-        return ret;
-    }
-
     /* TODO: an almost similar function exists in ProfileRouter, combine these.
     *  Should these live in a separate class? */
     public List<StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
@@ -313,7 +173,6 @@ public class GraphIndex {
         rr.from = new GenericLocation(lat, lon);
         // FIXME requires destination to be set, not necessary for analyst
         rr.to = new GenericLocation(lat, lon);
-        rr.batch = true;
         rr.setRoutingContext(graph);
         rr.walkSpeed = 1;
         rr.dominanceFunction = new DominanceFunction.LeastWalk();
@@ -526,18 +385,6 @@ public class GraphIndex {
         return ret;
     }
 
-    /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
-    public StopTreeCache getStopTreeCache() {
-        if (stopTreeCache == null) {
-            synchronized (this) {
-                if (stopTreeCache == null) {
-                    stopTreeCache = new StopTreeCache(graph, MAX_WALK_METERS); // TODO make this max-distance variable
-                }
-            }
-        }
-        return stopTreeCache;
-    }
-
     /**
      * Get the most up-to-date timetable for the given TripPattern, as of right now.
      * There should probably be a less awkward way to do this that just gets the latest entry from the resolver without
@@ -554,95 +401,6 @@ public class GraphIndex {
         return req.rctx.timetableSnapshot.resolve(tripPattern, serviceDate);
     }
 
-    /**
-     * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
-     * according to a parent/child station topology, if it exists.
-     */
-    private void clusterStops() {
-    	if (graph.stopClusterMode == StopClusterMode.parentStation) {
-            clusterByParentStation();
-        } else {
-            clusterByProximityAndName();
-        }
-    }
-
-    /**
-     * Cluster stops by proximity and name.
-     * This functionality was developed for the Washington, DC area and probably will not work anywhere else in the
-     * world. It depends on the exact way stops are named and the way street intersections are named in that geographic
-     * region and in the GTFS data sets which represent it. Based on comments, apparently it might work for TriMet
-     * as well.
-     *
-     * We can't use a name similarity comparison, we need exact matches. This is because many street names differ by
-     * only one letter or number, e.g. 34th and 35th or Avenue A and Avenue B. Therefore normalizing the names before
-     * the comparison is essential. The agency must provide either parent station information or a well thought out stop
-     * naming scheme to cluster stops -- no guessing is reasonable without that information.
-     */
-    private void clusterByProximityAndName() {
-    	int psIdx = 0; // unique index for next parent stop
-	    LOG.info("Clustering stops by geographic proximity and name...");
-	    // Each stop without a cluster will greedily claim other stops without clusters.
-	    for (Stop s0 : stopForId.values()) {
-	        if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
-	        String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
-	        StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
-	        // LOG.info("stop {}", s0normalizedName);
-	        // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
-	        Envelope env = new Envelope(new Coordinate(s0.getLon(), s0.getLat()));
-	        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(CLUSTER_RADIUS, s0.getLat()),
-	                SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
-	        for (TransitStop ts1 : stopSpatialIndex.query(env)) {
-	            Stop s1 = ts1.getStop();
-	            double geoDistance = SphericalDistanceLibrary.fastDistance(
-	                    s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
-	            if (geoDistance < CLUSTER_RADIUS) {
-	                String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
-	                // LOG.info("   --> {}", s1normalizedName);
-	                // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
-	                if (s1normalizedName.equals(s0normalizedName)) {
-	                    // Create a bidirectional relationship between the stop and its cluster
-	                    cluster.children.add(s1);
-	                    stopClusterForStop.put(s1, cluster);
-	                }
-	            }
-	        }
-	        cluster.computeCenter();
-	        stopClusterForId.put(cluster.id, cluster);
-	    }
-    }
-
-    /**
-     * Rather than using the names and geographic locations of stops to cluster them, group them by their declared
-     * parent station in the GTFS data. This should be a much more reliable method where these fields have been
-     * included in the GTFS data. However:
-     *
-     * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope.
-     * That means it would only work reliably if there is only one GTFS feed loaded.
-     * The DC regional graph has no parent stations pre-defined, so we use the alternative proximity / name method.
-     * Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
-     */
-    private void clusterByParentStation() {
-        LOG.info("Clustering stops by parent station...");
-    	for (Stop stop : stopForId.values()) {
-    	    String ps = stop.getParentStation();
-    	    if (ps == null || ps.isEmpty()) {
-    	        continue;
-    	    }
-    	    StopCluster cluster;
-    	    if (stopClusterForId.containsKey(ps)) {
-    	        cluster = stopClusterForId.get(ps);
-    	    } else {
-    	        cluster = new StopCluster(ps, stop.getName());
-    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
-                cluster.setCoordinates(parent.getLat(), parent.getLon());
-                stopClusterForId.put(ps, cluster);
-
-	        }
-    	    cluster.children.add(stop);
-    	    stopClusterForStop.put(stop, cluster);    
-    	}
-    }
-    
     public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
         ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
         Response.ResponseBuilder res = Response.status(Response.Status.OK);

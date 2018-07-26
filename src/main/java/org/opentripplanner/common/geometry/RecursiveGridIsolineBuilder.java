@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.opentripplanner.analyst.request.SampleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +253,6 @@ public class RecursiveGridIsolineBuilder {
      * IsoChronificator object, this will re-use the z = f(x,y) sampling if possible, as they are
      * kept in cache.
      * 
-     * @param request Parameters for the computation
      * @param center Center point (eg origin)
      * @param fz Function returning the z-value for a xy-coordinate
      * @param p0List Initial set of coverage points to seed the heuristics

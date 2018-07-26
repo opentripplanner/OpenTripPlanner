@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -24,7 +25,6 @@ import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -51,7 +51,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -143,33 +145,16 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Returns the StreetEdges that overlap between two vertices edge sets.
+     * Returns the StreetEdges that overlap between two vertices' edge sets.
      */
     private Set<StreetEdge> overlappingStreetEdges(Vertex u, Vertex v) {
-        Set<Integer> vIds = new HashSet<Integer>();
-        Set<Integer> uIds = new HashSet<Integer>();
-        for (Edge e : Iterables.concat(v.getIncoming(), v.getOutgoing())) {
-            vIds.add(e.getId());
-        }
-        for (Edge e : Iterables.concat(u.getIncoming(), u.getOutgoing())) {
-            uIds.add(e.getId());
-        }
-        
-        // Intesection of edge IDs between u and v.
-        uIds.retainAll(vIds);
-        Set<Integer> overlappingIds = uIds;
-
-        // Fetch the edges by ID - important so we aren't stuck with temporary edges.
-        Set<StreetEdge> overlap = new HashSet<>();
-        for (Integer id : overlappingIds) {
-            Edge e = graph.getEdgeById(id);
-            if (e == null || !(e instanceof StreetEdge)) {
-                continue;
-            }
-
-            overlap.add((StreetEdge) e);
-        }
-        return overlap;
+        Set<Edge> vEdges = Sets.newHashSet(Iterables.concat(v.getIncoming(), v.getOutgoing()));
+        Set<Edge> uEdges = Sets.newHashSet(Iterables.concat(u.getIncoming(), u.getOutgoing()));
+        return Sets.intersection(uEdges, vEdges).stream()
+                .filter(Objects::nonNull)
+                .filter(e -> e instanceof StreetEdge)
+                .map(e -> (StreetEdge)e)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -246,41 +231,16 @@ public class RoutingContext implements Cloneable {
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
-            if (opt.batch) {
-                // batch mode: find an OSM vertex, don't split
-                // We do this so that we are always linking to the same thing in analyst mode
-                // even if the transit network has changed.
-                // TODO offset time by distance to nearest OSM node?
-                if (opt.arriveBy) {
-                    // TODO what if there is no coordinate but instead a named place?
-                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate(), true);
-                    fromVertex = null;
-                }
-                else {
-                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate(), false);
-                    toVertex = null;
-                }
-            }
-
-            else {
-                // normal mode, search for vertices based RoutingRequest and split streets
-                toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
-                if (opt.to.hasEdgeId()) {
-                    toBackEdge = graph.getEdgeById(opt.to.edgeId);
-                }
-
-                if (opt.startingTransitTripId != null && !opt.arriveBy) {
-                    // Depart on-board mode: set the from vertex to "on-board" state
-                    OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
-                    if (onBoardDepartService == null)
-                        throw new UnsupportedOperationException("Missing OnBoardDepartService");
-                    fromVertex = onBoardDepartService.setupDepartOnBoard(this);
-                } else {
-                    fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
-                    if (opt.from.hasEdgeId()) {
-                        fromBackEdge = graph.getEdgeById(opt.from.edgeId);
-                    }
-                }
+            // normal mode, search for vertices based RoutingRequest and split streets
+            toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
+            if (opt.startingTransitTripId != null && !opt.arriveBy) {
+                // Depart on-board mode: set the from vertex to "on-board" state
+                OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
+                if (onBoardDepartService == null)
+                    throw new UnsupportedOperationException("Missing OnBoardDepartService");
+                fromVertex = onBoardDepartService.setupDepartOnBoard(this);
+            } else {
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
             }
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching
@@ -310,10 +270,7 @@ public class RoutingContext implements Cloneable {
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
         transferTable = graph.getTransferTable();
-        if (opt.batch)
-            remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
-        else
-            remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
+        remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
 
         if (this.origin != null) {
             LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
@@ -333,15 +290,13 @@ public class RoutingContext implements Cloneable {
         ArrayList<String> notFound = new ArrayList<String>();
 
         // check origin present when not doing an arrive-by batch search
-        if (!(opt.batch && opt.arriveBy))
-            if (fromVertex == null)
-                notFound.add("from");
+        if (fromVertex == null) {
+            notFound.add("from");
+        }
 
         // check destination present when not doing a depart-after batch search
-        if (!opt.batch || opt.arriveBy) {
-            if (toVertex == null) {
-                notFound.add("to");
-            }
+        if (toVertex == null) {
+            notFound.add("to");
         }
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);

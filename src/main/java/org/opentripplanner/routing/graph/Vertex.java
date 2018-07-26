@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -38,9 +40,14 @@ import org.opentripplanner.util.NonLocalizedString;
  * incoming and outgoing edges.
  */
 public abstract class Vertex implements Serializable, Cloneable {
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
+
+    // Some tests count the number of vertices by looking at the label -> vertex map, which requires unique labels
+    // This number is used only for making unique labels for this reason.
+    public static final AtomicInteger nextVertexIndex = new AtomicInteger();
 
     /* Short debugging name */
     private final String label;

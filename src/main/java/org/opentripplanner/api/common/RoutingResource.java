@@ -523,9 +523,6 @@ public abstract class RoutingResource {
             request.transferPenalty += 1800;
         }
 
-        if (batch != null)
-            request.batch = batch;
-
         if (optimize != null)
             request.setOptimize(optimize);
 

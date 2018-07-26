@@ -27,8 +27,6 @@ import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.scripting.impl.BSFOTPScript;
-import org.opentripplanner.scripting.impl.OTPScript;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,21 +139,6 @@ public class OTPMain {
             defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
             defaultRouter.graphVisualizer.run();
             defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
-        }
-
-        /* Start script if requested */
-        if (params.scriptFile != null) {
-            try {
-                OTPScript otpScript = new BSFOTPScript(otpServer, params.scriptFile);
-                if (otpScript != null) {
-                    Object retval = otpScript.run();
-                    if (retval != null) {
-                        LOG.warn("Your script returned something, no idea what to do with it: {}", retval);
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
 
         /* Start web server if requested */

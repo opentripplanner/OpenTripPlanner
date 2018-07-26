@@ -329,9 +329,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
 
-    /** when true, do not use goal direction or stop at the target, build a full SPT */
-    public boolean batch = false;
-
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
@@ -591,7 +588,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
     public double getMaxWalkDistance() {
-        if (modes.isTransit() || (batch && !softWalkLimiting)) {
+        if (modes.isTransit()) {
             return maxWalkDistance;
         } else {
             return Double.MAX_VALUE;            
@@ -892,19 +889,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (!(o instanceof RoutingRequest))
             return false;
         RoutingRequest other = (RoutingRequest) o;
-        if (this.batch != other.batch)
-            return false;
-        boolean endpointsMatch;
-        if (this.batch) {
-            if (this.arriveBy) {
-                endpointsMatch = to.equals(other.to);
-            } else {
-                endpointsMatch = from.equals(other.from);
-            }
-        } else {
-            endpointsMatch = ((from == null && other.from == null) || from.equals(other.from))
-                    && ((to == null && other.to == null) || to.equals(other.to));
-        }
+        boolean endpointsMatch = ((from == null && other.from == null) || from.equals(other.from))
+                && ((to == null && other.to == null) || to.equals(other.to));
         return endpointsMatch
                 && dateTime == other.dateTime
                 && arriveBy == other.arriveBy
@@ -992,20 +978,9 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
                 + new Boolean(useTraffic).hashCode() * 10169;
-        if (batch) {
-            hashCode *= -1;
-            // batch mode, only one of two endpoints matters
-            if (arriveBy) {
-                hashCode += to.hashCode() * 1327144003;
-            } else {
-                hashCode += from.hashCode() * 524287;
-            }
-            hashCode += numItineraries; // why is this only present here?
-        } else {
-            // non-batch, both endpoints matter
-            hashCode += from.hashCode() * 524287;
-            hashCode += to.hashCode() * 1327144003;
-        }
+        // non-batch, both endpoints matter
+        hashCode += from.hashCode() * 524287;
+        hashCode += to.hashCode() * 1327144003;
         return hashCode;
     }
 

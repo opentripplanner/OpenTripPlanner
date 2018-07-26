@@ -7,8 +7,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.analyst.request.*;
-import org.opentripplanner.analyst.scenario.ScenarioStore;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -47,26 +45,16 @@ public class Router {
     // Inspector/debug services
     public TileRendererManager tileRendererManager;
 
-    // Analyst services
-    public TileCache tileCache;
-    public Renderer renderer;
-    public IsoChroneSPTRenderer isoChroneSPTRenderer;
-    public SampleGridRenderer sampleGridRenderer;
-
     // A RoutingRequest containing default parameters that will be cloned when handling each request
     public RoutingRequest defaultRoutingRequest;
 
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
-    /** Storage for non-destructive alternatives analysis scenarios. */
-    public ScenarioStore scenarioStore = new ScenarioStore();
-
     public Router(String id, Graph graph) {
         this.id = id;
         this.graph = graph;
     }
-
 
     /**
      * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
@@ -81,14 +69,6 @@ public class Router {
     public void startup(JsonNode config) {
 
         this.tileRendererManager = new TileRendererManager(this.graph);
-
-        // Analyst Modules FIXME make these optional based on JSON?
-        {
-            this.tileCache = new TileCache(this.graph);
-            this.renderer = new Renderer(this.tileCache);
-            this.sampleGridRenderer = new SampleGridRenderer(this.graph);
-            this.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(this.sampleGridRenderer);
-        }
 
         /* Create the default router parameters from the JSON router config. */
         JsonNode routingDefaultsNode = config.get("routingDefaults");
