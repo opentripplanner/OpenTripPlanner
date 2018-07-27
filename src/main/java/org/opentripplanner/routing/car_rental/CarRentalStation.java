@@ -106,7 +106,7 @@ public class CarRentalStation implements Serializable, Cloneable {
         }
         CarRentalStation other = (CarRentalStation) o;
         // since ID is set to be a license plate, changes to position constitute a different station
-        return other.id.equals(id) && other.x == x && other.y == y;
+        return other.id.equals(id);
     }
 
     public int hashCode() {
