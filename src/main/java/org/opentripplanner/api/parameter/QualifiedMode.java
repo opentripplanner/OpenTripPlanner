@@ -6,6 +6,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 import java.io.Serializable;
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.Set;
 
 public class QualifiedMode implements Serializable {
@@ -28,6 +29,11 @@ public class QualifiedMode implements Serializable {
                 qualifiers.add(q);
             }
         }
+    }
+
+    public QualifiedMode(TraverseMode mode, Qualifier... qualifiers) {
+        this.mode = mode;
+        this.qualifiers.addAll(Arrays.asList(qualifiers));
     }
     
     public String toString() {
@@ -77,8 +83,7 @@ public class QualifiedMode implements Serializable {
         return false;
     }
 
-}
-
-enum Qualifier {
-    RENT, HAVE, PARK, KEEP, PICKUP
+    public enum Qualifier {
+        RENT, HAVE, PARK, KEEP, PICKUP
+    }
 }
