@@ -33,6 +33,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
 
+    public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
+        this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+    }
+
+    public Boolean getAddExtraEdgesToAreas() {
+        return addExtraEdgesToAreas;
+    }
+
+    private Boolean addExtraEdgesToAreas = true;
+
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");
     }
@@ -48,6 +58,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         if(graph.hasStreets) {
             LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
             SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
+            linker.setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
             linker.link();
         }
         //Calculates convex hull of a graph which is shown in routerInfo API point
