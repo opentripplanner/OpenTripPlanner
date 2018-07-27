@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -624,7 +625,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            preferredAgencies = Sets.newHashSet(s.split(","));
+            preferredAgencies = new HashSet<>();
+            Collections.addAll(preferredAgencies, s.split(","));
         }
     }
 
@@ -644,7 +646,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setUnpreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            unpreferredAgencies = Sets.newHashSet(s.split(","));
+            unpreferredAgencies = new HashSet<>();
+            Collections.addAll(unpreferredAgencies, s.split(","));
         }
     }
     
@@ -695,13 +698,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setBannedAgencies(String s) {
         if (!s.isEmpty()) {
-            bannedAgencies = Sets.newHashSet(s.split(","));
+            bannedAgencies = new HashSet<>();
+            Collections.addAll(bannedAgencies, s.split(","));
         }
     }
 
     public void setWhiteListedAgencies(String s) {
         if (!s.isEmpty()) {
-            whiteListedAgencies = Sets.newHashSet(s.split(","));
+            whiteListedAgencies = new HashSet<>();
+            Collections.addAll(whiteListedAgencies, s.split(","));
         }
     }
 
