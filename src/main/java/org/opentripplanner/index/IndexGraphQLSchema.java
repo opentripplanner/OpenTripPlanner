@@ -664,7 +664,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modes")
-                .description("The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.")
+                .description("Deprecated, use `transportModes` instead. ~~The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.~~")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
