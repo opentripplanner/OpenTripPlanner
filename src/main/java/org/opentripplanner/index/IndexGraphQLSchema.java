@@ -63,6 +63,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -315,6 +316,24 @@ public class IndexGraphQLSchema {
                 return null;
             }
         }).build();
+
+
+    private final GraphQLObjectType geometryType = GraphQLObjectType.newObject()
+            .name("Geometry")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("length")
+                    .description("The number of points in the string")
+                    .type(Scalars.GraphQLInt)
+                    .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getLength())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("points")
+                    .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
+                    .type(Scalars.GraphQLString)
+                    .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
+                    .build())
+            .build();
+
 
     private Agency getAgency(GraphIndex index, String agencyId) {
         //xxx what if there are duplciate agency ids?
@@ -1705,6 +1724,20 @@ public class IndexGraphQLSchema {
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripGeometry")
+                .type(geometryType)
+                .dataFetcher(environment -> {
+                    LineString geometry = index.patternForTrip
+                        .get(environment.getSource())
+                        .geometry;
+                    if (geometry == null) {
+                        return null;
+                    }
+
+                    return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")
                 .description("List of alerts which have an effect on this trip")
                 .type(new GraphQLList(alertType))
@@ -1821,6 +1854,18 @@ public class IndexGraphQLSchema {
                     } else {
                         return Arrays.asList(geometry.getCoordinates());
                     }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("patternGeometry")
+                .type(geometryType)
+                .dataFetcher(environment -> {
+                    LineString geometry = ((TripPattern) environment.getSource()).geometry;
+                    if (geometry == null) {
+                        return null;
+                    }
+
+                    return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
                 })
                 .build())
                 // TODO: add stoptimes
@@ -2866,22 +2911,6 @@ public class IndexGraphQLSchema {
     }
 
     private void createPlanType(GraphIndex index) {
-        final GraphQLObjectType legGeometryType = GraphQLObjectType.newObject()
-            .name("LegGeometry")
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("length")
-                .description("The number of points in the string")
-                .type(Scalars.GraphQLInt)
-                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getLength())
-                .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("points")
-                .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
-                .type(Scalars.GraphQLString)
-                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
-                .build())
-            .build();
-
         final GraphQLObjectType placeType = GraphQLObjectType.newObject()
             .name("Place")
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3014,7 +3043,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("legGeometry")
                 .description("The leg's geometry.")
-                .type(legGeometryType)
+                .type(geometryType)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).legGeometry)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
