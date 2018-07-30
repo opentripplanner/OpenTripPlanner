@@ -1710,7 +1710,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-		.description("List of coordinates of this trip's route")
+		        .description("List of coordinates of this trip's route")
                 .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
                 .dataFetcher(environment -> {
                     LineString geometry = index.patternForTrip
@@ -1725,6 +1725,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("tripGeometry")
+                .description("Coordinates of the route of this trip in Google polyline encoded format")
                 .type(geometryType)
                 .dataFetcher(environment -> {
                     LineString geometry = index.patternForTrip
@@ -1858,6 +1859,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patternGeometry")
+                .description("Coordinates of the route of this pattern in Google polyline encoded format")
                 .type(geometryType)
                 .dataFetcher(environment -> {
                     LineString geometry = ((TripPattern) environment.getSource()).geometry;
