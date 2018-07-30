@@ -619,4 +619,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.carRentalNetworks = networks;
     }
+
+    public void addRentedCar(String carId) {
+        cloneStateDataAsNeeded();
+        child.stateData.rentedCars.add(carId);
+    }
 }

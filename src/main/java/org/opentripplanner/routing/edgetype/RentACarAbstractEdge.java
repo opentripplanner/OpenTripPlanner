@@ -56,6 +56,9 @@ public abstract class RentACarAbstractEdge extends Edge {
             return null;
         }
 
+        // don't use the same car twice
+        if (s0.stateData.rentedCars.contains(dropoff.getId())) return null;
+
         StateEditor s1 = s0.edit(this);
         if (options.arriveBy) {
             s1.incrementWeight(options.carRentalDropoffCost);
@@ -66,6 +69,7 @@ public abstract class RentACarAbstractEdge extends Edge {
         }
         s1.boardRentedCar(0);
         s1.setCarRentalNetwork(networks);
+        s1.addRentedCar(dropoff.getId());
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
         return s1b;
