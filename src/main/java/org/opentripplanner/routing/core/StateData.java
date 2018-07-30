@@ -20,6 +20,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -105,6 +106,8 @@ public class StateData implements Cloneable {
     public Set<String> bikeRentalNetworks;
 
     public Set<String> carRentalNetworks;
+
+    public Set<String> rentedCars = new HashSet<>();
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
