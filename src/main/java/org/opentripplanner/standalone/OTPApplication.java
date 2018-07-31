@@ -99,7 +99,8 @@ public class OTPApplication extends Application {
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             CorsFilter.class,
             MultiPartFeature.class,
-            WalkComfort.class
+            WalkComfort.class,
+            ParkAndRide.class
         ));
         
         if (this.secure) {
