@@ -110,8 +110,7 @@ public class OTPMain {
             if (graphBuilder != null) {
                 // Load any existing graphs
                 if (graphBuilder.isBaseGraphSet()) {
-                    LOG.info("Loading base graph. If you want to build a graph from scratch, remove baseGraph.obj from" +
-                            " graph directory.");
+                    LOG.info("Loading base graph as requested.");
                     graphBuilder.loadBaseGraph();
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());

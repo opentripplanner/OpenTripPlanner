@@ -27,7 +27,6 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -64,10 +63,6 @@ public class GraphBuilder implements Runnable {
 
     public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
 
-    public static final String GRAPH_FILENAME = "Graph.obj";
-
-    public static final String BASE_GRAPH_FILENAME = "baseGraph.obj";
-
     private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
     private File graphFile;
@@ -83,8 +78,8 @@ public class GraphBuilder implements Runnable {
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
 
-    public GraphBuilder(File path, GraphBuilderParameters builderParams) {
-        graphFile = new File(path, "Graph.obj");
+    public GraphBuilder(File path, GraphBuilderParameters builderParams, CommandLineParameters commandLineParameters) {
+        graphFile = new File(path, commandLineParameters.saveGraphName);
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
 
@@ -204,7 +199,7 @@ public class GraphBuilder implements Runnable {
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
 
-        GraphBuilder graphBuilder = new GraphBuilder(dir, builderParams);
+        GraphBuilder graphBuilder = new GraphBuilder(dir, builderParams, params);
 
         // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
         routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
@@ -213,8 +208,10 @@ public class GraphBuilder implements Runnable {
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
                 case BASEGRAPH:
-                    LOG.info("Found base graph file {}", file);
-                    graphBuilder.setBaseGraph(file);
+                    if (file.getName().equals(params.loadBaseGraphName)) {
+                        LOG.info("Found base graph file {}", file);
+                        graphBuilder.setBaseGraph(file);
+                    }
                     break;
                 case GTFS:
                     LOG.info("Found GTFS file {}", file);
