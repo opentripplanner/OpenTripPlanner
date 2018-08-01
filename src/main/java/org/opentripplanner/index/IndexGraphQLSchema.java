@@ -1873,7 +1873,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("mode")
-                .type(Scalars.GraphQLString)
+                .type(modeEnum)
                 .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
                     environment.getSource()))
                 .build())
