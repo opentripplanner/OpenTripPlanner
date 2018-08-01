@@ -158,7 +158,7 @@ public class IndexGraphQLSchema {
         .value("FERRY", TraverseMode.FERRY, "FERRY")
         .value("FUNICULAR", TraverseMode.FUNICULAR, "FUNICULAR")
         .value("GONDOLA", TraverseMode.GONDOLA, "GONDOLA")
-        .value("LEG_SWITCH", TraverseMode.LEG_SWITCH, "LEG_SWITCH")
+        .value("LEG_SWITCH", TraverseMode.LEG_SWITCH, "Only used internally. No use for API users.")
         .value("RAIL", TraverseMode.RAIL, "RAIL")
         .value("SUBWAY", TraverseMode.SUBWAY, "SUBWAY")
         .value("TRAM", TraverseMode.TRAM, "TRAM")
