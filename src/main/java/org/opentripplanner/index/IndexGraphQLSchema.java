@@ -1207,7 +1207,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
-                .description("Returns all stops that are children of this station (Only applicable for locationType = 1)")
+                .description("Returns all stops that are children of this station (Only applicable for stations)")
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment -> index.stopsForParentStation.get(((Stop) environment.getSource()).getId()))
                 .build())
