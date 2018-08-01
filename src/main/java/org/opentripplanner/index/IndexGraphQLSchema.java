@@ -808,7 +808,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertHeaderTextTranslations")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
-                .description("Header of the alert in all different available languages notnull")
+                .description("Header of the alert in all different available languages")
                 .dataFetcher(environment -> {
                     AlertPatch alertPatch = environment.getSource();
                     Alert alert = alertPatch.getAlert();
@@ -822,13 +822,13 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertDescriptionText")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
-                .description("Long description of the alert notnull")
+                .description("Long description of the alert")
                 .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertDescriptionText)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alertDescriptionTextTranslations")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
-                .description("Long descriptions of the alert in all different available languages notnull")
+                .description("Long descriptions of the alert in all different available languages")
                 .dataFetcher(environment -> {
                     AlertPatch alertPatch = environment.getSource();
                     Alert alert = alertPatch.getAlert();
