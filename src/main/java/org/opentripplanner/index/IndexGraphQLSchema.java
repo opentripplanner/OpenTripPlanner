@@ -177,12 +177,13 @@ public class IndexGraphQLSchema {
 
     public static GraphQLEnumType optimizeTypeEnum = GraphQLEnumType.newEnum()
         .name("OptimizeType")
-        .value("QUICK", OptimizeType.QUICK, "QUICK")
-        .value("SAFE", OptimizeType.SAFE, "SAFE")
-        .value("FLAT", OptimizeType.FLAT, "FLAT")
+        .description("Optimization type for bicycling legs")
+        .value("QUICK", OptimizeType.QUICK, "Prefer faster routes")
+        .value("SAFE", OptimizeType.SAFE, "Prefer safer routes")
+        .value("FLAT", OptimizeType.FLAT, "Prefer flat terrain")
         .value("GREENWAYS", OptimizeType.GREENWAYS, "GREENWAYS")
-        .value("TRIANGLE", OptimizeType.TRIANGLE, "TRIANGLE")
-        .value("TRANSFERS", OptimizeType.TRANSFERS, "TRANSFERS")
+        .value("TRIANGLE", OptimizeType.TRIANGLE, "**TRIANGLE** optimization type can be used to set relative preferences of optimization factors. See argument `triangle`.")
+        .value("TRANSFERS", OptimizeType.TRANSFERS, "Deprecated, use argument `transferPenalty` to optimize for less transfers.")
         .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
