@@ -494,13 +494,22 @@ public class GraphPathFinder {
         Vertex lastVertex = lastState.getVertex();
 
         //With more paths we should allow more transfers
-        lastState.getOptions().maxTransfers *= paths.size();
+        RoutingRequest options = lastState.getOptions();
+        options.maxTransfers *= paths.size();
+        List<Integer> locationSlacks = new ArrayList<>();
 
-        for (GraphPath path : paths.subList(1, paths.size())) {
+        if (addLegsSwitchingEdges) {
+            locationSlacks = options.getLocationSlacks();
+        }
+
+        for (int i = 1; i < paths.size(); i++) {
+            GraphPath path = paths.get(i);
             lastState = newPath.states.getLast();
             // add a leg-switching state
             if (addLegsSwitchingEdges) {
-                LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
+                LOG.error("locationSlack: {}", locationSlacks.get(i));
+                LegSwitchingEdge legSwitchingEdge =
+                    new LegSwitchingEdge(lastVertex, lastVertex, locationSlacks.get(i));
                 lastState = legSwitchingEdge.traverse(lastState);
                 newPath.edges.add(legSwitchingEdge);
             }
