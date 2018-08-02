@@ -1892,7 +1892,7 @@ public class IndexGraphQLSchema {
                 .name("type")
                 .type(Scalars.GraphQLInt)
                 .dataFetcher(environment -> ((Route) environment.getSource()).getType())
-                .description("The raw type integer form the GTFS source.")
+                .description("The raw GTFS route type as a integer. For the list of possible values, see: https://developers.google.com/transit/gtfs/reference/#routestxt and https://developers.google.com/transit/gtfs/reference/extended-route-types")
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
