@@ -1544,6 +1544,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routeShortName")
+                .description("Short name of the route this trip is running. See field `shortName` of Route.")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> {
                     Trip trip = (Trip)environment.getSource();
