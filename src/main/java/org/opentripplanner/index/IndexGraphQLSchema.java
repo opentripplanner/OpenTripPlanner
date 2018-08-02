@@ -1191,7 +1191,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("vehicleType")
-		.description("Raw GTFS vehicle type used by routes which pass through this stop")
+		        .description("The raw GTFS route type used by routes which pass through this stop. For the list of possible values, see: https://developers.google.com/transit/gtfs/reference/#routestxt and https://developers.google.com/transit/gtfs/reference/extended-route-types")
                 .type(Scalars.GraphQLInt)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
