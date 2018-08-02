@@ -1836,6 +1836,7 @@ public class IndexGraphQLSchema {
                 // TODO: add stoptimes
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("semanticHash")
+                .description("Hash code of the pattern. This value is stable and not dependent on the pattern id, i.e. this value can be used to check whether two patterns are the same, even if their ids have changed.")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment ->
                     ((TripPattern) environment.getSource()).semanticHashString(null))
