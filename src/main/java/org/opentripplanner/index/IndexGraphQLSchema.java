@@ -2767,7 +2767,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceTimeRange")
-                .description("Get start and end time for publict transit services present in the graph")
+                .description("Get the time range for which the API has data available")
                 .type(serviceTimeRangeType)
                 .dataFetcher(environment -> index.graph)
                 .build())
