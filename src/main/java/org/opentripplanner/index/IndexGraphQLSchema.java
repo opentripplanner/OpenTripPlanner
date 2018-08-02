@@ -1221,7 +1221,7 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> index.patternsForStop.get(environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("transfers")               //TODO: add max distance as parameter?
+                .name("transfers")
 		        .description("List of nearby stops which can be used for transfers")
                 .type(new GraphQLList(stopAtDistanceType))
                 .argument(GraphQLArgument.newArgument()
