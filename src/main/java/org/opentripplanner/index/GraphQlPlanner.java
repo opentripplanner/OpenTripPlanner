@@ -214,7 +214,8 @@ public class GraphQlPlanner {
         callWith.argument("unpreferred.agencies", request::setUnpreferredAgencies);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
         callWith.argument("bikeBoardCost", request::setBikeBoardCost);
-        callWith.argument("banned.routes", request::setBannedRoutes);
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        callWith.argument("banned.routes", s -> request.setBannedRoutes(s.toString().replaceAll(":", "__")));
         callWith.argument("banned.agencies", request::setBannedAgencies);
         callWith.argument("banned.trips", (String v) -> request.bannedTrips = RoutingResource.makeBannedTripMap(v));
         callWith.argument("banned.stops", request::setBannedStops);
