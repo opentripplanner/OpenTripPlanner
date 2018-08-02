@@ -179,7 +179,7 @@ public class IndexGraphQLSchema {
         .name("OptimizeType")
         .description("Optimization type for bicycling legs")
         .value("QUICK", OptimizeType.QUICK, "Prefer faster routes")
-        .value("SAFE", OptimizeType.SAFE, "Prefer safer routes")
+        .value("SAFE", OptimizeType.SAFE, "Prefer safer routes, i.e. avoid crossing streets and use bike paths when possible")
         .value("FLAT", OptimizeType.FLAT, "Prefer flat terrain")
         .value("GREENWAYS", OptimizeType.GREENWAYS, "GREENWAYS")
         .value("TRIANGLE", OptimizeType.TRIANGLE, "**TRIANGLE** optimization type can be used to set relative preferences of optimization factors. See argument `triangle`.")
