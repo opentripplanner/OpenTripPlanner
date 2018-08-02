@@ -1226,7 +1226,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stopAtDistanceType))
                 .argument(GraphQLArgument.newArgument()
                         .name("maxDistance")
-                        .description("Maximum distance to the transfer stop")
+                        .description("Maximum distance to the transfer stop Defaults to unlimited. **Note:** only stops that are linked as a transfer stops to this stop are returned, i.e. this does not do a query to search for *all* stops within radius of `maxDistance`.")
                         .type(Scalars.GraphQLInt)
                         .build())
                 .dataFetcher(environment -> index.stopVertexForStop
