@@ -673,7 +673,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("nonpreferredTransferPenalty")
-                .description("Penalty for using a non-preferred transfer. Default value: 180.")
+                .description("Penalty (in seconds) for using a non-preferred transfer. Default value: 180.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
