@@ -1545,6 +1545,11 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routeShortName")
                 .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> {
+                    Trip trip = (Trip)environment.getSource();
+
+                    return trip.getRouteShortName() != null ? trip.getRouteShortName() : trip.getRoute().getShortName();
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("directionId")
