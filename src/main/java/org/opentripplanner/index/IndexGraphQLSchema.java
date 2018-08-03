@@ -1958,7 +1958,7 @@ public class IndexGraphQLSchema {
 
         agencyType = GraphQLObjectType.newObject()
             .name("Agency")
-            .description("Agency")
+            .description("A public transport agency")
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
