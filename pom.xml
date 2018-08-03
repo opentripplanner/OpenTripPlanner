@@ -100,13 +100,13 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
-            <resource>
-                <!-- shell scripts to start up OTP, need to be filtered to get JAR file name -->
-                <directory>src/scripts</directory>
-                <filtering>true</filtering>
-                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
-                <targetPath>../..</targetPath>
-            </resource>
+            <!--<resource>-->
+                <!--&lt;!&ndash; shell scripts to start up OTP, need to be filtered to get JAR file name &ndash;&gt;-->
+                <!--<directory>src/scripts</directory>-->
+                <!--<filtering>true</filtering>-->
+                <!--&lt;!&ndash; Copy the scripts up into the root of the repo, not /target/classes &ndash;&gt;-->
+                <!--<targetPath>../..</targetPath>-->
+            <!--</resource>-->
             <resource>
                 <directory>src/client</directory>
                 <targetPath>client</targetPath>
