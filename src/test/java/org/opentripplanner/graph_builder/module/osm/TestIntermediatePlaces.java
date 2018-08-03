@@ -250,7 +250,7 @@ public class TestIntermediatePlaces {
                 while (i < legs.size() - 1) {
                     i++;
                     Long lastEnd = legs.get(i - 1).endTime.getTimeInMillis();
-                    if (legs.get(i).from.name == place.name ||
+                    if (legs.get(i).from.name == place.name &&
                         legs.get(i).startTime.getTimeInMillis() - lastEnd >= slack) {
                         continue OUTER;
                     }
