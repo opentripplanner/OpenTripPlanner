@@ -2575,6 +2575,10 @@ public class IndexGraphQLSchema {
                     .name("ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> {
                     if ((environment.getArgument("ids") instanceof List)) {
                         if (environment.getArguments().entrySet()
@@ -2590,8 +2594,15 @@ public class IndexGraphQLSchema {
                                 .collect(Collectors.toList());
                     }
 
-                    Stream<Stop> stream = index.stationForId.values().stream();
-                    
+                    Stream<Stop> stream;
+                    if (environment.getArgument("name") == null) {
+                        stream = index.stationForId.values().stream();
+                    } else {
+                        stream = index.getLuceneIndex().query(environment.getArgument("name"), true, false, true, false, false)
+                            .stream()
+                            .map(result -> index.stationForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                    }
+
                     return stream.collect(Collectors.toList());
                 })
                 .build())
