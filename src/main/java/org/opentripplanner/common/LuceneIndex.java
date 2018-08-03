@@ -77,6 +77,9 @@ public class LuceneIndex {
             //directory = new RAMDirectory(); // only a little faster
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer).setOpenMode(OpenMode.CREATE);
             final IndexWriter writer = new IndexWriter(directory, config);
+            for (Stop station : graphIndex.stationForId.values()) {
+                addStation(writer, station);
+            }
             for (Stop stop : graphIndex.stopForId.values()) {
                 addStop(writer, stop);
             }
@@ -95,6 +98,16 @@ public class LuceneIndex {
         } catch (Exception ex) {
             throw new RuntimeException("Lucene indexing failed.", ex);
         }
+    }
+
+    private void addStation(IndexWriter iwriter, Stop station) throws IOException {
+        Document doc = new Document();
+        doc.add(new TextField("name", station.getName(), Field.Store.YES));
+        doc.add(new DoubleField("lat", station.getLat(), Field.Store.YES));
+        doc.add(new DoubleField("lon", station.getLon(), Field.Store.YES));
+        doc.add(new StringField("id", GtfsLibrary.convertIdToString(station.getId()), Field.Store.YES));
+        doc.add(new StringField("category", Category.STATION.name(), Field.Store.YES));
+        iwriter.addDocument(doc);
     }
 
     private void addStop(IndexWriter iwriter, Stop stop) throws IOException {
@@ -151,12 +164,14 @@ public class LuceneIndex {
      * @param queryString
      * @param autocomplete Whether we should use the query string to do a prefix match
      * @param stops Search for stops, either by name or stop code
+     * @param stations Search for stations by their name
      * @param clusters Search for clusters by their name
      * @param corners Search for street corners using at least one of the street names
      * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client
      */
-    public List<LuceneResult> query (String queryString, boolean autocomplete,
-                                     boolean stops, boolean clusters, boolean corners) {
+    public List<LuceneResult> query(String queryString, boolean autocomplete,
+                                    boolean stops, boolean stations,
+                                    boolean clusters, boolean corners) {
         /* Turn the query string into a Lucene query.*/
         BooleanQuery query = new BooleanQuery();
         BooleanQuery termQuery = new BooleanQuery();
@@ -166,7 +181,7 @@ public class LuceneIndex {
                 termQuery.add(new PrefixQuery(new Term("name", term.toLowerCase())), BooleanClause.Occur.SHOULD);
                 // This makes it possible to search for a stop code
                 termQuery.add(new TermQuery(new Term("code", term)),
-                    BooleanClause.Occur.SHOULD);
+                        BooleanClause.Occur.SHOULD);
             }
         } else {
             List<String> list = new ArrayList<String>();
@@ -178,27 +193,30 @@ public class LuceneIndex {
                 if (token.startsWith("\"") && token.endsWith("\"")) {
                     PhraseQuery phraseQuery = new PhraseQuery();
                     for (String phraseToken : token.substring(1, token.length() - 1)
-                        .split(" ")) {
+                            .split(" ")) {
                         phraseQuery.add(new Term("name", phraseToken.toLowerCase()));
                     }
                     termQuery.add(phraseQuery, BooleanClause.Occur.SHOULD);
                 } else { // a regular unquoted search term
                     termQuery.add(new FuzzyQuery(new Term("name", token)),
-                        BooleanClause.Occur.SHOULD);
+                            BooleanClause.Occur.SHOULD);
 
                     // This makes it possible to search for a stop code
                     termQuery.add(new TermQuery(new Term("code", token)),
-                        BooleanClause.Occur.SHOULD);
+                            BooleanClause.Occur.SHOULD);
                 }
             }
         }
 
         query.add(termQuery, BooleanClause.Occur.MUST);
 
-        if (stops || clusters || corners) {
+        if (stops || stations || clusters || corners) {
             BooleanQuery typeQuery = new BooleanQuery();
             if (stops) {
                 typeQuery.add(new TermQuery(new Term("category", Category.STOP.name())), BooleanClause.Occur.SHOULD);
+            }
+            if (stations) {
+                typeQuery.add(new TermQuery(new Term("category", Category.STATION.name())), BooleanClause.Occur.SHOULD);
             }
             if (clusters) {
                 typeQuery.add(new TermQuery(new Term("category", Category.CLUSTER.name())), BooleanClause.Occur.SHOULD);
@@ -226,7 +244,8 @@ public class LuceneIndex {
                     code = "";
                 }
                 if (doc.getField("category").stringValue().equals(Category.STOP.name()) ||
-                        doc.getField("category").stringValue().equals(Category.CLUSTER.name())) {
+                        doc.getField("category").stringValue().equals(Category.CLUSTER.name()) ||
+                        doc.getField("category").stringValue().equals(Category.STATION.name())) {
                     lr.id = doc.getField("id").stringValue();
                 }
                 String name = doc.getField("name").stringValue();
@@ -240,6 +259,22 @@ public class LuceneIndex {
         }
     }
 
+    /** Fetch results for the geocoder using the OTP graph for stops, clusters and street names
+     *
+     * @param queryString
+     * @param autocomplete Whether we should use the query string to do a prefix match
+     * @param stops Search for stops, either by name or stop code
+     * @param clusters Search for clusters by their name
+     * @param corners Search for street corners using at least one of the street names
+     * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client
+     *
+     * @deprecated Use {@link #query(String, boolean, boolean, boolean, boolean, boolean)} instead
+     */
+    public List<LuceneResult> query (String queryString, boolean autocomplete,
+                                     boolean stops, boolean clusters, boolean corners) {
+        return query(queryString, autocomplete, stops, false, clusters, corners);
+    }
+
     /** This class matches the structure of the Geocoder responses expected by the OTP client. */
     public static class LuceneResult {
         public double lat;
@@ -248,6 +283,6 @@ public class LuceneIndex {
         public String id;
     }
 
-    public static enum Category { STOP, CORNER, CLUSTER; }
+    public static enum Category { STOP, STATION, CORNER, CLUSTER; }
 }
 
