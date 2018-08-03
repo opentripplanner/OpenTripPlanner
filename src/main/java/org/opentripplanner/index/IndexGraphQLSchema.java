@@ -2571,7 +2571,29 @@ public class IndexGraphQLSchema {
                 .name("stations")
                 .description("Get all stations (stop with location_type = 1)")
                 .type(new GraphQLList(stopType))
-                .dataFetcher(environment -> new ArrayList<>(index.stationForId.values()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("ids")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                                .stream()
+                                .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                                .collect(Collectors.toList())
+                                .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
+                        return ((List<String>) environment.getArgument("ids"))
+                                .stream()
+                                .map(id -> index.stationForId.get(GtfsLibrary.convertIdFromString(id)))
+                                .collect(Collectors.toList());
+                    }
+
+                    Stream<Stop> stream = index.stationForId.values().stream();
+                    
+                    return stream.collect(Collectors.toList());
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
