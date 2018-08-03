@@ -2356,6 +2356,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("name")
+                    .description("Query stops by this name")
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
