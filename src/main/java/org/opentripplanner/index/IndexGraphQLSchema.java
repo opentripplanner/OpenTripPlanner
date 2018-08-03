@@ -2573,10 +2573,12 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stopType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
+                    .description("Only return stations that match one of the ids in this list")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("name")
+                    .description("Query stations by name")
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
