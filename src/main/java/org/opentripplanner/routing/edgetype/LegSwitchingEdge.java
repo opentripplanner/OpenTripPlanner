@@ -31,13 +31,6 @@ public class LegSwitchingEdge extends Edge {
 	private static final long serialVersionUID = 1L;
 	protected Integer locationSlack;
 
-	public LegSwitchingEdge(Vertex v1, Vertex v2) {
-        super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
-        fromv = v1;
-        tov = v2;
-        // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
-	}
-
 	public LegSwitchingEdge(Vertex v1, Vertex v2, Integer locationSlack) {
         super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
         fromv = v1;

@@ -1340,15 +1340,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public List<Integer> getLocationSlacks() {
-        List<Integer> locationSlacks = new ArrayList<>(from.locationSlack);
+        List<Integer> locationSlacks = new ArrayList<>();
+        locationSlacks.add(0);
         if (hasIntermediatePlaces()) {
             for (GenericLocation place : intermediatePlaces) {
                 locationSlacks.add(place.locationSlack);
             }
-        }
-        locationSlacks.add(to.locationSlack);
-        if (arriveBy) {
-            Collections.reverse(locationSlacks);
         }
         return locationSlacks;
     }

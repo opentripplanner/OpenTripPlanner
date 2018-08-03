@@ -507,7 +507,6 @@ public class GraphPathFinder {
             lastState = newPath.states.getLast();
             // add a leg-switching state
             if (addLegsSwitchingEdges) {
-                LOG.error("locationSlack: {}", locationSlacks.get(i));
                 LegSwitchingEdge legSwitchingEdge =
                     new LegSwitchingEdge(lastVertex, lastVertex, locationSlacks.get(i));
                 lastState = legSwitchingEdge.traverse(lastState);
