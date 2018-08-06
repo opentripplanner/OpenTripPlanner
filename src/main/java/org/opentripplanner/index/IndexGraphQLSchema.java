@@ -1041,6 +1041,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
+                .description("ID of the cluster")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> ((StopCluster) environment.getSource()).id)
                 .build())
@@ -1123,7 +1124,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
-		.description("Stop id in format FeedId:StopId")
+		        .description("ÌD of the stop in format `FeedId:StopId`")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
                     GtfsLibrary.convertIdToString(((Stop) environment.getSource()).getId()))
@@ -1514,6 +1515,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
+                .description("ID of the trip in format `FeedId:TripId`")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> GtfsLibrary
                     .convertIdToString(((Trip) environment.getSource()).getId()))
@@ -1863,6 +1865,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
+                .description("ID of the route in format `FeedId:RouteId`")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
                     GtfsLibrary.convertIdToString(((Route) environment.getSource()).getId()))
