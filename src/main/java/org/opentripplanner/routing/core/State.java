@@ -126,11 +126,7 @@ public class State implements Cloneable {
             this.stateData.bikeParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
-        } else if (options.rideAndKiss) {
-            this.stateData.carParked = !options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         }
-
         this.walkDistance = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
@@ -282,24 +278,20 @@ public class State implements Cloneable {
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
-        boolean rideAndPark = stateData.opt.rideAndKiss;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
-        boolean carRideAndParkOk = false;
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
-            carRideAndParkOk = !rideAndPark || isCarParked();
         } else {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
-            carRideAndParkOk = !rideAndPark || !isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && carRideAndParkOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public Stop getPreviousStop() {

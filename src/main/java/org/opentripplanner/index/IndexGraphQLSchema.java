@@ -30,7 +30,6 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -165,16 +164,6 @@ public class IndexGraphQLSchema {
         .value("TRAM", TraverseMode.TRAM, "TRAM")
         .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
         .value("WALK", TraverseMode.WALK, "WALK")
-        .build();
-
-    public static GraphQLEnumType qualifierEnum = GraphQLEnumType.newEnum()
-        .name("Qualifier")
-        .description("Additional qualifier for a transport mode")
-        .value("RENT", QualifiedMode.Qualifier.RENT, "The vehicle used for transport can be rented")
-        .value("HAVE", QualifiedMode.Qualifier.HAVE, "HAVE")
-        .value("PARK", QualifiedMode.Qualifier.PARK, "PARK")
-        .value("KEEP", QualifiedMode.Qualifier.KEEP, "KEEP")
-        .value("PICKUP", QualifiedMode.Qualifier.PICKUP, "The user can be picked up by someone else riding a vehicle")
         .build();
 
     public static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
@@ -491,19 +480,6 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
-        GraphQLInputObjectType transportModeInputType = GraphQLInputObjectType.newInputObject()
-            .name("TransportMode")
-            .description("Transportation mode which can be used in the itinerary")
-            .field(GraphQLInputObjectField.newInputObjectField()
-                .name("mode")
-                .type(new GraphQLNonNull(modeEnum))
-                .build())
-            .field(GraphQLInputObjectField.newInputObjectField()
-                .name("qualifier")
-                .type(qualifierEnum)
-                .build())
-            .build();
-
         GraphQLFieldDefinition planFieldType = GraphQLFieldDefinition.newFieldDefinition()
             .name("plan")
             .description("Plans an itinerary from point A to point B based on the given arguments")
@@ -664,13 +640,8 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modes")
-                .description("Deprecated, use `transportModes` instead. ~~The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.~~")
+                .description("The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.")
                 .type(Scalars.GraphQLString)
-                .build())
-            .argument(GraphQLArgument.newArgument()
-                .name("transportModes")
-                .description("List of transportation modes that the user is willing to use. Default: `[\"WALK\",\"TRANSIT\"]`")
-                .type(new GraphQLList(transportModeInputType))
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modeWeight")
@@ -2641,7 +2612,7 @@ public class IndexGraphQLSchema {
                             );
                     }
                     if (environment.getArgument("modes") != null) {
-                        Set<TraverseMode> modes = new QualifiedModeSet((String)
+                        Set<TraverseMode> modes = new QualifiedModeSet(
                             environment.getArgument("modes")).qModes
                             .stream()
                             .map(qualifiedMode -> qualifiedMode.mode)

@@ -46,7 +46,6 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("CAR", "CAR"));
         expected.add(new TravelOption("TRANSIT,BICYCLE", "TRANSIT_BICYCLE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        expected.add(new TravelOption("CAR_PICKUP,WALK,TRANSIT", "RIDEKISS"));
         assertEquals(expected, new HashSet<>(options));
 
         transitModes.add(TraverseMode.RAIL);
@@ -64,7 +63,6 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("TRANSIT,BICYCLE", "TRANSIT_BICYCLE"));
         expected.add(new TravelOption("BICYCLE_PARK,WALK,TRANSIT", "BIKERIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        expected.add(new TravelOption("CAR_PICKUP,WALK,TRANSIT", "RIDEKISS"));
 
         assertEquals(expected, new HashSet<>(options));
 
@@ -84,7 +82,6 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("TRANSIT,BICYCLE", "TRANSIT_BICYCLE"));
         expected.add(new TravelOption("TRANSIT,WALK,BICYCLE_RENT", "TRANSIT_BICYCLERENT"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        expected.add(new TravelOption("CAR_PICKUP,WALK,TRANSIT", "RIDEKISS"));
 
         assertEquals(expected, new HashSet<>(options));
 
@@ -102,7 +99,6 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("TRANSIT,BICYCLE", "TRANSIT_BICYCLE"));
         expected.add(new TravelOption("CAR_PARK,WALK,TRANSIT", "PARKRIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        expected.add(new TravelOption("CAR_PICKUP,WALK,TRANSIT", "RIDEKISS"));
 
         assertEquals(expected, new HashSet<>(options));
 
@@ -124,7 +120,6 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("CAR_PARK,WALK,TRANSIT", "PARKRIDE"));
         expected.add(new TravelOption("BICYCLE_PARK,WALK,TRANSIT", "BIKERIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        expected.add(new TravelOption("CAR_PICKUP,WALK,TRANSIT", "RIDEKISS"));
 
         assertEquals(expected, new HashSet<>(options));
 
