@@ -760,6 +760,7 @@ public class IndexGraphQLSchema {
             .description("Alert of a current or upcoming disruption in public transportation")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     alertType.getName(), ((AlertPatch) environment.getSource()).getId()))
@@ -889,6 +890,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(stopAtDistanceType.getName(),
                     Integer.toString(((GraphIndex.StopAndDistance) environment.getSource()).distance) + ";" +
@@ -914,6 +916,7 @@ public class IndexGraphQLSchema {
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(departureRowType.getName(), ((GraphIndex.DepartureRow)environment.getSource()).id))
                 .build())
@@ -985,6 +988,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> {
                     Object place = ((PlaceAndDistance) environment.getSource()).place;
@@ -1035,6 +1039,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                     .toGlobalId(clusterType.getName(), ((StopCluster) environment.getSource()).id))
@@ -1076,6 +1081,7 @@ public class IndexGraphQLSchema {
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     stopType.getName(),
@@ -1508,6 +1514,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     tripType.getName(),
@@ -1747,6 +1754,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     patternType.getName(), ((TripPattern) environment.getSource()).code))
@@ -1858,6 +1866,7 @@ public class IndexGraphQLSchema {
 	    .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
                     routeType.getName(),
@@ -1965,6 +1974,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                     .toGlobalId(agencyType.getName(), ((Agency) environment.getSource()).getId()))
@@ -2028,6 +2038,7 @@ public class IndexGraphQLSchema {
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                     .toGlobalId(bikeRentalStationType.getName(), ((BikeRentalStation) environment.getSource()).id))
@@ -2096,6 +2107,7 @@ public class IndexGraphQLSchema {
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                     .toGlobalId(bikeParkType.getName(), ((BikePark) environment.getSource()).id))
@@ -2142,6 +2154,7 @@ public class IndexGraphQLSchema {
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                         .toGlobalId(ticketType.getName(), ((TicketType) environment.getSource()).getId()))
@@ -2166,6 +2179,7 @@ public class IndexGraphQLSchema {
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
+                .description("Global object ID provided by Relay. This value can be used to refetch this object using **node** query.")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay
                     .toGlobalId(carParkType.getName(), ((CarPark) environment.getSource()).id))
