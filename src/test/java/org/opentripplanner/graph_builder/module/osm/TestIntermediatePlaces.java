@@ -144,7 +144,7 @@ public class TestIntermediatePlaces {
         GenericLocation fromLocation = new GenericLocation("Place 1", "39.9908,-83.0118");
         GenericLocation toLocation = new GenericLocation("Place 4", "39.9998,-83.0198");
         GenericLocation[] intermediateLocations = new GenericLocation[2];
-        intermediateLocations[0] = new GenericLocation("Place 2", "40.0000,-82.900", 1200);
+        intermediateLocations[0] = new GenericLocation("Place 2", "39.9948,-83.0148", 1200);
         intermediateLocations[1] = new GenericLocation("Place 3", "39.9100,-83.100", 4800);
 
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
@@ -250,8 +250,9 @@ public class TestIntermediatePlaces {
                 while (i < legs.size() - 1) {
                     i++;
                     Long lastEnd = legs.get(i - 1).endTime.getTimeInMillis();
-                    if (legs.get(i).from.name == place.name &&
-                        legs.get(i).startTime.getTimeInMillis() - lastEnd >= slack) {
+                    Leg leg = legs.get(i);
+                    if (leg.from.name == place.name &&
+                        leg.startTime.getTimeInMillis() - lastEnd >= slack) {
                         continue OUTER;
                     }
                 }
