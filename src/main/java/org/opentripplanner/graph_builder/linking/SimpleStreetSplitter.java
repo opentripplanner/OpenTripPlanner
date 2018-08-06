@@ -377,8 +377,10 @@ public class SimpleStreetSplitter {
 
             }
             //This throws runtime TrivialPathException if same edge is split in origin and destination link
-            //It is only used in origin/destination linking since otherwise options is null
-            if (options != null) {
+            //It is only used in origin/destination linking since otherwise options is null.
+            //Not used when there are intermediate places as it checks if first edge only exists once which
+            //is unwanted when there are intermediate places that separate places from each other.
+            if (options != null && !options.hasIntermediatePlaces()) {
                 options.canSplitEdge(edge);
             }
             // split the edge, get the split vertex
