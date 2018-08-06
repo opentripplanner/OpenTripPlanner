@@ -1951,7 +1951,8 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("mode")
-                .type(Scalars.GraphQLString)
+                .description("Transport mode of this route, e.g. `BUS`")
+                .type(modeEnum)
                 .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
                     environment.getSource()))
                 .build())
