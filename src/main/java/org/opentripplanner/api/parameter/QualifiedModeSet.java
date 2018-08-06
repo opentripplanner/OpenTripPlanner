@@ -6,7 +6,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -28,10 +27,6 @@ public class QualifiedModeSet implements Serializable {
         for (String qMode : s.split(",")) {
             qModes.add(new QualifiedMode(qMode));
         }
-    }
-
-    public QualifiedModeSet(Collection<QualifiedMode> qualifiedModes) {
-        qModes.addAll(qualifiedModes);
     }
 
     /**
