@@ -2352,6 +2352,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stopType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
+                    .description("Return stops with these ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
                 .argument(GraphQLArgument.newArgument()
