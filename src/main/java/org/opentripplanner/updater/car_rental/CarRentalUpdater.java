@@ -326,6 +326,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             CarRentalStation station = new CarRentalStation();
             String id = String.format("border_dropoff_%3.6f_%3.6f", coord.x, coord.y);
 
+            station.address = id;
             station.allowDropoff = true;
             station.allowPickup = false;
             station.carsAvailable = 0;
