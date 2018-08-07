@@ -262,8 +262,9 @@ public class StreetEdge extends Edge implements Cloneable {
         StateEditor editor = doTraverse(s0, options, s0.getNonTransitMode());
         State state = (editor == null) ? null : editor.makeState();
         /* Kiss and ride support. Mode transitions occur without the explicit loop edges used in park-and-ride. */
-        if (options.kissAndRide) {
-            if (options.arriveBy) {
+        if (options.kissAndRide || options.rideAndKiss) {
+            // Use of ride and kiss (instead of kiss and ride) will reverse the following car/walk mode change
+            if (options.arriveBy ^ options.rideAndKiss) {
                 // Branch search to "unparked" CAR mode ASAP after transit has been used.
                 // Final WALK check prevents infinite recursion.
                 if (s0.isCarParked() && s0.isEverBoarded() && currMode == TraverseMode.WALK) {
@@ -491,7 +492,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        if (options.kissAndRide || options.parkAndRide) {
+        if (options.kissAndRide || options.parkAndRide || options.rideAndKiss) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {

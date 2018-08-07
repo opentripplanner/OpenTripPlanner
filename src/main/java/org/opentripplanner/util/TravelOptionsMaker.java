@@ -84,6 +84,8 @@ public final class TravelOptionsMaker {
             }
             travelOptions.add(new TravelOption(String.join(",", TraverseMode.CAR.toString(), TraverseMode.WALK.toString(), TraverseMode.TRANSIT.toString()),
                 "KISSRIDE"));
+            travelOptions.add(new TravelOption(String.join(",", "CAR_PICKUP", TraverseMode.WALK.toString(), TraverseMode.TRANSIT.toString()),
+                "RIDEKISS"));
         }
 
 
