@@ -2818,6 +2818,7 @@ public class IndexGraphQLSchema {
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
                             .map(carParks::get)
+                            .filter(Objects::nonNull)
                             .collect(Collectors.toList());
                     }
                     return new ArrayList<>(index.graph.getService(CarParkService.class) != null
