@@ -2946,6 +2946,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(carParkType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
+                    .description("Return car parks with these ids. **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> {
