@@ -686,6 +686,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setBannedRoutes(String s) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
         if (s != null && !s.equals(""))
             bannedRoutes = RouteMatcher.parse(s);
         else

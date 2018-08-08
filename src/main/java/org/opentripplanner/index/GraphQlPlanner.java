@@ -229,7 +229,8 @@ public class GraphQlPlanner {
             request.transferPenalty += 1800;
         }
 
-        callWith.argument("batch", (Boolean v) -> request.batch = v);
+	//Set argument 'batch' to false, as it causes timeouts and is not useful for point-to-point itinerary planning
+        callWith.argument("batch", (Boolean v) -> /*request.batch = v*/ request.batch = false);
 
         if (optimize != null) {
             request.optimize = optimize;
