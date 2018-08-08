@@ -15,8 +15,9 @@ public class TestHslCarParkDataSource {
         assertTrue(source.update());
         List<CarPark> carParks = source.getCarParks();
 
-        // Station without car parking should be ignored, so only 5 parking areas
-        assertEquals(5, carParks.size());
+        // Station without car parking and INACTIVE station should be ignored,
+        // so only 5 parking areas
+        assertEquals(4, carParks.size());
         for (CarPark carPark : carParks) {
             System.out.println(carPark);
         }
@@ -30,11 +31,11 @@ public class TestHslCarParkDataSource {
         assertEquals(46, ainola.spacesAvailable);
 
         CarPark fake = carParks.get(2);
-        assertEquals("Ankkapurontie", fake.name.toString());
-        assertEquals("132", fake.id);
+        assertEquals("Asemakuja itäinen", fake.name.toString());
+        assertEquals("406", fake.id);
         // operative: false overrides available capacity
-        assertEquals(9, fake.maxCapacity);
-        assertEquals(0, fake.spacesAvailable);
+        assertEquals(18, fake.maxCapacity);
+        assertEquals(18, fake.spacesAvailable);
     }
 
 }

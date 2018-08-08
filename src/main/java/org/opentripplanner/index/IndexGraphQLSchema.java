@@ -30,6 +30,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -63,6 +64,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -164,6 +166,16 @@ public class IndexGraphQLSchema {
         .value("TRAM", TraverseMode.TRAM, "TRAM")
         .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
         .value("WALK", TraverseMode.WALK, "WALK")
+        .build();
+
+    public static GraphQLEnumType qualifierEnum = GraphQLEnumType.newEnum()
+        .name("Qualifier")
+        .description("Additional qualifier for a transport mode")
+        .value("RENT", QualifiedMode.Qualifier.RENT, "The vehicle used for transport can be rented")
+        .value("HAVE", QualifiedMode.Qualifier.HAVE, "HAVE")
+        .value("PARK", QualifiedMode.Qualifier.PARK, "PARK")
+        .value("KEEP", QualifiedMode.Qualifier.KEEP, "KEEP")
+        .value("PICKUP", QualifiedMode.Qualifier.PICKUP, "The user can be picked up by someone else riding a vehicle")
         .build();
 
     public static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
@@ -318,6 +330,24 @@ public class IndexGraphQLSchema {
                 return null;
             }
         }).build();
+
+
+    private final GraphQLObjectType geometryType = GraphQLObjectType.newObject()
+            .name("Geometry")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("length")
+                    .description("The number of points in the string")
+                    .type(Scalars.GraphQLInt)
+                    .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getLength())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("points")
+                    .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
+                    .type(Scalars.GraphQLString)
+                    .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
+                    .build())
+            .build();
+
 
     private Agency getAgency(GraphIndex index, String agencyId) {
         //xxx what if there are duplciate agency ids?
@@ -484,6 +514,19 @@ public class IndexGraphQLSchema {
                 .build())
             .build();
 
+        GraphQLInputObjectType transportModeInputType = GraphQLInputObjectType.newInputObject()
+            .name("TransportMode")
+            .description("Transportation mode which can be used in the itinerary")
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("mode")
+                .type(new GraphQLNonNull(modeEnum))
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("qualifier")
+                .type(qualifierEnum)
+                .build())
+            .build();
+
         GraphQLFieldDefinition planFieldType = GraphQLFieldDefinition.newFieldDefinition()
             .name("plan")
             .description("Plans an itinerary from point A to point B based on the given arguments")
@@ -500,20 +543,22 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("from")
-                .description("The geographical location where the itinerary begins")
+                .description("The geographical location where the itinerary begins. Use either this argument or `fromPlace`, but not both.")
                 .type(coordinateInputType)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("to")
-                .description("The geographical location where the itinerary ends")
+                .description("The geographical location where the itinerary ends. Use either this argument or `toPlace`, but not both.")
                 .type(coordinateInputType)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("fromPlace")
+                .description("The place where the itinerary begins in format `name::place`, where `place` is either a lat,lng pair (e.g. `Pasila::60.199041,24.932928`) or a stop id (e.g. `Pasila::HSL:1000202`). Use either this argument or `from`, but not both.")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("toPlace")
+                .description("The place where the itinerary ends in format `name::place`, where `place` is either a lat,lng pair (e.g. `Pasila::60.199041,24.932928`) or a stop id (e.g. `Pasila::HSL:1000202`). Use either this argument or `to`, but not both.")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -544,7 +589,7 @@ public class IndexGraphQLSchema {
                     .build())
             .argument(GraphQLArgument.newArgument()
                     .name("itineraryFiltering")
-                    .description("How easily bad itineraries are filtered. Default value: 0.")
+                    .description("How easily bad itineraries are filtered from results. Value 0 (default) disables filtering. Itineraries are filtered if they are worse than another one in some respect (e.g. more walking) by more than the percentage of filtering level, which is calculated by dividing 100% by the value of this argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).")
                     .type(Scalars.GraphQLFloat)
                     .build())
             .argument(GraphQLArgument.newArgument()
@@ -599,7 +644,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("arriveBy")
-                .description("Whether the trip should depart at dateTime (false), or arrive at dateTime (true). Default value: false.")
+                .description("Whether the itinerary should depart at the specified time (false), or arrive to the destination at the specified time (true). Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -639,13 +684,18 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("batch")
-                .description("When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.")
+                .description("This argument has no use for itinerary planning and will be removed later. ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modes")
-                .description("The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.")
+                .description("Deprecated, use `transportModes` instead. ~~The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.~~")
                 .type(Scalars.GraphQLString)
+                .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("transportModes")
+                .description("List of transportation modes that the user is willing to use. Default: `[\"WALK\",\"TRANSIT\"]`")
+                .type(new GraphQLList(transportModeInputType))
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("modeWeight")
@@ -669,12 +719,12 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("minTransferTime")
-                .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another. This time is in addition to time it might take to walk between transit stops. This time should also be overridden by specific transfer timing information in transfers.txt. Default value: 0")
+                .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another. This time is in addition to time it might take to walk between transit stops. Default value: 0")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("nonpreferredTransferPenalty")
-                .description("Penalty for using a non-preferred transfer. Default value: 180.")
+                .description("Penalty (in seconds) for using a non-preferred transfer. Default value: 180.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -684,22 +734,22 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("startTransitStopId")
-                .description("A transit stop that this trip must start from")
+                .description("This argument has currently no effect on which itineraries are returned. Use argument `fromPlace` to start the itinerary from a specific stop. ~~A transit stop that this trip must start from~~")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("startTransitTripId")
-                .description("A trip where this trip must start from (depart-onboard routing)")
+                .description("ID of the trip on which the itinerary starts. This argument can be used to plan itineraries when the user is already onboard a vehicle. When using this argument, arguments `time` and `from` should be set based on a vehicle position message received from the vehicle running the specified trip.  **Note:** this argument only takes into account the route and estimated travel time of the trip (and therefore arguments `time` and `from` must be used correctly to get meaningful itineraries).")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("claimInitialWait")
-                .description("The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.")
+                .description("No effect on itinerary planning, adjust argument `time` instead to get later departures. ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~")
                 .type(Scalars.GraphQLLong)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("reverseOptimizeOnTheFly")
-                .description("When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done. Default value: false.")
+                .description("**Consider this argument experimental** – setting this argument to true causes timeouts and unoptimal routes in many cases. \nWhen true, reverse optimize (find alternative transportation mode, which still arrives to the destination in time) this search on the fly after processing each transit leg, rather than reverse-optimizing the entire path when it's done. Default value: false.")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -709,27 +759,27 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("disableRemainingWeightHeuristic")
-                .description("If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service. Default value: false.")
+                .description("Only useful for testing and troubleshooting. ~~If true, the remaining weight heuristic is disabled. Currently only implemented for the long distance path service. Default value: false.~~")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("locale")
-                .description("Locale for returned text")
+                .description("Two-letter language code (ISO 639-1) used for returned text. **Note:** only part of the data has translations available and names of stops and POIs are returned in their default language. Due to missing translations, it is sometimes possible that returned text uses a mixture of two languages.")
                 .type(Scalars.GraphQLString)
                 .build())
             .argument(GraphQLArgument.newArgument()
                  .name("ticketTypes")
-                 .description("Allowed ticket types")
+                 .description("A comma-separated list of allowed ticket types.")
                  .type(Scalars.GraphQLString)
                  .build())
             .argument(GraphQLArgument.newArgument()
                 .name("heuristicStepsPerMainStep")
-                .description("Tuning parameter for the search algorithm.")
+                .description("Tuning parameter for the search algorithm, mainly useful for testing.")
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("compactLegsByReversedSearch")
-                .description("Whether legs should be compacted by performing a reversed search. Experimental argument, will be removed!.")
+                .description("Whether legs should be compacted by performing a reversed search. **Experimental argument, will be removed!**")
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
@@ -1561,7 +1611,13 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routeShortName")
+                .description("Short name of the route this trip is running. See field `shortName` of Route.")
                 .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> {
+                    Trip trip = (Trip)environment.getSource();
+
+                    return trip.getRouteShortName() != null ? trip.getRouteShortName() : trip.getRoute().getShortName();
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("directionId")
@@ -1708,7 +1764,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
-		.description("List of coordinates of this trip's route")
+		        .description("List of coordinates of this trip's route")
                 .type(new GraphQLList(new GraphQLList(Scalars.GraphQLFloat))) //TODO: Should be geometry
                 .dataFetcher(environment -> {
                     LineString geometry = index.patternForTrip
@@ -1720,6 +1776,21 @@ public class IndexGraphQLSchema {
                         .collect(Collectors.toList());
                     }
                 )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripGeometry")
+                .description("Coordinates of the route of this trip in Google polyline encoded format")
+                .type(geometryType)
+                .dataFetcher(environment -> {
+                    LineString geometry = index.patternForTrip
+                        .get(environment.getSource())
+                        .geometry;
+                    if (geometry == null) {
+                        return null;
+                    }
+
+                    return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")
@@ -1843,6 +1914,19 @@ public class IndexGraphQLSchema {
                     }
                 })
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("patternGeometry")
+                .description("Coordinates of the route of this pattern in Google polyline encoded format")
+                .type(geometryType)
+                .dataFetcher(environment -> {
+                    LineString geometry = ((TripPattern) environment.getSource()).geometry;
+                    if (geometry == null) {
+                        return null;
+                    }
+
+                    return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
+                })
+                .build())
                 // TODO: add stoptimes
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("semanticHash")
@@ -1896,7 +1980,8 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("mode")
-                .type(Scalars.GraphQLString)
+                .description("Transport mode of this route, e.g. `BUS`")
+                .type(modeEnum)
                 .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
                     environment.getSource()))
                 .build())
@@ -2429,7 +2514,13 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
+                    .description("Deprecated, use argument `feeds` instead")
                     .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .description("List of feed ids from which stops are returned")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
                     .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
@@ -2439,8 +2530,9 @@ public class IndexGraphQLSchema {
                             environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
-                    .filter(stop -> environment.getArgument("agency") == null || stop.getId()
-                        .getAgencyId().equalsIgnoreCase(environment.getArgument("agency")))
+                    .filter(stop -> (environment.getArgument("agency") == null && environment.getArgument("feeds") == null) ||
+                        stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("agency")) || (environment.getArgument("feeds") instanceof List && ((List)environment.getArgument("feeds")).contains(stop.getId().getAgencyId()))
+                    )
                     .collect(Collectors.toList()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2466,7 +2558,13 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("agency")
+                    .description("Deprecated, use argument `feeds` instead")
                     .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("feeds")
+                    .description("List of feed ids from which stops are returned")
+                    .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
@@ -2477,9 +2575,9 @@ public class IndexGraphQLSchema {
                             environment.getArgument("lon"),
                             environment.getArgument("radius"))
                             .stream()
-                            .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                                stopAndDistance.stop.getId().getAgencyId()
-                                    .equalsIgnoreCase(environment.getArgument("agency")))
+                            .filter(stopAndDistance -> (environment.getArgument("agency") == null && environment.getArgument("feeds") == null) ||
+                                stopAndDistance.stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("agency")) || (environment.getArgument("feeds") instanceof List && ((List)environment.getArgument("feeds")).contains(stopAndDistance.stop.getId().getAgencyId()))
+                            )
                             .sorted(Comparator.comparing(s -> s.distance))
                             .collect(Collectors.toList());
                     } catch (VertexNotFoundException e) {
@@ -2652,7 +2750,7 @@ public class IndexGraphQLSchema {
                             );
                     }
                     if (environment.getArgument("modes") != null) {
-                        Set<TraverseMode> modes = new QualifiedModeSet(
+                        Set<TraverseMode> modes = new QualifiedModeSet((String)
                             environment.getArgument("modes")).qModes
                             .stream()
                             .map(qualifiedMode -> qualifiedMode.mode)
@@ -2906,22 +3004,6 @@ public class IndexGraphQLSchema {
     }
 
     private void createPlanType(GraphIndex index) {
-        final GraphQLObjectType legGeometryType = GraphQLObjectType.newObject()
-            .name("LegGeometry")
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("length")
-                .description("The number of points in the string")
-                .type(Scalars.GraphQLInt)
-                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getLength())
-                .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("points")
-                .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
-                .type(Scalars.GraphQLString)
-                .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
-                .build())
-            .build();
-
         final GraphQLObjectType placeType = GraphQLObjectType.newObject()
             .name("Place")
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3054,7 +3136,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("legGeometry")
                 .description("The leg's geometry.")
-                .type(legGeometryType)
+                .type(geometryType)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).legGeometry)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()

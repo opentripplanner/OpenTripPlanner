@@ -14,42 +14,28 @@
 package org.opentripplanner.routing.car_park;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CarParkService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private Set<CarPark> carParks = new HashSet<CarPark>();
-
-    private Map<String, CarPark> carParkById;
+    private Map<String, CarPark> carParks = new HashMap<>();
 
     public Collection<CarPark> getCarParks() {
-        return carParks;
+        return carParks.values();
     }
 
     public Map<String, CarPark> getCarParkById() {
-        return carParkById;
+        return carParks;
     }
 
     public void addCarPark(CarPark carPark) {
-        // Remove old reference first, as adding will be a no-op if already present
-        carParks.remove(carPark);
-        carParks.add(carPark);
-        reindex();
+        carParks.put(carPark.id, carPark);
     }
 
     public void removeCarPark(CarPark carPark) {
-        carParks.remove(carPark);
-        reindex();
-    }
-
-    private void reindex() {
-        carParkById = carParks.stream()
-            .collect(Collectors.toMap(carPark -> carPark.id, carPark -> carPark));
+        carParks.remove(carPark.id);
     }
 }
