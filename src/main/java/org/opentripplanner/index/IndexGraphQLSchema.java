@@ -523,6 +523,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("qualifier")
+                .description("Optional additional qualifier for transport mode, e.g. `RENT`")
                 .type(qualifierEnum)
                 .build())
             .build();
