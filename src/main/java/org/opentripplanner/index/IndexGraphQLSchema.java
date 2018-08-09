@@ -172,9 +172,9 @@ public class IndexGraphQLSchema {
         .name("Qualifier")
         .description("Additional qualifier for a transport mode")
         .value("RENT", QualifiedMode.Qualifier.RENT, "The vehicle used for transport can be rented")
-        .value("HAVE", QualifiedMode.Qualifier.HAVE, "HAVE")
-        .value("PARK", QualifiedMode.Qualifier.PARK, "PARK")
-        .value("KEEP", QualifiedMode.Qualifier.KEEP, "KEEP")
+        .value("HAVE", QualifiedMode.Qualifier.HAVE, "~~HAVE~~ **Currently not used**")
+        .value("PARK", QualifiedMode.Qualifier.PARK, "~~PARK~~ **Currently not used**")
+        .value("KEEP", QualifiedMode.Qualifier.KEEP, "~~KEEP~~ **Currently not used**")
         .value("PICKUP", QualifiedMode.Qualifier.PICKUP, "The user can be picked up by someone else riding a vehicle")
         .build();
 
