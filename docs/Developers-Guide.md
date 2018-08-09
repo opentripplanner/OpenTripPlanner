@@ -228,21 +228,20 @@ is pushed to the main OpenTripPlanner repository on GitHub, this server will com
 ## Release Process
 
 This section serves as a checklist for the person responsible for performing releases (currently Andrew Byrd).
-Note that much of this mimics the actions taken by the Maven release plugin. Based experience throughout the history of OTP,
-the release plugin can fail at various points in the process leaving the repo in a confusing state, artifacts partially deployed etc.
-Taking these steps manually is more annoying but less prone to failure.
+Note that much of this mimics the actions taken by the Maven release plugin. Based on past experience,
+the release plugin can fail at various points in the process leaving the repo in a confusing state.
+Taking each action manually is more annoying but keeps eyes on each step and is less prone to failure.
 
-* Check that you are on the master branch with no uncommitted changes
+* Check that you are at the HEAD of master branch with no uncommitted changes
     * `git status`
     * `git clean -df`
-* Pull down the latest master code
     * `git pull`
 * Verify that all dependencies in the POM are non-SNAPSHOT versions
-* Update `docs/Changelog.md`.
-    * Items should have been added/updated as each pull request was merged.
-    * Update the header at the top of the list from x.y.z-SNAPSHOT to just x.y.z (current date).
-    * Add a new section header at the top of the list for the next iteration: x.y+1.0-SNAPSHOT.
-    * Check in any changes, and push to Github.
+* Update `docs/Changelog.md`
+    * Items should have been added/updated as each pull request was merged
+    * Update the header at the top of the list from x.y.z-SNAPSHOT to just x.y.z (current date)
+    * Add a new section header at the top of the list for the next iteration: x.y+1.0-SNAPSHOT
+    * Check in any changes, and push to Github
 * Check on Travis that the build is currently passing
     * https://travis-ci.org/opentripplanner/OpenTripPlanner/builds
 * Bump the SNAPSHOT version in the POM to the release version
@@ -278,6 +277,7 @@ Taking these steps manually is more annoying but less prone to failure.
 
 TODO Elaborate on:
 - Signing Certificate
+- AWS IAM credentials
 - Sonatype-OSS staging / Maven artifact deployment
 - Merging dev branches into master ("git flow")
 - Release from master should happen _automatically_ once version is changed
