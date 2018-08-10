@@ -109,7 +109,6 @@
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
-                <filtering>true</filtering>
             </testResource>
             <testResource>
                 <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
