@@ -44,6 +44,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
 
         // make sure the first vehicle looks like it should
         CarRentalStation firstVehicle = rentalStations.get(0);
+        assertEquals("6623 SE 17th Ave, Portland, OR 97202, USA", firstVehicle.address);
         assertEquals(true, firstVehicle.allowPickup);
         assertEquals(false, firstVehicle.allowDropoff);
         assertEquals(CarFuelType.GASOLINE, firstVehicle.fuelType);

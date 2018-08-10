@@ -78,6 +78,13 @@ public class CarRentalStation implements Serializable, Cloneable {
     public CarFuelType fuelType = CarFuelType.UNKNOWN;
 
     /**
+     * Reported address of car.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public String address;
+
+    /**
      * This is used for localization. Currently "car rental station" isn't part of the name.
      * It can be added on the client. But since it is used as Station: name, and Recommended Pick Up: name.
      * It isn't used.

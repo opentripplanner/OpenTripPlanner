@@ -134,6 +134,7 @@ public class Car2GoCarRentalDataSource implements CarRentalDataSource, JsonConfi
 
     private CarRentalStation makeStation(JsonNode vehicle) {
         CarRentalStation car2go = new CarRentalStation();
+        car2go.address = vehicle.get("address").asText();
         car2go.allowDropoff = false;
         car2go.allowPickup = vehicle.get("freeForRental").asBoolean();
         car2go.carsAvailable = 1;
