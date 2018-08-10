@@ -100,20 +100,23 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
-            <!--<resource>-->
-                <!--&lt;!&ndash; shell scripts to start up OTP, need to be filtered to get JAR file name &ndash;&gt;-->
-                <!--<directory>src/scripts</directory>-->
-                <!--<filtering>true</filtering>-->
-                <!--&lt;!&ndash; Copy the scripts up into the root of the repo, not /target/classes &ndash;&gt;-->
-                <!--<targetPath>../..</targetPath>-->
-            <!--</resource>-->
             <resource>
                 <directory>src/client</directory>
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
         </resources>
-
+        <testResources>
+            <testResource>
+                <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
+                <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
+                <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
+                <directory>src/scripts</directory>
+                <filtering>true</filtering>
+                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
+                <targetPath>../..</targetPath>
+            </testResource>
+        </testResources>
         <pluginManagement>
             <plugins>
                 <!-- m2eclipse lifecycle mapping configuration. This controls which Maven build goals should
