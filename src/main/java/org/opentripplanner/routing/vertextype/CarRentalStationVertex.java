@@ -18,6 +18,8 @@ import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
+import java.util.Set;
+
 /**
  * A vertex for a car rental station.
  * It is connected to the streets by a StreetCarRentalLink.
@@ -36,6 +38,10 @@ public class CarRentalStationVertex extends Vertex {
     private int spacesAvailable;
 
     private String id;
+
+    private String address;
+
+    private Set<String> networks;
     
     public CarRentalStationVertex(Graph g, CarRentalStation station) {
         //FIXME: raw_name can be null if car station is made from graph updater
@@ -44,6 +50,8 @@ public class CarRentalStationVertex extends Vertex {
         this.setId(station.id);
         this.setCarsAvailable(station.carsAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
+        this.setAddress(station.address);
+        this.setNetworks(station.networks);
     }
 
     public int getCarsAvailable() {
@@ -61,6 +69,14 @@ public class CarRentalStationVertex extends Vertex {
     public void setSpacesAvailable(int spaces) {
         this.spacesAvailable = spaces;
     }
+
+    public String getAddress() { return address; }
+
+    public void setAddress(String address) { this.address = address; }
+
+    public Set<String> getNetworks() { return networks; }
+
+    public void setNetworks(Set<String> networks) { this.networks = networks; }
 
     public String getId() {
         return id;

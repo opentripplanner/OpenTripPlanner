@@ -14,6 +14,7 @@
 package org.opentripplanner.api.model; 
 
 import java.util.Calendar;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
@@ -103,6 +104,18 @@ public class Place {
      * In case the vertex is of type Bike sharing station.
      */
     public String bikeShareId;
+
+    /**
+     * Car share station fields
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public Set<String> networks;
+
+    @XmlAttribute
+    @JsonSerialize
+    public String address;
+
 
     /**
      * Returns the geometry in GeoJSON format

@@ -731,6 +731,10 @@ public abstract class GraphPathToTripPlanConverter {
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;
+        } else if (vertex instanceof CarRentalStationVertex) {
+            place.address = ((CarRentalStationVertex) vertex).getAddress();
+            place.networks = ((CarRentalStationVertex) vertex).getNetworks();
+            place.vertexType = VertexType.CARSHARE;
         } else {
             place.vertexType = VertexType.NORMAL;
         }
