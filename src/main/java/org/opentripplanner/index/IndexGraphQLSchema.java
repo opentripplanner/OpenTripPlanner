@@ -2669,7 +2669,42 @@ public class IndexGraphQLSchema {
                 .name("stations")
                 .description("Get all stations (stop with location_type = 1)")
                 .type(new GraphQLList(stopType))
-                .dataFetcher(environment -> new ArrayList<>(index.stationForId.values()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("ids")
+                    .description("Only return stations that match one of the ids in this list")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("name")
+                    .description("Query stations by name")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    if ((environment.getArgument("ids") instanceof List)) {
+                        if (environment.getArguments().entrySet()
+                                .stream()
+                                .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
+                                .collect(Collectors.toList())
+                                .size() != 1) {
+                            throw new IllegalArgumentException("Unable to combine other filters with ids");
+                        }
+                        return ((List<String>) environment.getArgument("ids"))
+                                .stream()
+                                .map(id -> index.stationForId.get(GtfsLibrary.convertIdFromString(id)))
+                                .collect(Collectors.toList());
+                    }
+
+                    Stream<Stop> stream;
+                    if (environment.getArgument("name") == null) {
+                        stream = index.stationForId.values().stream();
+                    } else {
+                        stream = index.getLuceneIndex().query(environment.getArgument("name"), true, false, true, false, false)
+                            .stream()
+                            .map(result -> index.stationForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                    }
+
+                    return stream.collect(Collectors.toList());
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
