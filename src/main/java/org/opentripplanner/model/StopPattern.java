@@ -104,7 +104,7 @@ public class StopPattern implements Serializable {
         continuousPickup = new int[size];
         continuousDropOff = new int[size];
         serviceAreaRadius = new double[size];
-        serviceAreas = new Polygon[size];
+        serviceAreas = new Geometry[size];
     }
 
     public StopPattern (List<StopTime> stopTimes) {
