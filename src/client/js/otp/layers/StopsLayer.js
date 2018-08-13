@@ -79,8 +79,10 @@ otp.layers.StopsLayer =
              .on('click', function() {
                 var stopId = this._stopId;
                 var stopIdArr = stopId.split(':');
+                var agencyId = stopIdArr.shift();
+                var gtfsStopId = stopIdArr.join(':');
                 var marker = this;
-                this_.module.webapp.indexApi.loadStopById(stopIdArr[0], stopIdArr[1], this_, function(detailedStop) {
+                this_.module.webapp.indexApi.loadStopById(agencyId, gtfsStopId, this_, function(detailedStop) {
                     marker.setPopupContent(this_.getPopupContent(detailedStop));
                     this_.module.webapp.indexApi.loadRoutesForStop(stopId, this_, function(data) {
                         _.each(data, function(route) {

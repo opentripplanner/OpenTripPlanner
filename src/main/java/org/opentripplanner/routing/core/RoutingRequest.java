@@ -248,7 +248,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
     public int bikeBoardCost = 60 * 10;
 
-    /** Do not use certain named routes */
+    /**
+     * Do not use certain named routes.
+     * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
+     * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
+     */
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Do not use certain named agencies */

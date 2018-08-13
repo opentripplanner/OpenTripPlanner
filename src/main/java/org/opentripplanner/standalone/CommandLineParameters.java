@@ -32,7 +32,6 @@ public class CommandLineParameters implements Cloneable {
     private static final int    DEFAULT_PORT        = 8080;
     private static final int    DEFAULT_SECURE_PORT = 8081;
     private static final String DEFAULT_BASE_PATH   = "/var/otp";
-    private static final String DEFAULT_ROUTER_ID   = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
 
@@ -93,6 +92,9 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
             description = "Server port for plain HTTP.")
     public Integer port;
+
+    @Parameter(names = {"--maxThreads"}, description = "The maximum number of HTTP handler threads in the pool.")
+    public Integer maxThreads;
 
     @Parameter(names = {"--graphs"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing graphs. Defaults to BASE_PATH/graphs.")
