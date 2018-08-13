@@ -50,8 +50,9 @@ public class HslCarParkDataSource extends GenericJsonCarParkDataSource{
             station.x = station.geometry.getCentroid().getX();
             station.realTimeData = utilizations.containsKey(station.id);
             station.maxCapacity = node.path("builtCapacity").path("CAR").asInt();
-            if (!node.path("status").asText().equals("IN_OPERATION")) {
-                station.spacesAvailable = 0;
+            String stationStatus = node.path("status").asText();
+            if (stationStatus.equals("INACTIVE") || stationStatus.equals("TEMPORARILY_CLOSED")) {
+                return null;
             } else if (station.realTimeData) {
                 station.spacesAvailable = utilizations.get(station.id);
             } else {

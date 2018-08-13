@@ -375,7 +375,8 @@ public class WalkableAreaBuilder {
         }
         LinearRing shell = GeometryUtils.getGeometryFactory().createLinearRing(coordinates);
         Polygon poly = GeometryUtils.getGeometryFactory().createPolygon(shell, new LinearRing[0]);
-        return poly;
+
+        return (Polygon)poly.buffer(VISIBILITY_EPSILON);
     }
 
     private void createEdgesForRingSegment(Set<Edge> edges, AreaEdgeList edgeList, Area area,

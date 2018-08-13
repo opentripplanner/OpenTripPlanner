@@ -124,6 +124,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
+    /** The weight multipliers for TraverseModes */
+    public Map<TraverseMode, Double> modeWeights = new HashMap<>();
+
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
     // TODO this should be completely removed and done only with individual cost parameters
@@ -441,6 +444,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
+    public boolean rideAndKiss  = false;
 
     /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
     // TODO remove
@@ -683,6 +687,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setBannedRoutes(String s) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
         if (s != null && !s.equals(""))
             bannedRoutes = RouteMatcher.parse(s);
         else
@@ -953,6 +960,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
                 && modes.equals(other.modes)
+                && modeWeights == other.modeWeights
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -1119,8 +1127,13 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Allows de-prioritizing modes.
      */
     public double getModeWeight(TraverseMode traverseMode) {
-        Double weight = this.rctx.graph.modeWeights.get(traverseMode);
-        return weight != null ? weight : 1d;
+        Double graphWeight = this.rctx.graph.modeWeights.get(traverseMode);
+        Double requestWeight = this.modeWeights.get(traverseMode);
+        if (requestWeight == null) {
+           return graphWeight != null ? graphWeight : 1d;
+        } else {
+            return requestWeight;
+        }
     }
 
     /**
@@ -1142,6 +1155,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (maxPreTransitTime > 0) {
             this.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
+        }
+    }
+
+    public void setModeWeight(TraverseMode traverseMode, Double weight) {
+        if (weight > 0) {
+            this.modeWeights.put(traverseMode, weight);
         }
     }
 

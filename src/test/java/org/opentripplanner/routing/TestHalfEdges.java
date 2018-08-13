@@ -49,9 +49,11 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
@@ -451,14 +453,26 @@ public class TestHalfEdges {
         end.dispose();
         assertEquals(2, edges.size());
 
+        // test that traveling between origin and destination that are close to each other doesn't throw TrivialPathException
+        // when there are intermediatedPlaces
+        RoutingRequest intermediateWalking = new RoutingRequest(TraverseMode.WALK);
+        List<String> intermediatePlaces = Arrays.asList("Home::42.0,-76.0");
+        intermediateWalking.setIntermediatePlacesFromStrings(intermediatePlaces);
+        start = (TemporaryStreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.004, -74.0), intermediateWalking, false);
+        end = (TemporaryStreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.008, -74.0), intermediateWalking, true);
+        assertNotNull(start);
+        assertNotNull(end);
 
-        // test that it is possible to travel between two splits on the same street
+        // test that traveling between places that are close to each other throws TrivialPathException
         RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
         start = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.004, -74.0), walking, false);
         exception.expect(TrivialPathException.class);
         end = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.008, -74.0), walking, true);
+
          /*assertNotNull(end);
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);

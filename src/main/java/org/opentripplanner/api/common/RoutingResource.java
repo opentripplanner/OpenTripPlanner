@@ -27,9 +27,11 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,6 +174,42 @@ public abstract class RoutingResource {
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
+    /** The weight of TRAM traverse mode. Values over 1 add cost to tram travel and values under 1 decrease cost */
+    @QueryParam("tramWeight")
+    protected Double tramWeight;
+
+    /** The weight of SUBWAY traverse mode. Values over 1 add cost to subway travel and values under 1 decrease cost */
+    @QueryParam("subwayWeight")
+    protected Double subwayWeight;
+
+    /** The weight of RAIL traverse mode. Values over 1 add cost to rail travel and values under 1 decrease cost */
+    @QueryParam("railWeight")
+    protected Double railWeight;
+
+    /** The weight of BUS traverse mode. Values over 1 add cost to bus travel and values under 1 decrease cost */
+    @QueryParam("busWeight")
+    protected Double busWeight;
+
+    /** The weight of FERRY traverse mode. Values over 1 add cost to ferry travel and values under 1 decrease cost */
+    @QueryParam("ferryWeight")
+    protected Double ferryWeight;
+
+    /** The weight of CABLE_CAR traverse mode. Values over 1 add cost to cable car travel and values under 1 decrease cost */
+    @QueryParam("cableCarWeight")
+    protected Double cableCarWeight;
+
+    /** The weight of GONDOLA traverse mode. Values over 1 add cost to gondola travel and values under 1 decrease cost */
+    @QueryParam("gondolaWeight")
+    protected Double gondolaWeight;
+
+    /** The weight of FUNICULAR traverse mode. Values over 1 add cost to funicular travel and values under 1 decrease cost */
+    @QueryParam("funicularWeight")
+    protected Double funicularWeight;
+
+    /** The weight of AIRPLANE traverse mode. Values over 1 add cost to airplane travel and values under 1 decrease cost */
+    @QueryParam("airplaneWeight")
+    protected Double airplaneWeight;
+
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
@@ -297,11 +335,11 @@ public abstract class RoutingResource {
     @QueryParam("batch")
     protected Boolean batch;
 
-    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
+    /** A transit stop required to be the first stop in the search (AgencyId:StopId) */
     @QueryParam("startTransitStopId")
     protected String startTransitStopId;
 
-    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId:TripId) */
     @QueryParam("startTransitTripId")
     protected String startTransitTripId;
 
@@ -531,6 +569,42 @@ public abstract class RoutingResource {
             request.setModes(request.modes);
         }
 
+        if (tramWeight != null) {
+            request.setModeWeight(TraverseMode.TRAM, tramWeight);
+        }
+
+        if (subwayWeight != null) {
+            request.setModeWeight(TraverseMode.SUBWAY, subwayWeight);
+        }
+
+        if (railWeight != null) {
+            request.setModeWeight(TraverseMode.RAIL, railWeight);
+        }
+
+        if (busWeight != null) {
+            request.setModeWeight(TraverseMode.BUS, busWeight);
+        }
+
+        if (ferryWeight != null) {
+            request.setModeWeight(TraverseMode.FERRY, ferryWeight);
+        }
+
+        if (cableCarWeight != null) {
+            request.setModeWeight(TraverseMode.CABLE_CAR, cableCarWeight);
+        }
+
+        if (gondolaWeight != null) {
+            request.setModeWeight(TraverseMode.GONDOLA, gondolaWeight);
+        }
+
+        if (funicularWeight != null) {
+            request.setModeWeight(TraverseMode.FUNICULAR, funicularWeight);
+        }
+
+        if (airplaneWeight != null) {
+            request.setModeWeight(TraverseMode.AIRPLANE, airplaneWeight);
+        }
+
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
@@ -558,10 +632,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = AgencyAndId.convertFromString(startTransitStopId);
+            request.startingTransitStopId = GtfsLibrary.convertIdFromString(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = AgencyAndId.convertFromString(startTransitTripId);
+            request.startingTransitTripId = GtfsLibrary.convertIdFromString(startTransitTripId);
 
         if (clampInitialWait != null)
             request.clampInitialWait = clampInitialWait;
