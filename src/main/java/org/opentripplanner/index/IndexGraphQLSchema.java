@@ -824,6 +824,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
+                .description("Agency affected by the disruption. Note that this value is present only if the disruption has an effect on all operations of the agency (e.g. in case of a strike).")
                 .type(agencyType)
                 .dataFetcher(environment -> getAgency(index, ((AlertPatch) environment.getSource()).getAgency()))
                 .build())
