@@ -1655,6 +1655,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
+                .description("List of stops this trip passes through")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
                 .dataFetcher(environment -> index.patternForTrip
                     .get(environment.getSource()).getStops())
