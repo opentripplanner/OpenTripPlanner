@@ -607,7 +607,7 @@ public class StateEditor {
 
     public void setCarRenting(boolean carRenting) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = carRenting;
+        child.stateData.usingRentedCar = carRenting;
         if (carRenting) {
             child.stateData.nonTransitMode = TraverseMode.CAR;
         } else {
