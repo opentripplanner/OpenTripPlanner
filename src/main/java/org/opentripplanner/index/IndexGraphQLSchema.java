@@ -164,7 +164,7 @@ public class IndexGraphQLSchema {
         .value("RAIL", TraverseMode.RAIL, "RAIL")
         .value("SUBWAY", TraverseMode.SUBWAY, "SUBWAY")
         .value("TRAM", TraverseMode.TRAM, "TRAM")
-        .value("TRANSIT", TraverseMode.TRANSIT, "TRANSIT")
+        .value("TRANSIT", TraverseMode.TRANSIT, "A special transport mode, which includes all public transport.")
         .value("WALK", TraverseMode.WALK, "WALK")
         .build();
 
