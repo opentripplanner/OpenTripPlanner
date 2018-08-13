@@ -1622,6 +1622,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("directionId")
+                .description("Direction code of the trip, i.e. is this the outbound or inbound trip of a pattern. Possible values: 0, 1.")
                 .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
