@@ -635,7 +635,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("optimize")
-                .description("The set of characteristics ( QUICK, SAFE, FLAT, GREENWAYS, TRIANGLE, TRANSFERS) that the user wants to optimize for . Default value: QUICK")
+                .description("Optimization type for bicycling legs, e.g. prefer flat terrain. Default value: `QUICK`")
                 .type(optimizeTypeEnum)
                 .build())
             .argument(GraphQLArgument.newArgument()
