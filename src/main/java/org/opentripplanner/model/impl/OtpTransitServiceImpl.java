@@ -6,30 +6,24 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static java.util.function.Function.identity;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A in-memory implementation of {@link OtpTransitService}. It's super fast for most
@@ -46,86 +40,59 @@ import static java.util.stream.Collectors.toMap;
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
-    private Collection<Agency> agencies;
+    private final Collection<Agency> agencies;
 
-    private Collection<ServiceCalendarDate> calendarDates;
+    private final Collection<FareAttribute> fareAttributes;
 
-    private Collection<ServiceCalendar> calendars;
+    private final Collection<FareRule> fareRules;
 
-    private Collection<FareAttribute> fareAttributes;
+    private final Collection<FeedInfo> feedInfos;
 
-    private Collection<FareRule> fareRules;
+    private final Collection<Pathway> pathways;
 
-    private Collection<FeedInfo> feedInfos;
+    private final Collection<FeedScopedId> serviceIds;
 
-    private Collection<Frequency> frequencies;
+    private final Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId;
 
-    private Collection<Pathway> pathways;
+    private final Map<FeedScopedId, Stop> stopsById;
 
-    private Collection<Route> routes;
+    private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
-    private Collection<ShapePoint> shapePoints;
+    private final Collection<Transfer> transfers;
 
-    private Map<FeedScopedId, Stop> stops;
+    private final Collection<TripPattern> tripPatterns;
 
-    private Collection<StopTime> stopTimes;
+    private final Collection<Trip> trips;
 
-    private Collection<Transfer> transfers;
 
-    private Collection<Trip> trips;
+    // Lazy initialized indexes
 
-    // Indexes
-    private Map<FeedScopedId, List<String>> tripAgencyIdsByServiceId = null;
+    private Map<Stop, Collection<Stop>> stopsByStation = null;
 
-    private Map<Stop, List<Stop>> stopsByStation = null;
-
-    private Map<Trip, List<StopTime>> stopTimesByTrip = null;
-
-    private Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId = null;
-
-    private Map<FeedScopedId, List<ServiceCalendarDate>> calendarDatesByServiceId = null;
-
-    private Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId = null;
 
     /**
      * Create a read only version of the {@link OtpTransitService}.
-     * @see OtpTransitServiceBuilder Use builder to mutate the instance.
+     *
+     * @see OtpTransitServiceBuilder Use builder to create an new OtpTransitDao.
      */
-    OtpTransitServiceImpl(List<Agency> agencies, List<ServiceCalendarDate> calendarDates,
-            List<ServiceCalendar> calendars, List<FareAttribute> fareAttributes,
-            List<FareRule> fareRules, List<FeedInfo> feedInfos, List<Frequency> frequencies,
-            List<Pathway> pathways, List<Route> routes, List<ShapePoint> shapePoints,
-            List<Stop> stops, List<StopTime> stopTimes, List<Transfer> transfers,
-            List<Trip> trips) {
-        this.agencies = nullSafeUnmodifiableList(agencies);
-        this.calendarDates = nullSafeUnmodifiableList(calendarDates);
-        this.calendars = nullSafeUnmodifiableList(calendars);
-        this.fareAttributes = nullSafeUnmodifiableList(fareAttributes);
-        this.fareRules = nullSafeUnmodifiableList(fareRules);
-        this.feedInfos = nullSafeUnmodifiableList(feedInfos);
-        this.frequencies = nullSafeUnmodifiableList(frequencies);
-        this.pathways = nullSafeUnmodifiableList(pathways);
-        this.routes = nullSafeUnmodifiableList(routes);
-        this.shapePoints = nullSafeUnmodifiableList(shapePoints);
-        this.stops = stops.stream().collect(toMap(Stop::getId, identity()));
-        this.stopTimes = nullSafeUnmodifiableList(stopTimes);
-        this.transfers = nullSafeUnmodifiableList(transfers);
-        this.trips = nullSafeUnmodifiableList(trips);
+    OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
+        this.agencies = nullSafeUnmodifiableList(builder.getAgencies());
+        this.fareAttributes = nullSafeUnmodifiableList(builder.getFareAttributes());
+        this.fareRules = nullSafeUnmodifiableList(builder.getFareRules());
+        this.feedInfos = nullSafeUnmodifiableList(builder.getFeedInfos());
+        this.pathways = nullSafeUnmodifiableList(builder.getPathways());
+        this.serviceIds = nullSafeUnmodifiableList(builder.findAllServiceIds());
+        this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
+        this.stopsById = unmodifiableMap(builder.getStops().asMap());
+        this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asMap();
+        this.transfers = nullSafeUnmodifiableList(builder.getTransfers());
+        this.tripPatterns = nullSafeUnmodifiableList(builder.getTripPatterns().values());
+        this.trips = nullSafeUnmodifiableList(builder.getTrips().values());
     }
 
     @Override
     public Collection<Agency> getAllAgencies() {
         return agencies;
-    }
-
-    @Override
-    public Collection<ServiceCalendarDate> getAllCalendarDates() {
-        return calendarDates;
-    }
-
-    @Override
-    public Collection<ServiceCalendar> getAllCalendars() {
-        return calendars;
     }
 
     @Override
@@ -144,28 +111,39 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public Collection<Frequency> getAllFrequencies() {
-        return frequencies;
+    public Collection<Pathway> getAllPathways() {
+        return pathways;
     }
 
     @Override
-    public Collection<Route> getAllRoutes() {
-        return routes;
+    public Collection<FeedScopedId> getAllServiceIds() {
+        return serviceIds;
     }
 
     @Override
-    public Collection<ShapePoint> getAllShapePoints() {
-        return shapePoints;
+    public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
+        return nullSafeUnmodifiableList(shapePointsByShapeId.get(shapeId));
     }
 
     @Override
-    public Collection<StopTime> getAllStopTimes() {
-        return stopTimes;
+    public Stop getStopForId(FeedScopedId id) {
+        return stopsById.get(id);
+    }
+
+    @Override
+    public List<Stop> getStopsForStation(Stop station) {
+        ensureStopForStations();
+        return nullSafeUnmodifiableList(stopsByStation.get(station));
     }
 
     @Override
     public Collection<Stop> getAllStops() {
-        return stops.values();
+        return nullSafeUnmodifiableList(stopsById.values());
+    }
+
+    @Override
+    public List<StopTime> getStopTimesForTrip(Trip trip) {
+        return nullSafeUnmodifiableList(stopTimesByTrip.get(trip));
     }
 
     @Override
@@ -174,144 +152,49 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
+    public Collection<TripPattern> getTripPatterns() {
+        return tripPatterns;
+    }
+
+    @Override
     public Collection<Trip> getAllTrips() {
         return trips;
     }
 
-    @Override
-    public Collection<Pathway> getAllPathways() {
-        return pathways;
-    }
 
-    @Override
-    public Stop getStopForId(FeedScopedId id) {
-        return stops.get(id);
-    }
+    /*  Private Methods */
 
-    @Override
-    public List<String> getTripAgencyIdsReferencingServiceId(FeedScopedId serviceId) {
-
-        if (tripAgencyIdsByServiceId == null) {
-
-            Map<FeedScopedId, Set<String>> agencyIdsByServiceIds = new HashMap<>();
-
-            for (Trip trip : getAllTrips()) {
-                FeedScopedId tripId = trip.getId();
-                String tripAgencyId = tripId.getAgencyId();
-                FeedScopedId tripServiceId = trip.getServiceId();
-                Set<String> agencyIds = agencyIdsByServiceIds
-                        .computeIfAbsent(tripServiceId, k -> new HashSet<>());
-                agencyIds.add(tripAgencyId);
-            }
-
-            tripAgencyIdsByServiceId = new HashMap<>();
-
-            for (Map.Entry<FeedScopedId, Set<String>> entry : agencyIdsByServiceIds.entrySet()) {
-                FeedScopedId tripServiceId = entry.getKey();
-                List<String> agencyIds = new ArrayList<>(entry.getValue());
-                Collections.sort(agencyIds);
-                tripAgencyIdsByServiceId.put(tripServiceId, agencyIds);
-            }
-        }
-
-        return nullSafeUnmodifiableList(tripAgencyIdsByServiceId.get(serviceId));
-    }
-
-    @Override
-    public List<Stop> getStopsForStation(Stop station) {
+    private void ensureStopForStations() {
         if (stopsByStation == null) {
             stopsByStation = new HashMap<>();
             for (Stop stop : getAllStops()) {
                 if (stop.getLocationType() == 0 && stop.getParentStation() != null) {
                     Stop parentStation = getStopForId(
                             new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation()));
-                    List<Stop> subStops = stopsByStation
+                    Collection<Stop> subStops = stopsByStation
                             .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
                     subStops.add(stop);
                 }
             }
         }
-        return nullSafeUnmodifiableList(stopsByStation.get(station));
     }
 
-    @Override
-    public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-        ensureShapePointRelation();
-        return nullSafeUnmodifiableList(shapePointsByShapeId.get(shapeId));
-    }
-
-    @Override
-    public List<StopTime> getStopTimesForTrip(Trip trip) {
-
-        if (stopTimesByTrip == null) {
-            stopTimesByTrip = getAllStopTimes().stream().collect(groupingBy(StopTime::getTrip));
-
-            for (List<StopTime> stopTimes : stopTimesByTrip.values()) {
-                Collections.sort(stopTimes);
-            }
+    private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(Collection<ShapePoint> shapePoints) {
+        Map<FeedScopedId, List<ShapePoint>> map = shapePoints.stream()
+                .collect(groupingBy(ShapePoint::getShapeId));
+        for (List<ShapePoint> list : map.values()) {
+            Collections.sort(list);
         }
-
-        return nullSafeUnmodifiableList(stopTimesByTrip.get(trip));
+        return map;
     }
 
-    @Override
-    public List<FeedScopedId> getAllServiceIds() {
-        ensureCalendarDatesByServiceIdRelation();
-        ensureCalendarsByServiceIdRelation();
-        Set<FeedScopedId> serviceIds = new HashSet<>();
-        serviceIds.addAll(calendarDatesByServiceId.keySet());
-        serviceIds.addAll(calendarsByServiceId.keySet());
-        return new ArrayList<>(serviceIds);
-    }
-
-    @Override
-    public List<ServiceCalendarDate> getCalendarDatesForServiceId(FeedScopedId serviceId) {
-        ensureCalendarDatesByServiceIdRelation();
-        return nullSafeUnmodifiableList(calendarDatesByServiceId.get(serviceId));
-    }
-
-    @Override
-    public ServiceCalendar getCalendarForServiceId(FeedScopedId serviceId) {
-        ensureCalendarsByServiceIdRelation();
-        List<ServiceCalendar> calendars = calendarsByServiceId.get(serviceId);
-
-        if(calendars == null || calendars.isEmpty()) {
-            return null;
+    private static <T> List<T> nullSafeUnmodifiableList(Collection<T> c) {
+        List<T> list;
+        if (c instanceof List) {
+            list = (List<T>) c;
+        } else {
+            list = new ArrayList<>(c);
         }
-        if(calendars.size() == 1) {
-            return calendars.get(0);
-        }
-        throw new MultipleCalendarsForServiceIdException(serviceId);
-    }
-
-
-    /*  Private Methods */
-
-    private void ensureCalendarDatesByServiceIdRelation() {
-        if (calendarDatesByServiceId == null) {
-            calendarDatesByServiceId = getAllCalendarDates().stream()
-                    .collect(groupingBy(ServiceCalendarDate::getServiceId));
-        }
-    }
-
-    private void ensureCalendarsByServiceIdRelation() {
-        if (calendarsByServiceId == null) {
-            calendarsByServiceId = getAllCalendars().stream()
-                    .collect(groupingBy(ServiceCalendar::getServiceId));
-        }
-    }
-
-    private void ensureShapePointRelation() {
-        if (shapePointsByShapeId == null) {
-            shapePointsByShapeId = getAllShapePoints().stream()
-                    .collect(groupingBy(ShapePoint::getShapeId));
-            for (List<ShapePoint> list : shapePointsByShapeId.values()) {
-                Collections.sort(list);
-            }
-        }
-    }
-
-    private static <T> List<T> nullSafeUnmodifiableList(List<T> list) {
-        return Collections.unmodifiableList(list == null ? Collections.emptyList() : list);
+        return Collections.unmodifiableList(list);
     }
 }

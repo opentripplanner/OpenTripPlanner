@@ -5,8 +5,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
@@ -72,14 +71,14 @@ class Context {
         aStar = new AStar();
 
         // Create graph
-        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+        GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
         graph = spy(new Graph());
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getOtpTransitService())
+                createCalendarServiceData(context.getTransitBuilder())
         );
 
         feedId = context.getFeedId().getId();

@@ -1,18 +1,17 @@
 package org.opentripplanner;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class ConstantsForTests {
 
@@ -59,8 +58,10 @@ public class ConstantsForTests {
 
     private void setupPortland() {
         try {
-            portlandContext = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
             portlandGraph = new Graph();
+            portlandContext = contextBuilder(ConstantsForTests.PORTLAND_GTFS)
+                    .withGraphBuilderAnnotationsAndDeduplicator(portlandGraph)
+                    .build();
             PatternHopFactory factory = new PatternHopFactory(portlandContext);
             factory.run(portlandGraph);
             TransferGraphLinker linker = new TransferGraphLinker(portlandGraph);
@@ -69,7 +70,7 @@ public class ConstantsForTests {
             // this is now making a duplicate calendarservicedata but it's oh so practical
             portlandGraph.putService(
                     CalendarServiceData.class,
-                    createCalendarServiceData(portlandContext.getOtpTransitService())
+                    createCalendarServiceData(portlandContext.getTransitBuilder())
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,21 +80,21 @@ public class ConstantsForTests {
         StreetLinkerModule ttsnm = new StreetLinkerModule();
         ttsnm.buildGraph(portlandGraph, new HashMap<Class<?>, Object>());
     }
-    
+
     public static Graph buildGraph(String path) {
+        Graph graph = new Graph();
         GtfsContext context;
         try {
-            context = GtfsLibrary.readGtfs(new File(path));
+            context = contextBuilder(path).build();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        Graph graph = new Graph();
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getOtpTransitService())
+                createCalendarServiceData(context.getTransitBuilder())
         );
         return graph;
     }

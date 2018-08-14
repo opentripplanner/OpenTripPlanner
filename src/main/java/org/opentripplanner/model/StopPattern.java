@@ -2,7 +2,8 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -50,36 +51,6 @@ public class StopPattern implements Serializable {
     public final int[]  pickups;
     public final int[]  dropoffs;
 
-    public boolean equals(Object other) {
-        if (other instanceof StopPattern) {
-            StopPattern that = (StopPattern) other;
-            return Arrays.equals(this.stops,    that.stops) && 
-                   Arrays.equals(this.pickups,  that.pickups) && 
-                   Arrays.equals(this.dropoffs, that.dropoffs);
-        } else {
-            return false;
-        }
-    }
-
-    public int hashCode() {
-        int hash = size;
-        hash += Arrays.hashCode(this.stops);
-        hash *= 31;
-        hash += Arrays.hashCode(this.pickups);
-        hash *= 31;
-        hash += Arrays.hashCode(this.dropoffs);
-        return hash;
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("StopPattern: ");
-        for (int i = 0, j = stops.length; i < j; ++i) {
-            sb.append(String.format("%s_%d%d ", stops[i].getCode(), pickups[i], dropoffs[i]));
-        }
-        return sb.toString();
-    }
-
     private StopPattern (int size) {
         this.size = size;
         stops     = new Stop[size];
@@ -88,11 +59,13 @@ public class StopPattern implements Serializable {
     }
 
     /** Assumes that stopTimes are already sorted by time. */
-    public StopPattern (List<StopTime> stopTimes) {
+    public StopPattern (Collection<StopTime> stopTimes) {
         this (stopTimes.size());
         if (size == 0) return;
+        Iterator<StopTime> stopTimeIterator = stopTimes.iterator();
+
         for (int i = 0; i < size; ++i) {
-            StopTime stopTime = stopTimes.get(i);
+            StopTime stopTime = stopTimeIterator.next();
             stops[i] = stopTime.getStop();
             // should these just be booleans? anything but 1 means pick/drop is allowed.
             // pick/drop messages could be stored in individual trips
@@ -120,7 +93,35 @@ public class StopPattern implements Serializable {
         return false;
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(StopPattern.class);
+    public boolean equals(Object other) {
+        if (other instanceof StopPattern) {
+            StopPattern that = (StopPattern) other;
+            return Arrays.equals(this.stops,    that.stops) &&
+                   Arrays.equals(this.pickups,  that.pickups) &&
+                   Arrays.equals(this.dropoffs, that.dropoffs);
+        } else {
+            return false;
+        }
+    }
+
+    public int hashCode() {
+        int hash = size;
+        hash += Arrays.hashCode(this.stops);
+        hash *= 31;
+        hash += Arrays.hashCode(this.pickups);
+        hash *= 31;
+        hash += Arrays.hashCode(this.dropoffs);
+        return hash;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("StopPattern: ");
+        for (int i = 0, j = stops.length; i < j; ++i) {
+            sb.append(String.format("%s_%d%d ", stops[i].getCode(), pickups[i], dropoffs[i]));
+        }
+        return sb.toString();
+    }
 
     /**
      * In most cases we want to use identity equality for StopPatterns. There is a single StopPattern instance for each

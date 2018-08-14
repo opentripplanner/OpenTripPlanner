@@ -59,7 +59,7 @@ import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
-public class Graph implements Serializable {
+public class Graph implements Serializable, AddBuilderAnnotation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 

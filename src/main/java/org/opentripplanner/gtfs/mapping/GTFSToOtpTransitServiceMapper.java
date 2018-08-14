@@ -1,7 +1,9 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.StopTime;
+
 
 
 /**
@@ -42,14 +44,17 @@ public class GTFSToOtpTransitServiceMapper {
             routeMapper, fareAttributeMapper
     );
 
+
     /**
      * Map from GTFS data to the internal OTP model
      */
-    public static OtpTransitService mapGtfsDaoToOTPTransitService(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+    public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
+            GtfsRelationalDao data
+    ) {
         return new GTFSToOtpTransitServiceMapper().map(data);
     }
 
-    private OtpTransitService map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+    private OtpTransitServiceBuilder map(GtfsRelationalDao data) {
         OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
         builder.getAgencies().addAll(agencyMapper.map(data.getAllAgencies()));
@@ -63,10 +68,13 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
         builder.getStops().addAll(stopMapper.map(data.getAllStops()));
-        builder.getStopTimes().addAll(stopTimeMapper.map(data.getAllStopTimes()));
+        builder.getStopTimesSortedByTrip().addAll(
+                stopTimeMapper.map(data.getAllStopTimes()),
+                StopTime::getTrip
+        );
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTrips().addAll(tripMapper.map(data.getAllTrips()));
 
-        return builder.build();
+        return builder;
     }
 }
