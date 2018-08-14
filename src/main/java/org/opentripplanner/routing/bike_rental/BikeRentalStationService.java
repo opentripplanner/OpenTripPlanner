@@ -23,9 +23,9 @@ import org.opentripplanner.routing.bike_park.BikePark;
 public class BikeRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private Set<BikeRentalStation> bikeRentalStations = new HashSet<BikeRentalStation>();
+    private Set<BikeRentalStation> bikeRentalStations = new HashSet<>();
 
-    private Set<BikePark> bikeParks = new HashSet<BikePark>();
+    private Set<BikePark> bikeParks = new HashSet<>();
 
     public Collection<BikeRentalStation> getBikeRentalStations() {
         return bikeRentalStations;

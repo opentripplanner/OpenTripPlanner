@@ -1800,7 +1800,7 @@ public class IndexGraphQLSchema {
 
         patternType = GraphQLObjectType.newObject()
             .name("Pattern")
-	    .description("Pattern is sequence of stops used by trips on a specific direction and variant of a route. Most routes have only two patterns: one for outbound trips and one for inbound trips") 
+	    .description("Pattern is sequence of stops used by trips on a specific direction and variant of a route. Most routes have only two patterns: one for outbound trips and one for inbound trips")
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")

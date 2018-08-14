@@ -108,8 +108,8 @@ public class IndexAPI {
         streetIndex = router.graph.streetIndex;
     }
 
-   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
-   @Context UriInfo uriInfo;
+    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
+    @Context UriInfo uriInfo;
 
    private Router router;
 
@@ -564,23 +564,34 @@ public class IndexAPI {
 
     // TODO include pattern ID for each trip in responses
 
-    /** List basic information about all service IDs. */
+    /**
+     * List basic information about all service IDs.
+     * This is a placeholder endpoint and is not implemented yet.
+     */
     @GET
     @Path("/services")
     public Response getServices() {
-        index.serviceForId.values(); // TODO complete
+        // TODO complete: index.serviceForId.values();
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
+    /**
+     * List details about a specific service ID including which dates it runs on. Replaces the old /calendar.
+     * This is a placeholder endpoint and is not implemented yet.
+     */
     @GET
     @Path("/services/{serviceId}")
     public Response getServices(@PathParam("serviceId") String serviceId) {
-        index.serviceForId.get(serviceId); // TODO complete
+        // TODO complete: index.serviceForId.get(serviceId);
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    /** Return all clusters of stops. */
+    /**
+     * Return all clusters of stops.
+     * A cluster is not the same thing as a GTFS parent station.
+     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
+     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
+     */
     @GET
     @Path("/clusters")
     public Response getAllStopClusters () {
@@ -590,7 +601,12 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(scl).build();
     }
 
-    /** Return a cluster of stops by its ID. */
+    /**
+     * Return a cluster of stops by its ID.
+     * A cluster is not the same thing as a GTFS parent station.
+     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
+     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
+     */
     @GET
     @Path("/clusters/{clusterId}")
     public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
@@ -606,8 +622,8 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> queryParameters, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {        
-        
+    public Response getGraphQL (HashMap<String, Object> queryParameters, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+
         String query = (String) queryParameters.get("query");
         Object queryVariables = queryParameters.getOrDefault("variables", null);
         String operationName = (String) queryParameters.getOrDefault("operationName", null);
@@ -641,7 +657,7 @@ public class IndexAPI {
     public Response getGraphQLBatch (List<HashMap<String, Object>> queries, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
         List<Map<String, Object>> responses = new ArrayList<>();
         List<Callable<Map>> futures = new ArrayList<>();
-  
+
         for (HashMap<String, Object> query : queries) {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
@@ -656,7 +672,7 @@ public class IndexAPI {
             } else {
                 variables = Maps.newHashMap();
             }
-            
+
             String operationName = (String) query.getOrDefault("operationName", null);
 
             futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,variables, operationName, timeout, maxResolves, httpHeaders.getRequestHeaders()));

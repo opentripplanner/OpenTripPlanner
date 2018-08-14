@@ -94,19 +94,13 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
-        // Create a realtime data snapshot source and wait for runnable to be executed
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                // Only create a realtime data snapshot source if none exists already
-                if (graph.timetableSnapshotSource == null) {
-                    TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
-                    // Add snapshot source to graph
-                    graph.timetableSnapshotSource = (snapshotSource);
-                }
-            }
-        });
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+        // Only create a realtime data snapshot source if none exists already
+        if (graph.timetableSnapshotSource == null) {
+            TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
+            // Add snapshot source to graph
+            graph.timetableSnapshotSource = (snapshotSource);
+        }
     }
 
     @Override

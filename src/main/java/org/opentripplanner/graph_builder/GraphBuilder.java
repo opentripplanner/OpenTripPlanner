@@ -67,7 +67,7 @@ public class GraphBuilder implements Runnable {
 
     private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
-    private File graphFile;
+    private final File graphFile;
     
     private boolean _alwaysRebuild = true;
 
@@ -79,6 +79,11 @@ public class GraphBuilder implements Runnable {
 
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
+
+    public GraphBuilder(File path, GraphBuilderParameters builderParams) {
+        graphFile = new File(path, "Graph.obj");
+        graph.stopClusterMode = builderParams.stopClusterMode;
+    }
 
     public void addModule(GraphBuilderModule loader) {
         _graphBuilderModules.add(loader);
@@ -113,7 +118,7 @@ public class GraphBuilder implements Runnable {
         MDC.put("routerPath", path);
         graphFile = new File(path.concat("/Graph.obj"));
     }
-    
+
     public void setPath (File path) {
         MDC.put("routerPath", path.getPath());
         graphFile = new File(path, "Graph.obj");
@@ -184,7 +189,6 @@ public class GraphBuilder implements Runnable {
      */
     public static GraphBuilder forDirectory(CommandLineParameters params, File dir) {
         LOG.info("Wiring up and configuring graph builder task.");
-        GraphBuilder graphBuilder = new GraphBuilder();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         JsonNode builderConfig = null;
@@ -195,13 +199,16 @@ public class GraphBuilder implements Runnable {
             LOG.error("'{}' is not a readable directory.", dir);
             return null;
         }
-        graphBuilder.setPath(dir);
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
+
+        GraphBuilder graphBuilder = new GraphBuilder(dir, builderParams);
+
         // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
         routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
+
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
                 case GTFS:

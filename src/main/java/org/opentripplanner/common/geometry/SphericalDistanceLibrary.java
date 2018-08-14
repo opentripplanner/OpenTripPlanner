@@ -147,12 +147,10 @@ public abstract class SphericalDistanceLibrary {
      * Works only for small delta lat/lon, fall-back on exact distance if not the case.
      * See: http://www.movable-type.co.uk/scripts/latlong.html
      */
-    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2,
-            double radius) {
-        if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
-                || abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
+    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2, double radius) {
+        if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG || abs(lon1 - lon2) > MAX_LON_DELTA_DEG) {
             return distance(lat1, lon1, lat2, lon2, radius);
-
+        }
         double dLat = toRadians(lat2 - lat1);
         double dLon = toRadians(lon2 - lon1) * cos(toRadians((lat1 + lat2) / 2));
         return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
@@ -164,15 +162,19 @@ public abstract class SphericalDistanceLibrary {
 
     /**
      * @param distanceMeters Distance in meters.
-     * @return The number of degree for the given distance. For a latitude, this is exact. For a
-     *         longitude, this is an overestimate.
+     * @return The number of degree for the given distance. For degrees latitude, this is nearly correct. For degrees
+     *         longitude, this is an overestimate because meridians converge toward the poles.
      */
     public static double metersToDegrees(double distanceMeters) {
         return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
     }
 
-    public static double degreesToMeters(double distanceDegrees) {
-        return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * distanceDegrees / 360;
+    /**
+     * @return the approximate number of meters for the given number of degrees latitude. If degrees longitude are
+     *         supplied, this is an overestimate anywhere off the equator because meridians converge toward the poles.
+     */
+    public static double degreesLatitudeToMeters(double degreesLatitude) {
+        return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * degreesLatitude / 360;
     }
 
     /**

@@ -21,6 +21,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import com.google.common.collect.ArrayListMultimap;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Calendar;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -63,6 +70,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -163,7 +171,7 @@ public class GraphIndex {
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
-        
+
         FareService fareService = graph.getService(FareService.class);
         if(fareService instanceof DefaultFareServiceImpl) {
             LOG.info("Collecting fare information...");
@@ -175,7 +183,7 @@ public class GraphIndex {
                         ticketTypesForId.put(rs.getFareAttribute().getId(), new TicketType(rs));
                     }
                 }
-            }                             
+            }
         }
 
         for (String feedId : graph.getFeedIds()) {
@@ -263,7 +271,7 @@ public class GraphIndex {
         if (stopClusterSpatialIndex == null) {
             clusterStops();
             LOG.info("Creating a spatial index for stop clusters.");
-            stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
+            stopClusterSpatialIndex = new HashGridSpatialIndex<>();
             for (StopCluster cluster : stopClusterForId.values()) {
                 Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
                 stopClusterSpatialIndex.insert(envelope, cluster);
@@ -726,14 +734,14 @@ public class GraphIndex {
      * @return
      */
     public List<StopTimesInPattern> stopTimesForStop(final Stop stop, final long startTime, final int timeRange, final int numberOfDepartures, boolean omitNonPickups) {
-   
+
         final List<StopTimesInPattern> ret = new ArrayList<>();
 
         for (final TripPattern pattern : patternsForStop.get(stop)) {
-            
+
             final List<TripTimeShort> stopTimesForStop = stopTimesForPattern(stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups);
 
-            
+
             if (stopTimesForStop.size() >0) {
                 final StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
                 stopTimes.times.addAll(stopTimesForStop);
@@ -742,7 +750,7 @@ public class GraphIndex {
         }
         return ret;
     }
-    
+
     /**
      * Fetch next n upcoming vehicle departures for a stop of pattern. It goes
      * though the previous, current and next service date. It uses a priority
@@ -766,7 +774,7 @@ public class GraphIndex {
     public List<TripTimeShort> stopTimesForPattern(final Stop stop, final TripPattern pattern, long startTime, final int timeRange,
             int numberOfDepartures, boolean omitNonPickups) {
 
-        if (pattern == null) { 
+        if (pattern == null) {
             return Collections.emptyList();
         }
 
@@ -775,7 +783,7 @@ public class GraphIndex {
         }
 
         final PriorityQueue<TripTimeShort> ret = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
-            
+
             @Override
             protected boolean lessThan(final TripTimeShort t1, final TripTimeShort t2) {
                 return (t1.serviceDay + t1.realtimeDeparture) > (t2.serviceDay
@@ -849,11 +857,11 @@ public class GraphIndex {
                 result.add(0, tripTimeShort);
             }
         }
-        
-        return result; 
+
+        return result;
     }
-  
-    
+
+
     /**
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
      * timetables for a single day.
@@ -923,38 +931,30 @@ public class GraphIndex {
     }
 
     /**
-     * Stop clusters can be built in one of two ways, either by geographical proximity, or 
+     * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
      * according to a parent/child station topology, if it exists.
-     * 
-     * Some challenges faced by DC and Trimet:
-     * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
-     * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
-     * However Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
-     *
-     * We can't use a similarity comparison, we need exact matches. This is because many street names differ by only
-     * one letter or number, e.g. 34th and 35th or Avenue A and Avenue B.
-     * Therefore normalizing the names before the comparison is essential.
-     * The agency must provide either parent station information or a well thought out stop naming scheme to cluster
-     * stops -- no guessing is reasonable without that information.
      */
-    public void clusterStops() {
-    	if (graph.stopClusterMode != null) {
-            switch (graph.stopClusterMode) {
-                case "parentStation":
-                    clusterByParentStation();
-                    break;
-                case "proximity":
-                    clusterByProximity();
-                    break;
-                default:
-                    clusterByProximity();
-            }
+    private void clusterStops() {
+    	if (graph.stopClusterMode == StopClusterMode.parentStation) {
+            clusterByParentStation();
         } else {
-            clusterByProximity();
+            clusterByProximityAndName();
         }
     }
 
-    private void clusterByProximity() {	
+    /**
+     * Cluster stops by proximity and name.
+     * This functionality was developed for the Washington, DC area and probably will not work anywhere else in the
+     * world. It depends on the exact way stops are named and the way street intersections are named in that geographic
+     * region and in the GTFS data sets which represent it. Based on comments, apparently it might work for TriMet
+     * as well.
+     *
+     * We can't use a name similarity comparison, we need exact matches. This is because many street names differ by
+     * only one letter or number, e.g. 34th and 35th or Avenue A and Avenue B. Therefore normalizing the names before
+     * the comparison is essential. The agency must provide either parent station information or a well thought out stop
+     * naming scheme to cluster stops -- no guessing is reasonable without that information.
+     */
+    private void clusterByProximityAndName() {
     	int psIdx = 0; // unique index for next parent stop
 	    LOG.info("Clustering stops by geographic proximity and name...");
 	    // Each stop without a cluster will greedily claim other stops without clusters.
@@ -987,6 +987,16 @@ public class GraphIndex {
 	    }
     }
 
+    /**
+     * Rather than using the names and geographic locations of stops to cluster them, group them by their declared
+     * parent station in the GTFS data. This should be a much more reliable method where these fields have been
+     * included in the GTFS data. However:
+     *
+     * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope.
+     * That means it would only work reliably if there is only one GTFS feed loaded.
+     * The DC regional graph has no parent stations pre-defined, so we use the alternative proximity / name method.
+     * Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
+     */
     private void clusterByParentStation() {
         LOG.info("Clustering stops by parent station...");
     	for (Stop stop : stopForId.values()) {
@@ -1022,7 +1032,7 @@ public class GraphIndex {
 
     public HashMap<String, Object> getGraphQLExecutionResult(String query, Router router,
         Map<String, Object> variables, String operationName, int timeout, long maxResolves, MultivaluedMap<String, String> headers) {
-        
+
         GraphQL graphQL = GraphQL.newGraphQL(indexSchema).queryExecutionStrategy(
             new ResourceConstrainedExecutorServiceExecutionStrategy(threadPool, timeout, TimeUnit.MILLISECONDS, maxResolves)
         ).instrumentation(FieldErrorInstrumentation.get(query, router, variables, headers)).build();
@@ -1030,10 +1040,10 @@ public class GraphIndex {
         if (variables == null) {
             variables = new HashMap<>();
         }
-        
+
         ExecutionResult executionResult = graphQL.execute(query, operationName, router, variables);
         HashMap<String, Object> content = new HashMap<>();
-        
+
         if (!executionResult.getErrors().isEmpty()) {
             content.put("errors",
                 executionResult
