@@ -2010,7 +2010,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("color")
-                .description("The color (in hexadecimal format) the agency operating this route would prefer to use when displaying this route on a map. This value is not available for most routes.")
+                .description("The color (in hexadecimal format) the agency operating this route would prefer to use on UI elements (e.g. polylines on a map) related to this route. This value is not available for most routes.")
                 .type(Scalars.GraphQLString)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
