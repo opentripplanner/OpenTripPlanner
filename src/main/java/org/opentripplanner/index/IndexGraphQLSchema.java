@@ -1225,6 +1225,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("locationType")
+                .description("Identifies whether this stop represents a stop or station.")
                 .type(locationTypeEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
