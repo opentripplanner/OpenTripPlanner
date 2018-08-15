@@ -1456,6 +1456,7 @@ public class IndexGraphQLSchema {
 	    .description("Time of arrival and/or departure at a stop")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
+                .description("The stop where this arrival/departure happens")
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId
                     .get(((TripTimeShort) environment.getSource()).stopId))
