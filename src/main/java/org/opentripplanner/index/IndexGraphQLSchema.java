@@ -378,7 +378,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("address")
-                .description("The name of the place.")
+                .description("The name of the place. If specified, the place name in results uses this value instead of `\"Origin\"` or `\"Destination\"`")
                 .type(Scalars.GraphQLString)
                 .build())
             .build();
