@@ -99,7 +99,7 @@ import graphql.schema.TypeResolver;
 public class IndexGraphQLSchema {
 
     public static String experimental(String message) {
-        return String.format("!!This api is experimental and might change without further notice!!\n %s", message);
+        return String.format("**This API is experimental and might change without further notice**  \n %s", message);
     }
 
     public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
