@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -1359,5 +1360,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public ZoneIdSet getZoneIdSet() {
         return zones;
+    }
+
+    public List<Integer> getLocationSlacks() {
+        List<Integer> locationSlacks = new ArrayList<>();
+        locationSlacks.add(0);
+        if (hasIntermediatePlaces()) {
+            for (GenericLocation place : intermediatePlaces) {
+                locationSlacks.add(place.locationSlack);
+            }
+        }
+        return locationSlacks;
     }
 }

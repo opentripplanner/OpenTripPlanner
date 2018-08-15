@@ -376,6 +376,11 @@ public class IndexGraphQLSchema {
                 .description("The name of the place.")
                 .type(Scalars.GraphQLString)
                 .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("locationSlack")
+                .description("The amount of time, in seconds, to spend at this location before venturing forth.")
+                .type(Scalars.GraphQLInt)
+                .build())
             .build();
 
         GraphQLInputObjectType preferredInputType = GraphQLInputObjectType.newInputObject()
