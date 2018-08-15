@@ -575,7 +575,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("maxWalkDistance")
-                .description("The maximum distance (in meters) the user is willing to walk. Defaults  to unlimited (Double.MAX_VALUE)")
+                .description("The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
