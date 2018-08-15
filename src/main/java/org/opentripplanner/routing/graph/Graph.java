@@ -814,6 +814,9 @@ public class Graph implements Serializable {
     }
 
     public void save(File file) throws IOException {
+        for (Vertex v : getVertices()) {
+            System.out.println("vertex: " + v.toString());
+        }
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
@@ -899,6 +902,7 @@ public class Graph implements Serializable {
                 toRemove.add(v);
         // avoid concurrent vertex map modification
         for (Vertex v : toRemove) {
+            System.out.println("remove: " + v.toString());
             this.remove(v);
             removed += 1;
             LOG.trace("removed edgeless vertex {}", v);
@@ -1056,7 +1060,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

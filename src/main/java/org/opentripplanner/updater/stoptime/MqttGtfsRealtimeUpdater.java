@@ -70,7 +70,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override public void setup() throws Exception {
+    @Override public void setup(Graph setupGraph) throws Exception {
         updaterManager.executeBlocking(graph -> {
             // Only create a realtime data snapshot source if none exists already
             if (graph.timetableSnapshotSource == null) {
@@ -98,6 +98,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
                     client.subscribe(topic, qos);
                 } catch (MqttException e) {
                     LOG.warn("Could not subscribe to: " + topic);
+                    LOG.error(e.toString());
                 }
             }
 

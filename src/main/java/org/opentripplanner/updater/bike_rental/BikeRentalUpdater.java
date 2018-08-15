@@ -50,7 +50,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private static final String DEFAULT_NETWORK_LIST = "default";
 
-    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
+    private Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
     private BikeRentalDataSource source;
 
@@ -131,7 +131,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph setupGraph) throws Exception {
+        this.graph = setupGraph;
         while (graph.getVertices() == null) {
             LOG.warn("Graph has no vertices. Sleeping 5 sec");
             Thread.sleep(5000);

@@ -85,6 +85,10 @@ public class GraphBuilder implements Runnable {
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
 
+    public GraphBuilder() {
+        graphFile = new File(System.getProperty("java.io.tmpdir"), "Graph.obj");
+    }
+
     public void addModule(GraphBuilderModule loader) {
         _graphBuilderModules.add(loader);
     }
@@ -112,16 +116,6 @@ public class GraphBuilder implements Runnable {
 
     public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
-    }
-    
-    public void setPath (String path) {
-        MDC.put("routerPath", path);
-        graphFile = new File(path.concat("/Graph.obj"));
-    }
-
-    public void setPath (File path) {
-        MDC.put("routerPath", path.getPath());
-        graphFile = new File(path, "Graph.obj");
     }
 
     public Graph getGraph() {

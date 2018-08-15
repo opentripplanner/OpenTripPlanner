@@ -104,11 +104,11 @@ public class CarParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.graph = graph;
         this.source = source;
-        LOG.info("Creating car-park updater running every {} seconds : {}", frequencySec, source);
+        LOG.info("Creating car-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
 

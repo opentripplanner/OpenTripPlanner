@@ -121,12 +121,12 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Create a realtime data snapshot source and wait for runnable to be executed
         HashMap<String,Object> sentry = new HashMap<>();
         sentry.put("feedId",feedId);
         sentry.put("updateSource",updateSource.toString());
-        sentry.put("frequencySec",frequencySec);
+        sentry.put("frequencySec",pollingPeriodSeconds);
 
         SentryUtilities.setupSentryFromMap(sentry);
         updaterManager.executeBlocking(new GraphWriterRunnable() {
