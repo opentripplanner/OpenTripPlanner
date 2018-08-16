@@ -15,7 +15,7 @@ import org.opentripplanner.util.TranslatedString;
 public class OSMWithTags {
 
     /* To save memory this is only created when an entity actually has tags. */
-    private Map<String, String> _tags;
+    private Map<String, String> tags;
 
     protected long id;
 
@@ -39,10 +39,10 @@ public class OSMWithTags {
      * Adds a tag.
      */
     public void addTag(OSMTag tag) {
-        if (_tags == null)
-            _tags = new HashMap<String, String>();
+        if (tags == null)
+            tags = new HashMap<String, String>();
 
-        _tags.put(tag.getK().toLowerCase(), tag.getV());
+        tags.put(tag.getK().toLowerCase(), tag.getV());
     }
 
     /**
@@ -52,17 +52,17 @@ public class OSMWithTags {
         if (key == null || value == null)
             return;
 
-        if (_tags == null)
-            _tags = new HashMap<String, String>();
+        if (tags == null)
+            tags = new HashMap<String, String>();
 
-        _tags.put(key.toLowerCase(), value);
+        tags.put(key.toLowerCase(), value);
     }
 
     /**
      * The tags of an entity.
      */
     public Map<String, String> getTags() {
-        return _tags;
+        return tags;
     }
 
     /**
@@ -70,7 +70,7 @@ public class OSMWithTags {
      */
     public boolean hasTag(String tag) {
         tag = tag.toLowerCase();
-        return _tags != null && _tags.containsKey(tag);
+        return tags != null && tags.containsKey(tag);
     }
 
     /**
@@ -78,7 +78,7 @@ public class OSMWithTags {
      */
     public boolean isTagFalse(String tag) {
         tag = tag.toLowerCase();
-        if (_tags == null)
+        if (tags == null)
             return false;
 
         return isFalse(getTag(tag));
@@ -89,14 +89,14 @@ public class OSMWithTags {
      */
     public boolean isTagTrue(String tag) {
         tag = tag.toLowerCase();
-        if (_tags == null)
+        if (tags == null)
             return false;
 
         return isTrue(getTag(tag));
     }
 
     public boolean doesTagAllowAccess(String tag) {
-        if (_tags == null) {
+        if (tags == null) {
             return false;
         }
         if (isTagTrue(tag)) {
@@ -111,8 +111,8 @@ public class OSMWithTags {
     /** @return a tag's value, converted to lower case. */
     public String getTag(String tag) {
         tag = tag.toLowerCase();
-        if (_tags != null && _tags.containsKey(tag)) {
-            return _tags.get(tag);
+        if (tags != null && tags.containsKey(tag)) {
+            return tags.get(tag);
         }
         return null;
     }
@@ -122,8 +122,8 @@ public class OSMWithTags {
      */
     public Boolean isTag(String tag, String value) {
         tag = tag.toLowerCase();
-        if (_tags != null && _tags.containsKey(tag) && value != null)
-            return value.equals(_tags.get(tag));
+        if (tags != null && tags.containsKey(tag) && value != null)
+            return value.equals(tags.get(tag));
 
         return false;
     }
@@ -133,27 +133,27 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule#processRelations processRelations}
      */
     public I18NString getAssumedName() {
-        if (_tags.containsKey("name"))
+        if (tags.containsKey("name"))
             return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
 
-        if (_tags.containsKey("otp:route_name"))
-            return new NonLocalizedString(_tags.get("otp:route_name"));
+        if (tags.containsKey("otp:route_name"))
+            return new NonLocalizedString(tags.get("otp:route_name"));
 
         if (this.creativeName != null)
             return this.creativeName;
 
-        if (_tags.containsKey("otp:route_ref"))
-            return new NonLocalizedString(_tags.get("otp:route_ref"));
+        if (tags.containsKey("otp:route_ref"))
+            return new NonLocalizedString(tags.get("otp:route_ref"));
 
-        if (_tags.containsKey("ref"))
-            return new NonLocalizedString(_tags.get("ref"));
+        if (tags.containsKey("ref"))
+            return new NonLocalizedString(tags.get("ref"));
 
         return null;
     }
 
     public Map<String, String> getTagsByPrefix(String prefix) {
         Map<String, String> out = new HashMap<String, String>();
-        for (Map.Entry<String, String> entry : _tags.entrySet()) {
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
             String k = entry.getKey();
             if (k.equals(prefix) || k.startsWith(prefix + ":")) {
                 out.put(k, entry.getValue());

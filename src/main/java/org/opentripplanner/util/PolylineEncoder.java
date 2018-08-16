@@ -180,49 +180,49 @@ public class PolylineEncoder {
 
     private static class PointAdapterList extends AbstractList<Coordinate> {
 
-        private double[] _lat;
-        private double[] _lon;
-        private int _offset;
-        private int _length;
+        private double[] lat;
+        private double[] lon;
+        private int offset;
+        private int length;
 
         public PointAdapterList(double[] lat, double[] lon) {
             this(lat, lon, 0, lat.length);
         }
 
         public PointAdapterList(double[] lat, double[] lon, int offset, int length) {
-            _lat = lat;
-            _lon = lon;
-            _offset = offset;
-            _length = length;
+            this.lat = lat;
+            this.lon = lon;
+            this.offset = offset;
+            this.length = length;
         }
 
         @Override
         public Coordinate get(int index) {
-            return new Coordinate(_lon[_offset + index], _lat[_offset + index]);
+            return new Coordinate(lon[offset + index], lat[offset + index]);
         }
 
         @Override
         public int size() {
-            return _length;
+            return length;
         }
     }
 
     private static class CoordinateList extends AbstractList<Coordinate> {
 
-        private Coordinate[] _coordinates;
+        private Coordinate[] coordinates;
 
         public CoordinateList(Coordinate[] coordinates) {
-            _coordinates = coordinates;
+            this.coordinates = coordinates;
         }
 
         @Override
         public Coordinate get(int index) {
-            return _coordinates[index];
+            return coordinates[index];
         }
 
         @Override
         public int size() {
-            return _coordinates.length;
+            return coordinates.length;
         }
     }
 }

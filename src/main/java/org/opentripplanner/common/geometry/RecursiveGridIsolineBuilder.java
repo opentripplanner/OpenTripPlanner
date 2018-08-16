@@ -234,14 +234,13 @@ public class RecursiveGridIsolineBuilder {
 
     private Geometry debugGeometry = null;
         
-    // private List<Coordinate> __p0List;
+    // private List<Coordinate> p0List;
 
     /**
      * Create an object to compute isochrones. One may call several time isochronify on the same
      * IsoChronificator object, this will re-use the z = f(x,y) sampling if possible, as they are
      * kept in cache.
      * 
-     * @param request Parameters for the computation
      * @param center Center point (eg origin)
      * @param fz Function returning the z-value for a xy-coordinate
      * @param p0List Initial set of coverage points to seed the heuristics
@@ -258,7 +257,7 @@ public class RecursiveGridIsolineBuilder {
          * so it only needs to be not too far off to prevent int indexes from overflowing.
          */
         this.center = center;
-        // this.__p0List = p0List;
+        // this.p0List = p0List;
 
         LOG.debug("Center={} dX={} dY={}", this.center, dX, dY);
         this.fz = fz;
@@ -413,7 +412,7 @@ public class RecursiveGridIsolineBuilder {
                 Coordinate B = getCoordinate(e.B.index);
                 debugGeom.add(geomFactory.createLineString(new Coordinate[] { A, B }));
             }
-            // for (Coordinate p0 : __p0List) {
+            // for (Coordinate p0 : p0List) {
             // debugGeom.add(geomFactory.createPoint(p0));
             // }
         }

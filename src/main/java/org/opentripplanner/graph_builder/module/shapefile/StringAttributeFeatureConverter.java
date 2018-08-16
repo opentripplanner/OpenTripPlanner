@@ -13,7 +13,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class StringAttributeFeatureConverter extends AttributeFeatureConverter<String> {
 
-    private String _defaultValue;
+    private String defaultValue;
 
     public StringAttributeFeatureConverter() {
 
@@ -21,19 +21,19 @@ public class StringAttributeFeatureConverter extends AttributeFeatureConverter<S
 
     public StringAttributeFeatureConverter(String attributeName, String defaultValue) {
         super(attributeName);
-        _defaultValue = defaultValue;
+        this.defaultValue = defaultValue;
     }
 
     public StringAttributeFeatureConverter(String attributeName) {
         super(attributeName);
-        _defaultValue = null;
+        defaultValue = null;
     }
 
     /**
      * The default value to assign to features with null or empty (" ") values.
      */
     public void setDefaultValue(String defaultValue) {
-        _defaultValue = defaultValue;
+        this.defaultValue = defaultValue;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class StringAttributeFeatureConverter extends AttributeFeatureConverter<S
         // Since dBase (used in shapefiles) has poor/no null support, null strings are sometimes
         // stored as a single space " "
         if (attr == null || attr.equals(" ")) {
-            attr = _defaultValue;
+            attr = defaultValue;
         }
         return attr;
     }

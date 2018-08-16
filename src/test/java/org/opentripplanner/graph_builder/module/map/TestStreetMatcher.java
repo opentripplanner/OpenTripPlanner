@@ -11,7 +11,6 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -30,12 +29,12 @@ import org.opentripplanner.util.NonLocalizedString;
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
 
-    private Graph _graph;
+    private Graph graph;
 
     @Before
     public void before() {
 
-        _graph = new Graph();
+        graph = new Graph();
 
         vertex("56th_24th", 47.669457, -122.387577);
         vertex("56th_22nd", 47.669462, -122.384739);
@@ -88,7 +87,7 @@ public class TestStreetMatcher {
         
         LineString geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470);
 
-        StreetMatcher matcher = new StreetMatcher(_graph);
+        StreetMatcher matcher = new StreetMatcher(graph);
 
         List<Edge> match = matcher.match(geometry);
         assertNotNull(match);
@@ -131,14 +130,14 @@ public class TestStreetMatcher {
      ****/
 
     private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
+        SimpleVertex v = new SimpleVertex(graph, label, lat, lon);
         return v;
     }
 
     private void edges(String... vLabels) {
         for (int i = 0; i < vLabels.length - 1; i++) {
-            StreetVertex vA = (StreetVertex) _graph.getVertex(vLabels[i]);
-            StreetVertex vB = (StreetVertex) _graph.getVertex(vLabels[i + 1]);
+            StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
+            StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
 
             new SimpleEdge(vA, vB);
             new SimpleEdge(vB, vA);

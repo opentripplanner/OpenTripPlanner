@@ -10,29 +10,29 @@ public final class GraphBundle implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private File _path;
+    private File path;
     
     public GraphBundle() {
         
     }
     
     public GraphBundle(File path) {
-        _path = path;
+        this.path = path;
     }
     
     public void setPath(File path) {
-        _path = path;
+        this.path = path;
     }
     
     public File getPath() {
-        return _path;
+        return path;
     }
     
     public File getGraphPath() {
-        return new File(_path,"Graph.obj");
+        return new File(path,"Graph.obj");
     }
 
     public File getExtraClassPath() {
-        return new File(_path, "extraClasses");
+        return new File(path, "extraClasses");
     }
 }

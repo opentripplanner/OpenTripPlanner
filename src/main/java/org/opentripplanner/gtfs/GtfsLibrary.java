@@ -117,22 +117,22 @@ public class GtfsLibrary {
 
     private static class GtfsContextImpl implements GtfsContext {
 
-        private GtfsFeedId _feedId;
+        private GtfsFeedId feedId;
 
         private OtpTransitService transitService;
 
-        private CalendarService _calendar;
+        private CalendarService calendar;
 
         public GtfsContextImpl(GtfsFeedId feedId, OtpTransitService transitService,
                 CalendarService calendar) {
-            _feedId = feedId;
+            this.feedId = feedId;
             this.transitService = transitService;
-            _calendar = calendar;
+            this.calendar = calendar;
         }
 
         @Override
         public GtfsFeedId getFeedId() {
-            return _feedId;
+            return feedId;
         }
 
         @Override
@@ -142,7 +142,7 @@ public class GtfsLibrary {
 
         @Override
         public CalendarService getCalendarService() {
-            return _calendar;
+            return calendar;
         }
     }
 }

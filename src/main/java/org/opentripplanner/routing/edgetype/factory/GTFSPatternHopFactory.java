@@ -275,17 +275,17 @@ public class GTFSPatternHopFactory {
 
     private static GeometryFactory _geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private GtfsFeedId _feedId;
+    private GtfsFeedId feedId;
 
-    private OtpTransitService _transitService;
+    private OtpTransitService transitService;
 
-    private CalendarService _calendarService;
+    private CalendarService calendarService;
     
-    private Map<ShapeSegmentKey, LineString> _geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
+    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
 
-    private Map<FeedId, LineString> _geometriesByShapeId = new HashMap<FeedId, LineString>();
+    private Map<FeedId, LineString> geometriesByShapeId = new HashMap<FeedId, LineString>();
 
-    private Map<FeedId, double[]> _distancesByShapeId = new HashMap<FeedId, double[]>();
+    private Map<FeedId, double[]> distancesByShapeId = new HashMap<FeedId, double[]>();
     
     private FareServiceFactory fareServiceFactory;
 
@@ -304,15 +304,15 @@ public class GTFSPatternHopFactory {
     public int maxInterlineDistance = 200;
 
     public GTFSPatternHopFactory(GtfsContext context) {
-        this._feedId = context.getFeedId();
-        this._transitService = context.getOtpTransitService();
-        this._calendarService = context.getCalendarService();
+        this.feedId = context.getFeedId();
+        this.transitService = context.getOtpTransitService();
+        this.calendarService = context.getCalendarService();
     }
     
     public GTFSPatternHopFactory() {
-        this._feedId = null;
-        this._transitService = null;
-        this._calendarService = null;
+        this.feedId = null;
+        this.transitService = null;
+        this.calendarService = null;
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
@@ -320,7 +320,7 @@ public class GTFSPatternHopFactory {
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
-        fareServiceFactory.processGtfs(_transitService);
+        fareServiceFactory.processGtfs(transitService);
         
         // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
         loadStops(graph);
@@ -332,13 +332,13 @@ public class GTFSPatternHopFactory {
         clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
-        for (FeedId serviceId : _transitService.getAllServiceIds()) {
+        for (FeedId serviceId : transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
         
         LOG.debug("building hops from trips");
-        Collection<Trip> trips = _transitService.getAllTrips();
+        Collection<Trip> trips = transitService.getAllTrips();
         int tripCount = 0;
 
         /* First, record which trips are used by one or more frequency entries.
@@ -347,7 +347,7 @@ public class GTFSPatternHopFactory {
          * Timetable/TripPattern.
          */
         ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();        
-        for(Frequency freq : _transitService.getAllFrequencies()) {
+        for(Frequency freq : transitService.getAllFrequencies()) {
             frequenciesForTrip.put(freq.getTrip(), freq);
         }
         
@@ -370,13 +370,13 @@ public class GTFSPatternHopFactory {
             }
 
             // TODO: move to a validator module
-            if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
+            if ( ! calendarService.getServiceIds().contains(trip.getServiceId())) {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
                 continue TRIP; // Invalid trip, skip it, it will break later
             }
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
-            List<StopTime> stopTimes = new ArrayList<StopTime>(_transitService.getStopTimesForTrip(trip));
+            List<StopTime> stopTimes = new ArrayList<StopTime>(transitService.getStopTimesForTrip(trip));
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
@@ -741,7 +741,7 @@ public class GTFSPatternHopFactory {
             double endIndex = distanceSoFar + endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
 
             ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startIndex, endIndex);
-            LineString geometry = _geometriesByShapeSegmentKey.get(key);
+            LineString geometry = geometriesByShapeSegmentKey.get(key);
 
             if (geometry == null) {
                 LocationIndexedLine locationIndexed = new LocationIndexedLine(shape);
@@ -913,19 +913,19 @@ public class GTFSPatternHopFactory {
     }
     
     private void loadAgencies(Graph graph) {
-        for (Agency agency : _transitService.getAllAgencies()) {
-            graph.addAgency(_feedId.getId(), agency);
+        for (Agency agency : transitService.getAllAgencies()) {
+            graph.addAgency(feedId.getId(), agency);
         }
     }
 
     private void loadFeedInfo(Graph graph) {
-        for (FeedInfo info : _transitService.getAllFeedInfos()) {
+        for (FeedInfo info : transitService.getAllFeedInfos()) {
             graph.addFeedInfo(info);
         }
     }
 
     private void loadPathways(Graph graph) {
-        for (Pathway pathway : _transitService.getAllPathways()) {
+        for (Pathway pathway : transitService.getAllPathways()) {
             Vertex fromVertex = context.stationStopNodes.get(pathway.getFromStop());
             Vertex toVertex = context.stationStopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
@@ -937,7 +937,7 @@ public class GTFSPatternHopFactory {
     }
 
     private void loadStops(Graph graph) {
-        for (Stop stop : _transitService.getAllStops()) {
+        for (Stop stop : transitService.getAllStops()) {
             if (context.stops.contains(stop.getId())) {
                 LOG.error("Skipping stop {} because we already loaded an identical ID.", stop.getId());
                 continue;
@@ -1043,15 +1043,15 @@ public class GTFSPatternHopFactory {
     }
 
     private void clearCachedData() {
-        LOG.debug("shapes=" + _geometriesByShapeId.size());
-        LOG.debug("segments=" + _geometriesByShapeSegmentKey.size());
-        _geometriesByShapeId.clear();
-        _distancesByShapeId.clear();
-        _geometriesByShapeSegmentKey.clear();
+        LOG.debug("shapes=" + geometriesByShapeId.size());
+        LOG.debug("segments=" + geometriesByShapeSegmentKey.size());
+        geometriesByShapeId.clear();
+        distancesByShapeId.clear();
+        geometriesByShapeSegmentKey.clear();
     }
 
     private void loadTransfers(Graph graph) {
-        Collection<Transfer> transfers = _transitService.getAllTransfers();
+        Collection<Transfer> transfers = transitService.getAllTransfers();
         TransferTable transferTable = graph.getTransferTable();
         for (Transfer sourceTransfer : transfers) {
             // Transfers may be specified using parent stations (https://developers.google.com/transit/gtfs/reference/transfers-file)
@@ -1114,7 +1114,7 @@ public class GTFSPatternHopFactory {
         double endDistance = st1.getShapeDistTraveled();
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
-        LineString geometry = _geometriesByShapeSegmentKey.get(key);
+        LineString geometry = geometriesByShapeSegmentKey.get(key);
         if (geometry != null)
             return geometry;
 
@@ -1193,7 +1193,7 @@ public class GTFSPatternHopFactory {
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
 
-        LineString geometry = _geometriesByShapeSegmentKey.get(key);
+        LineString geometry = geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
 
             geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
@@ -1208,7 +1208,7 @@ public class GTFSPatternHopFactory {
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }
-            _geometriesByShapeSegmentKey.put(key, (LineString) geometry);
+            geometriesByShapeSegmentKey.put(key, (LineString) geometry);
         }
 
         return geometry;
@@ -1222,7 +1222,7 @@ public class GTFSPatternHopFactory {
      * which we do not want.
      */
     private List<ShapePoint> getUniqueShapePointsForShapeId(FeedId shapeId) {
-        List<ShapePoint> points = _transitService.getShapePointsForShapeId(shapeId);
+        List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
         ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
         ShapePoint last = null;
         for (ShapePoint sp : points) {
@@ -1247,7 +1247,7 @@ public class GTFSPatternHopFactory {
 
     private LineString getLineStringForShapeId(FeedId shapeId) {
 
-        LineString geometry = _geometriesByShapeId.get(shapeId);
+        LineString geometry = geometriesByShapeId.get(shapeId);
 
         if (geometry != null) 
             return geometry;
@@ -1281,15 +1281,15 @@ public class GTFSPatternHopFactory {
 
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
         geometry = _geometryFactory.createLineString(sequence);
-        _geometriesByShapeId.put(shapeId, geometry);
-        _distancesByShapeId.put(shapeId, distances);
+        geometriesByShapeId.put(shapeId, geometry);
+        distancesByShapeId.put(shapeId, distances);
 
         return geometry;
     }
 
     private double[] getDistanceForShapeId(FeedId shapeId) {
         getLineStringForShapeId(shapeId);
-        return _distancesByShapeId.get(shapeId);
+        return distancesByShapeId.get(shapeId);
     }
 
     private LinearLocation getSegmentFraction(double[] distances, double distance) {
@@ -1366,7 +1366,7 @@ public class GTFSPatternHopFactory {
      * but has been separated out since it is really a separate process.
      */
     public void createParentStationTransfers () {
-        for (Stop stop : _transitService.getAllStops()) {
+        for (Stop stop : transitService.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
                 Vertex stopVertex = context.stationStopNodes.get(stop);
@@ -1374,7 +1374,7 @@ public class GTFSPatternHopFactory {
                 String agencyId = stop.getId().getAgencyId();
                 FeedId parentStationId = new FeedId(agencyId, parentStation);
 
-                Stop parentStop = _transitService.getStopForId(parentStationId);
+                Stop parentStop = transitService.getStopForId(parentStationId);
                 Vertex parentStopVertex = context.stationStopNodes.get(parentStop);
 
                 new FreeEdge(parentStopVertex, stopVertex);
@@ -1412,13 +1412,13 @@ public class GTFSPatternHopFactory {
      * the long distance path service anywhere but the beginning or end of a path.
      */
     public void linkStopsToParentStations(Graph graph) {
-        for (Stop stop : _transitService.getAllStops()) {
+        for (Stop stop : transitService.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
                 TransitStop stopVertex = (TransitStop) context.stationStopNodes.get(stop);
                 String agencyId = stop.getId().getAgencyId();
                 FeedId parentStationId = new FeedId(agencyId, parentStation);
-                Stop parentStop = _transitService.getStopForId(parentStationId);
+                Stop parentStop = transitService.getStopForId(parentStationId);
                 if(context.stationStopNodes.get(parentStop) instanceof TransitStation) {
                     TransitStation parentStopVertex = (TransitStation)
                             context.stationStopNodes.get(parentStop);
@@ -1440,7 +1440,7 @@ public class GTFSPatternHopFactory {
     public void createTransfersTxtTransfers() {
 
         /* Create transfer edges based on transfers.txt. */
-        for (Transfer transfer : _transitService.getAllTransfers()) {
+        for (Transfer transfer : transitService.getAllTransfers()) {
 
             int type = transfer.getTransferType();
             if (type == 3) // type 3 = transfer not possible
@@ -1497,13 +1497,13 @@ public class GTFSPatternHopFactory {
             List<Stop> toStops;
 
             if (fromStop.getLocationType() == PARENT_STATION_LOCATION_TYPE) {
-                fromStops = _transitService.getStopsForStation(fromStop);
+                fromStops = transitService.getStopsForStation(fromStop);
             } else {
                 fromStops = Arrays.asList(fromStop);
             }
 
             if (toStop.getLocationType() == PARENT_STATION_LOCATION_TYPE) {
-                toStops = _transitService.getStopsForStation(toStop);
+                toStops = transitService.getStopsForStation(toStop);
             } else {
                 toStops = Arrays.asList(toStop);
             }

@@ -19,20 +19,20 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class PlainStreetEdgeTest {
 
-    private Graph _graph;
+    private Graph graph;
     private IntersectionVertex v0, v1, v2;
     private RoutingRequest proto;
 
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         proto = new RoutingRequest();
-        proto.setDummyRoutingContext(_graph);
+        proto.setDummyRoutingContext(graph);
         proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
@@ -70,7 +70,7 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.WALK);
-        options.setRoutingContext(_graph, v1, v2);
+        options.setRoutingContext(graph, v1, v2);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
@@ -89,7 +89,7 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, v1, v2);
+        options.setRoutingContext(graph, v1, v2);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
@@ -135,7 +135,7 @@ public class PlainStreetEdgeTest {
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
         forward.bikeSpeed = 3.0f;
-        forward.setRoutingContext(_graph, v0, v2);
+        forward.setRoutingContext(graph, v0, v2);
 
         State s0 = new State(forward);
         State s1 = e0.traverse(s0);
@@ -145,7 +145,7 @@ public class PlainStreetEdgeTest {
         reverse.setMode(TraverseMode.BICYCLE);
         reverse.setArriveBy(true);
         reverse.bikeSpeed = 3.0f;
-        reverse.setRoutingContext(_graph, v0, v2);
+        reverse.setRoutingContext(graph, v0, v2);
 
         State s3 = new State(reverse);
         State s4 = e1.traverse(s3);
@@ -171,7 +171,7 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
-        forward.setRoutingContext(_graph, v0, v2);
+        forward.setRoutingContext(graph, v0, v2);
 
         State s0 = new State(forward);
         State s1 = e0.traverse(s0);
@@ -180,7 +180,7 @@ public class PlainStreetEdgeTest {
         RoutingRequest reverse = proto.clone();
         reverse.setMode(TraverseMode.BICYCLE);
         reverse.setArriveBy(true);
-        reverse.setRoutingContext(_graph, v0, v2);
+        reverse.setRoutingContext(graph, v0, v2);
 
         State s3 = new State(reverse);
         State s4 = e1.traverse(s3);
@@ -201,7 +201,7 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest noPenalty = proto.clone();
         noPenalty.setMode(TraverseMode.BICYCLE);
-        noPenalty.setRoutingContext(_graph, v0, v0);
+        noPenalty.setRoutingContext(graph, v0, v0);
 
         State s0 = new State(noPenalty);
         State s1 = e0.traverse(s0);
@@ -212,7 +212,7 @@ public class PlainStreetEdgeTest {
         withPenalty.bikeSwitchTime = (42);
         withPenalty.bikeSwitchCost = (23);
         withPenalty.setMode(TraverseMode.BICYCLE);
-        withPenalty.setRoutingContext(_graph, v0, v0);
+        withPenalty.setRoutingContext(graph, v0, v0);
 
         State s4 = new State(withPenalty);
         State s5 = e0.traverse(s4);
@@ -247,7 +247,7 @@ public class PlainStreetEdgeTest {
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
-        _graph.addTurnRestriction(e1, new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+        graph.addTurnRestriction(e1, new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
 
         assertNotNull(e0.traverse(e1.traverse(state)));
     }
@@ -257,7 +257,7 @@ public class PlainStreetEdgeTest {
      ****/
 
     private IntersectionVertex vertex(String label, double x, double y) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, x, y);
+        IntersectionVertex v = new IntersectionVertex(graph, label, x, y);
         return v;
     }
 

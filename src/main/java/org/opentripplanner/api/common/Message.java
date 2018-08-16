@@ -35,7 +35,7 @@ public enum Message {
     TRIANGLE_VALUES_NOT_SET(373),
     ;
 
-    private Properties _c = getConfig();
+    private Properties config = getConfig();
     private final int m_id;
 
     /** enum constructors are private -- see values above */
@@ -49,15 +49,15 @@ public enum Message {
 
     /** simple checker / getter of the config */
     public Properties getConfig() {
-        if(_c == null)
-            _c = new Properties(Message.class);
-        return _c;
+        if(config == null)
+            config = new Properties(Message.class);
+        return config;
     }
 
     public String get(String def, Locale l) {
         try {
             getConfig();
-            return _c.get(name(), l);
+            return config.get(name(), l);
         }
         catch(Exception e) {
             Properties.LOG.warn("No entry in Message.properties file could be found for string " + name());

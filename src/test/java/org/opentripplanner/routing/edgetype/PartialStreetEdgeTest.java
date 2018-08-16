@@ -27,13 +27,13 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public class PartialStreetEdgeTest {
     
-    private Graph _graph;
+    private Graph graph;
     private IntersectionVertex v1, v2, v3, v4;
     private StreetEdge e1, e1Reverse, e2, e3;
     
     @Before
     public void setUp() throws Exception {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         v1 = vertex("maple_1st", 2.0, 2.0);
@@ -66,7 +66,7 @@ public class PartialStreetEdgeTest {
     public void testTraversal() {
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, v1, v2);
+        options.setRoutingContext(graph, v1, v2);
 
         // Partial edge with same endpoints as the parent.
         PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
@@ -102,13 +102,13 @@ public class PartialStreetEdgeTest {
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
         TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
-                _graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
+                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
         TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
-                _graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
+                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
 
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, v1, v2);
+        options.setRoutingContext(graph, v1, v2);
 
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
@@ -197,7 +197,7 @@ public class PartialStreetEdgeTest {
      ****/
 
     private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 

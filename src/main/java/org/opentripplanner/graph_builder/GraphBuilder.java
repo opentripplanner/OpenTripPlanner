@@ -14,7 +14,6 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -57,9 +56,9 @@ public class GraphBuilder implements Runnable {
     
     private boolean _alwaysRebuild = true;
 
-    private List<RoutingRequest> _modeList;
+    private List<RoutingRequest> modeList;
     
-    private String _baseGraph = null;
+    private String baseGraph = null;
     
     private Graph graph = new Graph();
 
@@ -84,7 +83,7 @@ public class GraphBuilder implements Runnable {
     }
     
     public void setBaseGraph(String baseGraph) {
-        this._baseGraph = baseGraph;
+        this.baseGraph = baseGraph;
         try {
             graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
         } catch (Exception e) {
@@ -93,11 +92,11 @@ public class GraphBuilder implements Runnable {
     }
 
     public void addMode(RoutingRequest mo) {
-        _modeList.add(mo);
+        modeList.add(mo);
     }
 
     public void setModes(List<RoutingRequest> modeList) {
-        _modeList = modeList;
+        this.modeList = modeList;
     }
     
     public Graph getGraph() {

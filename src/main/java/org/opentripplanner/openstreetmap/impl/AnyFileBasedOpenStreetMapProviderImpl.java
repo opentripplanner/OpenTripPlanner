@@ -7,10 +7,10 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
-    private File _path;
+    private File path;
 
     public void setPath(File path) {
-        _path = path;
+        this.path = path;
     }
 
     public AnyFileBasedOpenStreetMapProviderImpl (File file) {
@@ -22,28 +22,28 @@ public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvi
     @Override
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
-            if (_path.getName().endsWith(".pbf")) {
+            if (path.getName().endsWith(".pbf")) {
                 BinaryFileBasedOpenStreetMapProviderImpl p = new BinaryFileBasedOpenStreetMapProviderImpl();
-                p.setPath(_path);
+                p.setPath(path);
                 p.readOSM(handler);
             } else {
                 StreamedFileBasedOpenStreetMapProviderImpl p = new StreamedFileBasedOpenStreetMapProviderImpl();
-                p.setPath(_path);
+                p.setPath(path);
                 p.readOSM(handler);
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("error loading OSM from path " + _path, ex);
+            throw new IllegalStateException("error loading OSM from path " + path, ex);
         }
     }
 
     public String toString() {
-        return "AnyFileBasedOpenStreetMapProviderImpl(" + _path + ")";
+        return "AnyFileBasedOpenStreetMapProviderImpl(" + path + ")";
     }
 
     @Override
     public void checkInputs() {
-        if (!_path.canRead()) {
-            throw new RuntimeException("Can't read OSM path: " + _path);
+        if (!path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + path);
         }
     }
 }

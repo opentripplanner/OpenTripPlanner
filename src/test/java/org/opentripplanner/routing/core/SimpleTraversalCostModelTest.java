@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
  */
 public class SimpleTraversalCostModelTest {
     
-    private Graph _graph;
+    private Graph graph;
     
     private RoutingRequest options;
 
@@ -30,7 +30,7 @@ public class SimpleTraversalCostModelTest {
     
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
         costModel = new SimpleIntersectionTraversalCostModel();
         
         // Initialize the routing request.
@@ -247,7 +247,7 @@ public class SimpleTraversalCostModelTest {
      ****/
 
     private IntersectionVertex vertex(String label, Coordinate coord, boolean hasLight) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, coord.y, coord.x);
+        IntersectionVertex v = new IntersectionVertex(graph, label, coord.y, coord.x);
         v.trafficLight = (hasLight);
         return v;
     }

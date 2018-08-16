@@ -28,12 +28,12 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public class AStarTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     @Before
     public void before() {
 
-        _graph = new Graph();
+        graph = new Graph();
 
         vertex("56th_24th", 47.669457, -122.387577);
         vertex("56th_22nd", 47.669462, -122.384739);
@@ -85,10 +85,10 @@ public class AStarTest {
     public void testForward() {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("leary_20th"), false);
 
         List<State> states = path.states;
 
@@ -109,11 +109,11 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.setArriveBy(true);
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
-                _graph.getVertex("leary_20th"));
+        options.setRoutingContext(graph, graph.getVertex("56th_24th"),
+                graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("56th_24th"), false);
 
         List<State> states = path.states;
 
@@ -146,13 +146,13 @@ public class AStarTest {
 
         TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
                 new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
-        new TemporaryConcreteEdge(from, _graph.getVertex("shilshole_22nd"));
+        new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
         TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
                 new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
-        new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
+        new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-        options.setRoutingContext(_graph, from, to);
+        options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
@@ -182,13 +182,13 @@ public class AStarTest {
 
         TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
                 new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
-        new TemporaryConcreteEdge(from, _graph.getVertex("shilshole_22nd"));
+        new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
         TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
                 new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
-        new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
+        new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-        options.setRoutingContext(_graph, from, to);
+        options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
@@ -214,13 +214,13 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.batch = true;
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
 
         Set<Vertex> targets = new HashSet<Vertex>();
-        targets.add(_graph.getVertex("shilshole_22nd"));
-        targets.add(_graph.getVertex("market_russell"));
-        targets.add(_graph.getVertex("56th_20th"));
-        targets.add(_graph.getVertex("leary_20th"));
+        targets.add(graph.getVertex("shilshole_22nd"));
+        targets.add(graph.getVertex("market_russell"));
+        targets.add(graph.getVertex("56th_20th"));
+        targets.add(graph.getVertex("leary_20th"));
 
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
         ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
@@ -236,14 +236,14 @@ public class AStarTest {
      ****/
 
     private SimpleConcreteVertex vertex(String label, double lat, double lon) {
-        SimpleConcreteVertex v = new SimpleConcreteVertex(_graph, label, lat, lon);
+        SimpleConcreteVertex v = new SimpleConcreteVertex(graph, label, lat, lon);
         return v;
     }
 
     private void edges(String... vLabels) {
         for (int i = 0; i < vLabels.length - 1; i++) {
-            Vertex vA = _graph.getVertex(vLabels[i]);
-            Vertex vB = _graph.getVertex(vLabels[i + 1]);
+            Vertex vA = graph.getVertex(vLabels[i]);
+            Vertex vB = graph.getVertex(vLabels[i + 1]);
 
             new SimpleConcreteEdge(vA, vB);
             new SimpleConcreteEdge(vB, vA);

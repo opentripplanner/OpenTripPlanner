@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class TurnCostTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     private Vertex topRight;
 
@@ -40,7 +40,7 @@ public class TurnCostTest {
 
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
@@ -121,7 +121,7 @@ public class TurnCostTest {
     @Test
     public void testForwardDefaultNoTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         checkForwardRouteDuration(options, 300);
@@ -131,7 +131,7 @@ public class TurnCostTest {
     public void testForwardDefaultConstTurnCosts() {
         RoutingRequest options = proto.clone();
         options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         // Since we traverse 3 intersections, the total cost should be 330.
@@ -159,7 +159,7 @@ public class TurnCostTest {
     public void testForwardCarNoTurnCosts() {
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 3x100 + 1x50 = 300.
         GraphPath path = checkForwardRouteDuration(options, 350);
@@ -179,7 +179,7 @@ public class TurnCostTest {
         RoutingRequest options = proto.clone();
         options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 3x100 + 1x50 = 350.
         // Since there are 3 turns, the total cost should be 380.
@@ -206,7 +206,7 @@ public class TurnCostTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 
@@ -237,7 +237,7 @@ public class TurnCostTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        _graph.addTurnRestriction(from, restrict);
+        graph.addTurnRestriction(from, restrict);
     }
 
 }

@@ -14,14 +14,14 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class IntersectionVertexTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     private StreetEdge fromEdge;
     private StreetEdge straightAheadEdge;
     
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
@@ -62,7 +62,7 @@ public class IntersectionVertexTest {
 
     @Test
     public void testFreeFlowing() {
-        IntersectionVertex iv = new IntersectionVertex(_graph, "vertex", 1.0, 2.0);
+        IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
         assertFalse(iv.freeFlowing);
         
         iv.freeFlowing = (true);
@@ -71,7 +71,7 @@ public class IntersectionVertexTest {
     
     @Test
     public void testInferredFreeFlowing() {
-        IntersectionVertex iv = new IntersectionVertex(_graph, "vertex", 1.0, 2.0);
+        IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
         assertFalse(iv.trafficLight);
         assertFalse(iv.inferredFreeFlowing());
         assertEquals(0, iv.getDegreeIn());
@@ -105,7 +105,7 @@ public class IntersectionVertexTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 

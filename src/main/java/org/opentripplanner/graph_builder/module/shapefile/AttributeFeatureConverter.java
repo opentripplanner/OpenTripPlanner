@@ -10,11 +10,11 @@ import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConvert
  * Reads a single attribute from a feature and converts it to an object */
 public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
 
-    private String _attributeName;
+    private String attributeName;
     private boolean decodeUTF8 = true;
 
     public AttributeFeatureConverter(String attributeName) {
-        _attributeName = attributeName;
+        this.attributeName = attributeName;
     }
     
     public AttributeFeatureConverter() {
@@ -22,17 +22,17 @@ public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
     }
     
     public void setAttributeName(String attributeName){
-        _attributeName = attributeName;
+        this.attributeName = attributeName;
     }
     
     public String getAttributeName() {
-        return _attributeName;
+        return attributeName;
     }
 
     @SuppressWarnings({ "unchecked", "deprecation" })
     @Override
     public T convert(SimpleFeature feature) {
-        T value = (T) feature.getAttribute(_attributeName);
+        T value = (T) feature.getAttribute(attributeName);
         if (value instanceof String && decodeUTF8) {
             String str = (String) value;
             //decode UTF-8, irritatingly

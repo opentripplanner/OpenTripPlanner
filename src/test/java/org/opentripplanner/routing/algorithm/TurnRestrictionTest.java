@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class TurnRestrictionTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     private Vertex topRight;
 
@@ -37,7 +37,7 @@ public class TurnRestrictionTest {
 
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
@@ -87,8 +87,8 @@ public class TurnRestrictionTest {
 
     @Test
     public void testHasExplicitTurnRestrictions() {
-        assertFalse(_graph.getTurnRestrictions(maple_main1).isEmpty());
-        assertTrue(_graph.getTurnRestrictions(broad1_2).isEmpty());
+        assertFalse(graph.getTurnRestrictions(maple_main1).isEmpty());
+        assertTrue(graph.getTurnRestrictions(broad1_2).isEmpty());
     }
     
     @Test
@@ -97,7 +97,7 @@ public class TurnRestrictionTest {
         options.carSpeed = 1.0;
         options.walkSpeed = 1.0;
 
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -122,7 +122,7 @@ public class TurnRestrictionTest {
         RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
         options.walkSpeed = 1.0;
         
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -147,7 +147,7 @@ public class TurnRestrictionTest {
         RoutingRequest options = new RoutingRequest(TraverseMode.CAR);
         options.carSpeed = 1.0;
 
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -173,7 +173,7 @@ public class TurnRestrictionTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 
@@ -198,7 +198,7 @@ public class TurnRestrictionTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        _graph.addTurnRestriction(from, restrict);
+        graph.addTurnRestriction(from, restrict);
     }
 
 }

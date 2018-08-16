@@ -18,45 +18,45 @@ import crosby.binary.file.BlockInputStream;
  */
 public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
-    private File _path;
+    private File path;
 
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
             BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(handler);
 
-            FileInputStream input = new FileInputStream(_path);
+            FileInputStream input = new FileInputStream(path);
             parser.setParseNodes(false);
             parser.setParseWays(false);
             (new BlockInputStream(input, parser)).process();
             handler.doneFirstPhaseRelations();
 
-            input = new FileInputStream(_path);
+            input = new FileInputStream(path);
             parser.setParseRelations(false);
             parser.setParseWays(true);
             (new BlockInputStream(input, parser)).process();
             handler.doneSecondPhaseWays();
 
-            input = new FileInputStream(_path);
+            input = new FileInputStream(path);
             parser.setParseNodes(true);
             parser.setParseWays(false);
             (new BlockInputStream(input, parser)).process();
             handler.doneThirdPhaseNodes();
         } catch (Exception ex) {
-            throw new IllegalStateException("error loading OSM from path " + _path, ex);        }
+            throw new IllegalStateException("error loading OSM from path " + path, ex);        }
     }
 
     public void setPath(File path) {
-        _path = path;
+        this.path = path;
     }
 
     public String toString() {
-        return "BinaryFileBasedOpenStreetMapProviderImpl(" + _path + ")";
+        return "BinaryFileBasedOpenStreetMapProviderImpl(" + path + ")";
     }
 
     @Override
     public void checkInputs() {
-        if (!_path.canRead()) {
-            throw new RuntimeException("Can't read OSM path: " + _path);
+        if (!path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + path);
         }
     }
 }

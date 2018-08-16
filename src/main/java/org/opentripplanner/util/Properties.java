@@ -15,18 +15,18 @@ public class Properties {
 
     public static final Logger LOG = LoggerFactory.getLogger(Properties.class);
 
-    private final String _bundle; 
+    private final String bundle;
 
     public Properties() {
         this(Properties.class);
     }
 
     public Properties(Class<?> c) {
-        _bundle = c.getSimpleName();
+        bundle = c.getSimpleName();
     }
 
-    public Properties(String bun) {
-        _bundle = bun;
+    public Properties(String bundle) {
+        this.bundle = bundle;
     }
 
     /** 
@@ -45,11 +45,11 @@ public class Properties {
     }
 
     public synchronized String get(String name, Locale l) throws Exception {
-        ResourceBundle rb = getBundle(_bundle, l);
+        ResourceBundle rb = getBundle(bundle, l);
         return rb.getString(name);
     }
     public synchronized String get(String name) throws Exception {
-        ResourceBundle rb = getBundle(_bundle, Locale.getDefault());
+        ResourceBundle rb = getBundle(bundle, Locale.getDefault());
         return rb.getString(name);
     }
 
@@ -123,7 +123,7 @@ public class Properties {
 
     public synchronized String format(String name, Locale l, Object... args) {
         try {
-            ResourceBundle rb = getBundle(_bundle, l);
+            ResourceBundle rb = getBundle(bundle, l);
             return MessageFormat.format(rb.getString(name), args);
         } catch (Exception e) {
             LOG.warn("couldn't find / format property " + name + "; returning null", e);

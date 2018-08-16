@@ -52,7 +52,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private EntityHandler counter = new EntityCounter();
 
-    private FareServiceFactory _fareServiceFactory;
+    private FareServiceFactory fareServiceFactory;
 
     /** will be applied to all bundles which do not have the cacheDirectory property set */
     private File cacheDirectory;
@@ -79,7 +79,7 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     public void setFareServiceFactory(FareServiceFactory factory) {
-        _fareServiceFactory = factory;
+        fareServiceFactory = factory;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class GtfsModule implements GraphBuilderModule {
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
 
                 hf.setStopContext(stopContext);
-                hf.setFareServiceFactory(_fareServiceFactory);
+                hf.setFareServiceFactory(fareServiceFactory);
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
 
                 calendarService.addData(
@@ -366,10 +366,10 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityBikeability implements EntityHandler {
 
-        private Boolean _defaultBikesAllowed;
+        private Boolean defaultBikesAllowed;
 
         public EntityBikeability(Boolean defaultBikesAllowed) {
-            _defaultBikesAllowed = defaultBikesAllowed;
+            this.defaultBikesAllowed = defaultBikesAllowed;
         }
 
         @Override
@@ -379,7 +379,7 @@ public class GtfsModule implements GraphBuilderModule {
             }
 
             Trip trip = (Trip) bean;
-            if (_defaultBikesAllowed && BikeAccess.fromTrip(trip) == BikeAccess.UNKNOWN) {
+            if (defaultBikesAllowed && BikeAccess.fromTrip(trip) == BikeAccess.UNKNOWN) {
                 BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
             }
         }
