@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1260,8 +1261,17 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> {
                     try {
                         return GtfsLibrary.getTraverseMode(((Stop)environment.getSource()).getVehicleType());
-                    } catch (IllegalArgumentException iae) { //Handle unknown vehicle types
-                        return null;
+                    } catch (IllegalArgumentException iae) {
+                        //If 'vehicleType' is not specified, guess vehicle mode from list of patterns
+                        return index.patternsForStop.get(environment.getSource())
+                                .stream()
+                                .map(pattern -> pattern.mode)
+                                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                                .entrySet()
+                                .stream()
+                                .max(Comparator.comparing(Map.Entry::getValue))
+                                .map(e -> e.getKey())
+                                .orElse(null);
                     }
                 })
                 .build())
