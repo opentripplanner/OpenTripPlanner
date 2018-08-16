@@ -1,4 +1,4 @@
-/* This file is copied from OpenSphere project. */
+/* This file is based on code copied from project OpenSphere, see the LICENSE file for further information. */
 package org.opensphere.geometry.algorithm;
 
 import java.util.ArrayList;

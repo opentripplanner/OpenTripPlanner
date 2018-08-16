@@ -1,5 +1,7 @@
-/* This file is copied from Jerry Huxtable, JH Labs. */
-
+/*
+  This file is based on code copied from project Java Image Processing, JH Labs,
+  see the LICENSE file for further information.
+*/
 package com.jhlabs.awt;
 
 import java.awt.Font;

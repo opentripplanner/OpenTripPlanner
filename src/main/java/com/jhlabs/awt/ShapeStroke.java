@@ -1,4 +1,7 @@
-/* This file is copied from Jerry Huxtable, JH Labs. */
+/*
+  This file is based on code copied from project Java Image Processing, JH Labs,
+  see the LICENSE file for further information.
+*/
 package com.jhlabs.awt;
 
 import java.awt.Shape;
@@ -13,10 +16,10 @@ import java.awt.geom.Rectangle2D;
  * Stroke that draw a shape.
  * 
  * Slightly adapted to OTP from original source.
- * 
+ *
  * @see <a
  *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
- * 
+ *
  */
 public class ShapeStroke implements Stroke {
     private Shape theShape;
