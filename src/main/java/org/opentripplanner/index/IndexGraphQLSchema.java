@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1252,6 +1253,27 @@ public class IndexGraphQLSchema {
                 .name("vehicleType")
 		        .description("The raw GTFS route type used by routes which pass through this stop. For the list of possible values, see: https://developers.google.com/transit/gtfs/reference/#routestxt and https://developers.google.com/transit/gtfs/reference/extended-route-types")
                 .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("vehicleMode")
+                .description("Transport mode (e.g. `BUS`) used by routes which pass through this stop or `null` if mode cannot be determined, e.g. in case no routes pass through the stop.  \n Note that also other types of vehicles may use the stop, e.g. tram replacement buses might use stops which have `TRAM` as their mode.")
+                .type(modeEnum)
+                .dataFetcher(environment -> {
+                    try {
+                        return GtfsLibrary.getTraverseMode(((Stop)environment.getSource()).getVehicleType());
+                    } catch (IllegalArgumentException iae) {
+                        //If 'vehicleType' is not specified, guess vehicle mode from list of patterns
+                        return index.patternsForStop.get(environment.getSource())
+                                .stream()
+                                .map(pattern -> pattern.mode)
+                                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                                .entrySet()
+                                .stream()
+                                .max(Comparator.comparing(Map.Entry::getValue))
+                                .map(e -> e.getKey())
+                                .orElse(null);
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("platformCode")
