@@ -1254,6 +1254,18 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLInt)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("vehicleMode")
+                .description("Transport mode (e.g. `BUS`) used by routes which pass through this stop. ")
+                .type(modeEnum)
+                .dataFetcher(environment -> {
+                    try {
+                        return GtfsLibrary.getTraverseMode(((Stop)environment.getSource()).getVehicleType());
+                    } catch (IllegalArgumentException iae) { //Handle unknown vehicle types
+                        return null;
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("platformCode")
 		.description("Identifier of the platform, usually a number. This value is only present for stops that are part of a station")
                 .type(Scalars.GraphQLString)
