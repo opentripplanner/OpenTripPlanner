@@ -1255,7 +1255,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("vehicleMode")
-                .description("Transport mode (e.g. `BUS`) used by routes which pass through this stop. ")
+                .description("Transport mode (e.g. `BUS`) used by routes which pass through this stop.  \n Note that also other types of vehicles may use this stop, e.g. tram-replacement buses.")
                 .type(modeEnum)
                 .dataFetcher(environment -> {
                     try {
