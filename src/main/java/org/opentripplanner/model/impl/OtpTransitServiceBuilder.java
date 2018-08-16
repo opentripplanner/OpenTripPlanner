@@ -20,7 +20,12 @@ import org.opentripplanner.model.OtpTransitService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OtpTransitBuilder {
+/**
+ * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
+ * {@link #build()} method is read only, and this class provide a mutable collections to construct
+ * a {@link OtpTransitService} instance.
+ */
+public class OtpTransitServiceBuilder {
     private final List<Agency> agencies = new ArrayList<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
@@ -49,14 +54,14 @@ public class OtpTransitBuilder {
 
     private final List<Trip> trips = new ArrayList<>();
 
-    public OtpTransitBuilder() {
+    public OtpTransitServiceBuilder() {
     }
 
-    public OtpTransitBuilder(OtpTransitService transitService) {
+    public OtpTransitServiceBuilder(OtpTransitService transitService) {
         add(transitService);
     }
 
-    public OtpTransitBuilder add(OtpTransitService other) {
+    public OtpTransitServiceBuilder add(OtpTransitService other) {
         agencies.addAll(other.getAllAgencies());
         calendarDates.addAll(other.getAllCalendarDates());
         calendars.addAll(other.getAllCalendars());
@@ -132,18 +137,18 @@ public class OtpTransitBuilder {
 
     public OtpTransitService build() {
 
-        createNoneExistingIds();
+        createNoneExistentIds();
 
         return new OtpTransitServiceImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
                 feedInfos, frequencies, pathways, routes, shapePoints, stops, stopTimes, transfers,
                 trips);
     }
 
-    private void createNoneExistingIds() {
-        generateNoneExistingIds(feedInfos);
+    private void createNoneExistentIds() {
+        generateNoneExistentIds(feedInfos);
     }
 
-    static <T extends IdentityBean<Integer>> void generateNoneExistingIds(List<T> entities) {
+    static <T extends IdentityBean<Integer>> void generateNoneExistentIds(List<T> entities) {
         int maxId = 0;
         for (T it : entities) {
             maxId = zeroOrNull(it.getId()) ? maxId : Math.max(maxId, it.getId());

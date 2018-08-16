@@ -15,7 +15,7 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 /**
- *  Retains graph-wide information between GTFSPatternHopFactory runs on different feeds.
+ *  Retains graph-wide information between PatternHopFactory runs on different feeds.
  *  FIXME is there any legitimate reason to even do that? Wouldn't it be better to keep each GTFS completely isolated?
  */
 public class GtfsStopContext {

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Responsible for mapping GTFS Route into the OTP model. */
 class RouteMapper {
     private final AgencyMapper agencyMapper;
 
@@ -20,6 +21,7 @@ class RouteMapper {
         return MapUtils.mapToList(agencies, this::map);
     }
 
+    /** Map from GTFS to OTP model, {@code null} safe.  */
     Route map(org.onebusaway.gtfs.model.Route orginal) {
         return orginal == null ? null : mappedRoutes.computeIfAbsent(orginal, this::doMap);
     }

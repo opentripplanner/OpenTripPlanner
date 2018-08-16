@@ -11,7 +11,7 @@ import java.util.List;
 import static java.lang.Integer.valueOf;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.opentripplanner.model.impl.OtpTransitBuilder.generateNoneExistingIds;
+import static org.opentripplanner.model.impl.OtpTransitServiceBuilder.generateNoneExistentIds;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
@@ -24,16 +24,16 @@ public class OtpTransitServiceBuilderTest {
     private static final Integer ID_6 = valueOf(6);
 
     @Test
-    public void testGenerateNoneExistingIds() throws Exception {
+    public void testGenerateNoneExistentIds() throws Exception {
         List<? extends IdentityBean<Integer>> list;
 
         // An empty list should not cause any trouble (Exception)
-        generateNoneExistingIds(Collections.<FeedInfo>emptyList());
+        generateNoneExistentIds(Collections.<FeedInfo>emptyList());
 
 
         // Generate id for one value
         list = singletonList(newEntity());
-        generateNoneExistingIds(list);
+        generateNoneExistentIds(list);
         assertEquals(ID_1, list.get(0).getId());
 
         // Given two entities with no id and max Íd = 4
@@ -43,7 +43,7 @@ public class OtpTransitServiceBuilderTest {
                 newEntity()
         );
         // When
-        generateNoneExistingIds(list);
+        generateNoneExistentIds(list);
         // Then expect
         // First new id to be: maxId + 1 = 4+1 = 5
         assertEquals(ID_5, id(list, 0));

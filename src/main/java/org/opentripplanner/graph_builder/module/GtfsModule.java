@@ -34,7 +34,7 @@ import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarSrvDataWithoutDatesForLocalizedSrvId;
-import static org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper.mapDao;
+import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToOTPTransitService;
 
 public class GtfsModule implements GraphBuilderModule {
 
@@ -105,12 +105,12 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
                 }
 
-                OtpTransitService transitService = mapDao(loadBundle(gtfsBundle));
+                OtpTransitService transitService = mapGtfsDaoToOTPTransitService(loadBundle(gtfsBundle));
 
                 GtfsContext context = GtfsLibrary
                         .createContext(gtfsBundle.getFeedId(), transitService, calendarService);
 
-                GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
+                PatternHopFactory hf = new PatternHopFactory(context);
 
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(fareServiceFactory);

@@ -36,7 +36,7 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -94,7 +94,7 @@ public class TimetableSnapshotSourceTest {
             pathway.getId().setAgencyId(feedId);
         }
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
 

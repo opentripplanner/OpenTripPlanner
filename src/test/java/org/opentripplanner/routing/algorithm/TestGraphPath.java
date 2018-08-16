@@ -12,7 +12,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -31,7 +31,7 @@ public class TestGraphPath extends TestCase {
     public void setUp() throws Exception {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
-        GTFSPatternHopFactory hl = new GTFSPatternHopFactory(context);
+        PatternHopFactory hl = new PatternHopFactory(context);
         hl.run(graph);
         graph.putService(
                 CalendarServiceData.class,

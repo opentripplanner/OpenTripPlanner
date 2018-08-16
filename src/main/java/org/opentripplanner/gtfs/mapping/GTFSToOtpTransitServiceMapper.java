@@ -1,9 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.impl.OtpTransitBuilder;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.model.OtpTransitService;
 
-public class OtpTransitDaoMapper {
+
+/**
+ * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
+ * General mapping code or reusable bussiness logic should be moved into the Builder; hence
+ * reusable for other import modules.
+ */
+public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
 
     private final StopMapper stopMapper = new StopMapper();
@@ -36,12 +42,15 @@ public class OtpTransitDaoMapper {
             routeMapper, fareAttributeMapper
     );
 
-    public static OtpTransitService mapDao(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
-        return new OtpTransitDaoMapper().map(data);
+    /**
+     * Map from GTFS data to the internal OTP model
+     */
+    public static OtpTransitService mapGtfsDaoToOTPTransitService(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
+        return new GTFSToOtpTransitServiceMapper().map(data);
     }
 
     private OtpTransitService map(org.onebusaway.gtfs.services.GtfsRelationalDao data) {
-        OtpTransitBuilder builder = new OtpTransitBuilder();
+        OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
         builder.getAgencies().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));

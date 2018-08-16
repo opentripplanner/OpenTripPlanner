@@ -25,7 +25,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -45,7 +45,7 @@ public class TimetableSnapshotTest {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class, createCalendarServiceData(context.getOtpTransitService())

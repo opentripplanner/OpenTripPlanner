@@ -679,7 +679,7 @@ public class TimetableSnapshotSource {
             }
         }
 
-        // TODO: filter/interpolate stop times like in GTFSPatternHopFactory?
+        // TODO: filter/interpolate stop times like in PatternHopFactory?
 
         // Create StopPattern
         final StopPattern stopPattern = new StopPattern(stopTimes);

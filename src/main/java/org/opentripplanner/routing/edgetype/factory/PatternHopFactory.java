@@ -94,40 +94,7 @@ import java.util.Map;
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
 
-/** A wrapper class for Trips that allows them to be sorted. */
-class InterliningTrip  implements Comparable<InterliningTrip> {
-    public Trip trip;
-    public StopTime firstStopTime;
-    public StopTime lastStopTime;
-    TripPattern tripPattern;
-
-    InterliningTrip(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
-        this.trip = trip;
-        this.firstStopTime = stopTimes.get(0);
-        this.lastStopTime = stopTimes.get(stopTimes.size() - 1);
-        this.tripPattern = tripPattern;
-    }
-
-    public int getPatternIndex() {
-        return tripPattern.getTripIndex(trip);
-    }
-    
-    @Override
-    public int compareTo(InterliningTrip o) {
-        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof InterliningTrip) {
-            return compareTo((InterliningTrip) o) == 0;
-        }
-        return false;
-    }
-    
-}
-
-/** 
+/**
  * This compound key object is used when grouping interlining trips together by (serviceId, blockId). 
  */
 class BlockIdAndServiceId {
@@ -267,9 +234,9 @@ class IndexedLineSegmentComparator implements Comparator<IndexedLineSegment> {
 /**
  * Generates a set of edges from GTFS.
  */
-public class GTFSPatternHopFactory {
+public class PatternHopFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PatternHopFactory.class);
 
     private static final int SECONDS_IN_HOUR = 60 * 60; // rename to seconds in hour
 
@@ -303,13 +270,13 @@ public class GTFSPatternHopFactory {
 
     public int maxInterlineDistance = 200;
 
-    public GTFSPatternHopFactory(GtfsContext context) {
+    public PatternHopFactory(GtfsContext context) {
         this.feedId = context.getFeedId();
         this.transitService = context.getOtpTransitService();
         this.calendarService = context.getCalendarService();
     }
     
-    public GTFSPatternHopFactory() {
+    public PatternHopFactory() {
         this.feedId = null;
         this.transitService = null;
         this.calendarService = null;

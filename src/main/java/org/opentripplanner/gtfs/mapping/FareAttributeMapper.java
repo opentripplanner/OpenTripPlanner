@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
+/** Responsible for mapping GTFS FareAttribute into the OTP model. */
 class FareAttributeMapper {
     private Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
@@ -16,6 +17,7 @@ class FareAttributeMapper {
         return MapUtils.mapToList(allStops, this::map);
     }
 
+    /** Map from GTFS to OTP model, {@code null} safe.  */
     FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {
         return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
     }

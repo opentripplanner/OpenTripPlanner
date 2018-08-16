@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Responsible for mapping GTFS FareRule into the OTP model. */
 class FareRuleMapper {
 
     private final RouteMapper routeMapper;
@@ -24,6 +25,7 @@ class FareRuleMapper {
         return MapUtils.mapToList(allFareRules, this::map);
     }
 
+    /** Map from GTFS to OTP model, {@code null} safe.  */
     FareRule map(org.onebusaway.gtfs.model.FareRule orginal) {
         return orginal == null ? null : mappedFareRules.computeIfAbsent(orginal, this::doMap);
     }

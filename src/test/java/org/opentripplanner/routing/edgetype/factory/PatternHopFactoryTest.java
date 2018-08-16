@@ -12,7 +12,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
-public class GTFSPatternHopFactoryTest {
+public class PatternHopFactoryTest {
 
     @Test
     public void testBikesAllowed() throws IOException {
@@ -27,7 +27,7 @@ public class GTFSPatternHopFactoryTest {
                 "t0,09:00:00,17:00:00,300");
 
         GtfsFeedId feedId = new GtfsFeedId.Builder().id("FEED").build();
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(
+        PatternHopFactory factory = new PatternHopFactory(
                 GtfsLibrary.createContext(feedId, gtfs.read())
         );
         Graph graph = new Graph();

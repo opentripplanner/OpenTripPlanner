@@ -32,15 +32,15 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * A in-memory implementation of OtpTransitDao. It's super fast for most
- * methods, but only if you have enough memory to load your entire OtpTransitDao
+ * A in-memory implementation of {@link OtpTransitService}. It's super fast for most
+ * methods, but only if you have enough memory to load your entire {@link OtpTransitService}
  * into memory.
  * <p>
- * The Dao is read only, to enforece consistency after generating indexes and ids.
+ * This class is read only, to enforce consistency after generating indexes and ids.
  * You will get an exception if you try to add entities to one of the collections.
  * If you need to modify a {@link OtpTransitService}, you can create a new
- * {@link OtpTransitBuilder} based on your old data, do your modification and
- * create a new unmodifiable dao.
+ * {@link OtpTransitServiceBuilder} based on your old data, do your modification and
+ * create a new unmodifiable instance.
  *
  * @author bdferris
  */
@@ -88,8 +88,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private Map<FeedId, List<ServiceCalendar>> calendarsByServiceId = null;
 
     /**
-     * Create a read only version of the OtpTransitDao.
-     * @see OtpTransitBuilder Use builder to create an new OtpTransitDao.
+     * Create a read only version of the {@link OtpTransitService}.
+     * @see OtpTransitServiceBuilder Use builder to mutate the instance.
      */
     OtpTransitServiceImpl(List<Agency> agencies, List<ServiceCalendarDate> calendarDates,
             List<ServiceCalendar> calendars, List<FareAttribute> fareAttributes,

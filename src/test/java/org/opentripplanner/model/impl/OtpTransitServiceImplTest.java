@@ -20,7 +20,7 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
+import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class OtpTransitServiceImplTest {
         reader.setDefaultAgencyId(FEED_ID);
         reader.run();
 
-        OtpTransitBuilder builder = new OtpTransitBuilder(OtpTransitDaoMapper.mapDao(dao));
+        OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder(GTFSToOtpTransitServiceMapper.mapGtfsDaoToOTPTransitService(dao));
         agency = first(builder.getAgencies());
 
         // Supplement test data with at least one entity in all collections

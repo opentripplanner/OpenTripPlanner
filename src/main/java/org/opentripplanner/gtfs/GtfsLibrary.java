@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs;
 
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.gtfs.mapping.OtpTransitDaoMapper;
+import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.FeedId;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.OtpTransitService;
@@ -31,7 +31,7 @@ public class GtfsLibrary {
         GtfsImport gtfsImport = new GtfsImport(path);
 
         GtfsFeedId feedId = gtfsImport.getFeedId();
-        OtpTransitService transitService = OtpTransitDaoMapper.mapDao(gtfsImport.getDao());
+        OtpTransitService transitService = GTFSToOtpTransitServiceMapper.mapGtfsDaoToOTPTransitService(gtfsImport.getDao());
         CalendarService calendarService = createCalendarService(transitService);
 
         return new GtfsContextImpl(feedId, transitService, calendarService);

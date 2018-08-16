@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
+/** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
     private Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
 
@@ -16,6 +17,7 @@ class StopMapper {
         return MapUtils.mapToList(allStops, this::map);
     }
 
+    /** Map from GTFS to OTP model, {@code null} safe.  */
     Stop map(org.onebusaway.gtfs.model.Stop orginal) {
         return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
     }
