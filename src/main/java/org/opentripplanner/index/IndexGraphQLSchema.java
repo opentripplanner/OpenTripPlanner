@@ -167,11 +167,11 @@ public class IndexGraphQLSchema {
 
     public static GraphQLEnumType qualifierEnum = GraphQLEnumType.newEnum()
         .name("Qualifier")
-        .description("Additional qualifier for a transport mode")
+        .description("Additional qualifier for a transport mode.  \n Note that qualifiers can only be used with certain transport modes.")
         .value("RENT", QualifiedMode.Qualifier.RENT, "The vehicle used for transport can be rented")
-        .value("HAVE", QualifiedMode.Qualifier.HAVE, "~~HAVE~~ **Currently not used**")
-        .value("PARK", QualifiedMode.Qualifier.PARK, "~~PARK~~ **Currently not used**")
-        .value("KEEP", QualifiedMode.Qualifier.KEEP, "~~KEEP~~ **Currently not used**")
+        .value("HAVE", QualifiedMode.Qualifier.HAVE, "~~HAVE~~  \n **Currently not used**")
+        .value("PARK", QualifiedMode.Qualifier.PARK, "The vehicle used must be left to a parking area before continuing the journey. This qualifier is usable with transport modes `CAR` and `BICYCLE`.  \n Note that the vehicle is only parked if the journey is continued with public transportation (e.g. if only `CAR` and `WALK` transport modes are allowed to be used, the car will not be parked as it is used for the whole journey).")
+        .value("KEEP", QualifiedMode.Qualifier.KEEP, "~~KEEP~~  \n **Currently not used**")
         .value("PICKUP", QualifiedMode.Qualifier.PICKUP, "The user can be picked up by someone else riding a vehicle")
         .build();
 
