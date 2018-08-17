@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,9 +29,9 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Graph graph = new Graph();
         
         Stop stop1 = new Stop();
-        stop1.setId(new FeedId("agency", "stop1"));
+        stop1.setId(new FeedScopedId("agency", "stop1"));
         Stop stop2 = new Stop();
-        stop2.setId(new FeedId("agency", "stop2"));
+        stop2.setId(new FeedScopedId("agency", "stop2"));
         
         Vertex from = new TransitStop(graph, stop1);
         Vertex to = new TransitStop(graph, stop2);

@@ -12,7 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -323,17 +323,17 @@ public class TestPatternHopFactory extends TestCase {
         // create dummy routes and trips
         // In tests we don't patch entities with the feed id, only default agency id is used.
         Route fromRoute = new Route();
-        fromRoute.setId(new FeedId("agency", "1"));
+        fromRoute.setId(new FeedScopedId("agency", "1"));
         Trip fromTrip = new Trip();
-        fromTrip.setId(new FeedId("agency", "1.1"));
+        fromTrip.setId(new FeedScopedId("agency", "1.1"));
         fromTrip.setRoute(fromRoute);
         Route toRoute = new Route();
-        toRoute.setId(new FeedId("agency", "2"));
+        toRoute.setId(new FeedScopedId("agency", "2"));
         Trip toTrip = new Trip();
-        toTrip.setId(new FeedId("agency", "2.1"));
+        toTrip.setId(new FeedScopedId("agency", "2.1"));
         toTrip.setRoute(toRoute);
         Trip toTrip2 = new Trip();
-        toTrip2.setId(new FeedId("agency", "2.2"));
+        toTrip2.setId(new FeedScopedId("agency", "2.2"));
         toTrip2.setRoute(toRoute);
         
         // find stops

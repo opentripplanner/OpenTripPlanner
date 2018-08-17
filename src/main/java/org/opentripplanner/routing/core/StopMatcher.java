@@ -3,7 +3,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
@@ -19,7 +19,7 @@ public class StopMatcher implements Cloneable, Serializable {
     /**
      * Set of full matching stop ids (agency ID: + stop ID)
      */
-    private HashSet<FeedId> agencyAndStopIds = new HashSet<FeedId>();
+    private HashSet<FeedScopedId> agencyAndStopIds = new HashSet<FeedScopedId>();
 
     private StopMatcher() {
     }
@@ -58,7 +58,7 @@ public class StopMatcher implements Cloneable, Serializable {
             n++;
 
             try {
-                FeedId stopId = GtfsLibrary.convertIdFromString(stopString);
+                FeedScopedId stopId = GtfsLibrary.convertIdFromString(stopString);
                 retval.agencyAndStopIds.add(stopId);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Wrong stop spec format: " + stopString);
@@ -90,7 +90,7 @@ public class StopMatcher implements Cloneable, Serializable {
             else if (stop.getParentStation() != null 
                     && !stop.getParentStation().isEmpty()) {
                 // This stop has a parent
-                FeedId parentId = new FeedId(stop.getId().getAgencyId(), stop.getParentStation());
+                FeedScopedId parentId = new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
                 if (matches(parentId)) {
                     return true;    
                 }
@@ -105,7 +105,7 @@ public class StopMatcher implements Cloneable, Serializable {
      * @param stopId is the stop id
      * @return true when stop id is matched 
      */
-    private boolean matches(FeedId stopId) {
+    private boolean matches(FeedScopedId stopId) {
         if (agencyAndStopIds.contains(stopId)) {
             return true;    
         }
@@ -118,8 +118,8 @@ public class StopMatcher implements Cloneable, Serializable {
      */
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        for (FeedId feedId : agencyAndStopIds) {
-            builder.append(feedId.toString());
+        for (FeedScopedId id : agencyAndStopIds) {
+            builder.append(id.toString());
             builder.append(",");
         }
         // Remove last comma

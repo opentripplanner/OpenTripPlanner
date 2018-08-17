@@ -2,7 +2,7 @@ package org.opentripplanner.index.model;
 
 import java.util.Collection;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.beust.jcommander.internal.Lists;
@@ -10,7 +10,7 @@ import com.beust.jcommander.internal.Lists;
 public class PatternDetail extends PatternShort {
 
     /* Maybe these should just be lists of IDs only, since there are stops and trips subendpoints. */
-    public FeedId routeId;
+    public FeedScopedId routeId;
     public Collection<StopShort> stops = Lists.newArrayList();
     public Collection<TripShort> trips = Lists.newArrayList();
     

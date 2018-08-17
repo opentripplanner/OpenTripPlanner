@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.model.*;
 import org.mapdb.Fun;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -394,7 +394,7 @@ public class FakeGraph {
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
                 String id = "" + count++;
-                FeedId aid = new FeedId("TEST", id);
+                FeedScopedId aid = new FeedScopedId("TEST", id);
                 Stop stop = new Stop();
                 stop.setLat(lat);
                 stop.setLon(lon);
@@ -414,7 +414,7 @@ public class FakeGraph {
         double lon = -83;
         for (double lat = 40; lat < 40.01; lat += 0.005) {
             String id = "EXTRA_" + count++;
-            FeedId aid = new FeedId("EXTRA", id);
+            FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
             stop.setLat(lat);
             stop.setLon(lon);
@@ -431,7 +431,7 @@ public class FakeGraph {
 
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedId aid = new FeedId("EXTRA", id);
+            FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
             stop.setLat(lat);
             stop.setLon(lon);
@@ -448,7 +448,7 @@ public class FakeGraph {
 
         for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedId aid = new FeedId("EXTRA", id);
+            FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
             stop.setLat(lat);
             stop.setLon(lon);

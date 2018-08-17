@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 public class BogusShapeGeometry extends GraphBuilderAnnotation {
 
@@ -8,9 +8,9 @@ public class BogusShapeGeometry extends GraphBuilderAnnotation {
 
     public static final String FMT = "Shape geometry for shape_id %s does not have two distinct points.";
     
-    final FeedId shapeId;
+    final FeedScopedId shapeId;
     
-    public BogusShapeGeometry(FeedId shapeId){
+    public BogusShapeGeometry(FeedScopedId shapeId){
     	this.shapeId = shapeId;
     }
     

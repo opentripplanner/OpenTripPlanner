@@ -3,7 +3,7 @@ package org.opentripplanner.routing.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -42,7 +42,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     	// since fare IDs may not be unique across feeds and trip agency IDsqq
     	// may not match fare attribute agency IDs (which are feed IDs).
     	
-    	Map<FeedId, FareRuleSet> feedFareRules = new HashMap<>();
+    	Map<FeedScopedId, FareRuleSet> feedFareRules = new HashMap<>();
     	fillFareRules(null, transitService.getAllFareAttributes(),
                 transitService.getAllFareRules(), feedFareRules);
     	

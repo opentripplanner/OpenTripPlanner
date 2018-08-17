@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -138,8 +138,8 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
-        final FeedId tripId = new FeedId(feedId, "1.1");
-        final FeedId tripId2 = new FeedId(feedId, "1.2");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
@@ -164,8 +164,8 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleDelayedTrip() {
-        final FeedId tripId = new FeedId(feedId, "1.1");
-        final FeedId tripId2 = new FeedId(feedId, "1.2");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
@@ -299,7 +299,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.stopForId.get(new FeedId(feedId, "A"));
+        Stop stopA = graph.index.stopForId.get(new FeedScopedId(feedId, "A"));
         TransitStopDepart transitStopDepartA = graph.index.stopVertexForStop.get(stopA).departVertex;
         // Get trip pattern of last (most recently added) outgoing edge
         final List<Edge> outgoingEdges = (List<Edge>) transitStopDepartA.getOutgoing();
@@ -432,7 +432,7 @@ public class TimetableSnapshotSourceTest {
 
         // Original trip pattern
         {
-            final FeedId tripId = new FeedId(feedId, modifiedTripId);
+            final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
             final Trip trip = graph.index.tripForId.get(tripId);
             final TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
 
@@ -474,7 +474,7 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
-        final FeedId tripId = new FeedId(feedId, "1.1");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);

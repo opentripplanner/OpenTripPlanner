@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -240,7 +240,7 @@ public class StateEditor {
         child.stateData.tripTimes = tripTimes;
     }
 
-    public void setTripId(FeedId tripId) {
+    public void setTripId(FeedScopedId tripId) {
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
     }
@@ -308,13 +308,13 @@ public class StateEditor {
         }
     }
 
-    public void setRoute(FeedId routeId) {
+    public void setRoute(FeedScopedId routeId) {
         cloneStateDataAsNeeded();
         child.stateData.route = routeId;
         // unlike tripId, routeId is not set to null when alighting
         // but do a null check anyway
         if (routeId != null) {
-            FeedId[] oldRouteSequence = child.stateData.routeSequence;
+            FeedScopedId[] oldRouteSequence = child.stateData.routeSequence;
             //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
             int oldLength = oldRouteSequence.length;
             child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
@@ -437,7 +437,7 @@ public class StateEditor {
         return child.getElapsedTimeSeconds();
     }
 
-    public FeedId getTripId() {
+    public FeedScopedId getTripId() {
         return child.getTripId();
     }
 
@@ -449,7 +449,7 @@ public class StateEditor {
         return child.getZone();
     }
 
-    public FeedId getRoute() {
+    public FeedScopedId getRoute() {
         return child.getRoute();
     }
 

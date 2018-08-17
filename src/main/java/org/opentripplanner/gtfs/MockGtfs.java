@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
@@ -107,7 +107,7 @@ public class MockGtfs {
     /**
      * @return a full id with the default agency id ("a0") for the feed.
      */
-    public FeedId id(String id) {
+    public FeedScopedId id(String id) {
         return AgencyAndIdMapper.mapAgencyAndId(gtfsDelegate.id(id));
     }
 }

@@ -12,7 +12,7 @@ public class StopAgencyAndIdArrayListAdapter extends
     @Override
     public ArrayList<Stop> unmarshal(ArrayList<AgencyAndIdType> arg) throws Exception {
         throw new UnsupportedOperationException(
-                "We presently serialize stops as FeedId, and thus cannot deserialize them");
+                "We presently serialize stops as FeedScopedId, and thus cannot deserialize them");
     }
 
     @Override

@@ -17,7 +17,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Pathway;
@@ -99,7 +99,7 @@ import java.util.Map;
  */
 class BlockIdAndServiceId {
     public String blockId;
-    public FeedId serviceId;
+    public FeedScopedId serviceId;
 
     BlockIdAndServiceId(Trip trip) {
         this.blockId = trip.getBlockId();
@@ -250,9 +250,9 @@ public class PatternHopFactory {
     
     private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
 
-    private Map<FeedId, LineString> geometriesByShapeId = new HashMap<FeedId, LineString>();
+    private Map<FeedScopedId, LineString> geometriesByShapeId = new HashMap<FeedScopedId, LineString>();
 
-    private Map<FeedId, double[]> distancesByShapeId = new HashMap<FeedId, double[]>();
+    private Map<FeedScopedId, double[]> distancesByShapeId = new HashMap<FeedScopedId, double[]>();
     
     private FareServiceFactory fareServiceFactory;
 
@@ -299,7 +299,7 @@ public class PatternHopFactory {
         clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
-        for (FeedId serviceId : transitService.getAllServiceIds()) {
+        for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
@@ -571,7 +571,7 @@ public class PatternHopFactory {
      * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
      */
     private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        FeedId shapeId = trip.getShapeId();
+        FeedScopedId shapeId = trip.getShapeId();
         
         // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
         LineString[] geoms = new LineString[stopTimes.size() - 1];
@@ -1075,7 +1075,7 @@ public class PatternHopFactory {
     }
 
     
-    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedId shapeId, StopTime st0, StopTime st1) {
+    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
 
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
@@ -1153,7 +1153,7 @@ public class PatternHopFactory {
         return true;
     }
 
-    private LineString getSegmentGeometry(Graph graph, FeedId shapeId,
+    private LineString getSegmentGeometry(Graph graph, FeedScopedId shapeId,
             LocationIndexedLine locationIndexedLine, LinearLocation startIndex,
             LinearLocation endIndex, double startDistance, double endDistance, 
             StopTime st0, StopTime st1) {
@@ -1188,7 +1188,7 @@ public class PatternHopFactory {
      * which cause JTS location indexed line to return a segment location of NaN, 
      * which we do not want.
      */
-    private List<ShapePoint> getUniqueShapePointsForShapeId(FeedId shapeId) {
+    private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
         List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
         ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
         ShapePoint last = null;
@@ -1212,7 +1212,7 @@ public class PatternHopFactory {
         }
     }
 
-    private LineString getLineStringForShapeId(FeedId shapeId) {
+    private LineString getLineStringForShapeId(FeedScopedId shapeId) {
 
         LineString geometry = geometriesByShapeId.get(shapeId);
 
@@ -1254,7 +1254,7 @@ public class PatternHopFactory {
         return geometry;
     }
 
-    private double[] getDistanceForShapeId(FeedId shapeId) {
+    private double[] getDistanceForShapeId(FeedScopedId shapeId) {
         getLineStringForShapeId(shapeId);
         return distancesByShapeId.get(shapeId);
     }
@@ -1339,7 +1339,7 @@ public class PatternHopFactory {
                 Vertex stopVertex = context.stationStopNodes.get(stop);
 
                 String agencyId = stop.getId().getAgencyId();
-                FeedId parentStationId = new FeedId(agencyId, parentStation);
+                FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
 
                 Stop parentStop = transitService.getStopForId(parentStationId);
                 Vertex parentStopVertex = context.stationStopNodes.get(parentStop);
@@ -1384,7 +1384,7 @@ public class PatternHopFactory {
             if (parentStation != null) {
                 TransitStop stopVertex = (TransitStop) context.stationStopNodes.get(stop);
                 String agencyId = stop.getId().getAgencyId();
-                FeedId parentStationId = new FeedId(agencyId, parentStation);
+                FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
                 Stop parentStop = transitService.getStopForId(parentStationId);
                 if(context.stationStopNodes.get(parentStop) instanceof TransitStation) {
                     TransitStation parentStopVertex = (TransitStation)

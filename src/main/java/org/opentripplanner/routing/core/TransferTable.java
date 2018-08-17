@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -28,7 +28,7 @@ public class TransferTable implements Serializable {
     /**
      * Table which contains transfers between two stops
      */
-    protected HashMap<P2<FeedId>, StopTransfer> table = new HashMap<P2<FeedId>, StopTransfer>();
+    protected HashMap<P2<FeedScopedId>, StopTransfer> table = new HashMap<P2<FeedScopedId>, StopTransfer>();
     
     /**
      * Preferred transfers (or timed transfers, which are preferred as well) are present if true
@@ -73,17 +73,17 @@ public class TransferTable implements Serializable {
         // Check parents of stops if no transfer was found
         if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
             // Find parent ids
-            FeedId fromStopParentId = null;
-            FeedId toStopParentId = null;
+            FeedScopedId fromStopParentId = null;
+            FeedScopedId toStopParentId = null;
             if (fromStop.getParentStation() != null 
                     && !fromStop.getParentStation().isEmpty()) {
                 // From stop has a parent
-                fromStopParentId = new FeedId(fromStop.getId().getAgencyId(), fromStop.getParentStation());
+                fromStopParentId = new FeedScopedId(fromStop.getId().getAgencyId(), fromStop.getParentStation());
             }
             if (toStop.getParentStation() != null 
                     && !toStop.getParentStation().isEmpty()) {
                 // To stop has a parent
-                toStopParentId = new FeedId(toStop.getId().getAgencyId(), toStop.getParentStation());
+                toStopParentId = new FeedScopedId(toStop.getId().getAgencyId(), toStop.getParentStation());
             }
             
             // Check parent of from stop if no transfer was found
@@ -120,14 +120,14 @@ public class TransferTable implements Serializable {
      *   can be found in the StopTransfer.*_TRANSFER constants. If no transfer is found,
      *   StopTransfer.UNKNOWN_TRANSFER is returned.
      */
-    private int getTransferTime(FeedId fromStopId, FeedId toStopId, Trip fromTrip, Trip toTrip) {
+    private int getTransferTime(FeedScopedId fromStopId, FeedScopedId toStopId, Trip fromTrip, Trip toTrip) {
         checkNotNull(fromStopId);
         checkNotNull(toStopId);
         
         // Define transfer time to return
         int transferTime = StopTransfer.UNKNOWN_TRANSFER; 
         // Lookup transfer between two stops
-        StopTransfer stopTransfer = table.get(new P2<FeedId>(fromStopId, toStopId));
+        StopTransfer stopTransfer = table.get(new P2<FeedScopedId>(fromStopId, toStopId));
         if (stopTransfer != null) {
             // Lookup correct transfer time between two stops and two trips
             transferTime = stopTransfer.getTransferTime(fromTrip, toTrip);
@@ -158,7 +158,7 @@ public class TransferTable implements Serializable {
         }
         
         // Lookup whether a transfer between the two stops already exists
-        P2<FeedId> stopIdPair = new P2<FeedId>(fromStop.getId(), toStop.getId());
+        P2<FeedScopedId> stopIdPair = new P2<FeedScopedId>(fromStop.getId(), toStop.getId());
         StopTransfer stopTransfer = table.get(stopIdPair);
         if (stopTransfer == null) {
             // If not, create one and add to table
@@ -204,9 +204,9 @@ public class TransferTable implements Serializable {
      */
     @Deprecated
     public static class Transfer {
-        public FeedId fromStopId, toStopId;
+        public FeedScopedId fromStopId, toStopId;
         public int seconds;
-        public Transfer(FeedId fromStopId, FeedId toStopId, int seconds) {
+        public Transfer(FeedScopedId fromStopId, FeedScopedId toStopId, int seconds) {
             this.fromStopId = fromStopId;
             this.toStopId = toStopId;
             this.seconds = seconds;
@@ -221,8 +221,8 @@ public class TransferTable implements Serializable {
     @Deprecated
     public Iterable<Transfer> getAllFirstSpecificTransfers() {
         ArrayList<Transfer> transfers = new ArrayList<Transfer>(table.size());
-        for (Entry<P2<FeedId>, StopTransfer> entry : table.entrySet()) {
-            P2<FeedId> p2 = entry.getKey();
+        for (Entry<P2<FeedScopedId>, StopTransfer> entry : table.entrySet()) {
+            P2<FeedScopedId> p2 = entry.getKey();
             int transferTime = entry.getValue().getFirstSpecificTransferTime();
             if (transferTime != StopTransfer.UNKNOWN_TRANSFER) {
                 transfers.add(new Transfer(p2.first, p2.second, transferTime));

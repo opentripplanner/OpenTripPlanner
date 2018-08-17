@@ -10,7 +10,7 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
 
     private static final double MISSING_VALUE = -999;
 
-    private FeedId shapeId;
+    private FeedScopedId shapeId;
 
     private int sequence;
 
@@ -23,11 +23,11 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
     public ShapePoint() {
     }
 
-    public FeedId getShapeId() {
+    public FeedScopedId getShapeId() {
         return shapeId;
     }
 
-    public void setShapeId(FeedId shapeId) {
+    public void setShapeId(FeedScopedId shapeId) {
         this.shapeId = shapeId;
     }
 

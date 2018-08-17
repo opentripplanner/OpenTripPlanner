@@ -18,7 +18,7 @@ import com.google.common.collect.Iterables;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -37,7 +37,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 public class TimetableSnapshotTest {
     private static Graph graph;
     private static GtfsContext context;
-    private static Map<FeedId, TripPattern> patternIndex;
+    private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
     @BeforeClass
@@ -51,7 +51,7 @@ public class TimetableSnapshotTest {
                 CalendarServiceData.class, createCalendarServiceData(context.getOtpTransitService())
         );
 
-        patternIndex = new HashMap<FeedId, TripPattern>();
+        patternIndex = new HashMap<FeedScopedId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding) continue;
@@ -82,7 +82,7 @@ public class TimetableSnapshotTest {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
         ServiceDate tomorrow = today.next();
-        TripPattern pattern = patternIndex.get(new FeedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
         TimetableSnapshot resolver = new TimetableSnapshot();
 
         Timetable scheduled = resolver.resolve(pattern, today);
@@ -120,7 +120,7 @@ public class TimetableSnapshotTest {
     public void testUpdate() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
         Timetable origNow = resolver.resolve(pattern, today);
@@ -159,7 +159,7 @@ public class TimetableSnapshotTest {
     public void testCommit() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
 
@@ -206,7 +206,7 @@ public class TimetableSnapshotTest {
     public void testPurge() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

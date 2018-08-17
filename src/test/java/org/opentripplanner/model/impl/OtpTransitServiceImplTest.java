@@ -3,7 +3,7 @@ package org.opentripplanner.model.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -34,11 +34,11 @@ import static org.junit.Assert.assertEquals;
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";
 
-    private static final FeedId SERVICE_ALLDAYS_ID = new FeedId(FEED_ID, "alldays");
+    private static final FeedScopedId SERVICE_ALLDAYS_ID = new FeedScopedId(FEED_ID, "alldays");
 
-    private static final FeedId SERVICE_WEEKDAYS_ID = new FeedId(FEED_ID, "weekdays");
+    private static final FeedScopedId SERVICE_WEEKDAYS_ID = new FeedScopedId(FEED_ID, "weekdays");
 
-    private static final FeedId STATION_ID = new FeedId(FEED_ID, "station");
+    private static final FeedScopedId STATION_ID = new FeedScopedId(FEED_ID, "station");
 
     // The subject is used as read only; hence static is ok
     private static OtpTransitService subject;
@@ -194,7 +194,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopForId() {
-        Stop stop = subject.getStopForId(new FeedId("Z", "P"));
+        Stop stop = subject.getStopForId(new FeedScopedId("Z", "P"));
         assertEquals("<Stop Z_P>", stop.toString());
     }
 
@@ -217,7 +217,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetShapePointsForShapeId() {
-        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new FeedId("Z", "5"));
+        List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new FeedScopedId("Z", "5"));
         assertEquals("[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
                 shapePoints.stream().map(OtpTransitServiceImplTest::toString).collect(toList()).toString());
     }
@@ -231,7 +231,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetAllServiceIds() {
-        List<FeedId> serviceIds = subject.getAllServiceIds();
+        List<FeedScopedId> serviceIds = subject.getAllServiceIds();
 
         assertEquals(2, serviceIds.size());
         assertEquals("Z_alldays", first(serviceIds).toString());
@@ -253,7 +253,7 @@ public class OtpTransitServiceImplTest {
 
     private static FareAttribute createFareAttribute() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(agency.getId(), "FA"));
         FareRule rule = new FareRule();
         rule.setFare(fa);
         return fa;
@@ -261,7 +261,7 @@ public class OtpTransitServiceImplTest {
 
     private static FareRule createFareRule() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(agency.getId(), "FA"));
         FareRule rule = new FareRule();
         rule.setOriginId("Zone A");
         rule.setContainsId("Zone B");
@@ -271,7 +271,7 @@ public class OtpTransitServiceImplTest {
     }
 
 
-    private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedId serviceId) {
+    private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
         ServiceCalendarDate date = new ServiceCalendarDate();
         date.setServiceId(serviceId);
         date.setDate(new ServiceDate(2017, 8, 31));

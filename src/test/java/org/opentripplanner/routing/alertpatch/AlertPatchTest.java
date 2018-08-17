@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -59,7 +59,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new FeedId(feedId, "A"));
+        snp1.setStop(new FeedScopedId(feedId, "A"));
         snp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
@@ -106,7 +106,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new FeedId(feedId, "A"));
+        snp1.setStop(new FeedScopedId(feedId, "A"));
         snp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
@@ -162,7 +162,7 @@ public class AlertPatchTest extends TestCase {
         rnp1.setAlert(note1);
         rnp1.setId("id1");
         // Routes isn't patched in tests through GtfsBundle, which is why we have have a reference to agency id here.
-        rnp1.setRoute(new FeedId("agency", "1"));
+        rnp1.setRoute(new FeedScopedId("agency", "1"));
         rnp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");

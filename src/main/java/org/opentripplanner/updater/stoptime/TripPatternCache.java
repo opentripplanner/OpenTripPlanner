@@ -3,7 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -66,7 +66,7 @@ public class TripPatternCache {
      * @return unique trip pattern code
      */
     private String generateUniqueTripPatternCode(TripPattern tripPattern) {
-        FeedId routeId = tripPattern.route.getId();
+        FeedScopedId routeId = tripPattern.route.getId();
         String direction = tripPattern.directionId != -1 ? String.valueOf(tripPattern.directionId) : "";
         if (counter == Integer.MAX_VALUE) {
             counter = 0;

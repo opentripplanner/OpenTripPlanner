@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 
 public class BogusShapeGeometryCaught extends GraphBuilderAnnotation {
@@ -10,11 +10,11 @@ public class BogusShapeGeometryCaught extends GraphBuilderAnnotation {
     public static final String FMT = "Shape geometry for shape_id %s cannot be used with stop " +
     		"times %s and %s; using straight-line path instead";
     
-    final FeedId shapeId;
+    final FeedScopedId shapeId;
     final StopTime stA;
     final StopTime stB;
     
-    public BogusShapeGeometryCaught(FeedId shapeId, StopTime stA, StopTime stB){
+    public BogusShapeGeometryCaught(FeedScopedId shapeId, StopTime stA, StopTime stB){
     	this.shapeId = shapeId;
     	this.stA = stA;
     	this.stB = stB;

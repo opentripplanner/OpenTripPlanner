@@ -1,13 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.junit.Test;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
-public class FeedIdMapperTest {
+public class FeedScopedIdMapperTest {
 
     @Test
     public void testMapAgencyAndId() throws Exception {
@@ -15,7 +15,7 @@ public class FeedIdMapperTest {
                 "A", "1"
         );
 
-        FeedId mappedId = mapAgencyAndId(inputId);
+        FeedScopedId mappedId = mapAgencyAndId(inputId);
 
         assertEquals("A", mappedId.getAgencyId());
         assertEquals("1", mappedId.getId());
@@ -25,7 +25,7 @@ public class FeedIdMapperTest {
     public void testMapAgencyAndIdWithNulls() throws Exception {
         org.onebusaway.gtfs.model.AgencyAndId inputId = new org.onebusaway.gtfs.model.AgencyAndId();
 
-        FeedId mappedId = mapAgencyAndId(inputId);
+        FeedScopedId mappedId = mapAgencyAndId(inputId);
 
         assertNull(mappedId.getAgencyId());
         assertNull(mappedId.getId());

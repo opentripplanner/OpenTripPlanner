@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -14,7 +14,7 @@ public class TripsModelInfo implements Serializable {
 
     private static final long serialVersionUID = -4853941297409355512L;
 
-    public TripsModelInfo(String headsign, Integer number, String calendarId, FeedId tripId) {
+    public TripsModelInfo(String headsign, Integer number, String calendarId, FeedScopedId tripId) {
         this.headsign = headsign;
         this.numberOfTrips = number;
         this.calendarId = calendarId;

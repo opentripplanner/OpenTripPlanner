@@ -12,7 +12,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -110,7 +110,7 @@ public class Graph implements Serializable {
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<FeedId, Integer> serviceCodes = Maps.newHashMap();
+    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
@@ -197,7 +197,7 @@ public class Graph implements Serializable {
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<FeedId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -522,7 +522,7 @@ public class Graph implements Serializable {
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
-        for (FeedId sid : data.getServiceIds()) {
+        for (FeedScopedId sid : data.getServiceIds()) {
             agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +12,17 @@ import java.util.List;
  */
 public class FareComponent {
 
-    public FeedId fareId;
+    public FeedScopedId fareId;
     public Money price;
-    public List<FeedId> routes;
+    public List<FeedScopedId> routes;
 
-    public FareComponent(FeedId fareId, Money amount) {
+    public FareComponent(FeedScopedId fareId, Money amount) {
         this.fareId = fareId;
         price = amount;
-        routes = new ArrayList<FeedId>();
+        routes = new ArrayList<FeedScopedId>();
     }
 
-    public void addRoute(FeedId routeId) {
+    public void addRoute(FeedScopedId routeId) {
         routes.add(routeId);
     }
 
@@ -32,7 +32,7 @@ public class FareComponent {
         buffer.append(", ");
         buffer.append(price.toString());
         buffer.append(", ");
-        for (FeedId routeId : routes) {
+        for (FeedScopedId routeId : routes) {
             buffer.append(routeId.toString());
             buffer.append(", ");
         }

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.impl;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.Fare;
@@ -58,18 +58,18 @@ public class NycFareServiceImpl implements FareService, Serializable {
 	@Override
 	public Fare getCost(GraphPath path) {
 
-		final List<FeedId> SIR_PAID_STOPS = makeMtaStopList("S31", "S30");
+		final List<FeedScopedId> SIR_PAID_STOPS = makeMtaStopList("S31", "S30");
 
-		final List<FeedId> SUBWAY_FREE_TRANSFER_STOPS = makeMtaStopList(
+		final List<FeedScopedId> SUBWAY_FREE_TRANSFER_STOPS = makeMtaStopList(
 				"R11", "B08", "629");
 
-		final List<FeedId> SIR_BONUS_STOPS = makeMtaStopList("140", "420",
+		final List<FeedScopedId> SIR_BONUS_STOPS = makeMtaStopList("140", "420",
 				"419", "418", "M22", "M23", "R27", "R26");
 
-		final List<FeedId> SIR_BONUS_ROUTES = makeMtaStopList("M5", "M20",
+		final List<FeedScopedId> SIR_BONUS_ROUTES = makeMtaStopList("M5", "M20",
 				"M15-SBS");
 
-		final List<FeedId> CANARSIE = makeMtaStopList("L29", "303345");
+		final List<FeedScopedId> CANARSIE = makeMtaStopList("L29", "303345");
 
 		// List of NYC agencies to set fares for
 		final List<String> AGENCIES = new ArrayList<>();
@@ -110,7 +110,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				newRide = null;
 				continue;
 			}
-			FeedId routeId = state.getRoute();
+			FeedScopedId routeId = state.getRoute();
 			String agencyId = state.getBackTrip().getRoute().getAgency().getId();
 			if (!AGENCIES.contains(agencyId)) {
 				continue;
@@ -159,8 +159,8 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		boolean sirBonusTransfer = false;
 		float totalFare = 0;
 		for (Ride ride : rides) {
-			FeedId firstStopId = null;
-			FeedId lastStopId = null;
+			FeedScopedId firstStopId = null;
+			FeedScopedId lastStopId = null;
 			if (ride.firstStop != null) {
 				firstStopId = ride.firstStop.getId();
 				lastStopId = ride.lastStop.getId();
@@ -366,13 +366,13 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		return fare;
 	}
 
-	private List<FeedId> makeMtaStopList(String... stops) {
+	private List<FeedScopedId> makeMtaStopList(String... stops) {
 
-		ArrayList<FeedId> out = new ArrayList<FeedId>();
+		ArrayList<FeedScopedId> out = new ArrayList<FeedScopedId>();
 		for (String stop : stops) {
-			out.add(new FeedId("MTA NYCT", stop));
-			out.add(new FeedId("MTA NYCT", stop + "N"));
-			out.add(new FeedId("MTA NYCT", stop + "S"));
+			out.add(new FeedScopedId("MTA NYCT", stop));
+			out.add(new FeedScopedId("MTA NYCT", stop + "N"));
+			out.add(new FeedScopedId("MTA NYCT", stop + "S"));
 		}
 		return out;
 	}

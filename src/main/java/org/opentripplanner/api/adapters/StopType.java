@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.Stop;
@@ -54,7 +54,7 @@ public class StopType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedId id;
+    FeedScopedId id;
 
     @XmlAttribute
     @JsonSerialize
@@ -101,6 +101,6 @@ public class StopType {
     String direction;
 
     @XmlElements(value = @XmlElement(name = "route"))
-    public List<FeedId> routes;
+    public List<FeedScopedId> routes;
 
 }

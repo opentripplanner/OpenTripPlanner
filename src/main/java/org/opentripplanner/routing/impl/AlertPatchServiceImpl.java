@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -22,8 +22,8 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     private Graph graph;
 
     private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
-    private ListMultimap<FeedId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
-    private ListMultimap<FeedId, AlertPatch> patchesByStop = LinkedListMultimap.create();
+    private ListMultimap<FeedScopedId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
+    private ListMultimap<FeedScopedId, AlertPatch> patchesByStop = LinkedListMultimap.create();
 
     public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
@@ -35,7 +35,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getStopPatches(FeedId stop) {
+    public Collection<AlertPatch> getStopPatches(FeedScopedId stop) {
         List<AlertPatch> result = patchesByStop.get(stop);
         if (result == null) {
             result = Collections.emptyList();
@@ -44,7 +44,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getRoutePatches(FeedId route) {
+    public Collection<AlertPatch> getRoutePatches(FeedScopedId route) {
         List<AlertPatch> result = patchesByRoute.get(route);
         if (result == null) {
             result = Collections.emptyList();
@@ -62,11 +62,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
         alertPatch.apply(graph);
         alertPatches.put(alertPatch.getId(), alertPatch);
 
-        FeedId stop = alertPatch.getStop();
+        FeedScopedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.put(stop, alertPatch);
         }
-        FeedId route = alertPatch.getRoute();
+        FeedScopedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.put(route, alertPatch);
         }
@@ -106,11 +106,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     private void expire(AlertPatch alertPatch) {
-        FeedId stop = alertPatch.getStop();
+        FeedScopedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.remove(stop, alertPatch);
         }
-        FeedId route = alertPatch.getRoute();
+        FeedScopedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.remove(route, alertPatch);
         }

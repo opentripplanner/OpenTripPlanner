@@ -1,15 +1,15 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Trip extends IdentityBean<FeedId> {
+public final class Trip extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private FeedId id;
+    private FeedScopedId id;
 
     private Route route;
 
-    private FeedId serviceId;
+    private FeedScopedId serviceId;
 
     private String tripShortName;
 
@@ -21,7 +21,7 @@ public final class Trip extends IdentityBean<FeedId> {
 
     private String blockId;
 
-    private FeedId shapeId;
+    private FeedScopedId shapeId;
 
     private int wheelchairAccessible = 0;
 
@@ -54,11 +54,11 @@ public final class Trip extends IdentityBean<FeedId> {
         this.fareId = obj.fareId;
     }
 
-    public FeedId getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
-    public void setId(FeedId id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 
@@ -70,11 +70,11 @@ public final class Trip extends IdentityBean<FeedId> {
         this.route = route;
     }
 
-    public FeedId getServiceId() {
+    public FeedScopedId getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(FeedId serviceId) {
+    public void setServiceId(FeedScopedId serviceId) {
         this.serviceId = serviceId;
     }
 
@@ -118,11 +118,11 @@ public final class Trip extends IdentityBean<FeedId> {
         this.blockId = blockId;
     }
 
-    public FeedId getShapeId() {
+    public FeedScopedId getShapeId() {
         return shapeId;
     }
 
-    public void setShapeId(FeedId shapeId) {
+    public void setShapeId(FeedScopedId shapeId) {
         this.shapeId = shapeId;
     }
 

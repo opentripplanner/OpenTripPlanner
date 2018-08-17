@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendar;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @XmlRootElement(name = "Calendar")
 public class ServiceCalendarType {
 
-    public ServiceCalendarType(FeedId serviceId, int monday, int tuesday, int wednesday,
+    public ServiceCalendarType(FeedScopedId serviceId, int monday, int tuesday, int wednesday,
                                int thursday, int friday, int saturday, int sunday, long startDate, long endDate) {
         this.serviceId = serviceId;
         this.monday = monday;
@@ -44,7 +44,7 @@ public class ServiceCalendarType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedId serviceId;
+    FeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 
 public class TestStopMatcher extends TestCase {
@@ -12,9 +12,9 @@ public class TestStopMatcher extends TestCase {
      */
     public void testStopMatcher() {
         Stop s1 = new Stop();
-        s1.setId(new FeedId("A1", "42"));
+        s1.setId(new FeedScopedId("A1", "42"));
         Stop s2 = new Stop();
-        s2.setId(new FeedId("A1", "43"));
+        s2.setId(new FeedScopedId("A1", "43"));
 
         StopMatcher emptyMatcher = StopMatcher.emptyMatcher();
         assertFalse(emptyMatcher.matches(s1));
@@ -56,12 +56,12 @@ public class TestStopMatcher extends TestCase {
      */
     public void testStopMatcherParents() {
         Stop parent = new Stop();
-        parent.setId(new FeedId("A1", "10"));
+        parent.setId(new FeedScopedId("A1", "10"));
         Stop s1 = new Stop();
-        s1.setId(new FeedId("A1", "42"));
+        s1.setId(new FeedScopedId("A1", "42"));
         s1.setParentStation("10");
         Stop s2 = new Stop();
-        s2.setId(new FeedId("A1", "43"));
+        s2.setId(new FeedScopedId("A1", "43"));
         s2.setParentStation("10");
         
         StopMatcher matcherParent = StopMatcher.parse("A1:10");

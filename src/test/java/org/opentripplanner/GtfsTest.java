@@ -9,7 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
@@ -116,7 +116,7 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.to = new GenericLocation(null, feedId.getId() + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.startingTransitTripId = (new FeedId(feedId.getId(), onTripId));
+            routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);

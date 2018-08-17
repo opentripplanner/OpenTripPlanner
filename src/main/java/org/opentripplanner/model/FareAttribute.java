@@ -1,13 +1,13 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class FareAttribute extends IdentityBean<FeedId> {
+public final class FareAttribute extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
 
-    private FeedId id;
+    private FeedScopedId id;
 
     private float price;
 
@@ -42,12 +42,12 @@ public final class FareAttribute extends IdentityBean<FeedId> {
     }
 
     @Override
-    public FeedId getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
     @Override
-    public void setId(FeedId id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 

@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.*;
@@ -60,7 +60,7 @@ public class LinkStopToPlatformTest {
         edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
         Stop stop = new Stop();
-        stop.setId(new FeedId("TestAgency", "TestStop"));
+        stop.setId(new FeedScopedId("TestAgency", "TestStop"));
         stop.setLon(10.22213);
         stop.setLat(59.13545);
 

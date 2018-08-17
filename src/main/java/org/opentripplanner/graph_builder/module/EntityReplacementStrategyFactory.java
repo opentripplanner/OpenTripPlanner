@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
@@ -33,7 +33,7 @@ public class EntityReplacementStrategyFactory {
 
       while ((line = reader.readLine()) != null) {
         String[] tokens = line.split("\\s+");
-        List<FeedId> ids = new ArrayList<FeedId>();
+        List<FeedScopedId> ids = new ArrayList<FeedScopedId>();
         for (String token : tokens)
           ids.add(GtfsLibrary.convertIdFromString(token));
         for (int i = 1; i < ids.size(); i++)

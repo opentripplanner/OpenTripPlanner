@@ -3,15 +3,15 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.Set;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 public interface AlertPatchService {
     Collection<AlertPatch> getAllAlertPatches();
 
-    Collection<AlertPatch> getStopPatches(FeedId stop);
+    Collection<AlertPatch> getStopPatches(FeedScopedId stop);
 
-    Collection<AlertPatch> getRoutePatches(FeedId route);
+    Collection<AlertPatch> getRoutePatches(FeedScopedId route);
 
     void apply(AlertPatch alertPatch);
 

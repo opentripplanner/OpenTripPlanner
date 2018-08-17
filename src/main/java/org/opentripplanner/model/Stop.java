@@ -1,13 +1,13 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Stop extends IdentityBean<FeedId> {
+public final class Stop extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
 
-    private FeedId id;
+    private FeedScopedId id;
 
     private String name;
 
@@ -59,11 +59,11 @@ public final class Stop extends IdentityBean<FeedId> {
         this.platformCode = obj.platformCode;
     }
 
-    public FeedId getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
-    public void setId(FeedId id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 

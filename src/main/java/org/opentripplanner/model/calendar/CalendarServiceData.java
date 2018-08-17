@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,11 +20,11 @@ public class CalendarServiceData implements Serializable {
 
     private Map<String, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
-    private Map<FeedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
+    private Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
 
     private Map<LocalizedServiceId, List<Date>> datesByLocalizedServiceId = new HashMap<>();
 
-    private Map<ServiceDate, Set<FeedId>> serviceIdsByDate = new HashMap<>();
+    private Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
     /**
      * @param agencyId
@@ -39,7 +39,7 @@ public class CalendarServiceData implements Serializable {
         timeZonesByAgencyId.put(agencyId, timeZone);
     }
 
-    public Set<FeedId> getServiceIds() {
+    public Set<FeedScopedId> getServiceIds() {
         return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
     }
 
@@ -47,24 +47,24 @@ public class CalendarServiceData implements Serializable {
         return Collections.unmodifiableSet(datesByLocalizedServiceId.keySet());
     }
 
-    public List<ServiceDate> getServiceDatesForServiceId(FeedId serviceId) {
+    public List<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
         return serviceDatesByServiceId.get(serviceId);
     }
 
-    public Set<FeedId> getServiceIdsForDate(ServiceDate date) {
-        Set<FeedId> serviceIds = serviceIdsByDate.get(date);
+    public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
+        Set<FeedScopedId> serviceIds = serviceIdsByDate.get(date);
         if (serviceIds == null)
             serviceIds = new HashSet<>();
         return serviceIds;
     }
 
-    public void putServiceDatesForServiceId(FeedId serviceId, List<ServiceDate> serviceDates) {
+    public void putServiceDatesForServiceId(FeedScopedId serviceId, List<ServiceDate> serviceDates) {
         serviceDates = new ArrayList<>(serviceDates);
         Collections.sort(serviceDates);
         serviceDates = Collections.unmodifiableList(serviceDates);
         serviceDatesByServiceId.put(serviceId, serviceDates);
         for (ServiceDate serviceDate : serviceDates) {
-            Set<FeedId> serviceIds = serviceIdsByDate.get(serviceDate);
+            Set<FeedScopedId> serviceIds = serviceIdsByDate.get(serviceDate);
             if (serviceIds == null) {
                 serviceIds = new HashSet<>();
                 serviceIdsByDate.put(serviceDate, serviceIds);

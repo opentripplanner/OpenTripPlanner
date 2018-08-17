@@ -2,7 +2,7 @@ package org.opentripplanner.routing.core;
 
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.GenericLocation;
@@ -54,14 +54,14 @@ public class RoutingRequestTest {
 
     @Test
     public void testPreferencesPenaltyForRoute() {
-        FeedId feedId = new FeedId();
+        FeedScopedId id = new FeedScopedId();
         Agency agency = new Agency();
         Route route = new Route();
         Trip trip = new Trip();
         RoutingRequest routingRequest = new RoutingRequest();
 
         trip.setRoute(route);
-        route.setId(feedId);
+        route.setId(id);
         route.setAgency(agency);
         assertEquals(0, routingRequest.preferencesPenaltyForRoute(trip.getRoute()));
     }

@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -45,11 +45,11 @@ public class AlertPatch implements Serializable {
 
     private String agency;
 
-    private FeedId route;
+    private FeedScopedId route;
 
-    private FeedId trip;
+    private FeedScopedId trip;
 
-    private FeedId stop;
+    private FeedScopedId stop;
 
     /**
      * The headsign of the alert
@@ -233,17 +233,17 @@ public class AlertPatch implements Serializable {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public FeedId getRoute() {
+    public FeedScopedId getRoute() {
         return route;
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public FeedId getTrip() {
+    public FeedScopedId getTrip() {
         return trip;
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public FeedId getStop() {
+    public FeedScopedId getStop() {
         return stop;
     }
 
@@ -251,11 +251,11 @@ public class AlertPatch implements Serializable {
         this.agency = agency;
     }
 
-    public void setRoute(FeedId route) {
+    public void setRoute(FeedScopedId route) {
         this.route = route;
     }
 
-    public void setTrip(FeedId trip) {
+    public void setTrip(FeedScopedId trip) {
         this.trip = trip;
     }
 
@@ -280,7 +280,7 @@ public class AlertPatch implements Serializable {
         return directionId;
     }
 
-    public void setStop(FeedId stop) {
+    public void setStop(FeedScopedId stop) {
         this.stop = stop;
     }
 

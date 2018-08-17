@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.Fare;
@@ -34,9 +34,9 @@ class Ride {
     
     String agency; // route agency
 
-    FeedId route;
+    FeedScopedId route;
 
-    FeedId trip;
+    FeedScopedId trip;
     
     Set<String> zones;
 
@@ -107,7 +107,7 @@ class FareSearch {
 
     // Cell [i,j] holds the id of the fare that corresponds to the relevant cost
     // we can't just use FareAndId for resultTable because you need to sum them
-    FeedId[][] fareIds;
+    FeedScopedId[][] fareIds;
 
     // Cell [i] holds the index of the last ride that ride[i] has a fare to
     // If it's -1, the ride does not have fares to anywhere
@@ -116,7 +116,7 @@ class FareSearch {
     FareSearch(int size) {
         resultTable = new float[size][size];
         next = new int[size][size];
-        fareIds = new FeedId[size][size];
+        fareIds = new FeedScopedId[size][size];
         endOfComponent = new int[size];
         Arrays.fill(endOfComponent, -1);
     }
@@ -125,9 +125,9 @@ class FareSearch {
 /** Holds fare and corresponding fareId */
 class FareAndId {
     float fare;
-    FeedId fareId;
+    FeedScopedId fareId;
 
-    FareAndId(float fare, FeedId fareId) {
+    FareAndId(float fare, FeedScopedId fareId) {
         this.fare = fare;
         this.fareId = fareId;
     }
@@ -306,7 +306,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
             int via = r.next[start][r.endOfComponent[start]];
             float cost = r.resultTable[start][via];
-            FeedId fareId = r.fareIds[start][via];
+            FeedScopedId fareId = r.fareIds[start][via];
             FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
             for(int i = start; i <= via; ++i) {
                 detail.addRoute(rides.get(i).route);
@@ -329,9 +329,9 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
-        Set<FeedId> routes = new HashSet<FeedId>();
+        Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
         Set<String> agencies = new HashSet<String>();
-        Set<FeedId> trips = new HashSet<FeedId>();
+        Set<FeedScopedId> trips = new HashSet<FeedScopedId>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);

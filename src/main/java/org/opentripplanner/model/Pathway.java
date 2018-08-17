@@ -1,13 +1,13 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Pathway extends IdentityBean<FeedId> {
+public final class Pathway extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = -2404871423254094109L;
 
     private static final int MISSING_VALUE = -999;
 
-    private FeedId id;
+    private FeedScopedId id;
 
     private int pathwayType;
 
@@ -20,12 +20,12 @@ public final class Pathway extends IdentityBean<FeedId> {
     private int wheelchairTraversalTime = MISSING_VALUE;
 
     @Override
-    public FeedId getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
     @Override
-    public void setId(FeedId id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 

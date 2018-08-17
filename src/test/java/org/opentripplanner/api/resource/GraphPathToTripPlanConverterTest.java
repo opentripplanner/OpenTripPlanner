@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.LineString;
 import org.junit.Test;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
@@ -213,42 +213,42 @@ public class GraphPathToTripPlanConverterTest {
         Stop ferryStopDepart = new Stop();
         Stop ferryStopArrive = new Stop();
 
-        trainStopDepart.setId(new FeedId(feedId, "Depart"));
+        trainStopDepart.setId(new FeedScopedId(feedId, "Depart"));
         trainStopDepart.setName("Train stop depart");
         trainStopDepart.setLon(1);
         trainStopDepart.setLat(1);
         trainStopDepart.setCode("Train depart code");
         trainStopDepart.setPlatformCode("Train depart platform");
         trainStopDepart.setZoneId("Train depart zone");
-        trainStopDwell.setId(new FeedId(feedId, "Dwell"));
+        trainStopDwell.setId(new FeedScopedId(feedId, "Dwell"));
         trainStopDwell.setName("Train stop dwell");
         trainStopDwell.setLon(45);
         trainStopDwell.setLat(23);
         trainStopDwell.setCode("Train dwell code");
         trainStopDwell.setPlatformCode("Train dwell platform");
         trainStopDwell.setZoneId("Train dwell zone");
-        trainStopInterline.setId(new FeedId(feedId, "Interline"));
+        trainStopInterline.setId(new FeedScopedId(feedId, "Interline"));
         trainStopInterline.setName("Train stop interline");
         trainStopInterline.setLon(89);
         trainStopInterline.setLat(45);
         trainStopInterline.setCode("Train interline code");
         trainStopInterline.setPlatformCode("Train interline platform");
         trainStopInterline.setZoneId("Train interline zone");
-        trainStopArrive.setId(new FeedId(feedId, "Arrive"));
+        trainStopArrive.setId(new FeedScopedId(feedId, "Arrive"));
         trainStopArrive.setName("Train stop arrive");
         trainStopArrive.setLon(133);
         trainStopArrive.setLat(67);
         trainStopArrive.setCode("Train arrive code");
         trainStopArrive.setPlatformCode("Train arrive platform");
         trainStopArrive.setZoneId("Train arrive zone");
-        ferryStopDepart.setId(new FeedId(feedId, "Depart"));
+        ferryStopDepart.setId(new FeedScopedId(feedId, "Depart"));
         ferryStopDepart.setName("Ferry stop depart");
         ferryStopDepart.setLon(135);
         ferryStopDepart.setLat(67);
         ferryStopDepart.setCode("Ferry depart code");
         ferryStopDepart.setPlatformCode("Ferry depart platform");
         ferryStopDepart.setZoneId("Ferry depart zone");
-        ferryStopArrive.setId(new FeedId(feedId, "Arrive"));
+        ferryStopArrive.setId(new FeedScopedId(feedId, "Arrive"));
         ferryStopArrive.setName("Ferry stop arrive");
         ferryStopArrive.setLon(179);
         ferryStopArrive.setLat(89);
@@ -284,21 +284,21 @@ public class GraphPathToTripPlanConverterTest {
         Route secondRoute = new Route();
         Route thirdRoute = new Route();
 
-        firstRoute.setId(new FeedId(feedId, "A"));
+        firstRoute.setId(new FeedScopedId(feedId, "A"));
         firstRoute.setAgency(trainAgency);
         firstRoute.setShortName("A");
         firstRoute.setLongName("'A' Train");
         firstRoute.setType(2);
         firstRoute.setColor("White");
         firstRoute.setTextColor("Black");
-        secondRoute.setId(new FeedId(feedId, "B"));
+        secondRoute.setId(new FeedScopedId(feedId, "B"));
         secondRoute.setAgency(trainAgency);
         secondRoute.setShortName("B");
         secondRoute.setLongName("Another Train");
         secondRoute.setType(2);
         secondRoute.setColor("Cyan");
         secondRoute.setTextColor("Yellow");
-        thirdRoute.setId(new FeedId(feedId, "C"));
+        thirdRoute.setId(new FeedScopedId(feedId, "C"));
         thirdRoute.setAgency(ferryAgency);
         thirdRoute.setShortName("C");
         thirdRoute.setLongName("Ferry Cross the Mersey");
@@ -311,19 +311,19 @@ public class GraphPathToTripPlanConverterTest {
         Trip secondTrip = new Trip();
         Trip thirdTrip = new Trip();
 
-        firstTrip.setId(new FeedId(feedId, "A"));
+        firstTrip.setId(new FeedScopedId(feedId, "A"));
         firstTrip.setTripShortName("A");
         firstTrip.setBlockId("Alock");
         firstTrip.setRoute(firstRoute);
         BikeAccess.setForTrip(firstTrip, BikeAccess.ALLOWED);
         firstTrip.setTripHeadsign("Street Fighting Man");
-        secondTrip.setId(new FeedId(feedId, "B"));
+        secondTrip.setId(new FeedScopedId(feedId, "B"));
         secondTrip.setTripShortName("B");
         secondTrip.setBlockId("Block");
         secondTrip.setRoute(secondRoute);
         BikeAccess.setForTrip(secondTrip, BikeAccess.ALLOWED);
         secondTrip.setTripHeadsign("No Expectations");
-        thirdTrip.setId(new FeedId(feedId, "C"));
+        thirdTrip.setId(new FeedScopedId(feedId, "C"));
         thirdTrip.setTripShortName("C");
         thirdTrip.setBlockId("Clock");
         thirdTrip.setRoute(thirdRoute);
@@ -886,10 +886,10 @@ public class GraphPathToTripPlanConverterTest {
         }
         comparePlaces(places, type);
 
-        FeedId[][] stopIds = new FeedId[9][2];
+        FeedScopedId[][] stopIds = new FeedScopedId[9][2];
         for (int i = 0; i < stopIds.length; i++) {
             if (places[i].length > 2) {
-                stopIds[i] = new FeedId[places[i].length];
+                stopIds[i] = new FeedScopedId[places[i].length];
             }
             for (int j = 0; j < stopIds[i].length; j++) {
                 if (places[i][j] == null) continue;
@@ -1721,7 +1721,7 @@ public class GraphPathToTripPlanConverterTest {
     }
 
     /** Compare the stop ids to their expected values, place by place. */
-    private void compareStopIds(FeedId[][] stopIds, Type type) {
+    private void compareStopIds(FeedScopedId[][] stopIds, Type type) {
         assertEquals(2, stopIds[0].length);
         assertEquals(3, stopIds[1].length);
         assertEquals(2, stopIds[2].length);
@@ -1897,19 +1897,19 @@ public class GraphPathToTripPlanConverterTest {
     private static final class CalendarServiceDataStub extends CalendarServiceData {
         private static final long serialVersionUID = 1L;
 
-        final Set<FeedId> serviceIds;
+        final Set<FeedScopedId> serviceIds;
 
-        CalendarServiceDataStub(Set<FeedId> serviceIds) {
+        CalendarServiceDataStub(Set<FeedScopedId> serviceIds) {
             this.serviceIds = serviceIds;
         }
 
         @Override
-        public Set<FeedId> getServiceIds() {
+        public Set<FeedScopedId> getServiceIds() {
             return serviceIds;
         }
 
         @Override
-        public Set<FeedId> getServiceIdsForDate(ServiceDate date) {
+        public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
             return serviceIds;
         }
 

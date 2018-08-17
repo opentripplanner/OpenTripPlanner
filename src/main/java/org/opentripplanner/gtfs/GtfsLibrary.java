@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs;
 
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
@@ -38,16 +38,16 @@ public class GtfsLibrary {
     }
 
     /* Using in index since we can't modify OBA libs and the colon in the expected separator in the 1.0 API. */
-    public static FeedId convertIdFromString(String value) {
+    public static FeedScopedId convertIdFromString(String value) {
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
             throw new IllegalArgumentException("invalid agency-and-id: " + value);
         } else {
-            return new FeedId(value.substring(0, index), value.substring(index + 1));
+            return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
         }
     }
 
-    public static String convertIdToString(FeedId aid) {
+    public static String convertIdToString(FeedScopedId aid) {
         return aid.getAgencyId() + ID_SEPARATOR + aid.getId();
     }
 

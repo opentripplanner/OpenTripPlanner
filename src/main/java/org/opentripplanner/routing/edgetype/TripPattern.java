@@ -9,7 +9,7 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -529,7 +529,7 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public void dumpServices() {
-        Set<FeedId> services = Sets.newHashSet();
+        Set<FeedScopedId> services = Sets.newHashSet();
         for (Trip trip : this.trips) {
             services.add(trip.getServiceId());
         }
@@ -551,7 +551,7 @@ public class TripPattern implements Cloneable, Serializable {
      * but we need a reference to the Graph or at least the codes map. This could also be
      * placed in the hop factory itself.
      */
-    public void setServiceCodes (Map<FeedId, Integer> serviceCodes) {
+    public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         services = new BitSet();
         for (Trip trip : trips) {
             services.set(serviceCodes.get(trip.getServiceId()));
@@ -585,7 +585,7 @@ public class TripPattern implements Cloneable, Serializable {
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
         Multimap<String, TripPattern> patternsForRoute = HashMultimap.create();
         for (TripPattern pattern : tripPatterns) {
-            FeedId routeId = pattern.route.getId();
+            FeedScopedId routeId = pattern.route.getId();
             String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();

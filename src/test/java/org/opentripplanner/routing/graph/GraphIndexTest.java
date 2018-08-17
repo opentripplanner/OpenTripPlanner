@@ -2,7 +2,7 @@ package org.opentripplanner.routing.graph;
 
 import graphql.ExecutionResult;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -51,7 +51,7 @@ public class GraphIndexTest extends GtfsTest {
         assertEquals(agency.getName(), "Fake Agency");
 
         /* Stops */
-        graph.index.stopForId.get(new FeedId("X", "Y"));
+        graph.index.stopForId.get(new FeedScopedId("X", "Y"));
 
         /* Trips */
 //        graph.index.tripForId;
@@ -81,9 +81,9 @@ public class GraphIndexTest extends GtfsTest {
 
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
-        Stop stopJ = graph.index.stopForId.get(new FeedId(feedId, "J"));
-        Stop stopL = graph.index.stopForId.get(new FeedId(feedId, "L"));
-        Stop stopM = graph.index.stopForId.get(new FeedId(feedId, "M"));
+        Stop stopJ = graph.index.stopForId.get(new FeedScopedId(feedId, "J"));
+        Stop stopL = graph.index.stopForId.get(new FeedScopedId(feedId, "L"));
+        Stop stopM = graph.index.stopForId.get(new FeedScopedId(feedId, "M"));
         TransitStop stopvJ = graph.index.stopVertexForStop.get(stopJ);
         TransitStop stopvL = graph.index.stopVertexForStop.get(stopL);
         TransitStop stopvM = graph.index.stopVertexForStop.get(stopM);

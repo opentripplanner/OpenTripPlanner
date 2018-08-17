@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.Route;
@@ -30,7 +30,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
-    protected Map<FeedId, FareRuleSet> regularFareRules = new HashMap<FeedId, FareRuleSet>();
+    protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<FeedScopedId, FareRuleSet>();
 
     public FareService makeFareService() {
         DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
@@ -44,13 +44,13 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     }
 
     protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
-            Collection<FareRule> fareRules, Map<FeedId, FareRuleSet> fareRuleSet) {
+            Collection<FareRule> fareRules, Map<FeedScopedId, FareRuleSet> fareRuleSet) {
         /*
          * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
          * rules attached to them.
          */
         for (FareAttribute fare : fareAttributes) {
-            FeedId id = fare.getId();
+            FeedScopedId id = fare.getId();
             FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 fareRule = new FareRuleSet(fare);
@@ -67,7 +67,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
          */
         for (FareRule rule : fareRules) {
             FareAttribute fare = rule.getFare();
-            FeedId id = fare.getId();
+            FeedScopedId id = fare.getId();
             FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 // Should never happen by design
@@ -85,7 +85,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             }
             Route route = rule.getRoute();
             if (route != null) {
-                FeedId routeId = route.getId();
+                FeedScopedId routeId = route.getId();
                 fareRule.addRoute(routeId);
             }
         }

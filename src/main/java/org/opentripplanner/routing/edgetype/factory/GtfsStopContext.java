@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.T2;
@@ -20,7 +20,7 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
  */
 public class GtfsStopContext {
 
-    public HashSet<FeedId> stops = new HashSet<FeedId>();
+    public HashSet<FeedScopedId> stops = new HashSet<FeedScopedId>();
 
     // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
     public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();

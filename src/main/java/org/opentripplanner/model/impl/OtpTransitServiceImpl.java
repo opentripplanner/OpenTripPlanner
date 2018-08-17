@@ -2,7 +2,7 @@
 package org.opentripplanner.model.impl;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -66,7 +66,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private Collection<ShapePoint> shapePoints;
 
-    private Map<FeedId, Stop> stops;
+    private Map<FeedScopedId, Stop> stops;
 
     private Collection<StopTime> stopTimes;
 
@@ -75,17 +75,17 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private Collection<Trip> trips;
 
     // Indexes
-    private Map<FeedId, List<String>> tripAgencyIdsByServiceId = null;
+    private Map<FeedScopedId, List<String>> tripAgencyIdsByServiceId = null;
 
     private Map<Stop, List<Stop>> stopsByStation = null;
 
     private Map<Trip, List<StopTime>> stopTimesByTrip = null;
 
-    private Map<FeedId, List<ShapePoint>> shapePointsByShapeId = null;
+    private Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId = null;
 
-    private Map<FeedId, List<ServiceCalendarDate>> calendarDatesByServiceId = null;
+    private Map<FeedScopedId, List<ServiceCalendarDate>> calendarDatesByServiceId = null;
 
-    private Map<FeedId, List<ServiceCalendar>> calendarsByServiceId = null;
+    private Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId = null;
 
     /**
      * Create a read only version of the {@link OtpTransitService}.
@@ -184,21 +184,21 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public Stop getStopForId(FeedId id) {
+    public Stop getStopForId(FeedScopedId id) {
         return stops.get(id);
     }
 
     @Override
-    public List<String> getTripAgencyIdsReferencingServiceId(FeedId serviceId) {
+    public List<String> getTripAgencyIdsReferencingServiceId(FeedScopedId serviceId) {
 
         if (tripAgencyIdsByServiceId == null) {
 
-            Map<FeedId, Set<String>> agencyIdsByServiceIds = new HashMap<>();
+            Map<FeedScopedId, Set<String>> agencyIdsByServiceIds = new HashMap<>();
 
             for (Trip trip : getAllTrips()) {
-                FeedId tripId = trip.getId();
+                FeedScopedId tripId = trip.getId();
                 String tripAgencyId = tripId.getAgencyId();
-                FeedId tripServiceId = trip.getServiceId();
+                FeedScopedId tripServiceId = trip.getServiceId();
                 Set<String> agencyIds = agencyIdsByServiceIds
                         .computeIfAbsent(tripServiceId, k -> new HashSet<>());
                 agencyIds.add(tripAgencyId);
@@ -206,8 +206,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
             tripAgencyIdsByServiceId = new HashMap<>();
 
-            for (Map.Entry<FeedId, Set<String>> entry : agencyIdsByServiceIds.entrySet()) {
-                FeedId tripServiceId = entry.getKey();
+            for (Map.Entry<FeedScopedId, Set<String>> entry : agencyIdsByServiceIds.entrySet()) {
+                FeedScopedId tripServiceId = entry.getKey();
                 List<String> agencyIds = new ArrayList<>(entry.getValue());
                 Collections.sort(agencyIds);
                 tripAgencyIdsByServiceId.put(tripServiceId, agencyIds);
@@ -224,7 +224,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
             for (Stop stop : getAllStops()) {
                 if (stop.getLocationType() == 0 && stop.getParentStation() != null) {
                     Stop parentStation = getStopForId(
-                            new FeedId(stop.getId().getAgencyId(), stop.getParentStation()));
+                            new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation()));
                     List<Stop> subStops = stopsByStation
                             .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
                     subStops.add(stop);
@@ -235,7 +235,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public List<ShapePoint> getShapePointsForShapeId(FeedId shapeId) {
+    public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
         ensureShapePointRelation();
         return nullSafeUnmodifiableList(shapePointsByShapeId.get(shapeId));
     }
@@ -255,23 +255,23 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public List<FeedId> getAllServiceIds() {
+    public List<FeedScopedId> getAllServiceIds() {
         ensureCalendarDatesByServiceIdRelation();
         ensureCalendarsByServiceIdRelation();
-        Set<FeedId> serviceIds = new HashSet<>();
+        Set<FeedScopedId> serviceIds = new HashSet<>();
         serviceIds.addAll(calendarDatesByServiceId.keySet());
         serviceIds.addAll(calendarsByServiceId.keySet());
         return new ArrayList<>(serviceIds);
     }
 
     @Override
-    public List<ServiceCalendarDate> getCalendarDatesForServiceId(FeedId serviceId) {
+    public List<ServiceCalendarDate> getCalendarDatesForServiceId(FeedScopedId serviceId) {
         ensureCalendarDatesByServiceIdRelation();
         return nullSafeUnmodifiableList(calendarDatesByServiceId.get(serviceId));
     }
 
     @Override
-    public ServiceCalendar getCalendarForServiceId(FeedId serviceId) {
+    public ServiceCalendar getCalendarForServiceId(FeedScopedId serviceId) {
         ensureCalendarsByServiceIdRelation();
         List<ServiceCalendar> calendars = calendarsByServiceId.get(serviceId);
 

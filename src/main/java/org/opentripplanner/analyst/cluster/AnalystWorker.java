@@ -28,7 +28,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.SampleSet;
-import org.opentripplanner.api.model.FeedIdSerializer;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
@@ -211,7 +211,7 @@ public class AnalystWorker implements Runnable {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // ignore JSON fields that don't match target type
 
         /* Tell Jackson how to (de)serialize AgencyAndIds, which appear as map keys in routing requests. */
-        objectMapper.registerModule(FeedIdSerializer.makeModule());
+        objectMapper.registerModule(FeedScopedIdSerializer.makeModule());
 
         /* serialize/deserialize qualified mode sets */
         objectMapper.registerModule(QualifiedModeSetSerializer.makeModule());

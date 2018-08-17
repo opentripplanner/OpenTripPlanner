@@ -3,7 +3,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -18,7 +18,7 @@ public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
 
     /* Set of full matching route ids (agency ID + route ID) */
-    private HashSet<FeedId> agencyAndRouteIds = new HashSet<FeedId>();
+    private HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
 
     /* Set of full matching route code/names (agency ID + route code/name) */
     private HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
@@ -81,7 +81,7 @@ public class RouteMatcher implements Cloneable, Serializable {
                 routeId = null;
             if (agencyId != null && routeId != null && routeName == null) {
                 // Case 1: specified agency ID and route ID but no route name
-                retval.agencyAndRouteIds.add(new FeedId(agencyId, routeId));
+                retval.agencyAndRouteIds.add(new FeedScopedId(agencyId, routeId));
             } else if (agencyId != null && routeName != null && routeId == null) {
                 // Case 2: specified agency ID and route name but no route ID
                 retval.agencyIdAndRouteNames.add(new T2<String, String>(agencyId, routeName));
@@ -113,8 +113,8 @@ public class RouteMatcher implements Cloneable, Serializable {
 
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        for (FeedId feedId : agencyAndRouteIds) {
-            builder.append(feedId.getAgencyId() + "__" + feedId.getId());
+        for (FeedScopedId id : agencyAndRouteIds) {
+            builder.append(id.getAgencyId() + "__" + id.getId());
             builder.append(",");
         }
         for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {

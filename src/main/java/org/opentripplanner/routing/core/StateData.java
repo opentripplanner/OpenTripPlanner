@@ -3,7 +3,7 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -22,7 +22,7 @@ public class StateData implements Cloneable {
     // which trip index inside a pattern
     protected TripTimes tripTimes;
 
-    protected FeedId tripId;
+    protected FeedScopedId tripId;
     
     protected Trip previousTrip;
 
@@ -30,7 +30,7 @@ public class StateData implements Cloneable {
 
     protected String zone;
 
-    protected FeedId route;
+    protected FeedScopedId route;
 
     protected int numBoardings;
 
@@ -46,7 +46,7 @@ public class StateData implements Cloneable {
 
     protected long lastAlightedTime;
 
-    protected FeedId[] routeSequence;
+    protected FeedScopedId[] routeSequence;
 
     protected HashMap<Object, Object> extensions;
 

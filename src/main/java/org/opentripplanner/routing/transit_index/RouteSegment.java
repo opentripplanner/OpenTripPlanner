@@ -3,7 +3,7 @@ package org.opentripplanner.routing.transit_index;
 import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.io.Serializable;
@@ -20,8 +20,8 @@ public class RouteSegment implements Serializable  {
 	public Edge board;
 	public Edge alight;
 	public Edge dwell;
-	public FeedId stop;
-	public RouteSegment(FeedId stop) {
+	public FeedScopedId stop;
+	public RouteSegment(FeedScopedId stop) {
 		this.stop = stop;
 	}
 

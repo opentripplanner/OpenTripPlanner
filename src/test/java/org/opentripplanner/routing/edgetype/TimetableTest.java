@@ -14,7 +14,7 @@ import java.util.TimeZone;
 import com.google.common.collect.Iterables;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -42,7 +42,7 @@ public class TimetableTest {
     private static Graph graph;
     private AStar aStar = new AStar();
     private static GtfsContext context;
-    private static Map<FeedId, TripPattern> patternIndex;
+    private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
     private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
@@ -61,7 +61,7 @@ public class TimetableTest {
                 createCalendarServiceData(context.getOtpTransitService())
         );
 
-        patternIndex = new HashMap<FeedId, TripPattern>();
+        patternIndex = new HashMap<FeedScopedId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding)
@@ -73,7 +73,7 @@ public class TimetableTest {
             }
         }
         
-        pattern = patternIndex.get(new FeedId("agency", "1.1"));
+        pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
         timetable = pattern.scheduledTimetable;
     }
 
@@ -87,7 +87,7 @@ public class TimetableTest {
 
         String feedId = graph.getFeedIds().iterator().next();
 
-        int trip_1_1_index = timetable.getTripIndex(new FeedId("agency", "1.1"));
+        int trip_1_1_index = timetable.getTripIndex(new FeedScopedId("agency", "1.1"));
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
         Vertex stop_c = graph.getVertex(feedId + ":C");

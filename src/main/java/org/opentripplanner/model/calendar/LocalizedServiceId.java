@@ -1,14 +1,14 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.CalendarService;
 
 import java.io.Serializable;
 import java.util.TimeZone;
 
 /**
- * Combines a serviceId (represented by {@link FeedId}) and a
+ * Combines a serviceId (represented by {@link FeedScopedId}) and a
  * {@link TimeZone} object that can be used to ground {@link ServiceDate}
  * objects. See {@link ServiceDate#getAsDate(TimeZone)} for more info.
  *
@@ -21,11 +21,11 @@ public class LocalizedServiceId implements Serializable, Comparable<LocalizedSer
 
     private static final long serialVersionUID = 1L;
 
-    private final FeedId id;
+    private final FeedScopedId id;
 
     private final TimeZone timeZone;
 
-    public LocalizedServiceId(FeedId serviceId, TimeZone timeZone) {
+    public LocalizedServiceId(FeedScopedId serviceId, TimeZone timeZone) {
         if (serviceId == null)
             throw new IllegalArgumentException("serviceId cannot be null");
         if (timeZone == null)
@@ -34,7 +34,7 @@ public class LocalizedServiceId implements Serializable, Comparable<LocalizedSer
         this.timeZone = (TimeZone) timeZone.clone();
     }
 
-    public FeedId getId() {
+    public FeedScopedId getId() {
         return id;
     }
 

@@ -20,7 +20,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -252,7 +252,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new FeedId(
+                .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
                     ((Stop) environment.getSource()).getParentStation())))
                 .build())

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -177,8 +177,8 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
 
         // D -> E, null case
         options.setRoutingContext(gg, feedId+":D", feedId+":E");
@@ -195,11 +195,11 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new FeedId(feedId, "BC"));
-        assertEquals(fareComponents.get(1).routes.get(0), new FeedId("agency", "2"));
+        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
+        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
 
         // B -> D, 2 fully connected components
         options.setRoutingContext(gg, feedId+":B", feedId+":D");
@@ -209,9 +209,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "BD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "2"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedId("agency", "3"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "2"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
 
         // E -> G, missing in between fare
         options.setRoutingContext(gg, feedId+":E", feedId+":G");
@@ -221,9 +221,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedId("agency", "6"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // C -> E, missing fare after
         options.setRoutingContext(gg, feedId+":C", feedId+":E");
@@ -233,8 +233,8 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "CD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "3"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
 
         // D -> G, missing fare before
         options.setRoutingContext(gg, feedId+":D", feedId+":G");
@@ -244,9 +244,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedId("agency", "6"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // A -> D, use individual component parts
         options.setRoutingContext(gg, feedId+":A", feedId+":D");
@@ -256,11 +256,11 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new FeedId(feedId, "BD"));
-        assertEquals(fareComponents.get(1).routes.get(0), new FeedId("agency", "2"));
-        assertEquals(fareComponents.get(1).routes.get(1), new FeedId("agency", "3"));
+        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
+        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
+        assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId("agency", "3"));
     }
 }

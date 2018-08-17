@@ -16,7 +16,7 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -241,9 +241,9 @@ public class TestTransfers extends TestCase {
 
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
-        stopK.setId(new FeedId(feedId, "K"));
+        stopK.setId(new FeedScopedId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new FeedId(feedId, "F"));
+        stopF.setId(new FeedScopedId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
 
         // Plan journey
@@ -283,9 +283,9 @@ public class TestTransfers extends TestCase {
 
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
-        stopK.setId(new FeedId(feedId, "K"));
+        stopK.setId(new FeedScopedId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new FeedId(feedId, "F"));
+        stopF.setId(new FeedScopedId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
 
         // Plan journey
@@ -333,9 +333,9 @@ public class TestTransfers extends TestCase {
         // Add transfer to table such that the next trip will be chosen
         // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopP = new Stop();
-        stopP.setId(new FeedId(feedId, "P"));
+        stopP.setId(new FeedScopedId(feedId, "P"));
         Stop stopU = new Stop();
-        stopU.setId(new FeedId(feedId, "U"));
+        stopU.setId(new FeedScopedId(feedId, "U"));
         table.addTransferTime(stopP, stopU, null, null, null, null, 3675);
 
         // Plan journey
@@ -396,9 +396,9 @@ public class TestTransfers extends TestCase {
         // Add transfer to table such that the next trip will be chosen
         // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopV = new Stop();
-        stopV.setId(new FeedId(feedId, "V"));
+        stopV.setId(new FeedScopedId(feedId, "V"));
         Stop stopI = new Stop();
-        stopI.setId(new FeedId(feedId, "I"));
+        stopI.setId(new FeedScopedId(feedId, "I"));
         table.addTransferTime(stopV, stopI, null, null, null, null, 3675);
 
         // Plan journey
@@ -449,9 +449,9 @@ public class TestTransfers extends TestCase {
 
         // Add forbidden transfer to table
         Stop stopK = new Stop();
-        stopK.setId(new FeedId(feedId, "K"));
+        stopK.setId(new FeedScopedId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new FeedId(feedId, "F"));
+        stopF.setId(new FeedScopedId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null,
                 StopTransfer.FORBIDDEN_TRANSFER);
 
@@ -491,9 +491,9 @@ public class TestTransfers extends TestCase {
 
         // Add forbidden transfer to table
         Stop stopV = new Stop();
-        stopV.setId(new FeedId(feedId, "V"));
+        stopV.setId(new FeedScopedId(feedId, "V"));
         Stop stopI = new Stop();
-        stopI.setId(new FeedId(feedId, "I"));
+        stopI.setId(new FeedScopedId(feedId, "I"));
         table.addTransferTime(stopV, stopI, null, null, null, null,
                 StopTransfer.FORBIDDEN_TRANSFER);
 
@@ -534,9 +534,9 @@ public class TestTransfers extends TestCase {
 
         // Add timed transfer to table
         Stop stopK = new Stop();
-        stopK.setId(new FeedId(feedId, "K"));
+        stopK.setId(new FeedScopedId(feedId, "K"));
         Stop stopF = new Stop();
-        stopF.setId(new FeedId(feedId, "F"));
+        stopF.setId(new FeedScopedId(feedId, "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
         Vertex fromVertex = graph.getVertex(feedId + ":K_arrive");
@@ -552,7 +552,7 @@ public class TestTransfers extends TestCase {
 
         // Now apply a real-time update: let the to-trip be early by 27600 seconds,
         // resulting in a transfer time of 0 seconds
-        Trip trip = graph.index.tripForId.get(new FeedId("agency", "4.2"));
+        Trip trip = graph.index.tripForId.get(new FeedScopedId("agency", "4.2"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         applyUpdateToTripPattern(pattern, "4.2", "F", 1, 55200, 55200,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);

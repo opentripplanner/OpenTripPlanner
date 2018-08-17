@@ -2,7 +2,7 @@ package org.opentripplanner.routing.impl;
 
 import java.util.List;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -52,7 +52,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         opt.rctx = ctx;
 
         /* 1. Get the list of PatternHop for the given trip ID. */
-        FeedId tripId = opt.startingTransitTripId;
+        FeedScopedId tripId = opt.startingTransitTripId;
         Trip trip = ctx.graph.index.tripForId.get(tripId);
         TripPattern tripPattern = ctx.graph.index.patternForTrip.get(trip);
         if (tripPattern == null) {

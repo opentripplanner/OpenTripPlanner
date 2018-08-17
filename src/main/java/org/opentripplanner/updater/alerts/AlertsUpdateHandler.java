@@ -2,7 +2,7 @@ package org.opentripplanner.updater.alerts;
 
 import java.util.*;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
@@ -122,17 +122,17 @@ public class AlertsUpdateHandler {
             AlertPatch patch = new AlertPatch();
             patch.setFeedId(feedId);
             if (routeId != null) {
-                patch.setRoute(new FeedId(feedId, routeId));
+                patch.setRoute(new FeedScopedId(feedId, routeId));
                 // Makes no sense to set direction if we don't have a route
                 if (direction != -1) {
                     patch.setDirectionId(direction);
                 }
             }
             if (tripId != null) {
-                patch.setTrip(new FeedId(feedId, tripId));
+                patch.setTrip(new FeedScopedId(feedId, tripId));
             }
             if (stopId != null) {
-                patch.setStop(new FeedId(feedId, stopId));
+                patch.setStop(new FeedScopedId(feedId, stopId));
             }
             if (agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);

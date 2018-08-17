@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.calendar.impl;
 
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
@@ -27,12 +27,12 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Set<FeedId> getServiceIds() {
+    public Set<FeedScopedId> getServiceIds() {
         return data.getServiceIds();
     }
 
     @Override
-    public Set<ServiceDate> getServiceDatesForServiceId(FeedId serviceId) {
+    public Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
         Set<ServiceDate> dates = new HashSet<>();
         CalendarServiceData allData = getData();
         List<ServiceDate> serviceDates = allData.getServiceDatesForServiceId(serviceId);
@@ -42,7 +42,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Set<FeedId> getServiceIdsOnDate(ServiceDate date) {
+    public Set<FeedScopedId> getServiceIdsOnDate(ServiceDate date) {
         return data.getServiceIdsForDate(date);
     }
 

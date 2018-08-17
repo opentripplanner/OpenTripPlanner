@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,8 +31,8 @@ public class AlertPatchServiceImplTest {
     }
 
     private TestAlertPatch[] alerts;
-    private FeedId testStop = new FeedId("A", "A");
-    private FeedId testRoute = new FeedId("B", "B");
+    private FeedScopedId testStop = new FeedScopedId("A", "A");
+    private FeedScopedId testRoute = new FeedScopedId("B", "B");
 
     @Before
     public void setup() {

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import org.opentripplanner.model.FeedId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -246,7 +246,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /** Do not use certain trips */
-    public HashMap<FeedId, BannedStopSet> bannedTrips = new HashMap<FeedId, BannedStopSet>();
+    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
@@ -388,10 +388,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    public FeedId startingTransitStopId;
+    public FeedScopedId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    public FeedId startingTransitTripId;
+    public FeedScopedId startingTransitTripId;
 
     public boolean walkingBike;
 
@@ -804,7 +804,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
-            clone.bannedTrips = (HashMap<FeedId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
             if (this.bikeWalkingOptions != this)
@@ -1119,7 +1119,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void banTrip(FeedId trip) {
+    public void banTrip(FeedScopedId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
     
