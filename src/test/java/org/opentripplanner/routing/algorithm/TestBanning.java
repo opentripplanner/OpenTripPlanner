@@ -144,7 +144,7 @@ public class TestBanning extends TestCase {
                 }
                 // Used trips should not contains a banned trip
                 for (T2<AgencyAndId, BannedStopSet> usedTripDef : usedTripDefs) {
-                    BannedStopSet bannedStopSet = options.bannedTrips.get(usedTripDef.first);
+                    BannedStopSet bannedStopSet = options.getBannedTrip(usedTripDef.first);
                     if (bannedStopSet != null) {
                         for (Integer stopIndex : usedTripDef.second) {
                             assertFalse(bannedStopSet.contains(stopIndex));
@@ -158,9 +158,9 @@ public class TestBanning extends TestCase {
                         usedTripDefs);
                 T2<AgencyAndId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
                         .nextInt(usedTripDefs.size()));
-                options.bannedTrips.put(tripDefToBan.first, tripDefToBan.second);
+                options.banTrip(tripDefToBan.first, tripDefToBan.second);
             }
-            options.bannedTrips.clear();
+            options.clearBannedTrips();
         }
     }
 }

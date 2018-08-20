@@ -332,7 +332,7 @@ public class GraphPathFinder {
         reversedOptions.rctx.remainingWeightHeuristic = remainingWeightHeuristic;
         reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
-        reversedOptions.bannedTrips = options.bannedTrips;
+        reversedOptions.setBannedTrips(options.getBannedTrips());
         return reversedOptions;
     }
 

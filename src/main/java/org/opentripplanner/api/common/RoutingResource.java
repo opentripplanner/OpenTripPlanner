@@ -507,7 +507,7 @@ public abstract class RoutingResource {
 
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
         if (bannedTripMap != null)
-            request.bannedTrips = bannedTripMap;
+            request.setBannedTrips(bannedTripMap);
 
         if (bannedStops != null)
             request.setBannedStops(bannedStops);

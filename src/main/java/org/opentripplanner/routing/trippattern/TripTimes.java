@@ -327,7 +327,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     public boolean tripAcceptable(final State state0, final int stopIndex) {
         final RoutingRequest options = state0.getOptions();
-        final BannedStopSet banned = options.bannedTrips.get(trip.getId());
+        final BannedStopSet banned = options.getBannedTrip(trip.getId());
         if (banned != null && banned.contains(stopIndex)) {
             return false;
         }

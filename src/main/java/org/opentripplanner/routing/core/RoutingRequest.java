@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -113,7 +114,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useRequestedDateTimeInMaxHours = false;
 
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
-    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
+    public TraverseModeSet modes = null; // defaults in constructor overwrite this
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
@@ -122,7 +123,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // If this is the case it should be very well documented and carried over into the Enum name.
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    public long dateTime = new Date().getTime() / 1000;
+    public long dateTime = System.currentTimeMillis() / 1000;
 
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
     public boolean arriveBy = false;
@@ -146,7 +147,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double carSpeed;
 
-    public Locale locale = new Locale("en", "US");
+    public Locale locale = Locale.US;
 
     /**
      * An extra penalty added on transfers (i.e. all boardings except the first one).
@@ -256,10 +257,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Do not use certain named agencies */
-    public HashSet<String> bannedAgencies = new HashSet<String>();
+    private Set<String> bannedAgencies = null;
 
     /** Do not use certain trips */
-    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
+    private HashMap<AgencyAndId, BannedStopSet> bannedTrips = null;
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
@@ -271,7 +272,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
     /** Set of preferred agencies by user. */
-    public HashSet<String> preferredAgencies = new HashSet<String>();
+    private HashSet<String> preferredAgencies = null;
     
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
@@ -283,7 +284,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
     
     /** Set of unpreferred agencies for given user. */
-    public HashSet<String> unpreferredAgencies = new HashSet<String>();
+    private HashSet<String> unpreferredAgencies = null;
 
     /**
      * Penalty added for using every unpreferred route. We return number of seconds that we are willing to wait for preferred route.
@@ -310,7 +311,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * set. We provide an extension point for adding arbitrary parameters with an 
      * extension-specific key.
      */
-    public Map<Object, Object> extensions = new HashMap<Object, Object>();
+    private Map<Object, Object> extensions = null;
 
     /** Penalty for using a non-preferred transfer */
     public int nonpreferredTransferPenalty = 180;
@@ -572,18 +573,24 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Add an extension parameter with the specified key. Extensions allow you to add arbitrary traversal options.
      */
     public void putExtension(Object key, Object value) {
+        if(extensions == null) {
+            extensions = new HashMap<>();
+        }
         extensions.put(key, value);
     }
 
     /** Determine if a particular extension parameter is present for the specified key. */
     public boolean containsExtension(Object key) {
-        return extensions.containsKey(key);
+        return extensions != null && extensions.containsKey(key);
     }
 
     /** Get the extension parameter with the specified key. */
     @SuppressWarnings("unchecked")
     public <T> T getExtension(Object key) {
-        return (T) extensions.get(key);
+        if(extensions != null) {
+            return (T) extensions.get(key);
+        }
+        return null;
     }
 
     /** Returns the model that computes the cost of intersection traversal. */
@@ -816,10 +823,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest clone() {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
-            clone.bannedRoutes = bannedRoutes.clone();
-            clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
-            clone.bannedStops = bannedStops.clone();
-            clone.bannedStopsHard = bannedStopsHard.clone();
+            if(bannedRoutes != null) {
+                clone.bannedRoutes = bannedRoutes.clone();
+            }
+            if(bannedTrips != null) {
+                clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
+            }
+            if(bannedStops != null) {
+                clone.bannedStops = bannedStops.clone();
+            }
+            if(bannedStopsHard != null) {
+                clone.bannedStopsHard = bannedStopsHard.clone();
+            }
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -933,7 +948,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && walkBoardCost == other.walkBoardCost
                 && bikeBoardCost == other.bikeBoardCost
                 && bannedRoutes.equals(other.bannedRoutes)
-                && bannedTrips.equals(other.bannedTrips)
+                && Objects.equal(bannedTrips, other.bannedTrips)
                 && preferredRoutes.equals(other.preferredRoutes)
                 && unpreferredRoutes.equals(other.unpreferredRoutes)
                 && transferSlack == other.transferSlack
@@ -957,7 +972,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeRentalDropoffTime == other.bikeRentalDropoffTime
                 && bikeRentalDropoffCost == other.bikeRentalDropoffCost
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
-                && extensions.equals(other.extensions)
+                && Objects.equal(extensions, other.extensions)
                 && clampInitialWait == other.clampInitialWait
                 && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
@@ -984,7 +999,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + new Double(waitAtBeginningFactor).hashCode() * 15485863
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
-                + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
+                + (bannedTrips != null ? bannedTrips.hashCode() * 1373 : 0) + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
@@ -1133,7 +1148,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void banTrip(AgencyAndId trip) {
-        bannedTrips.put(trip, BannedStopSet.ALL);
+        banTrip(trip, BannedStopSet.ALL);
     }
     
     /** 
@@ -1235,5 +1250,33 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public HashMap<AgencyAndId, BannedStopSet> getBannedTrips() {
+        return bannedTrips;
+    }
+
+    public BannedStopSet getBannedTrip(AgencyAndId id) {
+        if(bannedTrips != null) {
+            bannedTrips.get(id);
+        }
+        return null;
+    }
+
+    public void clearBannedTrips() {
+        if(bannedTrips != null) {
+            bannedTrips.clear();
+        }
+    }
+
+    public void banTrip(AgencyAndId id, BannedStopSet set) {
+        if(bannedTrips == null) {
+            bannedTrips = new HashMap<>();
+        }
+        bannedTrips.put(id, set);
+    }
+
+    public void setBannedTrips(HashMap<AgencyAndId, BannedStopSet> bannedTrips) {
+        this.bannedTrips = bannedTrips;
     }
 }
