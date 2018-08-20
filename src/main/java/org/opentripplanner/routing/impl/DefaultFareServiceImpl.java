@@ -348,7 +348,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return getBestFareAndId(fareType, rides, fareRules).fare;
     }
 
-    private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
+    protected FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
@@ -420,8 +420,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
     }
-    
-    private float getFarePrice(FareAttribute fare, FareType type) {
+
+    protected float getFarePrice(FareAttribute fare, FareType type) {
     	switch(type) {
 		case senior:
 			if (fare.getSeniorPrice() >= 0) {
