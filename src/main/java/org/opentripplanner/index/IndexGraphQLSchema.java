@@ -18,6 +18,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import graphql.language.StringValue;
+import graphql.schema.*;
 import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.api.common.Message;
@@ -74,30 +76,30 @@ import com.vividsolutions.jts.geom.LineString;
 import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingEnvironmentImpl;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLType;
-import graphql.schema.GraphQLTypeReference;
-import graphql.schema.PropertyDataFetcher;
-import graphql.schema.TypeResolver;
 
 public class IndexGraphQLSchema {
 
     public static String experimental(String message) {
         return String.format("**This API is experimental and might change without further notice**  \n %s", message);
     }
+
+    public static GraphQLScalarType polylineScalar = new GraphQLScalarType("Polyline", "List of coordinates in an encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm). The value appears in JSON as a string.", new Coercing<String, String>() {
+        @Override
+        public String serialize(Object input) {
+            return input == null ? null : input.toString();
+        }
+
+        @Override
+        public String parseValue(Object input) {
+            return serialize(input);
+        }
+
+        @Override
+        public String parseLiteral(Object input) {
+            if (!(input instanceof StringValue)) return null;
+            return ((StringValue) input).getValue();
+        }
+    });
 
     public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
         .name("LocationType")
@@ -342,7 +344,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("points")
                     .description("List of coordinates of in a Google encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm)")
-                    .type(Scalars.GraphQLString)
+                    .type(polylineScalar)
                     .dataFetcher(environment -> ((EncodedPolylineBean)environment.getSource()).getPoints())
                     .build())
             .build();
