@@ -574,7 +574,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("maxWalkDistance")
-                .description("The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.")
+                .description("The maximum distance (in meters) the user is willing to walk per walking section. If the only transport mode allowed is `WALK`, then the value of this argument is ignored.  \n Default: 2000m  \n Maximum value: 15000m  \n **Note:** If this argument has a relatively small value and only some transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get an itinerary which has (useless) back and forth public transport legs to avoid walking too long distances.")
                 .type(Scalars.GraphQLFloat)
                 .build())
             .argument(GraphQLArgument.newArgument()
