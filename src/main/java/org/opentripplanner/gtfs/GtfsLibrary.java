@@ -95,8 +95,7 @@ public class GtfsLibrary {
         return route.getLongName();
     }
 
-    public static TraverseMode getTraverseMode(Route route) {
-        int routeType = route.getType();
+    public static TraverseMode getTraverseMode(int routeType) {
         /* TPEG Extension  https://groups.google.com/d/msg/gtfs-changes/keT5rTPS7Y0/71uMz2l6ke0J */
         if (routeType >= 100 && routeType < 200){ // Railway Service
             return TraverseMode.RAIL;
@@ -130,25 +129,31 @@ public class GtfsLibrary {
         }
         /* Original GTFS route types. Should these be checked before TPEG types? */
         switch (routeType) {
-        case 0:
-            return TraverseMode.TRAM;
-        case 1:
-            return TraverseMode.SUBWAY;
-        case 2:
-            return TraverseMode.RAIL;
-        case 3:
-            return TraverseMode.BUS;
-        case 4:
-            return TraverseMode.FERRY;
-        case 5:
-            return TraverseMode.CABLE_CAR;
-        case 6:
-            return TraverseMode.GONDOLA;
-        case 7:
-            return TraverseMode.FUNICULAR;
-        default:
-            throw new IllegalArgumentException("unknown gtfs route type " + routeType);
+            case 0:
+                return TraverseMode.TRAM;
+            case 1:
+                return TraverseMode.SUBWAY;
+            case 2:
+                return TraverseMode.RAIL;
+            case 3:
+                return TraverseMode.BUS;
+            case 4:
+                return TraverseMode.FERRY;
+            case 5:
+                return TraverseMode.CABLE_CAR;
+            case 6:
+                return TraverseMode.GONDOLA;
+            case 7:
+                return TraverseMode.FUNICULAR;
+            default:
+                throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }
+    }
+
+    public static TraverseMode getTraverseMode(Route route) {
+        int routeType = route.getType();
+
+        return getTraverseMode(routeType);
     }
 
     private static class GtfsContextImpl implements GtfsContext {
