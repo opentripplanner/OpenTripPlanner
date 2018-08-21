@@ -50,6 +50,7 @@ public class BikeRentalStationVertex extends Vertex {
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
+        this.station = station;
     }
 
     public int getBikesAvailable() {

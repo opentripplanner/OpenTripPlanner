@@ -115,7 +115,7 @@ public class CarParkUpdater extends PollingGraphUpdater {
         streetIndex = graph.streetIndex;
 
         // Adding a car parking service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
+        updaterManager.execute(new GraphWriterRunnable() {
             @Override
             public void run(Graph graph) {
                 carParkService = graph.getService(CarParkService.class, true);

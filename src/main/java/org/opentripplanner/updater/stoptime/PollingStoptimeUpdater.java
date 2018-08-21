@@ -129,7 +129,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         sentry.put("frequencySec",pollingPeriodSeconds);
 
         SentryUtilities.setupSentryFromMap(sentry);
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
+        updaterManager.execute(new GraphWriterRunnable() {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
