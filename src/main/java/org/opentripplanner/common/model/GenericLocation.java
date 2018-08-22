@@ -73,6 +73,11 @@ public class GenericLocation implements Cloneable, Serializable {
     private final static Pattern VERTEX_ID_PATTERN = Pattern.compile("\\(([\\w-:]+)\\)$");
 
     /**
+     * The default value setting for the location slack, in seconds.
+     */
+    private static final int DEFAULT_LOCATION_SLACK = 0;
+    
+    /**
      * The name of the place, if provided.
      */
     public final String name;
@@ -113,21 +118,35 @@ public class GenericLocation implements Cloneable, Serializable {
     public Double heading;
 
     /**
+     * The amount of time, in seconds, to spend at this location before venturing forth.
+     */
+     public final int locationSlack;
+    
+    /**
      * Constructs an empty GenericLocation.
      */
     public GenericLocation() {
         this.name = "";
         this.place = "";
+        this.locationSlack = DEFAULT_LOCATION_SLACK;
+    }
+
+    /**
+     * Constructs a GenericLocation with coordinates and a time spent at the location.
+     */
+    public GenericLocation(double lat, double lng, int locationSlack) {
+        this.name = "";
+        this.place = "";
+        this.lat = lat;
+        this.lng = lng;
+        this.locationSlack = locationSlack;
     }
 
     /**
      * Constructs a GenericLocation with coordinates only.
      */
     public GenericLocation(double lat, double lng) {
-        this.name = "";
-        this.place = "";
-        this.lat = lat;
-        this.lng = lng;
+        this(lat, lng, DEFAULT_LOCATION_SLACK);
     }
 
     /**
@@ -146,22 +165,13 @@ public class GenericLocation implements Cloneable, Serializable {
         this.lat = lat;
         this.lng = lng;
         this.heading = heading;
+        this.locationSlack = DEFAULT_LOCATION_SLACK;
     }
 
-
-
-    /**
-     * Construct from a name, place pair.
-     * Parses latitude, longitude data, heading and numeric edge ID out of the place string.
-     * Note that if the place string does not appear to contain a lat/lon pair, heading, or edge ID
-     * the GenericLocation will be missing that information but will still retain the place string,
-     * which will be interpreted during routing context construction as a vertex label within the
-     * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
-     * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
-     */
-    public GenericLocation(String name, String place) {
+    public GenericLocation(String name, String place, int locationSlack) {
         this.name = name;
         this.place = place;
+        this.locationSlack = locationSlack;
 
         if (place == null) {
             return;
@@ -200,12 +210,26 @@ public class GenericLocation implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Construct from a name, place pair.
+     * Parses latitude, longitude data, heading and numeric edge ID out of the place string.
+     * Note that if the place string does not appear to contain a lat/lon pair, heading, or edge ID
+     * the GenericLocation will be missing that information but will still retain the place string,
+     * which will be interpreted during routing context construction as a vertex label within the
+     * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
+     * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
+     */
+    public GenericLocation(String name, String place) {
+        this(name, place, DEFAULT_LOCATION_SLACK);
+    }
+
     public GenericLocation(String name, String vertexId, Double lat, Double lng) {
         this.name = name;
         this.vertexId = vertexId;
         this.lat = lat;
         this.lng = lng;
         this.place = Joiner.on(",").skipNulls().join(vertexId, lat, lng);
+        this.locationSlack = DEFAULT_LOCATION_SLACK;
     }
 
     /**

@@ -147,10 +147,17 @@ public class GraphQlPlanner {
         double lat = (double) m.get("lat");
         double lng = (double) m.get("lon");
         String address = (String) m.get("address");
+        Integer locationSlack = (Integer) m.get("locationSlack");
+
         if (address != null) {
-            return new GenericLocation(address, Double.toString(lat) + "," + Double.toString(lng));
+            return locationSlack != null
+                ? new GenericLocation(address, Double.toString(lat) + "," + Double.toString(lng), locationSlack)
+                : new GenericLocation(address, Double.toString(lat) + "," + Double.toString(lng));
         }
-        return new GenericLocation(lat, lng);
+
+        return locationSlack != null
+            ? new GenericLocation(lat, lng, locationSlack)
+            : new GenericLocation(lat, lng);
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {

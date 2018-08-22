@@ -117,19 +117,19 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
-        LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec, updateSource);
+        LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Create a realtime data snapshot source and wait for runnable to be executed
         HashMap<String,Object> sentry = new HashMap<>();
         sentry.put("feedId",feedId);
         sentry.put("updateSource",updateSource.toString());
-        sentry.put("frequencySec",frequencySec);
+        sentry.put("frequencySec",pollingPeriodSeconds);
 
         SentryUtilities.setupSentryFromMap(sentry);
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
+        updaterManager.execute(new GraphWriterRunnable() {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already

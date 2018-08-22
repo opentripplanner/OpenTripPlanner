@@ -180,7 +180,7 @@ public class GraphPathToTripPlanConverterTest {
         ExitVertex end = new ExitVertex(graph, "End", 0, 90, 0);
 
         FreeEdge depart = new FreeEdge(start, middle);
-        LegSwitchingEdge arrive = new LegSwitchingEdge(middle, end);
+        LegSwitchingEdge arrive = new LegSwitchingEdge(middle, end, 5);
 
         options.rctx = new RoutingContext(options, graph, start, end);
 
@@ -598,7 +598,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Edges for legs 6, 7 and 8
         LegSwitchingEdge e51 = new LegSwitchingEdge(
-                v50, v52);
+                v50, v52, 0);
         StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
                 StreetTraversalPermission.ALL, false);
         PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53", 1.0);

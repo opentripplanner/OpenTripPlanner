@@ -39,6 +39,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -52,7 +53,6 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
@@ -207,8 +207,8 @@ public class Graph implements Serializable {
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
     
-    /** How should we cluster stops? */
-    public String stopClusterMode = "proximity";
+    /** How should we cluster stops? By 'proximity' or 'ParentStation' */
+    public StopClusterMode stopClusterMode = StopClusterMode.proximity;
 
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
     public Double ellipsoidToGeoidDifference = 0.0;
@@ -814,6 +814,9 @@ public class Graph implements Serializable {
     }
 
     public void save(File file) throws IOException {
+        for (Vertex v : getVertices()) {
+            System.out.println("vertex: " + v.toString());
+        }
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
@@ -899,6 +902,7 @@ public class Graph implements Serializable {
                 toRemove.add(v);
         // avoid concurrent vertex map modification
         for (Vertex v : toRemove) {
+            System.out.println("remove: " + v.toString());
             this.remove(v);
             removed += 1;
             LOG.trace("removed edgeless vertex {}", v);
@@ -1056,7 +1060,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

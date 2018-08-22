@@ -131,6 +131,26 @@ public class TestIntermediatePlaces {
         handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
     }
 
+    @Test public void testTransitOneIntermediatePlaceWithSlack() {
+        GenericLocation fromLocation = new GenericLocation("Place 1", "39.9108,-83.0118");
+        GenericLocation toLocation = new GenericLocation("Place 3", "39.9698,-83.0198");
+        GenericLocation[] intermediateLocations = { new GenericLocation("Place 2", "39.9948,-83.0148", 7000) };
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
+    }
+
+    @Test public void testTransitTwoIntermediatePlacesWithSlack() {
+        GenericLocation fromLocation = new GenericLocation("Place 1", "39.9908,-83.0118");
+        GenericLocation toLocation = new GenericLocation("Place 4", "39.9998,-83.0198");
+        GenericLocation[] intermediateLocations = new GenericLocation[2];
+        intermediateLocations[0] = new GenericLocation("Place 2", "39.9948,-83.0148", 1200);
+        intermediateLocations[1] = new GenericLocation("Place 3", "39.9100,-83.100", 4800);
+
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, "TRANSIT,WALK", true);
+    }
+
     private void handleRequest(GenericLocation from, GenericLocation to, GenericLocation[] via,
         String modes, boolean arriveBy) {
         RoutingRequest request = new RoutingRequest(modes);
@@ -154,6 +174,7 @@ public class TestIntermediatePlaces {
         assertTrue(1 <= plan.itinerary.size());
         for (Itinerary itinerary : plan.itinerary) {
             validateIntermediatePlacesVisited(itinerary, via);
+            validateLocationSlacks(itinerary, via);
             assertTrue(via.length < itinerary.legs.size());
             validateLegsTemporally(request, itinerary);
             validateLegsSpatially(plan, itinerary);
@@ -217,6 +238,27 @@ public class TestIntermediatePlaces {
         // Check the total duration of the legs,
         int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
         assertEquals(sumOfDuration, itinerary.duration.doubleValue(), accuracy);
+    }
+
+    // Check that the locationSlacks are being used
+    private void validateLocationSlacks(Itinerary itinerary, GenericLocation[] via) {
+        List<Leg> legs = itinerary.legs;
+        int i = 0;
+        OUTER: for (GenericLocation place : via) {
+            Integer slack = place.locationSlack * 1000;
+            if (slack > 0) {
+                while (i < legs.size() - 1) {
+                    i++;
+                    Long lastEnd = legs.get(i - 1).endTime.getTimeInMillis();
+                    Leg leg = legs.get(i);
+                    if (leg.from.name == place.name &&
+                        leg.startTime.getTimeInMillis() - lastEnd >= slack) {
+                        continue OUTER;
+                    }
+                }
+                fail("locationSlack not used in itinerary");
+            }
+        }
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

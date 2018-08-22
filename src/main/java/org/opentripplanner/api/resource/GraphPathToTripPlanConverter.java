@@ -242,8 +242,8 @@ public abstract class GraphPathToTripPlanConverter {
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
         for (int i = 1; i < states.length - 1; i++) {
-            TraverseMode backMode = states[i].getBackMode();
-            TraverseMode forwardMode = states[i + 1].getBackMode();
+            TraverseMode backMode = states[i].getBackMode() != null ? states[i].getBackMode() : states[i].getBackState().getNonTransitMode();
+            TraverseMode forwardMode = states[i + 1].getBackMode() != null ? states[i + 1].getBackMode() : states[i + 1].getBackState().getNonTransitMode();
 
             if (backMode == null || forwardMode == null) continue;
 

@@ -25,8 +25,8 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
  * 
- * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only. Support for other matching expression can
- * be easily added later on.
+ * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only.
+ * Support for other matching expression can be easily added later on.
  */
 public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
@@ -64,7 +64,7 @@ public class RouteMatcher implements Cloneable, Serializable {
      *        "_" each *must* be replaced by a space. If the agency or route ID contains a "_" they
      *        must be escaped using a backslash.
      *        TODO why do we want to accept route name strings when we have IDs? Break backward compatibility.
-     *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch.
+     *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch, see #1671.
      * @return A RouteMatcher
      * @throws IllegalArgumentException If the string representation is invalid.
      */
