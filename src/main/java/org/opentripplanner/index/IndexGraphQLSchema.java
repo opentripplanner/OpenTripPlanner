@@ -2159,7 +2159,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("alerts")
-                .description("List of alerts which have an effect on any of the routes operated by this agency")
+                .description("List of alerts which have an effect on all operations of the agency (e.g. a strike)")
                 .type(new GraphQLList(alertType))
                 .dataFetcher(dataFetchingEnvironment -> index.getAlertsForAgency(
                     dataFetchingEnvironment.getSource()))
