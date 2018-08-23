@@ -1596,7 +1596,7 @@ public class IndexGraphQLSchema {
 
         tripType = GraphQLObjectType.newObject()
             .name("Trip")
-	    .description("Trip is a occurance of a route at specific time.")
+	    .description("Trip is a specific occurance of a pattern, usually identified by route, direction on the route and exact departure time.")
             .withInterface(nodeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("id")
