@@ -1136,6 +1136,7 @@ public class IndexGraphQLSchema {
 
         stopType = GraphQLObjectType.newObject()
             .name("Stop")
+            .description("Stop can represent either a single public transport stop, where passengers can board and/or disembark vehicles, or a station, which contains multiple stops. See field `locationType`.")
             .withInterface(nodeInterface)
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
