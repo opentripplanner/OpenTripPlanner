@@ -2250,6 +2250,7 @@ public class IndexGraphQLSchema {
 
         bikeParkType = GraphQLObjectType.newObject()
             .name("BikePark")
+            .description("Bike park represents a location where bicycles can be parked.")
             .withInterface(nodeInterface)
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
