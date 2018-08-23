@@ -2177,6 +2177,7 @@ public class IndexGraphQLSchema {
 
         bikeRentalStationType = GraphQLObjectType.newObject()
             .name("BikeRentalStation")
+            .description("Bike rental station represents a location where users can rent bicycles for a fee.")
             .withInterface(nodeInterface)
             .withInterface(placeInterface)
             .field(GraphQLFieldDefinition.newFieldDefinition()
