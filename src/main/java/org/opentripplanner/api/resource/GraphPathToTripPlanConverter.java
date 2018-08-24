@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -53,6 +54,8 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
     private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
+    private static final double WALK_LEG_DISTANCE_EPSILON = 1.0;
+    private static final double WALK_LEG_DURATION_EPSILON = 2e3;
 
     /**
      * Generates a TripPlan from a set of paths
@@ -163,6 +166,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         fixupLegs(itinerary.legs, legsStates);
 
+        itinerary.legs = filterLegs(itinerary.legs);
+
         itinerary.duration = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
@@ -179,6 +184,13 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         return itinerary;
+    }
+
+    private static List<Leg> filterLegs(List<Leg> legs) {
+        return legs.stream().filter(leg -> {
+            return !("WALK".equals(leg.mode) && leg.distance < WALK_LEG_DISTANCE_EPSILON && leg.endTime.getTimeInMillis() - leg.startTime.getTimeInMillis() < WALK_LEG_DURATION_EPSILON);
+        }).collect(Collectors.toList());
+
     }
 
     private static Calendar makeCalendar(State state) {
