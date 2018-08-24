@@ -1484,7 +1484,7 @@ public class IndexGraphQLSchema {
 
         stoptimeType = GraphQLObjectType.newObject()
             .name("Stoptime")
-	    .description("Time of arrival and/or departure at a stop")
+	        .description("Stoptime represents the time when a specific trip arrives to or departs from a specific stop.")
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .description("The stop where this arrival/departure happens")
