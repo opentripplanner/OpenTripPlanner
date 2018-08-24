@@ -18,14 +18,11 @@ public class WalkComfortCalculator {
     private static Logger LOG = LoggerFactory.getLogger(WalkComfortCalculator.class);
 
     public static final String WALK_CONFIG_FILENAME = "walk-config.json";
-
-    private JsonNode walkConfig;
-
     private List<WalkComfortRule> rules = new ArrayList<>();
 
     public WalkComfortCalculator(JsonNode walkConfig) {
 
-        if (!walkConfig.has("rules") || !walkConfig.get("rules").isArray()) {
+        if (walkConfig == null || !walkConfig.has("rules") || !walkConfig.get("rules").isArray()) {
             LOG.info("No rules found in walk config");
             return;
         }
