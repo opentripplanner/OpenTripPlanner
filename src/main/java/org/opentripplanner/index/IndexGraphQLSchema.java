@@ -295,7 +295,7 @@ public class IndexGraphQLSchema {
 
     private GraphQLInterfaceType placeInterface = GraphQLInterfaceType.newInterface()
         .name("PlaceInterface")
-        .description("Interface for places, i.e. stops, stations, parks")
+        .description("Interface for places, e.g. stops, stations, parking areas..")
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("id")
             .type(new GraphQLNonNull(Scalars.GraphQLID))
