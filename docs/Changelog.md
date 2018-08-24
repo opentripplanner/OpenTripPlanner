@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4 (in progress)
+
+- Update onebusaway-gtfs to latest version from OBA project (#2636)
+
 ## 1.3 (2018-08-03)
 
 - Fix stop linking to only one edge of platform (#2472)
