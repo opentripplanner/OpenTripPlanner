@@ -2836,7 +2836,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("transportModes")
-                    .description("Only include routes of these types")
+                    .description("Only include routes, which use one of these modes")
                     .type(GraphQLList.list(modeEnum))
                     .build())
                 .dataFetcher(environment -> {
