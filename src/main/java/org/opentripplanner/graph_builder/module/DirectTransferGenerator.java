@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.module;
 
+import com.csvreader.CsvWriter;
 import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -25,6 +26,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +48,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     private static Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
     final double radiusMeters;
+
+    public String transferTableDumpFile = null;
+
+    private CsvWriter transferTableCsvWriter = null;
 
     public List<String> provides() {
         return Arrays.asList("linking");
@@ -75,6 +82,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         int nTransfersTotal = 0;
         int nLinkableStops = 0;
+        if (transferTableDumpFile != null) {
+            transferTableCsvWriter = new CsvWriter(transferTableDumpFile, ',', Charset.forName("UTF8"));
+            writeCsvRowIfEnabled("from_stop_id", "to_stop_id", "distance_meters");
+        }
 
         for (TransitStop ts0 : Iterables.filter(graph.getVertices(), TransitStop.class)) {
 
@@ -101,7 +112,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
                 if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
-                new SimpleTransfer(ts0, sd.tstop, sd.dist, sd.geom, sd.edges);
+                SimpleTransfer simpleTransfer = new SimpleTransfer(ts0, sd.tstop, sd.dist, sd.geom, sd.edges);
+                writeCsvRowIfEnabled(ts0.getStopId().getId(), sd.tstop.getStopId().getId(), Double.toString(sd.dist));
                 n += 1;
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
@@ -112,6 +124,19 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         }
         LOG.info("Done connecting stops to one another. Created a total of {} transfers from {} stops.", nTransfersTotal, nLinkableStops);
         graph.hasDirectTransfers = true;
+        if (transferTableCsvWriter != null) {
+            transferTableCsvWriter.close();
+        }
+    }
+
+    private void writeCsvRowIfEnabled(String... values) {
+        if (transferTableCsvWriter != null) {
+            try {
+                transferTableCsvWriter.writeRecord(values);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

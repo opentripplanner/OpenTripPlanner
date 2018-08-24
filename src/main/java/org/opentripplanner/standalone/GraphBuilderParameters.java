@@ -173,6 +173,12 @@ public class GraphBuilderParameters {
     public final double maxTransferDistance;
 
     /**
+     * If a filename is supplied (not null), all transfers will be written out to that file as a CSV table so
+     * they can be imported into external trip planning modules.
+     */
+    public final String transferTableDumpFile;
+
+    /**
      * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
      */
     public final Boolean extraEdgesStopPlatformLink;
@@ -211,6 +217,7 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
+        transferTableDumpFile = config.path("transferTableDumpFile").asText(null);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
     }
 
