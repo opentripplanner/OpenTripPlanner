@@ -507,6 +507,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     //  (ie planning a trip with a rental car with the intent to keep the car and drive it later)
     public boolean allowCarRentalDropoffOutsideCarRentalRegion = false;
 
+    // allow custom shortest path search timeouts
+    // set to -1 by default which means don't use a custom timeout
+    // units are in milliseconds
+    public long searchTimeout = -1;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -1056,7 +1061,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
                 && invalidDateStrategy.equals(other.invalidDateStrategy)
-                && minTransitDistance == other.minTransitDistance;
+                && minTransitDistance == other.minTransitDistance
+                && searchTimeout == other.searchTimeout;
     }
 
     /**
