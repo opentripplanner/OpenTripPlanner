@@ -2821,6 +2821,7 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(routeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
+                    .description("Only return routes with these ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
                 .argument(GraphQLArgument.newArgument()
