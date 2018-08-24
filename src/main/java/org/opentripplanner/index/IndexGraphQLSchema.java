@@ -2825,6 +2825,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("name")
+                    .description("Query routes by this name")
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(GraphQLArgument.newArgument()
