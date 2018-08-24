@@ -2829,6 +2829,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("modes")
+                    .description("Deprecated, use argument `transportModes` instead.")
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(GraphQLArgument.newArgument()
