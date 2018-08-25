@@ -76,7 +76,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      */
     @Override
     public PackedCoordinateSequence getElevationProfile() {
-        PackedCoordinateSequence parentElev = parentEdge.getElevationProfile();
+        PackedCoordinateSequence parentElev = super.getElevationProfile();
         if (parentElev == null) return null;
 
         // Compute the linear-reference bounds of the partial edge as fractions of the parent edge
