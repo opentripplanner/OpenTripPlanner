@@ -15,17 +15,17 @@ package org.opentripplanner.routing.edgetype;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import java.util.LinkedList;
-import java.util.List;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Represents a sub-segment of a StreetEdge.
@@ -71,7 +71,7 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
      */
     @Override
     public PackedCoordinateSequence getElevationProfile() {
-        PackedCoordinateSequence parentElev = parentEdge.getElevationProfile();
+        PackedCoordinateSequence parentElev = super.getElevationProfile();
         if (parentElev == null) return null;
 
         // Compute the linear-reference bounds of the partial edge as fractions of the parent edge
