@@ -2725,7 +2725,7 @@ public class IndexGraphQLSchema {
                     List<TraverseMode> filterByModes = environment.getArgument("filterByModes");
                     List<GraphIndex.PlaceType> filterByPlaceTypes = environment.getArgument("filterByPlaceTypes");
 
-                    List<GraphIndex.PlaceAndDistance> places;
+                    List<PlaceAndDistance> places;
                     try {
                         places = new ArrayList<>(index.findClosestPlacesByWalking(
                             environment.getArgument("lat"),
@@ -2826,15 +2826,23 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(routeType))
                 .argument(GraphQLArgument.newArgument()
                     .name("ids")
+                    .description("Only return routes with these ids")
                     .type(new GraphQLList(Scalars.GraphQLString))
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("name")
+                    .description("Query routes by this name")
                     .type(Scalars.GraphQLString)
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("modes")
+                    .description("Deprecated, use argument `transportModes` instead.")
                     .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("transportModes")
+                    .description("Only include routes, which use one of these modes")
+                    .type(GraphQLList.list(modeEnum))
                     .build())
                 .dataFetcher(environment -> {
                     if ((environment.getArgument("ids") instanceof List)) {
@@ -2858,7 +2866,7 @@ public class IndexGraphQLSchema {
                                     ((String) environment.getArgument("name")).toLowerCase())
                             );
                     }
-                    if (environment.getArgument("modes") != null) {
+                    if (environment.getArgument("modes") != null && !(environment.getArgument("transportModes") instanceof List)) {
                         Set<TraverseMode> modes = new QualifiedModeSet((String)
                             environment.getArgument("modes")).qModes
                             .stream()
@@ -2869,6 +2877,11 @@ public class IndexGraphQLSchema {
                             .filter(route ->
                                 modes.contains(GtfsLibrary.getTraverseMode(route)));
                     }
+                    if (environment.getArgument("transportModes") instanceof List) {
+                        List<TraverseMode> modes = environment.getArgument("transportModes");
+                        stream = stream.filter(route -> modes.contains(GtfsLibrary.getTraverseMode(route)));
+                    }
+
                     return stream.collect(Collectors.toList());
                 })
                 .build())
