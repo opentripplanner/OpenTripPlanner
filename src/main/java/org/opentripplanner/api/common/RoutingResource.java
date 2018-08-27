@@ -380,6 +380,9 @@ public abstract class RoutingResource {
     @QueryParam("minTransitDistance")
     private String minTransitDistance;
 
+    @QueryParam("searchTimeout")
+    protected Long searchTimeout;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -619,6 +622,9 @@ public abstract class RoutingResource {
 
         if (minTransitDistance != null)
             request.minTransitDistance = minTransitDistance;
+
+        if (searchTimeout != null)
+            request.searchTimeout = searchTimeout;
 
 
 
