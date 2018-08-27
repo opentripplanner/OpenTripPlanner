@@ -65,7 +65,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
