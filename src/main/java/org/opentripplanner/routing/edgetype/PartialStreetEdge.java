@@ -130,7 +130,7 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
         }
 
         Coordinate coords[] = partialElevCoords.toArray(new Coordinate[partialElevCoords.size()]);
-        return new PackedCoordinateSequence.Double(coords);
+        return new PackedCoordinateSequence.Double(coords, 2);
     }
 
     /**
