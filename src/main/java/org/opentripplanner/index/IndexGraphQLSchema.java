@@ -2924,7 +2924,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("direction")
-                    .description("Direction of the trip, possible values: 0, 1")
+                    .description("Direction of the trip, possible values: 0, 1 or -1.")
                     .type(new GraphQLNonNull(Scalars.GraphQLInt))
                     .build())
                 .argument(GraphQLArgument.newArgument()
