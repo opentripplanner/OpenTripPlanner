@@ -2924,7 +2924,7 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("direction")
-                    .description("Direction of the trip, possible values: 0, 1 or -1.  \n -1 indicates that the direction is irrelevant, i.e. the route has trips only in one direction. See field `directionId` of Pattern.")
+                    .description("Direction of the trip, possible values: 0, 1 or -1.  \n -1 indicates that the direction is irrelevant, i.e. in case the route has trips only in one direction. See field `directionId` of Pattern.")
                     .type(Scalars.GraphQLInt)
                     .defaultValue(-1)
                     .build())
