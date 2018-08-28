@@ -36,8 +36,6 @@ public interface WayPropertySetSource {
 			return new NorwayWayPropertySetSource();
 		} else if ("finland".equals(type)) {
 			return new FinlandWayPropertySetSource();
-		} else if ("hsl".equals(type)) {
-			return new HSLWayPropertySetSource();
 		} else {
 			throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
 		}
