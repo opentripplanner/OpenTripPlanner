@@ -53,6 +53,9 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
         props.setCarSpeed("highway=trunk_link", 15); // = 54kph
         props.setCarSpeed("highway=primary", 22.22f); // 80kph "Kantatie"
         props.setCarSpeed("highway=primary_link", 15); // = 54kph
+
+        // Remove Helsinki city center service tunnel network from graph
+        props.setProperties("highway=service;tunnel=yes;access=destination", StreetTraversalPermission.NONE);
 		
         // Read the rest from the default set
 		new DefaultWayPropertySetSource().populateProperties(props);
