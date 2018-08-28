@@ -54,8 +54,8 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
     private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
-    private static final double WALK_LEG_DISTANCE_EPSILON = 1.0;
-    private static final double WALK_LEG_DURATION_EPSILON = 2e3;
+    private static final double WALK_LEG_DISTANCE_EPSILON = 2.0;
+    private static final double WALK_LEG_DURATION_EPSILON = 5e3;
 
     /**
      * Generates a TripPlan from a set of paths
@@ -188,7 +188,7 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static List<Leg> filterLegs(List<Leg> legs) {
         return legs.stream().filter(leg -> {
-            return !("WALK".equals(leg.mode) && leg.distance < WALK_LEG_DISTANCE_EPSILON && leg.endTime.getTimeInMillis() - leg.startTime.getTimeInMillis() < WALK_LEG_DURATION_EPSILON);
+            return !"WALK".equals(leg.mode) || (leg.distance > WALK_LEG_DISTANCE_EPSILON && leg.endTime.getTimeInMillis() - leg.startTime.getTimeInMillis() > WALK_LEG_DURATION_EPSILON);
         }).collect(Collectors.toList());
 
     }
