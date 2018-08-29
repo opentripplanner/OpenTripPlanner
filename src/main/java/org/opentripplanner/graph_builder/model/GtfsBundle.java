@@ -21,6 +21,7 @@ public class GtfsBundle {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
+    /** Can be either a directory or a zip file containing the GTFS txt files. */
     private File path;
 
     private URL url;
@@ -70,14 +71,6 @@ public class GtfsBundle {
 
     public void setUrl(URL url) {
         this.url = url;
-    }
-
-    public void setCsvInputSource(CsvInputSource csvInputSource) {
-        this.csvInputSource = csvInputSource;
-    }
-    
-    public String getDataKey() {
-        return path + ";" + url + ";" + (csvInputSource != null ? csvInputSource.hashCode() : "");
     }
     
     public CsvInputSource getCsvInputSource() throws IOException {

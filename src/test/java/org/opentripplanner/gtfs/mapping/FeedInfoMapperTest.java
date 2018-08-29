@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class FeedInfoMapperTest {
     private static final org.onebusaway.gtfs.model.FeedInfo FEED_INFO = new org.onebusaway.gtfs.model.FeedInfo();
 
-    private static final Integer ID = 45;
+    private static final String ID = "45";
 
     private static final ServiceDate START_DATE = new ServiceDate(2016, 10, 5);
 

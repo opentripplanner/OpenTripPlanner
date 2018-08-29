@@ -1,0 +1,4 @@
+This feed is used to test for ID collision behavior when multiple feeds using the same IDs are loaded at once.
+It contains three agencies, one with a UUID and the other two with IDs 1 and 2.
+The feed will be loaded multiple times, but the IDs should not collide because they should
+be scoped.

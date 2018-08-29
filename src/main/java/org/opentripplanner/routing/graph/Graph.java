@@ -796,6 +796,10 @@ public class Graph implements Serializable {
         }
     }
 
+    private Kryo makeKryo () {
+
+    }
+
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");

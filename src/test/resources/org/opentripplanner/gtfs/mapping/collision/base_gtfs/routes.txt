@@ -1,0 +1,3 @@
+agency_id,route_id,route_short_name,route_long_name,route_type
+TestAgency,route0,R0,Route Zero,2
+TestAgency,route1,R1,Route One,2

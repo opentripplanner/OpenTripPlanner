@@ -1,5 +1,6 @@
 package org.opentripplanner.model.impl;
 
+import com.google.common.base.Strings;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
@@ -18,7 +19,9 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
@@ -148,19 +151,18 @@ public class OtpTransitServiceBuilder {
         generateNoneExistentIds(feedInfos);
     }
 
-    static <T extends IdentityBean<Integer>> void generateNoneExistentIds(List<T> entities) {
-        int maxId = 0;
+    static <T extends IdentityBean<String>> void generateNoneExistentIds(List<T> entities) {
+        Set<String> idsSeen = new HashSet<>();
         for (T it : entities) {
-            maxId = zeroOrNull(it.getId()) ? maxId : Math.max(maxId, it.getId());
+            idsSeen.add(it.getId());
         }
+        int nextId = 0;
         for (T it : entities) {
-            if(zeroOrNull(it.getId())) {
-                it.setId(++maxId);
+            if(Strings.isNullOrEmpty(it.getId())) {
+                do {
+                    it.setId("F" + nextId++);
+                } while (idsSeen.contains(it.getId()));
             }
         }
-    }
-
-    private static boolean zeroOrNull(Integer id) {
-        return id == null || id == 0;
     }
 }

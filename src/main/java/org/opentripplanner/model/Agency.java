@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import com.conveyal.gtfs.loader.Feed;
+
 public final class Agency extends IdentityBean<String> {
 
     private static final long serialVersionUID = 1L;

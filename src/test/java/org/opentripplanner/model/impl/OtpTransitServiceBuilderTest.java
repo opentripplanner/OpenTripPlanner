@@ -18,14 +18,14 @@ import static org.opentripplanner.model.impl.OtpTransitServiceBuilder.generateNo
  */
 public class OtpTransitServiceBuilderTest {
 
-    private static final Integer ID_1 = valueOf(1);
-    private static final Integer ID_4 = valueOf(4);
-    private static final Integer ID_5 = valueOf(5);
-    private static final Integer ID_6 = valueOf(6);
+    private static final String ID_1 = "F1";
+    private static final String ID_4 = "F4";
+    private static final String ID_5 = "F5";
+    private static final String ID_6 = "F6";
 
     @Test
     public void testGenerateNoneExistentIds() throws Exception {
-        List<? extends IdentityBean<Integer>> list;
+        List<? extends IdentityBean<String>> list;
 
         // An empty list should not cause any trouble (Exception)
         generateNoneExistentIds(Collections.<FeedInfo>emptyList());
@@ -56,15 +56,15 @@ public class OtpTransitServiceBuilderTest {
 
     /* private methods */
 
-    private static Integer id(List<? extends IdentityBean<Integer>> list, int index) {
+    private static String id(List<? extends IdentityBean<String>> list, int index) {
         return list.get(index).getId();
     }
 
-    private static IdentityBean<Integer> newEntity() {
+    private static IdentityBean<String> newEntity() {
         return newEntity(null);
     }
 
-    private static IdentityBean<Integer> newEntity(Integer id) {
+    private static IdentityBean<String> newEntity(String id) {
         FeedInfo e = new FeedInfo();
         if(id != null) {
             e.setId(id);

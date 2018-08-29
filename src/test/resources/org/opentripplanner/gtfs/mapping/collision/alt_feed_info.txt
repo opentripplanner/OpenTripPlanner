@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version,feed_id
+OpenTripPlannerAlternate,http://opentripplanner.org,en,20180901,20180901,0,AlternateFeed
