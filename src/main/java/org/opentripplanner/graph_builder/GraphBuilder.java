@@ -81,6 +81,7 @@ public class GraphBuilder implements Runnable {
     public boolean serializeGraph = true;
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
+        MDC.put("routerPath", path.getAbsolutePath());
         graphFile = new File(path, "Graph.obj");
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
