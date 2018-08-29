@@ -794,7 +794,7 @@
         <dependency>
           <groupId>io.sentry</groupId>
           <artifactId>sentry-logback</artifactId>
-          <version>1.6.3</version>
+          <version>1.7.5</version>
         </dependency>
         <!--
             Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
