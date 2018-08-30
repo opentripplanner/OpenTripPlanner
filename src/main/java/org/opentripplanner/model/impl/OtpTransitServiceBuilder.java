@@ -148,19 +148,25 @@ public class OtpTransitServiceBuilder {
         generateNoneExistentIds(feedInfos);
     }
 
-    static <T extends IdentityBean<Integer>> void generateNoneExistentIds(List<T> entities) {
+    static <T extends IdentityBean<String>> void generateNoneExistentIds(List<T> entities) {
         int maxId = 0;
-        for (T it : entities) {
-            maxId = zeroOrNull(it.getId()) ? maxId : Math.max(maxId, it.getId());
-        }
-        for (T it : entities) {
-            if(zeroOrNull(it.getId())) {
-                it.setId(++maxId);
-            }
-        }
-    }
 
-    private static boolean zeroOrNull(Integer id) {
-        return id == null || id == 0;
+
+        for (T it : entities) {
+            try {
+                if(it.getId() != null) {
+                    maxId = Math.max(maxId, Integer.parseInt(it.getId()));
+                }
+            } catch (NumberFormatException ignore) {}
+        }
+
+        for (T it : entities) {
+            try {
+                if(it.getId() == null || Integer.parseInt(it.getId()) == 0) {
+                    it.setId(Integer.toString(++maxId));
+                }
+            }
+            catch (NumberFormatException ignore) { }
+        }
     }
 }
