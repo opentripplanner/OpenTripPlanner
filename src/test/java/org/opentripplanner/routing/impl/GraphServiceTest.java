@@ -53,7 +53,7 @@ public class GraphServiceTest extends TestCase {
         // Create an empty graph and it's serialized form
         emptyGraph = new Graph();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        emptyGraph.save(new ObjectOutputStream(baos));
+        emptyGraph.save(baos);
         emptyGraphData = baos.toByteArray();
 
         // Create a small graph with 2 vertices and one edge and it's serialized form

@@ -14,15 +14,26 @@
 package org.opentripplanner.routing.graph;
 
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.util.DefaultStreamFactory;
+import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -58,6 +69,7 @@ import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.InstanceCountingClassResolver;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -672,35 +684,14 @@ public class Graph implements Serializable {
 
     public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
-        // cannot use getClassLoader() in static context
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-        return load(in, level);
-    }
-
-    public static Graph load(ClassLoader classLoader, File file, LoadLevel level)
-            throws IOException, ClassNotFoundException {
-        LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
-        ObjectInputStream in = new GraphObjectInputStream(new BufferedInputStream(
-                new FileInputStream(file)), classLoader);
-        return load(in, level);
-    }
-
-    public static Graph load(InputStream is, LoadLevel level) throws ClassNotFoundException,
-            IOException {
-        return load(new ObjectInputStream(is), level);
+        return load(new FileInputStream(file), level);
     }
 
     /**
      * Default load. Uses DefaultStreetVertexIndexFactory.
-     * @param in
-     * @param level
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
      */
-    public static Graph load(ObjectInputStream in, LoadLevel level) throws IOException,
-            ClassNotFoundException {
-        return load(in, level, new DefaultStreetVertexIndexFactory());
+    public static Graph load(InputStream is, LoadLevel level) throws IOException, ClassNotFoundException {
+        return load(is, level, new DefaultStreetVertexIndexFactory());
     }
     
     /** 
@@ -710,7 +701,7 @@ public class Graph implements Serializable {
      * serialization. 
      * TODO: do we really need a factory for different street vertex indexes?
      */
-    public void index(StreetVertexIndexFactory indexFactory) {
+    public void index (StreetVertexIndexFactory indexFactory) {
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
@@ -736,44 +727,46 @@ public class Graph implements Serializable {
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
-    public static Graph load(ObjectInputStream in, LoadLevel level,
-            StreetVertexIndexFactory indexFactory) throws IOException, ClassNotFoundException {
-        try {
-            Graph graph = (Graph) in.readObject();
-            LOG.debug("Basic graph info read.");
-            if (graph.graphVersionMismatch())
-                throw new RuntimeException("Graph version mismatch detected.");
-            if (level == LoadLevel.BASIC)
-                return graph;
-            // vertex edge lists are transient to avoid excessive recursion depth
-            // vertex list is transient because it can be reconstructed from edges
-            LOG.debug("Loading edges...");
-            List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();
-            
-            for (Edge e : edges) {
-                graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-                graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
-            }
-
-            LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-            graph.index(indexFactory);
-
-            if (level == LoadLevel.FULL) {
-                return graph;
-            }
-            
-            if (graph.debugData) {
-                graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
-                LOG.debug("Debug info read.");
-            } else {
-                LOG.warn("Graph file does not contain debug data.");
-            }
-            return graph;
-        } catch (InvalidClassException ex) {
-            LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
-            throw new IllegalStateException("Stored Graph version error", ex);
+    public static Graph load(InputStream in, LoadLevel level, StreetVertexIndexFactory indexFactory) {
+        // TODO store version information, halt load if versions mismatch
+        Input input = new Input(in);
+        Kryo kryo = makeKryo();
+        Graph graph = (Graph) kryo.readClassAndObject(input);
+        LOG.debug("Basic graph info read.");
+        if (graph.graphVersionMismatch()) {
+            throw new RuntimeException("Graph version mismatch detected.");
         }
+        if (level == LoadLevel.BASIC) {
+            return graph;
+        }
+        // Vertex edge lists are transient to avoid excessive recursion depth during serialization.
+        // vertex list is transient because it can be reconstructed from edges.
+        LOG.debug("Loading edges...");
+        List<Edge> edges = (ArrayList<Edge>) kryo.readClassAndObject(input);
+        graph.vertices = new HashMap<>();
+
+        for (Edge e : edges) {
+            graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+            graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
+        }
+
+        LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+        graph.index(indexFactory);
+
+        if (level == LoadLevel.FULL) {
+            return graph;
+        }
+
+        if (graph.debugData) {
+            graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) kryo.readClassAndObject(input);
+            LOG.debug("Debug info read.");
+        } else {
+            LOG.warn("Graph file does not contain debug data.");
+        }
+        return graph;
+
+//        LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
+//        throw new IllegalStateException("Stored Graph version error", ex);
     }
 
     /**
@@ -809,23 +802,41 @@ public class Graph implements Serializable {
         }
     }
 
+    public static Kryo makeKryo() {
+        // For generating a histogram of serialized classes with associated serializers:
+        // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
+        Kryo kryo = new Kryo();
+        kryo.setRegistrationRequired(false);
+        kryo.setReferences(true);
+        kryo.addDefaultSerializer(TIntHash.class, ExternalizableSerializer.class);
+        //kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
+        kryo.register(BitSet.class, new JavaSerializer());
+        // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
+        try {
+            Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
+            kryo.addDefaultSerializer(unmodifiableCollection , UnmodifiableCollectionsSerializer.class);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
+        return kryo;
+    }
+
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
-                new FileOutputStream(file)));
         try {
-            save(out);
-            out.close();
-        } catch (RuntimeException e) {
-            out.close();
+            save(new FileOutputStream(file));
+        } catch (Exception e) {
             file.delete(); // remove half-written file
             throw e;
         }
     }
 
-    public void save(ObjectOutputStream out) throws IOException {
+    public void save(OutputStream outputStream) {
+        Kryo kryo = makeKryo();
         LOG.debug("Consolidating edges...");
+        Output output = new Output(outputStream);
         // this is not space efficient
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
         for (Vertex v : getVertices()) {
@@ -838,18 +849,21 @@ public class Graph implements Serializable {
         LOG.debug("Assigning vertex/edge ID numbers...");
         this.rebuildVertexAndEdgeIndices();
         LOG.debug("Writing edges...");
-        out.writeObject(this);
-        out.writeObject(edges);
+        kryo.writeClassAndObject(output, this);
+        kryo.writeClassAndObject(output, edges);
         if (debugData) {
             // should we make debug info generation conditional?
             LOG.debug("Writing debug data...");
-            out.writeObject(this.graphBuilderAnnotations);
-            out.writeObject(this.vertexById);
-            out.writeObject(this.edgeById);
+            kryo.writeClassAndObject(output, this.graphBuilderAnnotations);
+            kryo.writeClassAndObject(output, this.vertexById);
+            kryo.writeClassAndObject(output, this.edgeById);
         } else {
             LOG.debug("Skipping debug data.");
         }
+        output.close();
         LOG.info("Graph written.");
+        // Summarize serialized classes and associated serializers:
+        // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
     }
 
     /* deserialization for org.opentripplanner.customize */
