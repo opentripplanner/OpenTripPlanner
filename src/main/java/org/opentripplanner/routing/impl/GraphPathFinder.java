@@ -1,20 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -177,8 +164,8 @@ public class GraphPathFinder {
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
-                List<AgencyAndId> tripIds = path.getTrips();
-                for (AgencyAndId tripId : tripIds) {
+                List<FeedScopedId> tripIds = path.getTrips();
+                for (FeedScopedId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
                 if (tripIds.isEmpty()) {
@@ -281,7 +268,7 @@ public class GraphPathFinder {
                             (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
-                            for (AgencyAndId tripId : joinedPath.getTrips()) {
+                            for (FeedScopedId tripId : joinedPath.getTrips()) {
                                 options.banTrip(tripId);
                             }
                         }

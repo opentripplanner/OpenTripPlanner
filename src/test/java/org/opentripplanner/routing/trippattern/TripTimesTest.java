@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.trippattern;
 
 import static org.junit.Assert.assertEquals;
@@ -22,11 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -36,18 +23,18 @@ import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class TripTimesTest {
-    private static final AgencyAndId tripId = new AgencyAndId("agency", "testtrip");
+    private static final FeedScopedId tripId = new FeedScopedId("agency", "testtrip");
 
-    private static final AgencyAndId stop_a = new AgencyAndId("agency", "A"); // 0
-    private static final AgencyAndId stop_b = new AgencyAndId("agency", "B"); // 1
-    private static final AgencyAndId stop_c = new AgencyAndId("agency", "C"); // 2
-    private static final AgencyAndId stop_d = new AgencyAndId("agency", "D"); // 3
-    private static final AgencyAndId stop_e = new AgencyAndId("agency", "E"); // 4
-    private static final AgencyAndId stop_f = new AgencyAndId("agency", "F"); // 5
-    private static final AgencyAndId stop_g = new AgencyAndId("agency", "G"); // 6
-    private static final AgencyAndId stop_h = new AgencyAndId("agency", "H"); // 7
+    private static final FeedScopedId stop_a = new FeedScopedId("agency", "A"); // 0
+    private static final FeedScopedId stop_b = new FeedScopedId("agency", "B"); // 1
+    private static final FeedScopedId stop_c = new FeedScopedId("agency", "C"); // 2
+    private static final FeedScopedId stop_d = new FeedScopedId("agency", "D"); // 3
+    private static final FeedScopedId stop_e = new FeedScopedId("agency", "E"); // 4
+    private static final FeedScopedId stop_f = new FeedScopedId("agency", "F"); // 5
+    private static final FeedScopedId stop_g = new FeedScopedId("agency", "G"); // 6
+    private static final FeedScopedId stop_h = new FeedScopedId("agency", "H"); // 7
 
-    private static final AgencyAndId[] stops =
+    private static final FeedScopedId[] stops =
         {stop_a, stop_b, stop_c, stop_d, stop_e, stop_f, stop_g, stop_h};
 
     private static final TripTimes originalTripTimes;

@@ -1,22 +1,9 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -259,7 +246,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /** Do not use certain trips */
-    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
+    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
@@ -401,10 +388,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    public AgencyAndId startingTransitStopId;
+    public FeedScopedId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    public AgencyAndId startingTransitTripId;
+    public FeedScopedId startingTransitTripId;
 
     public boolean walkingBike;
 
@@ -817,7 +804,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
-            clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
             if (this.bikeWalkingOptions != this)
@@ -1132,7 +1119,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void banTrip(AgencyAndId trip) {
+    public void banTrip(FeedScopedId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
     
