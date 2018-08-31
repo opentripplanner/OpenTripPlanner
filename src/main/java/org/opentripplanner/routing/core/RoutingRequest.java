@@ -667,6 +667,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setPreferredRoutes(String s) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+        
         if (s != null && !s.equals(""))
             preferredRoutes = RouteMatcher.parse(s);
         else
@@ -684,6 +687,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setUnpreferredRoutes(String s) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
         if (s != null && !s.equals(""))
             unpreferredRoutes = RouteMatcher.parse(s);
         else
