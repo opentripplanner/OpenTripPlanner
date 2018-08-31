@@ -66,7 +66,6 @@ public final class SentryUtilities {
 
         sentryContext.addExtra("time", request.getDateTime().toString());
         sentryContext.addExtra("unixTime", request.getDateTime().getTime());
-        sentryContext.addExtra("zoneids", request.getZoneIdSet().toString());
         sentryContext.addExtra("maxWalkDistance", request.maxWalkDistance);
         sentryContext.addExtra("walkReluctance", request.walkReluctance);
         sentryContext.addExtra("walkSpeed", request.walkSpeed);

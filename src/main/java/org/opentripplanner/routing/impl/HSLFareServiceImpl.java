@@ -17,12 +17,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,20 @@ import org.slf4j.LoggerFactory;
 public class HSLFareServiceImpl extends DefaultFareServiceImpl {
     private static final long serialVersionUID = 20131259L;
     private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+
+    @Override
+    public boolean boardingAllowed(GraphPath path, String zone, Set<String> allowedFareIds) {
+        for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
+            Collection<FareRuleSet> fareRules = kv.getValue();
+            for (FareRuleSet ruleSet : fareRules) {
+                if(allowedFareIds.contains(ruleSet.getFareAttribute().getId().toString()) &&
+                   ruleSet.getContains().contains(zone)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     protected FareAndId getBestFareAndId(FareType fareType, List<Ride> rides, Collection<FareRuleSet> fareRules) {

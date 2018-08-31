@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -158,7 +159,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double carSpeed;
 
-    private ZoneIdSet zones = new ZoneIdSet();
+    public Set<String>allowedFares = null;
 
     public Locale locale = new Locale("en", "US");
 
@@ -1348,18 +1349,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
-    }
-
-    /**
-     * Set allowed fare zones
-     * @param zones
-     */
-    public void setZoneIdSet(ZoneIdSet zones) {
-        this.zones = zones; 
-    }
-    
-    public ZoneIdSet getZoneIdSet() {
-        return zones;
     }
 
     public List<Integer> getLocationSlacks() {

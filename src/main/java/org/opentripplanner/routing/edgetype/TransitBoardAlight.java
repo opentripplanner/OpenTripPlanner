@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 import java.util.Locale;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -28,9 +29,9 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.ZoneIdSet;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -130,8 +131,44 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State state0) {
         return traverse(state0, 0);
     }
-    
-    
+
+    private void dumpTransitPath(String succ, GraphPath path) {
+        State state = path.states.getLast();
+        final long arrDepTime = state.getTimeSeconds();
+        RoutingRequest options = state.getOptions();
+
+        // find first/last transit stop
+        long firstStopTime = 0;
+        String stop1 = null;
+        String zone1 = null;
+        String stop2 = null;
+        String zone2 = null;
+        String route = null;
+
+        while (stop2 == null) {
+            if(state.getVertex().getLabel().contains("arriv")) {
+                stop2 = state.getVertex().getLabel();
+                zone2 = state.getZone();
+            }
+            state = state.getBackState();
+        }
+
+        while (state != null) {
+            if (state.getRoute() != null)
+                route = state.getRoute().getId();
+            if (state.getZone() != null)
+                zone1 = state.getZone();
+
+            if(state.getVertex().getLabel().contains("depart")) {
+                stop1 = state.getVertex().getLabel();
+                firstStopTime = state.getTimeSeconds();
+            }
+            state = state.getBackState();
+        }
+        int btime= (int) (Math.abs(firstStopTime - options.dateTime)/60);
+        LOG.info(succ + " from {} zone {} route {} to {} zone {} boarding {}", stop1, zone1, route, stop2, zone2, btime);
+    }
+
     /**
      * NOTE: We do not need to check the pickup/drop off type. TransitBoardAlight edges are simply
      * not created for pick/drop type 1 (no pick/drop).
@@ -237,28 +274,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             s1.setBackMode(getMode());
             final State nextState = s1.makeState();
-            final ZoneIdSet zoneSet = options.getZoneIdSet();
-            if(zoneSet.getTicketIds()!=null && nextState.getRoute() != null) {
-                final GraphPath path = new GraphPath(nextState, false);
-                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);                
-                if (fareService != null) {
-                    Fare fare = fareService.getCost(path);
 
-                    if(fare != null) {
-                        if (fare.getFare(FareType.regular).getCents() == -1) {
-                            return null;
-                        }
-                        for(FareComponent fc:fare.getDetails(FareType.regular)) {
-                            if(!zoneSet.isAllowed(fc.fareId.toString())) {
-                                return null;
-                            }              
-                        }
-                    } else {
+            if(options.allowedFares != null && !options.reverseOptimizing) {
+                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);
+
+                // Must do an ugly check because of the stupid inheritance from a base interface
+                // why don't folks always use a real base class? Typical interface bs.
+                if (fareService instanceof DefaultFareServiceImpl) {
+                    final GraphPath path = new GraphPath(nextState, false);
+                    if(!((DefaultFareServiceImpl)fareService).journeyAllowed(path, options.allowedFares)) {
                         return null;
                     }
-                }        
+                }
             }
-            
+
             return nextState;
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
@@ -373,7 +402,19 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             } else {
                 s1.incrementWeight(wait_cost + options.getBoardCost(s0.getNonTransitMode()));
             }
-            
+
+            State nextState = s1.makeState();
+
+            if(options.allowedFares != null && !options.reverseOptimizing) {
+                final FareService fareService = options.getRoutingContext().graph.getService(FareService.class);
+                if (fareService instanceof DefaultFareServiceImpl) {
+                    final GraphPath path = new GraphPath(nextState, false);
+                    if(!((DefaultFareServiceImpl)fareService).boardingAllowed(path, getPattern().getZone(stopIndex), options.allowedFares)) {
+                        return null;
+                    }
+                }
+            }
+
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
@@ -384,13 +425,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 s0.getLastNextArrivalDelta() <= bestWait &&
                 s0.getLastNextArrivalDelta() > -1) {
                 // it is re-reversed by optimize, so this still yields a forward tree
-                State optimized = s1.makeState().optimizeOrReverse(true, true);
+                State optimized = nextState.optimizeOrReverse(true, true);
                 if (optimized == null) LOG.error("Null optimized state. This shouldn't happen.");
                 return optimized;
             }
             
             /* If we didn't return an optimized path, return an unoptimized one. */
-            return s1.makeState();
+            return nextState;
         }
     }
 
