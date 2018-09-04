@@ -796,10 +796,6 @@ public class Graph implements Serializable {
         }
     }
 
-    private Kryo makeKryo () {
-
-    }
-
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
@@ -1041,7 +1037,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {
