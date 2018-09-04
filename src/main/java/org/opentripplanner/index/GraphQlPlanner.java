@@ -26,7 +26,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.ZoneIdSet;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import com.google.common.collect.Sets;
 
 public class GraphQlPlanner {
 
@@ -258,12 +258,10 @@ public class GraphQlPlanner {
         }
 
         if (hasArgument(environment, "ticketTypes")) {
-            String ticketTypes = environment.getArgument("ticketTypes");
-            request.setZoneIdSet(ZoneIdSet.create(index, ticketTypes));
+            String ticketTypes = environment.getArgument("ticketTypes"); // comma separated list e.g. "HSL_esp,HSL_van"
+            request.allowedFares = Sets.newHashSet(ticketTypes);
             //TODO should we increase max walk distance?
             //request.setMaxWalkDistance(request.getMaxWalkDistance()*2);
-        } else {
-            request.setZoneIdSet(new ZoneIdSet());
         }
 
         if (request.allowBikeRental && !hasArgument(environment, "bikeSpeed")) {
