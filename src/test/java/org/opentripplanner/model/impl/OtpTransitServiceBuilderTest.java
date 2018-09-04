@@ -18,10 +18,10 @@ import static org.opentripplanner.model.impl.OtpTransitServiceBuilder.generateNo
  */
 public class OtpTransitServiceBuilderTest {
 
-    private static final String ID_1 = "F1";
-    private static final String ID_4 = "F4";
-    private static final String ID_5 = "F5";
-    private static final String ID_6 = "F6";
+    private static final String ID_1 = "1";
+    private static final String ID_4 = "4";
+    private static final String ID_5 = "5";
+    private static final String ID_6 = "6";
 
     @Test
     public void testGenerateNoneExistentIds() throws Exception {
@@ -66,9 +66,7 @@ public class OtpTransitServiceBuilderTest {
 
     private static IdentityBean<String> newEntity(String id) {
         FeedInfo e = new FeedInfo();
-        if(id != null) {
-            e.setId(id);
-        }
+        e.setId(id);
         return e;
     }
 }

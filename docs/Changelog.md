@@ -3,6 +3,8 @@
 ## 1.4 (in progress)
 
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
+- Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
+- Add tests for feed ID collisions (#2645)
 
 ## 1.3 (2018-08-03)
 

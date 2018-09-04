@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -93,8 +94,14 @@ public class IdentifierCollisionTest {
         gtfsBuilderModule.buildGraph(graph, null);
         graph.index(new DefaultStreetVertexIndexFactory());
 
+        System.out.println("Set of unique FeedIds: " + graph.getFeedIds());
+
         assertEquals("There are four feeds: two with the same ID that collide, two with no ID, one unique ID.",
                 4, graph.getFeedIds().size());
+
+        assertTrue(graph.getFeedIds().contains("TestFeed"));
+
+        assertTrue(graph.getFeedIds().contains("AlternateFeed"));
 
         // Check vertices in the graph, then the results of indexing them.
 
@@ -112,10 +119,10 @@ public class IdentifierCollisionTest {
         for (String feedId : graph.getFeedIds()) {
             // Every feed should have one agency, all with the same name "TestAgency", but different feed scopes.
             Collection<Agency> agencies = graph.getAgencies(feedId);
-            assertEquals(1, agencies.size());
             for (Agency agency : agencies) {
                 assertEquals("TestAgency", agency.getId());
             }
+            assertEquals(1, agencies.size());
         }
 
     }
