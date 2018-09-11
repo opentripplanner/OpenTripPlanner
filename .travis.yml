@@ -61,5 +61,5 @@ deploy:
   bucket: opentripplanner-builds
   acl: public_read
   on:
-    repo: opentripplanner/opentripplanner
+    repo: opentripplanner/OpenTripPlanner
     all_branches: true
