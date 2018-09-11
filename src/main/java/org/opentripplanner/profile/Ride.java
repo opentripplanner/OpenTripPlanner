@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -16,8 +16,6 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 

@@ -22,12 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * And this proposal to gtfs-changes:
  * https://groups.google.com/d/msg/gtfs-changes/zVjEoNIPr_Y/4ngWCajPoS0J
  * 
- * Our solution is to serialize the AgencyAndId as a single string with a separator character
+ * Our solution is to serialize the FeedScopedId as a single string with a separator character
  * between the agency and ID. In future versions this scoped identifier will actually represent a
  * feed and ID. The important thing is that the API will remain the same, and identifiers fetched
  * from one API result can be used in another request with no conflicts.
- * 
- * Since AgencyAndId is a third-party class, we can't modify it with a custom serialization method
+ *
+ * TODO - This is no longer the case - the FeedScopedId can be annotated.
+ * Since FeedScopedId is a third-party class, we can't modify it with a custom serialization method
  * or annotations. Instead, we have to let Jackson know which custom serializer class applies to the
  * third-party type. According to http://wiki.fasterxml.com/JacksonHowToCustomSerializers "Jackson
  * 1.7 added ability to register serializers and deserializes via Module interface. This is the
@@ -55,7 +56,7 @@ public class JSONObjectMapperProvider implements ContextResolver<ObjectMapper> {
         // Constructors are available for both unnamed, unversioned throwaway modules
         // and named, versioned reusable modules.
         mapper = new ObjectMapper()
-                .registerModule(AgencyAndIdSerializer.makeModule())
+                .registerModule(FeedScopedIdSerializer.makeModule())
                 .setSerializationInclusion(Include.NON_NULL); // skip null fields
     }
 

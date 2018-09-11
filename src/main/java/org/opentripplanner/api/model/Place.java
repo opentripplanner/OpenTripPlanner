@@ -1,24 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-package org.opentripplanner.api.model; 
+package org.opentripplanner.api.model;
 
 import java.util.Calendar;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.util.Constants; 
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.util.Constants;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -35,7 +22,7 @@ public class Place {
     /** 
      * The ID of the stop. This is often something that users don't care about.
      */
-    public AgencyAndId stopId = null;
+    public FeedScopedId stopId = null;
 
     /** 
      * The "code" of the stop. Depending on the transit agency, this is often

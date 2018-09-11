@@ -1,14 +1,10 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Sets;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.model.Stop;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 public class TimeRange {
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.analyst.scenario;
 
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
