@@ -185,12 +185,18 @@ public class State implements Cloneable {
     public String toStringVerbose() {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
-                " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
+                " wd=" + this.getWeightDelta() +
+                " t=" + this.getElapsedTimeSeconds() +
+                " td=" + this.getTimeDeltaSeconds() +
+                " d=" + this.getWalkDistance() +
+                " dd=" + this.getWalkDistanceDelta() +
                 " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
-                " pr=" + this.isCarParked() + ">";
+                " pr=" + this.isCarParked() +
+                " m=" + this.getBackMode() +
+                " v=" + this.vertex.toString() +
+                ">";
     }
     
     /** Returns time in seconds since epoch */
@@ -353,7 +359,10 @@ public class State implements Cloneable {
     }
 
     public double getWeightDelta() {
-        return this.weight - backState.weight;
+        if (backState != null)
+            return this.weight - backState.weight;
+        else
+            return 0;
     }
 
     public void checkNegativeWeight() {
@@ -499,6 +508,17 @@ public class State implements Cloneable {
         State s = this;
         while (s != null) {
             System.out.printf("%s via %s by %s\n", s, s.backEdge, s.getBackMode());
+            s = s.backState;
+        }
+        System.out.printf("---- END CHAIN OF STATES ----\n");
+    }
+
+
+    public void dumpPathStates() {
+        System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
+        State s = this;
+        while (s != null) {
+            System.out.println(s.toStringVerbose());
             s = s.backState;
         }
         System.out.printf("---- END CHAIN OF STATES ----\n");
