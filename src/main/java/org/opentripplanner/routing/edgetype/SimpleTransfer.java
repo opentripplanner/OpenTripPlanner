@@ -92,7 +92,6 @@ public class SimpleTransfer extends Edge {
 
         se.incrementWeight(time * rr.walkReluctance);
         se.incrementWalkDistance(distance);
-        System.out.println(this.toString() + " traverse secods=" + time + " weight=" + time * rr.walkReluctance + " distance=" + distance);
         return se.makeState();
     }
 
