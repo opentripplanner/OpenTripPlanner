@@ -179,6 +179,8 @@ public class NearbyStopFinder {
 
         public TransitStop tstop;
         public double      dist;
+        public double elapsedTime;
+        public boolean hasElapsedTime = false;
         public LineString  geom;
         public List<Edge>  edges;
 
@@ -189,6 +191,9 @@ public class NearbyStopFinder {
 
         @Override
         public int compareTo(StopAtDistance that) {
+            if (this.hasElapsedTime && that.hasElapsedTime) {
+                return (int)(this.elapsedTime)-(int)(that.elapsedTime);
+            }
             return (int) (this.dist) - (int) (that.dist);
         }
 
@@ -196,6 +201,10 @@ public class NearbyStopFinder {
             return String.format("stop %s at %.1f meters", tstop, dist);
         }
 
+        public void setElapsedTime(double elapsedTime) {
+            this.elapsedTime = elapsedTime;
+            this.hasElapsedTime = true;
+        }
     }
 
     /**
@@ -231,6 +240,7 @@ public class NearbyStopFinder {
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
         StopAtDistance sd = new StopAtDistance((TransitStop) state.getVertex(), distance);
+        sd.setElapsedTime(state.getElapsedTimeSeconds());
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;
