@@ -228,11 +228,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
 
-            /* We assume all trips in a pattern are on the same route. Check if that route is banned. */
-            if (options.bannedRoutes != null && options.bannedRoutes.matches(getPattern().route)) {
-                // TODO: remove route checks in/after the trip search
-                return null;
-            }
+            /* Check if route and/or agency are banned or whitelisted for this pattern */
+            if (options.routeIsBanned(this.getPattern().route)) return null;
             
             /*
              * Find the next boarding/alighting time relative to the current State. Check lists of
@@ -276,10 +273,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             if (bestWait < 0) return null; // no appropriate trip was found
             Trip trip = bestTripTimes.trip;
-            
-            /* check if route and/or Agency are banned for this plan */
-            // FIXME this should be done WHILE searching for a trip.
-            if (options.tripIsBanned(trip)) return null;
 
             /* Check if route is preferred by the user. */
             long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
