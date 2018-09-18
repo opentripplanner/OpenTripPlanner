@@ -56,7 +56,8 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
         // Remove Helsinki city center service tunnel network from graph
         props.setProperties("highway=service;tunnel=yes;access=destination", StreetTraversalPermission.NONE);
-		
+        props.setProperties("highway=service;access=destination", StreetTraversalPermission.ALL, 1.1, 1.1);
+
         // Read the rest from the default set
 		new DefaultWayPropertySetSource().populateProperties(props);
 	}
