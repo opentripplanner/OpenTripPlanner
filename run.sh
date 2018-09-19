@@ -7,8 +7,16 @@ JAR=`ls *-shaded*`
 echo JAR=$JAR
 SLEEP_TIME=5
 
+#Parse data container URL(s) to a bash array
+IFS=',' read -r -a ROUTER_DATA_CONTAINER_URLS <<< $ROUTER_DATA_CONTAINER_URL
+
+#Parse router name(s) to a bash array
+IFS=',' read -r -a ROUTER_NAMES <<< $ROUTER_NAME
+
+ROUTERS=$(printf " --router %s" ${ROUTER_NAMES[@]})
+
 function url {
-  echo $ROUTER_DATA_CONTAINER_URL/$1
+  echo "${ROUTER_DATA_CONTAINER_URLS[$1]}"/$2
 }
 
 function build_graph {
@@ -16,7 +24,7 @@ function build_graph {
   FILE=$2
   echo "building graph..."
   DIR="graphs"
-  rm -rf $DIR || true
+  rm -rf $DIR/$GRAPHNAME || true
   mkdir -p $DIR
   unzip -o -d $DIR $FILE
   mv $DIR/router-$GRAPHNAME $DIR/$GRAPHNAME
@@ -27,7 +35,7 @@ function download_graph {
   NAME=$1
   VERSION=$2
   GRAPH_FILE=graph-$NAME.zip
-  URL=$(url "graph-$NAME-$VERSION.zip")
+  URL=$(url $3 "graph-$NAME-$VERSION.zip")
   echo "Downloading graph from $URL"
   for i in {1..6}; do
     HTTP_STATUS=$(curl --write-out %{http_code} --silent --output $GRAPH_FILE $URL)
@@ -60,7 +68,7 @@ function version {
 
 function process {
   NAME=$1
-  URL=$(url "router-$NAME.zip")
+  URL=$(url $2 "router-$NAME.zip")
   FILE="$NAME.zip"
 
   echo "Retrieving graph source bundle from $URL"
@@ -79,14 +87,20 @@ if [ "$EUID" -eq 0 ]
   then echo "search marathon.l4lb.thisdcos.directory" >> /etc/resolv.conf
 fi
 
-
 VERSION=$(version)
 
 echo VERSION $VERSION
-echo ROUTER $ROUTER_NAME
 
+j="0"
 
-download_graph $ROUTER_NAME $VERSION || process $ROUTER_NAME
+for ROUTER in "${ROUTER_NAMES[@]}"
+do
+  echo ROUTER $ROUTER
 
-echo "graphString is: $ROUTER_NAME"
-java -Dsentry.release=$VERSION $JAVA_OPTS -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs --router $ROUTER_NAME
+  download_graph $ROUTER $VERSION "$j" || process $ROUTER "$j"
+
+  echo "graphString is: $ROUTER"
+  j=$[$j+1]
+done
+
+java -Dsentry.release=$VERSION $JAVA_OPTS -Duser.timezone=Europe/Helsinki -jar $JAR --server --port $PORT --securePort $SECURE_PORT --basePath ./ --graphs ./graphs $ROUTERS
