@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.serializer.GraphSerializerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 public class GraphStats {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphStats.class);
+
+    private final GraphSerializerService graphSerializerService = new GraphSerializerService();
 
     @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
     private boolean verbose = false;
@@ -95,7 +98,7 @@ public class GraphStats {
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
         try {
-            graph = Graph.load(graphFile, Graph.LoadLevel.FULL);
+            graph = graphSerializerService.load(graphFile);
         } catch (Exception e) {
             LOG.error("Exception while loading graph from " + graphFile);
             return;
