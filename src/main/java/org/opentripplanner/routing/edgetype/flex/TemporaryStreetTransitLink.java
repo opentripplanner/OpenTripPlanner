@@ -6,9 +6,6 @@ import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-/**
- * Created by dbenoff on 2/10/17.
- */
 public class TemporaryStreetTransitLink extends StreetTransitLink implements TemporaryEdge {
 
 
