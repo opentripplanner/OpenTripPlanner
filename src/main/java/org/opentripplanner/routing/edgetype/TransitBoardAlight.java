@@ -278,8 +278,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
-                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding))
+                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) {
                     continue;
+                }
                 TripTimes tripTimes = getNextTrip(s0, sd, timetable);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
