@@ -240,20 +240,23 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     private enum RequestStops {
-        NO, YES, PHONE, COORDINATE_WITH_DRIVER;
-        private static RequestStops fromGtfs(int value) {
-            switch(value) {
-                case 0:
-                    return YES;
-                case 1:
-                    return NO;
-                case 2:
-                    return PHONE;
-                case 3:
-                    return COORDINATE_WITH_DRIVER;
+        NO(1), YES(0), PHONE(2), COORDINATE_WITH_DRIVER(3);
+
+        final int gtfsCode;
+
+        RequestStops(int gtfsCode) {
+            this.gtfsCode = gtfsCode;
+        }
+
+        private static RequestStops fromGtfs(int code) {
+            for (RequestStops it : values()) {
+                if(it.gtfsCode == code) {
+                    return it;
+                }
             }
             return NO;
         }
+
         boolean allowed() {
             return this != NO;
         }
