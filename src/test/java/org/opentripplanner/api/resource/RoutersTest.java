@@ -1,9 +1,9 @@
 package org.opentripplanner.api.resource;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.routing.graph.Graph;
@@ -68,7 +68,7 @@ public class RoutersTest {
             }
         };
 
-        calendarService.putServiceDatesForServiceId(new AgencyAndId("NA", "1"), serviceDates);
+        calendarService.putServiceDatesForServiceId(new FeedScopedId("NA", "1"), serviceDates);
 
         final Graph graph = new Graph();
         graph.updateTransitFeedValidity(calendarService);

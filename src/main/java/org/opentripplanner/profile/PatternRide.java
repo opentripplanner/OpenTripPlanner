@@ -1,6 +1,6 @@
 package org.opentripplanner.profile;
 
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 /**

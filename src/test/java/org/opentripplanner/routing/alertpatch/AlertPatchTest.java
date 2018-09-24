@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.alertpatch;
 
 import java.io.File;
@@ -20,16 +7,15 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -37,6 +23,8 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
+
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 public class AlertPatchTest extends TestCase {
     private Graph graph;
@@ -52,9 +40,12 @@ public class AlertPatchTest extends TestCase {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         options = new RoutingRequest();
         graph = new Graph();
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         graph.index(new DefaultStreetVertexIndexFactory());
 
         feedId = context.getFeedId().getId();
@@ -68,7 +59,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new AgencyAndId(feedId, "A"));
+        snp1.setStop(new FeedScopedId(feedId, "A"));
         snp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
@@ -115,7 +106,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
-        snp1.setStop(new AgencyAndId(feedId, "A"));
+        snp1.setStop(new FeedScopedId(feedId, "A"));
         snp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
@@ -171,7 +162,7 @@ public class AlertPatchTest extends TestCase {
         rnp1.setAlert(note1);
         rnp1.setId("id1");
         // Routes isn't patched in tests through GtfsBundle, which is why we have have a reference to agency id here.
-        rnp1.setRoute(new AgencyAndId("agency", "1"));
+        rnp1.setRoute(new FeedScopedId("agency", "1"));
         rnp1.apply(graph);
 
         Vertex stop_a = graph.getVertex(feedId + ":A");

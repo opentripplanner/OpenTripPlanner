@@ -1,23 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
@@ -32,7 +19,7 @@ public class StopMatcher implements Cloneable, Serializable {
     /**
      * Set of full matching stop ids (agency ID: + stop ID)
      */
-    private HashSet<AgencyAndId> agencyAndStopIds = new HashSet<AgencyAndId>();
+    private HashSet<FeedScopedId> agencyAndStopIds = new HashSet<FeedScopedId>();
 
     private StopMatcher() {
     }
@@ -71,7 +58,7 @@ public class StopMatcher implements Cloneable, Serializable {
             n++;
 
             try {
-                AgencyAndId stopId = GtfsLibrary.convertIdFromString(stopString);
+                FeedScopedId stopId = GtfsLibrary.convertIdFromString(stopString);
                 retval.agencyAndStopIds.add(stopId);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Wrong stop spec format: " + stopString);
@@ -103,7 +90,7 @@ public class StopMatcher implements Cloneable, Serializable {
             else if (stop.getParentStation() != null 
                     && !stop.getParentStation().isEmpty()) {
                 // This stop has a parent
-                AgencyAndId parentId = new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation());
+                FeedScopedId parentId = new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
                 if (matches(parentId)) {
                     return true;    
                 }
@@ -118,7 +105,7 @@ public class StopMatcher implements Cloneable, Serializable {
      * @param stopId is the stop id
      * @return true when stop id is matched 
      */
-    private boolean matches(AgencyAndId stopId) {
+    private boolean matches(FeedScopedId stopId) {
         if (agencyAndStopIds.contains(stopId)) {
             return true;    
         }
@@ -131,8 +118,8 @@ public class StopMatcher implements Cloneable, Serializable {
      */
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        for (AgencyAndId agencyAndId : agencyAndStopIds) {
-            builder.append(agencyAndId.toString());
+        for (FeedScopedId id : agencyAndStopIds) {
+            builder.append(id.toString());
             builder.append(",");
         }
         // Remove last comma
