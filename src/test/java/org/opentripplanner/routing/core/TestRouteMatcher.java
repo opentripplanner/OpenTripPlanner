@@ -1,38 +1,25 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 
 public class TestRouteMatcher extends TestCase {
 
     public void testRouteMatcher() {
 
         Route r1 = new Route();
-        r1.setId(new AgencyAndId("A1", "42"));
+        r1.setId(new FeedScopedId("A1", "42"));
         r1.setShortName("R1");
         Route r2 = new Route();
-        r2.setId(new AgencyAndId("A1", "43"));
+        r2.setId(new FeedScopedId("A1", "43"));
         r2.setShortName("R2");
         Route r1b = new Route();
-        r1b.setId(new AgencyAndId("A2", "42"));
+        r1b.setId(new FeedScopedId("A2", "42"));
         r1b.setShortName("R1");
         Route r3 = new Route();
-        r3.setId(new AgencyAndId("A1", "44"));
+        r3.setId(new FeedScopedId("A1", "44"));
         r3.setShortName("R3_b");
 
         RouteMatcher emptyMatcher = RouteMatcher.emptyMatcher();
@@ -89,7 +76,7 @@ public class TestRouteMatcher extends TestCase {
         assertTrue(thrown);
         
         Route r1c = new Route();
-        r1c.setId(new AgencyAndId("A_1", "R_42"));
+        r1c.setId(new FeedScopedId("A_1", "R_42"));
         r1c.setShortName("R_42");
 
         RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");

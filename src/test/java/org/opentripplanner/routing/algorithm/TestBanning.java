@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -81,6 +68,57 @@ public class TestBanning extends TestCase {
         }
     }
 
+    public void testWhiteListedRoutes() {
+
+        Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+
+        String feedId = graph.getFeedIds().iterator().next();
+        RoutingRequest options = new RoutingRequest();
+        Vertex start = graph.getVertex(feedId + ":8371");
+        Vertex end = graph.getVertex(feedId + ":8374");
+        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
+        // must set routing context _after_ options is fully configured (time)
+        options.setRoutingContext(graph, start, end);
+        ShortestPathTree spt = null;
+
+        /*
+         * Same as testBannedRoutes, only for whitelisted routes. The last three entries in maxLines are removed, because
+         * it only matches against lineName, not lineId.
+         */
+        String[][] maxLines = { { "MAX Red Line", null }, { "MAX Blue Line", null },
+                { "MAX Green Line", null } };
+        for (int i = 0; i < maxLines.length; ++i) {
+            String lineName = maxLines[i][0];
+            String lineId = maxLines[i][1];
+            String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
+                    + (lineId != null ? "_" + lineId : "");
+            options.setWhiteListedRoutes(routeSpecStr);
+            spt = aStar.getShortestPathTree(options);
+            GraphPath path = spt.getPath(end, true);
+            for (State s : path.states) {
+                if (s.getBackEdge() instanceof PatternHop) {
+                    PatternHop e = (PatternHop) s.getBackEdge();
+                    Route route = e.getPattern().route;
+                    assertTrue(options.whiteListedRoutes.matches(route));
+                    boolean notFoundMaxLine = true;
+                    boolean foundMaxLine = false;
+                    for (int j = 0; j < maxLines.length; ++j) {
+                        if (e.getName().equals(maxLines[j][0])) {
+                            if (j != i) {
+                                notFoundMaxLine = false;
+                            } else {
+                                foundMaxLine = true;
+                            }
+
+                        }
+                    }
+                    assertTrue(notFoundMaxLine);
+                    assertTrue(foundMaxLine);
+                }
+            }
+        }
+    }
+
     public void testWholeBannedTrips() {
         doTestBannedTrips(false, 42);
     }
@@ -125,12 +163,12 @@ public class TestBanning extends TestCase {
                 if (path == null || spt == null)
                     break; // No path found
                 // List of used [trip,stop index] in the path
-                Set<T2<AgencyAndId, BannedStopSet>> usedTripDefs = new HashSet<T2<AgencyAndId, BannedStopSet>>();
+                Set<T2<FeedScopedId, BannedStopSet>> usedTripDefs = new HashSet<T2<FeedScopedId, BannedStopSet>>();
                 for (State s : path.states) {
                     if (s.getBackEdge() instanceof TransitBoardAlight) {
                         TransitBoardAlight tbae = (TransitBoardAlight) s.getBackEdge();
                         int boardingStopIndex = tbae.getStopIndex();
-                        AgencyAndId tripId = s.getTripId();
+                        FeedScopedId tripId = s.getTripId();
                         BannedStopSet stopSet;
                         if (partial) {
                             stopSet = new BannedStopSet();
@@ -139,11 +177,11 @@ public class TestBanning extends TestCase {
                             stopSet = BannedStopSet.ALL;
                         }
                         if (tripId != null)
-                            usedTripDefs.add(new T2<AgencyAndId, BannedStopSet>(tripId, stopSet));
+                            usedTripDefs.add(new T2<FeedScopedId, BannedStopSet>(tripId, stopSet));
                     }
                 }
                 // Used trips should not contains a banned trip
-                for (T2<AgencyAndId, BannedStopSet> usedTripDef : usedTripDefs) {
+                for (T2<FeedScopedId, BannedStopSet> usedTripDef : usedTripDefs) {
                     BannedStopSet bannedStopSet = options.bannedTrips.get(usedTripDef.first);
                     if (bannedStopSet != null) {
                         for (Integer stopIndex : usedTripDef.second) {
@@ -154,9 +192,9 @@ public class TestBanning extends TestCase {
                 if (usedTripDefs.size() == 0)
                     break; // Not a transit trip, no sense to ban trip any longer
                 // Pick a random used trip + stop set to ban
-                List<T2<AgencyAndId, BannedStopSet>> usedTripDefsList = new ArrayList<T2<AgencyAndId, BannedStopSet>>(
+                List<T2<FeedScopedId, BannedStopSet>> usedTripDefsList = new ArrayList<T2<FeedScopedId, BannedStopSet>>(
                         usedTripDefs);
-                T2<AgencyAndId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
+                T2<FeedScopedId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
                         .nextInt(usedTripDefs.size()));
                 options.bannedTrips.put(tripDefToBan.first, tripDefToBan.second);
             }

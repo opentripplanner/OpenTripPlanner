@@ -153,14 +153,7 @@ public class Router {
                 }
             }
         }
-        
-        JsonNode stopClusterMode = config.get("stopClusterMode");
-        if (stopClusterMode != null) {
-            graph.stopClusterMode = stopClusterMode.asText();    
-        } else {
-            graph.stopClusterMode = "proximity";
-        }
-        
+
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);
 
@@ -202,5 +195,4 @@ public class Router {
         logger.setAdditive(false);
         return logger;
     }
-
 }

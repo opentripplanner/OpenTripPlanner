@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.Assert.*;
@@ -38,7 +25,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 public class TriangleInequalityTest {
     
     private static HashMap<Class<?>, Object> extra;
-    private static Graph _graph;
+    private static Graph graph;
 
     private Vertex start;
     private Vertex end;
@@ -47,7 +34,7 @@ public class TriangleInequalityTest {
     public static void onlyOnce() throws Exception {
 
         extra = new HashMap<Class<?>, Object>();
-        _graph = new Graph();
+        graph = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
@@ -57,22 +44,22 @@ public class TriangleInequalityTest {
 
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(_graph, extra);
+        loader.buildGraph(graph, extra);
 
         // Need to set up the index because buildGraph doesn't do it.
-        _graph.rebuildVertexAndEdgeIndices();
+        graph.rebuildVertexAndEdgeIndices();
     }
     
     @Before
     public void before() {
-        start = _graph.getVertex("osm:node:1919595913");        
-        end = _graph.getVertex("osm:node:42448554");    
+        start = graph.getVertex("osm:node:1919595913");
+        end = graph.getVertex("osm:node:42448554");
     }
 
     private GraphPath getPath(AStar aStar, RoutingRequest proto,
             Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
-        options.setRoutingContext(_graph, startBackEdge, u, v);
+        options.setRoutingContext(graph, startBackEdge, u, v);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v, false);
         options.cleanup();
@@ -105,7 +92,7 @@ public class TriangleInequalityTest {
         }
         
         RoutingRequest options = prototypeOptions.clone();
-        options.setRoutingContext(_graph, start, end);
+        options.setRoutingContext(graph, start, end);
         
         AStar aStar = new AStar();
         
@@ -121,7 +108,7 @@ public class TriangleInequalityTest {
         
         // Try every vertex in the graph as an intermediate.
         boolean violated = false;
-        for (Vertex intermediate : _graph.getVertices()) {
+        for (Vertex intermediate : graph.getVertices()) {
             if (intermediate == start || intermediate == end) {
                 continue;
             }

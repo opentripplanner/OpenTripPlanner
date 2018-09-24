@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.shapefile;
 
 import java.util.HashMap;
@@ -70,9 +57,9 @@ public class CaseBasedTraversalPermissionConverter implements
 
     private static Logger log = LoggerFactory.getLogger(CaseBasedBicycleSafetyFeatureConverter.class);
 
-    private String _attributeName;
+    private String attributeName;
 
-    private P2<StreetTraversalPermission> _defaultPermission = P2.createPair(
+    private P2<StreetTraversalPermission> defaultPermission = P2.createPair(
             StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
 
     private Map<String, P2<StreetTraversalPermission>> _permissions = new HashMap<String, P2<StreetTraversalPermission>>();
@@ -82,27 +69,27 @@ public class CaseBasedTraversalPermissionConverter implements
     }
 
     public CaseBasedTraversalPermissionConverter(String attributeName) {
-        _attributeName = attributeName;
+        this.attributeName = attributeName;
     }
 
     public CaseBasedTraversalPermissionConverter(String attributeName,
             StreetTraversalPermission defaultPermission) {
-        _attributeName = attributeName;
-        _defaultPermission = P2.createPair(defaultPermission, defaultPermission);
+        this.attributeName = attributeName;
+        this.defaultPermission = P2.createPair(defaultPermission, defaultPermission);
     }
     
     /**
      * The name of the feature attribute to use when calculating the traversal permissions.
      */
     public void setAttributeName(String attributeName) {
-        _attributeName = attributeName;
+        this.attributeName = attributeName;
     }
 
     /**
      * The default permission to use when no matching case is found for a street.
      */
     public void setDefaultPermission(StreetTraversalPermission permission) {
-        _defaultPermission = P2.createPair(permission, permission);
+        defaultPermission = P2.createPair(permission, permission);
     }
 
     /**
@@ -130,17 +117,17 @@ public class CaseBasedTraversalPermissionConverter implements
 
     @Override
     public P2<StreetTraversalPermission> convert(SimpleFeature feature) {
-        if (_attributeName == null) {
-            return _defaultPermission;
+        if (attributeName == null) {
+            return defaultPermission;
         }
-        Object key = feature.getAttribute(_attributeName);
+        Object key = feature.getAttribute(attributeName);
         if (key == null) {
-            return _defaultPermission;
+            return defaultPermission;
         }
         P2<StreetTraversalPermission> permission = _permissions.get(key.toString());
         if (permission == null) {
             log.info("unexpected permission " + key.toString());
-            return _defaultPermission;
+            return defaultPermission;
         }
         return permission;
     }
