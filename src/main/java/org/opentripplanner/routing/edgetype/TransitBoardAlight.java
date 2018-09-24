@@ -286,8 +286,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     /* Wait is relative to departures on board and arrivals on alight. */
                     int wait = calculateWait(s0, sd, tripTimes);
                     /* A trip was found. The wait should be non-negative. */
-                    if (wait < 0)
+                    if (wait < 0) {
                         LOG.error("Negative wait time when boarding.");
+                    }
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
                         bestWait       = wait;
