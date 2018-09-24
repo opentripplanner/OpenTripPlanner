@@ -24,14 +24,14 @@ import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FeedInfo;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -42,6 +42,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -84,10 +85,10 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
-    public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+    public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
@@ -98,11 +99,11 @@ public class GraphIndex {
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Geometry> areasById = Maps.newHashMap();
+    public final Map<FeedScopedId, Geometry> areasById = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
-    private final Map<AgencyAndId,Integer> serviceCodes;
+    private final Map<FeedScopedId,Integer> serviceCodes;
 
     /* Full-text search extensions */
     public LuceneIndex luceneIndex;
@@ -190,7 +191,7 @@ public class GraphIndex {
 
         LOG.info("Initializing areas....");
         if (graph.areasById != null) {
-            for (AgencyAndId id : graph.areasById.keySet()) {
+            for (FeedScopedId id : graph.areasById.keySet()) {
                 areasById.put(id, graph.areasById.get(id));
             }
         }
@@ -369,7 +370,7 @@ public class GraphIndex {
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
-        for (AgencyAndId serviceId : calendarService.getServiceIdsOnDate(date)) {
+        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
             if (n < 0) continue;
             services.set(n);
@@ -569,18 +570,9 @@ public class GraphIndex {
      * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
      * according to a parent/child station topology, if it exists.
      */
-    public void clusterStops() {
-    	if (graph.stopClusterMode != null) {
-            switch (graph.stopClusterMode) {
-                case "parentStation":
-                    clusterByParentStation();
-                    break;
-                case "proximity":
-                    clusterByProximityAndName();
-                    break;
-                default:
-                    clusterByProximityAndName();
-            }
+    private void clusterStops() {
+    	if (graph.stopClusterMode == StopClusterMode.parentStation) {
+            clusterByParentStation();
         } else {
             clusterByProximityAndName();
         }
@@ -653,7 +645,7 @@ public class GraphIndex {
     	        cluster = stopClusterForId.get(ps);
     	    } else {
     	        cluster = new StopCluster(ps, stop.getName());
-    	        Stop parent = graph.parentStopById.get(new AgencyAndId(stop.getId().getAgencyId(), ps));
+    	        Stop parent = graph.parentStopById.get(new FeedScopedId(stop.getId().getAgencyId(), ps));
                 cluster.setCoordinates(parent.getLat(), parent.getLon());
                 stopClusterForId.put(ps, cluster);
 
@@ -683,7 +675,7 @@ public class GraphIndex {
      * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
      * Note that if the same agency ID is defined in several feeds, this will return one of them
      * at random. That is obviously not the right behavior. The problem is that agencies are
-     * not currently keyed on an AgencyAndId object, but on separate feedId and id Strings.
+     * not currently keyed on an FeedScopedId object, but on separate feedId and id Strings.
      * A real fix will involve replacing or heavily modifying the OBA GTFS loader, which is now
      * possible since we have forked it.
      */
@@ -712,7 +704,7 @@ public class GraphIndex {
     }
 
     // Heuristic for deciding if trip is call-n-ride, only used for transfer and banning rules
-    public boolean tripIsCallAndRide(AgencyAndId tripId) {
+    public boolean tripIsCallAndRide(FeedScopedId tripId) {
         Trip trip = tripForId.get(tripId);
         TripPattern pattern = patternForTrip.get(trip);
         return pattern.geometry == null;

@@ -2,13 +2,10 @@ package org.opentripplanner.routing.flex;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.math3.util.Pair;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -35,7 +32,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
-import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternArriveVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryPatternDepartVertex;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
@@ -49,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
@@ -276,7 +271,7 @@ public abstract class GtfsFlexGraphModifier {
 
     private TemporaryTransitStop createTemporaryTransitStop(String name, StreetVertex v, RoutingContext rctx) {
         Stop flagStop = new Stop();
-        flagStop.setId(new AgencyAndId("1", "temp_" + String.valueOf(Math.random())));
+        flagStop.setId(new FeedScopedId("1", "temp_" + String.valueOf(Math.random())));
         flagStop.setLat(v.getLat());
         flagStop.setLon(v.getLon());
         flagStop.setName(name);

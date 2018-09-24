@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.flex;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.BoardAlightType;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
@@ -26,7 +26,7 @@ public class Ride {
 
     private List<String> zones = new ArrayList<>();
 
-    private AgencyAndId route;
+    private FeedScopedId route;
 
     private String agency;
 
@@ -38,7 +38,7 @@ public class Ride {
 
     private Stop lastStop;
 
-    private AgencyAndId trip;
+    private FeedScopedId trip;
 
     private BoardAlightType boardType = BoardAlightType.DEFAULT;
 
@@ -56,7 +56,7 @@ public class Ride {
         return zones;
     }
 
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return route;
     }
 
@@ -80,7 +80,7 @@ public class Ride {
         return lastStop;
     }
 
-    public AgencyAndId getTrip() {
+    public FeedScopedId getTrip() {
         return trip;
     }
 

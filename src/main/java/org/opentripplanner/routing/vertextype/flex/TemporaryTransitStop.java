@@ -1,11 +1,9 @@
 package org.opentripplanner.routing.vertextype.flex;
 
 import com.google.common.collect.Iterables;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;

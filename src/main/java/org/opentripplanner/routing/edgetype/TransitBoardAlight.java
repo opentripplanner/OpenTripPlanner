@@ -1,25 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
 import java.util.Locale;
-
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -253,11 +239,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
 
-            /* We assume all trips in a pattern are on the same route. Check if that route is banned. */
-            if (options.bannedRoutes != null && options.bannedRoutes.matches(getPattern().route)) {
-                // TODO: remove route checks in/after the trip search
-                return null;
-            }
+            /* Check if route and/or agency are banned or whitelisted for this pattern */
+            if (options.routeIsBanned(this.getPattern().route)) return null;
             
             /*
              * Find the next boarding/alighting time relative to the current State. Check lists of
@@ -299,11 +282,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             if (bestWait < 0) return null; // no appropriate trip was found
             Trip trip = bestTripTimes.trip;
-
-            /* check if route and/or Agency are banned for this plan */
-            // FIXME this should be done WHILE searching for a trip.
-            if (options.tripIsBanned(trip)) return null;
-
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
@@ -352,7 +330,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
 
             s1.incrementWeight(getExtraWeight(options));
-            
+
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without

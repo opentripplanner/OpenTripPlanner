@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.graph;
 
 
@@ -24,14 +11,14 @@ import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.FeedInfo;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
@@ -40,6 +27,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -126,7 +114,7 @@ public class Graph implements Serializable {
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
+    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
@@ -206,20 +194,20 @@ public class Graph implements Serializable {
     /** A speed source for traffic data */
     public transient StreetSpeedSnapshotSource streetSpeedSource;
     
-    /** How should we cluster stops? */
-    public String stopClusterMode = "proximity";
+    /** How should we cluster stops? By 'proximity' or 'ParentStation' */
+    public StopClusterMode stopClusterMode = StopClusterMode.proximity;
 
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<AgencyAndId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
     /** Whether to use flex modes */
     public boolean useFlexService = false;
 
     /** Areas for flex service */
-    public Map<AgencyAndId, Geometry> areasById = new HashMap<>();
+    public Map<FeedScopedId, Geometry> areasById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -544,7 +532,7 @@ public class Graph implements Serializable {
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
-        for (AgencyAndId sid : data.getServiceIds()) {
+        for (FeedScopedId sid : data.getServiceIds()) {
             agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.
@@ -892,9 +880,7 @@ public class Graph implements Serializable {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
             if (data != null) {
-                CalendarServiceImpl calendarService = new CalendarServiceImpl();
-                calendarService.setData(data);
-                this.calendarService = calendarService;
+                this.calendarService = new CalendarServiceImpl(data);
             }
         }
         return this.calendarService;
@@ -939,7 +925,7 @@ public class Graph implements Serializable {
     }
 
     public void addArea(String feedId, String areaId, Polygon area) {
-        this.areasById.put(new AgencyAndId(feedId, areaId), area);
+        this.areasById.put(new FeedScopedId(feedId, areaId), area);
     }
 
     /**

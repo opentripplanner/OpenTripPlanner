@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.util;
 
 import java.util.ArrayList;
@@ -19,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class MapUtils {
 
@@ -89,5 +78,15 @@ public class MapUtils {
                 mapList.put(key, value);
             }
         }
+    }
+
+    /**
+     * Map a collection of objects of type <em>S</em> to a list of type <em>T</em> using the
+     * provided mapping function.
+     * <p>
+     * Nullsafe: if <em>entities</em> is <code>null</code>, then <code>null</code> is returned.
+     */
+    public static <S, T> List<T> mapToList(Collection<S> entities, Function<S, T> mapper) {
+        return entities == null ? null : entities.stream().map(mapper).collect(Collectors.toList());
     }
 }

@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;

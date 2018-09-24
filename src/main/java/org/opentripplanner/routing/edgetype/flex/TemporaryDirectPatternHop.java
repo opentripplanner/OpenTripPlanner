@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype.flex;
 
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.flex;
 
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;

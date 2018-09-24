@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -65,18 +52,23 @@ public class GraphBuilder implements Runnable {
 
     private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
-    private File graphFile;
+    private final File graphFile;
     
     private boolean _alwaysRebuild = true;
 
-    private List<RoutingRequest> _modeList;
+    private List<RoutingRequest> modeList;
     
-    private String _baseGraph = null;
+    private String baseGraph = null;
     
     private Graph graph = new Graph();
 
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
+
+    public GraphBuilder(File path, GraphBuilderParameters builderParams) {
+        graphFile = new File(path, "Graph.obj");
+        graph.stopClusterMode = builderParams.stopClusterMode;
+    }
 
     public void addModule(GraphBuilderModule loader) {
         _graphBuilderModules.add(loader);
@@ -91,7 +83,7 @@ public class GraphBuilder implements Runnable {
     }
     
     public void setBaseGraph(String baseGraph) {
-        this._baseGraph = baseGraph;
+        this.baseGraph = baseGraph;
         try {
             graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
         } catch (Exception e) {
@@ -100,21 +92,13 @@ public class GraphBuilder implements Runnable {
     }
 
     public void addMode(RoutingRequest mo) {
-        _modeList.add(mo);
+        modeList.add(mo);
     }
 
     public void setModes(List<RoutingRequest> modeList) {
-        _modeList = modeList;
+        this.modeList = modeList;
     }
     
-    public void setPath (String path) {
-        graphFile = new File(path.concat("/Graph.obj"));
-    }
-    
-    public void setPath (File path) {
-        graphFile = new File(path, "Graph.obj");
-    }
-
     public Graph getGraph() {
         return this.graph;
     }
@@ -180,7 +164,6 @@ public class GraphBuilder implements Runnable {
      */
     public static GraphBuilder forDirectory(CommandLineParameters params, File dir) {
         LOG.info("Wiring up and configuring graph builder task.");
-        GraphBuilder graphBuilder = new GraphBuilder();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         JsonNode builderConfig = null;
@@ -191,13 +174,16 @@ public class GraphBuilder implements Runnable {
             LOG.error("'{}' is not a readable directory.", dir);
             return null;
         }
-        graphBuilder.setPath(dir);
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
+
+        GraphBuilder graphBuilder = new GraphBuilder(dir, builderParams);
+
         // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
         routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
+
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
                 case GTFS:
@@ -276,7 +262,9 @@ public class GraphBuilder implements Runnable {
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
         // which need to be handled even when there's no transit.
-        graphBuilder.addModule(new StreetLinkerModule());
+        StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
+        streetLinkerModule.setAddExtraEdgesToAreas(builderParams.areaVisibility);
+        graphBuilder.addModule(streetLinkerModule);
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         if (builderParams.elevationBucket != null) {
