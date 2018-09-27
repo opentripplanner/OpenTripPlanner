@@ -299,7 +299,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("highway=pedestrian;bicycle=designated",
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
         props.setProperties("highway=cycleway;bicycle=designated",
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.6, 0.6);
 
         /* sidewalk and crosswalk */
         props.setProperties("footway=sidewalk;highway=footway;bicycle=yes",
