@@ -54,6 +54,9 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
         props.setCarSpeed("highway=primary", 22.22f); // 80kph "Kantatie"
         props.setCarSpeed("highway=primary_link", 15); // = 54kph
 
+        // Fixes problem with missing REDI park&ride tunnel connections
+        props.setProperties("highway=service;tunnel=yes", StreetTraversalPermission.ALL, 1.1, 1.1);
+
         // Remove Helsinki city center service tunnel network from graph
         props.setProperties("highway=service;tunnel=yes;access=destination", StreetTraversalPermission.NONE);
         props.setProperties("highway=service;access=destination", StreetTraversalPermission.ALL, 1.1, 1.1);
