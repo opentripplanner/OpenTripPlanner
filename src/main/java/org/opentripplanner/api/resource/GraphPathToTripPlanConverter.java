@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.model.*;
+import org.opentripplanner.api.resource.TripPlanFilter;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -41,6 +43,8 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
     private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
+    private static final double WALK_LEG_DISTANCE_EPSILON = 2.0;
+    private static final double WALK_LEG_DURATION_EPSILON = 5e3;
 
     /**
      * Generates a TripPlan from a set of paths
@@ -71,25 +75,14 @@ public abstract class GraphPathToTripPlanConverter {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
-        long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
-            if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
-                bestNonTransitTime = itinerary.walkTime;
-            }
-            itineraries.add(itinerary);
-        }
-
-        // Filter and add itineraries to plan
-        for (Itinerary itinerary : itineraries) {
-            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
-            // do not include in plan
-            if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
-
             plan.addItinerary(itinerary);
         }
+
+        plan = TripPlanFilter.filterPlan(plan, request);
 
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
@@ -162,6 +155,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         fixupLegs(itinerary.legs, legsStates);
 
+        itinerary.legs = filterLegs(itinerary.legs);
+
         itinerary.duration = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
@@ -178,6 +173,13 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         return itinerary;
+    }
+
+    private static List<Leg> filterLegs(List<Leg> legs) {
+        return legs.stream().filter(leg -> {
+            return !"WALK".equals(leg.mode) || (leg.distance > WALK_LEG_DISTANCE_EPSILON && leg.endTime.getTimeInMillis() - leg.startTime.getTimeInMillis() > WALK_LEG_DURATION_EPSILON);
+        }).collect(Collectors.toList());
+
     }
 
     private static Calendar makeCalendar(State state) {
@@ -241,8 +243,8 @@ public abstract class GraphPathToTripPlanConverter {
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
         for (int i = 1; i < states.length - 1; i++) {
-            TraverseMode backMode = states[i].getBackMode();
-            TraverseMode forwardMode = states[i + 1].getBackMode();
+            TraverseMode backMode = states[i].getBackMode() != null ? states[i].getBackMode() : states[i].getBackState().getNonTransitMode();
+            TraverseMode forwardMode = states[i + 1].getBackMode() != null ? states[i + 1].getBackMode() : states[i + 1].getBackState().getNonTransitMode();
 
             if (backMode == null || forwardMode == null) continue;
 
@@ -255,7 +257,12 @@ public abstract class GraphPathToTripPlanConverter {
                     if (legIndexPairs[1] != states.length - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
-                    legIndexPairs = new int[] {i, states.length - 1};
+                    if (states[i - 1].getBackEdge() instanceof LegSwitchingEdge) {
+                        // Include from from LegSwitchingEdge
+                        legIndexPairs = new int[] {i-1, states.length - 1};
+                    } else {
+                        legIndexPairs = new int[] {i, states.length - 1};
+                    }
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;
@@ -438,6 +445,19 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (i + 1 < legsStates.length) {
+                if (legs.get(i).intermediatePlace) {
+                    Leg leg = legs.get(i);
+                    Leg nextLeg = legs.get(i + 1);
+                    if (nextLeg != null && !nextLeg.intermediatePlace && nextLeg.isTransitLeg()) {
+                        long waitTime = nextLeg.startTime.getTimeInMillis() -
+                            leg.endTime.getTimeInMillis();
+                        leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + waitTime);
+                        leg.from.departure = leg.startTime;
+                        leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + waitTime);
+                        leg.to.arrival = leg.endTime;
+                    }
+                }
+
                 legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
                 legs.get(i).to.departure = legs.get(i + 1).from.departure;
 
@@ -457,6 +477,7 @@ public abstract class GraphPathToTripPlanConverter {
                     legs.get(i).alightRule = alightRule;    // leg, don't alight now.
                 }
             }
+
         }
     }
 
@@ -622,6 +643,10 @@ public abstract class GraphPathToTripPlanConverter {
         leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
         leg.to.departure = null;
 
+        if (states[0].getBackEdge() instanceof LegSwitchingEdge) {
+            leg.intermediatePlace = true;
+        }
+
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
 
@@ -691,7 +716,13 @@ public abstract class GraphPathToTripPlanConverter {
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
+            place.bikeParkId = ((BikeParkVertex) vertex).getId();
+            LOG.trace("Added bike parking Id {} to place", place.bikeParkId);
             place.vertexType = VertexType.BIKEPARK;
+        } else if (vertex instanceof ParkAndRideVertex) {
+            place.carParkId = ((ParkAndRideVertex) vertex).getId();
+            LOG.trace("Added bike parking Id {} to place", place.bikeParkId);
+            place.vertexType = VertexType.PARKANDRIDE;
         } else {
             place.vertexType = VertexType.NORMAL;
         }

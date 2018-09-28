@@ -14,9 +14,11 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +99,10 @@ public abstract class RoutingResource {
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
 
+    /** How much more reluctant is the user to walk on streets with car traffic allowed **/
+    @QueryParam("walkOnStreetReluctance")
+    protected Double walkOnStreetReluctance;
+
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
@@ -154,6 +160,42 @@ public abstract class RoutingResource {
     /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
+
+    /** The weight of TRAM traverse mode. Values over 1 add cost to tram travel and values under 1 decrease cost */
+    @QueryParam("tramWeight")
+    protected Double tramWeight;
+
+    /** The weight of SUBWAY traverse mode. Values over 1 add cost to subway travel and values under 1 decrease cost */
+    @QueryParam("subwayWeight")
+    protected Double subwayWeight;
+
+    /** The weight of RAIL traverse mode. Values over 1 add cost to rail travel and values under 1 decrease cost */
+    @QueryParam("railWeight")
+    protected Double railWeight;
+
+    /** The weight of BUS traverse mode. Values over 1 add cost to bus travel and values under 1 decrease cost */
+    @QueryParam("busWeight")
+    protected Double busWeight;
+
+    /** The weight of FERRY traverse mode. Values over 1 add cost to ferry travel and values under 1 decrease cost */
+    @QueryParam("ferryWeight")
+    protected Double ferryWeight;
+
+    /** The weight of CABLE_CAR traverse mode. Values over 1 add cost to cable car travel and values under 1 decrease cost */
+    @QueryParam("cableCarWeight")
+    protected Double cableCarWeight;
+
+    /** The weight of GONDOLA traverse mode. Values over 1 add cost to gondola travel and values under 1 decrease cost */
+    @QueryParam("gondolaWeight")
+    protected Double gondolaWeight;
+
+    /** The weight of FUNICULAR traverse mode. Values over 1 add cost to funicular travel and values under 1 decrease cost */
+    @QueryParam("funicularWeight")
+    protected Double funicularWeight;
+
+    /** The weight of AIRPLANE traverse mode. Values over 1 add cost to airplane travel and values under 1 decrease cost */
+    @QueryParam("airplaneWeight")
+    protected Double airplaneWeight;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -225,7 +267,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("whiteListedRoutes")
     protected String whiteListedRoutes;
-    
+
     /** The comma-separated list of banned agencies. */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
@@ -235,7 +277,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
-    
+
     /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
@@ -292,11 +334,11 @@ public abstract class RoutingResource {
     @QueryParam("batch")
     protected Boolean batch;
 
-    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
+    /** A transit stop required to be the first stop in the search (AgencyId:StopId) */
     @QueryParam("startTransitStopId")
     protected String startTransitStopId;
 
-    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId:TripId) */
     @QueryParam("startTransitTripId")
     protected String startTransitTripId;
 
@@ -361,7 +403,19 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
-    /* 
+    /**
+     * @see {@link org.opentripplanner.routing.core.RoutingRequest#carParkCarLegWeight}
+     */
+    @QueryParam("carParkCarLegWeight")
+    private Double carParkCarLegWeight;
+
+    @QueryParam("itineraryFiltering")
+    private Double itineraryFiltering;
+
+    @QueryParam("heuristicStepsPerMainStep")
+    private Integer heuristicStepsPerMainStep;
+
+    /*
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
      * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
@@ -389,29 +443,7 @@ public abstract class RoutingResource {
         if (toPlace != null)
             request.setToString(toPlace);
 
-        {
-            //FIXME: move into setter method on routing request
-            TimeZone tz;
-            tz = router.graph.getTimeZone();
-            if (date == null && time != null) { // Time was provided but not date
-                LOG.debug("parsing ISO datetime {}", time);
-                try {
-                    // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
-                    DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
-                    XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
-                    GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
-                    if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                        gregCal.setTimeZone(tz);
-                    }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
-                } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(date, time, tz);
-                }
-            } else {
-                request.setDateTime(date, time, tz);
-            }
-        }
+        request.parseTime(router.graph.getTimeZone(), this.date, this.time);
 
         if (wheelchair != null)
             request.setWheelchairAccessible(wheelchair);
@@ -427,11 +459,22 @@ public abstract class RoutingResource {
         if (maxPreTransitTime != null)
             request.setMaxPreTransitTime(maxPreTransitTime);
 
+        if(carParkCarLegWeight != null) {
+            request.setCarParkCarLegWeight(carParkCarLegWeight);
+        }
+
+        if(itineraryFiltering != null) {
+            request.setItineraryFiltering(itineraryFiltering);
+        }
+
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 
         if (waitReluctance != null)
             request.setWaitReluctance(waitReluctance);
+
+        if (walkOnStreetReluctance != null)
+            request.setWalkOnStreetReluctance(walkOnStreetReluctance);
 
         if (waitAtBeginningFactor != null)
             request.setWaitAtBeginningFactor(waitAtBeginningFactor);
@@ -452,19 +495,10 @@ public abstract class RoutingResource {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setOptimize(optimize);
             if (optimize == OptimizeType.TRIANGLE) {
-                if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-                    throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-                }
-                if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-                    throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-                }
-                // FIXME couldn't this be simplified by only specifying TWO of the values?
-                if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-                    throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-                }
-                request.setTriangleSafetyFactor(triangleSafetyFactor);
-                request.setTriangleSlopeFactor(triangleSlopeFactor);
-                request.setTriangleTimeFactor(triangleTimeFactor);
+                RoutingRequest.assertTriangleParameters(triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor);
+                request.setTriangleSafetyFactor(this.triangleSafetyFactor);
+                request.setTriangleSlopeFactor(this.triangleSlopeFactor);
+                request.setTriangleTimeFactor(this.triangleTimeFactor);
             }
         }
 
@@ -511,7 +545,7 @@ public abstract class RoutingResource {
             request.setWhiteListedAgencies(whiteListedAgencies);
 
         HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
-      
+
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
@@ -541,6 +575,42 @@ public abstract class RoutingResource {
             request.setModes(request.modes);
         }
 
+        if (tramWeight != null) {
+            request.setModeWeight(TraverseMode.TRAM, tramWeight);
+        }
+
+        if (subwayWeight != null) {
+            request.setModeWeight(TraverseMode.SUBWAY, subwayWeight);
+        }
+
+        if (railWeight != null) {
+            request.setModeWeight(TraverseMode.RAIL, railWeight);
+        }
+
+        if (busWeight != null) {
+            request.setModeWeight(TraverseMode.BUS, busWeight);
+        }
+
+        if (ferryWeight != null) {
+            request.setModeWeight(TraverseMode.FERRY, ferryWeight);
+        }
+
+        if (cableCarWeight != null) {
+            request.setModeWeight(TraverseMode.CABLE_CAR, cableCarWeight);
+        }
+
+        if (gondolaWeight != null) {
+            request.setModeWeight(TraverseMode.GONDOLA, gondolaWeight);
+        }
+
+        if (funicularWeight != null) {
+            request.setModeWeight(TraverseMode.FUNICULAR, funicularWeight);
+        }
+
+        if (airplaneWeight != null) {
+            request.setModeWeight(TraverseMode.AIRPLANE, airplaneWeight);
+        }
+
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
@@ -558,10 +628,7 @@ public abstract class RoutingResource {
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
+        request.assertSlack();
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
@@ -600,6 +667,9 @@ public abstract class RoutingResource {
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
 
+        if (heuristicStepsPerMainStep != null)
+            request.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
+
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
         return request;
@@ -610,7 +680,7 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    private HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
+    public static HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }

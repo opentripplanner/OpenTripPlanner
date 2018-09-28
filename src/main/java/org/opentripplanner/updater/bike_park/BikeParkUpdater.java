@@ -67,6 +67,8 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         if (sourceType != null) {
             if (sourceType.equals("kml-placemarks")) {
                 source = new KmlBikeParkDataSource();
+            } else if (sourceType.equals("hsl-parkandride")) {
+                source = new HslBikeParkDataSource();
             }
         }
 

@@ -19,6 +19,8 @@ public class BikeRentalStationVertex extends Vertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+    private BikeRentalStation station;
+
     private int bikesAvailable;
 
     private int spacesAvailable;
@@ -35,6 +37,7 @@ public class BikeRentalStationVertex extends Vertex {
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
+        this.station = station;
     }
 
     public int getBikesAvailable() {
@@ -70,4 +73,7 @@ public class BikeRentalStationVertex extends Vertex {
          return isCarStation ? TraverseMode.CAR : TraverseMode.BICYCLE;
     }
 
+    public BikeRentalStation getStation() {
+        return station;
+    }
 }

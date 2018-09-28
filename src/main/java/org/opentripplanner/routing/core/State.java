@@ -12,6 +12,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +113,11 @@ public class State implements Cloneable {
             this.stateData.bikeParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
+        } else if (options.rideAndKiss) {
+            this.stateData.carParked = !options.arriveBy;
+            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         }
+
         this.walkDistance = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
@@ -167,12 +172,18 @@ public class State implements Cloneable {
     public String toStringVerbose() {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
-                " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
+                " wd=" + this.getWeightDelta() +
+                " t=" + this.getElapsedTimeSeconds() +
+                " td=" + this.getTimeDeltaSeconds() +
+                " d=" + this.getWalkDistance() +
+                " dd=" + this.getWalkDistanceDelta() +
                 " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
-                " pr=" + this.isCarParked() + ">";
+                " pr=" + this.isCarParked() +
+                " m=" + this.getBackMode() +
+                " v=" + this.vertex.toString() +
+                ">";
     }
     
     /** Returns time in seconds since epoch */
@@ -264,20 +275,24 @@ public class State implements Cloneable {
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
+        boolean rideAndPark = stateData.opt.rideAndKiss;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
+        boolean carRideAndParkOk = false;
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
+            carRideAndParkOk = !rideAndPark || isCarParked();
         } else {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
+            carRideAndParkOk = !rideAndPark || !isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && carRideAndParkOk;
     }
 
     public Stop getPreviousStop() {
@@ -331,7 +346,10 @@ public class State implements Cloneable {
     }
 
     public double getWeightDelta() {
-        return this.weight - backState.weight;
+        if (backState != null)
+            return this.weight - backState.weight;
+        else
+            return 0;
     }
 
     public void checkNegativeWeight() {
@@ -477,6 +495,17 @@ public class State implements Cloneable {
         State s = this;
         while (s != null) {
             System.out.printf("%s via %s by %s\n", s, s.backEdge, s.getBackMode());
+            s = s.backState;
+        }
+        System.out.printf("---- END CHAIN OF STATES ----\n");
+    }
+
+
+    public void dumpPathStates() {
+        System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
+        State s = this;
+        while (s != null) {
+            System.out.println(s.toStringVerbose());
             s = s.backState;
         }
         System.out.printf("---- END CHAIN OF STATES ----\n");
@@ -673,7 +702,13 @@ public class State implements Cloneable {
                 }
 
                 if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
-                        ret.getBackMode() != orig.getBackMode()) {
+                    ret.getBackMode() != orig.getBackMode() &&
+                    orig.getBackMode() != TraverseMode.LEG_SWITCH &&
+                    ret.getBackMode() != TraverseMode.LEG_SWITCH &&
+                    // Ignore switching between walking and biking in elevators
+                    !(edge.getFromVertex() instanceof ElevatorOffboardVertex ||
+                        edge.getToVertex() instanceof ElevatorOffboardVertex )
+                    ) {
                     ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
 

@@ -68,7 +68,7 @@ public class WalkableAreaBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-    private final int MAX_AREA_NODES = 500;
+    private final int MAX_AREA_NODES = 1000;
 
     private static final double VISIBILITY_EPSILON = 0.000000001;
 
@@ -361,7 +361,8 @@ public class WalkableAreaBuilder {
         }
         LinearRing shell = GeometryUtils.getGeometryFactory().createLinearRing(coordinates);
         Polygon poly = GeometryUtils.getGeometryFactory().createPolygon(shell, new LinearRing[0]);
-        return poly;
+
+        return (Polygon)poly.buffer(VISIBILITY_EPSILON);
     }
 
     private void createEdgesForRingSegment(Set<Edge> edges, AreaEdgeList edgeList, Area area,
@@ -427,6 +428,12 @@ public class WalkableAreaBuilder {
 
             if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
                 street.setHasBogusName(true);
+            }
+
+            if (OSMFilter.getPlatformClass(areaEntity) == StreetEdge.CLASS_TRAIN_PLATFORM) {
+                if (areaEntity.hasTag("ref")) {
+                    street.setRef(areaEntity.getTag("ref"));
+                }
             }
 
             if (areaEntity.isTagFalse("wheelchair")) {

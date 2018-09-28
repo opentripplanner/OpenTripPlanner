@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
 
@@ -171,11 +172,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     public void addNode(OSMNode node) {
         if (node.isBikeRental()) {
             bikeRentalNodes.put(node.getId(), node);
-            return;
         }
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
-            return;
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
                 .isStop()))
@@ -648,10 +647,33 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 }
             }
             processedAreas.add(relation);
-            try {
-                newArea(new Area(relation, outerWays, innerWays, nodesById));
-            } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
-                continue;
+
+            Map<Ring, OSMWay> wayForRing = new HashMap<>();
+            List<List<Ring>> groups = new ArrayList<>();;
+            for (OSMWay way : outerWays) {
+                Ring ring = new Ring(way.getNodeRefs(), nodesById);
+                wayForRing.put(ring, way);
+                for (List<Ring> group : groups) {
+                    try {
+                        if (ring.toJtsPolygon().intersects(group.get(0).toJtsPolygon())) {
+                            group.add(ring);
+                            break;
+                        }
+                    } catch (Ring.RingConstructionException e) {
+                        continue;
+                    }
+                }
+                groups.add(new ArrayList<>(Collections.singletonList(ring)));
+            }
+
+            for (List<Ring> group : groups) {
+                try {
+                    List<OSMWay> outerRingWays = group.stream().map(wayForRing::get)
+                            .collect(Collectors.toList());
+                    newArea(new Area(relation, outerRingWays, innerWays, nodesById));
+                } catch (Area.AreaConstructionException e) {
+                    continue;
+                }
             }
 
             for (OSMRelationMember member : relation.getMembers()) {

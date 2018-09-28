@@ -8,7 +8,7 @@ public class SlopeCosts {
     public final double slopeSafetyCost; // An additional safety cost caused by the slope
     public final double lengthMultiplier; // Multiplier to get true length based on flat (projected) length
     public final double slopeWalkSpeedFactor; //
-    
+
     public SlopeCosts(double slopeSpeedFactor, double slopeWorkFactor, double slopeSafetyCost,
                       double maxSlope, double lengthMultiplier, boolean flattened, double slopeWalkSpeedFactor) {
         this.slopeSpeedFactor = slopeSpeedFactor;

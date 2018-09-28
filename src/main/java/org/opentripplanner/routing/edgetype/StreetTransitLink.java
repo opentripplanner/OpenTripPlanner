@@ -23,7 +23,7 @@ import java.util.Locale;
 public class StreetTransitLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    static final int STL_TRAVERSE_COST = 1;
+    static final int STL_TRAVERSE_COST = 0;
 
     private boolean wheelchairAccessible;
 
@@ -69,14 +69,12 @@ public class StreetTransitLink extends Edge {
     }
 
     public State traverse(State s0) {
-
-        // Forbid taking shortcuts composed of two street-transit links in a row. Also avoids spurious leg transitions.
-        if (s0.backEdge instanceof StreetTransitLink) {
-            return null;
-        }
-
         // Do not re-enter the street network following a transfer.
         if (s0.backEdge instanceof SimpleTransfer) {
+            return null;
+        }
+        // Do not detour through a TransitStop when traversing the street network
+        if (s0.getVertex() instanceof TransitStop && s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
 
@@ -102,7 +100,7 @@ public class StreetTransitLink extends Edge {
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (req.kissAndRide && !s0.isCarParked()) {
+            if ((req.kissAndRide && !s0.isCarParked()) || (req.rideAndKiss && s0.isCarParked())) {
                 s1.setCarParked(true);
             } else {
                 return null;

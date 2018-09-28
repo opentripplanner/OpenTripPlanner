@@ -37,9 +37,11 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private static final String DEFAULT_NETWORK_LIST = "default";
 
-    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
+    private Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
     private BikeRentalDataSource source;
+
+    private Graph graph;
 
     private SimpleStreetSplitter linker;
 
@@ -85,6 +87,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new GenericKmlBikeRentalDataSource();
             } else if (sourceType.equals("sf-bay-area")) {
                 source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("smoove")) {
+                source = new SmooveBikeRentalDataSource();
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
             } else if (sourceType.equals("uip-bike")) {
@@ -106,6 +110,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
+        this.graph = graph;
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
         if (pollingPeriodSeconds <= 0) {
@@ -117,7 +122,12 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph setupGraph) throws Exception {
+        this.graph = setupGraph;
+        while (graph.getVertices() == null) {
+            LOG.warn("Graph has no vertices. Sleeping 5 sec");
+            Thread.sleep(5000);
+        }
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
         // Adding a bike rental station service needs a graph writer runnable

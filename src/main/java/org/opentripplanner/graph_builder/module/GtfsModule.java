@@ -134,9 +134,6 @@ public class GtfsModule implements GraphBuilderModule {
                 if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
 
         // We need to save the calendar service data so we can use it later

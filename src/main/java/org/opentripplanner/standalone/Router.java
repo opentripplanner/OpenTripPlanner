@@ -67,7 +67,6 @@ public class Router {
         this.graph = graph;
     }
 
-
     /**
      * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
      * Current responsibilities are: 1) Binding proper services (depending on the configuration from command-line or
@@ -140,6 +139,17 @@ public class Router {
             for (TraverseMode mode : TraverseMode.values()) {
                 if (boardTimes.has(mode.name())) {
                     graph.boardTimes.put(mode, boardTimes.get(mode.name()).asInt(0));
+                }
+            }
+        }
+
+        // modeWeights should be used as the parameter name everywhere
+        final JsonNode modeWeights = config.get("modeWeight");
+        if (modeWeights != null && modeWeights.isObject()) {
+            graph.modeWeights = new EnumMap<>(TraverseMode.class);
+            for (TraverseMode mode : TraverseMode.values()) {   
+                if(modeWeights.has(mode.name())) {
+                    graph.modeWeights.put(mode, modeWeights.get(mode.name()).asDouble(1d));
                 }
             }
         }

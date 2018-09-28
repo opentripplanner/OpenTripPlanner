@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -53,11 +54,18 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // A TimedTransferEdge might be invalidated later, when we have boarded the next trip and have all the information
-        // we need to check the specificity. We do not want states that might be invalidated to dominate other valid
-        // states.
+        // A TimedTransferEdge cannot be trusted to dominate another state, since its resulting state can be invalidated
+        // when checking the specificity of the transfer
         if ((a.backEdge instanceof TimedTransferEdge) || (b.backEdge instanceof TimedTransferEdge)) {
             return false;
+        }
+
+        // If already boarded both via TimedTransfer the state should dominate boarding not via TimedTransfer. It is
+        // important that this check is done after boarding, as the transfer may fail its specificity check
+        if (a.backEdge instanceof TransitBoardAlight && b.backEdge instanceof TransitBoardAlight) {
+            if (a.getBackState().backEdge instanceof TimedTransferEdge) {
+                return true;
+            }
         }
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?

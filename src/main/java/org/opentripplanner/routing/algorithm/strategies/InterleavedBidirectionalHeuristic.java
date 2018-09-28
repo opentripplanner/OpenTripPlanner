@@ -5,6 +5,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -12,11 +13,13 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -55,7 +58,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
     // For each step in the main search, how many steps should the reverse search proceed?
-    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 8; // TODO determine a good value empirically
+    private int HEURISTIC_STEPS_PER_MAIN_STEP; // TODO determine a good value empirically
 
     /** The vertex at which the main search begins. */
     Vertex origin;
@@ -87,6 +90,14 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     // True when the entire transit network has been explored by the reverse search.
     boolean finished = false;
 
+    public InterleavedBidirectionalHeuristic() {
+        this(8);
+    }
+
+    public InterleavedBidirectionalHeuristic(final int heuristicStepsPerMainStep) {
+        HEURISTIC_STEPS_PER_MAIN_STEP = heuristicStepsPerMainStep;
+    }
+
     /**
      * Before the main search begins, the heuristic must search on the streets around the origin and destination.
      * This also sets up the initial states for the reverse search through the transit network, which progressively
@@ -104,8 +115,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         long start = System.currentTimeMillis();
         this.target = target;
         this.routingRequest = request;
-        request.softWalkLimiting = false;
-        request.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
         // Forward street search first, mark street vertices around the origin so H evaluates to 0
         TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
@@ -257,6 +266,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (fromTarget) {
             rr.setArriveBy(!rr.arriveBy);
         }
+        boolean stopReached = false;
         // Create a map that returns Infinity when it does not contain a vertex.
         TObjectDoubleMap<Vertex> vertices = new TObjectDoubleHashMap<>(100, 0.5f, Double.POSITIVE_INFINITY);
         ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
@@ -271,6 +281,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             State s = pq.extract_min();
             Vertex v = s.getVertex();
+
+            boolean initialStop = v instanceof TransitStop && s.backEdge != null && s.backEdge instanceof StationStopEdge;
+
             // At this point the vertex is closed (pulled off heap).
             // This is the lowest cost we will ever see for this vertex. We can record the cost to reach it.
             if (v instanceof TransitStop) {
@@ -283,15 +296,27 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                         maxWeightSeen = weight;
                     }
                 }
-                continue;
+                if (!stopReached) {
+                    stopReached = true;
+                    rr.softWalkLimiting = false;
+                    rr.softPreTransitLimiting = false;
+                    if (s.walkDistance > rr.maxWalkDistance) {
+                        // Add 300 meters in order to search for nearby stops
+                        rr.maxWalkDistance = s.walkDistance + 300;
+                    }
+                }
+                if (!initialStop) continue;
             }
             // We don't test whether we're on an instanceof StreetVertex here because some other vertex types
             // (park and ride or bike rental related) that should also be explored and marked as usable.
             // Record the cost to reach this vertex.
-            if (!vertices.containsKey(v)) {
+            if (!vertices.containsKey(v) && !(v instanceof TransitStop)) {
                 vertices.put(v, (int) s.getWeight()); // FIXME time or weight? is RR using right mode?
             }
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
+                if (v instanceof TransitStop && !(e instanceof StreetTransitLink)) {
+                    continue;
+                }
                 // arriveBy has been set to match actual directional behavior in this subsearch.
                 // Walk cutoff will happen in the street edge traversal method.
                 State s1 = e.traverse(s);

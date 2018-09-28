@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -24,13 +26,21 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Set;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -103,6 +113,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
+    /** The weight multipliers for TraverseModes */
+    public Map<TraverseMode, Double> modeWeights = new HashMap<>();
+
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
     // TODO this should be completely removed and done only with individual cost parameters
@@ -134,6 +147,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double carSpeed;
 
+    public Set<String>allowedFares = null;
+
     public Locale locale = new Locale("en", "US");
 
     /**
@@ -163,6 +178,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     /** Multiplicative factor on expected turning time. */
     public double turnReluctance = 1.0;
+
+    /** How much more reluctant is the user to walk on streets with car traffic allowed **/
+    public double walkOnStreetReluctance = 1.0;
 
     /**
      * How long does it take to get an elevator, on average (actually, it probably should be a bit *more* than average, to prevent optimistic trips)?
@@ -346,9 +364,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
+     * The number of heuristic steps per main step when using interleaved bidirectional heuristics. Default 8.
+     */
+
+    public int heuristicStepsPerMainStep = 8;
+
+    /**
      * When true, do a full reversed search to compact the legs of the GraphPath.
      */
-    public boolean compactLegsByReversedSearch = false;
+    public boolean compactLegsByReversedSearch = true;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
@@ -419,6 +443,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
+    public boolean rideAndKiss  = false;
 
     /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
     // TODO remove
@@ -444,6 +469,23 @@ public class RoutingRequest implements Cloneable, Serializable {
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
     private StreetEdge splitEdge = null;
+
+    /**
+     * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter.
+     */
+    public double carParkCarLegWeight = 1;
+
+
+    /**
+     * Filtering sensitivity. Value 0 disables filtering. The higher the value,
+     * the easier less good routes get filtered from response.
+     * Recommended value range is 0.2 - 5. Value 1 means that if an itinerary is twice as worse
+     * than another one in some respect (say 100% more walking), it will be filtered.
+     * Value 0.5 filters 200% worse itineraries and value 2 defines 50% filtering level.
+     * Value 5 filters 20% worse routes.
+     * So, filter level = 100%/sensitivity
+     */
+    public double itineraryFiltering = 0; // off by default
 
     /* CONSTRUCTORS */
 
@@ -623,6 +665,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setPreferredRoutes(String s) {
         if (!s.isEmpty()) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
+        if (s != null && !s.equals(""))
             preferredRoutes = RouteMatcher.parse(s);
         }
         else {
@@ -644,6 +690,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public void setUnpreferredRoutes(String s) {
         if (!s.isEmpty()) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
+        if (s != null && !s.equals(""))
             unpreferredRoutes = RouteMatcher.parse(s);
         }
         else {
@@ -653,6 +703,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setBannedRoutes(String s) {
         if (!s.isEmpty()) {
+        //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
+        s = s.replaceAll(":", "__");
+
+        if (s != null && !s.equals(""))
             bannedRoutes = RouteMatcher.parse(s);
         }
         else {
@@ -946,6 +1000,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
                 && modes.equals(other.modes)
+                && modeWeights == other.modeWeights
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -954,6 +1009,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && transferPenalty == other.transferPenalty
                 && maxSlope == other.maxSlope
                 && walkReluctance == other.walkReluctance
+                && walkOnStreetReluctance == other.walkOnStreetReluctance
                 && waitReluctance == other.waitReluctance
                 && waitAtBeginningFactor == other.waitAtBeginningFactor
                 && walkBoardCost == other.walkBoardCost
@@ -991,7 +1047,9 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
+                && geoidElevation == other.geoidElevation
+                && this.carParkCarLegWeight == other.carParkCarLegWeight
+                && itineraryFiltering == other.itineraryFiltering;
     }
 
     /**
@@ -1008,6 +1066,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(maxTransferWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+                + new Double(walkOnStreetReluctance).hashCode()
                 + new Double(waitAtBeginningFactor).hashCode() * 15485863
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
@@ -1021,7 +1080,9 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(useTraffic).hashCode() * 10169
+                + new Double(carParkCarLegWeight).hashCode()
+                + new Double(itineraryFiltering).hashCode()*17;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1105,6 +1166,20 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
+     * @return The weight (multiplier) for mode, the default weight is one.
+     * Allows de-prioritizing modes.
+     */
+    public double getModeWeight(TraverseMode traverseMode) {
+        Double graphWeight = this.rctx.graph.modeWeights.get(traverseMode);
+        Double requestWeight = this.modeWeights.get(traverseMode);
+        if (requestWeight == null) {
+           return graphWeight != null ? graphWeight : 1d;
+        } else {
+            return requestWeight;
+        }
+    }
+
+    /**
      * @return The time it actually takes to alight a vehicle. Could be significant eg. on airplanes and ferries
      */
     public int getAlightTime(TraverseMode transitMode) {
@@ -1139,10 +1214,34 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setModeWeight(TraverseMode traverseMode, Double weight) {
+        if (weight > 0) {
+            this.modeWeights.put(traverseMode, weight);
+        }
+    }
+
+    public void setCarParkCarLegWeight(double carParkCarLegWeight) {
+        if(carParkCarLegWeight>0) {
+            this.carParkCarLegWeight = carParkCarLegWeight;
+        }
+    }
+
+    public void setItineraryFiltering(double itineraryFiltering) {
+        if(itineraryFiltering>=0) {
+            this.itineraryFiltering = itineraryFiltering;
+        }
+    }
+
     public void setWalkReluctance(double walkReluctance) {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
             // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setWalkOnStreetReluctance(double walkOnStreetReluctance) {
+        if (walkOnStreetReluctance > 0) {
+            this.walkOnStreetReluctance = walkOnStreetReluctance;
         }
     }
 
@@ -1261,6 +1360,46 @@ public class RoutingRequest implements Cloneable, Serializable {
         return this.dominanceFunction.getNewShortestPathTree(this);
     }
 
+    public void parseTime(TimeZone tz, String date, String time) {
+        if (date == null && time != null) { // Time was provided but not date
+            LOG.debug("parsing ISO datetime {}", time);
+            try {
+                // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
+                DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
+                GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+                if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                    gregCal.setTimeZone(tz);
+                }
+                Date d2 = gregCal.getTime();
+                setDateTime(d2);
+            } catch (DatatypeConfigurationException e) {
+                setDateTime(date, time, tz);
+            }
+        } else {
+            setDateTime(date, time, tz);
+        }
+    }
+
+    public static void assertTriangleParameters(Double triangleSafetyFactor, Double triangleTimeFactor, Double triangleSlopeFactor) throws ParameterException {
+        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
+            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
+        }
+
+        // FIXME couldn't this be simplified by only specifying TWO of the values?
+        if (Math.abs(triangleSafetyFactor+ triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
+            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
+        }
+    }
+
+    public void assertSlack() {
+        if (boardSlack + alightSlack > transferSlack) {
+            // TODO thrown exception type is not consistent with assertTriangleParameters
+            throw new RuntimeException("Invalid parameters: " +
+                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        }
+    }
+
     /**
      * Does nothing if different edge is split in origin/destination search
      *
@@ -1278,5 +1417,16 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public List<Integer> getLocationSlacks() {
+        List<Integer> locationSlacks = new ArrayList<>();
+        locationSlacks.add(0);
+        if (hasIntermediatePlaces()) {
+            for (GenericLocation place : intermediatePlaces) {
+                locationSlacks.add(place.locationSlack);
+            }
+        }
+        return locationSlacks;
     }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -20,7 +21,10 @@ import java.util.Locale;
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
 
+
     private double distance;
+    private double elapsedSeconds;
+    private boolean hasElapsedSeconds = false;
     
     private LineString geometry;
     private List<Edge> edges;
@@ -36,8 +40,19 @@ public class SimpleTransfer extends Edge {
         this(from, to, distance, geometry, null);
     }
 
+    public SimpleTransfer(TransitStop from, NearbyStopFinder.StopAtDistance sd) {
+        this(from, sd.tstop, sd.dist, sd.geom, sd.edges);
+        if (sd.hasElapsedTime) {
+            this.hasElapsedSeconds = true;
+            this.elapsedSeconds = sd.elapsedTime;
+        }
+    }
+
     @Override
     public State traverse(State s0) {
+        if (!s0.getOptions().modes.contains(TraverseMode.WALK)) {
+            return null;
+        }
         // Forbid taking shortcuts composed of two transfers in a row
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
@@ -53,8 +68,15 @@ public class SimpleTransfer extends Edge {
         double walkspeed = rr.walkSpeed;
         StateEditor se = s0.edit(this);
         se.setBackMode(TraverseMode.WALK);
-        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+
+        int time;
+        if (!hasElapsedSeconds) {
+            time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+        } else {
+            time = (int) this.elapsedSeconds;
+        }
         se.incrementTimeInSeconds(time);
+
         se.incrementWeight(time * rr.walkReluctance);
         se.incrementWalkDistance(distance);
         return se.makeState();
@@ -92,6 +114,6 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public String toString() {
-        return "SimpleTransfer " + getName();
+        return "SimpleTransfer " + getName() + " (" + getDistance() + "m)";
     }
 }

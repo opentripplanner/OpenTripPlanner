@@ -1,4 +1,19 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.alertpatch;
+
+import static java.util.Collections.emptyList;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -50,6 +65,8 @@ public class AlertPatch implements Serializable {
     private FeedScopedId trip;
 
     private FeedScopedId stop;
+
+    private Collection<TripPattern> tripPatterns;
 
     /**
      * The headsign of the alert
@@ -111,7 +128,18 @@ public class AlertPatch implements Serializable {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
+		tripPatterns = graph.index.patternsForRoute.get(route).stream()
+                  .filter(tripPattern -> {
+                   if (direction != null && !direction.equals(tripPattern.getDirection())) {
+                       return false;
+                   }
+                   if (directionId != -1 && directionId == tripPattern.directionId) {
+                       return false;
+                   }
+                   return true;
+               })
+               .peek(tripPattern -> addAlertPatchToEdges(graph, stop, tripPattern))
+               .collect(Collectors.toList());
             } else {
                 // Find patterns for the feed.
                 tripPatterns = graph.index.patternsForFeedId.get(feedId);
@@ -148,6 +176,18 @@ public class AlertPatch implements Serializable {
                     graph.addAlertPatch(edge, this);
                     break;
                 }
+            }
+            tripPatterns = emptyList();
+        } else {
+            tripPatterns = emptyList();
+        }
+    }
+
+    private void addAlertPatchToEdges(Graph graph, Stop stop, TripPattern tripPattern) {
+        for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+            if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
+                graph.addAlertPatch(tripPattern.boardEdges[i], this);
+                graph.addAlertPatch(tripPattern.alightEdges[i], this);
             }
         }
     }
@@ -278,6 +318,10 @@ public class AlertPatch implements Serializable {
     @XmlElement
     public int getDirectionId() {
         return directionId;
+    }
+
+    public List<TripPattern> getTripPatterns() {
+        return tripPatterns!=null ? new ArrayList<TripPattern>(tripPatterns):new ArrayList();
     }
 
     public void setStop(FeedScopedId stop) {

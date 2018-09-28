@@ -51,25 +51,26 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      * </pre>
      */
     public BikeRentalStation makeStation(JsonNode node) {
+        // TODO: final winter maintenance value not known yet
         BikeRentalStation station = new BikeRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
-        String[] coordinates = node.path("coordinates").asText().split(",");
+        station.state = node.path("style").asText();
         try {
-            station.y = Double.parseDouble(coordinates[0].trim());
-            station.x = Double.parseDouble(coordinates[1].trim());
+            station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
+            station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
+            if (station.state.equals("Station on")) {
+                station.bikesAvailable = node.path("avl_bikes").asInt();
+                station.spacesAvailable = node.path("free_slots").asInt();
+            } else {
+                station.bikesAvailable = 0;
+                station.spacesAvailable = 0;
+            }
+            return station;
         } catch (NumberFormatException e) {
             // E.g. coordinates is empty
-            log.warn("Error parsing bike rental station " + station.id, e);
+            log.info("Error parsing bike rental station " + station.id, e);
             return null;
         }
-        if (!node.path("operative").asText().equals("true")) {
-            station.bikesAvailable = 0;
-            station.spacesAvailable = 0;
-        } else {
-            station.bikesAvailable = node.path("avl_bikes").asInt();
-            station.spacesAvailable = node.path("free_slots").asInt();
-        }
-        return station;
     }
 }

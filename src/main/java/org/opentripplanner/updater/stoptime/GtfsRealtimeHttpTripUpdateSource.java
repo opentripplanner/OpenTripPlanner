@@ -26,7 +26,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
      * previous updates should be disregarded
      */
     private boolean fullDataset = true;
-
+    
     /**
      * Feed id that is used to match trip ids in the TripUpdates
      */

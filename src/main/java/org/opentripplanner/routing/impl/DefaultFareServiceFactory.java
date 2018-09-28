@@ -147,7 +147,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         if (type == null) {
             type = "default";
         }
-
+        LOG.debug("Fare type = " + type);
         FareServiceFactory retval;
         switch (type) {
         case "default":
@@ -170,6 +170,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             break;
         case "seattle":
             retval = new SeattleFareServiceFactory();
+            break;
+        case "HSL":
+            retval = new HSLFareServiceFactory();
             break;
         default:
             throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));

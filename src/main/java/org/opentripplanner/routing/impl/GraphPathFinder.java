@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
@@ -14,6 +27,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.SearchTimeoutException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -103,8 +117,8 @@ public class GraphPathFinder {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
             // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
-            heuristic = new InterleavedBidirectionalHeuristic();
-            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
+            heuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
+            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic(options.heuristicStepsPerMainStep);
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
             reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
@@ -163,7 +177,11 @@ public class GraphPathFinder {
 
             // Do a full reversed search to compact the legs
             if(options.compactLegsByReversedSearch){
-                newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+                try {
+                    newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+                } catch (Exception e) {
+                    LOG.warn("CompactLegsByReversedSearch failed on request: " + originalReq.toString());
+                }
             }
 
             // Find all trips used in this path and ban them for the remaining searches
@@ -253,6 +271,8 @@ public class GraphPathFinder {
             Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
             RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
                     toTransVertex, transitStopTime, remainingWeightHeuristic);
+            // Limit reverse search to the same number of legs as the original result
+            reversedMainRequest.maxTransfers = newPath.getTrips().size() - 1;
             aStar.getShortestPathTree(reversedMainRequest, timeout);
 
             List<GraphPath> newRevPaths = aStar.getPathsToTarget();
@@ -267,10 +287,10 @@ public class GraphPathFinder {
                     if(options.arriveBy){
                         Collections.reverse(concatenatedPaths);
                     }
-                    GraphPath joinedPath = joinPaths(concatenatedPaths);
+                    GraphPath joinedPath = joinPaths(concatenatedPaths, false);
 
-                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
-                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
+                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() >= options.dateTime * 1000) ||
+                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() <= options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
                             for (FeedScopedId tripId : joinedPath.getTrips()) {
@@ -292,9 +312,10 @@ public class GraphPathFinder {
 
         RoutingRequest request = createReversedRequest(originalReq, options, fromVertex, toVertex,
                 arrDepTime, new EuclideanRemainingWeightHeuristic());
-        if((originalReq.parkAndRide || originalReq.kissAndRide) && !originalReq.arriveBy){
+        if((originalReq.parkAndRide || originalReq.kissAndRide || originalReq.rideAndKiss) && !originalReq.arriveBy){
             request.parkAndRide = false;
             request.kissAndRide = false;
+            request.rideAndKiss = false;
             request.modes.setCar(false);
         }
         request.maxWalkDistance = CLAMP_MAX_WALK;
@@ -309,9 +330,11 @@ public class GraphPathFinder {
             request.parkAndRide = false;
             request.kissAndRide = false;
             request.modes.setCar(false);
+        } else if(originalReq.rideAndKiss && !originalReq.arriveBy) {
+            request.rideAndKiss = false;
+            request.modes.setCar(true);
         }
         return request;
-
     }
 
     private RoutingRequest createReversedRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
@@ -376,7 +399,12 @@ public class GraphPathFinder {
         if (paths == null || paths.size() == 0) {
             LOG.debug("Path not found: " + request.from + " : " + request.to);
             request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
-            throw new PathNotFoundException();
+            if (request.rctx.debugOutput.timedOut) {
+                throw new SearchTimeoutException();
+            }
+            else {
+                throw new PathNotFoundException();
+            }
         }
 
         return paths;
@@ -398,70 +426,122 @@ public class GraphPathFinder {
             places.add(request.to);
             long time = request.dateTime;
 
-            List<GraphPath> paths = new ArrayList<>();
+            List <GraphPath> completePaths = new ArrayList<>();
             DebugOutput debugOutput = null;
-            int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
 
-            while (0 < placeIndex && placeIndex < places.size()) {
-                RoutingRequest intermediateRequest = request.clone();
-                intermediateRequest.setNumItineraries(1);
-                intermediateRequest.dateTime = time;
-                intermediateRequest.from = places.get(placeIndex - 1);
-                intermediateRequest.to = places.get(placeIndex);
-                intermediateRequest.rctx = null;
-                intermediateRequest.setRoutingContext(router.graph);
+            Vertex[] fromVertices = new Vertex[places.size()];
+            Vertex[] toVertices = new Vertex[places.size()];
 
-                if (debugOutput != null) {// Restore the previous debug info accumulator
-                    intermediateRequest.rctx.debugOutput = debugOutput;
-                } else {// Store the debug info accumulator
-                    debugOutput = intermediateRequest.rctx.debugOutput;
+            OUTER: for (int i = 0; i < request.numItineraries; i++) {
+                List<GraphPath> paths = new ArrayList<>();
+                int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
+
+                while (0 < placeIndex && placeIndex < places.size()) {
+                    GenericLocation currentPlace = places.get(placeIndex - 1);
+                    RoutingRequest intermediateRequest = request.clone();
+                    intermediateRequest.setNumItineraries(1);
+                    intermediateRequest.dateTime = time;
+                    intermediateRequest.from = currentPlace;
+                    intermediateRequest.to = places.get(placeIndex);
+                    intermediateRequest.rctx = null;
+
+                    if ( fromVertices[placeIndex - 1] != null && toVertices[placeIndex] != null ) {
+                        intermediateRequest.setRoutingContext(
+                            router.graph,
+                            fromVertices[placeIndex - 1],
+                            toVertices[placeIndex]
+                        );
+                    } else {
+                        intermediateRequest.setRoutingContext(router.graph);
+                    }
+
+                    // Need to save used vertices, so we won't get a TrivialPathException later.
+                    if (fromVertices[placeIndex - 1] == null) {
+                        fromVertices[placeIndex -1] = intermediateRequest.rctx.fromVertex;
+                    }
+
+                    if (toVertices[placeIndex] == null) {
+                        toVertices[placeIndex] = intermediateRequest.rctx.toVertex;
+                    }
+
+                    if (debugOutput != null) {// Restore the previous debug info accumulator
+                        intermediateRequest.rctx.debugOutput = debugOutput;
+                    } else {// Store the debug info accumulator
+                        debugOutput = intermediateRequest.rctx.debugOutput;
+                    }
+
+                    List<GraphPath> partialPaths = getPaths(intermediateRequest);
+                    if (partialPaths.size() == 0) {
+                        if (completePaths.size() == 0) {
+                            return partialPaths;
+                        }
+                        break OUTER;
+                    }
+
+                    GraphPath path = partialPaths.get(0);
+                    paths.add(path);
+                    time = (request.arriveBy
+                        ? path.getStartTime() - request.transferSlack - currentPlace.locationSlack
+                        : path.getEndTime() + request.transferSlack + currentPlace.locationSlack);
+                    placeIndex += (request.arriveBy ? -1 : +1);
                 }
-
-                List<GraphPath> partialPaths = getPaths(intermediateRequest);
-                if (partialPaths.size() == 0) {
-                    return partialPaths;
+                if (request.arriveBy) {
+                    Collections.reverse(paths);
                 }
+                GraphPath joinedPath = joinPaths(paths, true);
+                time = (request.arriveBy
+                    ? joinedPath.getEndTime() - 60
+                    : joinedPath.getStartTime() + 60);
+                completePaths.add(joinedPath);
 
-                GraphPath path = partialPaths.get(0);
-                paths.add(path);
-                time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
-                placeIndex += (request.arriveBy ? -1 : +1);
             }
             request.setRoutingContext(router.graph);
             request.rctx.debugOutput = debugOutput;
-            if (request.arriveBy) {
-                Collections.reverse(paths);
-            }
-            return Collections.singletonList(joinPaths(paths));
+            return completePaths;
         } else {
             return getPaths(request);
         }
     }
 
-    private static GraphPath joinPaths(List<GraphPath> paths) {
+    // TODO: implement support for not removing all wait times
+    private static GraphPath joinPaths(List<GraphPath> paths, Boolean addLegsSwitchingEdges) {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
         Vertex lastVertex = lastState.getVertex();
 
         //With more paths we should allow more transfers
-        lastState.getOptions().maxTransfers *= paths.size();
+        RoutingRequest options = lastState.getOptions();
+        options.maxTransfers *= paths.size();
+        List<Integer> locationSlacks = new ArrayList<>();
 
-        for (GraphPath path : paths.subList(1, paths.size())) {
+        if (addLegsSwitchingEdges) {
+            locationSlacks = options.getLocationSlacks();
+        }
+
+        for (int i = 1; i < paths.size(); i++) {
+            GraphPath path = paths.get(i);
             lastState = newPath.states.getLast();
             // add a leg-switching state
-            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
-            lastState = legSwitchingEdge.traverse(lastState);
-            newPath.edges.add(legSwitchingEdge);
+            if (addLegsSwitchingEdges) {
+                LegSwitchingEdge legSwitchingEdge =
+                    new LegSwitchingEdge(lastVertex, lastVertex, locationSlacks.get(i));
+                lastState = legSwitchingEdge.traverse(lastState);
+                newPath.edges.add(legSwitchingEdge);
+            }
             newPath.states.add(lastState);
             // add the next subpath
             for (Edge e : path.edges) {
                 lastState = e.traverse(lastState);
+                if (lastState==null){
+                    LOG.warn("About to add null lastState to newPath. This may cause nullPointer in next iteration? Caused by traversing edge: " + e);
+                }
                 newPath.edges.add(e);
                 newPath.states.add(lastState);
             }
             lastVertex = path.getEndVertex();
         }
-        return newPath;
+        // Do a second round of reverse optimization over the whole Path
+        return new GraphPath(newPath.states.getLast(), true);
     }
 
 /*

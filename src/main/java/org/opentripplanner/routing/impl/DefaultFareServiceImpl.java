@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
@@ -151,6 +152,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     /** For each fare type (regular, student, etc...) the collection of rules that apply. */
     protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
+    public Map<FareType, Collection<FareRuleSet>> getFareRulesPerType() {
+        return fareRulesPerType;
+    }
+
     public DefaultFareServiceImpl() {
         fareRulesPerType = new HashMap<>();
     }
@@ -188,8 +193,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return rides;
     }
 
-    @Override
-    public Fare getCost(GraphPath path) {
+    private Fare _getCost(GraphPath path, Set<String>allowedFareIds) {
 
         List<Ride> rides = createRides(path);
         // If there are no rides, there's no fare.
@@ -201,7 +205,12 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         boolean hasFare = false;
         for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
             FareType fareType = kv.getKey();
-            Collection<FareRuleSet> fareRules = kv.getValue();
+            Collection<FareRuleSet> fareRules;
+            if (allowedFareIds != null) {
+                fareRules = kv.getValue().stream().filter(f -> allowedFareIds.contains(f.getFareAttribute().getId().toString())).collect(Collectors.toList());
+            } else {
+                fareRules = kv.getValue();
+            }
             // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
             Currency currency = null;
             if (fareRules.size() > 0) {
@@ -210,6 +219,32 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             hasFare = populateFare(fare, currency, fareType, rides, fareRules);
         }
         return hasFare ? fare : null;
+    }
+
+    @Override
+    public Fare getCost(GraphPath path) {
+        return _getCost(path, null);
+    }
+
+    /* This variant calculates cost using a limited set of tickets (=fareIds) */
+    public Fare getCost(GraphPath path, Set<String>allowedFareIds) {
+        return _getCost(path, allowedFareIds);
+    }
+
+    public boolean boardingAllowed(GraphPath path, String zone, Set<String> allowedfareIds) {
+        return true;
+    }
+
+    public boolean journeyAllowed(GraphPath path, Set<String> allowedFareIds) {
+        List<Ride> rides = createRides(path);
+
+        if (rides.size() == 0) {
+            return true;
+        }
+        Collection<FareRuleSet> fareRules = fareRulesPerType.get(FareType.regular).stream().
+            filter(f -> allowedFareIds.contains(f.getFareAttribute().getId().toString())).collect(Collectors.toList());
+
+        return fareIsKnown(FareType.regular, rides, fareRules);
     }
 
     protected static Money getMoney(Currency currency, float cost) {
@@ -321,12 +356,28 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return count > 0;
     }
 
+    /* Check if fare is defined for all rides. Don't care about cost and details */
+    protected boolean fareIsKnown(FareType fareType, List<Ride> rides, Collection<FareRuleSet> fareRules) {
+        FareSearch r = performSearch(fareType, rides, fareRules);
+
+        int start = 0;
+        int end = rides.size() - 1;
+        while(start <= end) {
+            if(r.endOfComponent[start] < 0) {
+                return false;
+            }
+            int via = r.next[start][r.endOfComponent[start]];
+            start = via + 1;
+        }
+        return true;
+    }
+
     protected float calculateCost(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         return getBestFareAndId(fareType, rides, fareRules).fare;
     }
 
-    private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
+    protected FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
@@ -398,8 +449,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
     }
-    
-    private float getFarePrice(FareAttribute fare, FareType type) {
+
+    protected float getFarePrice(FareAttribute fare, FareType type) {
     	switch(type) {
 		case senior:
 			if (fare.getSeniorPrice() >= 0) {

@@ -41,6 +41,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonSerialize
     public boolean isCarStation = false;
 
+    @XmlAttribute
+    @JsonSerialize
+    public String state = "Station on"; // additional state info: on, off, closed, etc
+
     /**
      * List of compatible network names. Null (default) to be compatible with all.
      */

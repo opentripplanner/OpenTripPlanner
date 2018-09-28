@@ -16,6 +16,10 @@ public class FareRuleSet implements Serializable {
     private Set<FeedScopedId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
+    public Set<String> getContains() {
+        return contains;
+    }
+
     private FareAttribute fareAttribute;
     private Set<FeedScopedId> trips;
     

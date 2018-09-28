@@ -40,6 +40,7 @@ public class AStar {
     private boolean verbose = false;
 
     private TraverseVisitor traverseVisitor;
+    private ExtendedTraverseVisitor extendedTraverseVisitor;
 
     enum RunStatus {
         RUNNING, STOPPED
@@ -167,6 +168,9 @@ public class AStar {
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
+            if (extendedTraverseVisitor != null) {
+                extendedTraverseVisitor.preVisitEdge(edge, runState.u);
+            }
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over. TODO Use this to board multiple trips.
             for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
@@ -228,6 +232,7 @@ public class AStar {
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
@@ -344,14 +349,17 @@ public class AStar {
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
+        if (traverseVisitor instanceof ExtendedTraverseVisitor) {
+            this.extendedTraverseVisitor = (ExtendedTraverseVisitor)traverseVisitor;
+        }
     }
 
     public List<GraphPath> getPathsToTarget() {
-        if (runState == null) {
+        if (runState == null || runState.targetAcceptedStates == null) {
             return Collections.emptyList();
         }
 
-        List<GraphPath> ret = new LinkedList<>();
+        final List<GraphPath> ret = new LinkedList<>();
         for (State s : runState.targetAcceptedStates) {
             if (s.isFinal()) {
                 ret.add(new GraphPath(s, true));

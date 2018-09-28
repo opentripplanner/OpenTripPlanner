@@ -31,6 +31,7 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,8 +67,13 @@ public class GraphBuilder implements Runnable {
     public boolean serializeGraph = true;
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
+        MDC.put("routerPath", path.getAbsolutePath());
         graphFile = new File(path, "Graph.obj");
         graph.stopClusterMode = builderParams.stopClusterMode;
+    }
+
+    public GraphBuilder() {
+        graphFile = new File(System.getProperty("java.io.tmpdir"), "Graph.obj");
     }
 
     public void addModule(GraphBuilderModule loader) {
@@ -98,7 +104,7 @@ public class GraphBuilder implements Runnable {
     public void setModes(List<RoutingRequest> modeList) {
         this.modeList = modeList;
     }
-    
+
     public Graph getGraph() {
         return this.graph;
     }

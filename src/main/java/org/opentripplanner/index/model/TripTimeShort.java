@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -47,6 +48,7 @@ public class TripTimeShort {
         departureDelay     = tt.getDepartureDelay(i);
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
+        tripId             = tt.trip.getId();
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);
@@ -58,15 +60,25 @@ public class TripTimeShort {
         serviceDay = sd.time(0);
     }
 
+
     /**
      * must pass in both table and trip, because tripTimes do not have stops.
      */
-    public static List<TripTimeShort> fromTripTimes (Timetable table, Trip trip) {
-        TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
+    public static List<TripTimeShort> fromTripTimes(Timetable table, Trip trip) {
+        return fromTripTimes(table, trip, null);
+    }
+
+    /**
+     * must pass in both table and trip, because tripTimes do not have stops.
+     * @param serviceDay service day to set, if null none is set
+     */
+    public static List<TripTimeShort> fromTripTimes(Timetable table, Trip trip,
+        ServiceDay serviceDay) {
+        TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
         List<TripTimeShort> out = Lists.newArrayList();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeShort(times, i, table.pattern.getStop(i)));
+            out.add(new TripTimeShort(times, i, table.pattern.getStop(i), serviceDay));
         }
         return out;
     }

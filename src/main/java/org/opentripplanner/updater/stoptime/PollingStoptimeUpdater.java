@@ -1,11 +1,13 @@
 package org.opentripplanner.updater.stoptime;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.updater.*;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.SentryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,27 +108,40 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) {
-        // Only create a realtime data snapshot source if none exists already
-        TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
-        if (snapshotSource == null) {
-            snapshotSource = new TimetableSnapshotSource(graph);
-            // Add snapshot source to graph
-            graph.timetableSnapshotSource = (snapshotSource);
-        }
-        // Set properties of realtime data snapshot source
-        if (logFrequency != null) {
-            snapshotSource.logFrequency = (logFrequency);
-        }
-        if (maxSnapshotFrequency != null) {
-            snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
-        }
-        if (purgeExpiredData != null) {
-            snapshotSource.purgeExpiredData = (purgeExpiredData);
-        }
-        if (fuzzyTripMatcher != null) {
-            snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
-        }
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+        // Create a realtime data snapshot source and wait for runnable to be executed
+        HashMap<String,Object> sentry = new HashMap<>();
+        sentry.put("feedId",feedId);
+        sentry.put("updateSource",updateSource.toString());
+        sentry.put("frequencySec",pollingPeriodSeconds);
+
+        SentryUtilities.setupSentryFromMap(sentry);
+        updaterManager.execute(new GraphWriterRunnable() {
+            @Override
+            public void run(Graph graph) {
+                // Only create a realtime data snapshot source if none exists already
+                TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
+                if (snapshotSource == null) {
+                    snapshotSource = new TimetableSnapshotSource(graph);
+                    // Add snapshot source to graph
+                    graph.timetableSnapshotSource = (snapshotSource);
+                }
+
+                // Set properties of realtime data snapshot source
+                if (logFrequency != null) {
+                    snapshotSource.logFrequency = (logFrequency);
+                }
+                if (maxSnapshotFrequency != null) {
+                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+                }
+                if (purgeExpiredData != null) {
+                    snapshotSource.purgeExpiredData = (purgeExpiredData);
+                }
+                if (fuzzyTripMatcher != null) {
+                    snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
+                }
+            }
+        });
     }
 
     /**

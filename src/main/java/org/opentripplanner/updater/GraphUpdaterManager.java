@@ -20,25 +20,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is attached to the graph:
- * 
+ *
  * <pre>
  * GraphUpdaterManager updaterManager = graph.getUpdaterManager();
  * </pre>
- * 
+ *
  * Each updater will run in its own thread. When changes to the graph have to be made by these
  * updaters, this should be done via the execute method of this manager to prevent race conditions
  * between graph write operations.
- * 
+ *
  */
 public class GraphUpdaterManager {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
-    
+
     /**
      * Text used for naming threads when the graph lacks a routerId.
      */
     private static String DEFAULT_ROUTER_ID = "(default)";
-    
+
     /**
      * Thread factory used to create new threads, giving them more human-readable names including the routerId.
      */
@@ -76,11 +76,11 @@ public class GraphUpdaterManager {
      */
     public GraphUpdaterManager(Graph graph) {
         this.graph = graph;
-        
+
         String routerId = graph.routerId;
         if(routerId == null || routerId.isEmpty())
             routerId = DEFAULT_ROUTER_ID;
-        
+
         threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-" + routerId + "-%d").build();
         scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
         updaterPool = Executors.newCachedThreadPool(threadFactory);
@@ -122,7 +122,7 @@ public class GraphUpdaterManager {
 
     /**
      * Adds an updater to the manager and runs it immediately in its own thread.
-     * 
+     *
      * @param updater is the updater to add and run
      */
     public void addUpdater(final GraphUpdater updater) {
@@ -133,7 +133,7 @@ public class GraphUpdaterManager {
      * This is the method to use to modify the graph from the updaters. The runnables will be
      * scheduled after each other, guaranteeing that only one of these runnables will be active at
      * any time.
-     * 
+     *
      * @param runnable is a graph writer runnable
      */
     public void execute(GraphWriterRunnable runnable) {
@@ -187,5 +187,9 @@ public class GraphUpdaterManager {
     public GraphUpdater getUpdater (int id) {
         if (id >= updaterList.size()) return null;
         return updaterList.get(id);
+    }
+
+    public List<GraphUpdater> getUpdaterList() {
+        return updaterList;
     }
 }

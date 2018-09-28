@@ -26,6 +26,7 @@ import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -52,11 +54,9 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely close to the street
@@ -142,7 +142,10 @@ public class SimpleStreetSplitter {
     /** Link all relevant vertices to the street network */
     public void link () {	
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
+            if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
+                boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
+                if (alreadyLinked) continue;
+
                 if (!link(v)) {
                     if (v instanceof TransitStop)
                         LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStop) v)));
@@ -151,6 +154,7 @@ public class SimpleStreetSplitter {
                     else if (v instanceof BikeParkVertex)
                         LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
                 };
+            }
         }
     }
 
@@ -183,18 +187,31 @@ public class SimpleStreetSplitter {
         } else {
             traverseModeSet = new TraverseModeSet(traverseMode);
         }
+
+        List<StreetEdge> walkableEdges = idx.query(env).stream()
+                .filter(streetEdge -> streetEdge instanceof StreetEdge)
+                .map(edge -> (StreetEdge) edge)
+                // note: not filtering by radius here as distance calculation is expensive
+                // we do that below.
+                .filter(edge -> edge.canTraverse(traverseModeSet) &&
+                        // only link to edges still in the graph.
+                        edge.getToVertex().getIncoming().contains(edge))
+                .collect(Collectors.toList());
+
+        Stream<StreetEdge> edgeStream = walkableEdges.stream();
+        if (vertex instanceof TransitStop) {
+            String code = ((TransitStop)vertex).getStopCode();
+            Optional<StreetEdge> hasMatchingEdges = walkableEdges.stream().filter(edge -> edgeStopCodeEquals(code, edge)).findAny();
+            if (hasMatchingEdges.isPresent()) {
+                edgeStream = edgeStream.filter(edge -> edgeStopCodeEquals(code, edge));
+            }
+        }
+
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
-        List<StreetEdge> candidateEdges = idx.query(env).stream()
-            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
-            .map(edge -> (StreetEdge) edge)
-            // note: not filtering by radius here as distance calculation is expensive
-            // we do that below.
-            .filter(edge -> edge.canTraverse(traverseModeSet) &&
-                // only link to edges still in the graph.
-                edge.getToVertex().getIncoming().contains(edge))
+        List<StreetEdge> candidateEdges = edgeStream
             .collect(Collectors.toList());
 
         // Make a map of distances to all edges.
@@ -300,6 +317,10 @@ public class SimpleStreetSplitter {
         }
     }
 
+    private static boolean edgeStopCodeEquals(String code, StreetEdge edge) {
+        return edge.getRef() != null && edge.getRef().equals(code);
+    }
+
     // Link to all vertices in area/platform
     private void linkTransitToAreaVertices(Vertex splitterVertex, AreaEdgeList area) {
         List<Vertex> vertices = new ArrayList<>();
@@ -358,8 +379,10 @@ public class SimpleStreetSplitter {
 
             }
             //This throws runtime TrivialPathException if same edge is split in origin and destination link
-            //It is only used in origin/destination linking since otherwise options is null
-            if (options != null) {
+            //It is only used in origin/destination linking since otherwise options is null.
+            //Not used when there are intermediate places as it checks if first edge only exists once which
+            //is unwanted when there are intermediate places that separate places from each other.
+            if (options != null && !options.hasIntermediatePlaces()) {
                 options.canSplitEdge(edge);
             }
             // split the edge, get the split vertex
@@ -435,6 +458,8 @@ public class SimpleStreetSplitter {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to);
+        } else if (from instanceof ParkAndRideVertex) {
+            makeCarParkEdges((ParkAndRideVertex) from, to);
         }
     }
 
@@ -467,6 +492,20 @@ public class SimpleStreetSplitter {
 
         new StreetBikeParkLink(from, to);
         new StreetBikeParkLink(to, from);
+    }
+
+    /** Make car park edges */
+    private void makeCarParkEdges(ParkAndRideVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Car park edges are created with non destructive splitting!");
+        }
+        for (ParkAndRideLinkEdge sbpl : Iterables.filter(from.getOutgoing(), ParkAndRideLinkEdge.class)) {
+            if (sbpl.getToVertex() == to)
+                return;
+        }
+
+        new ParkAndRideLinkEdge(from, to);
+        new ParkAndRideLinkEdge(to, from);
     }
 
     /** 

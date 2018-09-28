@@ -26,6 +26,10 @@ public class ConstantsForTests {
 
     public static final String FARE_COMPONENT_GTFS = "src/test/resources/farecomponent_gtfs.zip";
 
+    public static final String OSLO_MINIMAL_GTFS = "src/test/resources/oslo/oslo_gtfs_minimal.zip";
+
+    public static final String OSLO_MINIMAL_OSM = "src/test/resources/oslo/oslo_osm_minimal.pbf";
+
     private static ConstantsForTests instance = null;
 
     private Graph portlandGraph = null;
