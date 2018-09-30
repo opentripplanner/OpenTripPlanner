@@ -99,10 +99,10 @@ public class LinkStopToPlatformTest {
     @Test
     public void testLinkStopWithStopCodeWithoutExtraEdgess() {
         stop.setCode("0001");
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
         splitter.link();
 
-        assertEquals(13, _graph.getEdges().size());
+        assertEquals(13, graph.getEdges().size());
     }
 
     private AreaEdge createAreaEdge(IntersectionVertex v1, IntersectionVertex v2, AreaEdgeList area, String nameString) {

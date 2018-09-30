@@ -312,7 +312,7 @@ public class Timetable implements Serializable {
     }
 
     /** @return the matching Trip in this particular Timetable */
-    public Trip getTrip(AgencyAndId tripId) {
+    public Trip getTrip(FeedScopedId tripId) {
         for (TripTimes tt : tripTimes) {
             if (tt.trip.getId().equals(tripId)) {
                 return tt.trip;

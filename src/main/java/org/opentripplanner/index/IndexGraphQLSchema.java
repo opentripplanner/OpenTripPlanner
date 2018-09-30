@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 
 import graphql.language.StringValue;
 import graphql.schema.*;
-import org.onebusaway.gtfs.model.*;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -1193,7 +1193,7 @@ public class IndexGraphQLSchema {
 		        .description("ÌD of the stop in format `FeedId:StopId`")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
-                    GtfsLibrary.convertIdToString(((Stop) environment.getSource()).getId()))
+                    ((Stop) environment.getSource()).getId().toString())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("name")
@@ -1351,11 +1351,9 @@ public class IndexGraphQLSchema {
                     .defaultValue(false)
                     .build())
                 .dataFetcher(environment -> {
-                    try {  // TODO: Add our own scalar types for at least serviceDate and FeedId
-                        return index.getStopTimesForStop(
-                            (Stop) environment.getSource(),
-                            ServiceDate.parseString(environment.getArgument("date")),
-                            environment.getArgument("omitNonPickups"));
+                    ServiceDate date;
+                    try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
+                        date = ServiceDate.parseString(environment.getArgument("date"));
                     } catch (ParseException e) {
                         return null;
                     }
@@ -1364,10 +1362,10 @@ public class IndexGraphQLSchema {
                     if (stop.getLocationType() == 1) {
                         // Merge all stops if this is a station
                         return index.stopsForParentStation
-                            .get(stop.getId())
-                            .stream()
-                            .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date,omitNonPickups).stream())
-                            .collect(Collectors.toList());
+                                .get(stop.getId())
+                                .stream()
+                                .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date,omitNonPickups).stream())
+                                .collect(Collectors.toList());
                     }
                     return index.getStopTimesForStop(stop, date, omitNonPickups);
                 })
@@ -2709,8 +2707,8 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
-                    List<AgencyAndId> filterByStops = null;
-                    List<AgencyAndId> filterByRoutes = null;
+                    List<FeedScopedId> filterByStops = null;
+                    List<FeedScopedId> filterByRoutes = null;
                     List<String> filterByBikeRentalStations = null;
                     List<String> filterByBikeParks = null;
                     List<String> filterByCarParks = null;
@@ -3124,9 +3122,9 @@ public class IndexGraphQLSchema {
             .build(dictionary);
     }
 
-    private List<AgencyAndId> toIdList(List<String> ids) {
+    private List<FeedScopedId> toIdList(List<String> ids) {
         if (ids == null) return Collections.emptyList();
-        return ids.stream().map(GtfsLibrary::convertIdFromString).collect(Collectors.toList());
+        return ids.stream().map(FeedScopedId::convertFromString).collect(Collectors.toList());
     }
 
     private void createPlanType(GraphIndex index) {

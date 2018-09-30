@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 
 import com.google.common.base.Preconditions;
 
