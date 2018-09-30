@@ -66,7 +66,7 @@ msgstr "nur Auto"
 #. Options widgets)
 #: src/client/js/otp/config.js:299
 msgid "Park and Ride"
-msgstr "Parken and Ride"
+msgstr "Park and Ride"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
