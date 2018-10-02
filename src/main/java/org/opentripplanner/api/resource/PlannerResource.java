@@ -13,6 +13,7 @@
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -85,7 +86,9 @@ public class PlannerResource extends RoutingResource {
             // Check for empty plan after filtering
             if(plan.itinerary.isEmpty()) {
                 // TODO: more descriptive message?
-                response.setError(new PlannerError());
+                PlannerError error = new PlannerError();
+                error.setMsg(Message.NO_PATHS_AFTER_FILTERING);
+                response.setError(error);
             }
             else response.setPlan(plan);
 
