@@ -182,6 +182,7 @@ public class State implements Cloneable {
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() +
                 " m=" + this.getBackMode() +
+                " e=" + (this.getBackEdge() != null ? this.getBackEdge().getClass().getName() : "") +
                 " v=" + this.vertex.toString() +
                 ">";
     }
