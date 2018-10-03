@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
-    public static final char ID_SEPARATOR = '_';
+    public static final char ID_SEPARATOR = ':';
 
     private static final long serialVersionUID = 1L;
 

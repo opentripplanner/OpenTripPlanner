@@ -2421,17 +2421,17 @@ public class IndexGraphQLSchema {
                 if (id.type.equals(stopAtDistanceType.getName())) {
                     String[] parts = id.id.split(";", 2);
                     return new GraphIndex.StopAndDistance(
-                        index.stopForId.get(GtfsLibrary.convertIdFromString(parts[1])),
+                        index.stopForId.get(FeedScopedId.convertFromString(parts[1])),
                         Integer.parseInt(parts[0], 10));
                 }
                 if (id.type.equals(stopType.getName())) {
-                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.stopForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(tripType.getName())) {
-                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.tripForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(routeType.getName())) {
-                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.routeForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(patternType.getName())) {
                     return index.patternForId.get(id.id);
@@ -2547,7 +2547,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.stopForId.get(FeedScopedId.convertFromString(id)))
                             .collect(Collectors.toList());
                     }
                     Stream<Stop> stream;
@@ -2557,7 +2557,7 @@ public class IndexGraphQLSchema {
                     else {
                         stream = index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
                             .stream()
-                            .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                            .map(result -> index.stopForId.get(FeedScopedId.convertFromString(result.id)));
                     }
                     return stream.collect(Collectors.toList());
                 })
@@ -2766,7 +2766,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.stopForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("station")
@@ -2777,7 +2777,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.stationForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stations")
@@ -2804,7 +2804,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                                 .stream()
-                                .map(id -> index.stationForId.get(GtfsLibrary.convertIdFromString(id)))
+                                .map(id -> index.stationForId.get(FeedScopedId.convertFromString(id)))
                                 .collect(Collectors.toList());
                     }
 
@@ -2814,7 +2814,7 @@ public class IndexGraphQLSchema {
                     } else {
                         stream = index.getLuceneIndex().query(environment.getArgument("name"), true, false, true, false, false)
                             .stream()
-                            .map(result -> index.stationForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                            .map(result -> index.stationForId.get(FeedScopedId.convertFromString(result.id)));
                     }
 
                     return stream.collect(Collectors.toList());
@@ -2855,7 +2855,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.routeForId.get(FeedScopedId.convertFromString(id)))
                             .collect(Collectors.toList());
                     }
                     Stream<Route> stream = index.routeForId.values().stream();
@@ -2894,7 +2894,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.routeForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
@@ -2911,7 +2911,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.tripForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("fuzzyTrip")
@@ -2942,7 +2942,7 @@ public class IndexGraphQLSchema {
                     try {
                         return fuzzyTripMatcher.getTrip(
                             index.routeForId.get(
-                                GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
+                                FeedScopedId.convertFromString(environment.getArgument("route"))),
                             environment.getArgument("direction"),
                             environment.getArgument("time"),
                             ServiceDate.parseString(((String) environment.getArgument("date")).replace("-", ""))
