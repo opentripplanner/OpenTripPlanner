@@ -20,11 +20,9 @@ import java.util.Locale;
  */
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
-
+    private int penaltySeconds;
 
     private double distance;
-    private double elapsedSeconds;
-    private boolean hasElapsedSeconds = false;
     
     private LineString geometry;
     private List<Edge> edges;
@@ -42,10 +40,7 @@ public class SimpleTransfer extends Edge {
 
     public SimpleTransfer(TransitStop from, NearbyStopFinder.StopAtDistance sd) {
         this(from, sd.tstop, sd.dist, sd.geom, sd.edges);
-        if (sd.hasElapsedTime) {
-            this.hasElapsedSeconds = true;
-            this.elapsedSeconds = sd.elapsedTime;
-        }
+        this.penaltySeconds = sd.penaltySeconds;
     }
 
     @Override
@@ -69,12 +64,8 @@ public class SimpleTransfer extends Edge {
         StateEditor se = s0.edit(this);
         se.setBackMode(TraverseMode.WALK);
 
-        int time;
-        if (!hasElapsedSeconds) {
-            time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
-        } else {
-            time = (int) this.elapsedSeconds;
-        }
+        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST + this.penaltySeconds;
+
         se.incrementTimeInSeconds(time);
 
         se.incrementWeight(time * rr.walkReluctance);
