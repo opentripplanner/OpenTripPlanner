@@ -25,6 +25,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -156,8 +158,13 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             // Zero is always an underestimate.
             return 0;
         }
-        if (v instanceof StreetVertex) {
-            // The main search is on the streets, not on transit.
+        if (
+            v instanceof StreetVertex ||
+                v instanceof BikeRentalStationVertex ||
+                v instanceof CarRentalStationVertex
+        ) {
+            // The main search is not on transit.
+            // FIXME should more vertex types be added to the above check?
             if (s.isEverBoarded()) {
                 // If we have already ridden transit we must be near the destination. If not the map returns INF.
                 return postBoardingWeights.get(v);
