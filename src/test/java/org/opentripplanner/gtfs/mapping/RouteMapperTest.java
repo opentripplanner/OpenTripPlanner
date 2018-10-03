@@ -75,7 +75,7 @@ public class RouteMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Route result = subject.map(ROUTE);
 
-        assertEquals("A_1", result.getId().toString());
+        assertEquals("A:1", result.getId().toString());
         assertNotNull(result.getAgency());
         assertEquals(SHORT_NAME, result.getShortName());
         assertEquals(LONG_NAME, result.getLongName());

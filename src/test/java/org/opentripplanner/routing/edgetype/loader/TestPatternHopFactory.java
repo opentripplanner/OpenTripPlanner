@@ -442,10 +442,10 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_1_" + feedId + "_entrance_a");
-        Vertex near_b = graph.getVertex("near_1_" + feedId + "_entrance_b");
-        Vertex near_c = graph.getVertex("near_1_" + feedId + "_C");
-        Vertex near_e = graph.getVertex("near_1_" + feedId + "_E");
+        Vertex near_a = graph.getVertex("near_1_" + feedId + ":entrance_a");
+        Vertex near_b = graph.getVertex("near_1_" + feedId + ":entrance_b");
+        Vertex near_c = graph.getVertex("near_1_" + feedId + ":C");
+        Vertex near_e = graph.getVertex("near_1_" + feedId + ":E");
 
         Vertex stop_d = graph.getVertex(feedId + ":D");
         Vertex split_d = null;

@@ -85,7 +85,7 @@ public class OtpTransitServiceImplTest {
 
         assertEquals(1, calendarDates.size());
         assertEquals(
-                "<CalendarDate serviceId=Z_weekdays date=ServiceIdDate(2017-8-31) exception=2>",
+                "<CalendarDate serviceId=Z:weekdays date=ServiceIdDate(2017-8-31) exception=2>",
                 first(calendarDates).toString());
     }
 
@@ -94,7 +94,7 @@ public class OtpTransitServiceImplTest {
         Collection<ServiceCalendar> calendars = subject.getAllCalendars();
 
         assertEquals(2, calendars.size());
-        assertEquals("<ServiceCalendar Z_alldays [1111111]>", first(calendars).toString());
+        assertEquals("<ServiceCalendar Z:alldays [1111111]>", first(calendars).toString());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class OtpTransitServiceImplTest {
         Collection<FareAttribute> fareAttributes = subject.getAllFareAttributes();
 
         assertEquals(1, fareAttributes.size());
-        assertEquals("<FareAttribute agency_FA>", first(fareAttributes).toString());
+        assertEquals("<FareAttribute agency:FA>", first(fareAttributes).toString());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class OtpTransitServiceImplTest {
 
         assertEquals(2, frequencies.size());
         assertEquals(
-                "<Frequency trip=agency_15.1 start=06:00:00 end=10:00:01>",
+                "<Frequency trip=agency:15.1 start=06:00:00 end=10:00:01>",
                 first(frequencies).toString()
         );
     }
@@ -140,7 +140,7 @@ public class OtpTransitServiceImplTest {
         Collection<Pathway> pathways = subject.getAllPathways();
 
         assertEquals(4, pathways.size());
-        assertEquals("<Pathway Z_pathways_1_1>", first(pathways).toString());
+        assertEquals("<Pathway Z:pathways_1_1>", first(pathways).toString());
     }
 
     @Test
@@ -148,7 +148,7 @@ public class OtpTransitServiceImplTest {
         Collection<Route> routes = subject.getAllRoutes();
 
         assertEquals(18, routes.size());
-        assertEquals("<Route agency_1 1>", first(routes).toString());
+        assertEquals("<Route agency:1 1>", first(routes).toString());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class OtpTransitServiceImplTest {
         Collection<Transfer> transfers = subject.getAllTransfers();
 
         assertEquals(9, transfers.size());
-        assertEquals("<Transfer stop=Z_F..Z_E>", first(transfers).toString());
+        assertEquals("<Transfer stop=Z:F..Z:E>", first(transfers).toString());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class OtpTransitServiceImplTest {
         Collection<ShapePoint> shapePoints = subject.getAllShapePoints();
 
         assertEquals(9, shapePoints.size());
-        assertEquals("<ShapePoint Z_4 #1 (41.0,-75.0)>", first(shapePoints).toString());
+        assertEquals("<ShapePoint Z:4 #1 (41.0,-75.0)>", first(shapePoints).toString());
     }
 
     @Test
@@ -172,7 +172,7 @@ public class OtpTransitServiceImplTest {
         Collection<Stop> stops = subject.getAllStops();
 
         assertEquals(25, stops.size());
-        assertEquals("<Stop Z_A>", first(stops).toString());
+        assertEquals("<Stop Z:A>", first(stops).toString());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class OtpTransitServiceImplTest {
         Collection<StopTime> stopTimes = subject.getAllStopTimes();
 
         assertEquals(80, stopTimes.size());
-        assertEquals("StopTime(seq=1 stop=Z_A trip=agency_1.1 times=00:00:00-00:00:00)",
+        assertEquals("StopTime(seq=1 stop=Z:A trip=agency:1.1 times=00:00:00-00:00:00)",
                 first(stopTimes).toString());
     }
 
@@ -189,13 +189,13 @@ public class OtpTransitServiceImplTest {
         Collection<Trip> trips = subject.getAllTrips();
 
         assertEquals(33, trips.size());
-        assertEquals("<Trip agency_1.1>", first(trips).toString());
+        assertEquals("<Trip agency:1.1>", first(trips).toString());
     }
 
     @Test
     public void testGetStopForId() {
         Stop stop = subject.getStopForId(new FeedScopedId("Z", "P"));
-        assertEquals("<Stop Z_P>", stop.toString());
+        assertEquals("<Stop Z:P>", stop.toString());
     }
 
     @Test
@@ -212,7 +212,7 @@ public class OtpTransitServiceImplTest {
     @Test
     public void testGetStopsForStation() {
         List<Stop> stops = subject.getStopsForStation(subject.getStopForId(STATION_ID));
-        assertEquals("[<Stop Z_A>]", stops.toString());
+        assertEquals("[<Stop Z:A>]", stops.toString());
     }
 
     @Test
@@ -225,7 +225,7 @@ public class OtpTransitServiceImplTest {
     @Test
     public void testGetStopTimesForTrip() {
         List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
-        assertEquals("[<Stop Z_A>, <Stop Z_B>, <Stop Z_C>]",
+        assertEquals("[<Stop Z:A>, <Stop Z:B>, <Stop Z:C>]",
                 stopTimes.stream().map(StopTime::getStop).collect(toList()).toString());
     }
 
@@ -234,21 +234,21 @@ public class OtpTransitServiceImplTest {
         List<FeedScopedId> serviceIds = subject.getAllServiceIds();
 
         assertEquals(2, serviceIds.size());
-        assertEquals("Z_alldays", first(serviceIds).toString());
+        assertEquals("Z:alldays", first(serviceIds).toString());
     }
 
     @Test
     public void testGetCalendarDatesForServiceId() {
         List<ServiceCalendarDate> dates = subject.getCalendarDatesForServiceId(SERVICE_WEEKDAYS_ID);
         assertEquals(
-                "[<CalendarDate serviceId=Z_weekdays date=ServiceIdDate(2017-8-31) exception=2>]",
+                "[<CalendarDate serviceId=Z:weekdays date=ServiceIdDate(2017-8-31) exception=2>]",
                 dates.toString());
     }
 
     @Test
     public void testGetCalendarForServiceId() {
         ServiceCalendar calendar = subject.getCalendarForServiceId(SERVICE_ALLDAYS_ID);
-        assertEquals("<ServiceCalendar Z_alldays [1111111]>", calendar.toString());
+        assertEquals("<ServiceCalendar Z:alldays [1111111]>", calendar.toString());
     }
 
     private static FareAttribute createFareAttribute() {

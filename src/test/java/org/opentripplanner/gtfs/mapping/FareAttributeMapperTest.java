@@ -60,7 +60,7 @@ public class FareAttributeMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.FareAttribute result = subject.map(FARE_ATTRIBUTE);
 
-        assertEquals("A_1", result.getId().toString());
+        assertEquals("A:1", result.getId().toString());
         assertEquals(CURRENCY_TYPE, result.getCurrencyType());
         assertEquals(JOURNEY_DURATION, result.getJourneyDuration());
         assertEquals(PAY_MENTMETHOD, result.getPaymentMethod());

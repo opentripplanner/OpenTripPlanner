@@ -229,8 +229,8 @@ public class OnBoardDepartServiceImplTest {
         routingRequest.from = new GenericLocation();
         routingRequest.startingTransitTripId = id;
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(10);
-        when(graph.getVertex("Station_0")).thenReturn(station0);
-        when(graph.getVertex("Station_1")).thenReturn(station1);
+        when(graph.getVertex("Station:0")).thenReturn(station0);
+        when(graph.getVertex("Station:1")).thenReturn(station1);
 
         tripPattern.add(tripTimes);
         graph.index = new GraphIndex(graph);
@@ -314,9 +314,9 @@ public class OnBoardDepartServiceImplTest {
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
         routingRequest.startingTransitTripId = id;
-        when(graph.getVertex("Station_0")).thenReturn(station0);
-        when(graph.getVertex("Station_1")).thenReturn(station1);
-        when(graph.getVertex("Station_2")).thenReturn(station2);
+        when(graph.getVertex("Station:0")).thenReturn(station0);
+        when(graph.getVertex("Station:1")).thenReturn(station1);
+        when(graph.getVertex("Station:2")).thenReturn(station2);
 
         tripPattern.add(tripTimes);
         graph.index = new GraphIndex(graph);
