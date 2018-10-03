@@ -56,8 +56,9 @@ public class TripTimeShort {
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
         this(tt, i, stop);
-        tripId = tt.trip.getId();
-        serviceDay = sd.time(0);
+        if (sd != null) {
+            serviceDay = sd.time(0);
+        }
     }
 
 
