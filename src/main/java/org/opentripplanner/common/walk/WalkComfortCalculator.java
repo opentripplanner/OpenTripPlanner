@@ -33,11 +33,7 @@ public class WalkComfortCalculator {
         Iterator<JsonNode> ruleIter = walkConfig.get("rules").elements();
         while(ruleIter.hasNext()) {
             JsonNode ruleNode = ruleIter.next();
-            String key = ruleNode.get("key").asText();
-            String value = ruleNode.get("value").asText();
-            float factor = ruleNode.get("factor").floatValue();
-            WalkComfortRule rule = new WalkComfortRule(key, value, factor);
-            rules.add(rule);
+            rules.add(new WalkComfortRule(ruleNode));
         }
     }
 
@@ -48,11 +44,13 @@ public class WalkComfortCalculator {
     public float computeScore(Map<String, String> tags) {
         float factor = 1.0f;
         for(WalkComfortRule rule : rules) {
-            String val = tags.get(rule.getTagKey());
-            if(val == null) continue;
-            float f = rule.computeFactor(val);
+            float f = rule.computeFactor(tags);
             factor = factor * f;
         }
         return factor;
+    }
+
+    public int getRuleCount() {
+        return rules.size();
     }
 }
