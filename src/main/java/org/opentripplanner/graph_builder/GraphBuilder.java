@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +14,6 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -71,9 +57,9 @@ public class GraphBuilder implements Runnable {
     
     private boolean _alwaysRebuild = true;
 
-    private List<RoutingRequest> _modeList;
+    private List<RoutingRequest> modeList;
     
-    private String _baseGraph = null;
+    private String baseGraph = null;
     
     private Graph graph = new Graph();
 
@@ -103,7 +89,7 @@ public class GraphBuilder implements Runnable {
     }
     
     public void setBaseGraph(String baseGraph) {
-        this._baseGraph = baseGraph;
+        this.baseGraph = baseGraph;
         try {
             graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
         } catch (Exception e) {
@@ -112,11 +98,11 @@ public class GraphBuilder implements Runnable {
     }
 
     public void addMode(RoutingRequest mo) {
-        _modeList.add(mo);
+        modeList.add(mo);
     }
 
     public void setModes(List<RoutingRequest> modeList) {
-        _modeList = modeList;
+        this.modeList = modeList;
     }
 
     public Graph getGraph() {
@@ -298,18 +284,18 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsBucketName = bucketConfig.bucketName;
             NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             gcf.tileSource = awsTileSource;
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         } else if (builderParams.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         } else if (demFile != null) {
             // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {

@@ -179,10 +179,9 @@ public class NearbyStopFinder {
 
         public TransitStop tstop;
         public double      dist;
-        public double elapsedTime;
-        public boolean hasElapsedTime = false;
         public LineString  geom;
         public List<Edge>  edges;
+        public int penaltySeconds = 0;
 
         public StopAtDistance(TransitStop tstop, double dist) {
             this.tstop = tstop;
@@ -191,20 +190,21 @@ public class NearbyStopFinder {
 
         @Override
         public int compareTo(StopAtDistance that) {
-            if (this.hasElapsedTime && that.hasElapsedTime) {
-                return (int)(this.elapsedTime)-(int)(that.elapsedTime);
-            }
-            return (int) (this.dist) - (int) (that.dist);
+            return (int) (this.dist / 1.33 + this.penaltySeconds) - (int) (that.dist / 1.33 + this.penaltySeconds);
         }
 
         public String toString() {
             return String.format("stop %s at %.1f meters", tstop, dist);
         }
 
-        public void setElapsedTime(double elapsedTime) {
-            this.elapsedTime = elapsedTime;
-            this.hasElapsedTime = true;
+        public void setPenaltySeconds(int penaltySeconds) {
+            this.penaltySeconds = penaltySeconds;
         }
+
+        public void increasePenaltySeconds(int penaltySecondsDelta) {
+            this.penaltySeconds += penaltySecondsDelta;
+        }
+
     }
 
     /**
@@ -240,7 +240,15 @@ public class NearbyStopFinder {
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
         StopAtDistance sd = new StopAtDistance((TransitStop) state.getVertex(), distance);
-        sd.setElapsedTime(state.getElapsedTimeSeconds());
+
+        State s = state;
+        while (s != null) {
+            if (s.getWalkDistanceDelta() < 0.1 && s.getTimeDeltaSeconds() > 0) {
+                sd.increasePenaltySeconds(s.getTimeDeltaSeconds());
+            }
+            s = s.getBackState();
+        }
+
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;

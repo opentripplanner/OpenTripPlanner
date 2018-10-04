@@ -1,17 +1,3 @@
-
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.common;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -39,16 +25,7 @@ public class StreetUtils {
     private static Logger LOG = LoggerFactory.getLogger(StreetUtils.class);
     private static int islandCounter = 0;
 
-    /* Island pruning strategy:
-       1. Extract islands without using noThruTraffic edges at all
-       2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across original islands!
-          Note: these expanded islands can overlap.
-       3  Relax connectivity even more: generate islands by allowing jumps between islands. Find out unreachable edges of small islands.
-       4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via noThruTraffic edges
-          to noThruTraffic state. Depedestrianize unreachable edges. Removed unconnected edges.
-     */
-
-    public static void pruneFloatingIslands(Graph graph, int maxIslandSize,
+    public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
             int islandWithStopMaxSize, String islandLogName) {
         LOG.debug("pruning");
         PrintWriter islandLog = null;

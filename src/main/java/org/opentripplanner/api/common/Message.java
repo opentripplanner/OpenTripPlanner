@@ -1,15 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.common;
 
 import java.util.Locale;
@@ -47,7 +35,7 @@ public enum Message {
     TRIANGLE_VALUES_NOT_SET(373),
     ;
 
-    private Properties _c = getConfig();
+    private Properties config = getConfig();
     private final int m_id;
 
     /** enum constructors are private -- see values above */
@@ -61,15 +49,15 @@ public enum Message {
 
     /** simple checker / getter of the config */
     public Properties getConfig() {
-        if(_c == null)
-            _c = new Properties(Message.class);
-        return _c;
+        if(config == null)
+            config = new Properties(Message.class);
+        return config;
     }
 
     public String get(String def, Locale l) {
         try {
             getConfig();
-            return _c.get(name(), l);
+            return config.get(name(), l);
         }
         catch(Exception e) {
             Properties.LOG.warn("No entry in Message.properties file could be found for string " + name());

@@ -3,15 +3,14 @@ package org.opentripplanner.routing.graph;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -54,7 +53,7 @@ public class GraphIndexTest extends GtfsTest {
         assertEquals(agency.getName(), "Fake Agency");
 
         /* Stops */
-        graph.index.stopForId.get(new AgencyAndId("X", "Y"));
+        graph.index.stopForId.get(new FeedScopedId("X", "Y"));
 
         /* Trips */
 //        graph.index.tripForId;
@@ -84,9 +83,9 @@ public class GraphIndexTest extends GtfsTest {
 
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
-        Stop stopJ = graph.index.stopForId.get(new AgencyAndId(feedId, "J"));
-        Stop stopL = graph.index.stopForId.get(new AgencyAndId(feedId, "L"));
-        Stop stopM = graph.index.stopForId.get(new AgencyAndId(feedId, "M"));
+        Stop stopJ = graph.index.stopForId.get(new FeedScopedId(feedId, "J"));
+        Stop stopL = graph.index.stopForId.get(new FeedScopedId(feedId, "L"));
+        Stop stopM = graph.index.stopForId.get(new FeedScopedId(feedId, "M"));
         TransitStop stopvJ = graph.index.stopVertexForStop.get(stopJ);
         TransitStop stopvL = graph.index.stopVertexForStop.get(stopL);
         TransitStop stopvM = graph.index.stopVertexForStop.get(stopM);

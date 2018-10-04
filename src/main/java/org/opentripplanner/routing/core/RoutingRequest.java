@@ -1,22 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import com.google.common.collect.Sets;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -37,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -273,24 +261,30 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
+    /** Only use certain named routes */
+    public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
+
     /** Do not use certain named agencies */
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
+    /** Only use certain named agencies */
+    public HashSet<String> whiteListedAgencies = new HashSet<String>();
+
     /** Do not use certain trips */
-    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
+    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
+    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher();
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
     /** Set of preferred agencies by user. */
     public HashSet<String> preferredAgencies = new HashSet<String>();
-    
+
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -425,10 +419,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    public AgencyAndId startingTransitStopId;
+    public FeedScopedId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    public AgencyAndId startingTransitTripId;
+    public FeedScopedId startingTransitTripId;
 
     public boolean walkingBike;
 
@@ -477,7 +471,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private StreetEdge splitEdge = null;
 
     /**
-     * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter. 
+     * How expensive it is to drive a car when car&parking, increase this value to make car driving parts shorter.
      */
     public double carParkCarLegWeight = 1;
 
@@ -663,18 +657,23 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setPreferredAgencies(String s) {
-        if (s != null && !s.equals(""))
-            preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+        if (!s.isEmpty()) {
+            preferredAgencies = new HashSet<>();
+            Collections.addAll(preferredAgencies, s.split(","));
+        }
     }
 
     public void setPreferredRoutes(String s) {
+        if (!s.isEmpty()) {
         //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
         s = s.replaceAll(":", "__");
-        
+
         if (s != null && !s.equals(""))
             preferredRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             preferredRoutes = RouteMatcher.emptyMatcher();
+        }
     }
     
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
@@ -683,32 +682,49 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setUnpreferredAgencies(String s) {
-        if (s != null && !s.equals(""))
-            unpreferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+        if (!s.isEmpty()) {
+            unpreferredAgencies = new HashSet<>();
+            Collections.addAll(unpreferredAgencies, s.split(","));
+        }
     }
     
     public void setUnpreferredRoutes(String s) {
+        if (!s.isEmpty()) {
         //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
         s = s.replaceAll(":", "__");
 
         if (s != null && !s.equals(""))
             unpreferredRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             unpreferredRoutes = RouteMatcher.emptyMatcher();
+        }
     }
 
     public void setBannedRoutes(String s) {
+        if (!s.isEmpty()) {
         //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
         s = s.replaceAll(":", "__");
 
         if (s != null && !s.equals(""))
             bannedRoutes = RouteMatcher.parse(s);
-        else
+        }
+        else {
             bannedRoutes = RouteMatcher.emptyMatcher();
+        }
+    }
+
+    public void setWhiteListedRoutes(String s) {
+        if (!s.isEmpty()) {
+            whiteListedRoutes = RouteMatcher.parse(s);
+        }
+        else {
+            whiteListedRoutes = RouteMatcher.emptyMatcher();
+        }
     }
 
     public void setBannedStops(String s) {
-        if (s != null && !s.equals("")) {
+        if (!s.isEmpty()) {
             bannedStops = StopMatcher.parse(s);
         }
         else {
@@ -717,7 +733,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setBannedStopsHard(String s) {
-        if (s != null && !s.equals("")) {
+        if (!s.isEmpty()) {
             bannedStopsHard = StopMatcher.parse(s);
         }
         else {
@@ -726,8 +742,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public void setBannedAgencies(String s) {
-        if (s != null && !s.equals(""))
-            bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+        if (!s.isEmpty()) {
+            bannedAgencies = new HashSet<>();
+            Collections.addAll(bannedAgencies, s.split(","));
+        }
+    }
+
+    public void setWhiteListedAgencies(String s) {
+        if (!s.isEmpty()) {
+            whiteListedAgencies = new HashSet<>();
+            Collections.addAll(whiteListedAgencies, s.split(","));
+        }
     }
 
     public final static int MIN_SIMILARITY = 1000;
@@ -868,9 +893,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
-            clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
+            clone.whiteListedAgencies = (HashSet<String>) whiteListedAgencies.clone();
+            clone.whiteListedRoutes = whiteListedRoutes.clone();
+            clone.preferredAgencies = (HashSet<String>) preferredAgencies.clone();
+            clone.preferredRoutes = preferredRoutes.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -1073,8 +1102,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Tear down any routing context (remove temporary edges from edge lists) */
     public void cleanup() {
-        if (this.rctx != null) {
+        if (this.rctx == null)
+            LOG.warn("routing context was not set, cannot destroy it.");
+        else {
             rctx.destroy();
+            LOG.debug("routing context destroyed");
         }
     }
 
@@ -1134,7 +1166,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
-     * @return The weight (multiplier) for mode, the default weight is one. 
+     * @return The weight (multiplier) for mode, the default weight is one.
      * Allows de-prioritizing modes.
      */
     public double getModeWeight(TraverseMode traverseMode) {
@@ -1153,6 +1185,19 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int getAlightTime(TraverseMode transitMode) {
         Integer i = this.rctx.graph.alightTimes.get(transitMode);
         return i == null ? 0 : i;
+    }
+
+    private String getRouteOrAgencyStr(HashSet<String> strings) {
+        StringBuilder builder = new StringBuilder();
+        for (String agency : strings) {
+            builder.append(agency);
+            builder.append(",");
+        }
+        if (builder.length() > 0) {
+            // trim trailing comma
+            builder.setLength(builder.length() - 1);
+        }
+        return builder.toString();
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
@@ -1212,29 +1257,46 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void banTrip(AgencyAndId trip) {
+    public void banTrip(FeedScopedId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
-    
-    /** 
-     * tripIsBanned is a misnomer: this checks whether the agency or route are banned.
-     * banning of individual trips is actually performed inside the trip search, 
-     * in TripTimes.tripAcceptable.
-     */
-    public boolean tripIsBanned(Trip trip) {
+
+    public boolean routeIsBanned(Route route) {
         /* check if agency is banned for this plan */
         if (bannedAgencies != null) {
-            if (bannedAgencies.contains(trip.getRoute().getAgency().getId())) {
+            if (bannedAgencies.contains(route.getAgency().getId())) {
                 return true;
             }
         }
 
         /* check if route banned for this plan */
         if (bannedRoutes != null) {
-            Route route = trip.getRoute();
             if (bannedRoutes.matches(route)) {
                 return true;
             }
+        }
+
+        boolean whiteListed = false;
+        boolean whiteListInUse = false;
+
+        /* check if agency is whitelisted for this plan */
+        if (whiteListedAgencies != null && whiteListedAgencies.size() > 0) {
+            whiteListInUse = true;
+            if (whiteListedAgencies.contains(route.getAgency().getId())) {
+                whiteListed = true;
+            }
+        }
+
+        /* check if route is whitelisted for this plan */
+        if (whiteListedRoutes != null && !whiteListedRoutes.isEmpty()) {
+            whiteListInUse = true;
+            if (whiteListedRoutes.matches(route)) {
+                whiteListed = true;
+            }
+        }
+
+        if (whiteListInUse && !whiteListed) {
+            return true;
         }
 
         return false;

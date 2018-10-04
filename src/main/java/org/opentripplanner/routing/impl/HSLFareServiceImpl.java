@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;

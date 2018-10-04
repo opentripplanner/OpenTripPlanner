@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 
 import graphql.language.StringValue;
 import graphql.schema.*;
-import org.onebusaway.gtfs.model.*;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -1193,7 +1193,7 @@ public class IndexGraphQLSchema {
 		        .description("ÌD of the stop in format `FeedId:StopId`")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment ->
-                    GtfsLibrary.convertIdToString(((Stop) environment.getSource()).getId()))
+                    ((Stop) environment.getSource()).getId().toString())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("name")
@@ -1240,7 +1240,7 @@ public class IndexGraphQLSchema {
 		.description("The station which this stop is part of (or null if this stop is not part of a station)")
                 .type(stopType)
                 .dataFetcher(environment -> ((Stop) environment.getSource()).getParentStation() != null ?
-                    index.stationForId.get(new AgencyAndId(
+                    index.stationForId.get(new FeedScopedId(
                         ((Stop) environment.getSource()).getId().getAgencyId(),
                         ((Stop) environment.getSource()).getParentStation())) : null)
                 .build())
@@ -1362,10 +1362,10 @@ public class IndexGraphQLSchema {
                     if (stop.getLocationType() == 1) {
                         // Merge all stops if this is a station
                         return index.stopsForParentStation
-                            .get(stop.getId())
-                            .stream()
-                            .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date,omitNonPickups).stream())
-                            .collect(Collectors.toList());
+                                .get(stop.getId())
+                                .stream()
+                                .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date,omitNonPickups).stream())
+                                .collect(Collectors.toList());
                     }
                     return index.getStopTimesForStop(stop, date, omitNonPickups);
                 })
@@ -2421,17 +2421,17 @@ public class IndexGraphQLSchema {
                 if (id.type.equals(stopAtDistanceType.getName())) {
                     String[] parts = id.id.split(";", 2);
                     return new GraphIndex.StopAndDistance(
-                        index.stopForId.get(GtfsLibrary.convertIdFromString(parts[1])),
+                        index.stopForId.get(FeedScopedId.convertFromString(parts[1])),
                         Integer.parseInt(parts[0], 10));
                 }
                 if (id.type.equals(stopType.getName())) {
-                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.stopForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(tripType.getName())) {
-                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.tripForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(routeType.getName())) {
-                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
+                    return index.routeForId.get(FeedScopedId.convertFromString(id.id));
                 }
                 if (id.type.equals(patternType.getName())) {
                     return index.patternForId.get(id.id);
@@ -2547,7 +2547,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.stopForId.get(FeedScopedId.convertFromString(id)))
                             .collect(Collectors.toList());
                     }
                     Stream<Stop> stream;
@@ -2557,7 +2557,7 @@ public class IndexGraphQLSchema {
                     else {
                         stream = index.getLuceneIndex().query(environment.getArgument("name"), true, true, false, false)
                             .stream()
-                            .map(result -> index.stopForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                            .map(result -> index.stopForId.get(FeedScopedId.convertFromString(result.id)));
                     }
                     return stream.collect(Collectors.toList());
                 })
@@ -2707,8 +2707,8 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
-                    List<AgencyAndId> filterByStops = null;
-                    List<AgencyAndId> filterByRoutes = null;
+                    List<FeedScopedId> filterByStops = null;
+                    List<FeedScopedId> filterByRoutes = null;
                     List<String> filterByBikeRentalStations = null;
                     List<String> filterByBikeParks = null;
                     List<String> filterByCarParks = null;
@@ -2766,7 +2766,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.stopForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("station")
@@ -2777,7 +2777,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.stationForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stations")
@@ -2804,7 +2804,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                                 .stream()
-                                .map(id -> index.stationForId.get(GtfsLibrary.convertIdFromString(id)))
+                                .map(id -> index.stationForId.get(FeedScopedId.convertFromString(id)))
                                 .collect(Collectors.toList());
                     }
 
@@ -2814,7 +2814,7 @@ public class IndexGraphQLSchema {
                     } else {
                         stream = index.getLuceneIndex().query(environment.getArgument("name"), true, false, true, false, false)
                             .stream()
-                            .map(result -> index.stationForId.get(GtfsLibrary.convertIdFromString(result.id)));
+                            .map(result -> index.stationForId.get(FeedScopedId.convertFromString(result.id)));
                     }
 
                     return stream.collect(Collectors.toList());
@@ -2855,7 +2855,7 @@ public class IndexGraphQLSchema {
                         }
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.routeForId.get(FeedScopedId.convertFromString(id)))
                             .collect(Collectors.toList());
                     }
                     Stream<Route> stream = index.routeForId.values().stream();
@@ -2894,7 +2894,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.routeForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
@@ -2911,7 +2911,7 @@ public class IndexGraphQLSchema {
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment -> index.tripForId
-                    .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                    .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("fuzzyTrip")
@@ -2942,7 +2942,7 @@ public class IndexGraphQLSchema {
                     try {
                         return fuzzyTripMatcher.getTrip(
                             index.routeForId.get(
-                                GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
+                                FeedScopedId.convertFromString(environment.getArgument("route"))),
                             environment.getArgument("direction"),
                             environment.getArgument("time"),
                             ServiceDate.parseString(((String) environment.getArgument("date")).replace("-", ""))
@@ -3122,9 +3122,9 @@ public class IndexGraphQLSchema {
             .build(dictionary);
     }
 
-    private List<AgencyAndId> toIdList(List<String> ids) {
+    private List<FeedScopedId> toIdList(List<String> ids) {
         if (ids == null) return Collections.emptyList();
-        return ids.stream().map(GtfsLibrary::convertIdFromString).collect(Collectors.toList());
+        return ids.stream().map(FeedScopedId::convertFromString).collect(Collectors.toList());
     }
 
     private void createPlanType(GraphIndex index) {

@@ -1,20 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -125,13 +112,25 @@ public class GraphPathFinder {
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
-        // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
+
+        /* In RoutingRequest, maxTransfers defaults to 2. But as discussed in #2522, you can't limit the number of
+         * transfers in our routing algorithm. This is a resource limiting problem, like imposing a walk limit or
+         * not optimizing on arrival time in a time-dependent network (both of which we have done / do but need
+         * to systematically eliminate).
+         */
+        options.maxTransfers = 4; // should probably be Integer.MAX_VALUE;
+
+        // OTP now always uses what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
-        /* In long distance mode, maxWalk has a different meaning than it used to.
-         * It's the radius around the origin or destination within which you can walk on the streets.
-         * If no value is provided, max walk defaults to the largest double-precision float.
-         * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
+        /* maxWalk has a different meaning than it used to. It's the radius around the origin or destination within
+         * which you can walk on the streets. An unlimited value would cause the bidi heuristic to do unbounded street
+         * searches and consider the whole graph walkable.
+         *
+         * After the limited areas of the street network around the origin and destination are explored, the
+         * options.maxWalkDistance will be set to unlimited for similar reasons to maxTransfers above. That happens
+         * in method org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic.initialize
+         */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         long searchBeginTime = System.currentTimeMillis();
@@ -175,8 +174,8 @@ public class GraphPathFinder {
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
-                List<AgencyAndId> tripIds = path.getTrips();
-                for (AgencyAndId tripId : tripIds) {
+                List<FeedScopedId> tripIds = path.getTrips();
+                for (FeedScopedId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
                 if (tripIds.isEmpty()) {
@@ -281,7 +280,7 @@ public class GraphPathFinder {
                             (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() <= options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
-                            for (AgencyAndId tripId : joinedPath.getTrips()) {
+                            for (FeedScopedId tripId : joinedPath.getTrips()) {
                                 options.banTrip(tripId);
                             }
                         }
@@ -333,6 +332,7 @@ public class GraphPathFinder {
         reversedOptions.setRoutingContext(router.graph, fromVertex, toVertex);
         reversedOptions.dominanceFunction = new DominanceFunction.MinimumWeight();
         reversedOptions.rctx.remainingWeightHeuristic = remainingWeightHeuristic;
+        reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
         reversedOptions.bannedTrips = options.bannedTrips;
         return reversedOptions;

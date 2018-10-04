@@ -1,22 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.util;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.util.elevation.ToblersHickingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +22,20 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
+    /**
+     * If the calculated factor is more than this constant, we ignore the calculated factor and use this
+     * constant in stead. See ths table in {@link ToblersHickingFunction} for a mapping between the
+     * factor and angels(degree and percentage). A factor of 3 with take effect for slopes with a
+     * incline above 31.4% and a decline below 41.4%. The worlds steepest road ia about 35%, and the
+     * steepest climes in Tour De France is usually in the range 8-12%. Some walking paths may be quite
+     * steep, but a penalty of 3 is still a large penalty.
+     */
     private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
+
+    /** parameter A in the Rees (2004) slope-dependent walk cost model **/
+    private static final double walkParA = 0.75;
+
+    private static final ToblersHickingFunction toblerWalkingFunction = new ToblersHickingFunction(MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
 
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
@@ -112,7 +113,7 @@ public class ElevationUtils {
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
-            slopeWalkEffectiveLength += run * getSlopeWalkEffectiveLengthFactor(run, rise);
+            slopeWalkEffectiveLength += run * calculateSlopeWalkEffectiveLengthFactor(run, rise);
         }
         /*
          * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
@@ -253,77 +254,19 @@ public class ElevationUtils {
     }
 
 
-    /** parameter A in the Rees (2004) slope-dependent walk cost model **/
-    private static double walkParA = 0.75;
-    /** parameter C in the Rees (2004) slope-dependent walk cost model **/
-    private static double walkParC = 14.6;
-
     /**
-     * The cost for walking in hilly/mountain terrain dependent on slope using an empirical function by
-     * WG Rees (Comp & Geosc, 2004), that overhauls the Naismith rule for mountaineering.<br>
-     * For a slope of 0 = 0 degree a cost is returned that approximates a speed of 1.333 m/sec = 4.8km/h<br>
-     * TODO: Not sure if it makes sense to use maxSlope as input and instead better use
-     * a lower estimate / average value. However, the DEM is most likely generalized/smoothed
-     * and hence maxSlope may be smaller than in the real world.
-     * @param verticalDistance the vertical distance of the line segment
-     * @param maxSlope the slope of the segment
-     * @return walk costs dependent on slope (in seconds)
+     * <p>
+     *     We use the Tobler function {@link ToblersHickingFunction} to calculate this.
+     * </p>
+     * <p>
+     *     When testing this we get good results in general, but for some edges
+     *     the elevation profile is not accurate. A (serpentine) road is usually
+     *     build with a constant slope, but the elevation profile in OTP is not
+     *     as smooth, resulting in an extra penalty for these roads.
+     * </p>
      */
-    public static double getWalkCostsForSlope(double verticalDistance, double maxSlope) {
-        /*
-        Naismith (1892):
-        "an hour for every three miles on the map, with an additional hour for
-        every 2,000 feet of ascent.'
-        -------
-        in S. Fritz and S. Carver (GISRUK 1998):
-        Naismith's Rule: 5 km/h plus 1 hour per 600m ascent; minus 10 minutes per 300 m
-        descent for slopes between 5 and 12 degrees; plus 10 minutes per 300m descent
-        for slopes greater than 12 degrees.
-        ...
-        In the case of a 50m grid resolution DEM for every m climbed, 6 seconds are added.
-        2 seconds are added in case of a ascent of more than 12 degrees and 2 seconds are
-        subtracted if the ascent is between 5-12 degrees.
-        -------
-        Naismith's rule was overhauled by W.G. Rees (2004), who developed a quadratic
-        function for speed estimation:
-                1/v = a + b*m + c*m^2
-        with a= 0.75 sec/m, b=0.09 s/m, c=14.6 s/m
-
-        As for b=0 there are no big differences the derived cost function is:
-                 k = a*d + c * (h*h) / d
-        with d= distance, and h = vertical separation
-
-        */
-        if (verticalDistance == 0){
-            return 0;
-        }
-        double costs = 0;
-        double h = maxSlope * verticalDistance;
-        costs = (walkParA * verticalDistance) + (  walkParC * (h * h) / verticalDistance);
-        if (maxSlope != 0) {
-            int i = 0;
-        }
-
-        return  costs;
-    }
-
-    /**
-     * http://mtntactical.com/research/walking-uphill-10-grade-cuts-speed-13not-12/
-     *
-     * "A 10% grade incline cuts your speed by 1/3 (33%)"
-     *
-     * Speed(at_grade) = speed(horizontal) * e ^ (-4 * slope)
-     */
-
-    public static double getSlopeWalkEffectiveLengthFactor(double run, double rise) {
-        double slopeWalkSpeedFactor;
-        if (run > 0 && rise > 0) {
-            slopeWalkSpeedFactor = 1 / Math.exp(-4 * (rise/run));
-        } else {
-            slopeWalkSpeedFactor = 1;
-        }
-        slopeWalkSpeedFactor = Math.min(slopeWalkSpeedFactor, MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
-        return slopeWalkSpeedFactor;
+    static double calculateSlopeWalkEffectiveLengthFactor(double run, double rise) {
+        return toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
     }
 
     public static PackedCoordinateSequence getPartialElevationProfile(

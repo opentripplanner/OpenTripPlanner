@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.api.common;
 
 import java.util.*;
@@ -23,7 +10,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -274,11 +261,23 @@ public abstract class RoutingResource {
      */
     @QueryParam("bannedRoutes")
     protected String bannedRoutes;
-    
+
+    /**
+     * Functions the same as bannnedRoutes, except only the listed routes are allowed.
+     */
+    @QueryParam("whiteListedRoutes")
+    protected String whiteListedRoutes;
+
     /** The comma-separated list of banned agencies. */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
-    
+
+    /**
+     * Functions the same as banned agencies, except only the listed agencies are allowed.
+     */
+    @QueryParam("whiteListedAgencies")
+    protected String whiteListedAgencies;
+
     /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
@@ -403,9 +402,9 @@ public abstract class RoutingResource {
      */
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
-    
-    /** 
-     * @see {@link org.opentripplanner.routing.core.RoutingRequest#carParkCarLegWeight} 
+
+    /**
+     * @see {@link org.opentripplanner.routing.core.RoutingRequest#carParkCarLegWeight}
      */
     @QueryParam("carParkCarLegWeight")
     private Double carParkCarLegWeight;
@@ -416,7 +415,7 @@ public abstract class RoutingResource {
     @QueryParam("heuristicStepsPerMainStep")
     private Integer heuristicStepsPerMainStep;
 
-    /* 
+    /*
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
      * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
@@ -536,10 +535,17 @@ public abstract class RoutingResource {
         if (bannedRoutes != null)
             request.setBannedRoutes(bannedRoutes);
 
+        if (whiteListedRoutes != null)
+            request.setWhiteListedRoutes(whiteListedRoutes);
+
         if (bannedAgencies != null)
             request.setBannedAgencies(bannedAgencies);
 
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
+        if (whiteListedAgencies != null)
+            request.setWhiteListedAgencies(whiteListedAgencies);
+
+        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
+
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
@@ -632,10 +638,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = GtfsLibrary.convertIdFromString(startTransitStopId);
+            request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = GtfsLibrary.convertIdFromString(startTransitTripId);
+            request.startingTransitTripId = FeedScopedId.convertFromString(startTransitTripId);
 
         if (clampInitialWait != null)
             request.clampInitialWait = clampInitialWait;
@@ -674,12 +680,12 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    public static HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    public static HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }
         
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
+        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {
             // TODO this apparently allows banning stops within a trip with integers. Why?
@@ -687,7 +693,7 @@ public abstract class RoutingResource {
             if (parts.length < 2) continue; // throw exception?
             String agencyIdString = parts[0];
             String tripIdString = parts[1];
-            AgencyAndId tripId = new AgencyAndId(agencyIdString, tripIdString);
+            FeedScopedId tripId = new FeedScopedId(agencyIdString, tripIdString);
             BannedStopSet bannedStops;
             if (parts.length == 2) {
                 bannedStops = BannedStopSet.ALL;
