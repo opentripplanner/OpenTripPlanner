@@ -121,6 +121,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.routingRequest = request;
         request.softWalkLimiting = false;
         request.softPreTransitLimiting = false;
+        // change the defaults in bikeWalkingOptions because traversals of one-way streets or otherwise non-traversable
+        // streets may occur while walking a bicycle that extend the pretransit search further than is needed
+        request.bikeWalkingOptions.softWalkLimiting = false;
+        request.bikeWalkingOptions.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
         // Forward street search first, mark street vertices around the origin so H evaluates to 0
         TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
