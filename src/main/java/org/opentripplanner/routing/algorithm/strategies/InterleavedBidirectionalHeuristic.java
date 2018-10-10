@@ -126,13 +126,19 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         request.bikeWalkingOptions.softWalkLimiting = false;
         request.bikeWalkingOptions.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
-        // Forward street search first, mark street vertices around the origin so H evaluates to 0
-        TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
+        // Forward street search first, mark street vertices around the origin so H evaluates to 0.
+        // If the car mode is allowed, avoid creating pretransit vertices because the entire graph will get explored due
+        // to car travel not counting towards the maxWalkDistance.
+        TObjectDoubleMap<Vertex> forwardStreetSearchResults = request.modes.getCar()
+            ? new TObjectDoubleHashMap<>()
+            : streetSearch(request, false, abortTime);
         if (forwardStreetSearchResults == null) {
             return; // Search timed out
         }
         preTransitVertices = forwardStreetSearchResults.keySet();
         LOG.debug("end forward street search {} ms", System.currentTimeMillis() - start);
+        // When the car mode is allowed the postBoardingWeights are the result of searching the graph in entirety, but
+        // doing so makes the overall search considerably faster when transit is also present.
         postBoardingWeights = streetSearch(request, true, abortTime);
         if (postBoardingWeights == null) {
             return; // Search timed out
@@ -175,7 +181,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             } else {
                 // We have not boarded transit yet. We have no idea what the weight to the target is so return zero.
                 // We could also use a Euclidean heuristic here.
-                if (preTransitVertices.contains(v)) {
+                // If the car mode is allowed, the preTransitVertices will be empty, so always return 0.
+                if (s.getOptions().modes.getCar() || preTransitVertices.contains(v)) {
                     return 0;
                 } else {
                     return Double.POSITIVE_INFINITY;
@@ -318,12 +325,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
                 // arriveBy has been set to match actual directional behavior in this subsearch.
                 // Walk cutoff will happen in the street edge traversal method.
-                State s1 = e.traverse(s);
-                if (s1 == null) {
-                    continue;
-                }
-                if (spt.add(s1)) {
-                    pq.insert(s1,  s1.getWeight());
+                // In here we must iterate through all state results to consider the forkStates produced when possibly
+                // transitioning to car or walk on a StreetEdge.
+                for (State s1 = e.traverse(s); s1 != null; s1 = s1.getNextResult()) {
+                    if (spt.add(s1)) {
+                        pq.insert(s1,  s1.getWeight());
+                    }
                 }
             }
         }
