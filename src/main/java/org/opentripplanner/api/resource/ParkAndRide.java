@@ -13,9 +13,11 @@
 
 package org.opentripplanner.api.resource;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
@@ -42,6 +44,7 @@ public class ParkAndRide {
     public Response getParkAndRide(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
+            @QueryParam("maxTransitDistance") Double maxTransitDistance,
             @PathParam("routerId") String routerId) {
 
         Router router = otpServer.getRouter(routerId);
@@ -51,14 +54,25 @@ public class ParkAndRide {
         if (lowerLeft != null) {
             envelope = getEnvelope(lowerLeft, upperRight);
         } else {
-            envelope = new Envelope(-180,180,-90,90);
+            envelope = new Envelope(-180, 180, -90, 90);
         }
 
         List<ParkAndRideInfo> prs = new ArrayList<>();
         for (Vertex v : router.graph.getVertices()) {
-            if (v instanceof ParkAndRideVertex && envelope.contains(v.getX(), v.getY())) {
-                prs.add(new ParkAndRideInfo((ParkAndRideVertex) v));
+            // Check if vertex is a ParkAndRideVertex
+            if (!(v instanceof ParkAndRideVertex)) continue;
+
+            // Check if vertex is within envelope
+            if (!envelope.contains(v.getX(), v.getY())) continue;
+
+            // Check if vertex is within maxTransitDistance of a stop (if specified)
+            if (maxTransitDistance != null) {
+                List<TransitStop> stops = router.graph.streetIndex.getNearbyTransitStops(
+                        new Coordinate(v.getX(), v.getY()), maxTransitDistance);
+                if (stops.isEmpty()) continue;
             }
+
+            prs.add(new ParkAndRideInfo((ParkAndRideVertex) v));
         }
 
         return Response.status(Status.OK).entity(prs).build();
