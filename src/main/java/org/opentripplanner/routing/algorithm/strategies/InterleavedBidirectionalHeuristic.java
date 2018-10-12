@@ -322,6 +322,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             if (!vertices.containsKey(v)) {
                 vertices.put(v, (int) s.getWeight()); // FIXME time or weight? is RR using right mode?
             }
+            // if searching from the target and traveling via car and the origin has been reached, immediately return
+            // the vertices so that the entire graph isn't searched.
+            if (fromTarget && rr.modes.getCar() && v == rr.rctx.origin) break;
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
                 // arriveBy has been set to match actual directional behavior in this subsearch.
                 // Walk cutoff will happen in the street edge traversal method.
