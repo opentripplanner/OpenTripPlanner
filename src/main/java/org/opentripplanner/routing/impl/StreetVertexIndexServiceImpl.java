@@ -117,12 +117,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
         boolean wheelchairAccessible = false;
 
-        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name,
-                endVertex);
+        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name, endVertex);
+
         for (StreetEdge street : edges) {
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
-            wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
+            wheelchairAccessible |= street.isWheelchairAccessible();
+
             /* forward edges and vertices */
             Vertex edgeLocation;
             if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {

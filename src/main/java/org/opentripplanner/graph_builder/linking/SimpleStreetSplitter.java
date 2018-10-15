@@ -433,7 +433,7 @@ public class SimpleStreetSplitter implements StreetSplitter {
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
         if (temporarySplit) {
-            v = new TemporarySplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
+            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y,
                 edge, endVertex);
             if (edge.isWheelchairAccessible()) {
                 ((TemporarySplitterVertex) v).setWheelchairAccessible(true);
