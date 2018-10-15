@@ -399,10 +399,32 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Tear down this routing context, removing any temporary edges.
+     * Tear down this routing context, removing any temporary edges from
+     * the "permanent" graph objects. This enables all temporary objects
+     * for garbage collection.
      */
     public void destroy() {
-        if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
-        if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
+        disposeTemporaryStart(fromVertex, null);
+        disposeTemporaryEnd(toVertex, null);
+    }
+
+    private static void disposeTemporaryStart(Vertex v, Edge incoming) {
+        if (v instanceof TemporaryVertex) {
+            for (Edge edge : v.getOutgoing()) {
+                disposeTemporaryStart(edge.getToVertex(), edge);
+            }
+        } else if (incoming != null) {
+            v.removeIncoming(incoming);
+        }
+    }
+
+    private static void disposeTemporaryEnd(Vertex v, Edge outgoing) {
+        if (v instanceof TemporaryVertex) {
+            for (Edge edge : v.getIncoming()) {
+                disposeTemporaryEnd(edge.getFromVertex(), edge);
+            }
+        } else if (outgoing != null) {
+            v.removeOutgoing(outgoing);
+        }
     }
 }
