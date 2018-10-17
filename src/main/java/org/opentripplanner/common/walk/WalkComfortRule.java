@@ -47,7 +47,7 @@ public class WalkComfortRule {
     }
 
     private WalkComfortTest createTestFromNode(JsonNode node) {
-        String type = null;
+        String type = "equal"; // Assume basic equality test if no type specified
         if (node.has("type")) type = node.get("type").asText();
         else if (node.has("key") && node.has("referenceValue")) type = "equal";
 
