@@ -1,22 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.model.FeedScopedId;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,17 +12,17 @@ import java.util.List;
  */
 public class FareComponent {
 
-    public AgencyAndId fareId;
+    public FeedScopedId fareId;
     public Money price;
-    public List<AgencyAndId> routes;
+    public List<FeedScopedId> routes;
 
-    public FareComponent(AgencyAndId fareId, Money amount) {
+    public FareComponent(FeedScopedId fareId, Money amount) {
         this.fareId = fareId;
         price = amount;
-        routes = new ArrayList<AgencyAndId>();
+        routes = new ArrayList<FeedScopedId>();
     }
 
-    public void addRoute(AgencyAndId routeId) {
+    public void addRoute(FeedScopedId routeId) {
         routes.add(routeId);
     }
 
@@ -47,7 +32,7 @@ public class FareComponent {
         buffer.append(", ");
         buffer.append(price.toString());
         buffer.append(", ");
-        for (AgencyAndId routeId : routes) {
+        for (FeedScopedId routeId : routes) {
             buffer.append(routeId.toString());
             buffer.append(", ");
         }

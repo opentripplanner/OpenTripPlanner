@@ -2,7 +2,7 @@ package org.opentripplanner.profile.fares;
 
 import com.csvreader.CsvReader;
 import com.google.common.collect.Maps;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.DCFareCalculator.Fare;
 import org.slf4j.Logger;

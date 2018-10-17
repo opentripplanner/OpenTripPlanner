@@ -1,24 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.common.model.P2;
 
 public class FareRuleSet implements Serializable {
@@ -26,18 +13,18 @@ public class FareRuleSet implements Serializable {
     private static final long serialVersionUID = 7218355718876553028L;
 
     private String agency = null;
-    private Set<AgencyAndId> routes;
+    private Set<FeedScopedId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
     private FareAttribute fareAttribute;
-    private Set<AgencyAndId> trips;
+    private Set<FeedScopedId> trips;
     
     public FareRuleSet(FareAttribute fareAttribute) {
         this.fareAttribute = fareAttribute;
-        routes = new HashSet<AgencyAndId>();
+        routes = new HashSet<FeedScopedId>();
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
-        trips = new HashSet<AgencyAndId>();
+        trips = new HashSet<FeedScopedId>();
     }
 
     public void setAgency(String agency) {
@@ -61,11 +48,11 @@ public class FareRuleSet implements Serializable {
         contains.add(containsId);
     }
     
-    public void addRoute(AgencyAndId route) {
+    public void addRoute(FeedScopedId route) {
         routes.add(route);
     }
     
-    public Set<AgencyAndId> getRoutes() {
+    public Set<FeedScopedId> getRoutes() {
     	return routes;
     }
 
@@ -77,16 +64,16 @@ public class FareRuleSet implements Serializable {
         return agency != null;
     }
 
-    public void addTrip(AgencyAndId trip) {
+    public void addTrip(FeedScopedId trip) {
     	trips.add(trip);
     }
     
-    public Set<AgencyAndId> getTrips() {
+    public Set<FeedScopedId> getTrips() {
     	return trips;
     }
     
     public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
-            Set<AgencyAndId> routesVisited, Set<AgencyAndId> tripsVisited) {
+                           Set<FeedScopedId> routesVisited, Set<FeedScopedId> tripsVisited) {
         //check for matching agency
         if (agency != null) {
             if (agencies.size() != 1 || !agencies.contains(agency))

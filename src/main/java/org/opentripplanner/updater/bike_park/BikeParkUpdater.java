@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.bike_park;
 
 import java.util.ArrayList;
@@ -39,17 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dynamic bike park updater which encapsulate one BikeParkDataSource.
- * 
- * Usage example ('fietsstalling' name is an example) in the file 'Graph.properties':
- * 
- * <pre>
- * fietsstalling.type = bike-park
- * fietsstalling.frequencySec = 600
- * fietsstalling.sourceType = kml-placemarks
- * fietsstalling.url = http://host.tld/fietsstalling.kml
- * </pre>
- * 
+ * Graph updater that dynamically sets availability information on bike parking lots.
+ * This updater fetches data from a single BikeParkDataSource.
+ *
  * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
  * (https://goabout.com/).
  * 
@@ -100,21 +79,15 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.graph = graph;
         this.source = source;
-        LOG.info("Creating bike-park updater running every {} seconds : {}", frequencySec, source);
+        LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
-
         // Adding a bike park station service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                bikeService = graph.getService(BikeRentalStationService.class, true);
-            }
-        });
+        bikeService = graph.getService(BikeRentalStationService.class, true);
     }
 
     @Override

@@ -93,27 +93,27 @@ can be automatically included in other Java projects.
 This repository is machine-readable (by Maven or other build systems) and also provides human readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
 you want. For example, release 1.1.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/1.1.0/otp-1.1.0-shaded.jar`.
 
-To make use of OTP in another Maven project, you must specify it as a dependency:
+To make use of OTP in another Maven project, you must specify it as a dependency in that project's `pom.xml`:
 
 ```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
 After each successful build, the [Travis continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner) deploys the final OTP "artifact" (the runnable JAR) to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can always fetch the latest work in progress by specifying a snapshot artifact:
 
- ```XML
- <repositories>
-   <repository>
-     <id>ossrh_snapshots</id>
-     <name>Sonatype OSSRH Shapshot Repository</name>
-     <url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
-   </repository>
- </repositories>
- ```
+```XML
+<repositories>
+  <repository>
+    <id>ossrh_snapshots</id>
+    <name>Sonatype OSSRH Shapshot Repository</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
+  </repository>
+</repositories>
+```
 
 ```XML
 <dependency>

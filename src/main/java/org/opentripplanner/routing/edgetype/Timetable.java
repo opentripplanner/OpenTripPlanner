@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
@@ -22,10 +9,10 @@ import java.util.TimeZone;
 
 import com.beust.jcommander.internal.Lists;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -298,7 +285,7 @@ public class Timetable implements Serializable {
     }
 
     /** @return the index of TripTimes for this trip ID in this particular Timetable */
-    public int getTripIndex(AgencyAndId tripId) {
+    public int getTripIndex(FeedScopedId tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
@@ -497,16 +484,16 @@ public class Timetable implements Serializable {
                 }
             }
             if (update != null) {
-                LOG.error("Part of a TripUpdate object could not be applied successfully.");
+                LOG.error("Part of a TripUpdate object could not be applied successfully to trip {}.", tripId);
                 return null;
             }
         }
         if (!newTimes.timesIncreasing()) {
-            LOG.error("TripTimes are non-increasing after applying GTFS-RT delay propagation.");
+            LOG.error("TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {}.", tripId);
             return null;
         }
 
-        LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
+        LOG.debug("A valid TripUpdate object was applied to trip {} using the Timetable class update method.", tripId);
         return newTimes;
     }
 
@@ -561,7 +548,7 @@ public class Timetable implements Serializable {
     
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
-    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+    public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         for (TripTimes tt : this.tripTimes) {
             tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }

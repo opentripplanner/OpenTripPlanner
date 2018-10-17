@@ -1,20 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -25,6 +12,7 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
@@ -35,10 +23,7 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,6 +67,8 @@ public class GraphPathFinder {
      */
     public List<GraphPath> getPaths(RoutingRequest options) {
 
+        RoutingRequest originalReq = options.clone();
+
         if (options == null) {
             LOG.error("PathService was passed a null routing request.");
             return null;
@@ -108,31 +95,41 @@ public class GraphPathFinder {
 
         // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
+        RemainingWeightHeuristic reversedSearchHeuristic;
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
+            reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
             // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
             // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
             heuristic = new InterleavedBidirectionalHeuristic();
+            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
+            reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
-        /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see
-         * itineraries with far more transfers. We do not expect transfer limiting to improve
-         * search times on the LongDistancePathService, so we set it to the maximum we ever expect
-         * to see. Because people may use either the traditional path services or the 
-         * LongDistancePathService, we do not change the global default but override it here. */
-        options.maxTransfers = 4;
-        // Now we always use what used to be called longDistance mode. Non-longDistance mode is no longer supported.
+
+        /* In RoutingRequest, maxTransfers defaults to 2. But as discussed in #2522, you can't limit the number of
+         * transfers in our routing algorithm. This is a resource limiting problem, like imposing a walk limit or
+         * not optimizing on arrival time in a time-dependent network (both of which we have done / do but need
+         * to systematically eliminate).
+         */
+        options.maxTransfers = 4; // should probably be Integer.MAX_VALUE;
+
+        // OTP now always uses what used to be called longDistance mode. Non-longDistance mode is no longer supported.
         options.longDistance = true;
 
-        /* In long distance mode, maxWalk has a different meaning than it used to.
-         * It's the radius around the origin or destination within which you can walk on the streets.
-         * If no value is provided, max walk defaults to the largest double-precision float.
-         * This would cause long distance mode to do unbounded street searches and consider the whole graph walkable. */
+        /* maxWalk has a different meaning than it used to. It's the radius around the origin or destination within
+         * which you can walk on the streets. An unlimited value would cause the bidi heuristic to do unbounded street
+         * searches and consider the whole graph walkable.
+         *
+         * After the limited areas of the street network around the origin and destination are explored, the
+         * options.maxWalkDistance will be set to unlimited for similar reasons to maxTransfers above. That happens
+         * in method org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic.initialize
+         */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         long searchBeginTime = System.currentTimeMillis();
@@ -153,20 +150,27 @@ public class GraphPathFinder {
                 options.rctx.aborted = true;
                 break;
             }
+            // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
             aStar.getShortestPathTree(options, timeout);
+
             if (options.rctx.aborted) {
                 break; // Search timed out or was gracefully aborted for some other reason.
             }
-            // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
             List<GraphPath> newPaths = aStar.getPathsToTarget();
             if (newPaths.isEmpty()) {
                 break;
             }
+
+            // Do a full reversed search to compact the legs
+            if(options.compactLegsByReversedSearch){
+                newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
+            }
+
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 // path.dump();
-                List<AgencyAndId> tripIds = path.getTrips();
-                for (AgencyAndId tripId : tripIds) {
+                List<FeedScopedId> tripIds = path.getTrips();
+                for (FeedScopedId tripId : tripIds) {
                     options.banTrip(tripId);
                 }
                 if (tripIds.isEmpty()) {
@@ -176,7 +180,14 @@ public class GraphPathFinder {
             }
 
             paths.addAll(newPaths.stream()
-                    .filter(path -> path.getDuration() < options.maxHours * 60 * 60)
+                    .filter(path -> {
+                        double duration = options.useRequestedDateTimeInMaxHours
+                            ? options.arriveBy
+                                ? options.dateTime - path.getStartTime()
+                                : path.getEndTime() - options.dateTime
+                            : path.getDuration();
+                        return duration < options.maxHours * 60 * 60;
+                    })
                     .collect(Collectors.toList()));
 
             LOG.debug("we have {} paths", paths.size());
@@ -184,6 +195,137 @@ public class GraphPathFinder {
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
+    }
+
+    /**
+     * Do a full reversed search to compact the legs of the path.
+     *
+     * By doing a reversed search we are looking for later departures that will still be in time for transfer
+     * to the next trip, shortening the transfer wait time. Also considering other routes than the ones found
+     * in the original search.
+     *
+     * For arrive-by searches, we are looking to shorten transfer wait time and rather arrive earlier.
+     */
+    private List<GraphPath> compactLegsByReversedSearch(AStar aStar, RoutingRequest originalReq, RoutingRequest options,
+                                                        List<GraphPath> newPaths, double timeout,
+                                                        RemainingWeightHeuristic remainingWeightHeuristic){
+        List<GraphPath> reversedPaths = new ArrayList<>();
+        for(GraphPath newPath : newPaths){
+            State targetAcceptedState = options.arriveBy ? newPath.states.getLast().reverse() : newPath.states.getLast();
+            if(targetAcceptedState.stateData.getNumBooardings() < 2) {
+                reversedPaths.add(newPath);
+                continue;
+            }
+            final long arrDepTime = targetAcceptedState.getTimeSeconds();
+            LOG.debug("Dep time: " + new Date(newPath.getStartTime() * 1000));
+            LOG.debug("Arr time: " + new Date(newPath.getEndTime() * 1000));
+
+            // find first/last transit stop
+            Vertex transitStop = null;
+            long transitStopTime = arrDepTime;
+            while (transitStop == null) {
+                if(targetAcceptedState.backEdge instanceof TransitBoardAlight){
+                    if(options.arriveBy){
+                        transitStop = targetAcceptedState.backEdge.getFromVertex();
+                    }else{
+                        transitStop = targetAcceptedState.backEdge.getToVertex();
+                    }
+                    transitStopTime = targetAcceptedState.getTimeSeconds();
+                }
+                targetAcceptedState = targetAcceptedState.getBackState();
+            }
+
+            // find the path from transitStop to origin/destination
+            Vertex fromVertex = options.arriveBy ? options.rctx.fromVertex : transitStop;
+            Vertex toVertex = options.arriveBy ? transitStop : options.rctx.toVertex;
+            RoutingRequest reversedTransitRequest = createReversedTransitRequest(originalReq, options, fromVertex, toVertex,
+                    arrDepTime, new EuclideanRemainingWeightHeuristic());
+            aStar.getShortestPathTree(reversedTransitRequest, timeout);
+            List<GraphPath> pathsToTarget = aStar.getPathsToTarget();
+            if(pathsToTarget.isEmpty()){
+                reversedPaths.add(newPath);
+                continue;
+            }
+            GraphPath walkPath = pathsToTarget.get(0);
+
+            // do the reversed search to/from transitStop
+            Vertex fromTransVertex = options.arriveBy ? transitStop : options.rctx.fromVertex;
+            Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
+            RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
+                    toTransVertex, transitStopTime, remainingWeightHeuristic);
+            aStar.getShortestPathTree(reversedMainRequest, timeout);
+
+            List<GraphPath> newRevPaths = aStar.getPathsToTarget();
+            if (newRevPaths.isEmpty()) {
+                reversedPaths.add(newPath);
+            }else{
+                List<GraphPath> joinedPaths = new ArrayList<>();
+                for(GraphPath newRevPath : newRevPaths){
+                    LOG.debug("REV Dep time: " + new Date(newRevPath.getStartTime() * 1000));
+                    LOG.debug("REV Arr time: " + new Date(newRevPath.getEndTime() * 1000));
+                    List<GraphPath> concatenatedPaths = Arrays.asList(newRevPath, walkPath);
+                    if(options.arriveBy){
+                        Collections.reverse(concatenatedPaths);
+                    }
+                    GraphPath joinedPath = joinPaths(concatenatedPaths);
+
+                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
+                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
+                        joinedPaths.add(joinedPath);
+                        if(newPaths.size() > 1){
+                            for (FeedScopedId tripId : joinedPath.getTrips()) {
+                                options.banTrip(tripId);
+                            }
+                        }
+                    }
+                }
+                reversedPaths.addAll(joinedPaths);
+            }
+        }
+        return reversedPaths.isEmpty() ? newPaths : reversedPaths;
+    }
+
+
+
+    private RoutingRequest createReversedTransitRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
+                                                 Vertex toVertex, long arrDepTime, RemainingWeightHeuristic remainingWeightHeuristic){
+
+        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex, toVertex,
+                arrDepTime, new EuclideanRemainingWeightHeuristic());
+        if((originalReq.parkAndRide || originalReq.kissAndRide) && !originalReq.arriveBy){
+            request.parkAndRide = false;
+            request.kissAndRide = false;
+            request.modes.setCar(false);
+        }
+        request.maxWalkDistance = CLAMP_MAX_WALK;
+        return request;
+    }
+
+    private RoutingRequest createReversedMainRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
+                                                        Vertex toVertex, long dateTime, RemainingWeightHeuristic remainingWeightHeuristic){
+        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex,
+                toVertex, dateTime, remainingWeightHeuristic);
+        if((originalReq.parkAndRide || originalReq.kissAndRide) && originalReq.arriveBy){
+            request.parkAndRide = false;
+            request.kissAndRide = false;
+            request.modes.setCar(false);
+        }
+        return request;
+
+    }
+
+    private RoutingRequest createReversedRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
+                                                 Vertex toVertex, long dateTime, RemainingWeightHeuristic remainingWeightHeuristic){
+        RoutingRequest reversedOptions = originalReq.clone();
+        reversedOptions.dateTime = dateTime;
+        reversedOptions.setArriveBy(!originalReq.arriveBy);
+        reversedOptions.setRoutingContext(router.graph, fromVertex, toVertex);
+        reversedOptions.dominanceFunction = new DominanceFunction.MinimumWeight();
+        reversedOptions.rctx.remainingWeightHeuristic = remainingWeightHeuristic;
+        reversedOptions.maxTransfers = 4;
+        reversedOptions.longDistance = true;
+        reversedOptions.bannedTrips = options.bannedTrips;
+        return reversedOptions;
     }
 
     /* Try to find N paths through the Graph */

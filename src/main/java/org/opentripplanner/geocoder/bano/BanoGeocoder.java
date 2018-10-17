@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.geocoder.bano;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -48,7 +35,7 @@ import java.util.List;
 public class BanoGeocoder implements Geocoder {
     private static final Logger LOG = LoggerFactory.getLogger(BanoGeocoder.class);
 
-    private static final String BANO_URL = "http://api.adresse.data.gouv.fr/search/";
+    private static final String BANO_URL = "http://api-adresse.data.gouv.fr/search/";
 
     private static final int CLAMP_RESULTS = 10;
 

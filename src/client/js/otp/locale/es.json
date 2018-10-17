@@ -86,7 +86,7 @@
     "\nView itinerary online:\n%(itinerary_link)s\n": "\nVer ruta online:\n%(itinerary_link)s\n",
     "We're sorry. The trip planner is temporarily unavailable. Please try again later.": "Lo sentimos. El planificador de ruta está fuera de servicio temporalmente. Inténtelo más tarde.",
     "Trip is not possible.  You might be trying to plan a trip outside the map data boundary.": "Viaje no disponible. Puede que estés intentando planificar un viaje fuera de los límites disponibles.",
-    "Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway).": "Viaje no disponible. Tu inicio o final puede que no sean seguros, selecciona un inicio y final en calles residenciales.",
+    "No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible.": "Viaje no disponible. Tu inicio o final puede que no sean seguros, selecciona un inicio y final en calles residenciales.",
     "No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose.": "Tiempos no disponibles. La información disponible podría no ser válida para la fecha actual o no hay rutas disponibles para tu viaje.",
     "The trip planner is taking way too long to process your request. Please try again later.": "El planificador de rutas está tardando demasiado. Por favor, inténtalo más tarde.",
     "The request has errors that the server is not willing or able to process.": "Error en la petición, el server no puede procesar la información.",

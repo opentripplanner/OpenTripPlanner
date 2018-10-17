@@ -5,8 +5,8 @@ import java.util.Map;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
-import org.onebusaway.gtfs.model.Route;
-import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -33,7 +33,7 @@ public class OTPHttpHandler extends HttpHandler {
         this.graph = graph;
         handlers.put("routes", new RoutesHandler());
         handlers.put("plan",   new PlanHandler());
-        Module module = AgencyAndIdSerializer.makeModule();
+        Module module = FeedScopedIdSerializer.makeModule();
         xmlMapper.registerModule(module);
         jsonMapper.registerModule(module);
     }

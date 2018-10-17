@@ -91,7 +91,7 @@
     ],
     "We're sorry. The trip planner is temporarily unavailable. Please try again later.": "Siamo spiacenti. Il servizio è momentaneamente indisponibile.Riprova più tardi.",
     "Trip is not possible.  You might be trying to plan a trip outside the map data boundary.": "Il percorso richiesto cade al di fuori dell'area di riferimento.",
-    "Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway).": "Percorso non trovato. Il punto di partenza (o di arrivo) non è raggiungibile o non è correttamente connesso alla rete stradale.",
+    "No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible.": "Percorso non trovato. Il punto di partenza (o di arrivo) non è raggiungibile o non è correttamente connesso alla rete stradale.",
     "No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose.": "Nessun servizio di Trasporto Pubblico trovato. La data indicata potrebbe essere al di fuori del periodo preso in considerazione dal Calcolo Percorso.",
     "The trip planner is taking way too long to process your request. Please try again later.": "Il servizio di Calcolo percorsi sta impiegando troppo tempo per processare la tua richiesta. Riprova più tardi.",
     "The request has errors that the server is not willing or able to process.": "La richiesta contiene errori che il server non è in grado di trattare.",
