@@ -928,29 +928,29 @@ public class GraphPathToTripPlanConverterTest {
     /** Compare all simple itinerary fields to their expected values. */
     private void compareItinerary(Itinerary itinerary, Type type) {
         if (type == Type.FORWARD) {
-            assertEquals(64.0, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(62.0, itinerary.duration.doubleValue(), 0.0);
             assertEquals(0L, itinerary.startTime.getTimeInMillis());
-            assertEquals(64000L, itinerary.endTime.getTimeInMillis());
+            assertEquals(62000L, itinerary.endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(70.0, itinerary.duration.doubleValue(), 0.0);
             assertEquals(0L, itinerary.startTime.getTimeInMillis());
             assertEquals(70000L, itinerary.endTime.getTimeInMillis());
         } else if (type == Type.ONBOARD) {
-            assertEquals(58.0, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(56.0, itinerary.duration.doubleValue(), 0.0);
             assertEquals(6000L, itinerary.startTime.getTimeInMillis());
-            assertEquals(64000L, itinerary.endTime.getTimeInMillis());
+            assertEquals(62000L, itinerary.endTime.getTimeInMillis());
         }
 
         if (type == Type.FORWARD) {
-            assertEquals(34L, itinerary.walkTime);
+            assertEquals(32L, itinerary.walkTime);
             assertEquals(20L, itinerary.transitTime);
             assertEquals(10L, itinerary.waitingTime);
         } else if (type == Type.BACKWARD) {
-            assertEquals(34L, itinerary.walkTime);
+            assertEquals(32L, itinerary.walkTime);
             assertEquals(20L, itinerary.transitTime);
-            assertEquals(16L, itinerary.waitingTime);
+            assertEquals(18L, itinerary.waitingTime);
         } else if (type == Type.ONBOARD) {
-            assertEquals(28L, itinerary.walkTime);
+            assertEquals(26L, itinerary.walkTime);
             assertEquals(20L, itinerary.transitTime);
             assertEquals(10L, itinerary.waitingTime);
         }
@@ -1216,7 +1216,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[5].alightRule);
         assertFalse(legs[5].pathway);
         assertEquals("WALK", legs[5].mode);
-        assertEquals(13.0, legs[5].getDuration(), 0.0);
+        assertEquals(11.0, legs[5].getDuration(), 0.0);
         assertEquals(0, legs[5].departureDelay);
         assertEquals(0, legs[5].arrivalDelay);
         assertFalse(legs[5].realTime);
@@ -1225,9 +1225,9 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(F_DISTANCE[5], legs[5].distance, 0.0);
         if (type == Type.FORWARD) {
             assertEquals(44000L, legs[5].startTime.getTimeInMillis());
-            assertEquals(57000L, legs[5].endTime.getTimeInMillis());
+            assertEquals(55000L, legs[5].endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
-            assertEquals(50000L, legs[5].startTime.getTimeInMillis());
+            assertEquals(52000L, legs[5].startTime.getTimeInMillis());
             assertEquals(63000L, legs[5].endTime.getTimeInMillis());
         }
 
@@ -1263,8 +1263,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[6].headway);
         assertEquals(F_DISTANCE[6], legs[6].distance, 0.0);
         if (type == Type.FORWARD) {
-            assertEquals(57000L, legs[6].startTime.getTimeInMillis());
-            assertEquals(59000L, legs[6].endTime.getTimeInMillis());
+            assertEquals(55000L, legs[6].startTime.getTimeInMillis());
+            assertEquals(57000L, legs[6].endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(63000L, legs[6].startTime.getTimeInMillis());
             assertEquals(65000L, legs[6].endTime.getTimeInMillis());
@@ -1303,8 +1303,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[7].headway);
         assertEquals(F_DISTANCE[7], legs[7].distance, 0.0);
         if (type == Type.FORWARD) {
-            assertEquals(59000L, legs[7].startTime.getTimeInMillis());
-            assertEquals(61000L, legs[7].endTime.getTimeInMillis());
+            assertEquals(57000L, legs[7].startTime.getTimeInMillis());
+            assertEquals(59000L, legs[7].endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(65000L, legs[7].startTime.getTimeInMillis());
             assertEquals(67000L, legs[7].endTime.getTimeInMillis());
@@ -1342,8 +1342,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[8].headway);
         assertEquals(F_DISTANCE[8], legs[8].distance, 0.0);
         if (type == Type.FORWARD) {
-            assertEquals(61000L, legs[8].startTime.getTimeInMillis());
-            assertEquals(64000L, legs[8].endTime.getTimeInMillis());
+            assertEquals(59000L, legs[8].startTime.getTimeInMillis());
+            assertEquals(62000L, legs[8].endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(67000L, legs[8].startTime.getTimeInMillis());
             assertEquals(70000L, legs[8].endTime.getTimeInMillis());
@@ -1686,7 +1686,7 @@ public class GraphPathToTripPlanConverterTest {
             assertEquals(44000L, places[4][1].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(43000L, places[4][1].arrival.getTimeInMillis());
-            assertEquals(50000L, places[4][1].departure.getTimeInMillis());
+            assertEquals(52000L, places[4][1].departure.getTimeInMillis());
         }
 
         assertEquals("Ferry stop arrive", places[5][0].name);
@@ -1703,7 +1703,7 @@ public class GraphPathToTripPlanConverterTest {
             assertEquals(44000L, places[5][0].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(43000L, places[5][0].arrival.getTimeInMillis());
-            assertEquals(50000L, places[5][0].departure.getTimeInMillis());
+            assertEquals(52000L, places[5][0].departure.getTimeInMillis());
         }
 
 
@@ -1717,8 +1717,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[5][1].zoneId);
         assertNull(places[5][1].orig);
         if (type == Type.FORWARD) {
-            assertEquals(57000L, places[5][1].arrival.getTimeInMillis());
-            assertEquals(57000L, places[5][1].departure.getTimeInMillis());
+            assertEquals(55000L, places[5][1].arrival.getTimeInMillis());
+            assertEquals(55000L, places[5][1].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(63000L, places[5][1].arrival.getTimeInMillis());
             assertEquals(63000L, places[5][1].departure.getTimeInMillis());
@@ -1734,8 +1734,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[6][0].zoneId);
         assertNull(places[6][0].orig);
         if (type == Type.FORWARD) {
-            assertEquals(57000L, places[6][0].arrival.getTimeInMillis());
-            assertEquals(57000L, places[6][0].departure.getTimeInMillis());
+            assertEquals(55000L, places[6][0].arrival.getTimeInMillis());
+            assertEquals(55000L, places[6][0].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(63000L, places[6][0].arrival.getTimeInMillis());
             assertEquals(63000L, places[6][0].departure.getTimeInMillis());
@@ -1750,8 +1750,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[6][1].zoneId);
         assertNull(places[6][1].orig);
         if (type == Type.FORWARD) {
-            assertEquals(59000L, places[6][1].arrival.getTimeInMillis());
-            assertEquals(59000L, places[6][1].departure.getTimeInMillis());
+            assertEquals(57000L, places[6][1].arrival.getTimeInMillis());
+            assertEquals(57000L, places[6][1].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(65000L, places[6][1].arrival.getTimeInMillis());
             assertEquals(65000L, places[6][1].departure.getTimeInMillis());
@@ -1766,8 +1766,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[7][0].zoneId);
         assertNull(places[7][0].orig);
         if (type == Type.FORWARD) {
-            assertEquals(59000L, places[7][0].arrival.getTimeInMillis());
-            assertEquals(59000L, places[7][0].departure.getTimeInMillis());
+            assertEquals(57000L, places[7][0].arrival.getTimeInMillis());
+            assertEquals(57000L, places[7][0].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(65000L, places[7][0].arrival.getTimeInMillis());
             assertEquals(65000L, places[7][0].departure.getTimeInMillis());
@@ -1783,8 +1783,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[7][1].zoneId);
         assertNull(places[7][1].orig);
         if (type == Type.FORWARD) {
-            assertEquals(61000L, places[7][1].arrival.getTimeInMillis());
-            assertEquals(61000L, places[7][1].departure.getTimeInMillis());
+            assertEquals(59000L, places[7][1].arrival.getTimeInMillis());
+            assertEquals(59000L, places[7][1].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(67000L, places[7][1].arrival.getTimeInMillis());
             assertEquals(67000L, places[7][1].departure.getTimeInMillis());
@@ -1800,8 +1800,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[8][0].zoneId);
         assertNull(places[8][0].orig);
         if (type == Type.FORWARD) {
-            assertEquals(61000L, places[8][0].arrival.getTimeInMillis());
-            assertEquals(61000L, places[8][0].departure.getTimeInMillis());
+            assertEquals(59000L, places[8][0].arrival.getTimeInMillis());
+            assertEquals(59000L, places[8][0].departure.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(67000L, places[8][0].arrival.getTimeInMillis());
             assertEquals(67000L, places[8][0].departure.getTimeInMillis());
@@ -1817,7 +1817,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(places[8][1].orig);
         assertNull(places[8][1].departure);
         if (type == Type.FORWARD) {
-            assertEquals(64000L, places[8][1].arrival.getTimeInMillis());
+            assertEquals(62000L, places[8][1].arrival.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
             assertEquals(70000L, places[8][1].arrival.getTimeInMillis());
         }
