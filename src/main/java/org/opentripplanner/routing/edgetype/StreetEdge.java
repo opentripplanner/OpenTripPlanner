@@ -253,6 +253,13 @@ public class StreetEdge extends Edge implements Cloneable {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
     }
 
+    /**
+     * Accessor to retrive the length in mm, for subclasses only.
+     */
+    protected int getLength_mm() {
+        return length_mm;
+    }
+
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
@@ -371,14 +378,16 @@ public class StreetEdge extends Edge implements Cloneable {
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = getSlopeWalkSpeedEffectiveLength();
-                weight = costs / speed;
+                double distance = getSlopeWalkSpeedEffectiveLength();
+                weight = distance / speed;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
                 if(weight > 100){
-                    double timeflat = length / speed;
-                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfile.getMaxSlope(), costs, weight, timeflat);
+                    double timeflat = length_mm / speed;
+
+
+                    System.out.format("line length: %.1f m, slope: %.3f ---> distance: %.1f , weight: %.1f , time (flat):  %.1f %n", getDistance(), getMaxSlope(), distance, weight, timeflat);
                 }
                 */
             }
@@ -784,7 +793,7 @@ public class StreetEdge extends Edge implements Cloneable {
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
-    
+
     /** calculate the length of this street segement from its geometry */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;
@@ -872,12 +881,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 e2.setStreetClass(this.getStreetClass());
             }
         }
-
-
-
-
-
-        return new P2<StreetEdge>(e1, e2);
+        return new P2<>(e1, e2);
     }
 
     /**

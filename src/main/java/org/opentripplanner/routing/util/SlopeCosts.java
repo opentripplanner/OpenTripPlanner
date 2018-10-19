@@ -20,16 +20,23 @@ public class SlopeCosts {
     public final double maxSlope; // Max{abs(slope)}
     public final double slopeSafetyCost; // An additional safety cost caused by the slope
     public final double lengthMultiplier; // Multiplier to get true length based on flat (projected) length
-    public final double slopeWalkSpeedFactor; //
+
+    /**
+     * The distance ajusted to incorporate the effect of the slope. Let say the
+     * distance is 1000 m and 5% uphill, then we can use e.g. the Tobler function
+     * to calculate the increase of 19% to walk such a distance. We add that
+     * percentage to the 'flat' distance and get 1190m.
+     */
+    public final int effectiveWalkDistance_mm;
     
-    public SlopeCosts(double slopeSpeedFactor, double slopeWorkFactor, double slopeSafetyCost,
-                      double maxSlope, double lengthMultiplier, boolean flattened, double slopeWalkSpeedFactor) {
+    SlopeCosts(double slopeSpeedFactor, double slopeWorkFactor, double slopeSafetyCost,
+                      double maxSlope, double lengthMultiplier, boolean flattened, int effectiveWalkDistance_mm) {
         this.slopeSpeedFactor = slopeSpeedFactor;
         this.slopeWorkFactor = slopeWorkFactor;
         this.slopeSafetyCost = slopeSafetyCost;
         this.maxSlope = maxSlope;
         this.lengthMultiplier = lengthMultiplier;
         this.flattened = flattened;
-        this.slopeWalkSpeedFactor = slopeWalkSpeedFactor;
+        this.effectiveWalkDistance_mm = effectiveWalkDistance_mm;
     }
 }
