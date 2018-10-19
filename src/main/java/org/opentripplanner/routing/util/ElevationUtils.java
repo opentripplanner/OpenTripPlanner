@@ -32,9 +32,6 @@ public class ElevationUtils {
      */
     private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
 
-    /** parameter A in the Rees (2004) slope-dependent walk cost model **/
-    private static final double walkParA = 0.75;
-
     private static final ToblersHickingFunction toblerWalkingFunction = new ToblersHickingFunction(MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
 
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
@@ -69,13 +66,13 @@ public class ElevationUtils {
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
-        double slopeWalkEffectiveLength = 0;
+        double effectiveWalkLength = 0;
         double[] lengths = getLengthsFromElevation(elev);
         double trueLength = lengths[0];
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
             log.error("Too small edge, returning neutral slope costs.");
-            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
+            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, (int)(flatLength*1000d));
         }
         double lengthMultiplier = trueLength / flatLength;
         for (int i = 0; i < coordinates.length - 1; ++i) {
@@ -113,14 +110,14 @@ public class ElevationUtils {
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
-            slopeWalkEffectiveLength += run * calculateSlopeWalkEffectiveLengthFactor(run, rise);
+            effectiveWalkLength += calculateEffectiveWalkLength(run, rise);
         }
         /*
          * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
          * length of the street edge which is the flat one.
          */
         return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
-                slopeSafetyCost, maxSlope, lengthMultiplier, flattened, slopeWalkEffectiveLength * walkParA / flatLength);
+                slopeSafetyCost, maxSlope, lengthMultiplier, flattened, (int)(effectiveWalkLength * 1000d));
     }
 
     /** constants for slope computation */
@@ -265,8 +262,8 @@ public class ElevationUtils {
      *     as smooth, resulting in an extra penalty for these roads.
      * </p>
      */
-    static double calculateSlopeWalkEffectiveLengthFactor(double run, double rise) {
-        return toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
+    static double calculateEffectiveWalkLength(double run, double rise) {
+        return run * toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
     }
 
     public static PackedCoordinateSequence getPartialElevationProfile(

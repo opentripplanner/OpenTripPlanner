@@ -59,7 +59,7 @@ public class ToblersHickingFunctionTest {
         }
 
         String describe() {
-            return String.format("Multiplier at %.1f%% slope angle.", slopeAnglePercentage);
+            return String.format("Multiplier at %.1f%% slope angle with dx %.1f and dh %.1f.", slopeAnglePercentage, dx, dh);
         }
     }
 }
