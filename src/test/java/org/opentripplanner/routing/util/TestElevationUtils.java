@@ -27,11 +27,4 @@ public class TestElevationUtils extends TestCase {
 		assertEquals(1.00992634231424500668, costs.lengthMultiplier);
 	}
 
-	public void testCalculateSlopeWalkEffectiveLengthFactor() {
-		assertEquals(3.0, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 35), 0.01);
-		assertEquals(1.42, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 10), 0.01);
-		assertEquals(1.0, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, 0));
-		assertEquals(1.0, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, -10));
-		assertEquals(3.0, ElevationUtils.calculateSlopeWalkEffectiveLengthFactor(100, -45), 0.01);
-	}
 }
