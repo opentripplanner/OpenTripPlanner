@@ -359,10 +359,16 @@ public class WalkableAreaBuilder {
             VLPoint vlPoint = visibilityPolygon.get(p);
             coordinates[p] = new Coordinate(vlPoint.x, vlPoint.y);
         }
-        LinearRing shell = GeometryUtils.getGeometryFactory().createLinearRing(coordinates);
-        Polygon poly = GeometryUtils.getGeometryFactory().createPolygon(shell, new LinearRing[0]);
 
-        return (Polygon)poly.buffer(VISIBILITY_EPSILON);
+        Polygon poly = GeometryUtils.getGeometryFactory().createPolygon(coordinates);
+        Geometry expanded = poly.buffer(VISIBILITY_EPSILON);
+
+        if (expanded instanceof Polygon) {
+            return (Polygon)expanded;
+        } else if (expanded instanceof MultiPolygon && expanded.getNumGeometries() > 0) {
+            return (Polygon)expanded.getGeometryN(0);
+        }
+        return null;
     }
 
     private void createEdgesForRingSegment(Set<Edge> edges, AreaEdgeList edgeList, Area area,
