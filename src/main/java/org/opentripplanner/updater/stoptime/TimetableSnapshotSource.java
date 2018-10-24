@@ -52,7 +52,7 @@ public class TimetableSnapshotSource {
      */
     private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
-    public GtfsRealtimeStatistics analytics = new GtfsRealtimeStatistics();
+    public final GtfsRealtimeStatistics statistics = new GtfsRealtimeStatistics();
 
     /**
      * If a timetable snapshot is requested less than this number of milliseconds after the previous
@@ -193,7 +193,7 @@ public class TimetableSnapshotSource {
 
                 if (!tripUpdate.hasTrip()) {
                     LOG.warn("Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
-                    analytics.increaseRejected();
+                    statistics.increaseRejected();
                     continue;
                 }
 
@@ -205,7 +205,7 @@ public class TimetableSnapshotSource {
                         serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
                     } catch (final ParseException e) {
                         LOG.warn("Failed to parse start date in gtfs-rt trip update: \n{}", tripUpdate);
-                        analytics.increaseRejected();
+                        statistics.increaseRejected();
                         continue;
                     }
                 } else {
@@ -241,16 +241,16 @@ public class TimetableSnapshotSource {
                 }
 
                 if (applied) {
-                    analytics.increaseApplied();
+                    statistics.increaseApplied();
                 } else {
                     LOG.info("Failed to apply TripUpdate.");
                     LOG.trace(" Contents: {}", tripUpdate);
-                    analytics.increaseRejected();
+                    statistics.increaseRejected();
                 }
 
             }
             LOG.debug("end of update message");
-            analytics.printAndClear();
+            statistics.printAndClear();
 
             // Make a snapshot after each message in anticipation of incoming requests
             // Purge data if necessary (and force new snapshot if anything was purged)
