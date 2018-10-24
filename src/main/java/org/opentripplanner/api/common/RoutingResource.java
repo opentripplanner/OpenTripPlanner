@@ -37,6 +37,9 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.*;
+
+import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -645,7 +648,7 @@ public abstract class RoutingResource {
             TransportationNetworkCompanyService service =
                 router.graph.getService(TransportationNetworkCompanyService.class);
             if (service == null) {
-                LOG.error("Unconfigured Transportaiton Network Company service for router with id: " + routerId);
+                LOG.error("Unconfigured Transportation Network Company service for router with id: " + routerId);
                 throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
             }
 
@@ -668,15 +671,10 @@ public abstract class RoutingResource {
                 );
             }
 
-            String[] acceptedRideTypes = {
-                "lyft", // standard lyft pickup
-                "a6eef2e1-c99a-436f-bde9-fefb9181c0b0" // uberX
-            };
-
             // iterate through results and find earliest ETA of an acceptable ride type
             int earliestEta = 999999;
             for (ArrivalTime arrivalEstimate : arrivalEstimates) {
-                for (String rideType : acceptedRideTypes) {
+                for (String rideType : ACCEPTED_RIDE_TYPES) {
                     if (arrivalEstimate.productId.equals(rideType) &&
                         arrivalEstimate.estimatedSeconds < earliestEta
                         ) {

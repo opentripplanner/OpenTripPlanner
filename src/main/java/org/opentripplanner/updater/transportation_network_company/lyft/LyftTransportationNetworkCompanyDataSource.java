@@ -190,6 +190,7 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
 
             for (final LyftRideEstimate estimate: response.cost_estimates) {
                 estimates.add(new RideEstimate(
+                    TransportationNetworkCompany.LYFT,
                     estimate.currency,
                     estimate.estimated_duration_seconds,
                     // Lyft's esimated cost is in the "minor" unit, so the following

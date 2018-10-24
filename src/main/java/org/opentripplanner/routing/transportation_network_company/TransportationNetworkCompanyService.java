@@ -31,7 +31,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     private static Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyService.class);
 
     private Map<TransportationNetworkCompany, TransportationNetworkCompanyDataSource> sources =
-        new HashMap<TransportationNetworkCompany, TransportationNetworkCompanyDataSource>();
+        new HashMap<>();
 
     public void addSource(TransportationNetworkCompanyDataSource source) {
         sources.put(source.getType(), source);
@@ -42,10 +42,10 @@ public class TransportationNetworkCompanyService implements Serializable {
         String companies
     ) throws ExecutionException, InterruptedException {
 
-        List<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
+        List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
-        ArrayList<TransportationNetworkCompanyDataSource> companiesToRequestFrom
-            = new ArrayList<TransportationNetworkCompanyDataSource>();
+        List<TransportationNetworkCompanyDataSource> companiesToRequestFrom
+            = new ArrayList<>();
 
         // parse list of tnc companies
         for (String company : companies.split(",")) {
@@ -56,24 +56,22 @@ public class TransportationNetworkCompanyService implements Serializable {
             return arrivalTimes;
         }
 
-        LOG.info("Finding TNC arrival times for " + companiesToRequestFrom.size() + " companies");
+        LOG.debug("Finding TNC arrival times for {} companies", companiesToRequestFrom.size());
 
         // add a request for all matching companies
         ExecutorService pool = Executors.newFixedThreadPool(10);
         List<Callable<List<ArrivalTime>>> tasks = new ArrayList<>();
 
         for (TransportationNetworkCompanyDataSource transportationNetworkCompany : companiesToRequestFrom) {
-            tasks.add(new Callable<List<ArrivalTime>>() {
-                public List<ArrivalTime> call() throws Exception {
-                    LOG.info("Finding TNC arrival times for " + transportationNetworkCompany.getType());
-                    return transportationNetworkCompany.getArrivalTimes(place.lat, place.lon);
-                }
+            tasks.add(() -> {
+                LOG.debug("Finding TNC arrival times for {} ({},{})", transportationNetworkCompany.getType(), place.lat, place.lon);
+                return transportationNetworkCompany.getArrivalTimes(place.lat, place.lon);
             });
         }
 
         List<Future<List<ArrivalTime>>> results = pool.invokeAll(tasks);
 
-        LOG.info("Collecting results");
+        LOG.debug("Collecting results");
 
         for (Future<List<ArrivalTime>> future : results) {
             arrivalTimes.addAll(future.get());

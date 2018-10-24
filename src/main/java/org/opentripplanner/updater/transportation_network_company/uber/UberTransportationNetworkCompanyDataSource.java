@@ -69,18 +69,18 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
         connection.setRequestProperty("Accept-Language", "en_US");
         connection.setRequestProperty("Content-Type", "application/json");
 
-        LOG.info("Made request to uber API at following URL: " + requestUrl);
+        LOG.info("Made arrival time request to Uber API at following URL: {}", requestUrl);
 
-        // make request, parse repsonse
+        // Make request, parse response
         InputStream responseStream = connection.getInputStream();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         UberArrivalEstimateResponse response = mapper.readValue(responseStream, UberArrivalEstimateResponse.class);
 
         // serialize into Arrival Time objects
-        ArrayList<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
+        List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
-        LOG.info("Received " + response.times.size() + " uber arrival time estimates");
+        LOG.debug("Received {} Uber arrival time estimates", response.times.size());
 
         for (final UberArrivalEstimate time: response.times) {
             arrivalTimes.add(
@@ -113,9 +113,9 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
         connection.setRequestProperty("Accept-Language", "en_US");
         connection.setRequestProperty("Content-Type", "application/json");
 
-        LOG.info("Made request to uber API at following URL: " + requestUrl);
+        LOG.info("Made price estimate request to Uber API at following URL: " + requestUrl);
 
-        // make request, parse repsonse
+        // Make request, parse response
         InputStream responseStream = connection.getInputStream();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -125,12 +125,13 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
             throw new IOException("Unexpected response format");
         }
 
-        LOG.info("Recieved " + response.prices.size() + " uber price/time estimates");
+        LOG.debug("Received {} Uber price estimates", response.prices.size());
 
-        List<RideEstimate> estimates = new ArrayList<RideEstimate>();
+        List<RideEstimate> estimates = new ArrayList<>();
 
         for (final UberTripTimeEstimate price: response.prices) {
             estimates.add(new RideEstimate(
+                TransportationNetworkCompany.UBER,
                 price.currency_code,
                 price.duration,
                 price.high_estimate,

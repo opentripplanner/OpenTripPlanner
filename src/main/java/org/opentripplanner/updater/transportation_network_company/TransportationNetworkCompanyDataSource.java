@@ -28,10 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public abstract class TransportationNetworkCompanyDataSource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyDataSource.class);
-
-    private static final int cacheTimeSeconds = 30;
+    // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit
+    private static final int cacheTimeSeconds = 120;
 
     private Cache<Position, List<ArrivalTime>> arrivalTimeCache =
         CacheBuilder.newBuilder().expireAfterWrite(cacheTimeSeconds, TimeUnit.SECONDS).build();
@@ -41,19 +39,12 @@ public abstract class TransportationNetworkCompanyDataSource {
     public abstract TransportationNetworkCompany getType();
 
     // get the next arrivals for a specific location
-    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws IOException, ExecutionException {
-        Position request = new Position(latitude, longitude);
-        return arrivalTimeCache.get(
-            request,
-            new Callable<List<ArrivalTime>>() {
-                @Override
-                public List<ArrivalTime> call() throws IOException {
-                    return queryArrivalTimes(request);
-                }
-            });
+    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws ExecutionException {
+        Position position = new Position(truncateValue(latitude), truncateValue(longitude));
+        return arrivalTimeCache.get(position, () -> queryArrivalTimes(position));
     }
 
-    protected abstract List<ArrivalTime> queryArrivalTimes(Position request) throws IOException;
+    protected abstract List<ArrivalTime> queryArrivalTimes(Position position) throws IOException;
 
     // get the estimated trip time
     public RideEstimate getRideEstimate(
@@ -62,16 +53,13 @@ public abstract class TransportationNetworkCompanyDataSource {
         double startLongitude,
         double endLatitude,
         double endLongitude
-    ) throws IOException, ExecutionException {
-        RideEstimateRequest request = new RideEstimateRequest(startLatitude, startLongitude, endLatitude, endLongitude);
-        List<RideEstimate> rideEstimates = rideEstimateCache.get(
-            request,
-            new Callable<List<RideEstimate>>() {
-                @Override
-                public List<RideEstimate> call() throws IOException {
-                    return queryRideEstimates(request);
-                }
-            });
+    ) throws ExecutionException {
+        double roundedStartLat = truncateValue(startLatitude);
+        double roundedStartLon = truncateValue(startLongitude);
+        double roundedEndLat = truncateValue(endLatitude);
+        double roundedEndLon = truncateValue(endLongitude);
+        RideEstimateRequest request = new RideEstimateRequest(roundedStartLat, roundedStartLon, roundedEndLat, roundedEndLon);
+        List<RideEstimate> rideEstimates = rideEstimateCache.get(request, () -> queryRideEstimates(request));
 
 
         for (RideEstimate rideEstimate : rideEstimates) {
@@ -81,6 +69,11 @@ public abstract class TransportationNetworkCompanyDataSource {
         }
 
         return null;
+    }
+
+    private static double truncateValue(double value) {
+        double precisionFactor = 1000.0;
+        return Math.round(value * precisionFactor) / precisionFactor;
     }
 
     protected abstract List<RideEstimate> queryRideEstimates(
