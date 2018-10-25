@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 
 /**
  * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops.
@@ -30,22 +30,22 @@ public class SpecificTransfer implements Serializable {
     /**
      * Route id of arriving trip. Is allowed to be null. Is ignored when fromTripId is not null.
      */
-    final private AgencyAndId fromRouteId;
+    final private FeedScopedId fromRouteId;
         
     /**
      * Route id of departing trip. Is allowed to be null. Is ignored when toTripId is not null.
      */
-    final private AgencyAndId toRouteId;
+    final private FeedScopedId toRouteId;
     
     /**
      * Trip id of arriving trip. Is allowed to be null.
      */
-    final private AgencyAndId fromTripId;
+    final private FeedScopedId fromTripId;
     
     /**
      * Trip id of departing trip. Is allowed to be null.
      */
-    final private AgencyAndId toTripId;
+    final private FeedScopedId toTripId;
     
     /**
      * Value indicating the minimum transfer time in seconds. May contain special (negative) values which meaning
@@ -53,7 +53,7 @@ public class SpecificTransfer implements Serializable {
      */
     final int transferTime;
     
-    public SpecificTransfer(AgencyAndId fromRouteId, AgencyAndId toRouteId, AgencyAndId fromTripId, AgencyAndId toTripId, int transferTime) {
+    public SpecificTransfer(FeedScopedId fromRouteId, FeedScopedId toRouteId, FeedScopedId fromTripId, FeedScopedId toTripId, int transferTime) {
         this.fromRouteId = fromRouteId;
         this.toRouteId = toRouteId;
         this.fromTripId = fromTripId;

@@ -1,15 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.util;
 
 import java.text.MessageFormat;
@@ -27,18 +15,18 @@ public class Properties {
 
     public static final Logger LOG = LoggerFactory.getLogger(Properties.class);
 
-    private final String _bundle; 
+    private final String bundle;
 
     public Properties() {
         this(Properties.class);
     }
 
     public Properties(Class<?> c) {
-        _bundle = c.getSimpleName();
+        bundle = c.getSimpleName();
     }
 
-    public Properties(String bun) {
-        _bundle = bun;
+    public Properties(String bundle) {
+        this.bundle = bundle;
     }
 
     /** 
@@ -57,11 +45,11 @@ public class Properties {
     }
 
     public synchronized String get(String name, Locale l) throws Exception {
-        ResourceBundle rb = getBundle(_bundle, l);
+        ResourceBundle rb = getBundle(bundle, l);
         return rb.getString(name);
     }
     public synchronized String get(String name) throws Exception {
-        ResourceBundle rb = getBundle(_bundle, Locale.getDefault());
+        ResourceBundle rb = getBundle(bundle, Locale.getDefault());
         return rb.getString(name);
     }
 
@@ -135,7 +123,7 @@ public class Properties {
 
     public synchronized String format(String name, Locale l, Object... args) {
         try {
-            ResourceBundle rb = getBundle(_bundle, l);
+            ResourceBundle rb = getBundle(bundle, l);
             return MessageFormat.format(rb.getString(name), args);
         } catch (Exception e) {
             LOG.warn("couldn't find / format property " + name + "; returning null", e);

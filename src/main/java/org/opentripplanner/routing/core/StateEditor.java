@@ -1,25 +1,12 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -253,7 +240,7 @@ public class StateEditor {
         child.stateData.tripTimes = tripTimes;
     }
 
-    public void setTripId(AgencyAndId tripId) {
+    public void setTripId(FeedScopedId tripId) {
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
     }
@@ -321,13 +308,13 @@ public class StateEditor {
         }
     }
 
-    public void setRoute(AgencyAndId routeId) {
+    public void setRoute(FeedScopedId routeId) {
         cloneStateDataAsNeeded();
         child.stateData.route = routeId;
         // unlike tripId, routeId is not set to null when alighting
         // but do a null check anyway
         if (routeId != null) {
-            AgencyAndId[] oldRouteSequence = child.stateData.routeSequence;
+            FeedScopedId[] oldRouteSequence = child.stateData.routeSequence;
             //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
             int oldLength = oldRouteSequence.length;
             child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
@@ -450,7 +437,7 @@ public class StateEditor {
         return child.getElapsedTimeSeconds();
     }
 
-    public AgencyAndId getTripId() {
+    public FeedScopedId getTripId() {
         return child.getTripId();
     }
 
@@ -462,7 +449,7 @@ public class StateEditor {
         return child.getZone();
     }
 
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return child.getRoute();
     }
 
