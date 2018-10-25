@@ -54,6 +54,7 @@ public abstract class TransportationNetworkCompanyDataSource {
         double endLatitude,
         double endLongitude
     ) throws ExecutionException {
+        // Truncate lat/lon values in order to reduce the number of API requests made.
         double roundedStartLat = truncateValue(startLatitude);
         double roundedStartLon = truncateValue(startLongitude);
         double roundedEndLat = truncateValue(endLatitude);
@@ -71,8 +72,11 @@ public abstract class TransportationNetworkCompanyDataSource {
         return null;
     }
 
+    /**
+     * Truncate double values by the specified precision factor.
+     */
     private static double truncateValue(double value) {
-        double precisionFactor = 1000.0;
+        double precisionFactor = 10000.0;
         return Math.round(value * precisionFactor) / precisionFactor;
     }
 

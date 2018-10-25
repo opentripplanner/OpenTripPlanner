@@ -403,6 +403,7 @@ public abstract class GraphPathToTripPlanConverter {
      * provider's API for price and ETA estimates and associates this data with its respective TNC leg.
      */
     private static void addTNCData(Graph graph, Itinerary itinerary, String companies) {
+        String rideType = companies.equals("UBER") ? ACCEPTED_RIDE_TYPES[1] : ACCEPTED_RIDE_TYPES[0];
         // Store async tasks in lists for any TNC legs that need info.
         List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();
         List<Callable<RideEstimate>> priceEstimateTasks = new ArrayList<>();
@@ -414,7 +415,6 @@ public abstract class GraphPathToTripPlanConverter {
             if (!leg.hailedCar) continue;
             tncLegs.add(leg);
             // FIXME: Use an enum to handle this check.
-            String rideType = companies.equals("UBER") ? ACCEPTED_RIDE_TYPES[1] : ACCEPTED_RIDE_TYPES[0];
             priceEstimateTasks.add(() -> service.getRideEstimate(companies, rideType, leg.from, leg.to));
             arrivalEstimateTasks.add(() -> service.getArrivalTimes(leg.from, companies));
         }
@@ -433,7 +433,12 @@ public abstract class GraphPathToTripPlanConverter {
                 for (int i = 0; i < etaResults.size(); i++) {
                     ArrivalTime eta = null;
                     List<ArrivalTime> arrivalTimes = etaResults.get(i).get();
-                    if (arrivalTimes.size() > 0) eta = arrivalTimes.get(0);
+                    for (ArrivalTime arrivalTime : arrivalTimes) {
+                        if (rideType.equals(arrivalTime.productId)) {
+                            eta = arrivalTime;
+                            break;
+                        }
+                    }
                     tncLegs.get(i).tncData = new TransportationNetworkCompanySummary(priceResults.get(i).get(), eta);
                 }
             } catch (InterruptedException | ExecutionException e) {
