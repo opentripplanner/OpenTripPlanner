@@ -52,13 +52,14 @@
   <logger name="com.amazonaws" level="info"/>
   <logger name="org.apache.http" level="info" />
   <logger name="com.conveyal" level="info"/>
-  <!-- for now disable realtime logging -->
+  <!-- for now disable realtime logging, leave only statistics -->
   <logger name="org.opentripplanner.updater.bike_rental.SmooveBikeRentalDataSource" level="warn" />
   <logger name="org.opentripplanner.updater.bike_rental.BikeRentalUpdater" level="warn" />
   <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource" level="error" />
+  <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource$GtfsRealtimeStatistics" level="info" />
   <logger name="org.opentripplanner.routing.edgetype.Timetable" level="off" />
   <logger name="org.opentripplanner.routing.trippattern.TripTimes" level="off" />
-  <!-- /for now disable realtime logging -->   
+  <!-- /for now disable realtime logging, leave only statistics -->
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
   <logger name="org.opentripplanner.analyst" level="info" />

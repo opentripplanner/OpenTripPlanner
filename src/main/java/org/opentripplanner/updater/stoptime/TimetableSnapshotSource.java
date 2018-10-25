@@ -52,9 +52,7 @@ public class TimetableSnapshotSource {
      */
     private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
-    public int logFrequency = 2000;
-
-    private int appliedBlockCount = 0;
+    public final GtfsRealtimeStatistics statistics = new GtfsRealtimeStatistics();
 
     /**
      * If a timetable snapshot is requested less than this number of milliseconds after the previous
@@ -195,6 +193,7 @@ public class TimetableSnapshotSource {
 
                 if (!tripUpdate.hasTrip()) {
                     LOG.warn("Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+                    statistics.increaseRejected();
                     continue;
                 }
 
@@ -206,6 +205,7 @@ public class TimetableSnapshotSource {
                         serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
                     } catch (final ParseException e) {
                         LOG.warn("Failed to parse start date in gtfs-rt trip update: \n{}", tripUpdate);
+                        statistics.increaseRejected();
                         continue;
                     }
                 } else {
@@ -241,17 +241,16 @@ public class TimetableSnapshotSource {
                 }
 
                 if (applied) {
-                    appliedBlockCount++;
+                    statistics.increaseApplied();
                 } else {
                     LOG.info("Failed to apply TripUpdate.");
                     LOG.trace(" Contents: {}", tripUpdate);
+                    statistics.increaseRejected();
                 }
 
-                if (appliedBlockCount > 0 && appliedBlockCount % logFrequency == 0) {
-                    LOG.info("Applied {} trip updates.", appliedBlockCount);
-                }
             }
             LOG.debug("end of update message");
+            statistics.printAndClear();
 
             // Make a snapshot after each message in anticipation of incoming requests
             // Purge data if necessary (and force new snapshot if anything was purged)
@@ -972,4 +971,37 @@ public class TimetableSnapshotSource {
         return stop;
     }
 
+    /**
+     * Simple logger to provide some statistics about processed GTFS-RT messages.
+     */
+    static class GtfsRealtimeStatistics {
+        private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeStatistics.class);
+
+        private int logFrequency = 2000;
+        private int appliedBlockCount = 0;
+        private int rejectedBlockCount = 0;
+
+        public void setLogFrequency(int frequency) {
+            logFrequency = frequency;
+        }
+
+        public void increaseApplied() {
+            appliedBlockCount++;
+        }
+
+        public void increaseRejected() {
+            rejectedBlockCount++;
+        }
+
+        public void printAndClear() {
+            int sum = appliedBlockCount + rejectedBlockCount;
+            if (sum >= logFrequency) {
+                float percentage = 100.0f * (float)appliedBlockCount / (float)sum;
+                LOG.info("Gtfs-Rt statistics: applied {} messages, rejected {} messages, success rate {} %",
+                        appliedBlockCount, rejectedBlockCount, percentage);
+                appliedBlockCount = 0;
+                rejectedBlockCount = 0;
+            }
+        }
+    }
 }
