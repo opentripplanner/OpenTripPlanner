@@ -19,6 +19,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.serializers.MapSerializer;
 import com.esotericsoftware.kryo.util.DefaultStreamFactory;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.google.common.annotations.VisibleForTesting;
@@ -49,6 +50,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -114,7 +116,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    private boolean debugData = true;
+    private boolean debugData = false;
 
     // TODO this would be more efficient if it was just an array.
     private transient Map<Integer, Vertex> vertexById;
@@ -746,8 +748,15 @@ public class Graph implements Serializable {
         graph.vertices = new HashMap<>();
 
         for (Edge e : edges) {
-            graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-            graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
+            Vertex fromVertex = e.getFromVertex();
+            Vertex toVertex = e.getToVertex();
+            graph.vertices.put(fromVertex.getLabel(), fromVertex);
+            graph.vertices.put(toVertex.getLabel(), toVertex);
+            // Compensating for the fact that we're not using the standard Java de/serialization methods.
+            fromVertex.initEdgeListsIfNeeded();
+            toVertex.initEdgeListsIfNeeded();
+            fromVertex.addOutgoing(e);
+            toVertex.addIncoming(e);
         }
 
         LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
@@ -802,15 +811,32 @@ public class Graph implements Serializable {
         }
     }
 
+    /**
+     * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same configuration.
+     * This allows us to use identically configured instances for serialization and deserialization.
+     *
+     * When configuring serializers, there's a difference between kryo.register() and kryo.addDefaultSerializer().
+     * The latter will set the default for a whole tree of classes. The former matches only the specified class.
+     * By default Kryo will serialize all the non-transient fields of an instance. If the class has its own overridden
+     * Java serialization methods Kryo will not automatically use those, a JavaSerializer must be registered.
+     */
     public static Kryo makeKryo() {
         // For generating a histogram of serialized classes with associated serializers:
         // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
         Kryo kryo = new Kryo();
+        // Allow serialization of unrecognized classes, for which we haven't manually set up a serializer.
+        // We might actually want to manually register a serializer for every class, to be safe.
         kryo.setRegistrationRequired(false);
         kryo.setReferences(true);
         kryo.addDefaultSerializer(TIntHash.class, ExternalizableSerializer.class);
         //kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
+        // Default Kryo deserialization of BitSet fails, but BitSet implements Serializable.
+        // Use BitSet's own built-in (de)serialization methods.
         kryo.register(BitSet.class, new JavaSerializer());
+        // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
+        // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
+        // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
+        kryo.register(HashBiMap.class, new HashBiMapSerializer());
         // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
         try {
             Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
@@ -818,6 +844,10 @@ public class Graph implements Serializable {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        // Instantiator strategy for creating new objects upon deserialization.
+        // First, try to use a zero-arg constructor (the default strategy).
+        // If that doesn't work, fall back on instantiating classes like the Java serialization framework does
+        // (using the zero-arg constructor of the closest non-serializable superclass).
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
     }

@@ -98,6 +98,17 @@ public abstract class Vertex implements Serializable, Cloneable {
         return index;
     }
 
+    // Stupid method for deserialization, initialize transient fields.
+    // Stopgap until old serialization methods are completely replaced.
+    public void initEdgeListsIfNeeded () {
+        if (this.outgoing == null) {
+            this.outgoing = new Edge[0];
+        }
+        if (this.incoming == null) {
+            this.incoming = new Edge[0];
+        }
+    }
+
     /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */
 
     /**
