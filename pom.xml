@@ -817,7 +817,7 @@
             <artifactId>traffic-engine</artifactId>
             <version>0.2</version>
         </dependency>
-        <!-- R5 may eventually be an alternate routing option within OTP, and provides Graph serialization. -->
+        <!-- R5 may eventually be an alternate routing option within OTP. -->
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
@@ -828,6 +828,12 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Used to generate semantic equals() methods when deep-comparing objects in tests. -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
         </dependency>
     </dependencies>
 
