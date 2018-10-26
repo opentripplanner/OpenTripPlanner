@@ -494,7 +494,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     // we store the earliest pickup time here and add it upon the first boarding
     // this way, a graph search can proceed and give walking a time advantage
-    public Date earliestTransportationNetworkCompanyPickupAtOrigin = null;
+    // initial value of -1 indicates ETA is not available
+    public int transportationNetworkCompanyEtaAtOrigin = -1;
 
     public String companies;
 
@@ -1336,11 +1337,5 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setTransportationNetworkCompanies(String companies) {
         this.companies = companies;
-    }
-
-    public void setEarliestTransportationNetworkCompanyPickupAtOrigin(
-        Date earliestTransportationNetworkCompanyPickupAtOrigin
-    ) {
-        this.earliestTransportationNetworkCompanyPickupAtOrigin = earliestTransportationNetworkCompanyPickupAtOrigin;
     }
 }

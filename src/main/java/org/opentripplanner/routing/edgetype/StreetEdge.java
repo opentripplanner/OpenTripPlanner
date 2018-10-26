@@ -343,6 +343,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 !s0.isUsingHailedCar()
                     && getPermission().allows(TraverseMode.CAR)
                     && currMode != TraverseMode.CAR
+                    && getTNCStopSuitability()
             ) {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip

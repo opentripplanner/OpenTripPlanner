@@ -403,6 +403,7 @@ public abstract class GraphPathToTripPlanConverter {
      * provider's API for price and ETA estimates and associates this data with its respective TNC leg.
      */
     private static void addTNCData(Graph graph, Itinerary itinerary, String companies) {
+        if (companies == null) return;
         String rideType = companies.equals("UBER") ? ACCEPTED_RIDE_TYPES[1] : ACCEPTED_RIDE_TYPES[0];
         // Store async tasks in lists for any TNC legs that need info.
         List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();

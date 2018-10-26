@@ -629,15 +629,14 @@ public abstract class RoutingResource {
         if (searchTimeout != null)
             request.searchTimeout = searchTimeout;
 
-
-
-        /**
-         * If using Transportation Network Companies, make sure service exists at origin.
-         * This is not a future-proof solution as TNC coverage areas could be different in the future.
-         *
-         * Also, if "depart at" and leaving soonish,
-         * save earliest departure time for use when boarding first TNC
-         */
+        // If using Transportation Network Companies, make sure service exists at origin.
+        // This is not a future-proof solution as TNC coverage areas could be different in the future.  For example, a
+        // trip planned months in advance may not take into account a TNC company deciding to no longer provide service
+        // on that particular date in the future.  The current ETA estimate is only valid for perhaps 30 minutes into
+        // the future.
+        //
+        // Also, if "depart at" and leaving soonish, save earliest departure time for use later use when boarding the
+        // first TNC before transit.  (See StateEditor.boardHailedCar)
         if (this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
             if (companies == null) {
                 throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
@@ -689,9 +688,9 @@ public abstract class RoutingResource {
                 throw new TransportationNetworkCompanyAvailabilityException();
             }
 
-            // store the earliest ETA if planning a "depart at" trip that begins soonish
+            // store the earliest ETA if planning a "depart at" trip that begins soonish (within + or - 30 minutes)
             long now = (new Date()).getTime() / 1000;
-            long departureTimeWindow = 3600;
+            long departureTimeWindow = 1800;
             long timeSeconds = request.dateTime;
             if (
                     this.arriveBy == false &&
@@ -702,7 +701,7 @@ public abstract class RoutingResource {
                 if (earliestRideBeginTime > timeSeconds) {
                     // update time to reflect earliest possible departure time in a TNC
                     LOG.info("updated time to reflect earliest TNC eta");
-                    request.earliestTransportationNetworkCompanyPickupAtOrigin = new Date(earliestRideBeginTime * 1000);
+                    request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
                 }
             }
         }
