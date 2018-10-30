@@ -691,11 +691,10 @@ public abstract class RoutingResource {
             // store the earliest ETA if planning a "depart at" trip that begins soonish (within + or - 30 minutes)
             long now = (new Date()).getTime() / 1000;
             long departureTimeWindow = 1800;
-            long timeSeconds = request.dateTime;
             if (
                 this.arriveBy == false &&
-                timeSeconds < now + departureTimeWindow &&
-                timeSeconds > now - departureTimeWindow
+                    request.dateTime < now + departureTimeWindow &&
+                    request.dateTime > now - departureTimeWindow
             ) {
                 request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
             }
