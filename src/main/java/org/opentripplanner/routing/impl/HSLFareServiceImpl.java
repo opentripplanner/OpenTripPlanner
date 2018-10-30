@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Map;
 
@@ -24,6 +25,9 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
 import org.slf4j.Logger;
@@ -36,6 +40,41 @@ import org.slf4j.LoggerFactory;
 public class HSLFareServiceImpl extends DefaultFareServiceImpl {
     private static final long serialVersionUID = 20131259L;
     private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+
+    @Override
+    protected List<Ride> createRides(GraphPath path) {
+        // HSL version: ride ends (and hence ticket validity is considered)
+        // whenever consecutive sequence of hop edges breaks
+        List<Ride> rides = new LinkedList<Ride>();
+        Ride ride = null;
+        boolean newRide = true;
+        for (State state : path.states) {
+            Edge edge = state.getBackEdge();
+            if (!(edge instanceof HopEdge)) {
+                newRide = true;
+                continue;
+            }
+            HopEdge hEdge = (HopEdge) edge;
+            if (newRide == true) {
+                ride = new Ride();
+                rides.add(ride);
+                ride.startZone = hEdge.getBeginStop().getZoneId();
+                ride.zones.add(ride.startZone);
+                ride.agency = state.getBackTrip().getRoute().getAgency().getId();
+                ride.route = state.getRoute();
+                ride.startTime = state.getBackState().getTimeSeconds();
+                ride.firstStop = hEdge.getBeginStop();
+                ride.trip = state.getTripId();
+                newRide = false; // ride until hopping ends
+            }
+            ride.lastStop = hEdge.getEndStop();
+            ride.endZone  = ride.lastStop.getZoneId();
+            ride.zones.add(ride.endZone);
+            ride.endTime  = state.getTimeSeconds();
+            ride.classifier = state.getBackMode();
+        }
+        return rides;
+    }
 
     @Override
     public boolean boardingAllowed(GraphPath path, String zone, Set<String> allowedFareIds) {
@@ -94,9 +133,13 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
             if (ruleSet.getContains().containsAll(zones)) { // contains, not equals !!
                 FareAttribute attribute = ruleSet.getFareAttribute();
                 // transfers are evaluated at boarding time
-                if (attribute.isTransferDurationSet() &&
-                    tripTime > attribute.getTransferDuration()) {
-                    continue;
+                if (attribute.isTransferDurationSet()) {
+                    if(tripTime > attribute.getTransferDuration()) {
+                        LOG.debug("transfer time exceeded; {} > {} in fare {}", tripTime, attribute.getTransferDuration(), attribute.getId());
+                        continue;
+                    } else {
+                        LOG.debug("transfer time OK; {} < {} in fare {}", tripTime, attribute.getTransferDuration(), attribute.getId());
+                    }
                 }
                 float newFare = getFarePrice(attribute, fareType);
                 if (newFare < bestFare) {
@@ -105,7 +148,7 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
                 }
             }
         }
-
+        LOG.debug("HSL {} best for {}", bestAttribute, rides);
         return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
     }
 }
