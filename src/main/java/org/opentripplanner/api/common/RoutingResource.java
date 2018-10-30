@@ -693,16 +693,11 @@ public abstract class RoutingResource {
             long departureTimeWindow = 1800;
             long timeSeconds = request.dateTime;
             if (
-                    this.arriveBy == false &&
-                    timeSeconds < now + departureTimeWindow &&
-                    timeSeconds > now - departureTimeWindow
-                ) {
-                long earliestRideBeginTime = now + earliestEta;
-                if (earliestRideBeginTime > timeSeconds) {
-                    // update time to reflect earliest possible departure time in a TNC
-                    LOG.info("updated time to reflect earliest TNC eta");
-                    request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
-                }
+                this.arriveBy == false &&
+                timeSeconds < now + departureTimeWindow &&
+                timeSeconds > now - departureTimeWindow
+            ) {
+                request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
             }
         }
 
