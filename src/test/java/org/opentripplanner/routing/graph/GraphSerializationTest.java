@@ -42,6 +42,8 @@ public class GraphSerializationTest {
     @Test
     public void testRoundTrip () throws Exception {
 
+        // This graph does not make an ideal test because it doesn't have any street data.
+        // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
         originalGraph.index(new DefaultStreetVertexIndexFactory());
 
