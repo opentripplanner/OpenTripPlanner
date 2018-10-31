@@ -15,13 +15,6 @@ DOCKER_IMAGE_COMMIT=$DOCKER_IMAGE:$DOCKER_TAG
 DOCKER_IMAGE_LATEST=$DOCKER_IMAGE:latest
 DOCKER_IMAGE_PROD=$DOCKER_IMAGE:prod
 
-function hello() {
-    for (( c=1; c<=3; c++ ));do
-        sleep 120
-        echo "hello, travis"
-    done
-}
-
 if [ -z $TRAVIS_TAG ]; then
   # Build image
   echo Building OTP
@@ -29,7 +22,6 @@ if [ -z $TRAVIS_TAG ]; then
   mkdir export
   docker run --rm --entrypoint tar "$ORG/$DOCKER_IMAGE:builder" -c target|tar x -C ./
   #package OTP quietly while keeping travis happpy
-  hello &
   docker build --tag="$DOCKER_IMAGE_COMMIT" -f Dockerfile .
 fi
 
