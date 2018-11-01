@@ -1,15 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
@@ -59,7 +47,7 @@ public class PlannerResource extends RoutingResource {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
+         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
          *       or vertex ids to planner (or error back to user)
          * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
          *       out so it's used here too...

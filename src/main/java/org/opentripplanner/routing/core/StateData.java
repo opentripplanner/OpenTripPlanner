@@ -1,21 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import java.util.HashMap;
+import java.util.Set;
+
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -36,15 +26,15 @@ public class StateData implements Cloneable {
     // which trip index inside a pattern
     protected TripTimes tripTimes;
 
-    protected AgencyAndId tripId;
-    
+    protected FeedScopedId tripId;
+
     protected Trip previousTrip;
 
     protected double lastTransitWalk = 0;
 
     protected String zone;
 
-    protected AgencyAndId route;
+    protected FeedScopedId route;
 
     protected int numBoardings;
 
@@ -65,12 +55,12 @@ public class StateData implements Cloneable {
     protected boolean carParked;
 
     protected boolean bikeParked;
-    
+
     protected Stop previousStop;
 
     protected long lastAlightedTime;
 
-    protected AgencyAndId[] routeSequence;
+    protected FeedScopedId[] routeSequence;
 
     protected HashMap<Object, Object> extensions;
 
@@ -82,7 +72,7 @@ public class StateData implements Cloneable {
 
     protected TraverseMode nonTransitMode;
 
-    /** 
+    /**
      * This is the wait time at the beginning of the trip (or at the end of the trip for
      * reverse searches). In Analyst anyhow, this is is subtracted from total trip length of each
      * final State in lieu of reverse optimization. It is initially set to zero so that it will be

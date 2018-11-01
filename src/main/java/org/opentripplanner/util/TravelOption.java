@@ -1,5 +1,3 @@
-
-
 package org.opentripplanner.util;
 
 import java.util.HashSet;

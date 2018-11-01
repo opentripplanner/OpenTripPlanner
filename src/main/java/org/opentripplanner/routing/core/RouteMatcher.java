@@ -1,37 +1,24 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
  * 
- * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only. Support for other matching expression can
- * be easily added later on.
+ * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only.
+ * Support for other matching expression can be easily added later on.
  */
 public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
 
     /* Set of full matching route ids (agency ID + route ID) */
-    private HashSet<AgencyAndId> agencyAndRouteIds = new HashSet<AgencyAndId>();
+    private HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
 
     /* Set of full matching route code/names (agency ID + route code/name) */
     private HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
@@ -61,7 +48,7 @@ public class RouteMatcher implements Cloneable, Serializable {
      *        "_" each *must* be replaced by a space. If the agency or route ID contains a "_" they
      *        must be escaped using a backslash.
      *        TODO why do we want to accept route name strings when we have IDs? Break backward compatibility.
-     *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch.
+     *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch, see #1671.
      * @return A RouteMatcher
      * @throws IllegalArgumentException If the string representation is invalid.
      */
@@ -94,7 +81,7 @@ public class RouteMatcher implements Cloneable, Serializable {
                 routeId = null;
             if (agencyId != null && routeId != null && routeName == null) {
                 // Case 1: specified agency ID and route ID but no route name
-                retval.agencyAndRouteIds.add(new AgencyAndId(agencyId, routeId));
+                retval.agencyAndRouteIds.add(new FeedScopedId(agencyId, routeId));
             } else if (agencyId != null && routeName != null && routeId == null) {
                 // Case 2: specified agency ID and route name but no route ID
                 retval.agencyIdAndRouteNames.add(new T2<String, String>(agencyId, routeName));
@@ -124,10 +111,14 @@ public class RouteMatcher implements Cloneable, Serializable {
         return false;
     }
 
+    public boolean isEmpty() {
+        return agencyAndRouteIds.size() == 0 && agencyIdAndRouteNames.size() == 0 && routeNames.size() == 0;
+    }
+
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        for (AgencyAndId agencyAndId : agencyAndRouteIds) {
-            builder.append(agencyAndId.getAgencyId() + "__" + agencyAndId.getId());
+        for (FeedScopedId id : agencyAndRouteIds) {
+            builder.append(id.getAgencyId() + "__" + id.getId());
             builder.append(",");
         }
         for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {

@@ -18,7 +18,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.transportation_network_company.lyft.LyftTransportationNetworkCompanyDataSource;
 import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
@@ -38,14 +37,8 @@ public class TransportationNetworkCompanyUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup() throws Exception {
-        // Execute anonymous graph writer runnable and wait for its termination
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                service = graph.getService(TransportationNetworkCompanyService.class, true);
-            }
-        });
+    public void setup(Graph graph) {
+        service = graph.getService(TransportationNetworkCompanyService.class, true);
     }
 
     @Override

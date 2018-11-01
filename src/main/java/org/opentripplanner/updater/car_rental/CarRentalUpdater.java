@@ -106,7 +106,11 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         this.graph = graph;
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
-        LOG.info("Creating car rental updater running every {} seconds : {}", frequencySec, source);
+        if (pollingPeriodSeconds <= 0) {
+            LOG.info("Creating car rental updater running once only (non-polling): {}", source);
+        } else {
+            LOG.info("Creating car rental updater running every {} seconds : {}", pollingPeriodSeconds, source);
+        }
     }
 
     @Override
@@ -115,17 +119,11 @@ public class CarRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup() throws Exception {
+    public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
 
-        // Adding a car rental station service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                service = graph.getService(CarRentalStationService.class, true);
-            }
-        });
+        service = graph.getService(CarRentalStationService.class, true);
     }
 
     @Override

@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.openstreetmap.impl;
 
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
@@ -29,14 +16,14 @@ import crosby.binary.Osmformat;
  * @since 0.4
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
-    private OpenStreetMapContentHandler _handler;
-    private boolean _parseWays = true;
-    private boolean _parseRelations = true;
-    private boolean _parseNodes = true;
+    private OpenStreetMapContentHandler handler;
+    private boolean parseWays = true;
+    private boolean parseRelations = true;
+    private boolean parseNodes = true;
     private Map<String, String> stringTable = new HashMap<String, String>();
 
     public BinaryOpenStreetMapParser(OpenStreetMapContentHandler handler) {
-        _handler = handler;
+        this.handler = handler;
     }
 
     // The strings are already being pulled from a string table in the PBF file,
@@ -58,7 +45,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseNodes(List<Osmformat.Node> nodes) {
-        if(!_parseNodes) {
+        if(!parseNodes) {
             return;
         }
 
@@ -70,7 +57,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
             for (int j = 0; j < i.getKeysCount(); j++) {
                 String key = internalize(getStringById(i.getKeys(j)));
-                // if _handler.retain_tag(key) // TODO: filter tags
+                // if handler.retain_tag(key) // TODO: filter tags
                 String value = internalize(getStringById(i.getVals(j)));
                 OSMTag tag = new OSMTag();
                 tag.setK(key);
@@ -78,7 +65,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 tmp.addTag(tag);
             }
 
-            _handler.addNode(tmp);
+            handler.addNode(tmp);
         }
     }
 
@@ -87,7 +74,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
         long lastId = 0, lastLat = 0, lastLon = 0;
         int j = 0; // Index into the keysvals array.
 
-        if(!_parseNodes) {
+        if(!parseNodes) {
             return;
         }
 
@@ -122,13 +109,13 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 j++; // Skip over the '0' delimiter.
             }
 
-            _handler.addNode(tmp);
+            handler.addNode(tmp);
         }
     }
 
     @Override
     protected void parseWays(List<Osmformat.Way> ways) {
-        if(!_parseWays) {
+        if(!parseWays) {
             return;
         }
 
@@ -154,13 +141,13 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 lastId = j + lastId;
             }
 
-            _handler.addWay(tmp);
+            handler.addWay(tmp);
         }
     }
 
     @Override
     protected void parseRelations(List<Osmformat.Relation> rels) {
-        if(!_parseRelations) {
+        if(!parseRelations) {
             return;
         }
 
@@ -200,7 +187,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 tmp.addMember(relMember);
             }
 
-            _handler.addRelation(tmp);
+            handler.addRelation(tmp);
         }
     }
 
@@ -223,7 +210,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
      * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
      */
     public void setParseWays(boolean parseWays) {
-        this._parseWays = parseWays;
+        this.parseWays = parseWays;
     }
 
     /**
@@ -232,7 +219,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
      * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
      */
     public void setParseRelations(boolean parseRelations) {
-        this._parseRelations = parseRelations;
+        this.parseRelations = parseRelations;
     }
 
     /**
@@ -241,6 +228,6 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
      * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
      */
     public void setParseNodes(boolean parseNodes) {
-        _parseNodes = parseNodes;
+        this.parseNodes = parseNodes;
     }
 }

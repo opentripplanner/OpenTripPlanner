@@ -19,13 +19,12 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -253,7 +252,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new AgencyAndId(
+                .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
                     ((Stop) environment.getSource()).getParentStation())))
                 .build())
@@ -321,7 +320,7 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
-                    try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
+                    try {  // TODO: Add our own scalar types for at least serviceDate and FeedId
                         return index.getStopTimesForStop(
                             (Stop) environment.getSource(),
                             ServiceDate.parseString(environment.getArgument("date")),
@@ -893,10 +892,8 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
-                        new Coordinate((double) (float) environment.getArgument("minLon"),
-                            (double) (float) environment.getArgument("minLat")),
-                        new Coordinate((double) (float) environment.getArgument("maxLon"),
-                            (double) (float) environment.getArgument("maxLat"))))
+                        new Coordinate(environment.getArgument("minLon"), environment.getArgument("minLat")),
+                        new Coordinate(environment.getArgument("maxLon"), environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
                     .filter(stop -> environment.getArgument("agency") == null || stop.getId()

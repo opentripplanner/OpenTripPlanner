@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -28,9 +15,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.util.Locale;
 
-/** 
+/**
  * This represents the connection between a street vertex and a transit vertex
- * where going from the street to the vehicle is immediate -- such as at a 
+ * where going from the street to the vehicle is immediate -- such as at a
  * curbside bus stop.
  */
 public class StreetTransitLink extends Edge {
@@ -149,7 +136,7 @@ public class StreetTransitLink extends Edge {
         s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
-    
+
     // anecdotally, the lower bound search is about 2x faster when you don't reach stops
     // and therefore don't even consider boarding
     @Override

@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.openstreetmap.impl;
 
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
@@ -28,7 +15,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  */
 public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
-    private File _path;
+    private File path;
 
     /* (non-Javadoc)
      * @see org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider#readOSM(org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler)
@@ -36,52 +23,52 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
     @Override
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
-            if (_path.getName().endsWith(".gz")) {
-                InputStream in = new GZIPInputStream(new FileInputStream(_path));
+            if (path.getName().endsWith(".gz")) {
+                InputStream in = new GZIPInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 1);
                 handler.doneFirstPhaseRelations();
 
-                in = new GZIPInputStream(new FileInputStream(_path));
+                in = new GZIPInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 2);
                 handler.doneSecondPhaseWays();
 
-                in = new GZIPInputStream(new FileInputStream(_path));
+                in = new GZIPInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 3);
                 handler.doneThirdPhaseNodes();
 
-            } else if (_path.getName().endsWith(".bz2")) {
-                InputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
+            } else if (path.getName().endsWith(".bz2")) {
+                InputStream in = new BZip2CompressorInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 1);
                 handler.doneFirstPhaseRelations();
 
-                in = new BZip2CompressorInputStream(new FileInputStream(_path));
+                in = new BZip2CompressorInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 2);
                 handler.doneSecondPhaseWays();
 
-                in = new BZip2CompressorInputStream(new FileInputStream(_path));
+                in = new BZip2CompressorInputStream(new FileInputStream(path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 3);
                 handler.doneThirdPhaseNodes();
 
             } else {
-                StreamedOpenStreetMapParser.parseMap(_path, handler);
+                StreamedOpenStreetMapParser.parseMap(path, handler);
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("error loading OSM from path " + _path, ex);
+            throw new IllegalStateException("error loading OSM from path " + path, ex);
         }
     }
 
     public void setPath(File path) {
-        _path = path;
+        this.path = path;
     }
 
     public String toString() {
-        return "StreamedFileBasedOpenStreetMapProviderImpl(" + _path + ")";
+        return "StreamedFileBasedOpenStreetMapProviderImpl(" + path + ")";
     }
 
     @Override
     public void checkInputs() {
-        if (!_path.canRead()) {
-            throw new RuntimeException("Can't read OSM path: " + _path);
+        if (!path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + path);
         }
     }
 }

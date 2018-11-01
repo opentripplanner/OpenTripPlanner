@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module;
 
 import java.io.BufferedInputStream;
@@ -32,23 +19,23 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(DownloadableGtfsInputSource.class);
 
-    private URL _url;
+    private URL url;
 
-    private File _cacheDirectory;
+    private File cacheDirectory;
 
-    private String _defaultAgencyId;
+    private String defaultAgencyId;
     
     public boolean useCached = true;
 
     // Pattern: Decorator
-    private ZipFileCsvInputSource _zip;
+    private ZipFileCsvInputSource zip;
 
     public void setUrl(URL url) {
-        _url = url;
+        this.url = url;
     }
 
     public void setCacheDirectory(File cacheDirectory) {
-        _cacheDirectory = cacheDirectory;
+        this.cacheDirectory = cacheDirectory;
     }
 
     private void copyStreams(InputStream in, OutputStream out) throws IOException {
@@ -65,13 +52,13 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
     private File getTemporaryDirectory() {
 
-        if (_cacheDirectory != null) {
-            if (!_cacheDirectory.exists()) {
-                if (!_cacheDirectory.mkdirs()) {
-                    throw new RuntimeException("Failed to create cache directory " + _cacheDirectory);
+        if (cacheDirectory != null) {
+            if (!cacheDirectory.exists()) {
+                if (!cacheDirectory.mkdirs()) {
+                    throw new RuntimeException("Failed to create cache directory " + cacheDirectory);
                 }
             }
-            return _cacheDirectory;
+            return cacheDirectory;
         }
 
         return new File(System.getProperty("java.io.tmpdir"));
@@ -79,13 +66,13 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
     private File getPathForGtfsBundle() throws IOException {
 
-        if (_url != null) {
+        if (url != null) {
 
             File tmpDir = getTemporaryDirectory();
-            String cacheFile = _defaultAgencyId;
+            String cacheFile = defaultAgencyId;
             if (cacheFile == null) {
                 // Build a cache file based on URL
-                cacheFile = (_url.getHost() + _url.getFile()).replace("/", "_");
+                cacheFile = (url.getHost() + url.getFile()).replace("/", "_");
             }
             String fileName = cacheFile + "_gtfs.zip";
             File gtfsFile = new File(tmpDir, fileName);
@@ -98,9 +85,9 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
                 LOG.info("useCached=false; GTFS will be re-downloaded." + gtfsFile);
             }
 
-            LOG.info("downloading gtfs: url=" + _url + " path=" + gtfsFile);
+            LOG.info("downloading gtfs: url=" + url + " path=" + gtfsFile);
 
-            BufferedInputStream in = new BufferedInputStream(_url.openStream());
+            BufferedInputStream in = new BufferedInputStream(url.openStream());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
             try {
                 copyStreams(in, out);
@@ -118,26 +105,26 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
     }
 
     private synchronized void checkIfDownloaded() throws IOException {
-        if (_zip == null) {
-            _zip = new ZipFileCsvInputSource(new ZipFile(getPathForGtfsBundle()));
+        if (zip == null) {
+            zip = new ZipFileCsvInputSource(new ZipFile(getPathForGtfsBundle()));
         }
     }
 
     @Override
     public boolean hasResource(String name) throws IOException {
         checkIfDownloaded();
-        return _zip.hasResource(name);
+        return zip.hasResource(name);
     }
 
     @Override
     public InputStream getResource(String name) throws IOException {
         checkIfDownloaded();
-        return _zip.getResource(name);
+        return zip.getResource(name);
     }
 
     @Override
     public void close() throws IOException {
         checkIfDownloaded();
-        _zip.close();
+        zip.close();
     }
 }

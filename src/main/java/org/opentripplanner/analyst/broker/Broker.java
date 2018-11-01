@@ -20,7 +20,7 @@ import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 import org.opentripplanner.analyst.cluster.AnalystWorker;
-import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
@@ -88,7 +88,7 @@ public class Broker implements Runnable {
     private long nextRedeliveryCheckTime = System.currentTimeMillis();
 
     static {
-        mapper.registerModule(AgencyAndIdSerializer.makeModule());
+        mapper.registerModule(FeedScopedIdSerializer.makeModule());
         mapper.registerModule(QualifiedModeSetSerializer.makeModule());
         mapper.registerModule(JodaLocalDateSerializer.makeModule());
         mapper.registerModule(TraverseModeSetSerializer.makeModule());

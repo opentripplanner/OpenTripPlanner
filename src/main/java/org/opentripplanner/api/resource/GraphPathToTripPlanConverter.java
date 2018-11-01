@@ -1,35 +1,46 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.api.resource;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.api.model.*;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
+import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.core.*;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,7 +52,13 @@ import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,7 +248,7 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone(); 
+        TimeZone timeZone = rctx.graph.getTimeZone();
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTimeInMillis(state.getTimeInMillis());
         return calendar;
@@ -843,9 +860,9 @@ public abstract class GraphPathToTripPlanConverter {
 
     /**
      * Converts a list of street edges to a list of turn-by-turn directions.
-     * 
+     *
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
-     * 
+     *
      * @return
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
@@ -1075,34 +1092,34 @@ public abstract class GraphPathToTripPlanConverter {
 
                     if (twoBack.distance < MAX_ZAG_DISTANCE
                             && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-                        
-                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT || 
+
+                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
                                 (twoBack.relativeDirection == RelativeDirection.RIGHT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
-                                ((lastStep.relativeDirection == RelativeDirection.LEFT || 
+                                ((lastStep.relativeDirection == RelativeDirection.LEFT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
                                 (twoBack.relativeDirection == RelativeDirection.LEFT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
-                            // in this case, we have two left turns or two right turns in quick 
+                            // in this case, we have two left turns or two right turns in quick
                             // succession; this is probably a U-turn.
-                            
+
                             steps.remove(last - 1);
-                            
+
                             lastStep.distance += twoBack.distance;
-                            
-                            // A U-turn to the left, typical in the US. 
-                            if (lastStep.relativeDirection == RelativeDirection.LEFT || 
+
+                            // A U-turn to the left, typical in the US.
+                            if (lastStep.relativeDirection == RelativeDirection.LEFT ||
                                     lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
                                 lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
                             else
                                 lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
-                            
-                            // in this case, we're definitely staying on the same street 
+
+                            // in this case, we're definitely staying on the same street
                             // (since it's zag removal, the street names are the same)
                             lastStep.stayOn = true;
                         }
-                                
+
                         else {
                             // What is a zag? TODO write meaningful documentation for this.
                             // It appears to mean simplifying out several rapid turns in succession
@@ -1149,11 +1166,11 @@ public abstract class GraphPathToTripPlanConverter {
 
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation = 
+            steps.get(steps.size()-1).bikeRentalOnStation =
                     new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation = 
+            steps.get(0).bikeRentalOffStation =
                     new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
         }
 

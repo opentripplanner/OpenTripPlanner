@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -30,9 +17,9 @@ import java.util.Set;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ *
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -52,7 +39,7 @@ public class StateEditor {
     /* CONSTRUCTORS */
 
     protected StateEditor() {}
-    
+
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -211,7 +198,7 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-    
+
     public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
@@ -220,7 +207,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -263,7 +250,7 @@ public class StateEditor {
         child.stateData.tripTimes = tripTimes;
     }
 
-    public void setTripId(AgencyAndId tripId) {
+    public void setTripId(FeedScopedId tripId) {
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
     }
@@ -276,7 +263,7 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-    
+
     /**
      * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
      * This happens in Analyst.
@@ -285,11 +272,11 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
     }
-    
+
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
@@ -297,12 +284,12 @@ public class StateEditor {
     public void setBackWalkingBike (boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /** 
+    /**
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
@@ -331,13 +318,13 @@ public class StateEditor {
         }
     }
 
-    public void setRoute(AgencyAndId routeId) {
+    public void setRoute(FeedScopedId routeId) {
         cloneStateDataAsNeeded();
         child.stateData.route = routeId;
         // unlike tripId, routeId is not set to null when alighting
         // but do a null check anyway
         if (routeId != null) {
-            AgencyAndId[] oldRouteSequence = child.stateData.routeSequence;
+            FeedScopedId[] oldRouteSequence = child.stateData.routeSequence;
             //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
             int oldLength = oldRouteSequence.length;
             child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
@@ -356,14 +343,16 @@ public class StateEditor {
         child.stateData.everBoarded = true;
     }
 
-    public void setBikeRenting(boolean bikeRenting) {
+    public void beginVehicleRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = bikeRenting;
-        if (bikeRenting) {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
-        } else {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
-        }
+        child.stateData.usingRentedBike = true;
+        child.stateData.nonTransitMode = vehicleMode;
+    }
+
+    public void doneVehicleRenting() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
     }
 
     /**
@@ -413,7 +402,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
@@ -458,19 +447,19 @@ public class StateEditor {
         return child.getElapsedTimeSeconds();
     }
 
-    public AgencyAndId getTripId() {
+    public FeedScopedId getTripId() {
         return child.getTripId();
     }
 
     public Trip getPreviousTrip() {
         return child.getPreviousTrip();
     }
-    
+
     public String getZone() {
         return child.getZone();
     }
 
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return child.getRoute();
     }
 

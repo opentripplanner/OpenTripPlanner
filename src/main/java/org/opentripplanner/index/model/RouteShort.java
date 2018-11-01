@@ -3,15 +3,15 @@ package org.opentripplanner.index.model;
 import java.util.Collection;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
 import com.beust.jcommander.internal.Lists;
 
 public class RouteShort {
 
-    public AgencyAndId id;
+    public FeedScopedId id;
     public String shortName;
     public String longName;
     public String mode;
