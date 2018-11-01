@@ -124,8 +124,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         }
         preTransitVertices = forwardStreetSearchResults.keySet();
         LOG.debug("end forward street search {} ms", System.currentTimeMillis() - start);
-        // When the car mode is allowed the postBoardingWeights are the result of searching the graph in entirety, but
-        // doing so makes the overall search considerably faster when transit is also present.
+        // When the car mode is allowed the postBoardingWeights are the result of searching the graph until the origin
+        // is reached.
         postBoardingWeights = streetSearch(request, true, abortTime);
         if (postBoardingWeights == null) {
             return; // Search timed out
