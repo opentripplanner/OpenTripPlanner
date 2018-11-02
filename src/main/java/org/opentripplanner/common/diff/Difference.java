@@ -15,6 +15,9 @@
 
 package org.opentripplanner.common.diff;
 
+/**
+ * This represents a single difference found between two objects by the ObjectDiffer.
+ */
 public class Difference {
 
     Object a;

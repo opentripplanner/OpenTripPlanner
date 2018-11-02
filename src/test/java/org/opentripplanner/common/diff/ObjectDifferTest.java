@@ -1,17 +1,9 @@
 package org.opentripplanner.common.diff;
 
-import com.google.common.collect.Sets;
 import org.junit.Test;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.notes.StaticStreetNotesSource;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -20,20 +12,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * This test verifies that the GenericObjectDiffer can find differences in nested objects.
+ * This test verifies that the ObjectDiffer can find differences in nested objects.
  * It is expected to automatically perform a recursive, semantic comparison of the two supplied objects.
  */
-public class GenericObjectDifferTest {
+public class ObjectDifferTest {
 
     @Test
     public void testDiff() throws IllegalAccessException {
         {
             // Compare two separate essentially empty graphs.
-            GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
-            genericObjectDiffer.ignoreFields("graphBuilderAnnotations", "streetNotesService", "vertexById", "buildTime", "modCount");
+            ObjectDiffer objectDiffer = new ObjectDiffer();
+            objectDiffer.ignoreFields("graphBuilderAnnotations", "streetNotesService", "vertexById", "buildTime", "modCount");
             Graph graph1 = new Graph();
             Graph graph2 = new Graph();
-            genericObjectDiffer.compareTwoObjects(graph1, graph2);
+            objectDiffer.compareTwoObjects(graph1, graph2);
         }
 
         // Ideally we'd compare two separate but identical complex graphs.
@@ -49,17 +41,17 @@ public class GenericObjectDifferTest {
             // No differences should be found between the two.
             Map<Integer, Fields> o1 = makeFieldsMap();
             Map<Integer, Fields> o2 = makeFieldsMap();
-            GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
-            genericObjectDiffer.compareTwoObjects(o1, o2);
-            assertFalse(genericObjectDiffer.hasDifferences());
+            ObjectDiffer objectDiffer = new ObjectDiffer();
+            objectDiffer.compareTwoObjects(o1, o2);
+            assertFalse(objectDiffer.hasDifferences());
 
             // Now make one of the two nested objects different. Differences should be found.
             o2.get(10).nestedMap.get("50").clear();
             // This should fail
-            genericObjectDiffer = new GenericObjectDiffer(); // TODO add a reset function
-            genericObjectDiffer.compareTwoObjects(o1, o2);
-            assertTrue(genericObjectDiffer.hasDifferences());
-            genericObjectDiffer.printDifferences();
+            objectDiffer = new ObjectDiffer(); // TODO add a reset function
+            objectDiffer.compareTwoObjects(o1, o2);
+            assertTrue(objectDiffer.hasDifferences());
+            objectDiffer.printDifferences();
         }
 
     }

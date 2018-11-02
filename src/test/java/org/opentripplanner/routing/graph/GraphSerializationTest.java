@@ -6,7 +6,7 @@ import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.common.diff.GenericObjectDiffer;
+import org.opentripplanner.common.diff.ObjectDiffer;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -26,16 +26,11 @@ import static org.junit.Assert.assertTrue;
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization) does not corrupt
  * the graph, and yields exactly the same data.
  *
- * Candidates for performing the comparison included:
- * DeepEquals from https://github.com/jdereg/java-util
- * isEqualToComparingFieldByFieldRecursively() from http://joel-costigliola.github.io/assertj/
+ * We tried several existing libraries to perform the comparison but nothing did exactly what we needed in a way that
+ * we could control precisely.
  *
- * We need to use a system that can detect cycles, and one that can display or record any differences encountered.
- * DeepEquals cannot record what differences it encounters. isEqualToComparingFieldByFieldRecursively finds
- * differences but there are so many it runs out of memory.
- *
- * So currently I'm using the object differ supplied by csolem via the Entur OTP branch at
- * https://github.com/entur/OpenTripPlanner/tree/protostuff_poc
+ * The object differ we're using started out as a copy of the one supplied by csolem via the Entur OTP branch at
+ * https://github.com/entur/OpenTripPlanner/tree/protostuff_poc but has been mostly rewritten at this point.
  *
  * Created by abyrd on 2018-10-26
  */
@@ -57,13 +52,13 @@ public class GraphSerializationTest {
         // We can exclude relatively few classes here, the two trees are of course perfectly identical.
         // We do skip edge lists - otherwise this does a depth-first search of the graph causing a stack overflow.
         // And also some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
-        GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
-        genericObjectDiffer.ignoreFields("incoming", "outgoing");
-        genericObjectDiffer.ignoreClasses(WeakValueHashMap.class);
-        genericObjectDiffer.enableComparingIdenticalObjects();
-        genericObjectDiffer.compareTwoObjects(originalGraph, originalGraph);
-        genericObjectDiffer.printDifferences();
-        assertFalse(genericObjectDiffer.hasDifferences());
+        ObjectDiffer objectDiffer = new ObjectDiffer();
+        objectDiffer.ignoreFields("incoming", "outgoing");
+        objectDiffer.ignoreClasses(WeakValueHashMap.class);
+        objectDiffer.enableComparingIdenticalObjects();
+        objectDiffer.compareTwoObjects(originalGraph, originalGraph);
+        objectDiffer.printDifferences();
+        assertFalse(objectDiffer.hasDifferences());
 
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
@@ -72,19 +67,19 @@ public class GraphSerializationTest {
 
         // This time we need to make some exclusions because some classes are inherently transient or contain
         // unordered lists we can't yet compare.
-        genericObjectDiffer = new GenericObjectDiffer();
+        objectDiffer = new ObjectDiffer();
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
-        genericObjectDiffer.ignoreFields("incoming", "outgoing");
-        genericObjectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
+        objectDiffer.ignoreFields("incoming", "outgoing");
+        objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
         // are deduplicated.
-        genericObjectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
+        objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
 
-        genericObjectDiffer.compareTwoObjects(originalGraph, copiedGraph);
-        assertFalse(genericObjectDiffer.hasDifferences());
-        genericObjectDiffer.printDifferences();
+        objectDiffer.compareTwoObjects(originalGraph, copiedGraph);
+        assertFalse(objectDiffer.hasDifferences());
+        objectDiffer.printDifferences();
     }
 
 }

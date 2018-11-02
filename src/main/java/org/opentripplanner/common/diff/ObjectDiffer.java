@@ -12,15 +12,15 @@ import java.util.*;
 
 /**
  * Perform a recursive deep comparison of objects.
- * This is intended only for testing that graph building is reproducible and serialization restores an identical graph.
- * It should be kept simple.
+ * This is intended for testing that graph building is reproducible and serialization restores an identical graph.
+ * It should be kept relatively simple.
  *
- * This class is not threadsafe. It holds configuration and state internally, and should therefore be used for one
- * comparison only and thrown away.
+ * This class is not threadsafe. It holds configuration and state internally. Each instance should therefore be used
+ * for one comparison only and thrown away.
  */
-public class GenericObjectDiffer {
+public class ObjectDiffer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenericObjectDiffer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ObjectDiffer.class);
 
     /**
      * The maximum recursion depth during the comparison.
@@ -53,13 +53,13 @@ public class GenericObjectDiffer {
 
     private int nObjectsCompared = 0;
 
-    /**
-     * If true, execute the whole comparison procedure, even for two identical object references.
-     * Normally these comparisons would be optimized away since they are by definition identical trees of objects.
-     * However this is useful in tests of the comparison system itself - differences should be impossible.
-     */
     private boolean compareIdenticalObjects = false;
 
+    /**
+     * Tell the Differ to execute the whole comparison procedure even when comparing two identical object references.
+     * Normally such comparisons would be optimized away since they are by definition identical trees of objects.
+     * However this is useful in tests of the comparison system itself - there are known to be no differences.
+     */
     public void enableComparingIdenticalObjects() {
         compareIdenticalObjects = true;
     }
@@ -88,6 +88,10 @@ public class GenericObjectDiffer {
         useEquals.addAll(Arrays.asList(classes));
     }
 
+    /**
+     * This is the main entry point to compare two objects. It's also called recursively for many other
+     * complex objects in the tree.
+     */
     public void compareTwoObjects (Object a, Object b) {
         nObjectsCompared += 1;
         if (compareIdenticalObjects) {
@@ -149,8 +153,8 @@ public class GenericObjectDiffer {
             compareMaps(new MultimapWrapper((Multimap) a), new MultimapWrapper((Multimap) b));
         }
         else if (a instanceof Collection) {
-            compareCollections((Collection) a, (Collection) b);
             // TODO maybe even generalize this to iterable?
+            compareCollections((Collection) a, (Collection) b);
         }
         else if (classToCompare.isArray()){
             compareArrays(a, b);
@@ -162,8 +166,8 @@ public class GenericObjectDiffer {
     }
 
     /**
-     * The fallback comparison method - compare every field of the two objects.
-     * Note that the two objects passed in must already be known to be of the same class.
+     * The fallback comparison method - compare every field of two objects of the same class.
+     * Note that the two objects passed in must already be known to be of the same class by the caller.
      */
     private void compareFieldByField (Object a, Object b) {
         Class classToCompare = a.getClass();
