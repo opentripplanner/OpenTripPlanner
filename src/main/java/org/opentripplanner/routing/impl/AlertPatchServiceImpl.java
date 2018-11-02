@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
@@ -22,26 +9,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.Context;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.GraphService;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.opentripplanner.standalone.OTPApplication;
-import org.opentripplanner.standalone.OTPServer;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
 
     private Graph graph;
 
     private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
-    private ListMultimap<AgencyAndId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
-    private ListMultimap<AgencyAndId, AlertPatch> patchesByStop = LinkedListMultimap.create();
+    private ListMultimap<FeedScopedId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
+    private ListMultimap<FeedScopedId, AlertPatch> patchesByStop = LinkedListMultimap.create();
 
     public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
@@ -53,7 +35,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getStopPatches(AgencyAndId stop) {
+    public Collection<AlertPatch> getStopPatches(FeedScopedId stop) {
         List<AlertPatch> result = patchesByStop.get(stop);
         if (result == null) {
             result = Collections.emptyList();
@@ -62,7 +44,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getRoutePatches(AgencyAndId route) {
+    public Collection<AlertPatch> getRoutePatches(FeedScopedId route) {
         List<AlertPatch> result = patchesByRoute.get(route);
         if (result == null) {
             result = Collections.emptyList();
@@ -80,11 +62,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
         alertPatch.apply(graph);
         alertPatches.put(alertPatch.getId(), alertPatch);
 
-        AgencyAndId stop = alertPatch.getStop();
+        FeedScopedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.put(stop, alertPatch);
         }
-        AgencyAndId route = alertPatch.getRoute();
+        FeedScopedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.put(route, alertPatch);
         }
@@ -124,11 +106,11 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     private void expire(AlertPatch alertPatch) {
-        AgencyAndId stop = alertPatch.getStop();
+        FeedScopedId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.remove(stop, alertPatch);
         }
-        AgencyAndId route = alertPatch.getRoute();
+        FeedScopedId route = alertPatch.getRoute();
         if (route != null) {
             patchesByRoute.remove(route, alertPatch);
         }

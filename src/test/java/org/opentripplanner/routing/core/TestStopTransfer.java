@@ -1,23 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 
 public class TestStopTransfer extends TestCase {
 
@@ -27,23 +14,23 @@ public class TestStopTransfer extends TestCase {
     public void testStopTransfer() {
         // Setup from trip with route
         Route fromRoute = new Route();
-        fromRoute.setId(new AgencyAndId("A1", "R1"));
+        fromRoute.setId(new FeedScopedId("A1", "R1"));
         Trip fromTrip = new Trip();
-        fromTrip.setId(new AgencyAndId("A1", "T1"));
+        fromTrip.setId(new FeedScopedId("A1", "T1"));
         fromTrip.setRoute(fromRoute);
         
         // Setup to trip with route
         Route toRoute = new Route();
-        toRoute.setId(new AgencyAndId("A1", "R2"));
+        toRoute.setId(new FeedScopedId("A1", "R2"));
         Trip toTrip = new Trip();
-        toTrip.setId(new AgencyAndId("A1", "T2"));
+        toTrip.setId(new FeedScopedId("A1", "T2"));
         toTrip.setRoute(toRoute);
         
         // Setup second to trip with route
         Route toRoute2 = new Route();
-        toRoute2.setId(new AgencyAndId("A1", "R3"));
+        toRoute2.setId(new FeedScopedId("A1", "R3"));
         Trip toTrip2 = new Trip();
-        toTrip2.setId(new AgencyAndId("A1", "T3"));
+        toTrip2.setId(new FeedScopedId("A1", "T3"));
         toTrip2.setRoute(toRoute2);
         
         // Create StopTransfer
@@ -52,7 +39,7 @@ public class TestStopTransfer extends TestCase {
         assertEquals(StopTransfer.UNKNOWN_TRANSFER, transfer.getTransferTime(fromTrip, toTrip2));
         
         // Add empty SpecificTransfer, specificity 0
-        transfer.addSpecificTransfer(new SpecificTransfer((AgencyAndId) null, null, null, null, StopTransfer.FORBIDDEN_TRANSFER));
+        transfer.addSpecificTransfer(new SpecificTransfer((FeedScopedId) null, null, null, null, StopTransfer.FORBIDDEN_TRANSFER));
         assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transfer.getTransferTime(fromTrip, toTrip));
         assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transfer.getTransferTime(fromTrip, toTrip2));
         

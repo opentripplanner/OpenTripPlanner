@@ -1,5 +1,4 @@
 # Spanish translations for OpenTripPlanner.
-# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the OpenTripPlanner
 # project.
 #

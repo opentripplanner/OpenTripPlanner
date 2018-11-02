@@ -1,5 +1,27 @@
 # Troubleshooting Routing
 
+## Graph Builder Annotations
+
+When you build a graph, OTP may encounter clearly incorrect or ambiguous data, or may detect less severe but potentially problematic situations in the input data. Most such problems result in a "graph builder annotation" being added to the graph. Many annotations are logged to the console while the graph, but some that might yield too many messages may be recorded as annotations without being logged. At the end of the graph build process, OTP prints a summary of all the annotations it added to the graph, like the following:
+
+ ```
+ 11:35:57.515 INFO (Graph.java:970) Summary (number of each type of annotation):
+ 11:35:57.518 INFO (Graph.java:976)     TurnRestrictionBad - 560
+ 11:35:57.518 INFO (Graph.java:976)     TurnRestrictionException - 15
+ 11:35:57.518 INFO (Graph.java:976)     StopLinkedTooFar - 22
+ 11:35:57.518 INFO (Graph.java:976)     HopSpeedSlow - 22
+ 11:35:57.518 INFO (Graph.java:976)     Graphwide - 1
+ 11:35:57.518 INFO (Graph.java:976)     GraphConnectivity - 407
+ 11:35:57.519 INFO (Graph.java:976)     ParkAndRideUnlinked - 1
+ 11:35:57.519 INFO (Graph.java:976)     StopNotLinkedForTransfers - 31
+ 11:35:57.519 INFO (Graph.java:976)     NoFutureDates - 1
+```
+
+The full set of annotations can be written out to an HTML report for closer inspection. To enable the creation of these (potentially voluminous) HTML reports, add `"htmlAnnotations" : true` to your graph builder JSON configuration.
+
+If the graph is saved to a file, these annotations are saved with it and can be examined later. Currently the only tool for doing this is the "Graph Visualizer", which is not particularly well maintained and is intended for use by software developers familiar with OTP who can patch up the code as needed.
+
+
 ## Debug layers
 
 OpenTripplanner has option to ease debugging problems with graph. Older option is graph visualizer.
@@ -46,6 +68,8 @@ Both *are* allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=foo
 Finally, bicycles are *not*allowed on *highway=footway* when any of the following tags appear on a footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
+
+See [osmWayPropertySet config attribute](Configuration#Way-property-sets)
 
 ### Railway Platforms
 

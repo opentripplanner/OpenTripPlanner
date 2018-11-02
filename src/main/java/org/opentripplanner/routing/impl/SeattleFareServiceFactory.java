@@ -1,24 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
@@ -35,28 +22,29 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     @Override
     public FareService makeFareService() {
     	
-    	DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+    	SeattleFareServiceImpl fareService = new SeattleFareServiceImpl();
     	fareService.addFareRules(FareType.regular, regularFareRules.values());
     	fareService.addFareRules(FareType.youth, regularFareRules.values());
     	fareService.addFareRules(FareType.senior, regularFareRules.values());
-    	
+
     	return fareService;
     }
-    
+
     @Override
     public void configure(JsonNode config) {
         // No config for the moment
     }
     
     @Override
-    public void processGtfs(GtfsRelationalDao dao) {
+    public void processGtfs(OtpTransitService transitService) {
     	// Add custom extension: trips may have a fare ID specified in KCM GTFS.
     	// Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
-    	// since fare IDs may not be unique across feeds and trip agency IDs
+    	// since fare IDs may not be unique across feeds and trip agency IDsqq
     	// may not match fare attribute agency IDs (which are feed IDs).
     	
-    	Map<AgencyAndId, FareRuleSet> feedFareRules = new HashMap<>();
-    	fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), feedFareRules);
+    	Map<FeedScopedId, FareRuleSet> feedFareRules = new HashMap<>();
+    	fillFareRules(null, transitService.getAllFareAttributes(),
+                transitService.getAllFareRules(), feedFareRules);
     	
     	regularFareRules.putAll(feedFareRules);
     	
@@ -67,7 +55,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         	feedFareRulesById.put(id, rule);
         }
         
-        for (Trip trip : dao.getAllTrips()) {
+        for (Trip trip : transitService.getAllTrips()) {
         	String fareId = trip.getFareId();
         	FareRuleSet rule = feedFareRulesById.get(fareId);
         	if (rule != null)

@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
@@ -40,17 +27,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource.
- * 
- * Usage example ('bike1' name is an example) in the file 'Graph.properties':
- * 
- * <pre>
- * bike1.type = bike-rental
- * bike1.frequencySec = 60
- * bike1.networks = V3,V3N
- * bike1.sourceType = jcdecaux
- * bike1.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
- * </pre>
+ * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
  */
 public class BikeRentalUpdater extends PollingGraphUpdater {
 
@@ -63,8 +40,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
     private BikeRentalDataSource source;
-
-    private Graph graph;
 
     private SimpleStreetSplitter linker;
 
@@ -83,6 +58,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         // Set data source type from config JSON
         String sourceType = config.path("sourceType").asText();
         String apiKey = config.path("apiKey").asText();
+        // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
+        // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
         String networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
@@ -110,8 +87,14 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
+            } else if (sourceType.equals("uip-bike")) {
+                source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource();
+                source = new GbfsBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("smoove")) {
+                source = new SmooveBikeRentalDataSource();
+            } else if (sourceType.equals("bicimad")) {
+                source = new BicimadBikeRentalDataSource();
             }
         }
 
@@ -123,24 +106,22 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
-        this.graph = graph;
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec, source);
+        if (pollingPeriodSeconds <= 0) {
+            LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
+        } else {
+            LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
+        }
+
     }
 
     @Override
-    public void setup() throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph);
-
         // Adding a bike rental station service needs a graph writer runnable
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                service = graph.getService(BikeRentalStationService.class, true);
-            }
-        });
+        service = graph.getService(BikeRentalStationService.class, true);
     }
 
     @Override
@@ -172,8 +153,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
-            Set<String> defaultNetworks = new HashSet<String>(Arrays.asList(network));
+            Set<BikeRentalStation> stationSet = new HashSet<>();
+            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
