@@ -26,7 +26,7 @@ public class ObjectDiffer {
      * The maximum recursion depth during the comparison.
      * We want both depth limiting and cycle detection.
      */
-    private static final int MAX_RECURSION_DEPTH = 200;
+    private static final int MAX_RECURSION_DEPTH = 300;
 
     /** Current depth of recursive diff. */
     private int depth = 0;

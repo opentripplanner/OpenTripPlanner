@@ -13,6 +13,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStation;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,9 +37,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class GraphSerializationTest {
 
+    /**
+     * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
+     */
     @Test
     public void testRoundTrip () throws Exception {
-
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
@@ -48,26 +51,13 @@ public class GraphSerializationTest {
         transitVertices.forEach(originalGraph::remove);
         originalGraph.index(new DefaultStreetVertexIndexFactory());
 
-        // Test comparison of two references to the same graph.
-        // We can exclude relatively few classes here, the two trees are of course perfectly identical.
-        // We do skip edge lists - otherwise this does a depth-first search of the graph causing a stack overflow.
-        // And also some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
-        ObjectDiffer objectDiffer = new ObjectDiffer();
-        objectDiffer.ignoreFields("incoming", "outgoing");
-        objectDiffer.ignoreClasses(WeakValueHashMap.class);
-        objectDiffer.enableComparingIdenticalObjects();
-        objectDiffer.compareTwoObjects(originalGraph, originalGraph);
-        objectDiffer.printDifferences();
-        assertFalse(objectDiffer.hasDifferences());
-
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
         originalGraph.save(tempFile);
         Graph copiedGraph = Graph.load(tempFile, Graph.LoadLevel.FULL);
 
-        // This time we need to make some exclusions because some classes are inherently transient or contain
-        // unordered lists we can't yet compare.
-        objectDiffer = new ObjectDiffer();
+        // Make some exclusions because some classes are inherently transient or contain unordered lists we can't yet compare.
+        ObjectDiffer objectDiffer = new ObjectDiffer();
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
         objectDiffer.ignoreFields("incoming", "outgoing");
