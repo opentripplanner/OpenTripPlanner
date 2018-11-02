@@ -1,20 +1,9 @@
 package org.opentripplanner.api.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -22,7 +11,11 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
  /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -35,12 +28,12 @@ public class Leg {
      * The date and time this leg begins.
      */
     public Calendar startTime = null;
-
+    
     /**
      * The date and time this leg ends.
      */
     public Calendar endTime = null;
-
+    
     /**
      * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
      * "scheduled time of departure at boarding stop" = startTime - departureDelay
@@ -55,24 +48,24 @@ public class Leg {
      * Whether there is real-time data about this Leg
      */
     public Boolean realTime = false;
-
+    
     /**
      * Is this a frequency-based trip with non-strict departure times?
      */
     public Boolean isNonExactFrequency = null;
-
+    
     /**
-     * The best estimate of the time between two arriving vehicles. This is particularly important
-     * for non-strict frequency trips, but could become important for real-time trips, strict
+     * The best estimate of the time between two arriving vehicles. This is particularly important 
+     * for non-strict frequency trips, but could become important for real-time trips, strict 
      * frequency trips, and scheduled trips with empirical headways.
      */
     public Integer headway = null;
-
+    
     /**
      * The distance traveled while traversing the leg in meters.
      */
     public Double distance = null;
-
+    
     /**
      * Is this leg a traversing pathways?
      */
@@ -125,7 +118,7 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public Integer routeType = null;
-
+    
     /**
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
@@ -146,7 +139,7 @@ public class Leg {
     @JsonSerialize
     public Boolean interlineWithPreviousLeg;
 
-
+    
     /**
      * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
      */
@@ -160,7 +153,7 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String tripBlockId = null;
-
+    
     /**
      * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
@@ -175,13 +168,13 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String agencyId = null;
-
+    
     /**
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
     public FeedScopedId tripId = null;
-
+    
     /**
      * For transit legs, the service date of the trip.
      * For non-transit legs, null.
@@ -201,7 +194,7 @@ public class Leg {
      * The Place where the leg originates.
      */
     public Place from = null;
-
+    
     /**
      * The Place where the leg begins.
      */
@@ -223,9 +216,8 @@ public class Leg {
 
     public List<EncodedPolylineBean> interStopGeometry;
 
-
      /**
-     * A series of turn by turn instructions used for walking, biking and driving.
+     * A series of turn by turn instructions used for walking, biking and driving. 
      */
     @XmlElementWrapper(name = "steps")
     @JsonProperty(value="steps")
@@ -280,8 +272,8 @@ public class Leg {
         else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
         else return true;
     }
-
-    /**
+    
+    /** 
      * The leg's duration in seconds
      */
     @XmlElement

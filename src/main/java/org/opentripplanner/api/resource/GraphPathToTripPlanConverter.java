@@ -248,7 +248,7 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone();
+        TimeZone timeZone = rctx.graph.getTimeZone(); 
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTimeInMillis(state.getTimeInMillis());
         return calendar;
@@ -860,9 +860,9 @@ public abstract class GraphPathToTripPlanConverter {
 
     /**
      * Converts a list of street edges to a list of turn-by-turn directions.
-     *
+     * 
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
-     *
+     * 
      * @return
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
@@ -1092,34 +1092,34 @@ public abstract class GraphPathToTripPlanConverter {
 
                     if (twoBack.distance < MAX_ZAG_DISTANCE
                             && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-
-                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
+                        
+                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT || 
                                 lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
                                 (twoBack.relativeDirection == RelativeDirection.RIGHT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
-                                ((lastStep.relativeDirection == RelativeDirection.LEFT ||
+                                ((lastStep.relativeDirection == RelativeDirection.LEFT || 
                                 lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
                                 (twoBack.relativeDirection == RelativeDirection.LEFT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
-                            // in this case, we have two left turns or two right turns in quick
+                            // in this case, we have two left turns or two right turns in quick 
                             // succession; this is probably a U-turn.
-
+                            
                             steps.remove(last - 1);
-
+                            
                             lastStep.distance += twoBack.distance;
-
-                            // A U-turn to the left, typical in the US.
-                            if (lastStep.relativeDirection == RelativeDirection.LEFT ||
+                            
+                            // A U-turn to the left, typical in the US. 
+                            if (lastStep.relativeDirection == RelativeDirection.LEFT || 
                                     lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
                                 lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
                             else
                                 lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
-
-                            // in this case, we're definitely staying on the same street
+                            
+                            // in this case, we're definitely staying on the same street 
                             // (since it's zag removal, the street names are the same)
                             lastStep.stayOn = true;
                         }
-
+                                
                         else {
                             // What is a zag? TODO write meaningful documentation for this.
                             // It appears to mean simplifying out several rapid turns in succession
@@ -1166,11 +1166,11 @@ public abstract class GraphPathToTripPlanConverter {
 
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation =
+            steps.get(steps.size()-1).bikeRentalOnStation = 
                     new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation =
+            steps.get(0).bikeRentalOffStation = 
                     new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
         }
 

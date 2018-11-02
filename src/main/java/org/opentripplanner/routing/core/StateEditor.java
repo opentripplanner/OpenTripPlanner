@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.core;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -10,16 +14,12 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- *
+ * 
  * By virtue of being in the same package as States, it can modify their package private fields.
- *
+ * 
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -39,7 +39,7 @@ public class StateEditor {
     /* CONSTRUCTORS */
 
     protected StateEditor() {}
-
+    
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -198,7 +198,7 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-
+    
     public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
@@ -207,7 +207,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }
+    }    
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -263,7 +263,7 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-
+    
     /**
      * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
      * This happens in Analyst.
@@ -272,11 +272,11 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
     }
-
+    
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-
+        
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
@@ -284,12 +284,12 @@ public class StateEditor {
     public void setBackWalkingBike (boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-
+        
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /**
+    /** 
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
@@ -402,7 +402,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
-     *
+     * 
      * @param state
      */
     public void setFromState(State state) {
@@ -454,7 +454,7 @@ public class StateEditor {
     public Trip getPreviousTrip() {
         return child.getPreviousTrip();
     }
-
+    
     public String getZone() {
         return child.getZone();
     }

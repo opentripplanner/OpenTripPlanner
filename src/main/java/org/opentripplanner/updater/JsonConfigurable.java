@@ -1,5 +1,7 @@
 package org.opentripplanner.updater;
 
+import java.util.prefs.Preferences;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 

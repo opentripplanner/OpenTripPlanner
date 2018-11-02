@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.core;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -27,7 +24,7 @@ public class StateData implements Cloneable {
     protected TripTimes tripTimes;
 
     protected FeedScopedId tripId;
-
+    
     protected Trip previousTrip;
 
     protected double lastTransitWalk = 0;
@@ -72,7 +69,7 @@ public class StateData implements Cloneable {
 
     protected TraverseMode nonTransitMode;
 
-    /**
+    /** 
      * This is the wait time at the beginning of the trip (or at the end of the trip for
      * reverse searches). In Analyst anyhow, this is is subtracted from total trip length of each
      * final State in lieu of reverse optimization. It is initially set to zero so that it will be
