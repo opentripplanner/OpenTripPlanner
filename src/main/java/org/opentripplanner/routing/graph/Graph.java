@@ -113,7 +113,7 @@ public class Graph implements Serializable {
 
     private transient SampleFactory sampleFactory;
 
-    public final Deduplicator deduplicator = new Deduplicator();
+    public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
@@ -727,7 +727,7 @@ public class Graph implements Serializable {
         // vertex list is transient because it can be reconstructed from edges.
         LOG.debug("Loading edges...");
         List<Edge> edges = (ArrayList<Edge>) kryo.readClassAndObject(input);
-        graph.vertices = new HashMap<>();
+        graph.vertices = new ConcurrentHashMap<>(); // why is this concurrent?
 
         for (Edge e : edges) {
             Vertex fromVertex = e.getFromVertex();

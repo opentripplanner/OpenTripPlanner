@@ -25,25 +25,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class GenericObjectDifferTest {
 
-    private GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
-
-    private GenericDiffConfig genericDiffConfig = GenericDiffConfig.builder()
-            .ignoreFields(Sets.newHashSet("graphBuilderAnnotations", "streetNotesService", "vertexById", "buildTime", "modCount"))
-            .identifiers(Sets.newHashSet("id", "index"))
-            .useEqualsBuilder(Sets.newHashSet(TurnRestriction.class, StaticStreetNotesSource.class, Vertex.class))
-            .build();
-
-    private DiffPrinter diffPrinter = new DiffPrinter();
-
-    // TODO split into several tests
     @Test
     public void testDiff() throws IllegalAccessException {
         {
             // Compare two separate essentially empty graphs.
+            GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
+            genericObjectDiffer.ignoreFields("graphBuilderAnnotations", "streetNotesService", "vertexById", "buildTime", "modCount");
             Graph graph1 = new Graph();
             Graph graph2 = new Graph();
-            List<Difference> differences = genericObjectDiffer.compareObjects(graph1, graph2, genericDiffConfig);
-            assertTrue(differences.isEmpty());
+            genericObjectDiffer.compareTwoObjects(graph1, graph2);
         }
 
         // Ideally we'd compare two separate but identical complex graphs.
@@ -57,43 +47,59 @@ public class GenericObjectDifferTest {
         {
             // Create two semantically equal objects that are composed of completely separate instances.
             // No differences should be found between the two.
-            Wrapper o1 = new Wrapper();
-            Wrapper o2 = new Wrapper();
-            List<Difference> differences = genericObjectDiffer.compareObjects(o1, o2, genericDiffConfig);
-            assertTrue(differences.isEmpty());
+            Map<Integer, Fields> o1 = makeFieldsMap();
+            Map<Integer, Fields> o2 = makeFieldsMap();
+            GenericObjectDiffer genericObjectDiffer = new GenericObjectDiffer();
+            genericObjectDiffer.compareTwoObjects(o1, o2);
+            assertFalse(genericObjectDiffer.hasDifferences());
 
             // Now make one of the two nested objects different. Differences should be found.
-            o2.wrappedItem.get("50").clear();
-            differences = genericObjectDiffer.compareObjects(o1, o2, genericDiffConfig);
-            // This assertion fails - the differ gives a false negative when the map values are different.
-            assertFalse(differences.isEmpty());
+            o2.get(10).nestedMap.get("50").clear();
+            // This should fail
+            genericObjectDiffer = new GenericObjectDiffer(); // TODO add a reset function
+            genericObjectDiffer.compareTwoObjects(o1, o2);
+            assertTrue(genericObjectDiffer.hasDifferences());
+            genericObjectDiffer.printDifferences();
         }
 
     }
 
-    /**
-     * The diff code currently assumes the outermost object should be compared field-by-field (is not a Collection or
-     * Map and does not define semantic equals() method). Therefore we compare two appropriate objects wrapping complex
-     * nested collections.
-     */
-    private static class Wrapper {
-        Map<String, Map<int[], String>> wrappedItem = makeNestedObject();
+    private Map<Integer, Fields> makeFieldsMap () {
+        Map<Integer, Fields> result = new HashMap<>();
+        for (int i = 0; i < 100; i += 10) {
+            result.put(Integer.valueOf(i), new Fields(i));
+        }
+        return result;
     }
 
-    public static Map<String, Map<int[], String>> makeNestedObject() {
-        Map<String, Map<int[], String>> result = new HashMap<>();
+    private static class Fields {
+        int integer;
+        String string;
+        Double doubleObject;
+        Map<String, Map<String, int[]>> nestedMap;
+
+        public Fields(int i) {
+            this.integer = i;
+            this.string = Integer.toString(i);
+            this.doubleObject = Double.valueOf(i);
+            this.nestedMap = makeNestedMap();
+        }
+    }
+
+    public static Map<String, Map<String, int[]>> makeNestedMap() {
+        Map<String, Map<String, int[]>> result = new HashMap<>();
         for (int x = 10; x < 100; x += 10) {
             result.put(Integer.toString(x), getMap(x, 10));
         }
         return result;
     }
 
-    public static Map<int[], String> getMap (int start, int size) {
-        Map<int[], String> result = new HashMap<>();
+    public static Map<String, int[]> getMap (int start, int size) {
+        Map<String, int[]> result = new HashMap<>();
         for (int x = start; x < start + size; x++) {
             int[] array = getSequentialArray(x, 10);
             String string = Integer.toString(x);
-            result.put(array, string);
+            result.put(string, array);
         }
         return result;
     }
