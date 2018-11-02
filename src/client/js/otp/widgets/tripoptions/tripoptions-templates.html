@@ -6,7 +6,7 @@
         <div style="height: 2em;">{{start}}:</div>
         <div>{{end}}:</div>
     </div>
-
+        
     <div class="notDraggable" style="position: relative; margin-left: 4em; height: 3.6em; overflow: hidden;">
         <div style="position: absolute; left:0px; right: 30px; height: 20px;">
             <div style="position: absolute; left:0px; right: 16px; top:1px; bottom: 0px;">
@@ -39,9 +39,9 @@
                      <option>{{name}}</option>
                 {{/geocoders}}
             </select>
-        </div>
+        </div>            
     {{/showGeocoders}}
-
+    
 </script>
 
 
@@ -55,10 +55,10 @@
             <option>{{depart}}</option>
             <option>{{arrive}}</option>
         </select>
-
+        
         <input type="text" id="{{widgetId}}-time" class="otp-time-input" />
         <input type="text" id="{{widgetId}}-date" class="otp-date-input" />
-        <button id="{{widgetId}}-nowButton">{{now}}</button>
+        <button id="{{widgetId}}-nowButton">{{now}}</button>        
     </div>
 
 </script>
@@ -102,7 +102,7 @@
             {{/presets}}
         </select>
     </div>
-
+        
 </script>
 
 
@@ -117,14 +117,14 @@
         {{preferredRoutes_label}}: <span id="{{widgetId}}-list">({{none}})</span>
         <div style="clear:both;"></div>
     </div>
-
+    
     <div class="otp-tripViewer-select notDraggable" style="margin-top: 8px;" >
         <div style="float: left;">{{weight}}:</div>
         <div style="margin-left:80px;">
             <div id="{{widgetId}}-weightSlider" style="width:90%" />
         </div>
     </div>
-
+    
 </script>
 
 
@@ -138,7 +138,7 @@
             <select id="{{widgetId}}-routeList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable">
             </select>
         </div>
-
+        
         <div style="float:right">{{name}}<br>
             <select id="{{widgetId}}-selectedList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable">
             </select>
@@ -148,7 +148,7 @@
             <button id="{{widgetId}}-addButton" style="margin-bottom: 5px;">&gt;</button><br>
             <button id="{{widgetId}}-removeButton">&lt;</button><br>
         </div>
-
+        
         <div style="clear:both;" /></div>
     </div>
 
