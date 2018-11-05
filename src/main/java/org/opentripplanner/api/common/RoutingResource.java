@@ -654,7 +654,7 @@ public abstract class RoutingResource {
         //
         // Also, if "depart at" and leaving soonish, save earliest departure time for use later use when boarding the
         // first TNC before transit.  (See StateEditor.boardHailedCar)
-        if (this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
+        if (this.modes != null && this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
             if (companies == null) {
                 throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
             }

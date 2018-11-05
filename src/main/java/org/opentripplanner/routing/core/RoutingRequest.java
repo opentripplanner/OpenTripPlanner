@@ -854,7 +854,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 }
             }
         }
-        LOG.debug("Setting date to {}", date.toString());
+        LOG.debug("Setting date to {}", date);
         setDateTime(dateObject);
     }
 
