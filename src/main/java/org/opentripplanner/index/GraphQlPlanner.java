@@ -260,6 +260,7 @@ public class GraphQlPlanner {
         if (hasArgument(environment, "ticketTypes")) {
             String ticketTypes = environment.getArgument("ticketTypes"); // comma separated list e.g. "HSL_esp,HSL_van"
             request.allowedFares = Sets.newHashSet(ticketTypes);
+            request.allowedFares.addAll(request.allowedFares.stream().map(val -> val.replaceFirst("_", ":")).collect(Collectors.toList()));
             //TODO should we increase max walk distance?
             //request.setMaxWalkDistance(request.getMaxWalkDistance()*2);
         }
