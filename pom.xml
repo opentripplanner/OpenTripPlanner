@@ -817,11 +817,11 @@
             <artifactId>traffic-engine</artifactId>
             <version>0.2</version>
         </dependency>
-        <!-- R5 may eventually be an alternate routing option within OTP. -->
+        <!-- OTP 2.0 will adopt routing methods based on those in R5. This also contains a serialization test framework. -->
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-simple</artifactId>

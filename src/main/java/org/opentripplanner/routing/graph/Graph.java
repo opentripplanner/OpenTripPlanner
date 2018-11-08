@@ -820,6 +820,7 @@ public class Graph implements Serializable {
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
         kryo.register(HashBiMap.class, new HashBiMapSerializer());
         // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
+        // FIXME we're importing all the contributed kryo-serializers just for this one serializer
         try {
             Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
             kryo.addDefaultSerializer(unmodifiableCollection , UnmodifiableCollectionsSerializer.class);
