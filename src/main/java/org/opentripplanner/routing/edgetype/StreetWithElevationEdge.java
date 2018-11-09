@@ -38,6 +38,11 @@ public class StreetWithElevationEdge extends StreetEdge {
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
 
+        // Fix issue with effectiveWalkLength_mm being zero despite best efforts @ StreetEdge.split
+        if (length < 0.1) {
+            this.calculateLengthFromGeometry();
+        }
+
         // Initiate to "flat" distance, use #setElevationProfile() to set elevation adjusted value
         this.effectiveWalkLength_mm = getLength_mm();
     }
