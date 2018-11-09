@@ -98,8 +98,6 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    private boolean debugData = false;
-
     // TODO this would be more efficient if it was just an array.
     private transient Map<Integer, Vertex> vertexById;
 
@@ -662,23 +660,12 @@ public class Graph implements Serializable {
 
     /* (de) serialization */
 
-    public enum LoadLevel {
-        BASIC, FULL, DEBUG;
-    }
-
-    public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
+    public static Graph load(File file) throws IOException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
-        return load(new FileInputStream(file), level);
+        return load(new FileInputStream(file));
     }
 
     /**
-     * Default load. Uses DefaultStreetVertexIndexFactory.
-     */
-    public static Graph load(InputStream is, LoadLevel level) throws IOException, ClassNotFoundException {
-        return load(is, level, new DefaultStreetVertexIndexFactory());
-    }
-    
-    /** 
      * Perform indexing on vertices, edges, and timetables, and create transient data structures.
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
      * allows passing graphs from graphbuilder to server in memory, without a round trip through
@@ -701,17 +688,7 @@ public class Graph implements Serializable {
         this.index = new GraphIndex(this);
     }
     
-    /**
-     * Loading which allows you to specify StreetVertexIndexFactory and inject other implementation.
-     * @param in
-     * @param level
-     * @param indexFactory
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    @SuppressWarnings("unchecked")
-    public static Graph load(InputStream in, LoadLevel level, StreetVertexIndexFactory indexFactory) {
+    public static Graph load(InputStream in) {
         // TODO store version information, halt load if versions mismatch
         Input input = new Input(in);
         Kryo kryo = makeKryo();
@@ -719,9 +696,6 @@ public class Graph implements Serializable {
         LOG.debug("Basic graph info read.");
         if (graph.graphVersionMismatch()) {
             throw new RuntimeException("Graph version mismatch detected.");
-        }
-        if (level == LoadLevel.BASIC) {
-            return graph;
         }
         // Vertex edge lists are transient to avoid excessive recursion depth during serialization.
         // vertex list is transient because it can be reconstructed from edges.
@@ -742,22 +716,8 @@ public class Graph implements Serializable {
         }
 
         LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(indexFactory);
-
-        if (level == LoadLevel.FULL) {
-            return graph;
-        }
-
-        if (graph.debugData) {
-            graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) kryo.readClassAndObject(input);
-            LOG.debug("Debug info read.");
-        } else {
-            LOG.warn("Graph file does not contain debug data.");
-        }
+        graph.index(new DefaultStreetVertexIndexFactory());
         return graph;
-
-//        LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
-//        throw new IllegalStateException("Stored Graph version error", ex);
     }
 
     /**
@@ -864,38 +824,10 @@ public class Graph implements Serializable {
         LOG.debug("Writing edges...");
         kryo.writeClassAndObject(output, this);
         kryo.writeClassAndObject(output, edges);
-        if (debugData) {
-            // should we make debug info generation conditional?
-            LOG.debug("Writing debug data...");
-            kryo.writeClassAndObject(output, this.graphBuilderAnnotations);
-            kryo.writeClassAndObject(output, this.vertexById);
-            kryo.writeClassAndObject(output, this.edgeById);
-        } else {
-            LOG.debug("Skipping debug data.");
-        }
         output.close();
         LOG.info("Graph written.");
         // Summarize serialized classes and associated serializers:
         // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
-    }
-
-    /* deserialization for org.opentripplanner.customize */
-    private static class GraphObjectInputStream extends ObjectInputStream {
-        ClassLoader classLoader;
-
-        public GraphObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
-            super(in);
-            this.classLoader = classLoader;
-        }
-
-        @Override
-        public Class<?> resolveClass(ObjectStreamClass osc) {
-            try {
-                return Class.forName(osc.getName(), false, classLoader);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public Integer getIdForEdge(Edge edge) {
@@ -1077,7 +1009,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

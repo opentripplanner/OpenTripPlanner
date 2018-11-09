@@ -48,7 +48,7 @@ public class GraphSerializationTest {
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
         originalGraph.save(tempFile);
-        Graph copiedGraph = Graph.load(tempFile, Graph.LoadLevel.FULL);
+        Graph copiedGraph = Graph.load(tempFile);
         assertNoDifferences(originalGraph, copiedGraph);
     }
 
