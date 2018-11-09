@@ -48,8 +48,10 @@ public class GraphSerializationTest {
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
         originalGraph.save(tempFile);
-        Graph copiedGraph = Graph.load(tempFile);
-        assertNoDifferences(originalGraph, copiedGraph);
+        Graph copiedGraph1 = Graph.load(tempFile);
+        assertNoDifferences(originalGraph, copiedGraph1);
+        Graph copiedGraph2 = Graph.load(tempFile);
+        assertNoDifferences(copiedGraph1, copiedGraph2);
     }
 
     // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
