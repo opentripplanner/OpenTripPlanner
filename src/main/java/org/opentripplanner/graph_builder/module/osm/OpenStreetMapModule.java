@@ -788,32 +788,80 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     onboardVertices.add(onboardVertex);
                 }
 
-                // -1 because we loop over onboardVertices two at a time
-                for (Integer i = 0, vSize = onboardVertices.size() - 1; i < vSize; i++) {
-                    Vertex from = onboardVertices.get(i);
-                    Vertex to = onboardVertices.get(i + 1);
 
-                    // default permissions: pedestrian, wheelchair, and bicycle
-                    boolean wheelchairAccessible = true;
-                    StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-                    // check for bicycle=no, otherwise assume it's OK to take a bike
-                    if (node.isTagFalse("bicycle")) {
-                        permission = StreetTraversalPermission.PEDESTRIAN;
-                    }
-                    // check for wheelchair=no
-                    if (node.isTagFalse("wheelchair")) {
-                        wheelchairAccessible = false;
-                    }
+                createElevatorHopEdges(onboardVertices, node.isTagFalse("bicycle"), node.isTagFalse("wheelchair"));
 
-                    // The narrative won't be strictly correct, as it will show the elevator as part
-                    // of the cycling leg, but I think most cyclists will figure out that they
-                    // should really dismount.
-                    ElevatorHopEdge foreEdge = new ElevatorHopEdge(from, to, permission);
-                    ElevatorHopEdge backEdge = new ElevatorHopEdge(to, from, permission);
-                    foreEdge.wheelchairAccessible = wheelchairAccessible;
-                    backEdge.wheelchairAccessible = wheelchairAccessible;
-                }
+
             } // END elevator edge loop
+
+
+            // Add highway=elevators to graph as elevators
+            Iterator<OSMWay> elevators = osmdb.getWays().stream()
+                    .filter(way -> way.hasTag("highway") && "elevator".equals(way.getTag("highway")) && !osmdb.isAreaWay(way.getId()))
+                    .iterator();
+
+
+            for (Iterator<OSMWay> it = elevators; it.hasNext(); ) {
+
+                OSMWay elevatorWay = it.next();
+
+                List<Long> nodes = elevatorWay.getNodeRefs().stream().filter(nodeRef -> intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null).collect(Collectors.toList());
+                ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
+
+                for (int i = 0; i < nodes.size(); i++) {
+                    Long node = nodes.get(i);
+                    OsmVertex sourceVertex = intersectionNodes.get(nodes.get(i));
+                    String sourceVertexLabel = sourceVertex.getLabel();
+
+                    ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(graph,
+                            sourceVertexLabel + "_offboard", sourceVertex.getX(),
+                            sourceVertex.getY(), elevatorWay.getId() + " / " + i);
+
+                    new FreeEdge(sourceVertex, offboardVertex);
+                    new FreeEdge(offboardVertex, sourceVertex);
+
+                    ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(graph,
+                            sourceVertexLabel + "_onboard", sourceVertex.getX(),
+                            sourceVertex.getY(), elevatorWay.getId() + " / " + i);
+
+                    new ElevatorBoardEdge(offboardVertex, onboardVertex);
+                    new ElevatorAlightEdge(onboardVertex, offboardVertex, elevatorWay.getId() + " / " + i);
+
+                    onboardVertices.add(onboardVertex);
+
+                }
+                createElevatorHopEdges(onboardVertices, elevatorWay.isTagFalse("bicycle"), elevatorWay.isTagFalse("wheelchair"));
+                LOG.info("Created elevatorHopEdges for way {}", elevatorWay.getId());
+            }
+
+        }
+
+        private void createElevatorHopEdges(ArrayList<Vertex> onboardVertices, boolean bicycle, boolean wheelchair) {
+            // -1 because we loop over onboardVertices two at a time
+            for (Integer i = 0, vSize = onboardVertices.size() - 1; i < vSize; i++) {
+                Vertex from = onboardVertices.get(i);
+                Vertex to = onboardVertices.get(i + 1);
+
+                // default permissions: pedestrian, wheelchair, and bicycle
+                boolean wheelchairAccessible = true;
+                StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+                // check for bicycle=no, otherwise assume it's OK to take a bike
+                if (bicycle) {
+                    permission = StreetTraversalPermission.PEDESTRIAN;
+                }
+                // check for wheelchair=no
+                if (wheelchair) {
+                    wheelchairAccessible = false;
+                }
+
+                // The narrative won't be strictly correct, as it will show the elevator as part
+                // of the cycling leg, but I think most cyclists will figure out that they
+                // should really dismount.
+                ElevatorHopEdge foreEdge = new ElevatorHopEdge(from, to, permission);
+                ElevatorHopEdge backEdge = new ElevatorHopEdge(to, from, permission);
+                foreEdge.wheelchairAccessible = wheelchairAccessible;
+                backEdge.wheelchairAccessible = wheelchairAccessible;
+            }
         }
 
         private void unifyTurnRestrictions() {
