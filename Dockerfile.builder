@@ -12,4 +12,4 @@ ADD src ${OTP_ROOT}/src
 add .git ${OTP_ROOT}/.git
 
 # Build OTP
-RUN mvn package -DskipTests
+RUN mvn package
