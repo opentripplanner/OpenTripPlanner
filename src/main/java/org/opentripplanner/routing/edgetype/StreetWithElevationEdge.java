@@ -30,7 +30,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     private boolean flattened;
 
-    private int effectiveWalkLength_mm;
+    private double effectiveWalkFactor = 1.0;
 
     /**
      * Remember to call the {@link #setElevationProfile(PackedCoordinateSequence, boolean)} to initiate elevation data.
@@ -39,8 +39,6 @@ public class StreetWithElevationEdge extends StreetEdge {
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
 
-        // Initiate to "flat" distance, use #setElevationProfile() to set elevation adjusted value
-        this.effectiveWalkLength_mm = getLength_mm();
     }
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -68,7 +66,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         slopeWorkFactor = (float)costs.slopeWorkFactor;
         maxSlope = (float)costs.maxSlope;
         flattened = costs.flattened;
-        effectiveWalkLength_mm = costs.effectiveWalkDistance_mm;
+        effectiveWalkFactor = costs.effectiveWalkFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
         bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
@@ -106,20 +104,7 @@ public class StreetWithElevationEdge extends StreetEdge {
     @Override
     public double getSlopeWalkSpeedEffectiveLength() {
         // Convert from fixed millimeters to double meters
-        return effectiveWalkLength_mm / 1000d;
-    }
-
-    @Override
-    protected void calculateLengthFromGeometry () {
-        double accumulatedMeters = 0;
-
-        LineString geom = getGeometry();
-
-        for (int i = 1; i < geom.getNumPoints(); i++) {
-            accumulatedMeters += SphericalDistanceLibrary.distance(geom.getCoordinateN(i - 1), geom.getCoordinateN(i));
-        }
-
-        effectiveWalkLength_mm = (int) (accumulatedMeters * 1000);
+        return effectiveWalkFactor * getDistance();
     }
 
     @Override

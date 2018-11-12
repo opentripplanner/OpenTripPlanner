@@ -72,7 +72,7 @@ public class ElevationUtils {
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
             log.error("Too small edge, returning neutral slope costs.");
-            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, (int)(flatLength*1000d));
+            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
         }
         double lengthMultiplier = trueLength / flatLength;
         for (int i = 0; i < coordinates.length - 1; ++i) {
@@ -117,7 +117,7 @@ public class ElevationUtils {
          * length of the street edge which is the flat one.
          */
         return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
-                slopeSafetyCost, maxSlope, lengthMultiplier, flattened, (int)(effectiveWalkLength * 1000d));
+                slopeSafetyCost, maxSlope, lengthMultiplier, flattened, effectiveWalkLength / flatLength);
     }
 
     /** constants for slope computation */
