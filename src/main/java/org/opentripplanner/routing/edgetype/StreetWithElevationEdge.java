@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -37,11 +38,6 @@ public class StreetWithElevationEdge extends StreetEdge {
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
-
-        // Fix issue with effectiveWalkLength_mm being zero despite best efforts @ StreetEdge.split
-        if (length < 0.1) {
-            this.calculateLengthFromGeometry();
-        }
 
         // Initiate to "flat" distance, use #setElevationProfile() to set elevation adjusted value
         this.effectiveWalkLength_mm = getLength_mm();
@@ -111,6 +107,19 @@ public class StreetWithElevationEdge extends StreetEdge {
     public double getSlopeWalkSpeedEffectiveLength() {
         // Convert from fixed millimeters to double meters
         return effectiveWalkLength_mm / 1000d;
+    }
+
+    @Override
+    protected void calculateLengthFromGeometry () {
+        double accumulatedMeters = 0;
+
+        LineString geom = getGeometry();
+
+        for (int i = 1; i < geom.getNumPoints(); i++) {
+            accumulatedMeters += SphericalDistanceLibrary.distance(geom.getCoordinateN(i - 1), geom.getCoordinateN(i));
+        }
+
+        effectiveWalkLength_mm = (int) (accumulatedMeters * 1000);
     }
 
     @Override
