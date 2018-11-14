@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
@@ -50,8 +51,11 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
         boolean newRide = true;
         for (State state : path.states) {
             Edge edge = state.getBackEdge();
-            if (!(edge instanceof HopEdge)) {
+            if (edge instanceof TransitBoardAlight) {
                 newRide = true;
+                continue;
+            }
+            if (!(edge instanceof HopEdge)) {
                 continue;
             }
             HopEdge hEdge = (HopEdge) edge;
