@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.impl.DefaultFareServiceImpl;
@@ -50,8 +51,11 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
         boolean newRide = true;
         for (State state : path.states) {
             Edge edge = state.getBackEdge();
-            if (!(edge instanceof HopEdge)) {
+            if (edge instanceof TransitBoardAlight) {
                 newRide = true;
+                continue;
+            }
+            if (!(edge instanceof HopEdge)) {
                 continue;
             }
             HopEdge hEdge = (HopEdge) edge;
@@ -101,13 +105,22 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
 
             /* HSL specific logig: all exception routes start and end from the defined zone set,
                but visit temporarily (maybe 1 stop only) an 'external' zone */
+            float bestSpecialFare = Float.POSITIVE_INFINITY;
             Set<String> ruleZones = null;
             for (FareRuleSet ruleSet : fareRules) {
                 if(ruleSet.getRoutes().contains(ride.route) &&
                    ruleSet.getContains().contains(ride.startZone) &&
                    ruleSet.getContains().contains(ride.endZone)) {
-                    ruleZones = ruleSet.getContains();
-                    break;
+                    // check validity of this special rule and that it is the cheapest applicable one
+                    FareAttribute attribute = ruleSet.getFareAttribute();
+                    if (!attribute.isTransferDurationSet() ||
+                        lastRideStartTime - startTime < attribute.getTransferDuration()) {
+                            float newFare = getFarePrice(attribute, fareType);
+                            if (newFare < bestSpecialFare) {
+                                bestSpecialFare = newFare;
+                                ruleZones = ruleSet.getContains();
+                            }
+                        }
                 }
             }
             if (ruleZones != null) { // the special case
