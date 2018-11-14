@@ -14,16 +14,16 @@ public class SlopeCosts {
      * to calculate the increase of 19% to walk such a distance. We add that
      * percentage to the 'flat' distance and get 1190m.
      */
-    public final int effectiveWalkDistance_mm;
+    public final double effectiveWalkFactor;
     
     SlopeCosts(double slopeSpeedFactor, double slopeWorkFactor, double slopeSafetyCost,
-                      double maxSlope, double lengthMultiplier, boolean flattened, int effectiveWalkDistance_mm) {
+                      double maxSlope, double lengthMultiplier, boolean flattened, double effectiveWalkFactor) {
         this.slopeSpeedFactor = slopeSpeedFactor;
         this.slopeWorkFactor = slopeWorkFactor;
         this.slopeSafetyCost = slopeSafetyCost;
         this.maxSlope = maxSlope;
         this.lengthMultiplier = lengthMultiplier;
         this.flattened = flattened;
-        this.effectiveWalkDistance_mm = effectiveWalkDistance_mm;
+        this.effectiveWalkFactor = effectiveWalkFactor;
     }
 }

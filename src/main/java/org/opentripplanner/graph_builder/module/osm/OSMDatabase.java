@@ -164,6 +164,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return waysNodeIds.contains(nodeId);
     }
 
+    public boolean isAreaWay(Long wayId) { return areaWayIds.contains(wayId); }
+
     public Collection<GraphBuilderAnnotation> getAnnotations() {
         return Collections.unmodifiableList(annotations);
     }
