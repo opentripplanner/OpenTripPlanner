@@ -91,13 +91,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * Before the main search begins, the heuristic must search on the streets around the origin and destination.
      * This also sets up the initial states for the reverse search through the transit network, which progressively
      * improves lower bounds on travel time to the target to guide the main search.
-     *
      */
     @Override
     public void initialize(RoutingRequest request, long abortTime) {
-        // This code used to use the RoutingRequest for the original search, & as a side effect,
-        // set softWalkLimiting = false and maxWalkDistance = Infinity. Now, we use a cloned version of the
-        // request instead.
         Vertex target = request.rctx.target;
         if (target == this.target) {
             LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
@@ -107,24 +103,27 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.graph = request.rctx.graph;
         long start = System.currentTimeMillis();
         this.target = target;
-        this.routingRequest = request.clone();
-        routingRequest.excludeWalking = false;
-        routingRequest.softWalkLimiting = false;
-        routingRequest.softPreTransitLimiting = false;
-        routingRequest.maxWalkDistance = request.maxWalkDistanceHeuristic;
+        this.routingRequest = request;
+        request.softWalkLimiting = false;
+        request.softPreTransitLimiting = false;
         transitQueue = new BinHeap<>();
         // Forward street search first, mark street vertices around the origin so H evaluates to 0
-        TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(routingRequest, false, abortTime);
+        TObjectDoubleMap<Vertex> forwardStreetSearchResults = streetSearch(request, false, abortTime);
         if (forwardStreetSearchResults == null) {
             return; // Search timed out
         }
         preTransitVertices = forwardStreetSearchResults.keySet();
         LOG.debug("end forward street search {} ms", System.currentTimeMillis() - start);
-        postBoardingWeights = streetSearch(routingRequest, true, abortTime);
+        postBoardingWeights = streetSearch(request, true, abortTime);
         if (postBoardingWeights == null) {
             return; // Search timed out
         }
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
+        // once street searches are done, raise the limits to max
+        // because hard walk limiting is incorrect and is observed to cause problems 
+        // for trips near the cutoff
+        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        request.setMaxPreTransitTime(Integer.MAX_VALUE);
         LOG.debug("initialized SSSP");
         request.rctx.debugOutput.finishedPrecalculating();
     }
