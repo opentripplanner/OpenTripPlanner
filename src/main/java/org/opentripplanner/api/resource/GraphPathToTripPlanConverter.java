@@ -735,12 +735,6 @@ public abstract class GraphPathToTripPlanConverter {
                 }
                 if ((endOfLeg && hop.isDeviatedRouteAlight()) || (!endOfLeg && hop.isDeviatedRouteBoard())) {
                     place.boardAlightType = BoardAlightType.DEVIATED;
-                    if (hop.getDisplayGeometry().getNumPoints() > 0) {
-                        int i = endOfLeg ? hop.getDisplayGeometry().getNumPoints() - 1 : 0;
-                        Coordinate c = hop.getDisplayGeometry().getCoordinateN(i);
-                        place.deviatedRouteLat = c.getOrdinate(1);
-                        place.deviatedRouteLon = c.getOrdinate(0);
-                    }
                 }
             }
         } else if(vertex instanceof BikeRentalStationVertex) {
