@@ -18,7 +18,6 @@ public class VermontFlexRoutingTest {
 
     private Graph graph = ConstantsForTests.getInstance().getVermontGraph();
     private static final int MAX_WALK_DISTANCE = 804;
-    private static final int MAX_WALK_DISTANCE_HEURISTIC = 5000;
     private static final double CALL_AND_RIDE_RELUCTANCE = 3.0;
     private static final double WALK_RELUCTANCE = 3.0;
     private static final double WAIT_AT_BEGINNING_FACTOR = 0;
@@ -104,7 +103,6 @@ public class VermontFlexRoutingTest {
         RoutingRequest options = new RoutingRequest();
         // defaults in vermont router-config.json
         options.maxWalkDistance = MAX_WALK_DISTANCE;
-        options.maxWalkDistanceHeuristic = MAX_WALK_DISTANCE_HEURISTIC;
         options.callAndRideReluctance = CALL_AND_RIDE_RELUCTANCE;
         options.walkReluctance = WALK_RELUCTANCE;
         options.waitAtBeginningFactor = WAIT_AT_BEGINNING_FACTOR;
@@ -116,20 +114,18 @@ public class VermontFlexRoutingTest {
         options.setToString(to);
         options.setRoutingContext(graph);
 
-        return buildRoutingRequest(from, to, date, time, MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_HEURISTIC,
+        return buildRoutingRequest(from, to, date, time, MAX_WALK_DISTANCE,
                 CALL_AND_RIDE_RELUCTANCE, WALK_RELUCTANCE, WAIT_AT_BEGINNING_FACTOR,
                 TRANSFER_PENALTY, IGNORE_DRT_ADVANCE_MIN_BOOKING);
     }
 
     private RoutingRequest buildRoutingRequest(String from, String to, String date, String time, int maxWalkDistance,
-                                               int maxWalkDistanceHeuristic, double callAndRideReluctance,
-                                               double walkReluctance,
+                                               double callAndRideReluctance, double walkReluctance,
                                                double waitAtBeginningFactor, int transferPenalty,
                                                boolean ignoreDrtAdvanceMinBooking) {
         RoutingRequest options = new RoutingRequest();
         // defaults in vermont router-config.json
         options.maxWalkDistance = maxWalkDistance;
-        options.maxWalkDistanceHeuristic = maxWalkDistanceHeuristic;
         options.callAndRideReluctance = callAndRideReluctance;
         options.walkReluctance = walkReluctance;
         options.waitAtBeginningFactor = waitAtBeginningFactor;

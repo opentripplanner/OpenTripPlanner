@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -74,12 +72,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Defaults to unlimited.
      */
     public double maxWalkDistance = Double.MAX_VALUE;
-
-    /**
-     * The maximum distance (in meters) the heuristic should explore to find transit access/egress.
-     * Defaults to unlimited.
-     */
-    public double maxWalkDistanceHeuristic = Double.MAX_VALUE;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.
@@ -1014,7 +1006,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
-                && maxWalkDistanceHeuristic == other.maxWalkDistanceHeuristic
                 && maxTransferWalkDistance == other.maxTransferWalkDistance
                 && maxPreTransitTime == other.maxPreTransitTime
                 && transferPenalty == other.transferPenalty
@@ -1083,7 +1074,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + (int) (worstTime & 0xffffffff) + modes.hashCode()
                 + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
-                + new Double(maxWalkDistanceHeuristic).hashCode()
                 + new Double(maxTransferWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
