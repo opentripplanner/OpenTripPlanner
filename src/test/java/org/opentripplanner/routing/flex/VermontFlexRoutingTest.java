@@ -24,7 +24,6 @@ public class VermontFlexRoutingTest {
     private static final int TRANSFER_PENALTY = 600;
     private static final boolean IGNORE_DRT_ADVANCE_MIN_BOOKING = true;
 
-    // http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.42145960616986%2C-72.01937198638917&toPlace=44.427773287332464%2C-72.0120351442025&date=05%2F23%2F2018&time=1%3A37%20PM&mode=TRANSIT%2CWALK&numItineraries=3&wheelchairAccessible=false&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true
     // Flag stop on both sides, on Jay-Lyn (route 1382)
     @Test
     public void testFlagStop() {
@@ -42,7 +41,6 @@ public class VermontFlexRoutingTest {
     }
 
 
-    // http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.38485134435363%2C-72.05881118774415&toPlace=44.422379116722084%2C-72.0198440551758&date=05%2F23%2F2018&time=1%3A37%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&wheelchairAccessible=false&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true
     // Deviated Route on both ends
     @Test
     public void testCallAndRide() {
@@ -59,7 +57,6 @@ public class VermontFlexRoutingTest {
         checkFare(path);
     }
 
-    //http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.950950106914135%2C-72.20008850097658&toPlace=44.94985671536269%2C-72.13708877563478&date=06%2F11%2F2018&time=4%3A00%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&wheelchairAccessible=false&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true&=
     // Deviated Fixed Route at both ends
     @Test
     public void testDeviatedFixedRoute() {
@@ -76,7 +73,6 @@ public class VermontFlexRoutingTest {
         checkFare(path);
     }
 
-    // http://otp-vtrans-qa.camsys-apps.com/local/#plan?fromPlace=44.8091683%2C-72.20580269999999&toPlace=44.94985671536269%2C-72.13708877563478&date=06%2F11%2F2018&time=4%3A00%20PM&arriveBy=false&maxWalkDistance=804&mode=TRANSIT%2CWALK&numItineraries=3&flagStopBufferSize=50&useReservationServices=true&useEligibilityServices=true
     // Flag stop to a deviated fixed route that starts as a regular route and ends deviated
     @Test
     public void testFlagStopToRegularStopEndingInDeviatedFixedRoute() {
