@@ -688,19 +688,20 @@ public abstract class RoutingResource {
             }
 
             // iterate through results and find earliest ETA of an acceptable ride type
-            int earliestEta = 999999;
+            int earliestEta = Integer.MAX_VALUE;
             for (ArrivalTime arrivalEstimate : arrivalEstimates) {
                 for (String rideType : ACCEPTED_RIDE_TYPES) {
-                    if (arrivalEstimate.productId.equals(rideType) &&
+                    if (
+                        arrivalEstimate.productId.equals(rideType) &&
                         arrivalEstimate.estimatedSeconds < earliestEta
-                        ) {
+                    ) {
                         earliestEta = arrivalEstimate.estimatedSeconds;
                         break;
                     }
                 }
             }
 
-            if (earliestEta == 999999) {
+            if (earliestEta == Integer.MAX_VALUE) {
                 // no acceptable ride types found
                 throw new TransportationNetworkCompanyAvailabilityException();
             }
