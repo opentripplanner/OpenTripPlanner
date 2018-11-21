@@ -5,11 +5,20 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -40,7 +49,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
@@ -108,6 +117,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    // whether or not this street is a good place to board or alight a TNC vehicle
+    private boolean suitableForTNCStop = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -272,6 +284,57 @@ public class StreetEdge extends Edge implements Cloneable {
                         return editor.makeState(); // return only the "parked" walking state
                     }
 
+                }
+            }
+        } else if (options.useTransportationNetworkCompany) {
+            // Irrevocable transition from using hailed car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                    s0.isUsingHailedCar()
+                            && !getPermission().allows(TraverseMode.CAR)
+                            && currMode == TraverseMode.CAR
+            ) {
+                if (!s0.isTNCStopAllowed()) {
+                    return null;
+                }
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.alightHailedCar(); // done with TNC use for now
+                    return editor.makeState(); // return only the state with updated TNC usage
+                }
+            }
+            // possible transition to hailing a car
+            else if (
+                    !s0.isUsingHailedCar()
+                            && getPermission().allows(TraverseMode.CAR)
+                            && currMode != TraverseMode.CAR
+                            && getTNCStopSuitability()
+            ) {
+                // perform extra checks to prevent entering a tnc vehicle if a car has already been
+                // hailed in the pre or post transit part of trip
+                Vertex toVertex = options.rctx.toVertex;
+                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                        (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                    return state;
+                }
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    editorCar.boardHailedCar(getDistance()); // start of TNC use
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
                 }
             }
         }
@@ -451,6 +514,17 @@ public class StreetEdge extends Edge implements Cloneable {
 
             if (!traverseMode.isDriving()) {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
+            } else {
+                // check if driveTimeReluctance is defined (ie it is greater than 0)
+                if (options.driveTimeReluctance > 0) {
+                    s1.incrementWeight(time * options.driveTimeReluctance);
+                }
+                if (options.driveDistanceReluctance > 0) {
+                    s1.incrementWeight(getDistance() * options.driveDistanceReluctance);
+                }
+                if (s0.isUsingHailedCar()) {
+                    s1.incrementTransportationNetworkCompanyDistance(getDistance());
+                }
             }
 
             long turnTime = (long) Math.ceil(realTurnCost);
@@ -745,6 +819,12 @@ public class StreetEdge extends Edge implements Cloneable {
 	public void setCarSpeed(float carSpeed) {
 		this.carSpeed = carSpeed;
 	}
+
+    public void setTNCStopSuitability(boolean isSuitable) {
+        this.suitableForTNCStop = isSuitable;
+    }
+
+    public boolean getTNCStopSuitability() { return suitableForTNCStop; }
 
 	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);

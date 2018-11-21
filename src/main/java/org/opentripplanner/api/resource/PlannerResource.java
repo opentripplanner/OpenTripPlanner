@@ -1,6 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -46,7 +47,7 @@ public class PlannerResource extends RoutingResource {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
+         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
          *       or vertex ids to planner (or error back to user)
          * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
          *       out so it's used here too...
@@ -69,7 +70,15 @@ public class PlannerResource extends RoutingResource {
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
             TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
-            response.setPlan(plan);
+
+            // Check for empty plan after filtering
+            if(plan.itinerary.isEmpty()) {
+                // TODO: more descriptive message?
+                PlannerError error = new PlannerError();
+                error.setMsg(Message.NO_PATHS_AFTER_FILTERING);
+                response.setError(error);
+            }
+            else response.setPlan(plan);
 
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
@@ -85,10 +94,12 @@ public class PlannerResource extends RoutingResource {
             }
         }
 
-        /* Populate up the elevation metadata */
-        response.elevationMetadata = new ElevationMetadata();
-        response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
-        response.elevationMetadata.geoidElevation = request.geoidElevation;
+        /* Populate up the elevation metadata, only if no error occurred */
+        if (response.getError() == null) {
+            response.elevationMetadata = new ElevationMetadata();
+            response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
+            response.elevationMetadata.geoidElevation = request.geoidElevation;
+        }
 
         /* Log this request if such logging is enabled. */
         if (request != null && router != null && router.requestLogger != null) {
@@ -118,8 +129,8 @@ public class PlannerResource extends RoutingResource {
                     sb.append(path.getTrips().size());
                     sb.append(' ');
                 }
+                router.requestLogger.info(sb.toString());
             }
-            router.requestLogger.info(sb.toString());
         }
         return response;
     }

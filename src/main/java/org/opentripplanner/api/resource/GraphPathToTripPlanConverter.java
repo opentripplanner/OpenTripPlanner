@@ -3,7 +3,14 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.api.model.*;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
+import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -15,8 +22,24 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.core.*;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -24,13 +47,34 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -87,6 +131,24 @@ public abstract class GraphPathToTripPlanConverter {
             // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
             // do not include in plan
             if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
+
+            // If this is a transit option and minTransitDistance is specified, do not include in plan if the
+            // itinerary's total transit distance is less than minTransitDistance
+            if (itinerary.transitTime > 0 && request.minTransitDistance != null) {
+                double totalDistance = 0, transitDistance = 0;
+                for (Leg leg : itinerary.legs) {
+                    totalDistance += leg.distance;
+                    if (leg.isTransitLeg()) transitDistance += leg.distance;
+                }
+                // Handle percentage case
+                // TODO: handle number formatting errors
+                if (request.minTransitDistance.endsWith("%")) {
+                    double pctTransit = transitDistance / totalDistance;
+                    double minPct = Double.parseDouble(request.minTransitDistance.substring(0, request.minTransitDistance.length() - 1)) / 100;
+                    if (pctTransit < minPct) continue;
+                }
+                // TODO: handle explicit distance case
+            }
 
             plan.addItinerary(itinerary);
         }
@@ -159,7 +221,7 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
-
+        addTNCData(graph, itinerary, states[0].getOptions().companies);
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
@@ -325,10 +387,66 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        // check at start or end because either could be the very beginning or end of the trip
+        // which are temporary edges and stuff
+        leg.hailedCar = states[0].isUsingHailedCar() || states[states.length - 1].isUsingHailedCar();
+
         addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
         if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
+    }
+
+    /**
+     * Adds TNC data to legs with {@link Leg#hailedCar}=true. This makes asynchronous, concurrent requests to the TNC
+     * provider's API for price and ETA estimates and associates this data with its respective TNC leg.
+     */
+    private static void addTNCData(Graph graph, Itinerary itinerary, String companies) {
+        if (companies == null) return;
+        String rideType = companies.equals("UBER") ? ACCEPTED_RIDE_TYPES[1] : ACCEPTED_RIDE_TYPES[0];
+        // Store async tasks in lists for any TNC legs that need info.
+        List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();
+        List<Callable<RideEstimate>> priceEstimateTasks = new ArrayList<>();
+        // Keep track of TNC legs here (so the TNC responses can be filled in later).
+        List<Leg> tncLegs = new ArrayList<>();
+        TransportationNetworkCompanyService service = graph.getService(TransportationNetworkCompanyService.class);
+        // Accumulate TNC request tasks for each TNC leg.
+        for (Leg leg : itinerary.legs) {
+            if (!leg.hailedCar) continue;
+            tncLegs.add(leg);
+            // FIXME: Use an enum to handle this check.
+            priceEstimateTasks.add(() -> service.getRideEstimate(companies, rideType, leg.from, leg.to));
+            arrivalEstimateTasks.add(() -> service.getArrivalTimes(leg.from, companies));
+        }
+        if (tncLegs.size() > 0) {
+            // Use a thread pool so that requests are asynchronous and concurrent. # of threads should accommodate
+            // 2x however many TNC legs there are.
+            ExecutorService pool = Executors.newFixedThreadPool(tncLegs.size() * 2);
+            try {
+                // Execute TNC requests.
+                List<Future<List<ArrivalTime>>> etaResults = pool.invokeAll(arrivalEstimateTasks);
+                List<Future<RideEstimate>> priceResults = pool.invokeAll(priceEstimateTasks);
+                int resultCount = priceResults.size() + etaResults.size();
+                LOG.info("Collating {} TNC results for {} legs for {}", resultCount, tncLegs.size(), itinerary);
+                // Collate results into itinerary legs. ETA and price result lists will have the same length.
+                for (int i = 0; i < etaResults.size(); i++) {
+                    ArrivalTime eta = null;
+                    List<ArrivalTime> arrivalTimes = etaResults.get(i).get();
+                    for (ArrivalTime arrivalTime : arrivalTimes) {
+                        if (rideType.equals(arrivalTime.productId)) {
+                            eta = arrivalTime;
+                            break;
+                        }
+                    }
+                    tncLegs.get(i).tncData = new TransportationNetworkCompanySummary(priceResults.get(i).get(), eta);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                LOG.error("Error fetching TNC data");
+                e.printStackTrace();
+            }
+            // Shutdown thread pool.
+            pool.shutdown();
+        }
     }
 
     private static void addFrequencyFields(State[] states, Leg leg) {
@@ -1011,7 +1129,7 @@ public abstract class GraphPathToTripPlanConverter {
                         step.elevation = s;
                     }
                 }
-                distance += edge.getDistance();
+                if (!createdNewStep) distance += edge.getDistance();
 
             }
 

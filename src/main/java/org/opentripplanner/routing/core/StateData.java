@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.core;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -37,6 +37,11 @@ public class StateData implements Cloneable {
     protected boolean everBoarded;
 
     protected boolean usingRentedBike;
+
+    protected boolean usingHailedCar;
+
+    protected boolean hasHailedCarPostTransit = false;
+    protected boolean hasHailedCarPreTransit = false;
 
     protected boolean carParked;
 
@@ -107,5 +112,9 @@ public class StateData implements Cloneable {
     public int getNumBooardings(){
         return numBoardings;
     }
+
+    public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
+
+    public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
 
 }

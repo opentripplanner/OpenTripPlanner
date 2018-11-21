@@ -54,6 +54,10 @@ public class QualifiedMode implements Serializable {
         if (usingTransit && this.mode == TraverseMode.CAR) {
             if (this.qualifiers.contains(Qualifier.PARK)) {
                 req.parkAndRide = true;
+            } else if (this.qualifiers.contains(Qualifier.HAIL)) {
+                req.useTransportationNetworkCompany = true;
+                req.driveTimeReluctance = 1.75;
+                req.driveDistanceReluctance = 0.2;
             } else {
                 req.kissAndRide = true;
             }
@@ -78,5 +82,5 @@ public class QualifiedMode implements Serializable {
 }
 
 enum Qualifier {
-    RENT, HAVE, PARK, KEEP
+    RENT, HAVE, PARK, HAIL, KEEP
 }

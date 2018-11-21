@@ -1,8 +1,8 @@
 package org.opentripplanner.api.common;
 
-import java.util.Locale;
-
 import org.opentripplanner.util.Properties;
+
+import java.util.Locale;
 
 /**
  * The purpose of Messages is to read supply Message.properties to underlying calling code...
@@ -16,6 +16,7 @@ public enum Message {
 
     OUTSIDE_BOUNDS(400),
     PATH_NOT_FOUND(404),
+    NO_PATHS_AFTER_FILTERING(405),
     NO_TRANSIT_TIMES(406),
     REQUEST_TIMEOUT(408),
     BOGUS_PARAMETER(413),
@@ -24,6 +25,9 @@ public enum Message {
     GEOCODE_FROM_TO_NOT_FOUND(460),
     TOO_CLOSE(409),
     LOCATION_NOT_ACCESSIBLE(470),
+    TRANSPORTATION_NETWORK_COMPANY_UNAVAILABLE(480),
+    TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID(481),
+    TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID(482),
 
     GEOCODE_FROM_AMBIGUOUS(340),
     GEOCODE_TO_AMBIGUOUS(350),

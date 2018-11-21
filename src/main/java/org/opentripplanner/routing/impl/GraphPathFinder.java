@@ -77,6 +77,7 @@ public class GraphPathFinder {
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
         if (options.rctx == null) {
+            // This call will also set the start and end vertices
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
         }
@@ -141,7 +142,9 @@ public class GraphPathFinder {
             if (timeoutIndex >= router.timeouts.length) {
                 timeoutIndex = router.timeouts.length - 1;
             }
-            double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
+            double timeout = searchBeginTime + (
+                options.searchTimeout < 0 ? router.timeouts[timeoutIndex] * 1000 : options.searchTimeout
+            );
             timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
             timeout /= 1000; // Convert milliseconds to seconds
             if (timeout <= 0) {

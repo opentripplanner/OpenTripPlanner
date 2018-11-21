@@ -1,19 +1,24 @@
 package org.opentripplanner.routing.core;
 
-import java.util.Date;
-import java.util.Set;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TablePatternEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.Set;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -48,6 +53,9 @@ public class State implements Cloneable {
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
+
+    // The current distance traveled in a transportation network company vehicle
+    public double transportationNetworkCompanyDriveDistance;
     
     private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
@@ -113,8 +121,13 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
+        // if allowed to hail a car, initialize state with CAR mode if we're already in a hailed car
+        else if (options.useTransportationNetworkCompany) {
+            this.stateData.nonTransitMode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK;
+        }
         this.walkDistance = 0;
         this.preTransitTime = 0;
+        this.transportationNetworkCompanyDriveDistance = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new FeedScopedId[0];
     }
@@ -249,6 +262,8 @@ public class State implements Cloneable {
     public boolean isBikeRenting() {
         return stateData.usingRentedBike;
     }
+
+    public boolean isUsingHailedCar() { return stateData.usingHailedCar; }
     
     public boolean isCarParked() {
         return stateData.carParked;
@@ -268,6 +283,10 @@ public class State implements Cloneable {
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
+        boolean tncOK = !stateData.opt.useTransportationNetworkCompany || (
+                isEverBoarded() &&
+                        (!isUsingHailedCar() || isTNCStopAllowed())
+        );
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
@@ -277,7 +296,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && tncOK;
     }
 
     public Stop getPreviousStop() {
@@ -332,6 +351,13 @@ public class State implements Cloneable {
 
     public double getWeightDelta() {
         return this.weight - backState.weight;
+    }
+
+    public double getTransportationNetworkCompanyDistanceDelta() {
+        if (backState != null)
+            return Math.abs(this.transportationNetworkCompanyDriveDistance - backState.transportationNetworkCompanyDriveDistance);
+        else
+            return 0;
     }
 
     public void checkNegativeWeight() {
@@ -469,6 +495,7 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.usingHailedCar = stateData.usingHailedCar;
         return newState;
     }
 
@@ -702,19 +729,23 @@ public class State implements Cloneable {
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
+                editor.incrementTransportationNetworkCompanyDistance(orig.getTransportationNetworkCompanyDistanceDelta());
                 
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
+                State origBackState = orig.getBackState();
 
-                if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+                if (orig.isBikeRenting() && !origBackState.isBikeRenting()) {
                     editor.doneVehicleRenting();
-                } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                } else if (!orig.isBikeRenting() && origBackState.isBikeRenting()) {
                     editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
                 }
-                if (orig.isCarParked() != orig.getBackState().isCarParked())
+                if (orig.isCarParked() != origBackState.isCarParked())
                     editor.setCarParked(!orig.isCarParked());
-                if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+                if (orig.isBikeParked() != origBackState.isBikeParked())
                     editor.setBikeParked(!orig.isBikeParked());
+                if (orig.isUsingHailedCar() != origBackState.isUsingHailedCar())
+                    editor.setUsingHailedCar(!orig.isUsingHailedCar());
 
                 editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 
@@ -827,4 +858,34 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    /**
+     * Checks if a TNC stop (alighting or boarding) should be allowed given the current state and
+     * characteristics of the last seen street edge.
+     */
+    public boolean isTNCStopAllowed() {
+        // Make sure travel distance in car is greater than minimum distance
+        if (this.transportationNetworkCompanyDriveDistance <
+                this.stateData.opt.minimumTransportationNetworkCompanyDistance) {
+            return false;
+        }
+        // see if street edge forbids parking
+        StreetEdge theEdge = getLastSeenStreetEdge(this);
+        if (!theEdge.getTNCStopSuitability())
+            return false;
+        return true;
+    }
+
+    /**
+     * Returns the last street edge traversed by scanning the backEdge of the state chain backward.
+     * @param state a State
+     */
+    private StreetEdge getLastSeenStreetEdge(State state) {
+        if (state == null) {
+            return null;
+        }
+        if (state.backEdge instanceof StreetEdge) {
+            return (StreetEdge) state.backEdge;
+        }
+        return getLastSeenStreetEdge(state.backState);
+    }
 }

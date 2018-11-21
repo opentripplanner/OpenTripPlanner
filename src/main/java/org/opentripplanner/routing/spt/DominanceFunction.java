@@ -81,6 +81,19 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        // Does one state represent using a hailed car and the other using another mode?
+        if (a.isUsingHailedCar() != b.isUsingHailedCar()) {
+            return false;
+        }
+        // Does one state represent using a hailed car before transit and the other using a hailed car after?
+        if (a.stateData.hasHailedCarPreTransit() != b.stateData.hasHailedCarPreTransit()) {
+            return false;
+        }
+        // Does one state represent using a hailed car before transit and the other using a hailed car after?
+        if (a.stateData.hasHailedCarPostTransit() != b.stateData.hasHailedCarPostTransit()) {
+            return false;
+        }
+
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
         if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
             if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {

@@ -1,6 +1,20 @@
 package org.opentripplanner.api.common;
 
-import java.util.*;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.parameter.QualifiedMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
+import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -9,18 +23,14 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
 
-import org.opentripplanner.util.ResourceBundleSingleton;
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -361,6 +371,24 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /*
+     * A comma separated list of TNC companies to use in the routing request
+     */
+    @QueryParam("companies")
+    protected String companies;
+
+    /**
+     * If request date is invalid, apply the provided strategy to come up with a valid date.
+     */
+    @QueryParam("invalidDateStrategy")
+    protected String invalidDateStrategy;
+
+    @QueryParam("minTransitDistance")
+    private String minTransitDistance;
+
+    @QueryParam("searchTimeout")
+    protected Long searchTimeout;
+
     /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
      * otherwise it uses default sorting. More sorting methods may be added in the future.
@@ -395,6 +423,11 @@ public abstract class RoutingResource {
 
         if (toPlace != null)
             request.setToString(toPlace);
+
+        // NOTE: This query parameter dictates how OTP handles a bad date/time value. It must be set on the request
+        // before setDateTime is called, otherwise the strategy will not be applied.
+        if (invalidDateStrategy != null)
+            request.invalidDateStrategy = invalidDateStrategy;
 
         {
             //FIXME: move into setter method on routing request
@@ -606,6 +639,84 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (minTransitDistance != null)
+            request.minTransitDistance = minTransitDistance;
+
+        if (searchTimeout != null)
+            request.searchTimeout = searchTimeout;
+
+        // If using Transportation Network Companies, make sure service exists at origin.
+        // This is not a future-proof solution as TNC coverage areas could be different in the future.  For example, a
+        // trip planned months in advance may not take into account a TNC company deciding to no longer provide service
+        // on that particular date in the future.  The current ETA estimate is only valid for perhaps 30 minutes into
+        // the future.
+        //
+        // Also, if "depart at" and leaving soonish, save earliest departure time for use later use when boarding the
+        // first TNC before transit.  (See StateEditor.boardHailedCar)
+        if (this.modes != null && this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
+            if (companies == null) {
+                throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
+            }
+
+            request.setTransportationNetworkCompanies(companies);
+
+            TransportationNetworkCompanyService service =
+                router.graph.getService(TransportationNetworkCompanyService.class);
+            if (service == null) {
+                LOG.error("Unconfigured Transportation Network Company service for router with id: " + routerId);
+                throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
+            }
+
+            List<ArrivalTime> arrivalEstimates;
+
+            try {
+                arrivalEstimates = service.getArrivalTimes(
+                    new Place(
+                        request.from.lng,
+                        request.from.lat,
+                        request.from.name
+                    ),
+                    companies
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new UnsupportedOperationException(
+                    "Unable to verify availability of Transportation Network Company service due to error: " +
+                        e.getMessage()
+                );
+            }
+
+            // iterate through results and find earliest ETA of an acceptable ride type
+            int earliestEta = Integer.MAX_VALUE;
+            for (ArrivalTime arrivalEstimate : arrivalEstimates) {
+                for (String rideType : ACCEPTED_RIDE_TYPES) {
+                    if (
+                        arrivalEstimate.productId.equals(rideType) &&
+                        arrivalEstimate.estimatedSeconds < earliestEta
+                    ) {
+                        earliestEta = arrivalEstimate.estimatedSeconds;
+                        break;
+                    }
+                }
+            }
+
+            if (earliestEta == Integer.MAX_VALUE) {
+                // no acceptable ride types found
+                throw new TransportationNetworkCompanyAvailabilityException();
+            }
+
+            // store the earliest ETA if planning a "depart at" trip that begins soonish (within + or - 30 minutes)
+            long now = (new Date()).getTime() / 1000;
+            long departureTimeWindow = 1800;
+            if (
+                this.arriveBy == false &&
+                    request.dateTime < now + departureTimeWindow &&
+                    request.dateTime > now - departureTimeWindow
+            ) {
+                request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
+            }
+        }
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;
