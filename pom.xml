@@ -646,7 +646,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -655,6 +655,14 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
+        <!-- wiremock is used to mock http requests -->
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>2.14.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Guava, Trove, and Kryo. -->
         <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
         <dependency>

@@ -1,12 +1,15 @@
 package org.opentripplanner.api.common;
 
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.tnc.api.routing.TncRequestMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -51,7 +56,7 @@ public abstract class RoutingResource {
      * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated
-    @PathParam("routerId") 
+    @PathParam("routerId")
     public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
@@ -111,7 +116,7 @@ public abstract class RoutingResource {
      */
     @Deprecated
     @QueryParam("arriveBy")
-    protected Boolean arriveBy;
+    public Boolean arriveBy;
     
     /**
      * Whether the trip must be wheelchair accessible.
@@ -247,7 +252,7 @@ public abstract class RoutingResource {
      *   <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
      */
     @QueryParam("mode")
-    protected QualifiedModeSet modes;
+    public QualifiedModeSet modes;
 
     /**
      * The minimum time, in seconds, between successive trips on different vehicles.
@@ -587,6 +592,13 @@ public abstract class RoutingResource {
     private Boolean geoidElevation;
 
     /**
+     * TODO TNC - This could be replaced by agency white listing
+     * A comma separated list of TNC companies to use in the routing request
+     */
+    @QueryParam("companies")
+    public String companies;
+
+    /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
      * otherwise it uses default sorting. More sorting methods may be added in the future.
      *
@@ -816,6 +828,11 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if(OTPFeature.TncRouting.isOn()) {
+            TransportationNetworkCompanyService tncService = router.graph.getService(TransportationNetworkCompanyService.class);
+            new TncRequestMapper(tncService).mapToRequest(this, request);
+        }
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;

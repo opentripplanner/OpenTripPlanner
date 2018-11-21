@@ -5,6 +5,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.util.OTPFeature;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +39,9 @@ public class State implements Cloneable {
     // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
     // we should DEFINITELY rename this variable and the associated methods.
     public double walkDistance;
+
+    // The current distance traveled in a transportation network company vehicle
+    public double transportationNetworkCompanyDriveDistance;
 
     /* CONSTRUCTORS */
 
@@ -114,7 +118,12 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
+        // if allowed to hail a car, initialize state with CAR mode if we're already in a hailed car
+        else if(OTPFeature.TncRouting.isOn() && options.useTransportationNetworkCompany) {
+            this.stateData.nonTransitMode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK;
+        }
         this.walkDistance = 0;
+        this.transportationNetworkCompanyDriveDistance = 0;
         this.time = timeSeconds * 1000;
     }
 
@@ -154,7 +163,7 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
+                " d=" + this.getWalkDistance() +
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() + ">";
     }
@@ -173,6 +182,8 @@ public class State implements Cloneable {
         return stateData.usingRentedBike;
     }
     
+    public boolean isUsingHailedCar() { return stateData.usingHailedCar; }
+
     public boolean isCarParked() {
         return stateData.carParked;
     }
@@ -191,6 +202,12 @@ public class State implements Cloneable {
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
+        boolean tncOK = !stateData.opt.useTransportationNetworkCompany || (
+
+                // TODO TNC - This method seems to no exist any more ....
+                //          - isEverBoarded() &&
+                        (!isUsingHailedCar() || isTNCStopAllowed())
+        );
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
@@ -200,7 +217,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && tncOK;
     }
 
     public double getWalkDistance() {
@@ -232,6 +249,13 @@ public class State implements Cloneable {
 
     public double getWeightDelta() {
         return this.weight - backState.weight;
+    }
+
+    public double getTransportationNetworkCompanyDistanceDelta() {
+        if (backState != null)
+            return Math.abs(this.transportationNetworkCompanyDriveDistance - backState.transportationNetworkCompanyDriveDistance);
+        else
+            return 0;
     }
 
     void checkNegativeWeight() {
@@ -325,6 +349,7 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.usingHailedCar = stateData.usingHailedCar;
         return newState;
     }
 
@@ -421,19 +446,24 @@ public class State implements Cloneable {
             editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
             editor.incrementWeight(orig.getWeightDelta());
             editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+            editor.incrementTransportationNetworkCompanyDistance(orig.getTransportationNetworkCompanyDistanceDelta());
 
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());
+                State origBackState = orig.getBackState();
 
-            if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+                if (orig.isBikeRenting() && !origBackState.isBikeRenting()) {
                 editor.doneVehicleRenting();
-            } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                } else if (!orig.isBikeRenting() && origBackState.isBikeRenting()) {
                 editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
             }
-            if (orig.isCarParked() != orig.getBackState().isCarParked())
+                if (orig.isCarParked() != origBackState.isCarParked())
                 editor.setCarParked(!orig.isCarParked());
-            if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+                if (orig.isBikeParked() != origBackState.isBikeParked())
                 editor.setBikeParked(!orig.isBikeParked());
+                if (orig.isUsingHailedCar() != origBackState.isUsingHailedCar()) {
+                    editor.setUsingHailedCar(!orig.isUsingHailedCar());
+                }
 
             ret = editor.makeState();
 
@@ -454,4 +484,35 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    /**
+     * Checks if a TNC stop (alighting or boarding) should be allowed given the current state and
+     * characteristics of the last seen street edge.
+     */
+    public boolean isTNCStopAllowed() {
+        if(OTPFeature.TncRouting.isOff()) { return false; }
+
+        // Make sure travel distance in car is greater than minimum distance
+        if (this.transportationNetworkCompanyDriveDistance <
+                this.stateData.opt.minimumTransportationNetworkCompanyDistance) {
+            return false;
+        }
+        // see if street edge forbids parking
+        StreetEdge theEdge = getLastSeenStreetEdge(this);
+        if (!theEdge.isTncStopSuitable()) { return false; }
+        return true;
+    }
+
+    /**
+     * Returns the last street edge traversed by scanning the backEdge of the state chain backward.
+     * @param state a State
+     */
+    private StreetEdge getLastSeenStreetEdge(State state) {
+        if (state == null) {
+            return null;
+        }
+        if (state.backEdge instanceof StreetEdge) {
+            return (StreetEdge) state.backEdge;
+        }
+        return getLastSeenStreetEdge(state.backState);
+    }
 }

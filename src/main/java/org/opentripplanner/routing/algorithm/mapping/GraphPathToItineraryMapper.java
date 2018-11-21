@@ -42,6 +42,7 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,6 @@ public abstract class GraphPathToItineraryMapper {
             itineraries.add(itinerary);
         }
 
-        // TODO OTP2 - Move this to a more apropriate place ...
         request.rctx.debugOutput.finishedRendering();
 
         return itineraries;
@@ -135,6 +135,8 @@ public abstract class GraphPathToItineraryMapper {
 
         addWalkSteps(graph, legs, legsStates, requestedLocale);
 
+        // TODO TNC - Fix API classes...
+        // TncItinerarySummaryDataMapper.addTncDataToItinerary(graph, itinerary, states[0].getOptions().companies);
 
         boolean first = true;
         for (Leg leg : legs) {
@@ -293,6 +295,12 @@ public abstract class GraphPathToItineraryMapper {
         addFrequencyFields(states, leg);
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+
+        if(OTPFeature.TncRouting.isOn()) {
+            // check at start or end because either could be the very beginning or end of the trip
+            // which are temporary edges and stuff
+            leg.hailedCar = states[0].isUsingHailedCar() || states[states.length - 1].isUsingHailedCar();
+        }
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering);
 

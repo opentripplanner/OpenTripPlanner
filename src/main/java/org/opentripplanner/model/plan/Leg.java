@@ -197,6 +197,8 @@ public class Leg {
 
    public Boolean rentedBike;
 
+   public Boolean hailedCar;
+
    /**
     * Whether this leg is a transit leg or not.
     * @return Boolean true if the leg is a transit leg

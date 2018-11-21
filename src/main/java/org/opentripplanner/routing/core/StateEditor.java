@@ -176,12 +176,18 @@ public class StateEditor {
         child.walkDistance += length;
     }
 
+    public void incrementTransportationNetworkCompanyDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.transportationNetworkCompanyDriveDistance += distance;
+    }
+
+
     /* Basic Setters */
 
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-    
+
 
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
@@ -316,6 +322,72 @@ public class StateEditor {
 
     public boolean hasEnteredNoThroughTrafficArea() {
         return child.hasEnteredNoThruTrafficArea();
+    }
+
+    public void alightHailedCar() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    /**
+     * Board a hailed car (provided by a transportation network company).
+     *
+     * If boarding a hailed car before boarding transit in "depart at" mode, we assume that the ETA estimate is
+     * applicable and it is added to the duration of the TNC trip.  In all other cases, the assumption is being made
+     * that this is not necessarily trip plan for "right now".  Furthermore, it is assumed that in "right now" trips
+     * once a user has boarded transit they are able to minimize their wait time at their final transit deboarding
+     * location by somehow getting a TNC vehicle to be available to board immediately at the next possible street edge.
+     *
+     * This method is called from the traverse method of the StreetEdge class.  The edge will be traversed in CAR mode,
+     * but since the determination to board a hailed car happens after that, the initial distance traveled in the car
+     * must be added here to the transportationNetworkCompanyDriveDistance variable.
+     */
+    public void boardHailedCar(double initialEdgeDistance) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = true;
+        child.stateData.nonTransitMode = TraverseMode.CAR;
+        if (true) { // TODO TNC : This method do not exist any more -> child.isEverBoarded()) {
+            child.stateData.hasHailedCarPostTransit = true;
+        } else {
+            child.stateData.hasHailedCarPreTransit = true;
+            RoutingRequest options = child.getContext().opt;
+            // add the earliest ETA of a TNC vehicle if using "departing at" mode and if before transit.
+            // This uses the ETA of a TNC vehicle at the origin, so this code is making the assumption that the ETA
+            // estimate obtained for the origin is applicable at other places and times so long as transit has not been
+            // boarded yet.  The way to obtain ETA estimates for every possible street and vertex would involve making
+            // potentially hundreds of thousands of http requests to existing TNC API endpoints.  It sure would be nice
+            // if there were a way to download network-wide ETA estimates in a single request, but that option currently
+            // does not exist.
+            //
+            // FIXME: If a non-transit mode travels a significant distance from the origin prior to boarding a TNC, the
+            // ETA will still be added when it probably shouldn't be.
+            if (
+                    !options.arriveBy &&
+                            options.transportationNetworkCompanyEtaAtOrigin > -1
+                            // TODO TNC
+                            //&& !child.stateData.everBoarded
+            ) {
+                // increment the time by the ETA at the origin.
+                incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
+            }
+        }
+        // Add the initial TNC distance as the first StreetEdge traversed is done so while the usingHailedCar flag is
+        // still set to false
+        child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
+    }
+
+    /**
+     * Used only in State.optimizeOrReverse
+     */
+    public void setUsingHailedCar(boolean usingHailedCar) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingHailedCar = usingHailedCar;
+        if (usingHailedCar) {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
     }
 
 }

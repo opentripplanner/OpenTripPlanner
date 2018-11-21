@@ -27,6 +27,7 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
@@ -114,6 +115,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    // whether or not this street is a good place to board or alight a TNC vehicle
+    private boolean tncStopSuitable = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -278,6 +282,61 @@ public class StreetEdge extends Edge implements Cloneable {
                         return editor.makeState(); // return only the "parked" walking state
                     }
 
+                }
+            }
+        } else if (OTPFeature.TncRouting.isOn() && options.useTransportationNetworkCompany) {
+            // Irrevocable transition from using hailed car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                    s0.isUsingHailedCar()
+                            && !getPermission().allows(TraverseMode.CAR)
+                            && currMode == TraverseMode.CAR
+            ) {
+                if (!s0.isTNCStopAllowed()) {
+                    return null;
+                }
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.alightHailedCar(); // done with TNC use for now
+                    return editor.makeState(); // return only the state with updated TNC usage
+                }
+            }
+            // possible transition to hailing a car
+            else if (
+                    !s0.isUsingHailedCar()
+                            && getPermission().allows(TraverseMode.CAR)
+                            && currMode != TraverseMode.CAR
+                            && isTncStopSuitable()
+            ) {
+                // perform extra checks to prevent entering a tnc vehicle if a car has already been
+                // hailed in the pre or post transit part of trip
+
+                // TODO TNC - This needs to be fixed, commented out
+                // Vertex toVertex = options.rctx.toVertex;
+                // if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                //        (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                //    return state;
+                //}
+
+
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    editorCar.boardHailedCar(getDistanceMeters()); // start of TNC use
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
                 }
             }
         }
@@ -458,6 +517,18 @@ public class StreetEdge extends Edge implements Cloneable {
 
             if (!traverseMode.isDriving()) {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
+            }
+            else if(OTPFeature.TncRouting.isOn()) {
+                // check if driveTimeReluctance is defined (ie it is greater than 0)
+                if (options.driveTimeReluctance > 0) {
+                    s1.incrementWeight(time * options.driveTimeReluctance);
+                }
+                if (options.driveDistanceReluctance > 0) {
+                    s1.incrementWeight(getDistanceMeters() * options.driveDistanceReluctance);
+                }
+                if (s0.isUsingHailedCar()) {
+                    s1.incrementTransportationNetworkCompanyDistance(getDistanceMeters());
+                }
             }
 
             int turnTime = (int) Math.ceil(realTurnCost);
@@ -719,6 +790,12 @@ public class StreetEdge extends Edge implements Cloneable {
 	public void setCarSpeed(float carSpeed) {
 		this.carSpeed = carSpeed;
 	}
+
+    public void setTncStopSuitable(boolean tncStopSuitable) {
+        this.tncStopSuitable = tncStopSuitable;
+    }
+
+    public boolean isTncStopSuitable() { return tncStopSuitable; }
 
 	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);

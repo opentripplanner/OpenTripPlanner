@@ -14,6 +14,12 @@ public class StateData implements Cloneable {
 
     protected boolean usingRentedBike;
 
+    // TODO TNC - Is it possible to solve this in another way? (Next 3 fields)
+    protected boolean usingHailedCar;
+
+    protected boolean hasHailedCarPostTransit = false;
+    protected boolean hasHailedCarPreTransit = false;
+
     protected boolean carParked;
 
     protected boolean bikeParked;
@@ -53,4 +59,8 @@ public class StateData implements Cloneable {
             throw new IllegalStateException("This is not happening");
         }
     }
+
+    public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
+
+    public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
 }

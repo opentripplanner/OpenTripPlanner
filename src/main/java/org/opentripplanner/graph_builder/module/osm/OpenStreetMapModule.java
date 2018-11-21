@@ -1120,6 +1120,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             StreetEdge street = edgeFactory.createEdge(startEndpoint, endEndpoint, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
+            street.setTncStopSuitable(wayPropertySet.isSuitableForTNCStop(way));
 
             String highway = way.getTag("highway");
             int cls;

@@ -1,6 +1,5 @@
 package org.opentripplanner.common.geometry;
 
-import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -151,14 +150,5 @@ public class GeometryUtils {
         else if (r > 1.0)
             return 1.0;
         return r;
-    }
-
-    private static Coordinate[] convertPath(List<LngLatAlt> path) {
-        Coordinate[] coords = new Coordinate[path.size()];
-        int i = 0;
-        for (LngLatAlt p : path) {
-            coords[i++] = new Coordinate(p.getLatitude(), p.getLongitude());
-        }
-        return coords;
     }
 }

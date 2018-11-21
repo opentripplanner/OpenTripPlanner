@@ -241,6 +241,14 @@ public class ApiLeg {
     @JsonSerialize
     public Boolean rentedBike;
 
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean hailedCar;
+
+    @XmlAttribute
+    @JsonSerialize
+    public TransportationNetworkCompanySummary tncData;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
