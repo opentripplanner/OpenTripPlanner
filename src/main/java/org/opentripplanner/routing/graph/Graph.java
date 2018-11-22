@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.graph;
 
+import com.conveyal.r5.kryo.TIntArrayListSerializer;
+import com.conveyal.r5.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -12,8 +14,11 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import gnu.trove.impl.hash.TIntHash;
+import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
@@ -770,10 +775,12 @@ public class Graph implements Serializable {
         // We might actually want to manually register a serializer for every class, to be safe.
         kryo.setRegistrationRequired(false);
         kryo.setReferences(true);
-        kryo.addDefaultSerializer(TIntHash.class, ExternalizableSerializer.class);
-        //kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
-        // Default Kryo deserialization of BitSet fails, but BitSet implements Serializable.
-        // Use BitSet's own built-in (de)serialization methods.
+        kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
+        kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
+        kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
+        // Kryo's default instantiation and deserialization of BitSets leaves them empty.
+        // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
+        // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
         kryo.register(BitSet.class, new JavaSerializer());
         // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
@@ -787,10 +794,10 @@ public class Graph implements Serializable {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        // Instantiator strategy for creating new objects upon deserialization.
-        // First, try to use a zero-arg constructor (the default strategy).
-        // If that doesn't work, fall back on instantiating classes like the Java serialization framework does
-        // (using the zero-arg constructor of the closest non-serializable superclass).
+        // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?
+        // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
+        // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
+        // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
     }
