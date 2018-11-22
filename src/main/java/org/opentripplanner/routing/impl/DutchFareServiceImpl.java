@@ -89,7 +89,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     private UnitsFareZone getUnitsByZones(String agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
         P2<String> od = new P2<String>(startZone, endZone);
 
-        LOG.warn("Search " + startZone + " and " + endZone);
+        LOG.trace("Search " + startZone + " and " + endZone);
 
         String fareIdStartsWith = agencyId + "::";
 
@@ -100,7 +100,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 String[] parts = fareId.split("::");
                 String fareZone = parts[1];
 
-                LOG.warn("Between " + startZone + " and " + endZone + ": " + (int) ruleSet.getFareAttribute().getPrice() + " (" + fareZone + ")");
+                LOG.trace("Between " + startZone + " and " + endZone + ": " + (int) ruleSet.getFareAttribute().getPrice() + " (" + fareZone + ")");
                 return new UnitsFareZone((int) ruleSet.getFareAttribute().getPrice(), fareZone);
             }
         }
@@ -212,10 +212,10 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         long alightedTariefEenheden = 0;
 
         for (Ride ride : rides) {
-            LOG.warn(String.format("%s %s %s %s %s %s", ride.startZone, ride.endZone, ride.firstStop, ride.lastStop, ride.route, ride.agency));
+            LOG.trace(String.format("%s %s %s %s %s %s", ride.startZone, ride.endZone, ride.firstStop, ride.lastStop, ride.route, ride.agency));
 
             if (ride.agency.startsWith("IFF:")) {
-                LOG.warn("1. Trains");
+                LOG.trace("1. Trains");
 		        /* In Reizen op Saldo we will try to fares as long as possible. */
 
                 /* If our previous agency isn't this agency, then we must have checked out */
@@ -223,7 +223,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
                 /* When a user has checked out, we first calculate the units made until then. */
                 if (mustHaveCheckedOut && lastAgencyId != null) {
-                    LOG.warn("2. Must have checked out from a station");
+                    LOG.trace("2. Must have checked out from a station");
                     UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
                     if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
                     lastFareZone = unitsFareZone.fareZone;
@@ -234,7 +234,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
         		/* The entrance Fee applies if the transfer time ends before the new trip starts. */
                 if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime) {
-                    LOG.warn("3. Exceeded Transfer Time");
+                    LOG.trace("3. Exceeded Transfer Time");
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
                     if (cost == Float.POSITIVE_INFINITY) return cost;
 
@@ -244,7 +244,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                     mustHaveCheckedOut = false;
 
                 } else if (!ride.agency.equals(lastAgencyId)) {
-                    LOG.warn("4. Swiched Rail Agency");
+                    LOG.trace("4. Swiched Rail Agency");
 
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
                     if (cost == Float.POSITIVE_INFINITY) return cost;
@@ -259,7 +259,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 lastAgencyId = ride.agency;
 
             } else {
-                LOG.warn("5. Easy Trip");
+                LOG.trace("5. Easy Trip");
 
                 /* We are now on Easy Trip, so we must have checked-out from Reizen op Saldo, if we were on it */
                 mustHaveCheckedOut = (startTariefEenheden != null);
@@ -275,7 +275,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
             }
         }
 
-        LOG.warn("6. Final");
+        LOG.trace("6. Final");
         if (lastAgencyId != null) {
             UnitsFareZone unitsFareZone = getUnitsByZones(lastAgencyId, startTariefEenheden, endTariefEenheden, fareRules);
             if (unitsFareZone == null) return Float.POSITIVE_INFINITY;
