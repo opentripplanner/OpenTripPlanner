@@ -24,13 +24,15 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DutchFareServiceImpl.class);
 
     public static final int TRANSFER_DURATION = 60 * 35; /* tranfers within 35 min won't require a new base fare */
-    
+
+    final Currency euros = Currency.getInstance("EUR");
+
     @Override
     protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
                                    Collection<FareRuleSet> fareRules) {
         float lowestCost = getLowestCost(fareType, rides, fareRules);
         if(lowestCost != Float.POSITIVE_INFINITY) {
-            fare.addFare(fareType, getMoney(currency, lowestCost));
+            fare.addFare(fareType, getMoney(euros, lowestCost));
             return true;
         }
         return false;
