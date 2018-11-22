@@ -53,6 +53,7 @@ import org.opentripplanner.routing.transportation_network_company.Transportation
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -386,6 +387,7 @@ public abstract class GraphPathToTripPlanConverter {
         addFrequencyFields(states, leg);
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+        leg.rentedCar = states[0].isCarRenting() && states[states.length - 1].isCarRenting();
 
         // check at start or end because either could be the very beginning or end of the trip
         // which are temporary edges and stuff
@@ -810,6 +812,10 @@ public abstract class GraphPathToTripPlanConverter {
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;
+        } else if (vertex instanceof CarRentalStationVertex) {
+            place.address = ((CarRentalStationVertex) vertex).getAddress();
+            place.networks = ((CarRentalStationVertex) vertex).getNetworks();
+            place.vertexType = VertexType.CARSHARE;
         } else {
             place.vertexType = VertexType.NORMAL;
         }

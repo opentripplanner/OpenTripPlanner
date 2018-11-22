@@ -111,6 +111,13 @@ public class StreetTransitLink extends Edge {
                 } else {
                     return null;
                 }
+            } else if (req.allowCarRental && s0.isCarRenting()) {
+                // check to see if transit may be used after parking rented car
+                if (s0.isCarRentalDropoffAllowed()) {
+                    s1.alightRentedCar();
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }

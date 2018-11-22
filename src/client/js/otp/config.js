@@ -339,5 +339,7 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
     "CAR_HAIL,WALK,TRANSIT"     : _tr('TNC &amp; Transit'),
-    "CAR_HAIL,WALK,TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"     : _tr('TNC &amp; Rail')
+    "CAR_HAIL,WALK,TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"     : _tr('TNC &amp; Rail'),
+    "CAR_RENT,WALK,TRANSIT"     : _tr('Car Rental &amp; Transit'),
+    "CAR_RENT,WALK,TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"     : _tr('Car Rental &amp; Rail'),
     };

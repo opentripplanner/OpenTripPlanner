@@ -14,6 +14,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -160,7 +161,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (
             v instanceof StreetVertex ||
                 v instanceof BikeRentalStationVertex ||
-                v instanceof BikeParkVertex
+                v instanceof BikeParkVertex ||
+                v instanceof CarRentalStationVertex
         ) {
             // The main search is not on transit.
             if (s.isEverBoarded()) {

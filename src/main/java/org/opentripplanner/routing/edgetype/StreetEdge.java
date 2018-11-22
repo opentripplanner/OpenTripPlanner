@@ -36,8 +36,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * This represents a street segment.
@@ -120,6 +122,14 @@ public class StreetEdge extends Edge implements Cloneable {
 
     // whether or not this street is a good place to board or alight a TNC vehicle
     private boolean suitableForTNCStop = true;
+
+    /**
+     * A set of car networks where this edge is located inside their service regions.
+     */
+    private Set<String> carNetworks;
+
+    // whether or not this street is a good place to dropoff a floating car rental
+    private boolean suitableForFloatingCarRentalDropoff = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -337,6 +347,24 @@ public class StreetEdge extends Edge implements Cloneable {
                     }
                 }
             }
+        } else if (options.allowCarRental) {
+            // Irrevocable transition from using rented car to walking.
+            // Final CAR check needed to prevent infinite recursion.
+            if (
+                s0.isCarRenting()
+                    && !getPermission().allows(TraverseMode.CAR)
+                    && currMode == TraverseMode.CAR
+            ) {
+                // Make sure car rental dropoff is allowed at this location
+                if (!s0.isCarRentalDropoffAllowed()) {
+                    return null;
+                }
+                editor = doTraverse(s0, options, TraverseMode.WALK);
+                if (editor != null) {
+                    editor.alightRentedCar(); // done with car rental use for now
+                    return editor.makeState(); // return only the state with updated rental car usage
+                }
+            }
         }
         return state;
     }
@@ -524,6 +552,9 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
                 if (s0.isUsingHailedCar()) {
                     s1.incrementTransportationNetworkCompanyDistance(getDistance());
+                }
+                if (s0.isCarRenting()) {
+                    s1.incrementCarRentalDistance(getDistance());
                 }
             }
 
@@ -825,6 +856,34 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public boolean getTNCStopSuitability() { return suitableForTNCStop; }
+
+    public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
+
+    public Set<String> getCarNetworks() { return carNetworks; }
+
+    public void setFloatingCarDropoffSuitability(boolean isSuitable) {
+        this.suitableForFloatingCarRentalDropoff = isSuitable;
+    }
+
+    public boolean getFloatingCarDropoffSuitability() { return suitableForFloatingCarRentalDropoff; }
+
+    public boolean addCarNetwork(String carNetwork) {
+        if (carNetworks == null) {
+            synchronized (this) {
+                if (carNetworks == null) {
+                    carNetworks = new HashSet<>();
+                }
+            }
+        }
+        return carNetworks.add(carNetwork);
+    }
+
+    public boolean containsCarNetwork(String carNetwork) {
+        if (carNetworks == null){
+            return false;
+        }
+        return carNetworks.contains(carNetwork);
+    }
 
 	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);

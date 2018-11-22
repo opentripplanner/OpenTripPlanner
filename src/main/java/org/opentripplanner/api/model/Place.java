@@ -1,13 +1,13 @@
 package org.opentripplanner.api.model;
 
-import java.util.Calendar;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement; 
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.Calendar;
+import java.util.Set;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -90,6 +90,17 @@ public class Place {
      * In case the vertex is of type Bike sharing station.
      */
     public String bikeShareId;
+
+    /**
+     * Car share station fields
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public Set<String> networks;
+
+    @XmlAttribute
+    @JsonSerialize
+    public String address;
 
     /**
      * Returns the geometry in GeoJSON format

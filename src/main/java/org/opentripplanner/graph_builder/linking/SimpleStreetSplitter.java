@@ -18,34 +18,36 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -159,8 +161,19 @@ public class SimpleStreetSplitter {
         return link(vertex, TraverseMode.WALK, null);
     }
 
-    /** Link this vertex into the graph */
+    // Link this vertex to the graph assuming use of one mode
     public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
+        final TraverseModeSet traverseModeSet;
+        if (traverseMode == TraverseMode.BICYCLE) {
+            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
+        } else {
+            traverseModeSet = new TraverseModeSet(traverseMode);
+        }
+        return link(vertex, traverseModeSet, options);
+    }
+
+    /** Link this vertex into the graph */
+    public boolean link(Vertex vertex, TraverseModeSet traverseModeSet, RoutingRequest options) {
         // find nearby street edges
         // TODO: we used to use an expanding-envelope search, which is more efficient in
         // dense areas. but first let's see how inefficient this is. I suspect it's not too
@@ -177,12 +190,6 @@ public class SimpleStreetSplitter {
 
         final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
-        final TraverseModeSet traverseModeSet;
-        if (traverseMode == TraverseMode.BICYCLE) {
-            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
-        } else {
-            traverseModeSet = new TraverseModeSet(traverseMode);
-        }
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
@@ -435,6 +442,8 @@ public class SimpleStreetSplitter {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to);
+        } else if (from instanceof CarRentalStationVertex) {
+            makeCarRentalLinkEdges((CarRentalStationVertex) from, to);
         }
     }
 
@@ -485,6 +494,20 @@ public class SimpleStreetSplitter {
 
         new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
         new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
+    }
+
+    /** Make link edges for car rental */
+    private void makeCarRentalLinkEdges (CarRentalStationVertex from, StreetVertex to) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Car rental edges are created with non destructive splitting!");
+        }
+        for (StreetCarRentalLink scrl : Iterables.filter(from.getOutgoing(), StreetCarRentalLink.class)) {
+            if (scrl.getToVertex() == to)
+                return;
+        }
+
+        new StreetCarRentalLink(from, to);
+        new StreetCarRentalLink(to, from);
     }
 
     /** Make link edges for bike rental */
@@ -568,13 +591,24 @@ public class SimpleStreetSplitter {
             coord, new NonLocalizedString(name), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
+        boolean linkWithSingleMode = true;
+        TraverseModeSet linkingModeSet = null;
+
         //It can be null in tests
         if (options != null) {
             TraverseModeSet modes = options.modes;
             if (modes.getCar())
                 // for park and ride we will start in car mode and walk to the end vertex
-                if (endVertex && (options.parkAndRide || options.kissAndRide)) {
+                if ((endVertex && (options.parkAndRide || options.kissAndRide))
+                ) {
                     nonTransitMode = TraverseMode.WALK;
+                }
+                // tnc routing and car rental it would be possible to walk or drive
+                else if (options.useTransportationNetworkCompany || options.allowCarRental) {
+                    linkWithSingleMode = false;
+                    if(!link(closest, new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR), options)) {
+                        LOG.warn("Couldn't link {}", location);
+                    }
                 } else {
                     nonTransitMode = TraverseMode.CAR;
                 }
@@ -584,7 +618,7 @@ public class SimpleStreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!link(closest, nonTransitMode, options)) {
+        if (linkWithSingleMode && !link(closest, nonTransitMode, options)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;

@@ -1077,6 +1077,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     permissions, back);
             street.setCarSpeed(carSpeed);
             street.setTNCStopSuitability(wayPropertySet.isSuitableForTNCStop(way));
+            street.setFloatingCarDropoffSuitability(wayPropertySet.isSuitableForStreetParking(way));
 
             String highway = way.getTag("highway");
             int cls;

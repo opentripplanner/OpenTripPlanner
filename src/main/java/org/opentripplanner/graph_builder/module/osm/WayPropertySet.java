@@ -404,4 +404,14 @@ public class WayPropertySet {
         return !parkingLaneProperty.equals("no_stopping") && !parkingLaneProperty.equals("fire_lane");
     }
 
+    public boolean isSuitableForStreetParking(OSMWay way) {
+        String parkingLaneProperty = getFirstParkingLaneProperty(way);
+        // assume this is a suitable place if no property exists
+        if (parkingLaneProperty == null)
+            return true;
+        // return false if this way is marked as no parking, no stopping or a fire lane
+        return !parkingLaneProperty.equals("no_parking") &&
+                !parkingLaneProperty.equals("no_stopping") &&
+                !parkingLaneProperty.equals("fire_lane");
+    }
 }
