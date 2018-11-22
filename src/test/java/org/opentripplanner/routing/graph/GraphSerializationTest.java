@@ -113,6 +113,8 @@ public class GraphSerializationTest {
         // are deduplicated.
         objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
         objectDiffer.compareTwoObjects(g1, g2);
+        // Print differences before assertion so we can see what went wrong.
+        objectDiffer.printDifferences();
         assertFalse(objectDiffer.hasDifferences());
     }
 
