@@ -829,12 +829,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Used to generate semantic equals() methods when deep-comparing objects in tests. -->
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
     </dependencies>
 
 </project>
