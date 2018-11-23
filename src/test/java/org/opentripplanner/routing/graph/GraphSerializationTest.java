@@ -45,6 +45,9 @@ public class GraphSerializationTest {
                 .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
         transitVertices.forEach(originalGraph::remove);
         originalGraph.index(new DefaultStreetVertexIndexFactory());
+        // The cached timezone in the graph is transient and lazy-initialized.
+        // Previous tests may have caused a timezone to be cached.
+        originalGraph.clearTimeZone();
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
         originalGraph.save(tempFile);
