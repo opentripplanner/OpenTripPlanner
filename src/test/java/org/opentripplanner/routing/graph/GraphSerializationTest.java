@@ -86,7 +86,8 @@ public class GraphSerializationTest {
         ObjectDiffer objectDiffer = new ObjectDiffer();
         objectDiffer.ignoreFields("incoming", "outgoing");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
-        objectDiffer.ignoreClasses(WeakValueHashMap.class);
+        // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
+        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class);
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
