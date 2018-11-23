@@ -821,7 +821,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.4.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-simple</artifactId>
