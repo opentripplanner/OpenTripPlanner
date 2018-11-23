@@ -106,7 +106,8 @@ public class GraphSerializationTest {
         ObjectDiffer objectDiffer = new ObjectDiffer();
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
-        objectDiffer.ignoreFields("incoming", "outgoing");
+        // Some tests re-build the graph which will result in build times different by as little as a few milliseconds.
+        objectDiffer.ignoreFields("incoming", "outgoing", "buildTime");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
@@ -114,7 +115,6 @@ public class GraphSerializationTest {
         objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
         objectDiffer.compareTwoObjects(g1, g2);
         // Print differences before assertion so we can see what went wrong.
-        objectDiffer.printDifferences();
         assertFalse(objectDiffer.hasDifferences());
     }
 
