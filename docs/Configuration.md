@@ -569,3 +569,59 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
+------
+
+## List of allowed settings in build-config.json
+
+config key | description | value type | value default | notes
+---------- | ----------- | ---------- | ------------- | -----
+`htmlAnnotations` |  Generate nice HTML report of Graph errors/warnings (annotations) | boolean | false |
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | false |
+`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
+`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
+`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
+`stopClusterMode` | Stop clusters can be built in one of two ways, either by geographical proximity and name, or according to a parent/child station topology, if it exists | enum | `proximity` | options: `proximity`, `parentStation`
+`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`streets` | Include street input files (OSM/PBF) | boolean | true | 
+`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
+`areaVisibility` | Perform visibility calculations on OSM areas (these calculations can be time consuming) | boolean | true |
+`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
+`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
+`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
+`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
+`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
+`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
+`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
+`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
+`maxHtmlAnnotationsPerFile` | If number of annotations is larger then specified number annotations will be split in multiple files | int | 1,000 | 
+`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
+`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
+`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
+`banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
+`banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
+`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+
+See the code for `GraphBuilderParameters` at https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215
+
+## List of allowed settings in router-config.json
+
+config key | description | value type | value default | notes
+---------- | ----------- | ---------- | ------------- | -----
+`routingDefaults` | Default routing parameters, which will be applied to every request | object | TODO | see [routing defaults](#routing-defaults)
+`timeout` | TODO | double | units: seconds; see [timeouts](#timeouts)
+`timeouts` | TODO| array of doubles | none | units: seconds; see [timeouts](#timeouts)
+`requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
+`boardTimes` | TODO | object | TODO | see [boarding and alighting times](#boarding-and-alighting-times)
+`alightTimes` | TODO | object | TODO | see [boarding and alighting times](#boarding-and-alighting-times)
+
+See https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/Router.java
+
+
+## List of allowed command-line parameters
+
+See `CommandLineParameters` class in https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/CommandLineParameters.java
+
+and http://dev.opentripplanner.org/javadoc/1.3.0/org/opentripplanner/standalone/CommandLineParameters.html
