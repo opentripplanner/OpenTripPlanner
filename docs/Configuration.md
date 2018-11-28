@@ -71,7 +71,7 @@ This table lists the possible settings that can be defined in a `build-config.js
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
 `htmlAnnotations` |  Generate nice HTML report of Graph errors/warnings (annotations) | boolean | false |
-`transit` | Include all transit input files (GTFS) from scanned directory | boolean | false |
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
 `stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
