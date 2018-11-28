@@ -334,7 +334,7 @@ internally that are not exposed via the API. You may want to change the default 
 i.e. the value which will be applied unless it is overridden in a web API request.
 
 A full list of them can be found in the RoutingRequest class
-[in the Javadoc](http://dev.opentripplanner.org/javadoc/master/org/opentripplanner/routing/core/RoutingRequest.html).
+[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.3.0/org/opentripplanner/routing/core/RoutingRequest.html).
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
