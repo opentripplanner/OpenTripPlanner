@@ -2425,7 +2425,12 @@ public class IndexGraphQLSchema {
                         Integer.parseInt(parts[0], 10));
                 }
                 if (id.type.equals(stopType.getName())) {
-                    return index.stopForId.get(FeedScopedId.convertFromString(id.id));
+                    Stop matchedStop = index.stopForId.get(FeedScopedId.convertFromString(id.id));
+                    if (matchedStop == null) {
+                        matchedStop = index.stationForId.get(FeedScopedId.convertFromString(id.id));
+                    }
+
+                    return matchedStop;
                 }
                 if (id.type.equals(tripType.getName())) {
                     return index.tripForId.get(FeedScopedId.convertFromString(id.id));
