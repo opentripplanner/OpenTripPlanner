@@ -459,5 +459,10 @@ public class EncodedPolylineJSONSerializerTest extends TestCase {
         public String getValueAsString(String s) throws IOException {
             return stringProducer.get();
         }
+
+        @Override
+        public boolean hasToken(JsonToken t) {
+            return false;
+        }
     }
 }
