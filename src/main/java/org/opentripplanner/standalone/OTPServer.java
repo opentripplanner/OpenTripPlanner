@@ -3,7 +3,7 @@ package org.opentripplanner.standalone;
 import java.io.File;
 import java.util.Collection;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
 import org.opentripplanner.analyst.SurfaceCache;

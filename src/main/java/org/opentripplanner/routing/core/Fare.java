@@ -25,11 +25,11 @@ public class Fare {
     /**
      * A mapping from {@link FareType} to a list of {@link FareComponent}.
      */
-    public HashMap<FareType, List<FareComponent>> details;
+    public HashMap<FareType, ArrayList<FareComponent>> details;
 
     public Fare() {
-        fare = new HashMap<FareType, Money>();
-        details = new HashMap<FareType, List<FareComponent>>();
+        fare = new HashMap<>();
+        details = new HashMap<>();
     }
 
     public Fare(Fare aFare) {
@@ -50,7 +50,7 @@ public class Fare {
         fare.put(fareType, money);
     }
 
-    public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
+    public void addFareDetails(FareType fareType, ArrayList<FareComponent> newDetails) {
         details.put(fareType, newDetails);
     }
 

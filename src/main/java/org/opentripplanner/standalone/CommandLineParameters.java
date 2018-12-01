@@ -3,7 +3,7 @@ package org.opentripplanner.standalone;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.opentripplanner.routing.services.GraphService;
 
 import java.io.File;

@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import jersey.repackaged.com.google.common.collect.Maps;
-import jersey.repackaged.com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;

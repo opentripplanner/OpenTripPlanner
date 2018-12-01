@@ -9,7 +9,7 @@ import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import jersey.repackaged.com.google.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;

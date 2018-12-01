@@ -290,7 +290,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             Collection<FareRuleSet> fareRules) {
         FareSearch r = performSearch(fareType, rides, fareRules);
 
-        List<FareComponent> details = new ArrayList<FareComponent>();
+        ArrayList<FareComponent> details = new ArrayList<>();
         int count = 0;
         int start = 0;
         int end = rides.size() - 1;

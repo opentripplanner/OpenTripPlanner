@@ -78,10 +78,10 @@
     </scm>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <geotools.version>10.5</geotools.version>
         <jackson.version>2.9.7</jackson.version>
-        <jersey.version>2.18</jersey.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jersey.version>2.27</jersey.version>
         <aws.version>1.9.39</aws.version>
     </properties>
 
@@ -600,6 +600,11 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
             <version>${jersey.version}</version>
         </dependency>
         <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
