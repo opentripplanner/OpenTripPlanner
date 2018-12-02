@@ -29,11 +29,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class RoutingContext_Destroy_Test {
-
-    private static final boolean ARRIVE_BY_TRUE = true;
-
-    private static final boolean ARRIVE_BY_FALSE = false;
-
     private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
     private RoutingRequest request;
     private RoutingContext subject;
@@ -65,17 +60,10 @@ public class RoutingContext_Destroy_Test {
     }
 
     @Test public void temporary_changes_is_removed_from_graph_on_context_destroy() {
-        // try arriveBy set to both true and false
-        temporary_changes_is_removed_from_graph_on_context_destroy(ARRIVE_BY_TRUE);
-        temporary_changes_is_removed_from_graph_on_context_destroy(ARRIVE_BY_FALSE);
-    }
-
-    private void temporary_changes_is_removed_from_graph_on_context_destroy(boolean arriveBy) {
         // Given - A request
         request = new RoutingRequest();
         request.from = from;
         request.to = to;
-        request.arriveBy = arriveBy;
 
         // When - the context is created
         subject = new RoutingContext(request, g);
@@ -151,9 +139,8 @@ public class RoutingContext_Destroy_Test {
         return list;
     }
 
-    private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex source, Edge e,
-            Vertex v) {
-        String sourceName = source.getName();
+    private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
+        String sourceName = src.getName();
         assertFalse(sourceName + " -> " + e.getName(), e instanceof TemporaryEdge);
         assertFalse(sourceName + " -> " + v.getName(), v instanceof TemporaryVertex);
     }

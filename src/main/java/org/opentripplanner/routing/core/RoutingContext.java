@@ -141,7 +141,7 @@ public class RoutingContext implements Cloneable {
         for (Edge e : Iterables.concat(u.getIncoming(), u.getOutgoing())) {
             uIds.add(e.getId());
         }
-        
+
         // Intesection of edge IDs between u and v.
         uIds.retainAll(vIds);
         Set<Integer> overlappingIds = uIds;
@@ -229,7 +229,6 @@ public class RoutingContext implements Cloneable {
         else
             this.streetSpeedSnapshot = null;
 
-
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -290,7 +289,7 @@ public class RoutingContext implements Cloneable {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
-        
+
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
@@ -404,27 +403,7 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        disposeTemporaryStart(fromVertex, null);
-        disposeTemporaryEnd(toVertex, null);
-    }
-
-    private static void disposeTemporaryStart(Vertex v, Edge incoming) {
-        if (v instanceof TemporaryVertex) {
-            for (Edge edge : v.getOutgoing()) {
-                disposeTemporaryStart(edge.getToVertex(), edge);
-            }
-        } else if (incoming != null) {
-            v.removeIncoming(incoming);
-        }
-    }
-
-    private static void disposeTemporaryEnd(Vertex v, Edge outgoing) {
-        if (v instanceof TemporaryVertex) {
-            for (Edge edge : v.getIncoming()) {
-                disposeTemporaryEnd(edge.getFromVertex(), edge);
-            }
-        } else if (outgoing != null) {
-            v.removeOutgoing(outgoing);
-        }
+        TemporaryVertex.dispose(fromVertex);
+        TemporaryVertex.dispose(toVertex);
     }
 }
