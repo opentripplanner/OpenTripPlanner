@@ -99,7 +99,7 @@ public class TemporaryVertexDisposeTest {
      */
     @Test public void disposeTemporaryVertexesWithComplexPaths() {
 
-        TempVertex x = new TempVertex("x");
+        Vertex x = new TempVertex("x");
         Vertex y = new TempVertex("y");
         Vertex z = new TempVertex("z");
         Vertex q = new TempVertex("q");
@@ -118,35 +118,24 @@ public class TemporaryVertexDisposeTest {
         edge(z, a);
         edge(q, a);
         edge(q, b);
-
-        // Then before we dispose temporary vertexes
-        assertEquals("[B->A, x->A, z->A, q->A]", a.getIncoming().toString());
-        assertEquals("[A->B, y->B, q->B]", b.getIncoming().toString());
-
-        // When
-        TemporaryVertex.dispose(x);
-
-        // Then
-        assertEquals("[B->A]", a.getIncoming().toString());
-        assertEquals("[A->B]", b.getIncoming().toString());
-
-
-        // Destination, connect to A and B outgoing - we can reuse the temp structure
         edge(a, x);
         edge(b, y);
         edge(a, z);
-        edge(a, q);
-        edge(b, q);
 
-        assertEquals("[A->B, A->x, A->z, A->q]", a.getOutgoing().toString());
-        assertEquals("[B->A, B->y, B->q]", b.getOutgoing().toString());
+        // Then before we dispose temporary vertexes
+        assertEquals("[B->A, x->A, z->A, q->A]", a.getIncoming().toString());
+        assertEquals("[A->B, A->x, A->z]", a.getOutgoing().toString());
+        assertEquals("[A->B, y->B, q->B]", b.getIncoming().toString());
+        assertEquals("[B->A, B->y]", b.getOutgoing().toString());
 
         // When
         TemporaryVertex.dispose(x);
 
         // Then
         assertEquals("[B->A]", a.getIncoming().toString());
+        assertEquals("[A->B]", a.getOutgoing().toString());
         assertEquals("[A->B]", b.getIncoming().toString());
+        assertEquals("[B->A]", b.getOutgoing().toString());
     }
 
     /**
@@ -176,7 +165,38 @@ public class TemporaryVertexDisposeTest {
         assertOriginalGraphIsIntact();
     }
 
-    /* private test helper classes */
+    /**
+     * We should be able to delete a very deep path without getting a stack overflow error.
+     */
+    @Test public void disposeVeryDeepTemporaryPath() {
+        // Create access and egress legs with 1000 vertexes
+        Vertex origin = new TempVertex("origin");
+
+        Vertex o1 = origin;
+        Vertex o2 = null;
+
+        // Number of temporary vertexes in path
+        int i = 1024;
+
+        while (i>0) {
+            o2 = new TempVertex("T" + --i);
+            edge(o1, o2);
+            o1 = o2;
+        }
+        edge(o2, a);
+
+        // Verify A is connected to the chain of temporary vertexes.
+        assertEquals("[T0->A]", a.getIncoming().toString());
+
+        // When
+        TemporaryVertex.dispose(origin);
+
+        // Then
+        assertOriginalGraphIsIntact();
+    }
+
+
+    /* private methods */
 
     private void assertOriginalGraphIsIntact() {
         assertEquals("[]", a.getIncoming().toString());
@@ -186,7 +206,9 @@ public class TemporaryVertexDisposeTest {
     }
 
 
-    static class V extends Vertex {
+    /* private test helper classes */
+
+    private static class V extends Vertex {
         private V(String label) {
             super(null, label, ANY_LOC, ANY_LOC);
         }
@@ -196,17 +218,13 @@ public class TemporaryVertexDisposeTest {
         }
     }
 
-    static class TempVertex extends Vertex implements TemporaryVertex {
+    private static class TempVertex extends V implements TemporaryVertex {
         private TempVertex(String label) {
-            super(null, label, ANY_LOC, ANY_LOC);
+            super(label);
         }
 
         @Override public boolean isEndVertex() {
             throw new IllegalStateException("The `isEndVertex` is not used by dispose logic.");
-        }
-
-        @Override public String toString() {
-            return getLabel();
         }
     }
 
@@ -215,13 +233,13 @@ public class TemporaryVertexDisposeTest {
         new E(a, b);
     }
 
-    static class E extends FreeEdge {
+    private static class E extends FreeEdge {
         private E(Vertex from, Vertex to) {
             super(from, to);
         }
 
         @Override public String toString() {
-            return getFromVertex().toString() + "->" + getToVertex();
+            return getFromVertex().getLabel() + "->" + getToVertex().getLabel();
         }
     }
 }
