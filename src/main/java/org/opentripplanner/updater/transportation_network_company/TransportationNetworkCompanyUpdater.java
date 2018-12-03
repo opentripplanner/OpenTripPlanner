@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.transportation_network_company;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.updater.GraphUpdater;
@@ -22,6 +23,9 @@ import org.opentripplanner.updater.transportation_network_company.lyft.LyftTrans
 import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransportationNetworkCompanyUpdater implements GraphUpdater {
 
@@ -56,19 +60,32 @@ public class TransportationNetworkCompanyUpdater implements GraphUpdater {
         String sourceType = config.path("sourceType").asText();
         if (sourceType != null) {
             if (sourceType.equals("uber")) {
-                source = new UberTransportationNetworkCompanyDataSource(config.path("serverToken").asText());
+
+                source = new UberTransportationNetworkCompanyDataSource(
+                    config.path("serverToken").asText(),
+                    getRideTypes(config)
+                );
             } else if (sourceType.equals("lyft")) {
                 source = new LyftTransportationNetworkCompanyDataSource(
                     config.path("clientId").asText(),
-                    config.path("clientSecret").asText()
+                    config.path("clientSecret").asText(),
+                    getRideTypes(config)
                 );
             }
         }
 
         if (source == null) {
-            throw new IllegalArgumentException("Unknown transportation netowrk company source type: " + sourceType);
+            throw new IllegalArgumentException("Unknown transportation network company source type: " + sourceType);
         }
 
-        LOG.info("Setup a transportation netowrk company updater for type: " + sourceType);
+        LOG.info("Setup a transportation network company updater for type: " + sourceType);
+    }
+
+    private List<String> getRideTypes(JsonNode config) {
+        List<String> rideTypes = new ArrayList<>();
+        for (JsonNode node : config.path("rideTypes")) {
+            rideTypes.add(node.asText());
+        }
+        return rideTypes;
     }
 }

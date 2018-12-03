@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
-
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -690,9 +688,8 @@ public abstract class RoutingResource {
             // iterate through results and find earliest ETA of an acceptable ride type
             int earliestEta = Integer.MAX_VALUE;
             for (ArrivalTime arrivalEstimate : arrivalEstimates) {
-                for (String rideType : ACCEPTED_RIDE_TYPES) {
-                    if (
-                        arrivalEstimate.productId.equals(rideType) &&
+                for (String rideType : service.getAcceptedRideTypes(companies)) {
+                    if (arrivalEstimate.productId.equals(rideType) &&
                         arrivalEstimate.estimatedSeconds < earliestEta
                     ) {
                         earliestEta = arrivalEstimate.estimatedSeconds;

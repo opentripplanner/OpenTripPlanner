@@ -39,15 +39,18 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
     private static final String UBER_API_URL = "https://api.uber.com/v1.2/";
 
     private String serverToken;
+    private final List<String> rideTypes;
     private String baseUrl;
 
-    public UberTransportationNetworkCompanyDataSource (String serverToken) {
+    public UberTransportationNetworkCompanyDataSource (String serverToken, List<String> rideTypes) {
         this.serverToken = serverToken;
+        this.rideTypes = rideTypes;
         this.baseUrl = UBER_API_URL;
     }
 
-    public UberTransportationNetworkCompanyDataSource (String serverToken, String baseUrl) {
+    public UberTransportationNetworkCompanyDataSource (String serverToken, List<String> rideTypes, String baseUrl) {
         this.serverToken = serverToken;
+        this.rideTypes = rideTypes;
         this.baseUrl = baseUrl;
     }
 
@@ -94,6 +97,11 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
         }
 
         return arrivalTimes;
+    }
+
+    @Override
+    public List<String> getAcceptedRideTypes() {
+        return rideTypes;
     }
 
     @Override

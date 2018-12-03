@@ -76,7 +76,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -153,7 +152,9 @@ public abstract class GraphPathToTripPlanConverter {
 
                 // TODO: handle explicit distance case
             }
-
+            // Add TNC data after the filter stage so that OTP does not make requests to a rate-limited TNC API service
+            // for itineraries that ultimately never make it back to the requester.
+            addTNCData(exemplar, itinerary);
             plan.addItinerary(itinerary);
         }
 
@@ -225,7 +226,7 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
-        addTNCData(graph, itinerary, states[0].getOptions().companies);
+
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
@@ -419,22 +420,33 @@ public abstract class GraphPathToTripPlanConverter {
      * Adds TNC data to legs with {@link Leg#hailedCar}=true. This makes asynchronous, concurrent requests to the TNC
      * provider's API for price and ETA estimates and associates this data with its respective TNC leg.
      */
-    private static void addTNCData(Graph graph, Itinerary itinerary, String companies) {
+    private static void addTNCData(GraphPath path, Itinerary itinerary) {
+        Graph graph = path.getRoutingContext().graph;
+        String companies = path.states.getFirst().getOptions().companies;
         if (companies == null) return;
-        String rideType = companies.equals("UBER") ? ACCEPTED_RIDE_TYPES[1] : ACCEPTED_RIDE_TYPES[0];
         // Store async tasks in lists for any TNC legs that need info.
         List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();
         List<Callable<RideEstimate>> priceEstimateTasks = new ArrayList<>();
         // Keep track of TNC legs here (so the TNC responses can be filled in later).
         List<Leg> tncLegs = new ArrayList<>();
         TransportationNetworkCompanyService service = graph.getService(TransportationNetworkCompanyService.class);
+        // FIXME This needs to be refactored to account for the case where multiple companies/ride types are included.
+        // For now, only one company should be included in the request (e.g., companies=UBER) and only one ride type per
+        // TNC data source should be specified.
+        List<String> rideTypes = service.getAcceptedRideTypes(companies);
+        String rideType = !rideTypes.isEmpty() ? rideTypes.get(0) : null;
         // Accumulate TNC request tasks for each TNC leg.
         for (Leg leg : itinerary.legs) {
             if (!leg.hailedCar) continue;
-            tncLegs.add(leg);
-            // FIXME: Use an enum to handle this check.
+            // If handling the first TNC leg, do not attempt to get an arrival estimate for the leg from location
+            // because it could be different from the request's from location if there was an initial walk leg to
+            // travel to the pickup location. This avoids unnecessary/redundant API requests to TNC providers.
+            Place from = tncLegs.size() == 0
+                ? itinerary.legs.get(0).from
+                : leg.from;
             priceEstimateTasks.add(() -> service.getRideEstimate(companies, rideType, leg.from, leg.to));
-            arrivalEstimateTasks.add(() -> service.getArrivalTimes(leg.from, companies));
+            arrivalEstimateTasks.add(() -> service.getArrivalTimes(from, companies));
+            tncLegs.add(leg);
         }
         if (tncLegs.size() > 0) {
             // Use a thread pool so that requests are asynchronous and concurrent. # of threads should accommodate
@@ -502,12 +514,10 @@ public abstract class GraphPathToTripPlanConverter {
 
         String lastMode = null;
 
-        BikeRentalStationVertex onVertex = null, offVertex = null;
-
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
             String legMode = legs.get(i).mode;
-            if(legMode != lastMode && !walkSteps.isEmpty()) {
+            if(!legMode.equals(lastMode) && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
             }

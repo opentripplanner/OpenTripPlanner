@@ -44,19 +44,22 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
     private String baseUrl;  // for testing purposes
     private String clientId;
     private String clientSecret;
+    private final List<String> rideTypes;
     private Date tokenExpirationTime;
 
-    public LyftTransportationNetworkCompanyDataSource(String clientId, String clientSecret) {
+    public LyftTransportationNetworkCompanyDataSource(String clientId, String clientSecret, List<String> rideTypes) {
         this.baseUrl = LYFT_API_URL;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.rideTypes = rideTypes;
     }
 
     // intended for use during testing
-    public LyftTransportationNetworkCompanyDataSource(String baseUrl, String clientId, String clientSecret) {
-        this.baseUrl = baseUrl;
+    public LyftTransportationNetworkCompanyDataSource(String clientId, String clientSecret, List<String> rideTypes, String baseUrl) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.rideTypes = rideTypes;
+        this.baseUrl = baseUrl;
     }
 
     private String getAccessToken() throws IOException {
@@ -152,6 +155,11 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
             LOG.error(error.toString());
             throw new IOException("received an error from the Lyft API");
         }
+    }
+
+    @Override
+    public List<String> getAcceptedRideTypes() {
+        return rideTypes;
     }
 
     @Override

@@ -113,7 +113,7 @@ public class Car2GoCarRentalDataSource implements CarRentalDataSource, JsonConfi
             parseVehiclesJSON(data);
             data.close();
         } catch (IOException e) {
-            LOG.warn("Error reading bike rental feed from " + vehiclesUrl, e);
+            LOG.warn("Error reading car rental feed from " + vehiclesUrl, e);
             return false;
         }
         return true;

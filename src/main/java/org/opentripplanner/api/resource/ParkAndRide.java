@@ -74,7 +74,7 @@ public class ParkAndRide {
 
             prs.add(new ParkAndRideInfo((ParkAndRideVertex) v));
         }
-
+        System.out.println("P+R RESPONSE!!!!");
         return Response.status(Status.OK).entity(prs).build();
     }
 
@@ -91,12 +91,13 @@ public class ParkAndRide {
 
     public class ParkAndRideInfo {
         private static final long serialVersionUID = 1L;
-
+        public String id;
         public String name;
 
         public Double x, y;
 
         public ParkAndRideInfo(ParkAndRideVertex vertex) {
+            this.id = vertex.getId();
             this.name = vertex.getName();
             this.x = vertex.getX();
             this.y = vertex.getY();

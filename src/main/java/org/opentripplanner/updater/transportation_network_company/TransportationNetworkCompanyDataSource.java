@@ -46,6 +46,8 @@ public abstract class TransportationNetworkCompanyDataSource {
 
     protected abstract List<ArrivalTime> queryArrivalTimes(Position position) throws IOException;
 
+    public abstract List<String> getAcceptedRideTypes ();
+
     // get the estimated trip time
     public RideEstimate getRideEstimate(
         String rideType,

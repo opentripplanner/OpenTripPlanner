@@ -37,6 +37,16 @@ public class TransportationNetworkCompanyService implements Serializable {
         sources.put(source.getType(), source);
     }
 
+    public List<String> getAcceptedRideTypes (String companies) {
+        List<String> rideTypes = new ArrayList<>();
+        if (companies != null) {
+            for (String company : companies.split(",")) {
+                rideTypes.addAll(getTransportationNetworkCompanyDataSource(company).getAcceptedRideTypes());
+            }
+        }
+        return rideTypes;
+    }
+
     public List<ArrivalTime> getArrivalTimes(
         Place place,
         String companies

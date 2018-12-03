@@ -24,6 +24,7 @@ import org.opentripplanner.updater.transportation_network_company.lyft.LyftAuthe
 import org.opentripplanner.updater.transportation_network_company.lyft.LyftTransportationNetworkCompanyDataSource;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -36,6 +37,7 @@ public class LyftTransportationNetworkCompanyDataSourceTest {
     private static LyftTransportationNetworkCompanyDataSource source = new LyftTransportationNetworkCompanyDataSource(
         "http://localhost:8089/",
         "testClientId",
+        Collections.singletonList("lyft"),
         "testClientSecret"
     );
 

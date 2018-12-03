@@ -21,6 +21,7 @@ import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -32,6 +33,7 @@ public class UberTransportationNetworkCompanyDataSourceTest {
 
     private static UberTransportationNetworkCompanyDataSource source = new UberTransportationNetworkCompanyDataSource(
         "test",
+        Collections.singletonList("a6eef2e1-c99a-436f-bde9-fefb9181c0b0"),
         "http://localhost:8089/"
     );
 
@@ -43,7 +45,7 @@ public class UberTransportationNetworkCompanyDataSourceTest {
     );
 
     @Test
-    public void testGetArrivalTimes () throws IOException, ExecutionException {
+    public void testGetArrivalTimes () throws ExecutionException {
         // setup mock server to respond to ride estimate request
         stubFor(
             get(urlPathEqualTo("/estimates/time"))
