@@ -1,6 +1,4 @@
 package org.opentripplanner.routing.edgetype;
 
 /** Marker interface for temporary edges */
-public interface TemporaryEdge {
-    public void dispose();
-}
+public interface TemporaryEdge { }
