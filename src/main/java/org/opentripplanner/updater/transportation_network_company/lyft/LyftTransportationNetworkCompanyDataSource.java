@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.transportation_network_company.lyft;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
@@ -46,10 +47,11 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
     private String clientSecret;
     private Date tokenExpirationTime;
 
-    public LyftTransportationNetworkCompanyDataSource(String clientId, String clientSecret) {
+    public LyftTransportationNetworkCompanyDataSource(JsonNode config) {
         this.baseUrl = LYFT_API_URL;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.clientId = config.path("clientId").asText();
+        this.clientSecret = config.path("clientSecret").asText();
+        this.wheelChairAccessibleRideType = config.path("wheelChairAccessibleRideType").asText();
     }
 
     // intended for use during testing
@@ -100,7 +102,7 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
     }
 
     @Override
-    public TransportationNetworkCompany getType() {
+    public TransportationNetworkCompany getTransportationNetworkCompanyType() {
         return TransportationNetworkCompany.LYFT;
     }
 
@@ -138,7 +140,8 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
                         TransportationNetworkCompany.LYFT,
                         time.ride_type,
                         time.display_name,
-                        time.eta_seconds
+                        time.eta_seconds,
+                        productIsWheelChairAccessible(time.ride_type)
                     )
                 );
             }
@@ -196,9 +199,10 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
                     // Lyft's esimated cost is in the "minor" unit, so the following
                     // may not work in countries that don't have 100 minor units per major unit
                     // see https://en.wikipedia.org/wiki/ISO_4217#Treatment_of_minor_currency_units_(the_"exponent")
-                    estimate.estimated_cost_cents_max / 100,
-                    estimate.estimated_cost_cents_min / 100,
-                    estimate.ride_type
+                    estimate.estimated_cost_cents_max / 100.0,
+                    estimate.estimated_cost_cents_min / 100.0,
+                    estimate.ride_type,
+                    productIsWheelChairAccessible(estimate.ride_type)
                 ));
             }
 

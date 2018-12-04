@@ -19,11 +19,19 @@ public class ArrivalTime {
     public String productId;
     public String displayName;
     public int estimatedSeconds;
+    public boolean wheelchairAccessible;
 
-    public ArrivalTime(TransportationNetworkCompany company, String productId, String displayName, int estimatedSeconds) {
+    public ArrivalTime(
+        TransportationNetworkCompany company,
+        String productId,
+        String displayName,
+        int estimatedSeconds,
+        boolean wheelchairAccessible
+    ) {
         this.company = company;
         this.productId = productId;
         this.displayName = displayName;
         this.estimatedSeconds = estimatedSeconds;
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 }

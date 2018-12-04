@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.transportation_network_company.uber;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
@@ -41,9 +42,10 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
     private String serverToken;
     private String baseUrl;
 
-    public UberTransportationNetworkCompanyDataSource (String serverToken) {
-        this.serverToken = serverToken;
+    public UberTransportationNetworkCompanyDataSource(JsonNode config) {
+        this.serverToken = config.path("serverToken").asText();
         this.baseUrl = UBER_API_URL;
+        this.wheelChairAccessibleRideType = config.path("wheelChairAccessibleRideType").asText();
     }
 
     public UberTransportationNetworkCompanyDataSource (String serverToken, String baseUrl) {
@@ -52,7 +54,7 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
     }
 
     @Override
-    public TransportationNetworkCompany getType() {
+    public TransportationNetworkCompany getTransportationNetworkCompanyType() {
         return TransportationNetworkCompany.UBER;
     }
 
@@ -88,7 +90,8 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
                     TransportationNetworkCompany.UBER,
                     time.product_id,
                     time.localized_display_name,
-                    time.estimate
+                    time.estimate,
+                    productIsWheelChairAccessible(time.product_id)
                 )
             );
         }
@@ -136,7 +139,8 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
                 price.duration,
                 price.high_estimate,
                 price.low_estimate,
-                price.product_id
+                price.product_id,
+                productIsWheelChairAccessible(price.product_id)
             ));
         }
 

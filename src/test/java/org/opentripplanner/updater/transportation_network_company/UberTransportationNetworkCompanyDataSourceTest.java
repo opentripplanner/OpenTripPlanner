@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class UberTransportationNetworkCompanyDataSourceTest {
 
@@ -79,14 +80,25 @@ public class UberTransportationNetworkCompanyDataSourceTest {
                 )
         );
 
-        RideEstimate rideTime = source.getRideEstimate(
-            "26546650-e557-4a7b-86e7-6a3942445247",
+        List<RideEstimate> rideEstimates = source.getRideEstimates(
             1.2,
             3.4,
             1.201,
             3.401
         );
 
-        assertEquals(rideTime.duration, 1080);
+        RideEstimate rideEstimate = null;
+
+        for (RideEstimate estimate : rideEstimates) {
+            if (estimate.rideType.equals("a1111c8c-c720-46c3-8534-2fcdd730040d")) {
+                rideEstimate = estimate;
+                break;
+            }
+        }
+
+        assertNotNull(rideEstimate);
+        assertEquals(1080, rideEstimate.duration);
+        assertEquals(13, rideEstimate.minCost, 0.001);
+        assertEquals(17, rideEstimate.maxCost, 0.001);
     }
 }

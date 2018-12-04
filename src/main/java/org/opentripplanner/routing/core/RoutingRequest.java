@@ -499,8 +499,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double minimumCarRentalDistance = 804.672;
 
-    // we store the earliest pickup time here and add it upon the first boarding
-    // this way, a graph search can proceed and give walking a time advantage
+    // The earliest time in seconds that a TNC vehicle can pick up at the origin.  The earliest
+    // pickup time is stored here and added to the time it upon the first boarding.  This way, a
+    // graph search can proceed and give walking a time advantage and we can reuse the estimate
+    // instead of making numerous requests at very similar locaions.
     // initial value of -1 indicates ETA is not available
     public int transportationNetworkCompanyEtaAtOrigin = -1;
 
