@@ -2,6 +2,18 @@ language: java
 # OpenTripPlanner requires Java 8 and Travis doesn't (yet) support OpenJDK 8
 jdk:
   - oraclejdk8
+  - openjdk8
+  - oraclejdk9
+  - openjdk9
+# deprecated - oraclejdk10
+  - openjdk10
+  - oraclejdk11
+  - openjdk11
+  - openjdk-ea
+
+matrix:
+  allow_failures:
+  - jdk: openjdk-ea
   
 # Replace Travis's default Maven installation step with a no-op.
 # This avoids redundantly pre-running 'mvn install -DskipTests' every time.
