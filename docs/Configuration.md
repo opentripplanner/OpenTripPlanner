@@ -99,7 +99,7 @@ config key | description | value type | value default | notes
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 
-This list of parameters in defined in the code for `GraphBuilderParameters` at https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
 
 ## Reaching a subway platform
 
@@ -319,7 +319,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`routingDefaults` | Default routing parameters, which will be applied to every request | object | TODO | see [routing defaults](#routing-defaults)
+`routingDefaults` | Default routing parameters, which will be applied to every request | object |  | see [routing defaults](#routing-defaults)
 `timeout` | maximum time limit for route queries | double | null | units: seconds; see [timeouts](#timeouts)
 `timeouts` | when returning multiple itineraries, set different maximum time limits for the 1st, 2nd, etc. itinerary | array of doubles | `[5, 4, 2]` | units: seconds; see [timeouts](#timeouts)
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
