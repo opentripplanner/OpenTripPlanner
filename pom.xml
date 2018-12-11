@@ -78,7 +78,7 @@
     </scm>
 
     <properties>
-        <geotools.version>10.5</geotools.version>
+        <geotools.version>20.1</geotools.version>
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
