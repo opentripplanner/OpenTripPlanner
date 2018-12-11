@@ -215,6 +215,7 @@ order as the above-mentioned SRTM data, which is also the default for the popula
 DEM files(USGS DEM) is not supported by OTP, but can be converted to GeoTIFF with tools like [GDAL](http://www.gdal.org/). 
 Use `gdal_merge.py -o merged.tiff *.dem` to merge a set of `dem` files into one `tif` file.
 
+See Interline [PlanetUtils](https://github.com/interline-io/planetutils) for a set of scripts to download, merge, and resample [Mapzen/Amazon Terrain Tiles](https://registry.opendata.aws/terrain-tiles/).
 
 ## Fares configuration
 
