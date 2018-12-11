@@ -55,7 +55,7 @@ public class GenericLocation implements Cloneable, Serializable {
 
     // We want to ignore any number of non-digit characters at the beginning of the string, except
     // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point). 
-    private static final Pattern _latLonPattern = Pattern.compile("[\D&&^[-+.]]*(" + _doublePattern
+    private static final Pattern _latLonPattern = Pattern.compile("[\\D&&^[-+.]]*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
     
     private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("
