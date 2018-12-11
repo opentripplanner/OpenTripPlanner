@@ -1,6 +1,6 @@
 package org.opentripplanner.analyst;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import org.joda.time.LocalDate;
 import org.mapdb.*;
 import org.opentripplanner.analyst.cluster.ResultEnvelope;

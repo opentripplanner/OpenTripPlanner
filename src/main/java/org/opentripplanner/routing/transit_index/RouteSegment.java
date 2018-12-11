@@ -2,7 +2,7 @@ package org.opentripplanner.routing.transit_index;
 
 import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.graph.Edge;
 

@@ -3,9 +3,9 @@ package org.opentripplanner.common.geometry;
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Envelope;
 
 /**
  * A {@link CoordinateSequence} implementation based on a packed arrays. In this implementation,
@@ -36,14 +36,14 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
     transient protected SoftReference<Coordinate[]> coordRef;
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getDimension()
+     * @see org.locationtech.jts.geom.CoordinateSequence#getDimension()
      */
     public int getDimension() {
         return this.dimension;
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getCoordinate(int)
      */
     public Coordinate getCoordinate(int i) {
         Coordinate[] coords = getCachedCoords();
@@ -54,14 +54,14 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getCoordinate(int)
      */
     public Coordinate getCoordinateCopy(int i) {
         return getCoordinateInternal(i);
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getCoordinate(int)
      */
     public void getCoordinate(int i, Coordinate coord) {
         coord.x = getOrdinate(i, 0);
@@ -69,7 +69,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#toCoordinateArray()
+     * @see org.locationtech.jts.geom.CoordinateSequence#toCoordinateArray()
      */
     public Coordinate[] toCoordinateArray() {
         Coordinate[] coords = getCachedCoords();
@@ -107,21 +107,21 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getX(int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getX(int)
      */
     public double getX(int index) {
         return getOrdinate(index, 0);
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getY(int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getY(int)
      */
     public double getY(int index) {
         return getOrdinate(index, 1);
     }
 
     /**
-     * @see com.vividsolutions.jts.geom.CoordinateSequence#getOrdinate(int, int)
+     * @see org.locationtech.jts.geom.CoordinateSequence#getOrdinate(int, int)
      */
     public abstract double getOrdinate(int index, int ordinateIndex);
 
@@ -270,7 +270,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
+         * @see org.locationtech.jts.geom.CoordinateSequence#getCoordinate(int)
          */
         public Coordinate getCoordinateInternal(int i) {
             double x = coords[i * dimension];
@@ -280,7 +280,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#size()
+         * @see org.locationtech.jts.geom.CoordinateSequence#size()
          */
         public int size() {
             return coords.length / dimension;
@@ -295,8 +295,15 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
             return clone;
         }
 
+        @Override
+        public CoordinateSequence copy() {
+            Double clone = (Double) super.clone();
+            clone.coords = coords.clone();
+            return clone;
+        }
+
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#getOrdinate(int, int) Beware, for
+         * @see org.locationtech.jts.geom.CoordinateSequence#getOrdinate(int, int) Beware, for
          *      performace reasons the ordinate index is not checked, if it's over dimensions you
          *      may not get an exception but a meaningless value.
          */
@@ -305,7 +312,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.PackedCoordinateSequence#setOrdinate(int, int, double)
+         * @see org.locationtech.jts.geom.PackedCoordinateSequence#setOrdinate(int, int, double)
          */
         public void setOrdinate(int index, int ordinate, double value) {
             coordRef = null;
@@ -395,7 +402,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
+         * @see org.locationtech.jts.geom.CoordinateSequence#getCoordinate(int)
          */
         public Coordinate getCoordinateInternal(int i) {
             double x = coords[i * dimension];
@@ -405,7 +412,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#size()
+         * @see org.locationtech.jts.geom.CoordinateSequence#size()
          */
         public int size() {
             return coords.length / dimension;
@@ -420,8 +427,15 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
             return clone;
         }
 
+        @Override
+        public CoordinateSequence copy() {
+            Float clone = (Float) super.clone();
+            clone.coords = coords.clone();
+            return clone;
+        }
+
         /**
-         * @see com.vividsolutions.jts.geom.CoordinateSequence#getOrdinate(int, int) Beware, for
+         * @see org.locationtech.jts.geom.CoordinateSequence#getOrdinate(int, int) Beware, for
          *      performace reasons the ordinate index is not checked, if it's over dimensions you
          *      may not get an exception but a meaningless value.
          */
@@ -430,7 +444,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * @see com.vividsolutions.jts.geom.PackedCoordinateSequence#setOrdinate(int, int, double)
+         * @see org.locationtech.jts.geom.PackedCoordinateSequence#setOrdinate(int, int, double)
          */
         public void setOrdinate(int index, int ordinate, double value) {
             coordRef = null;

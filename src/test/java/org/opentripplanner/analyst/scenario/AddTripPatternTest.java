@@ -1,8 +1,8 @@
 package org.opentripplanner.analyst.scenario;
 
 import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.io.WKTReader;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.io.WKTReader;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TIntIntMap;
 import junit.framework.TestCase;

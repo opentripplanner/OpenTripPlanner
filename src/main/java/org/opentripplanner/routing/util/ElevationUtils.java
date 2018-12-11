@@ -7,8 +7,8 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 public class ElevationUtils {
     private static Logger log = LoggerFactory.getLogger(ElevationUtils.class);

@@ -4,8 +4,8 @@ import java.awt.Graphics2D;
 
 import org.opentripplanner.routing.graph.Graph;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.util.AffineTransformation;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.util.AffineTransformation;
 
 /**
  * Interface for a slippy map tile renderer.
