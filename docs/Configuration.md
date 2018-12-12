@@ -217,6 +217,19 @@ Use `gdal_merge.py -o merged.tiff *.dem` to merge a set of `dem` files into one 
 
 See Interline [PlanetUtils](https://github.com/interline-io/planetutils) for a set of scripts to download, merge, and resample [Mapzen/Amazon Terrain Tiles](https://registry.opendata.aws/terrain-tiles/).
 
+### Elevation unit conversion
+
+By default, OTP expects the elevation data to use metres. However, by setting `elevationUnitMultiplier` in `build-config.json`,
+it is possible to define a multiplier that converts the elevation values from some other unit to metres.
+
+```JSON
+// build-config.json
+{
+  // Correct conversation multiplier when source data uses decimetres instead of metres
+  "elevationUnitMultiplier": 0.1
+}
+```
+
 ## Fares configuration
 
 By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
