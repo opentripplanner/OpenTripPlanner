@@ -95,7 +95,7 @@ public class GraphStats {
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
         try {
-            graph = Graph.load(graphFile, Graph.LoadLevel.FULL);
+            graph = Graph.load(graphFile);
         } catch (Exception e) {
             LOG.error("Exception while loading graph from " + graphFile);
             return;
