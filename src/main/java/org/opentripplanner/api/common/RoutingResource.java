@@ -361,6 +361,13 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
+    /**
+     * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
+     * otherwise it uses default sorting. More sorting methods may be added in the future.
+     */
+    @QueryParam("pathComparator")
+    private String pathComparator;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -599,6 +606,9 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
+
+        if (pathComparator != null)
+            request.pathComparator = pathComparator;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
