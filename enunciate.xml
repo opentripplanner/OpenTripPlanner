@@ -19,7 +19,10 @@
     <ruby-json-client disabled="true"/>
     <idl disabled="true"/>
     <swagger disabled="true"/>
-    <docs disableRestMountpoint="true"/>
+    <docs disableRestMountpoint="true"  includeApplicationPath="true"/>
+    <jaxrs>
+       <application path="/otp/" />
+    </jaxrs>
   </modules>
 
 </enunciate>
