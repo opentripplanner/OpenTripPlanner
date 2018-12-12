@@ -28,9 +28,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class RoutingContext_Destroy_Test {
+public class RoutingContextDestroyTest {
     private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
-    private RoutingRequest request;
     private RoutingContext subject;
 
     // Given:
@@ -59,9 +58,9 @@ public class RoutingContext_Destroy_Test {
         g.index(new DefaultStreetVertexIndexFactory());
     }
 
-    @Test public void temporary_changes_is_removed_from_graph_on_context_destroy() {
+    @Test public void temporaryChangesRemovedOnContextDestroy() {
         // Given - A request
-        request = new RoutingRequest();
+        RoutingRequest request = new RoutingRequest();
         request.from = from;
         request.to = to;
 
@@ -69,7 +68,7 @@ public class RoutingContext_Destroy_Test {
         subject = new RoutingContext(request, g);
 
         // Then:
-        origin_and_destination_is_inserted_correct_in_the_graph();
+        originAndDestinationInsertedCorrect();
 
         // And When:
         subject.destroy();
@@ -86,7 +85,7 @@ public class RoutingContext_Destroy_Test {
         }
     }
 
-    private void origin_and_destination_is_inserted_correct_in_the_graph() {
+    private void originAndDestinationInsertedCorrect() {
         // Then - the origin and destination is
         assertEquals("Origin", subject.fromVertex.getName());
         assertEquals("Destination", subject.toVertex.getName());
