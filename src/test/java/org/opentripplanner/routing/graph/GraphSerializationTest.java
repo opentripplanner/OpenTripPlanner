@@ -15,6 +15,7 @@ import org.opentripplanner.routing.vertextype.TransitStation;
 import java.io.File;
 import java.util.BitSet;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -24,10 +25,10 @@ import static org.junit.Assert.assertFalse;
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization) does not corrupt
  * the graph, and yields exactly the same data.
- *
+ * <p>
  * We tried several existing libraries to perform the comparison but nothing did exactly what we needed in a way that
  * we could control precisely.
- *
+ * <p>
  * Created by abyrd on 2018-10-26
  */
 public class GraphSerializationTest {
@@ -36,7 +37,7 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     @Test
-    public void testRoundTrip () throws Exception {
+    public void testRoundTrip() throws Exception {
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
@@ -69,13 +70,13 @@ public class GraphSerializationTest {
      * and allows us to perform a very deep comparison of almost the entire object graph because there are no problems
      * with lists being reordered, transient indexes being rebuilt, etc. The ObjectDiffer supports such comparisons
      * of identical objects with a special switch specifically for testing.
-     *
+     * <p>
      * This is as much a test of the ObjectDiffer itself as of OpenTripPlanner serialization. It is situated here
      * instead of in the same package as ObjectDiffer so it has access to the OpenTripPlanner classes, which provide a
      * suitably complex tangle of fields and references for exercising all the differ's capabilities.
      */
     @Test
-    public void compareGraphToItself () {
+    public void compareGraphToItself() {
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
@@ -87,7 +88,7 @@ public class GraphSerializationTest {
         objectDiffer.ignoreFields("incoming", "outgoing");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
-        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class);
+        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, TreeMap.class, org.opentripplanner.common.LuceneIndex.class);
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
@@ -105,7 +106,7 @@ public class GraphSerializationTest {
         assertNoDifferences(graph1, graph2);
     }
 
-    private static void assertNoDifferences (Graph g1, Graph g2) {
+    private static void assertNoDifferences(Graph g1, Graph g2) {
         // Make some exclusions because some classes are inherently transient or contain unordered lists we can't yet compare.
         ObjectDiffer objectDiffer = new ObjectDiffer();
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
@@ -116,7 +117,7 @@ public class GraphSerializationTest {
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
         // are deduplicated.
-        objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
+        objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class, TreeMap.class, org.opentripplanner.common.LuceneIndex.class, graphql.schema.GraphQLSchema.class);
         objectDiffer.compareTwoObjects(g1, g2);
         // Print differences before assertion so we can see what went wrong.
         assertFalse(objectDiffer.hasDifferences());
