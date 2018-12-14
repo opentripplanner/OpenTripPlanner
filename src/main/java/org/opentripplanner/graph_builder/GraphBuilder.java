@@ -23,7 +23,6 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.OTPMain;
@@ -85,7 +84,7 @@ public class GraphBuilder implements Runnable {
     public void setBaseGraph(String baseGraph) {
         this.baseGraph = baseGraph;
         try {
-            graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
+            graph = Graph.load(new File(baseGraph));
         } catch (Exception e) {
             throw new RuntimeException("error loading base graph");
         }
@@ -278,18 +277,18 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsBucketName = bucketConfig.bucketName;
             NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             gcf.tileSource = awsTileSource;
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         } else if (builderParams.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         } else if (demFile != null) {
             // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {

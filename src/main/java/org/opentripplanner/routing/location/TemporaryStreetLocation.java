@@ -45,11 +45,4 @@ final public class TemporaryStreetLocation extends StreetLocation implements Tem
     public boolean isEndVertex() {
         return endVertex;
     }
-
-    @Override
-    public void dispose() {
-        for (Object temp : endVertex ? getIncoming() : getOutgoing()) {
-            ((TemporaryEdge) temp).dispose();
-        }
-    }
 }
