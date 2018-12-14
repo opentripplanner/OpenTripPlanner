@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import com.conveyal.r5.diff.ObjectDiffer;
+import com.conveyal.object_differ.ObjectDiffer;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.util.WeakValueHashMap;

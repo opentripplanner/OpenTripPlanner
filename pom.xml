@@ -596,6 +596,13 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
+        <!-- Used for testing that a round trip through serialization reproduces the same Graph. -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>object-differ</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Jersey annontation-driven REST web services (JAX-RS implementation) -->
         <dependency>
