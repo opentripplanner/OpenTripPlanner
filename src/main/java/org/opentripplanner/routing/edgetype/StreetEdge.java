@@ -335,8 +335,25 @@ public class StreetEdge extends Edge implements Cloneable {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip
                 Vertex toVertex = options.rctx.toVertex;
-                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
-                    (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                if (
+                    // arriveBy searches
+                    (
+                        options.arriveBy && (
+                            // forbid hailing car a 2nd time post transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit()) ||
+                            // forbid hailing car a 2nd time pre transit
+                            (s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit())
+                        )
+                    )||
+                    (
+                        !options.arriveBy && (
+                            // forbid hailing car a 2nd time pre transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                            // forbid hailing car a 2nd time post transit
+                            (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())
+                        )
+                    )
+                ) {
                     return state;
                 }
 
@@ -590,12 +607,31 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
+        // On itineraries with car mode enabled, limit both walking and driving before transit,
+        // either soft or hard.
+        // We can safely assume no limit on driving after transit as most TNC companies will drive
+        // outside of the pickup boundaries.
         int roundedTime = (int) Math.ceil(time);
-        if (options.kissAndRide || options.parkAndRide) {
+        if (
+            options.kissAndRide ||
+                options.parkAndRide ||
+                options.useTransportationNetworkCompany ||
+                options.allowCarRental
+        ) {
             if (options.arriveBy) {
-                if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
+                // use different determining factor depending on what type of search this is.
+                if (
+                    // if kiss/park and ride, check if car has not yet been parked
+                    ((options.kissAndRide || options.parkAndRide) && !s0.isCarParked()) ||
+                        // if car rentals are enabled, check if a car has been rented before transit
+                        (options.allowCarRental && s0.stateData.hasRentedCarPreTransit()) ||
+                        // if car hailing is enabled, check if a car has been hailed before transit
+                        (options.useTransportationNetworkCompany && s0.stateData.hasRentedCarPreTransit())
+                ) {
+                    s1.incrementPreTransitTime(roundedTime);
+                }
             } else {
+                // there is no differentiation in depart at queries
                 if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
             }
             if (s1.isMaxPreTransitTimeExceeded(options)) {
