@@ -28,12 +28,6 @@ public class SampleEdge extends Edge implements TemporaryEdge {
     }
 
     @Override
-    public void dispose() {
-        tov.removeIncoming(this);
-        fromv.removeOutgoing(this);
-    }
-
-    @Override
     /** We want to use exactly the same logic here as is used in propagating to samples */
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);

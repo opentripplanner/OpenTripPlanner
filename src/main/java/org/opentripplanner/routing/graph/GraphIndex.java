@@ -150,7 +150,7 @@ public class GraphIndex {
     private final Map<FeedScopedId,Integer> serviceCodes;
 
     /* Full-text search extensions */
-    public LuceneIndex luceneIndex;
+    public transient LuceneIndex luceneIndex;
 
     /* Separate transfers for profile routing */
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
@@ -165,7 +165,7 @@ public class GraphIndex {
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
-    final GraphQLSchema indexSchema;
+    final transient GraphQLSchema indexSchema;
 
     public final ExecutorService threadPool;
 

@@ -385,7 +385,6 @@ public class TestHalfEdges {
 
         req.setWheelchairAccessible(true);
 
-        start.dispose();
         start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
@@ -402,7 +401,6 @@ public class TestHalfEdges {
         assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
-        start.dispose();
     }
 
     @Test
@@ -416,7 +414,6 @@ public class TestHalfEdges {
         TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.00, -74.00), null, true);
         assertNotNull(some);
-        some.dispose();
 
         // test that the closest vertex finder correctly splits streets
         TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocation(
@@ -426,7 +423,6 @@ public class TestHalfEdges {
                 start.isWheelchairAccessible());
 
         Collection<Edge> edges = start.getOutgoing();
-        start.dispose();
         assertEquals(2, edges.size());
 
         RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
@@ -435,7 +431,6 @@ public class TestHalfEdges {
         assertNotNull(end);
 
         edges = end.getIncoming();
-        end.dispose();
         assertEquals(2, edges.size());
 
         // test that traveling between origin and destination that are close to each other doesn't throw TrivialPathException
