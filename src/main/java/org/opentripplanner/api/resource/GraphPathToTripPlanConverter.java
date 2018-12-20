@@ -188,9 +188,9 @@ public abstract class GraphPathToTripPlanConverter {
         return makeCalendar(timeZone, state.getTimeInMillis());
     }
 
-    private static Calendar makeCalendar(TimeZone timeZone, long time) {
+    private static Calendar makeCalendar(TimeZone timeZone, long timeMillis) {
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(time);
+        calendar.setTimeInMillis(timeMillis);
         return calendar;
     }
 
