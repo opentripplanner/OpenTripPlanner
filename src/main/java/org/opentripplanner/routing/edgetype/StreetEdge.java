@@ -401,19 +401,22 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.setBackWalkingBike(walkingBike);
 
         /* Handle no through traffic areas. */
-        if (this.isNoThruTraffic()) {
-            // Record transition into no-through-traffic area.
-            if (backEdge instanceof StreetEdge && !((StreetEdge)backEdge).isNoThruTraffic()) {
-                s1.setEnteredNoThroughTrafficArea();
-            }
-            // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
-            if (s1.hasEnteredNoThroughTrafficArea()) {
-                // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
-                // on thru _Vertices_. This could certainly be improved somehow.
-                for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
-                    if (!se.isNoThruTraffic()) {
-                        // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
-                        return null;
+        if (!s0.getReverseOptimizing()) {
+            if (this.isNoThruTraffic()) {
+                // Record transition into no-through-traffic area.
+                if (backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isNoThruTraffic()) {
+                    s1.setEnteredNoThroughTrafficArea();
+                }
+                // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+                if (s1.hasEnteredNoThroughTrafficArea()) {
+                    // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
+                    // on thru _Vertices_. This could certainly be improved somehow.
+                    for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
+                        if (!se.isNoThruTraffic()) {
+
+                            // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
+                            return null;
+                        }
                     }
                 }
             }
@@ -616,7 +619,7 @@ public class StreetEdge extends Edge implements Cloneable {
     public String toString() {
         return "StreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
                 + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
-                + " permission=" + this.getPermission() + " ref=" + this.getRef() + ")";
+                + " permission=" + this.getPermission() + " ref=" + this.getRef() + " NTT=" + this.isNoThruTraffic() + ")";
     }
 
     @Override
