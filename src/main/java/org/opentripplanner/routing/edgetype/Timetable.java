@@ -233,7 +233,7 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         Stop currentStop = pattern.getStop(stopIndex);
         long bestTime = boarding ? Long.MAX_VALUE : Long.MIN_VALUE;
-        boolean useClockTime = !s0.getOptions().ignoreDrtAdvanceBookMin;
+        boolean useClockTime = !s0.getOptions().flexIgnoreDrtAdvanceBookMin;
         long clockTime = s0.getOptions().clockTimeSec;
         for (TripTimes tt : tripTimes) {
             if (tt.isCanceled()) continue;

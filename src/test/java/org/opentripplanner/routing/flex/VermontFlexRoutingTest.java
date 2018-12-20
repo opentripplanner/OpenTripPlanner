@@ -99,12 +99,12 @@ public class VermontFlexRoutingTest {
         RoutingRequest options = new RoutingRequest();
         // defaults in vermont router-config.json
         options.maxWalkDistance = MAX_WALK_DISTANCE;
-        options.callAndRideReluctance = CALL_AND_RIDE_RELUCTANCE;
+        options.flexCallAndRideReluctance = CALL_AND_RIDE_RELUCTANCE;
         options.walkReluctance = WALK_RELUCTANCE;
         options.waitAtBeginningFactor = WAIT_AT_BEGINNING_FACTOR;
         options.transferPenalty = TRANSFER_PENALTY;
         // for testing
-        options.ignoreDrtAdvanceBookMin = IGNORE_DRT_ADVANCE_MIN_BOOKING;
+        options.flexIgnoreDrtAdvanceBookMin = IGNORE_DRT_ADVANCE_MIN_BOOKING;
         options.setDateTime(date, time, graph.getTimeZone());
         options.setFromString(from);
         options.setToString(to);
@@ -122,13 +122,13 @@ public class VermontFlexRoutingTest {
         RoutingRequest options = new RoutingRequest();
         // defaults in vermont router-config.json
         options.maxWalkDistance = maxWalkDistance;
-        options.callAndRideReluctance = callAndRideReluctance;
+        options.flexCallAndRideReluctance = callAndRideReluctance;
         options.walkReluctance = walkReluctance;
         options.waitAtBeginningFactor = waitAtBeginningFactor;
         options.transferPenalty = transferPenalty;
 
         // for testing
-        options.ignoreDrtAdvanceBookMin = ignoreDrtAdvanceMinBooking;
+        options.flexIgnoreDrtAdvanceBookMin = ignoreDrtAdvanceMinBooking;
 
         options.setDateTime(date, time, graph.getTimeZone());
         options.setFromString(from);

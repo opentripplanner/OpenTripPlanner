@@ -55,7 +55,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         return new SearchTerminationStrategy() {
             @Override
             public boolean shouldSearchTerminate(Vertex origin, Vertex target, State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
-                return current.getElapsedTimeSeconds() > traverseOptions.maxCallAndRideSeconds;
+                return current.getElapsedTimeSeconds() > traverseOptions.flexMaxCallAndRideSeconds;
             }
         };
     }
@@ -74,7 +74,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
             return null;
         }
         return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
-                startIndex, endIndex, null, 0, path.getGeometry(), path.getDuration(), opt.flagStopBufferSize);
+                startIndex, endIndex, null, 0, path.getGeometry(), path.getDuration(), opt.flexFlagStopBufferSize);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
             return null;
         }
         return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(),
-                startIndex, endIndex, path.getGeometry(), path.getDuration(), null, 0, opt.flagStopBufferSize);
+                startIndex, endIndex, path.getGeometry(), path.getDuration(), null, 0, opt.flexFlagStopBufferSize);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
             return null;
         } else {
             return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop,
-                    startIndex, endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), path.getGeometry(), path.getDuration(), opt.flagStopBufferSize);
+                    startIndex, endIndex, hop.getStartGeometry(), hop.getStartVehicleTime(), path.getGeometry(), path.getDuration(), opt.flexFlagStopBufferSize);
         }
     }
 

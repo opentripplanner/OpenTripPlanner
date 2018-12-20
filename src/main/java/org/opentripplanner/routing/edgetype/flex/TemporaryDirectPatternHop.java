@@ -52,7 +52,7 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
 
     @Override
     public int getWeight(State s0, int runningTime) {
-        return (int) Math.round(s0.getOptions().callAndRideReluctance * runningTime);
+        return (int) Math.round(s0.getOptions().flexCallAndRideReluctance * runningTime);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementCallAndRideTime(directTime);
-        if (s1.getCallAndRideTime() >= s0.getOptions().maxCallAndRideSeconds) {
+        if (s1.getCallAndRideTime() >= s0.getOptions().flexMaxCallAndRideSeconds) {
             return null;
         }
         return super.traverse(s0, s1);

@@ -139,11 +139,11 @@ public class GraphPathFinder {
             FlagStopGraphModifier svc1 = new FlagStopGraphModifier(router.graph);
             DeviatedRouteGraphModifier svc2 = new DeviatedRouteGraphModifier(router.graph);
             svc1.createForwardHops(options);
-            if (options.useReservationServices) {
+            if (options.flexUseReservationServices) {
                 svc2.createForwardHops(options);
             }
             svc1.createBackwardHops(options);
-            if (options.useReservationServices) {
+            if (options.flexUseReservationServices) {
                 svc2.createBackwardHops(options);
             }
         }
@@ -198,9 +198,9 @@ public class GraphPathFinder {
                 if (tripIds.size() < 2) {
                     int duration = path.getCallAndRideDuration();
                     if (duration > 0) {
-                        int constantLimit = Math.min(0, duration - options.reduceCallAndRideSeconds);
-                        int ratioLimit = (int) Math.round(options.reduceCallAndRideRatio * duration);
-                        options.maxCallAndRideSeconds = Math.min(constantLimit, ratioLimit);
+                        int constantLimit = Math.min(0, duration - options.flexReduceCallAndRideSeconds);
+                        int ratioLimit = (int) Math.round(options.flexReduceCallAndRideRatio * duration);
+                        options.flexMaxCallAndRideSeconds = Math.min(constantLimit, ratioLimit);
                     }
                 }
             }

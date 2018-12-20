@@ -44,13 +44,13 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
     @Override
     public TemporaryPartialPatternHop makeHopNewTo(RoutingRequest opt, State state, PatternHop hop, PatternArriveVertex to, Stop toStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()), opt.flagStopBufferSize);
+        return new TemporaryPartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()), opt.flexFlagStopBufferSize);
     }
 
     @Override
     public TemporaryPartialPatternHop makeHopNewFrom(RoutingRequest opt, State state, PatternHop hop, PatternDepartVertex from, Stop fromStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
-        return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex(), opt.flagStopBufferSize);
+        return new TemporaryPartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex(), opt.flexFlagStopBufferSize);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
         if (endIndex < hop.getStartIndex())
             return null;
         return new TemporaryPartialPatternHop(originalHop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, hop.getStartIndex(), endIndex,
-                hop.getStartGeometry(), hop.getStartVehicleTime(), null, 0, opt.flagStopBufferSize);
+                hop.getStartGeometry(), hop.getStartVehicleTime(), null, 0, opt.flexFlagStopBufferSize);
     }
 
     @Override

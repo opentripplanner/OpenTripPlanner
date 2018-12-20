@@ -73,7 +73,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
         if (hop.isUnscheduled()) {
             int currTime = sd.secondsSinceMidnight(s0.getTimeSeconds());
-            boolean useClockTime = !s0.getOptions().ignoreDrtAdvanceBookMin;
+            boolean useClockTime = !s0.getOptions().flexIgnoreDrtAdvanceBookMin;
             long clockTime = s0.getOptions().clockTimeSec;
             if (boarding) {
                 int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime, sd, useClockTime, clockTime);
@@ -109,7 +109,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
     @Override
     public long getExtraWeight(RoutingRequest options) {
         boolean deviatedRoute = (boarding && hop.isDeviatedRouteBoard()) || (!boarding && hop.isDeviatedRouteAlight());
-        return (deviatedRoute ? options.deviatedRouteExtraPenalty : options.flagStopExtraPenalty);
+        return (deviatedRoute ? options.flexDeviatedRouteExtraPenalty : options.flexFlagStopExtraPenalty);
     }
 
     @Override
