@@ -255,7 +255,7 @@ public class PatternHopFactory {
 
     private Map<FeedScopedId, double[]> distancesByShapeId = new HashMap<FeedScopedId, double[]>();
 
-    private Map<String, Geometry> _areasById = new HashMap<>();
+    private Map<String, Geometry> flexAreasById = new HashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 
@@ -301,8 +301,8 @@ public class PatternHopFactory {
         // Perhaps it is to allow name collisions with previously loaded feeds.
         clearCachedData(); 
 
-        loadAreaMap();
-        loadAreasIntoGraph(graph);
+        loadFlexAreaMap();
+        loadFlexAreasIntoGraph(graph);
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
@@ -375,7 +375,7 @@ public class PatternHopFactory {
             }
 
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
-            StopPattern stopPattern = new StopPattern(stopTimes, _areasById::get);
+            StopPattern stopPattern = new StopPattern(stopTimes, flexAreasById::get);
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
@@ -1021,7 +1021,7 @@ public class PatternHopFactory {
         geometriesByShapeId.clear();
         distancesByShapeId.clear();
         geometriesByShapeSegmentKey.clear();
-        _areasById.clear();
+        flexAreasById.clear();
     }
 
     private void loadTransfers(Graph graph) {
@@ -1519,17 +1519,17 @@ public class PatternHopFactory {
             return expandedTransfers;
         }
     }
-    private void loadAreaMap() {
+    private void loadFlexAreaMap() {
         for (Area area : transitService.getAllAreas()) {
             Geometry geometry = GeometryUtils.parseWkt(area.getWkt());
-            _areasById.put(area.getAreaId(), geometry);
+            flexAreasById.put(area.getAreaId(), geometry);
         }
     }
 
-    private void loadAreasIntoGraph(Graph graph) {
-        for (Map.Entry<String, Geometry> entry : _areasById.entrySet()) {
+    private void loadFlexAreasIntoGraph(Graph graph) {
+        for (Map.Entry<String, Geometry> entry : flexAreasById.entrySet()) {
             FeedScopedId id = new FeedScopedId(feedId.getId(), entry.getKey());
-            graph.areasById.put(id, entry.getValue());
+            graph.flexAreasById.put(id, entry.getValue());
         }
     }
 }

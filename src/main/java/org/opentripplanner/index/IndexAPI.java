@@ -601,20 +601,23 @@ public class IndexAPI {
         }
     }
 
-    /** Return all area IDs. */
+    /**
+     * Return all GTFS-Flex area IDs. Areas are defined in GTFS-Flex to be a lat/lon polygon in
+     * which certain kinds of flex service take place (deviated-route and call-and-ride).
+     */
     @GET
-    @Path("/areas")
+    @Path("/flexAreas")
     public Response getAllAreas() {
-        List<FeedScopedId> ids = new ArrayList<>(index.areasById.keySet());
+        List<FeedScopedId> ids = new ArrayList<>(index.flexAreasById.keySet());
         return Response.status(Status.OK).entity(ids).build();
     }
 
     /** Return a specific area given an ID in Agency:ID format. */
     @GET
-    @Path("/areas/{id}")
+    @Path("/flexAreas/{id}")
     public Response getAreaIdByFeedId(@PathParam("id") String areaIdString) {
         FeedScopedId id = GtfsLibrary.convertIdFromString(areaIdString);
-        Geometry area = index.areasById.get(id);
+        Geometry area = index.flexAreasById.get(id);
         if (area == null) {
             return Response.status(Status.NOT_FOUND).build();
         }

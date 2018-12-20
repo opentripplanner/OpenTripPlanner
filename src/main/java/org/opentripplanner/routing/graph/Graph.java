@@ -207,7 +207,7 @@ public class Graph implements Serializable {
     public boolean useFlexService = false;
 
     /** Areas for flex service */
-    public Map<FeedScopedId, Geometry> areasById = new HashMap<>();
+    public Map<FeedScopedId, Geometry> flexAreasById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -924,8 +924,8 @@ public class Graph implements Serializable {
         this.feedInfoForId.put(info.getId().toString(), info);
     }
 
-    public void addArea(String feedId, String areaId, Polygon area) {
-        this.areasById.put(new FeedScopedId(feedId, areaId), area);
+    public void addFlexArea(String feedId, String areaId, Polygon flexArea) {
+        this.flexAreasById.put(new FeedScopedId(feedId, areaId), flexArea);
     }
 
     /**
