@@ -388,7 +388,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * in router-config.json.
      *
      * In GTFS-Flex, a flag stop is a point at which a vehicle is boarded or alighted which is not
-     * a defined stop, e.g. the bus is flagged down in between stops. Increasing this parameter
+     * a defined stop, e.g. the bus is flagged down in between stops. This parameter is an
+     * additional cost added when a board/alight occurs at a flag stop. Increasing this parameter
      * increases the cost of using a flag stop relative to a regular scheduled stop.
      */
     public int flexFlagStopExtraPenalty = 90;
@@ -399,7 +400,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * in router-config.json.
      *
      * In GTFS-Flex, deviated-route service is when a vehicle can deviate a certain distance
-     * (or within a certain area) in order to drop off or pick up a passenger. Increasing this
+     * (or within a certain area) in order to drop off or pick up a passenger. This parameter is an
+     * additional cost added when a board/alight occurs before/after a deviation. Increasing this
      * parameter increases the cost of using deviated-route service relative to fixed-route.
      */
     public int flexDeviatedRouteExtraPenalty = 180;
