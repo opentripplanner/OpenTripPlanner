@@ -47,8 +47,9 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
-        if (setInPattern)
+        if (setInPattern) {
             getPattern().setPatternHop(stopIndex, this);
+        }
         this.requestPickup = requestPickup;
         this.requestDropoff = requestDropoff;
         this.serviceAreaRadius = serviceAreaRadius;
