@@ -7,10 +7,6 @@ _This documentation is targeted primarily at the OTP development community and m
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
 
-**Latest Updates**
-
- * **Version 1.2 was released on 18 August 2017.**
-
 ## External Technical Documentation
 
 Some technical documentation is generated automatically from the OTP source code and available from other locations.

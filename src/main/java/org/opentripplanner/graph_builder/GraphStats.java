@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder;
 
 import java.awt.geom.Point2D;
@@ -26,7 +13,7 @@ import java.util.Set;
 
 import com.google.common.collect.Iterables;
 import org.geotools.referencing.GeodeticCalculator;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -108,7 +95,7 @@ public class GraphStats {
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
         try {
-            graph = Graph.load(graphFile, Graph.LoadLevel.FULL);
+            graph = Graph.load(graphFile);
         } catch (Exception e) {
             LOG.error("Exception while loading graph from " + graphFile);
             return;

@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module;
 
 import static org.junit.Assert.assertEquals;
@@ -22,10 +9,10 @@ import java.util.List;
 
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.IdentityBean;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.services.MockGtfs;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -34,9 +21,9 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 public class GtfsGraphBuilderModuleTest {
 
-    private static final HashMap<Class<?>, Object> _extra = new HashMap<Class<?>, Object>();
+    private static final HashMap<Class<?>, Object> _extra = new HashMap<>();
 
-    private GtfsModule _builder;
+    private GtfsModule builder;
 
     @Test
     public void testNoBikesByDefault() throws IOException {
@@ -48,23 +35,23 @@ public class GtfsGraphBuilderModuleTest {
 
         List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
         bundleList.get(0).setDefaultBikesAllowed(false);
-        _builder = new GtfsModule(bundleList);
+        builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
-        _builder.buildGraph(graph, _extra);
+        builder.buildGraph(graph, _extra);
         graph.index(new DefaultStreetVertexIndexFactory());
 
         // Feed id is used instead of the agency id for OBA entities.
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
+        Trip trip = graph.index.tripForId.get(new FeedScopedId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.UNKNOWN,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
+                BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
+                BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t1"))));
     }
 
     @Test
@@ -77,23 +64,23 @@ public class GtfsGraphBuilderModuleTest {
 
         List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
         bundleList.get(0).setDefaultBikesAllowed(true);
-        _builder = new GtfsModule(bundleList);
+        builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
-        _builder.buildGraph(graph, _extra);
+        builder.buildGraph(graph, _extra);
         graph.index(new DefaultStreetVertexIndexFactory());
 
         // Feed id is used instead of the agency id for OBA entities.
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new AgencyAndId(feedId.getId(), "t0"));
+        Trip trip = graph.index.tripForId.get(new FeedScopedId(feedId.getId(), "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t0"))));
+                BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t0"))));
         assertEquals(BikeAccess.NOT_ALLOWED,
-                BikeAccess.fromTrip(withId(trips, new AgencyAndId(feedId.getId(), "t1"))));
+                BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t1"))));
     }
 
     private MockGtfs getSimpleGtfs() throws IOException {

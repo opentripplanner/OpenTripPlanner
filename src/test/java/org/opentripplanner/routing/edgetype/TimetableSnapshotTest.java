@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 import java.io.File;
 import java.util.ConcurrentModificationException;
@@ -30,14 +18,14 @@ import com.google.common.collect.Iterables;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -49,7 +37,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 public class TimetableSnapshotTest {
     private static Graph graph;
     private static GtfsContext context;
-    private static Map<AgencyAndId, TripPattern> patternIndex;
+    private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
     @BeforeClass
@@ -57,12 +45,13 @@ public class TimetableSnapshotTest {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class, createCalendarServiceData(context.getOtpTransitService())
+        );
 
-        patternIndex = new HashMap<AgencyAndId, TripPattern>();
+        patternIndex = new HashMap<FeedScopedId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding) continue;
@@ -93,7 +82,7 @@ public class TimetableSnapshotTest {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
         ServiceDate tomorrow = today.next();
-        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
         TimetableSnapshot resolver = new TimetableSnapshot();
 
         Timetable scheduled = resolver.resolve(pattern, today);
@@ -131,7 +120,7 @@ public class TimetableSnapshotTest {
     public void testUpdate() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
         Timetable origNow = resolver.resolve(pattern, today);
@@ -170,7 +159,7 @@ public class TimetableSnapshotTest {
     public void testCommit() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
 
@@ -217,7 +206,7 @@ public class TimetableSnapshotTest {
     public void testPurge() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

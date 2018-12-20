@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
@@ -71,6 +58,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         // Set data source type from config JSON
         String sourceType = config.path("sourceType").asText();
         String apiKey = config.path("apiKey").asText();
+        // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
+        // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
         String networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
@@ -101,7 +90,11 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             } else if (sourceType.equals("uip-bike")) {
                 source = new UIPBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource();
+                source = new GbfsBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("smoove")) {
+                source = new SmooveBikeRentalDataSource();
+            } else if (sourceType.equals("bicimad")) {
+                source = new BicimadBikeRentalDataSource();
             }
         }
 

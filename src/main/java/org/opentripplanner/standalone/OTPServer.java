@@ -14,8 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is essentially replacing a Spring application context.
- * It just bundles together references to all the OTP components so we can pass them around the system.
+ * This replaces a Spring application context, which OTP originally used.
+ * It contains a field referencing each top-level component of an OTP server. This means that supplying a single
+ * instance of this object allows accessing any of the other OTP components.
  */
 public class OTPServer {
 

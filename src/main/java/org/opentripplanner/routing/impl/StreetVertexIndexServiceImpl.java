@@ -1,20 +1,6 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 
-import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -29,8 +15,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraversalRequirements;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -42,8 +26,6 @@ import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,12 +116,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
         boolean wheelchairAccessible = false;
 
-        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name,
-                endVertex);
+        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name, endVertex);
+
         for (StreetEdge street : edges) {
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
-            wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
+            wheelchairAccessible |= street.isWheelchairAccessible();
+
             /* forward edges and vertices */
             Vertex edgeLocation;
             if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {

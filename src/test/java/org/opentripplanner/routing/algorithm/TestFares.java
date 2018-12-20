@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -25,7 +12,7 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
@@ -36,6 +23,8 @@ import org.opentripplanner.util.TestUtils;
 import java.io.File;
 import java.util.List;
 
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+
 public class TestFares extends TestCase {
 
     private AStar aStar = new AStar();
@@ -44,9 +33,12 @@ public class TestFares extends TestCase {
 
         Graph gg = new Graph();
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
@@ -119,11 +111,14 @@ public class TestFares extends TestCase {
     	Graph gg = new Graph();
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.KCM_GTFS));
         
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.setFareServiceFactory(new SeattleFareServiceFactory());
         
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
        
@@ -157,9 +152,12 @@ public class TestFares extends TestCase {
     public void testFareComponent() throws Exception {
         Graph gg = new Graph();
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FARE_COMPONENT_GTFS));
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(gg);
-        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        gg.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
@@ -179,8 +177,8 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
 
         // D -> E, null case
         options.setRoutingContext(gg, feedId+":D", feedId+":E");
@@ -197,11 +195,11 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BC"));
-        assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
+        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
+        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
 
         // B -> D, 2 fully connected components
         options.setRoutingContext(gg, feedId+":B", feedId+":D");
@@ -211,9 +209,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "BD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "2"));
-        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "3"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "2"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
 
         // E -> G, missing in between fare
         options.setRoutingContext(gg, feedId+":E", feedId+":G");
@@ -223,9 +221,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // C -> E, missing fare after
         options.setRoutingContext(gg, feedId+":C", feedId+":E");
@@ -235,8 +233,8 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "CD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "3"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
 
         // D -> G, missing fare before
         options.setRoutingContext(gg, feedId+":D", feedId+":G");
@@ -246,9 +244,9 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new AgencyAndId("agency", "6"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
+        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // A -> D, use individual component parts
         options.setRoutingContext(gg, feedId+":A", feedId+":D");
@@ -258,11 +256,11 @@ public class TestFares extends TestCase {
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new AgencyAndId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new AgencyAndId("agency", "1"));
+        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
         assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new AgencyAndId(feedId, "BD"));
-        assertEquals(fareComponents.get(1).routes.get(0), new AgencyAndId("agency", "2"));
-        assertEquals(fareComponents.get(1).routes.get(1), new AgencyAndId("agency", "3"));
+        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
+        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
+        assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId("agency", "3"));
     }
 }

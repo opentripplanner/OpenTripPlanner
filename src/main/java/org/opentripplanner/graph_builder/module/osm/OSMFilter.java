@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
@@ -39,23 +26,30 @@ public class OSMFilter {
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
      */
-    public static boolean isWayRoutable(OSMWithTags way) {
-        if (!isOsmEntityRoutable(way))
+    static boolean isWayRoutable(OSMWithTags way) {
+        if (!isOsmEntityRoutable(way)) {
             return false;
+        }
 
         String highway = way.getTag("highway");
-        if (highway != null
-                && (highway.equals("conveyer") || highway.equals("proposed")
-                        || highway.equals("construction") || highway.equals("raceway") || highway
-                            .equals("unbuilt")))
-            return false;
+        if (highway != null) {
+            if(
+                    highway.equals("conveyer") ||
+                    highway.equals("proposed") ||
+                    highway.equals("construction") ||
+                    highway.equals("razed") ||
+                    highway.equals("raceway") ||
+                    highway.equals("unbuilt")
+            ) {
+                return false;
+            }
+        }
 
         if (way.isGeneralAccessDenied()) {
             // There are exceptions.
             return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
                     .isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed());
         }
-
         return true;
     }
 

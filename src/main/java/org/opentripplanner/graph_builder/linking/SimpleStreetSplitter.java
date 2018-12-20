@@ -19,6 +19,9 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
+import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -28,6 +31,9 @@ import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -39,6 +45,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +79,10 @@ public class SimpleStreetSplitter {
 
     public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
+    private Boolean addExtraEdgesToAreas = false;
+
+    private StreetEdgeFactory edgeFactory;
+
     public static final int WARNING_DISTANCE_METERS = 20;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
@@ -100,6 +113,7 @@ public class SimpleStreetSplitter {
         this.graph = graph;
         this.transitStopIndex = transitStopIndex;
         this.destructiveSplitting = destructiveSplitting;
+        this.edgeFactory = new DefaultStreetEdgeFactory();
 
         //We build a spatial index if it isn't provided
         if (hashGridSpatialIndex == null) {
@@ -286,6 +300,28 @@ public class SimpleStreetSplitter {
         }
     }
 
+    // Link to all vertices in area/platform
+    private void linkTransitToAreaVertices(Vertex splitterVertex, AreaEdgeList area) {
+        List<Vertex> vertices = new ArrayList<>();
+
+        for (AreaEdge areaEdge : area.getEdges()) {
+            if (!vertices.contains(areaEdge.getToVertex())) vertices.add(areaEdge.getToVertex());
+            if (!vertices.contains(areaEdge.getFromVertex())) vertices.add(areaEdge.getFromVertex());
+        }
+
+        for (Vertex vertex : vertices) {
+            if (vertex instanceof  StreetVertex && !vertex.equals(splitterVertex)) {
+                LineString line = geometryFactory.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
+                double length = SphericalDistanceLibrary.distance(splitterVertex.getCoordinate(),
+                        vertex.getCoordinate());
+                I18NString name = new LocalizedString("", new OSMWithTags());
+
+                edgeFactory.createAreaEdge((IntersectionVertex) splitterVertex, (IntersectionVertex) vertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area);
+                edgeFactory.createAreaEdge((IntersectionVertex) vertex, (IntersectionVertex) splitterVertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area);
+            }
+        }
+    }
+
     /** split the edge and link in the transit stop */
     private void link(Vertex tstop, StreetEdge edge, double xscale, RoutingRequest options) {
         // TODO: we've already built this line string, we should save it
@@ -329,6 +365,12 @@ public class SimpleStreetSplitter {
             // split the edge, get the split vertex
             SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
+
+            // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
+            // edges that were missed by WalkableAreaBuilder
+            if (edge instanceof AreaEdge && tstop instanceof TransitStop && this.addExtraEdgesToAreas) {
+                linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
+            }
         }
     }
 
@@ -351,7 +393,7 @@ public class SimpleStreetSplitter {
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
         if (temporarySplit) {
-            v = new TemporarySplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
+            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y,
                 edge, endVertex);
             if (edge.isWheelchairAccessible()) {
                 ((TemporarySplitterVertex) v).setWheelchairAccessible(true);
@@ -547,5 +589,13 @@ public class SimpleStreetSplitter {
         }
         return closest;
 
+    }
+
+    public Boolean getAddExtraEdgesToAreas() {
+        return addExtraEdgesToAreas;
+    }
+
+    public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
+        this.addExtraEdgesToAreas = addExtraEdgesToAreas;
     }
 }
