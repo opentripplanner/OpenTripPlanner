@@ -197,19 +197,37 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return stopIndex;
     }
 
-    public RequestStops getRequestPickup() {
+    /**
+     * Return the permissions associated with unscheduled pickups in between the endpoints of this
+     * PatternHop. This relates to flag-stops in the GTFS-Flex specification; if flex and/or flag
+     * stops are not enabled, this will always be RequestStops.NO.
+     */
+    protected RequestStops getRequestPickup() {
         return requestPickup;
     }
 
-    public RequestStops getRequestDropoff() {
+    /**
+     * Return the permissions associated with unscheduled dropoffs in between the endpoints of this
+     * PatternHop. This relates to flag-stops in the GTFS-Flex specification; if flex and/or flag
+     * stops are not enabled, this will always be RequestStops.NO.
+     */
+    protected RequestStops getRequestDropoff() {
         return requestDropoff;
     }
 
-    public boolean hasFlagStopService() {
+    /**
+     * Return whether flag stops are enabled in this hop. Flag stops are enabled if either pickups
+     * or dropoffs at unscheduled locations can be requested. This is a GTFS-Flex feature.
+     */
+    private boolean hasFlagStopService() {
         return requestPickup.allowed() || requestDropoff.allowed();
     }
 
-    public boolean hasFlexService() {
+
+    /**
+     * Return true if any GTFS-Flex service is defined for this hop.
+     */
+    private boolean hasFlexService() {
         return hasFlagStopService() || getServiceAreaRadius() > 0 || getServiceArea() != null;
     }
 
