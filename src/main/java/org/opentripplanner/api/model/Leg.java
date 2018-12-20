@@ -257,17 +257,17 @@ public class Leg {
     /* For call-n-ride leg, supply maximum start time based on calculation. */
     @XmlAttribute
     @JsonSerialize
-    public Calendar maxStartTime = null;
+    public Calendar flexCallAndRideMaxStartTime = null;
 
      /* For call-n-ride leg, supply minimum end time based on calculation. */
     @XmlAttribute
     @JsonSerialize
-    public Calendar minEndTime = null;
+    public Calendar flexCallAndRideMinEndTime = null;
 
     /** trip.drt_advance_book_min if this is a demand-response leg */
     @XmlAttribute
     @JsonSerialize
-    public double drtAdvanceBookMin;
+    public double flexDrtAdvanceBookMin;
 
      /**
       *  Agency message if this is leg has a demand-response pickup and the Trip has
@@ -275,7 +275,7 @@ public class Leg {
       */
      @XmlAttribute
      @JsonSerialize
-     public String drtPickupMessage;
+     public String flexDrtPickupMessage;
 
      /**
       * Agency message if this is leg has a demand-response dropoff and the Trip has
@@ -283,7 +283,7 @@ public class Leg {
       */
      @XmlAttribute
      @JsonSerialize
-     public String drtDropOffMessage;
+     public String flexDrtDropOffMessage;
 
      /**
       * Agency message if this is leg has a flag stop pickup and the Trip has
@@ -291,7 +291,7 @@ public class Leg {
       */
      @XmlAttribute
      @JsonSerialize
-     public String continuousPickupMessage;
+     public String flexFlagStopPickupMessage;
 
      /**
       * Agency message if this is leg has a flag stop dropoff and the Trip has
@@ -299,7 +299,7 @@ public class Leg {
       */
      @XmlAttribute
      @JsonSerialize
-     public String continuousDropOffMessage;
+     public String flexFlagStopDropOffMessage;
 
     /**
      * Whether this leg is a transit leg or not.

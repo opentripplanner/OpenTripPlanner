@@ -591,11 +591,11 @@ public abstract class GraphPathToTripPlanConverter {
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
-            leg.drtAdvanceBookMin = trip.getDrtAdvanceBookMin();
-            leg.drtPickupMessage = trip.getDrtPickupMessage();
-            leg.drtDropOffMessage = trip.getDrtDropOffMessage();
-            leg.continuousPickupMessage = trip.getContinuousPickupMessage();
-            leg.continuousDropOffMessage = trip.getContinuousDropOffMessage();
+            leg.flexDrtAdvanceBookMin = trip.getDrtAdvanceBookMin();
+            leg.flexDrtPickupMessage = trip.getDrtPickupMessage();
+            leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
+            leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
+            leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -619,11 +619,11 @@ public abstract class GraphPathToTripPlanConverter {
                 if (directTime != 0 && delta > 0) {
                     if (hop.isDeviatedRouteBoard()) {
                         long maxStartTime = leg.startTime.getTimeInMillis() + (delta * 1000);
-                        leg.maxStartTime = makeCalendar(leg.startTime.getTimeZone(), maxStartTime);
+                        leg.flexCallAndRideMaxStartTime = makeCalendar(leg.startTime.getTimeZone(), maxStartTime);
                     }
                     if (hop.isDeviatedRouteAlight()) {
                         long minEndTime = leg.endTime.getTimeInMillis() - (delta * 1000);
-                        leg.minEndTime = makeCalendar(leg.endTime.getTimeZone(), minEndTime);
+                        leg.flexCallAndRideMinEndTime = makeCalendar(leg.endTime.getTimeZone(), minEndTime);
                     }
                 }
             }
