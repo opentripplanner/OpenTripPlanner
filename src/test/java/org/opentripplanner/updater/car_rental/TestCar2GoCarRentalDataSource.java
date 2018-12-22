@@ -13,9 +13,6 @@
 
 package org.opentripplanner.updater.car_rental;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Files;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import junit.framework.TestCase;
@@ -24,7 +21,6 @@ import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,7 +31,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
         car2GoCarRentalDataSource.setVehiclesUrl("file:src/test/resources/car/car2go.json");
 
         // update data source and consume vehicles json
-        assertTrue(car2GoCarRentalDataSource.update());
+        assertTrue(car2GoCarRentalDataSource.updateStations());
         List<CarRentalStation> rentalStations = car2GoCarRentalDataSource.getStations();
         assertEquals(3, rentalStations.size());
         for (CarRentalStation rentalStation : rentalStations) {
@@ -61,23 +57,17 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
 
     @Test
     public void testParseRegionJson() throws IOException {
-        GeometryFactory geometryFactory = new GeometryFactory();
-
-        // load test region json
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode regionJsonNode = mapper.readTree(
-            new String(Files.toByteArray(new File("src/test/resources/car/region.json")))
-        );
-
         Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
+        car2GoCarRentalDataSource.setRegionsUrl("file:src/test/resources/car/region.json");
 
-        // consume test region json
-        CarRentalRegion region = car2GoCarRentalDataSource.parseRegionJson(regionJsonNode).get(0);
+        assertTrue(car2GoCarRentalDataSource.updateRegions());
+        CarRentalRegion firstRegion = car2GoCarRentalDataSource.getRegions().get(0);
 
         // verify integrity of region, by checking if a particular point exists inside it
+        GeometryFactory geometryFactory = new GeometryFactory();
         assertEquals(
             true,
-            region.geometry.contains(geometryFactory.createPoint(new Coordinate( -122.64759, 45.530162)))
+            firstRegion.geometry.contains(geometryFactory.createPoint(new Coordinate( -122.64759, 45.530162)))
         );
     }
 }

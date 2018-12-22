@@ -1,0 +1,60 @@
+[
+  {
+    "licensePlate": "TEST1",
+    "remainingRangeInMeters": 283000,
+    "color": "MINERAL GREY METALLIC",
+    "vin": "TEST2",
+    "updatedAt": "2018-12-21T19:40:37.188",
+    "shortDisplayAddress": "3123 SE 62nd Ave",
+    "id": "958",
+    "fuelPercentage": 52,
+    "fuelLevel": 30,
+    "lastActiveAt": "2018-12-21T10:26:10.544",
+    "make": "BMW 328I XDRIVE",
+    "location": {
+      "lat": 45.499904,
+      "lng": -122.599453
+    },
+    "vehicleTypeId": 5,
+    "chargingState": "NOT_APPLICABLE",
+    "available": true,
+    "serviceIds": [
+      2
+    ],
+    "pool": "active",
+    "imageUrl": "https://dks9bwr9w3csy.cloudfront.net/uploads/vehicles/display_pics/bf88b01f-debe-43a3-936f-a7ceafe50bea.png",
+    "doorStatus": "locked",
+    "reservationStatus": "FREE",
+    "fleet": "",
+    "engineType": "electric"
+  },
+  {
+    "licensePlate": "TEST3",
+    "remainingRangeInMeters": 501000,
+    "color": "Thunder Grey Metallic",
+    "vin": "TEST4",
+    "updatedAt": "2018-12-21T18:41:43.389",
+    "shortDisplayAddress": "3428 SE 53rd Ave",
+    "id": "1648",
+    "fuelPercentage": 99,
+    "fuelLevel": 49,
+    "lastActiveAt": "2018-12-21T18:41:36.432",
+    "make": "MINI CLUBMAN S",
+    "location": {
+      "lat": 45.497766,
+      "lng": -122.608039
+    },
+    "vehicleTypeId": 1,
+    "chargingState": "NOT_APPLICABLE",
+    "available": true,
+    "serviceIds": [
+      2
+    ],
+    "pool": "active",
+    "imageUrl": "https://dks9bwr9w3csy.cloudfront.net/uploads/vehicles/display_pics/a9889627-53cf-4a5e-87db-fd3e0e444b40.png",
+    "doorStatus": "locked",
+    "reservationStatus": "FREE",
+    "fleet": "",
+    "engineType": "electric"
+  }
+]
