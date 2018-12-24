@@ -154,7 +154,6 @@ public class AStarTest {
 
         options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
-        options.cleanup();
 
         GraphPath path = tree.getPath(to, false);
 
@@ -171,6 +170,8 @@ public class AStarTest {
         assertEquals("market_20th", states.get(6).getVertex().getLabel());
         assertEquals("56th_20th", states.get(7).getVertex().getLabel());
         assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
+
+        options.cleanup();
     }
 
     @Test
@@ -190,7 +191,6 @@ public class AStarTest {
 
         options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
-        options.cleanup();
 
         GraphPath path = tree.getPath(from, false);
 
@@ -207,6 +207,8 @@ public class AStarTest {
         assertEquals("market_20th", states.get(6).getVertex().getLabel());
         assertEquals("56th_20th", states.get(7).getVertex().getLabel());
         assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
+
+        options.cleanup();
     }
 
     @Test

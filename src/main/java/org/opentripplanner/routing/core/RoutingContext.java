@@ -406,5 +406,6 @@ public class RoutingContext implements Cloneable {
         for (Vertex vertex : graph.getTemporaryVertices()) {
             TemporaryVertex.dispose(vertex);
         }
+        graph.getTemporaryVertices().clear();
     }
 }
