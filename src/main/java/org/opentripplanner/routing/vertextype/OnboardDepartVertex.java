@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -13,8 +14,8 @@ import org.opentripplanner.util.NonLocalizedString;
 public class OnboardDepartVertex extends Vertex implements TemporaryVertex {
     private static final long serialVersionUID = -6721280275560962711L;
 
-    public OnboardDepartVertex(String label, double lon, double lat) {
-        super(null, label, lon, lat, new NonLocalizedString(label));
+    public OnboardDepartVertex(Graph graph, String label, double lon, double lat) {
+        super(graph, label, lon, lat, new NonLocalizedString(label));
     }
 
     @Override

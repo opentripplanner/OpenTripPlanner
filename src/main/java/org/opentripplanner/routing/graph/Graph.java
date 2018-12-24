@@ -53,6 +53,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -211,6 +212,9 @@ public class Graph implements Serializable {
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
+    /** Temporary vertices - thread- (and request-) specific. */
+    private transient ThreadLocal<List<Vertex>> temporaryVertices = ThreadLocal.withInitial(ArrayList::new);
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
@@ -224,8 +228,13 @@ public class Graph implements Serializable {
 
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
+     * Temporary vertices should not be added to main graph data structures.
      */
     public void addVertex(Vertex v) {
+        if (v instanceof TemporaryVertex) {
+            getTemporaryVertices().add(v);
+            return;
+        }
         Vertex old = vertices.put(v.getLabel(), v);
         if (old != null) {
             if (old == v)
@@ -1051,5 +1060,9 @@ public class Graph implements Serializable {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public List<Vertex> getTemporaryVertices() {
+        return temporaryVertices.get();
     }
 }

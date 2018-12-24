@@ -55,7 +55,6 @@ public abstract class Vertex implements Serializable, Cloneable {
         this.x = x;
         this.y = y;
         this.index = maxIndex  ++;
-        // null graph means temporary vertex
         if (g != null)
             g.addVertex(this);
         this.name = new NonLocalizedString("(no name provided)");

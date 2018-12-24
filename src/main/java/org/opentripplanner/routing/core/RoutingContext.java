@@ -403,7 +403,8 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        TemporaryVertex.dispose(fromVertex);
-        TemporaryVertex.dispose(toVertex);
+        for (Vertex vertex : graph.getTemporaryVertices()) {
+            TemporaryVertex.dispose(vertex);
+        }
     }
 }

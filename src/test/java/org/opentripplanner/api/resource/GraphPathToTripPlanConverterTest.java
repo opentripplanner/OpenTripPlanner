@@ -692,7 +692,7 @@ public class GraphPathToTripPlanConverterTest {
         ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, feedId);
 
         // Temporary graph objects for onboard depart tests
-        OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex("Onboard", 23.0, 12.0);
+        OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex(graph, "Onboard", 23.0, 12.0);
         OnBoardDepartPatternHop onBoardDepartPatternHop = new OnBoardDepartPatternHop(
                 onboardDepartVertex, v12, firstTripPattern.scheduledTimetable.getTripTimes(0), serviceDay, 0, 0.5);
 

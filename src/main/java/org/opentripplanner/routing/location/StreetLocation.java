@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.location;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -13,9 +14,9 @@ public class StreetLocation extends StreetVertex {
     private boolean wheelchairAccessible;
 
     // maybe name should just be pulled from street being split
-    public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
+    public StreetLocation(Graph graph, String id, Coordinate nearestPoint, I18NString name) {
         // calling constructor with null graph means this vertex is temporary
-        super(null, id, nearestPoint.x, nearestPoint.y, name);
+        super(graph, id, nearestPoint.x, nearestPoint.y, name);
     }
 
     //For tests only

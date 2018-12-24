@@ -226,7 +226,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             }
         }
 
-        OnboardDepartVertex onboardDepart = new OnboardDepartVertex("on_board_depart", lon, lat);
+        OnboardDepartVertex onboardDepart = new OnboardDepartVertex(opt.rctx.graph, "on_board_depart", lon, lat);
         OnBoardDepartPatternHop startHop = new OnBoardDepartPatternHop(onboardDepart, nextStop,
                 bestTripTimes, bestServiceDay, bestStopIndex, fractionCovered);
         startHop.setGeometry(geomRemaining);

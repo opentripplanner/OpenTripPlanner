@@ -161,7 +161,7 @@ public class TestOnBoardRouting extends TestCase {
             /* And use it for onboard departure */
             double lat = end.getLat();
             double lon = end.getLon(); // Mock location, not really important here.
-            OnboardDepartVertex onboardOrigin = new OnboardDepartVertex("OnBoard_Origin", lat, lon);
+            OnboardDepartVertex onboardOrigin = new OnboardDepartVertex(graph, "OnBoard_Origin", lat, lon);
             @SuppressWarnings("unused")
             OnBoardDepartPatternHop currentHop = new OnBoardDepartPatternHop(onboardOrigin, nextV,
                     tripTimes, options.rctx.serviceDays.get(1), stopIndex, k);

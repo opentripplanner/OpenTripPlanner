@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.junit.Test;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +12,7 @@ public class TemporaryVertexDisposeTest {
     private static final double ANY_LOC = 1;
 
     // Given a very simple graph: A -> B
+    private Graph graph = new Graph();
     private final Vertex a = new V("A");
     private final Vertex b = new V("B");
     {
@@ -30,8 +32,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[B->dest]", b.getOutgoing().toString());
 
         // When
-        TemporaryVertex.dispose(origin);
-        TemporaryVertex.dispose(destination);
+        graph.getTemporaryVertices().forEach(TemporaryVertex::dispose);
 
         // Then
         assertOriginalGraphIsIntact();
@@ -85,7 +86,7 @@ public class TemporaryVertexDisposeTest {
         edge(z, a);
 
         // When
-        TemporaryVertex.dispose(x);
+        graph.getTemporaryVertices().forEach(TemporaryVertex::dispose);
 
         // Then do return without stack overflow and:
         assertOriginalGraphIsIntact();
@@ -129,7 +130,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[B->A, B->y]", b.getOutgoing().toString());
 
         // When
-        TemporaryVertex.dispose(x);
+        graph.getTemporaryVertices().forEach(TemporaryVertex::dispose);
 
         // Then
         assertEquals("[B->A]", a.getIncoming().toString());
@@ -159,7 +160,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[A->B, y->B]", b.getIncoming().toString());
 
         // When
-        TemporaryVertex.dispose(x);
+        graph.getTemporaryVertices().forEach(TemporaryVertex::dispose);
 
         // Then
         assertOriginalGraphIsIntact();
@@ -189,7 +190,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[T0->A]", a.getIncoming().toString());
 
         // When
-        TemporaryVertex.dispose(origin);
+        graph.getTemporaryVertices().forEach(TemporaryVertex::dispose);
 
         // Then
         assertOriginalGraphIsIntact();
@@ -208,9 +209,9 @@ public class TemporaryVertexDisposeTest {
 
     /* private test helper classes */
 
-    private static class V extends Vertex {
+    private class V extends Vertex {
         private V(String label) {
-            super(null, label, ANY_LOC, ANY_LOC);
+            super(graph, label, ANY_LOC, ANY_LOC);
         }
 
         @Override public String toString() {
@@ -218,7 +219,7 @@ public class TemporaryVertexDisposeTest {
         }
     }
 
-    private static class TempVertex extends V implements TemporaryVertex {
+    private class TempVertex extends V implements TemporaryVertex {
         private TempVertex(String label) {
             super(label);
         }

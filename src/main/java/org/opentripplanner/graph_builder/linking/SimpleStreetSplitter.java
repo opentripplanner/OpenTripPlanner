@@ -393,7 +393,7 @@ public class SimpleStreetSplitter {
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
         if (temporarySplit) {
-            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y,
+            v = new TemporarySplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
                 edge, endVertex);
             if (edge.isWheelchairAccessible()) {
                 ((TemporarySplitterVertex) v).setWheelchairAccessible(true);
@@ -564,7 +564,7 @@ public class SimpleStreetSplitter {
         } else {
             name = location.name;
         }
-        TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
+        TemporaryStreetLocation closest = new TemporaryStreetLocation(graph, UUID.randomUUID().toString(),
             coord, new NonLocalizedString(name), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;

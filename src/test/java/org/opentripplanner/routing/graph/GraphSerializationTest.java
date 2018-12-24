@@ -111,7 +111,7 @@ public class GraphSerializationTest {
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
         // Some tests re-build the graph which will result in build times different by as little as a few milliseconds.
-        objectDiffer.ignoreFields("incoming", "outgoing", "buildTime");
+        objectDiffer.ignoreFields("incoming", "outgoing", "buildTime", "temporaryVertices");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
