@@ -202,7 +202,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
      * PatternHop. This relates to flag-stops in the GTFS-Flex specification; if flex and/or flag
      * stops are not enabled, this will always be RequestStops.NO.
      */
-    protected RequestStops getRequestPickup() {
+    public RequestStops getRequestPickup() {
         return requestPickup;
     }
 
@@ -211,7 +211,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
      * PatternHop. This relates to flag-stops in the GTFS-Flex specification; if flex and/or flag
      * stops are not enabled, this will always be RequestStops.NO.
      */
-    protected RequestStops getRequestDropoff() {
+    public RequestStops getRequestDropoff() {
         return requestDropoff;
     }
 
@@ -227,7 +227,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     /**
      * Return true if any GTFS-Flex service is defined for this hop.
      */
-    private boolean hasFlexService() {
+    public boolean hasFlexService() {
         return hasFlagStopService() || getServiceAreaRadius() > 0 || getServiceArea() != null;
     }
 
