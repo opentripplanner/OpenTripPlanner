@@ -11,6 +11,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,12 @@ public class StateEditor {
         // if something was flagged incorrect, do not make a new state
         if (defectiveTraversal) {
             LOG.error("Defective traversal flagged on edge " + child.backEdge);
+            return null;
+        }
+
+        // Check TemporaryVertex on a different thread
+        if ((getVertex() instanceof TemporaryVertex)
+            && !child.getOptions().rctx.graph.getTemporaryVertices().contains(getVertex())) {
             return null;
         }
 
