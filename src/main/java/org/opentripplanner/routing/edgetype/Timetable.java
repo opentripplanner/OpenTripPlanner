@@ -242,7 +242,7 @@ public class Timetable implements Serializable {
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
             if (adjustedTime == -1) continue;
             if (boarding) {
-                long depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime, serviceDay, useClockTime, clockTime);
+                long depTime = tt.getCallAndRideBoardTime(stopIndex, adjustedTime, directTime, serviceDay, useClockTime, clockTime);
                 if (depTime >= adjustedTime && depTime < bestTime && inBounds(depTime)) {
                     bestTrip = tt;
                     bestTime = depTime;

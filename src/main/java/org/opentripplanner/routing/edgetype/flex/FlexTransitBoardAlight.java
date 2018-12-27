@@ -76,7 +76,7 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
             boolean useClockTime = !s0.getOptions().flexIgnoreDrtAdvanceBookMin;
             long clockTime = s0.getOptions().clockTimeSec;
             if (boarding) {
-                int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime, sd, useClockTime, clockTime);
+                int scheduledTime = tripTimes.getCallAndRideBoardTime(getStopIndex(), currTime, (int) hop.timeLowerBound(s0.getOptions()), sd, useClockTime, clockTime);
                 if (scheduledTime < 0)
                     throw new IllegalArgumentException("Unexpected bad wait time");
                 return (int) (sd.time(scheduledTime) - s0.getTimeSeconds());
