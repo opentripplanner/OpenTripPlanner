@@ -25,6 +25,7 @@ import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPatternFlexFields;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
@@ -374,8 +375,13 @@ public class PatternHopFactory {
                 directionId = -1;
             }
 
+            boolean hasFlexService = stopTimes.stream().anyMatch(this::stopTimeHasFlex);
+
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
-            StopPattern stopPattern = new StopPattern(stopTimes, flexAreasById::get);
+            StopPattern stopPattern = new StopPattern(stopTimes);
+            if (hasFlexService) {
+                stopPattern.setFlexFields(new StopPatternFlexFields(stopTimes, flexAreasById));
+            }
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
@@ -1531,5 +1537,13 @@ public class PatternHopFactory {
             FeedScopedId id = new FeedScopedId(feedId.getId(), entry.getKey());
             graph.flexAreasById.put(id, entry.getValue());
         }
+    }
+
+    private boolean stopTimeHasFlex(StopTime st) {
+        return (st.getContinuousPickup() != 1 && st.getContinuousPickup() != StopTime.MISSING_VALUE)
+                || (st.getContinuousDropOff() != 1 && st.getContinuousDropOff() != StopTime.MISSING_VALUE)
+                || st.getStartServiceArea() != null || st.getEndServiceArea() != null
+                || st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE
+                || st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE;
     }
 }

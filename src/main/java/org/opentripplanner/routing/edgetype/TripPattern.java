@@ -13,6 +13,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopPatternFlexFields;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
@@ -508,7 +509,14 @@ public class TripPattern implements Cloneable, Serializable {
             }
             pav1 = new PatternArriveVertex(graph, this, stop + 1);
             arriveVertices[stop + 1] = pav1;
-            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop, stopPattern.continuousPickup[stop], stopPattern.continuousDropOff[stop], stopPattern.serviceAreaRadius[stop], stopPattern.serviceAreas[stop]);
+            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
+            if (stopPattern.hasFlexFields()) {
+                StopPatternFlexFields flexFields = stopPattern.getFlexFields();
+                hopEdges[stop].setRequestPickup(flexFields.continuousPickup[stop]);
+                hopEdges[stop].setRequestDropoff(flexFields.continuousDropOff[stop]);
+                hopEdges[stop].setServiceAreaRadius(flexFields.serviceAreaRadius[stop]);
+                hopEdges[stop].setServiceArea(flexFields.serviceAreas[stop]);
+            }
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
             TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;

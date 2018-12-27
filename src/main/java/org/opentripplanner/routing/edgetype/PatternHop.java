@@ -30,19 +30,19 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private Stop begin, end;
 
-    private RequestStops requestPickup;
+    private RequestStops requestPickup = RequestStops.NO;
 
-    private RequestStops requestDropoff;
+    private RequestStops requestDropoff = RequestStops.NO;
 
-    private double serviceAreaRadius;
+    private double serviceAreaRadius = 0d;
 
-    private Geometry serviceArea;
+    private Geometry serviceArea = null;
 
     public int stopIndex;
 
     private LineString geometry = null;
 
-    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, RequestStops requestPickup, RequestStops requestDropoff, double serviceAreaRadius, Geometry serviceArea, boolean setInPattern) {
+    protected PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, boolean setInPattern) {
         super(from, to);
         this.begin = begin;
         this.end = end;
@@ -50,18 +50,10 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         if (setInPattern) {
             getPattern().setPatternHop(stopIndex, this);
         }
-        this.requestPickup = requestPickup;
-        this.requestDropoff = requestDropoff;
-        this.serviceAreaRadius = serviceAreaRadius;
-        this.serviceArea = serviceArea;
     }
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex, int continuousPickup, int continuousDropoff, double serviceAreaRadius, Geometry serviceArea) {
-        this(from, to, begin, end, stopIndex, RequestStops.fromGtfs(continuousPickup),
-                RequestStops.fromGtfs(continuousDropoff), serviceAreaRadius, serviceArea, true);
-    }
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
-        this(from, to, begin, end, stopIndex, 1, 1, 0d, null);
+        this(from, to, begin, end, stopIndex, true);
     }
 
     // made more accurate
@@ -244,6 +236,30 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     public boolean hasServiceArea() {
         return serviceArea != null;
+    }
+
+    public void setRequestPickup(RequestStops requestPickup) {
+        this.requestPickup = requestPickup;
+    }
+
+    public void setRequestPickup(int code) {
+        setRequestPickup(RequestStops.fromGtfs(code));
+    }
+
+    public void setRequestDropoff(RequestStops requestDropoff) {
+        this.requestDropoff = requestDropoff;
+    }
+
+    public void setRequestDropoff(int code) {
+        setRequestDropoff(RequestStops.fromGtfs(code));
+    }
+
+    public void setServiceAreaRadius(double serviceAreaRadius) {
+        this.serviceAreaRadius = serviceAreaRadius;
+    }
+
+    public void setServiceArea(Geometry serviceArea) {
+        this.serviceArea = serviceArea;
     }
 
     private enum RequestStops {
