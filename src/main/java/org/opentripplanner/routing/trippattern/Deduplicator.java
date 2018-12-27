@@ -101,7 +101,7 @@ public class Deduplicator implements Serializable {
         }
     }
 
-    /** A wrapper for a primitive int array. This is insane but necessary in Java. */
+    /** A wrapper for a primitive double array. This is insane but necessary in Java. */
     private class DoubleArray implements Serializable {
         private static final long serialVersionUID = 20140524L;
         final double[] array;

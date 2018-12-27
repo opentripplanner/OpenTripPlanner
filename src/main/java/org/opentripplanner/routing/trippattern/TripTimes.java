@@ -112,7 +112,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
 
-    /* DRT service parameters */
+    /**
+     * Demand-Response Transit (DRT) service parameters. In GTFS-Flex, DRT transit is transit which
+     * is reserved in advance with the provider. This includes call-and-ride service, and
+     * potentially the deviated portion of deviated-fixed routes. For DRT, the travel time is
+     * calculated by applying formulas to the direct vehicle time. The following parameters give
+     * the maximum possible and average travel time formulas, given a direct vehicle time.
+     */
+
     private DrtTravelTime maxTravelTime;
 
     private DrtTravelTime avgTravelTime;

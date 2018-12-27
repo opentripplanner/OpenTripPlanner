@@ -612,7 +612,7 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(ids).build();
     }
 
-    /** Return a specific area given an ID in Agency:ID format. */
+    /** Return a specific GTFS-Flex area given an ID in Agency:ID format. */
     @GET
     @Path("/flexAreas/{id}")
     public Response getAreaIdByFeedId(@PathParam("id") String areaIdString) {

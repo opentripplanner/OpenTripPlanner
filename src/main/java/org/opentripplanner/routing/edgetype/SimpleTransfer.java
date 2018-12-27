@@ -48,7 +48,7 @@ public class SimpleTransfer extends Edge {
         if(distance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
-        // Don't allow SimpleTransfer right after Call-n-Ride - in that case we need to transfer at the same stop
+        // Don't allow SimpleTransfer right after a call-and-ride or deviated-route dropoff - in that case we need to transfer at the same stop
         if (s0.isLastBoardAlightDeviated()) {
             return null;
         }

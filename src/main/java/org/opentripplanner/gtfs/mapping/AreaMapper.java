@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Responsible for mapping GTFS Area into the OTP model. */
+/** Map from the OBA model of GTFS-flex areas to the OTP internal model of areas. */
 class AreaMapper {
 
     private final Map<org.onebusaway.gtfs.model.Area, Area> mappedAreas = new HashMap<>();
@@ -16,7 +16,7 @@ class AreaMapper {
         return MapUtils.mapToList(agencies, this::map);
     }
 
-    /** Map from GTFS to OTP model, {@code null} safe.  */
+    /** Map from the OBA model of GTFS-flex areas to the OTP internal model of areas.  */
     Area map(org.onebusaway.gtfs.model.Area orginal) {
         return orginal == null ? null : mappedAreas.computeIfAbsent(orginal, this::doMap);
     }

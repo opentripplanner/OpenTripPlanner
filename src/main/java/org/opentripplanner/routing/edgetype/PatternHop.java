@@ -223,7 +223,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return requestPickup.allowed() || requestDropoff.allowed();
     }
 
-
     /**
      * Return true if any GTFS-Flex service is defined for this hop.
      */
