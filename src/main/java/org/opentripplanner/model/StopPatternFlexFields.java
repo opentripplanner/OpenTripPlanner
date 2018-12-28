@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -22,10 +23,21 @@ public class StopPatternFlexFields implements Serializable {
      * Default constructor.
      * @param stopTimes stopTimes for this pattern
      * @param areaGeometryByArea Map of GTFS-Flex areas, keyed by area ID
+     * @param deduplicator Deduplicator
      */
-    public StopPatternFlexFields(List<StopTime> stopTimes, Map<String, Geometry> areaGeometryByArea) {
-        this (stopTimes.size());
-        if (size == 0) return;
+    public StopPatternFlexFields(List<StopTime> stopTimes, Map<String, Geometry> areaGeometryByArea, Deduplicator deduplicator) {
+        size = stopTimes.size();
+        if (size == 0) {
+            continuousPickup = new int[size];
+            continuousDropOff = new int[size];
+            serviceAreaRadius = new double[size];
+            serviceAreas = new Geometry[size];
+            return;
+        }
+        int[] continuousPickup = new int[size];
+        int[] continuousDropOff = new int[size];
+        double[] serviceAreaRadius = new double[size];
+        serviceAreas = new Geometry[size];
         double lastServiceAreaRadius = 0;
         Geometry lastServiceArea = null;
         for (int i = 0; i < size; ++i) {
@@ -54,14 +66,10 @@ public class StopPatternFlexFields implements Serializable {
                 }
             }
         }
-    }
+        this.continuousPickup = deduplicator.deduplicateIntArray(continuousPickup);
+        this.continuousDropOff = deduplicator.deduplicateIntArray(continuousDropOff);
+        this.serviceAreaRadius = deduplicator.deduplicateDoubleArray(serviceAreaRadius);
 
-    private StopPatternFlexFields(int size) {
-        this.size = size;
-        continuousPickup = new int[size];
-        continuousDropOff = new int[size];
-        serviceAreaRadius = new double[size];
-        serviceAreas = new Geometry[size];
     }
 
     @Override

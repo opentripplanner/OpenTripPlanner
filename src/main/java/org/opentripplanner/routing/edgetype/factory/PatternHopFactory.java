@@ -378,9 +378,9 @@ public class PatternHopFactory {
             boolean hasFlexService = stopTimes.stream().anyMatch(this::stopTimeHasFlex);
 
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
-            StopPattern stopPattern = new StopPattern(stopTimes);
+            StopPattern stopPattern = new StopPattern(stopTimes, graph.deduplicator);
             if (hasFlexService) {
-                stopPattern.setFlexFields(new StopPatternFlexFields(stopTimes, flexAreasById));
+                stopPattern.setFlexFields(new StopPatternFlexFields(stopTimes, flexAreasById, graph.deduplicator));
             }
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 

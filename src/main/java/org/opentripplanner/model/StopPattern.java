@@ -10,6 +10,7 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,17 +90,22 @@ public class StopPattern implements Serializable {
         return sb.toString();
     }
 
-    private StopPattern (int size) {
-        this.size = size;
-        stops     = new Stop[size];
-        pickups   = new int[size];
-        dropoffs  = new int[size];
-    }
-
-    /** Assumes that stopTimes are already sorted by time. */
-    public StopPattern (List<StopTime> stopTimes) {
-        this (stopTimes.size());
-        if (size == 0) return;
+    /**
+     * Default constructor
+     * @param stopTimes List of StopTimes; assumes that stopTimes are already sorted by time.
+     * @param deduplicator Deduplicator. If null, do not deduplicate arrays.
+     */
+    public StopPattern (List<StopTime> stopTimes, Deduplicator deduplicator) {
+        this.size = stopTimes.size();
+        if (size == 0) {
+            this.stops = new Stop[size];
+            this.pickups = new int[0];
+            this.dropoffs = new int[0];
+            return;
+        }
+        stops = new Stop[size];
+        int[] pickups = new int[size];
+        int[] dropoffs = new int[size];
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
@@ -118,6 +124,22 @@ public class StopPattern implements Serializable {
          */
         dropoffs[0] = 0;
         pickups[size - 1] = 0;
+
+        if (deduplicator != null) {
+            this.pickups = deduplicator.deduplicateIntArray(pickups);
+            this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
+        } else {
+            this.pickups = pickups;
+            this.dropoffs = dropoffs;
+        }
+    }
+
+    /**
+     * Create StopPattern without deduplicating arrays
+     * @param stopTimes List of StopTimes; assumes that stopTimes are already sorted by time.
+     */
+    public StopPattern (List<StopTime> stopTimes) {
+        this(stopTimes, null);
     }
 
     /**
