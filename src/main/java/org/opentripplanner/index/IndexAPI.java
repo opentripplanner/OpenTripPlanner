@@ -607,7 +607,7 @@ public class IndexAPI {
      */
     @GET
     @Path("/flexAreas")
-    public Response getAllAreas() {
+    public Response getAllFlexAreas() {
         List<FeedScopedId> ids = new ArrayList<>(index.flexAreasById.keySet());
         return Response.status(Status.OK).entity(ids).build();
     }
@@ -615,7 +615,7 @@ public class IndexAPI {
     /** Return a specific GTFS-Flex area given an ID in Agency:ID format. */
     @GET
     @Path("/flexAreas/{id}")
-    public Response getAreaIdByFeedId(@PathParam("id") String areaIdString) {
+    public Response getFlexAreaByFeedId(@PathParam("id") String areaIdString) {
         FeedScopedId id = GtfsLibrary.convertIdFromString(areaIdString);
         Geometry area = index.flexAreasById.get(id);
         if (area == null) {

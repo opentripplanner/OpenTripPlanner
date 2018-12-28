@@ -17,7 +17,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.Area;
+import org.opentripplanner.model.FlexArea;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
@@ -1526,9 +1526,9 @@ public class PatternHopFactory {
         }
     }
     private void loadFlexAreaMap() {
-        for (Area area : transitService.getAllAreas()) {
-            Geometry geometry = GeometryUtils.parseWkt(area.getWkt());
-            flexAreasById.put(area.getAreaId(), geometry);
+        for (FlexArea flexArea : transitService.getAllAreas()) {
+            Geometry geometry = GeometryUtils.parseWkt(flexArea.getWkt());
+            flexAreasById.put(flexArea.getAreaId(), geometry);
         }
     }
 

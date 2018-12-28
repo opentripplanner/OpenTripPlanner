@@ -201,7 +201,7 @@ public class GraphPathFinder {
                 // so that the same leg cannot be found in a subsequent search.
                 if (tripIds.size() < 2) {
                     int duration = path.getCallAndRideDuration();
-                    if (duration > 0) {
+                    if (duration > 0) { // only true if there are call-and-ride legs
                         int constantLimit = Math.min(0, duration - options.flexReduceCallAndRideSeconds);
                         int ratioLimit = (int) Math.round(options.flexReduceCallAndRideRatio * duration);
                         options.flexMaxCallAndRideSeconds = Math.min(constantLimit, ratioLimit);

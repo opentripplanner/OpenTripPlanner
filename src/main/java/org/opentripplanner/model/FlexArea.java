@@ -1,18 +1,18 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public class Area extends IdentityBean<FeedScopedId> {
+public class FlexArea extends IdentityBean<FeedScopedId> {
     private static final long serialVersionUID = 1L;
 
     private FeedScopedId id;
 
     private String wkt;
 
-    public Area() {
+    public FlexArea() {
 
     }
 
-    public Area(Area a) {
+    public FlexArea(FlexArea a) {
         this.id = a.id;
         this.wkt = a.wkt;
     }
