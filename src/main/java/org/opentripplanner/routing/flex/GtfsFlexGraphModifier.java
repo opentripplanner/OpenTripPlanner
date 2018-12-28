@@ -16,12 +16,12 @@ import org.opentripplanner.routing.edgetype.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.flex.FlexTransitBoardAlight;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPreAlightEdge;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPreBoardEdge;
 import org.opentripplanner.routing.edgetype.flex.TemporaryStreetTransitLink;
-import org.opentripplanner.routing.edgetype.flex.TemporaryTransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -399,17 +399,17 @@ public abstract class GtfsFlexGraphModifier {
         return patternDepartVertex;
     }
 
-    private TemporaryTransitBoardAlight createBoardEdge(RoutingRequest rr, TransitStopDepart transitStopDepart, PatternDepartVertex patternDepartVertex,
-                                                        TemporaryPartialPatternHop hop) {
-        TemporaryTransitBoardAlight transitBoardAlight =
-                new TemporaryTransitBoardAlight(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop);
+    private FlexTransitBoardAlight createBoardEdge(RoutingRequest rr, TransitStopDepart transitStopDepart, PatternDepartVertex patternDepartVertex,
+                                                   TemporaryPartialPatternHop hop) {
+        FlexTransitBoardAlight transitBoardAlight =
+                new FlexTransitBoardAlight(transitStopDepart, patternDepartVertex, hop.getStopIndex(), hop);
         rr.rctx.temporaryEdges.add(transitBoardAlight);
         return transitBoardAlight;
     }
 
-    private TemporaryTransitBoardAlight createAlightEdge(RoutingRequest rr, TransitStopArrive transitStopArrive, PatternArriveVertex patternArriveVertex, TemporaryPartialPatternHop hop) {
-        TemporaryTransitBoardAlight transitBoardAlight =
-                new TemporaryTransitBoardAlight(patternArriveVertex, transitStopArrive, hop.getStopIndex() + 1, hop);
+    private FlexTransitBoardAlight createAlightEdge(RoutingRequest rr, TransitStopArrive transitStopArrive, PatternArriveVertex patternArriveVertex, TemporaryPartialPatternHop hop) {
+        FlexTransitBoardAlight transitBoardAlight =
+                new FlexTransitBoardAlight(patternArriveVertex, transitStopArrive, hop.getStopIndex() + 1, hop);
         rr.rctx.temporaryEdges.add(transitBoardAlight);
         return transitBoardAlight;
     }

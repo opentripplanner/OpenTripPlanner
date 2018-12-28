@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype.flex;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -11,7 +12,7 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 
-public class FlexTransitBoardAlight extends TransitBoardAlight {
+public class FlexTransitBoardAlight extends TransitBoardAlight implements TemporaryEdge {
 
     // normalized to [0, 1]
     private double startIndex;
@@ -122,5 +123,11 @@ public class FlexTransitBoardAlight extends TransitBoardAlight {
         return "FlexTransitBoardAlight(" +
                 (boarding ? "boarding " : "alighting ") +
                 getFromVertex() + " to " + getToVertex() + ")";
+    }
+
+    @Override
+    public void dispose() {
+        fromv.removeOutgoing(this);
+        tov.removeIncoming(this);
     }
 }
