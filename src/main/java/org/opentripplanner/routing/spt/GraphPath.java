@@ -213,6 +213,10 @@ public class GraphPath {
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
+    /**
+     * Return the total duration, in seconds, of call-and-ride legs used in a trip plan. If no
+     * call-and-ride legs are used, the duration is 0.
+     */
     public int getCallAndRideDuration() {
         if (states.isEmpty() || !states.getFirst().getOptions().rctx.graph.useFlexService) {
             return 0;

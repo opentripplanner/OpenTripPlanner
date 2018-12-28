@@ -195,7 +195,10 @@ public class GraphPathFinder {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
                 }
-                // for direct-hop trip banning, limit the allowable call-n-ride time to what it is currently
+                // Call-and-Ride trips should not use regular trip-banning, since call-and-ride trips can beused in
+                // multiple ways (e.g. from origin to destination, or from origin to a transfer stop.) Instead,
+                // after an itinerary which uses call-and-ride is found, reduce the allowable call-and-ride duration
+                // so that the same leg cannot be found in a subsequent search.
                 if (tripIds.size() < 2) {
                     int duration = path.getCallAndRideDuration();
                     if (duration > 0) {
