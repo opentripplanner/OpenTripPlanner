@@ -509,13 +509,17 @@ public class TripPattern implements Cloneable, Serializable {
             }
             pav1 = new PatternArriveVertex(graph, this, stop + 1);
             arriveVertices[stop + 1] = pav1;
-            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
+
             if (stopPattern.hasFlexFields()) {
+                FlexPatternHop hop = new FlexPatternHop(pdv0, pav1, s0, s1, stop);
                 StopPatternFlexFields flexFields = stopPattern.getFlexFields();
-                hopEdges[stop].setRequestPickup(flexFields.continuousPickup[stop]);
-                hopEdges[stop].setRequestDropoff(flexFields.continuousDropOff[stop]);
-                hopEdges[stop].setServiceAreaRadius(flexFields.serviceAreaRadius[stop]);
-                hopEdges[stop].setServiceArea(flexFields.serviceAreas[stop]);
+                hop.setRequestPickup(flexFields.continuousPickup[stop]);
+                hop.setRequestDropoff(flexFields.continuousDropOff[stop]);
+                hop.setServiceAreaRadius(flexFields.serviceAreaRadius[stop]);
+                hop.setServiceArea(flexFields.serviceAreas[stop]);
+                hopEdges[stop] = hop;
+            } else {
+                hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
             }
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */

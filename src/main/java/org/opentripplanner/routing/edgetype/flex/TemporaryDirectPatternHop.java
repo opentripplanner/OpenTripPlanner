@@ -5,6 +5,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.edgetype.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -23,7 +24,7 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
      */
     private int directTime;
 
-    public TemporaryDirectPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, LineString geometry, int time) {
+    public TemporaryDirectPatternHop(FlexPatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, LineString geometry, int time) {
         super(hop, from, to, fromStop, toStop);
         setGeometry(geometry);
         this.directTime = time;

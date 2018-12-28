@@ -13,7 +13,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,7 +38,7 @@ import java.util.Set;
 public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     // want to ensure we only keep one pattern hop per trip pattern
-    private Map<TripPattern, PatternHop> directServices = Maps.newHashMap();
+    private Map<TripPattern, FlexPatternHop> directServices = Maps.newHashMap();
     private Set<State> transitStopStates = Sets.newHashSet();
 
     public DeviatedRouteGraphModifier(Graph graph) {
@@ -61,7 +61,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     }
 
     @Override
-    public TemporaryPartialPatternHop makeHopNewTo(RoutingRequest opt, State state, PatternHop hop, PatternArriveVertex to, Stop toStop) {
+    public TemporaryPartialPatternHop makeHopNewTo(RoutingRequest opt, State state, FlexPatternHop hop, PatternArriveVertex to, Stop toStop) {
         GraphPath path = new GraphPath(state, false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         double startIndex = line.getStartIndex();
@@ -78,7 +78,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     }
 
     @Override
-    public TemporaryPartialPatternHop makeHopNewFrom(RoutingRequest opt, State state, PatternHop hop, PatternDepartVertex from, Stop fromStop) {
+    public TemporaryPartialPatternHop makeHopNewFrom(RoutingRequest opt, State state, FlexPatternHop hop, PatternDepartVertex from, Stop fromStop) {
         GraphPath path = new GraphPath(state, false);
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         // state is place where we meet line
@@ -97,7 +97,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     @Override
     public TemporaryPartialPatternHop shortenEnd(RoutingRequest opt, State state, TemporaryPartialPatternHop hop, PatternStopVertex to, Stop toStop) {
-        PatternHop originalHop = hop.getOriginalHop();
+        FlexPatternHop originalHop = hop.getOriginalHop();
         GraphPath path = new GraphPath(state, false);
         LengthIndexedLine line = new LengthIndexedLine(originalHop.getGeometry());
         double startIndex = hop.getStartIndex();
@@ -114,13 +114,13 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         }
     }
 
-    private boolean tooLittleOnRoute(PatternHop originalHop, LengthIndexedLine line, double startIndex, double endIndex) {
+    private boolean tooLittleOnRoute(FlexPatternHop originalHop, LengthIndexedLine line, double startIndex, double endIndex) {
         double onRouteDistance = SphericalDistanceLibrary.fastLength((LineString) line.extractLine(startIndex, endIndex));
         return onRouteDistance <= Math.min(100, originalHop.getDistance());
     }
 
     @Override
-    public boolean checkHopAllowsBoardAlight(State s, PatternHop hop, boolean boarding) {
+    public boolean checkHopAllowsBoardAlight(State s, FlexPatternHop hop, boolean boarding) {
         StreetVertex sv = findFirstStreetVertex(s);
         // If first vertex is not a StreetVertex, it's a transit vertex, which we'll catch later.
         if (sv == null) {
@@ -152,7 +152,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
         return ret;
     }
 
-    private boolean addHopAsDirectService(PatternHop hop, Point orig) {
+    private boolean addHopAsDirectService(FlexPatternHop hop, Point orig) {
         return hop.hasServiceArea() && hop.getServiceArea().contains(orig) && directServices.get(hop.getPattern()) == null;
     }
 
@@ -177,11 +177,11 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     }
 
     private void createDirectHopsToStops(RoutingRequest opt) {
-        Collection<PatternHop> services = directServices.values();
+        Collection<FlexPatternHop> services = directServices.values();
         for (State state : transitStopStates) {
             Vertex v = state.getVertex();
             Point dest = GeometryUtils.getGeometryFactory().createPoint(v.getCoordinate());
-            for (PatternHop hop : services) {
+            for (FlexPatternHop hop : services) {
                 if (hop.getServiceArea().contains(dest)) {
                     TransitStop fromStop, toStop;
                     if (opt.arriveBy) {
@@ -229,7 +229,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
     }
 
     @Override
-    public StreetVertex getLocationForTemporaryStop(State s, PatternHop hop) {
+    public StreetVertex getLocationForTemporaryStop(State s, FlexPatternHop hop) {
         return findFirstStreetVertex(s);
     }
 

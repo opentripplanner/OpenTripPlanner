@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.module.map.StreetMatcher;
+import org.opentripplanner.routing.edgetype.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -33,14 +34,14 @@ public class FlexIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlexIndex.class);
 
-    private final Multimap<Edge, PatternHop> hopsForEdge = HashMultimap.create();
+    private final Multimap<Edge, FlexPatternHop> hopsForEdge = HashMultimap.create();
 
     public void init(Graph graph) {
         LOG.info("initializing hops-for-edge map...");
         initializeHopsForEdgeMap(graph);
     }
 
-    public Collection<PatternHop> getHopsForEdge(Edge e) {
+    public Collection<FlexPatternHop> getHopsForEdge(Edge e) {
         if (e instanceof TemporaryPartialStreetEdge) {
             e = ((TemporaryPartialStreetEdge) e).getParentEdge();
         }
@@ -57,7 +58,11 @@ public class FlexIndex {
         for (TripPattern pattern : graph.index.patternForId.values()) {
             if (pattern.hasFlexService()) {
                 LOG.debug("Matching {}", pattern);
-                for(PatternHop patternHop : pattern.getPatternHops()) {
+                for(PatternHop ph : pattern.getPatternHops()) {
+                    if (!ph.hasFlexService() || ! (ph instanceof FlexPatternHop)) {
+                        continue;
+                    }
+                    FlexPatternHop patternHop = (FlexPatternHop) ph;
                     List<Edge> edges;
                     if (patternHop.getGeometry() == null) {
                         continue;

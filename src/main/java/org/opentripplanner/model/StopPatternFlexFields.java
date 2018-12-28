@@ -12,6 +12,9 @@ import java.util.Map;
  * Class to keep track of GTFS-Flex related StopPattern parameters
  */
 public class StopPatternFlexFields implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     public final int size;
 
     public final int[] continuousPickup;

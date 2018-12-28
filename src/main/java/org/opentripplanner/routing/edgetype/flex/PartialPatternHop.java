@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
@@ -18,7 +19,7 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PartialPatternHop extends PatternHop {
+public class PartialPatternHop extends FlexPatternHop {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +29,7 @@ public class PartialPatternHop extends PatternHop {
     private double endIndex;
     private double originalHopLength;
     private double percentageOfHop;
-    private PatternHop originalHop;
+    private FlexPatternHop originalHop;
     private Geometry boardArea;
     private Geometry alightArea;
     private LineString displayGeometry;
@@ -42,7 +43,7 @@ public class PartialPatternHop extends PatternHop {
 
     // constructor for flag stops
     // this could be merged into deviated-route service constructor
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
+    public PartialPatternHop(FlexPatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex, double buffer) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), false);
         setRequestPickup(hop.getRequestPickup());
         setRequestDropoff(hop.getRequestDropoff());
@@ -58,7 +59,7 @@ public class PartialPatternHop extends PatternHop {
     }
 
     // constructor for deviated-route service
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
+    public PartialPatternHop(FlexPatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop, double startIndex, double endIndex,
                              LineString startGeometry, int startVehicleTime, LineString endGeometry, int endVehicleTime, double buffer) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), false);
         setRequestPickup(hop.getRequestPickup());
@@ -102,7 +103,7 @@ public class PartialPatternHop extends PatternHop {
     }
 
     // pass-thru for TemporaryDirectPatternHop
-    public PartialPatternHop(PatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
+    public PartialPatternHop(FlexPatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
         super(from, to, fromStop, toStop, hop.getStopIndex(), false);
         setRequestPickup(hop.getRequestPickup());
         setRequestDropoff(hop.getRequestDropoff());
@@ -131,12 +132,12 @@ public class PartialPatternHop extends PatternHop {
     }
 
     // given hop s0->s1 and a temporary position t, create a partial hop s0->t
-    public static PartialPatternHop startHop(PatternHop hop, PatternArriveVertex to, Stop toStop) {
+    public static PartialPatternHop startHop(FlexPatternHop hop, PatternArriveVertex to, Stop toStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         return new PartialPatternHop(hop, (PatternStopVertex) hop.getFromVertex(), to, hop.getBeginStop(), toStop, line.getStartIndex(), line.project(to.getCoordinate()), 0);
     }
 
-    public static PartialPatternHop endHop(PatternHop hop, PatternDepartVertex from, Stop fromStop) {
+    public static PartialPatternHop endHop(FlexPatternHop hop, PatternDepartVertex from, Stop fromStop) {
         LengthIndexedLine line = new LengthIndexedLine(hop.getGeometry());
         return new PartialPatternHop(hop, from, (PatternStopVertex) hop.getToVertex(), fromStop, hop.getEndStop(), line.project(from.getCoordinate()), line.getEndIndex(), 0);
     }
@@ -237,7 +238,7 @@ public class PartialPatternHop extends PatternHop {
         return alightArea != null;
     }
 
-    public PatternHop getOriginalHop() {
+    public FlexPatternHop getOriginalHop() {
         return originalHop;
     }
 
