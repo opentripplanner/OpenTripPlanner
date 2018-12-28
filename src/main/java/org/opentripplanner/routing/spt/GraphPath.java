@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.spt;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -212,6 +214,9 @@ public class GraphPath {
     }
 
     public int getCallAndRideDuration() {
+        if (states.isEmpty() || !states.getFirst().getOptions().rctx.graph.useFlexService) {
+            return 0;
+        }
         int duration = 0;
         for (State s : states) {
             if (s.getBackEdge() != null && s.getBackEdge() instanceof TemporaryDirectPatternHop) {
@@ -222,4 +227,20 @@ public class GraphPath {
         return duration;
     }
 
+    /**
+     * Get all trips used in the search which were call-and-ride trips. Call-and-ride is part of
+     * GTFS-Flex and must be explicitly turned on in the graph.
+     */
+    public List<FeedScopedId> getCallAndRideTrips() {
+        if (states.isEmpty() || !states.getFirst().getOptions().rctx.graph.useFlexService) {
+            return Collections.emptyList();
+        }
+        List<FeedScopedId> trips = new ArrayList<>();
+        for (State s : states) {
+            if (s.getBackEdge() != null && s.getBackEdge() instanceof TemporaryDirectPatternHop) {
+                trips.add(s.getBackTrip().getId());
+            }
+        }
+        return trips;
+    }
 }

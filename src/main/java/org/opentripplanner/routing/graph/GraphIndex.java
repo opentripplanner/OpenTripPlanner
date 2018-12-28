@@ -702,11 +702,4 @@ public class GraphIndex {
         }
         return allAgencies;
     }
-
-    // Heuristic for deciding if trip is call-n-ride, only used for transfer and banning rules
-    public boolean tripIsCallAndRide(FeedScopedId tripId) {
-        Trip trip = tripForId.get(tripId);
-        TripPattern pattern = patternForTrip.get(trip);
-        return pattern.geometry == null;
-    }
 }

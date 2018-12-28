@@ -185,8 +185,9 @@ public class GraphPathFinder {
             for (GraphPath path : newPaths) {
                 // path.dump();
                 List<FeedScopedId> tripIds = path.getTrips();
+                List<FeedScopedId> callAndRideTripIds = path.getCallAndRideTrips();
                 for (FeedScopedId tripId : tripIds) {
-                    if (!router.graph.index.tripIsCallAndRide(tripId)) {
+                    if (!callAndRideTripIds.contains(tripId)) {
                         options.banTrip(tripId);
                     }
                 }
