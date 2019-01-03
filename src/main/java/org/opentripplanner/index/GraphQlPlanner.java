@@ -287,8 +287,10 @@ public class GraphQlPlanner {
         callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = GtfsLibrary.convertIdFromString(v));
         callWith.argument("clamInitialWait", (Long v) -> request.clampInitialWait = v);
         callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
+        callWith.argument("useCanceledTransit", (Boolean v) -> request.useCanceledTransit = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
         callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
+        callWith.argument("useCanceledTransit", (Boolean v) -> request.useCanceledTransit = v);
 
         callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
 

@@ -14,6 +14,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -250,6 +251,10 @@ public class Leg {
      @XmlAttribute
      @JsonSerialize
      public Boolean intermediatePlace = false;
+
+     @XmlAttribute
+     @JsonSerialize
+     public RealTimeState realTimeState;
 
      /**
      * Whether this leg is a transit leg or not.

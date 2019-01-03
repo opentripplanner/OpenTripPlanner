@@ -25,6 +25,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.PolylineEncoder;
@@ -745,6 +746,8 @@ public abstract class GraphPathToTripPlanConverter {
                 leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
             }
             leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
+
+            leg.realTimeState = tripTimes.isCanceled() || tripTimes.isCanceledDeparture(leg.from.stopIndex) || tripTimes.isCanceledArrival(leg.to.stopIndex) ? RealTimeState.CANCELED : tripTimes.getRealTimeState();
         }
     }
 

@@ -49,7 +49,7 @@ public class TripTimeShort {
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
         tripId             = tt.trip.getId();
-        realtimeState      = tt.getRealTimeState();
+        realtimeState      = tt.isTimeCanceled(i) ? RealTimeState.CANCELED : tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);
     }

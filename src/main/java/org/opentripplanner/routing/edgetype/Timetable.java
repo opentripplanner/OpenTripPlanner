@@ -149,8 +149,11 @@ public class Timetable implements Serializable {
         int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
+
+        boolean useCanceledTransit =  s0.getOptions().useCanceledTransit;
+
         for (TripTimes tt : tripTimes) {
-            if (tt.isCanceled()) continue;
+            if (tt.isCanceled() && !useCanceledTransit) continue;
             if ((tt.getNumStops() <= stopIndex)) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
@@ -158,7 +161,7 @@ public class Timetable implements Serializable {
             if (adjustedTime == -1) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
-                if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
+                if (tt.isCanceledDeparture(stopIndex) && !useCanceledTransit) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
                                            // now its not sure if this check should be still in place because there is a boolean field
                                            // for canceled trips
                 if (depTime >= adjustedTime && depTime < bestTime) {
@@ -167,7 +170,7 @@ public class Timetable implements Serializable {
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
-                if (arvTime < 0) continue;
+                if (tt.isCanceledArrival(stopIndex) && !useCanceledTransit) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;
                     bestTime = arvTime;
@@ -460,7 +463,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelArrivalTime(i);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
                             }
@@ -486,7 +489,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelDepartureTime(i);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                             }
@@ -500,8 +503,8 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     if (delay == null) {
-                        newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                        newTimes.cancelArrivalTime(i);
+                        newTimes.cancelDepartureTime(i);
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
                         newTimes.updateDepartureDelay(i, delay);
