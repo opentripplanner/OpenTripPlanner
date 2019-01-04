@@ -2,6 +2,8 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Vertex;
 
+import java.util.Collection;
+
 /**
  * Marker interface for temporary vertices.
  * <p/>
@@ -19,8 +21,9 @@ public interface TemporaryVertex {
      * Note! If the {@code vertex} is NOT a TemporaryVertex the method returns. No action taken.
      *
      * @param vertex Vertex part of the temporary part of the graph.
+     * @return a collection of all the vertices removed from the graph.
      */
-    static void dispose(Vertex vertex) {
-        TemporaryVertexDispose.dispose(vertex);
+    static Collection<Vertex> dispose(Vertex vertex) {
+        return TemporaryVertexDispose.dispose(vertex);
     }
 }

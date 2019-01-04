@@ -124,10 +124,4 @@ public class FlexTransitBoardAlight extends TransitBoardAlight implements Tempor
                 (boarding ? "boarding " : "alighting ") +
                 getFromVertex() + " to " + getToVertex() + ")";
     }
-
-    @Override
-    public void dispose() {
-        fromv.removeOutgoing(this);
-        tov.removeIncoming(this);
-    }
 }

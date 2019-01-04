@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -116,8 +117,11 @@ public class RoutingContext implements Cloneable {
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
 
-    public Collection<TemporaryEdge> temporaryEdges = new ArrayList<>();
-
+    /**
+     * Temporary vertices created during the request. This is needed for GTFS-Flex support. The other temporary vertices which are created have
+     * known locations (the endpoints of the search), but GTFS-Flex routing may require temporary vertices to be created at other places in the
+     * graph. Temporary vertices are request-specific need to be disposed of at the end-of-life of a request.
+     */
     public Collection<Vertex> temporaryVertices = new ArrayList<>();
 
     /* CONSTRUCTORS */
@@ -411,9 +415,14 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        TemporaryVertex.dispose(fromVertex);
-        TemporaryVertex.dispose(toVertex);
-        temporaryVertices.forEach(TemporaryVertex::dispose);
+        List<Vertex> disposed = new ArrayList<>();
+        disposed.addAll(TemporaryVertex.dispose(fromVertex));
+        disposed.addAll(TemporaryVertex.dispose(toVertex));
+        for (Vertex vertex : temporaryVertices) {
+            if (!disposed.contains(vertex)) {
+                TemporaryVertex.dispose(vertex);
+            }
+        }
         temporaryVertices.clear();
     }
 }

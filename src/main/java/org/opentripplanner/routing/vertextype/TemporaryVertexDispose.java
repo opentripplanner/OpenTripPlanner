@@ -4,6 +4,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,12 +40,16 @@ class TemporaryVertexDispose {
 
     /**
      * Create an instance and dispose temporary subgraph.
-     * @param tempVertex any temporary vertex part of the temporary subgrap.
+     * @param tempVertex any temporary vertex part of the temporary subgraph.
+     * @return a collection of all the vertices removed from the graph.
      */
-    static void dispose(Vertex tempVertex) {
+    static Collection<Vertex> dispose(Vertex tempVertex) {
         if(tempVertex instanceof TemporaryVertex) {
-            new TemporaryVertexDispose(tempVertex).dispose();
+            TemporaryVertexDispose task = new TemporaryVertexDispose(tempVertex);
+            task.dispose();
+            return task.done;
         }
+        return Collections.emptySet();
     }
 
 

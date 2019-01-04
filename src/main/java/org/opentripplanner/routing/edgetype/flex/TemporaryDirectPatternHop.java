@@ -67,12 +67,6 @@ public class TemporaryDirectPatternHop extends TemporaryPartialPatternHop implem
     }
 
     @Override
-    public void dispose() {
-        fromv.removeOutgoing(this);
-        tov.removeIncoming(this);
-    }
-
-    @Override
     public int getDirectVehicleTime() {
         return directTime;
     }

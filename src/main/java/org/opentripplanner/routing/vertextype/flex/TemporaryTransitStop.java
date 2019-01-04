@@ -24,13 +24,6 @@ public class TemporaryTransitStop extends TransitStop implements TemporaryVertex
         return false;
     }
 
-    @Override
-    public void dispose() {
-        for (Object temp : Iterables.concat(getIncoming(), getOutgoing())) {
-            ((TemporaryEdge) temp).dispose();
-        }
-    }
-
     public StreetVertex getStreetVertex() {
         return streetVertex;
     }

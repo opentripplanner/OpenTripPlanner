@@ -21,9 +21,4 @@ public class TemporaryPreBoardEdge extends PreBoardEdge implements StationEdge, 
         super(from, to);
     }
 
-    @Override
-    public void dispose() {
-        fromv.removeOutgoing(this);
-        tov.removeIncoming(this);
-    }
 }

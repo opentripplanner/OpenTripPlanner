@@ -21,12 +21,4 @@ public class TemporaryStreetTransitLink extends StreetTransitLink implements Tem
         return super.traverse(s0);
     }
 
-    @Override
-    public void dispose() {
-        //TemporaryStreetLocation dispose could have been called already
-        if(fromv.getOutgoing().contains(this))
-            fromv.removeOutgoing(this);
-        if(tov.getIncoming().contains(this))
-            tov.removeIncoming(this);
-    }
 }

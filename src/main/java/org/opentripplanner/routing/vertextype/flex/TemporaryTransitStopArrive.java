@@ -17,11 +17,4 @@ public class TemporaryTransitStopArrive extends TransitStopArrive implements Tem
     public boolean isEndVertex() {
         return false;
     }
-
-    @Override
-    public void dispose() {
-        for (Object temp : Iterables.concat(getIncoming(), getOutgoing())) {
-            ((TemporaryEdge) temp).dispose();
-        }
-    }
 }

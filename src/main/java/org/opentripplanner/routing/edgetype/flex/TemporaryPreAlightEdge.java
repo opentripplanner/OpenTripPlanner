@@ -9,14 +9,8 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
 
 public class TemporaryPreAlightEdge extends PreAlightEdge implements StationEdge, TemporaryEdge {
 
-
     public TemporaryPreAlightEdge(TransitStopArrive from, TransitStop to) {
         super(from, to);
     }
 
-    @Override
-    public void dispose() {
-        fromv.removeOutgoing(this);
-        tov.removeIncoming(this);
-    }
 }

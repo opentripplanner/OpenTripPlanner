@@ -21,11 +21,4 @@ public class TemporaryPartialPatternHop extends PartialPatternHop implements Tem
     public TemporaryPartialPatternHop(FlexPatternHop hop, PatternStopVertex from, PatternStopVertex to, Stop fromStop, Stop toStop) {
         super(hop, from, to, fromStop, toStop);
     }
-
-    @Override
-    public void dispose() {
-        fromv.removeOutgoing(this);
-        tov.removeIncoming(this);
-    }
-
 }

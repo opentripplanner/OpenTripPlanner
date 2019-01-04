@@ -18,11 +18,4 @@ public class TemporaryPatternArriveVertex extends PatternArriveVertex implements
     public boolean isEndVertex() {
         return false;
     }
-
-    @Override
-    public void dispose() {
-        for (Object temp : Iterables.concat(getIncoming(), getOutgoing())) {
-            ((TemporaryEdge) temp).dispose();
-        }
-    }
 }
