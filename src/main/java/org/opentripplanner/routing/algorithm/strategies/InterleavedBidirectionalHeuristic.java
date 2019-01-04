@@ -129,8 +129,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
         // once street searches are done, raise the limits to max
         // because hard walk limiting is incorrect and is observed to cause problems
-        // for trips near the cutoff
-        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        // for trips near the cutoff.  However, if the car mode is enabled, excessive walking legs
+        // can occur that take advantage of the vertices explored only by car, so keep the cap if
+        // the car mode is enabled.
+        if (!request.modes.getCar()) request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
         request.setMaxPreTransitTime(Integer.MAX_VALUE);
         LOG.debug("initialized SSSP");
         request.rctx.debugOutput.finishedPrecalculating();
