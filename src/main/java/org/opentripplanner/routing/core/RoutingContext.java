@@ -148,7 +148,7 @@ public class RoutingContext implements Cloneable {
         for (Edge e : Iterables.concat(u.getIncoming(), u.getOutgoing())) {
             uIds.add(e.getId());
         }
-        
+
         // Intesection of edge IDs between u and v.
         uIds.retainAll(vIds);
         Set<Integer> overlappingIds = uIds;
@@ -236,7 +236,6 @@ public class RoutingContext implements Cloneable {
         else
             this.streetSpeedSnapshot = null;
 
-
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -297,7 +296,7 @@ public class RoutingContext implements Cloneable {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
-        
+
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
@@ -407,18 +406,14 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Tear down this routing context, removing any temporary edges.
+     * Tear down this routing context, removing any temporary edges from
+     * the "permanent" graph objects. This enables all temporary objects
+     * for garbage collection.
      */
     public void destroy() {
-        if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
-        if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
-
-        LOG.debug("ms Cleaning up {} temporary edges", temporaryEdges.size());
-        temporaryEdges.forEach(TemporaryEdge::dispose);
-        temporaryEdges.clear();
-
-        temporaryVertices.forEach(graph::remove);
+        TemporaryVertex.dispose(fromVertex);
+        TemporaryVertex.dispose(toVertex);
+        temporaryVertices.forEach(TemporaryVertex::dispose);
         temporaryVertices.clear();
-
     }
 }
