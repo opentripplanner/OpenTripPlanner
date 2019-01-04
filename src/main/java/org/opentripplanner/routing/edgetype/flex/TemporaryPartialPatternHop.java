@@ -2,8 +2,6 @@ package org.opentripplanner.routing.edgetype.flex;
 
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.edgetype.FlexPatternHop;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 

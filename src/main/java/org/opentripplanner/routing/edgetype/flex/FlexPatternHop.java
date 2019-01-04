@@ -1,7 +1,8 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.edgetype.flex;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 /** A PatternHop with GTFS-Flex service enabled. */

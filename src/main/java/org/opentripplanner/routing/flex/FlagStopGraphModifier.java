@@ -6,7 +6,7 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.FlexPatternHop;
+import org.opentripplanner.routing.edgetype.flex.FlexPatternHop;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.flex.TemporaryPartialPatternHop;
 import org.opentripplanner.routing.graph.Edge;
