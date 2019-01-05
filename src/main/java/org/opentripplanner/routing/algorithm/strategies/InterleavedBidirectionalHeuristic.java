@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -174,7 +175,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 // We could also use a Euclidean heuristic here.
                 if (preTransitVertices.containsKey(v)) {
                     VertexModeWeight weight = preTransitVertices.get(v);
-                    if (s.getNonTransitMode().isDriving()) {
+                    TraverseMode nonTransitMode = s.getNonTransitMode();
+                    if (nonTransitMode != null && nonTransitMode.isDriving()) {
                         return weight.carWeight == Double.POSITIVE_INFINITY ? Double.POSITIVE_INFINITY : 0;
                     } else {
                         return weight.walkWeight == Double.POSITIVE_INFINITY ? Double.POSITIVE_INFINITY : 0;
@@ -337,7 +339,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             } else {
                 weights = vertices.get(v);
             }
-            if (s.getNonTransitMode().isDriving()) {
+            TraverseMode nonTransitMode = s.getNonTransitMode();
+            if (nonTransitMode != null && s.getNonTransitMode().isDriving()) {
                 weights.carWeight = s.getWeight();
             } else {
                 weights.walkWeight = s.getWeight();
