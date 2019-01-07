@@ -422,6 +422,7 @@ public class GraphPathFinder {
      * the end.
      */
     private List<GraphPath> getGraphPathsConsideringIntermediates (RoutingRequest request) {
+        Collection<Vertex> temporaryVertices = new ArrayList<>();
         if (request.hasIntermediatePlaces()) {
             List<GenericLocation> places = Lists.newArrayList(request.from);
             places.addAll(request.intermediatePlaces);
@@ -439,7 +440,7 @@ public class GraphPathFinder {
                 intermediateRequest.from = places.get(placeIndex - 1);
                 intermediateRequest.to = places.get(placeIndex);
                 intermediateRequest.rctx = null;
-                intermediateRequest.setRoutingContext(router.graph);
+                intermediateRequest.setRoutingContext(router.graph, temporaryVertices);
 
                 if (debugOutput != null) {// Restore the previous debug info accumulator
                     intermediateRequest.rctx.debugOutput = debugOutput;

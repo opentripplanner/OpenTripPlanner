@@ -3,6 +3,7 @@ package org.opentripplanner.routing.flex;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.BoardAlightType;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -11,14 +12,21 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
 
 public class VermontFlexRoutingTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(VermontFlexRoutingTest.class);
 
     private Graph graph = ConstantsForTests.getInstance().getVermontGraph();
     private static final int MAX_WALK_DISTANCE = 804;
@@ -31,10 +39,9 @@ public class VermontFlexRoutingTest {
     // Flag stop on both sides, on Jay-Lyn (route 1382)
     @Test
     public void testFlagStop() {
-        GraphPath path = getPathToDestination(
-                buildRequest("44.4214596,-72.019371", "44.4277732,-72.01203514",
-                "2018-05-23", "1:37pm")
-        );
+        RoutingRequest options = buildRequest("44.4214596,-72.019371", "44.4277732,-72.01203514",
+                "2018-05-23", "1:37pm");
+        GraphPath path = getPathToDestination(options);
         List<Ride> rides = Ride.createRides(path);
         assertEquals(1, rides.size());
         Ride ride = rides.get(0);
@@ -42,15 +49,15 @@ public class VermontFlexRoutingTest {
         assertEquals(BoardAlightType.FLAG_STOP, ride.getBoardType());
         assertEquals(BoardAlightType.FLAG_STOP, ride.getAlightType());
         checkFare(path);
+        options.rctx.destroy();
     }
 
     // Deviated Route on both ends
     @Test
     public void testCallAndRide() {
-        GraphPath path = getPathToDestination(
-                buildRequest("44.38485134435363,-72.05881118774415", "44.422379116722084,-72.0198440551758",
-                "2018-05-23", "1:37pm")
-        );
+        RoutingRequest options = buildRequest("44.38485134435363,-72.05881118774415", "44.422379116722084,-72.0198440551758",
+                "2018-05-23", "1:37pm");
+        GraphPath path = getPathToDestination(options);
         List<Ride> rides = Ride.createRides(path);
         assertEquals(1, rides.size());
         Ride ride = rides.get(0);
@@ -104,15 +111,15 @@ public class VermontFlexRoutingTest {
         ride = rides.get(0);
         assertEquals("7415", ride.getRoute().getId());
         assertDateEquals(ride.getEndTime(), "2018-05-24", "3:00pm", graph.getTimeZone());
+        options.rctx.destroy();
     }
 
     // Deviated Fixed Route at both ends
     @Test
     public void testDeviatedFixedRoute() {
-        GraphPath path = getPathToDestination(
-                buildRequest("44.950950106914135,-72.20008850097658", "44.94985671536269,-72.13708877563478",
-                        "2018-05-23", "4:00pm")
-        );
+        RoutingRequest options = buildRequest("44.950950106914135,-72.20008850097658", "44.94985671536269,-72.13708877563478",
+                "2018-05-23", "4:00pm");
+        GraphPath path = getPathToDestination(options);
         List<Ride> rides = Ride.createRides(path);
         assertEquals(1, rides.size());
         Ride ride = rides.get(0);
@@ -120,15 +127,15 @@ public class VermontFlexRoutingTest {
         assertEquals(BoardAlightType.DEVIATED, ride.getBoardType());
         assertEquals(BoardAlightType.DEVIATED, ride.getAlightType());
         checkFare(path);
+        options.rctx.destroy();
     }
 
     // Flag stop to a deviated fixed route that starts as a regular route and ends deviated
     @Test
     public void testFlagStopToRegularStopEndingInDeviatedFixedRoute() {
-        GraphPath path = getPathToDestination(
-                buildRequest("44.8091683,-72.20580269999999", "44.94985671536269,-72.13708877563478",
-                        "2018-06-13", "9:30am")
-        );
+        RoutingRequest options = buildRequest("44.8091683,-72.20580269999999", "44.94985671536269,-72.13708877563478",
+                "2018-06-13", "9:30am");
+        GraphPath path = getPathToDestination(options);
         List<Ride> rides = Ride.createRides(path);
         assertEquals(2, rides.size());
         Ride ride = rides.get(0);
@@ -141,6 +148,64 @@ public class VermontFlexRoutingTest {
         assertEquals(BoardAlightType.DEFAULT, ride2.getBoardType());
         assertEquals(BoardAlightType.DEVIATED, ride2.getAlightType());
         checkFare(path);
+        options.rctx.destroy();
+    }
+
+    // Deviated Route on both ends
+    @Test
+    public void testMultipleThreads() throws InterruptedException, ExecutionException {
+        AtomicBoolean thread1SetupComplete = new AtomicBoolean(false),
+                thread2SearchComplete = new AtomicBoolean(false);
+
+        FutureTask<Boolean> task1 = new FutureTask<>(() -> {
+            boolean success = true;
+            LOG.info("Thread 1 starting");
+            RoutingRequest options = buildRequest("44.4214596,-72.019371", "44.4277732,-72.01203514",
+                    "2018-05-23", "1:37pm");
+            GraphPath path = getPathToDestination(options);
+            thread1SetupComplete.set(true);
+            List<Ride> rides = Ride.createRides(path);
+            assertEquals(1, rides.size());
+            Ride ride = rides.get(0);
+            success &= "1382".equals(ride.getRoute().getId());
+            success &= BoardAlightType.FLAG_STOP.equals(ride.getBoardType());
+            success &= BoardAlightType.FLAG_STOP.equals(ride.getAlightType());
+            while (!thread2SearchComplete.get()) ;
+            LOG.info("Thread 1 cleaning up...");
+            options.rctx.destroy();
+            LOG.info("Thread 1 complete.");
+            return success;
+        });
+
+        FutureTask<Boolean> task2 = new FutureTask<>(() -> {
+            boolean success = true;
+            while(!thread1SetupComplete.get());
+            LOG.info("Thread 2 starting");
+            RoutingRequest options = buildRequest("44.4214596,-72.019371", "44.4277732,-72.01203514",
+                    "2018-05-23", "1:37pm");
+            // Don't make temporary edges
+            AStar astar = new AStar();
+            astar.getShortestPathTree(options);
+            GraphPath path = astar.getPathsToTarget().iterator().next();
+            List<Ride> rides = Ride.createRides(path);
+            // possibly no rides if just walking.
+            if (!rides.isEmpty()) {
+                Ride ride = rides.get(0);
+                success &= !BoardAlightType.FLAG_STOP.equals(ride.getBoardType());
+                success &= !BoardAlightType.FLAG_STOP.equals(ride.getAlightType());
+            }
+            LOG.info("Thread 2 cleaning up...");
+            options.rctx.destroy();
+            LOG.info("Thread 2 complete");
+            thread2SearchComplete.set(true);
+            return success;
+        });
+
+        new Thread(task1).start();
+        new Thread(task2).start();
+
+        assertTrue(task1.get());
+        assertTrue(task2.get());
     }
 
     private RoutingRequest buildRequest(String from, String to, String date, String time) {
@@ -148,12 +213,12 @@ public class VermontFlexRoutingTest {
     }
 
     private RoutingRequest buildRequest(String from, String to, String date, String time, boolean arriveBy) {
-        return buildRoutingRequest(from, to, date, time, arriveBy, MAX_WALK_DISTANCE,
+        return buildRequest(from, to, date, time, arriveBy, MAX_WALK_DISTANCE,
                 CALL_AND_RIDE_RELUCTANCE, WALK_RELUCTANCE, WAIT_AT_BEGINNING_FACTOR,
                 TRANSFER_PENALTY, IGNORE_DRT_ADVANCE_MIN_BOOKING);
     }
 
-    private RoutingRequest buildRoutingRequest(String from, String to, String date, String time, boolean arriveBy,
+    private RoutingRequest buildRequest(String from, String to, String date, String time, boolean arriveBy,
                                                int maxWalkDistance, double callAndRideReluctance, double walkReluctance,
                                                double waitAtBeginningFactor, int transferPenalty,
                                                boolean ignoreDrtAdvanceMinBooking) {

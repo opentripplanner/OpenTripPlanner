@@ -13,7 +13,6 @@ import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeight
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -42,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -130,14 +128,23 @@ public class RoutingContext implements Cloneable {
      * Constructor that automatically computes origin/target from RoutingRequest.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph) {
-        this(routingRequest, graph, null, null, true);
+        this(routingRequest, graph, null, null, true, null);
+    }
+
+    /**
+     * Constructor that automatically computes origin/target from RoutingRequest, and sets the
+     * context's temporary vertices. This is needed for intermediate places, as a consequence of
+     * the check that temporary vertices are request-specific.
+     */
+    public RoutingContext(RoutingRequest routingRequest, Graph graph, Collection<Vertex> temporaryVertices) {
+        this(routingRequest, graph, null, null, true, temporaryVertices);
     }
 
     /**
      * Constructor that takes to/from vertices as input.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
-        this(routingRequest, graph, from, to, false);
+        this(routingRequest, graph, from, to, false, null);
     }
 
     /**
@@ -200,9 +207,10 @@ public class RoutingContext implements Cloneable {
      * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
      * 
      * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
+     * @param temporaryVerticesParam if not null, use this collection to keep track of temporary vertices.
      */
     private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
-            boolean findPlaces) {
+            boolean findPlaces, Collection<Vertex> temporaryVerticesParam) {
         if (graph == null) {
             throw new GraphNotFoundException();
         }
@@ -300,6 +308,14 @@ public class RoutingContext implements Cloneable {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
+
+        // Add temporary subgraphs to the routing context. If `fromVertex` or `toVertex` are not
+        // tempoorary vertices, their subgraphs are empty, so this has no effect.
+        if (temporaryVerticesParam != null) {
+            temporaryVertices = temporaryVerticesParam;
+        }
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(fromVertex));
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(toVertex));
 
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
@@ -415,14 +431,7 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        List<Vertex> disposed = new ArrayList<>();
-        disposed.addAll(TemporaryVertex.dispose(fromVertex));
-        disposed.addAll(TemporaryVertex.dispose(toVertex));
-        for (Vertex vertex : temporaryVertices) {
-            if (!disposed.contains(vertex)) {
-                TemporaryVertex.dispose(vertex);
-            }
-        }
-        temporaryVertices.clear();
+       TemporaryVertex.disposeAll(temporaryVertices);
+       temporaryVertices.clear();
     }
 }

@@ -22,8 +22,9 @@ import java.util.Set;
  * the implementation.
  */
 class TemporaryVertexDispose {
+
     /**
-     * A list of all Vertexes not jet processed.
+     * A list of all Vertexes not yet processed.
      */
     private List<Vertex> todo = new ArrayList<>();
 
@@ -38,24 +39,55 @@ class TemporaryVertexDispose {
         todo.add(tempVertex);
     }
 
+    private TemporaryVertexDispose() {
+    }
+
     /**
      * Create an instance and dispose temporary subgraph.
      * @param tempVertex any temporary vertex part of the temporary subgraph.
      * @return a collection of all the vertices removed from the graph.
      */
     static Collection<Vertex> dispose(Vertex tempVertex) {
+        return search(tempVertex, true);
+    }
+
+    /**
+     * Create an instance and dispose temporary subgraphs.
+     * @param vertices all temporary vertices to search from to dispose subgraphs
+     * @return a collection of all vertices removed from the graph
+     */
+    static Collection<Vertex> disposeAll(Collection<Vertex> vertices) {
+        TemporaryVertexDispose task = new TemporaryVertexDispose();
+        for (Vertex vertex : vertices) {
+            if (vertex instanceof TemporaryVertex) {
+                task.todo.add(vertex);
+            }
+        }
+        task.search(true);
+        return task.done;
+    }
+
+    /**
+     * Create an instance and discover TemporaryVertex subgraph.
+     * @param tempVertex any temporary vertex part of the temporary subgraph.
+     * @return a collection of all the vertices connected to this vertex.
+     */
+    static Collection<Vertex> search(Vertex tempVertex) {
+        return search(tempVertex, false);
+    }
+
+    /* private methods */
+
+    private static Collection<Vertex> search(Vertex tempVertex, boolean dispose) {
         if(tempVertex instanceof TemporaryVertex) {
             TemporaryVertexDispose task = new TemporaryVertexDispose(tempVertex);
-            task.dispose();
+            task.search(dispose);
             return task.done;
         }
         return Collections.emptySet();
     }
 
-
-    /* private methods */
-
-    private void dispose() {
+    private void search(boolean dispose) {
         // Add all connected vertexes to the TODO_list and disconnect all
         // main graph vertexes. We use a loop and not recursion to avoid
         // stack overflow in the case of deep temporary graphs.
@@ -63,10 +95,10 @@ class TemporaryVertexDispose {
             Vertex current = next();
             if(isNotAlreadyProcessed(current)) {
                 for (Edge edge : current.getOutgoing()) {
-                    disposeVertex(edge.getToVertex(), edge, true);
+                    visitVertex(edge.getToVertex(), edge, true, dispose);
                 }
                 for (Edge edge : current.getIncoming()) {
-                    disposeVertex(edge.getFromVertex(), edge, false);
+                    visitVertex(edge.getFromVertex(), edge, false, dispose);
                 }
                 done.add(current);
             }
@@ -74,18 +106,19 @@ class TemporaryVertexDispose {
     }
 
     /**
-     * Add the temporary vertex to processing queue OR disconnect edge from vertex if
-     * vertex is part of the main graph.
+     * Add the temporary vertex to processing queue, or if dispose = true, disconnect edge from
+     * vertex if vertex is part of the main graph.
      *
      * @param v the vertex to dispose
      * @param connectedEdge the connected temporary edge
      * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
+     * @param dispose true if edge should be disconnected from the vertex
      */
-    private void disposeVertex(Vertex v, Edge connectedEdge, boolean incoming) {
+    private void visitVertex(Vertex v, Edge connectedEdge, boolean incoming, boolean dispose) {
         if(v instanceof TemporaryVertex) {
             addVertexToProcessTodoList(v);
         }
-        else {
+        else if (dispose) {
             removeEdgeFromMainGraphVertex(v, connectedEdge, incoming);
         }
     }

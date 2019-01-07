@@ -296,7 +296,7 @@ public abstract class GtfsFlexGraphModifier {
             TemporaryPartialPatternHop newHop = shortenEnd(rr, state, reverseHop, patternArriveVertex, flagStop);
             if (newHop == null || newHop.isTrivial(rr)) {
                 if (newHop != null) {
-                    TemporaryVertex.dispose(newHop.getFromVertex());
+                    removeEdge(newHop);
                 }
                 continue;
             }
@@ -308,7 +308,7 @@ public abstract class GtfsFlexGraphModifier {
         TemporaryPartialPatternHop hop = makeHopNewTo(rr, state, originalPatternHop, patternArriveVertex, flagStop);
         if (hop == null || hop.isTrivial(rr)) {
             if (hop != null) {
-                TemporaryVertex.dispose(hop.getFromVertex());
+                removeEdge(hop);
             }
             return;
         }
@@ -325,7 +325,7 @@ public abstract class GtfsFlexGraphModifier {
         TemporaryPartialPatternHop hop = makeHopNewFrom(rr, state, originalPatternHop, patternDepartVertex, flagStop);
         if (hop == null || hop.isTrivial(rr)) {
             if (hop != null) {
-                TemporaryVertex.dispose(hop.getFromVertex());
+                removeEdge(hop);
             }
             return;
         }
@@ -452,5 +452,10 @@ public abstract class GtfsFlexGraphModifier {
             return vertex;
         }
         return new CarPermissionSearch(opt, arriveBy).findVertexWithPermission(vertex, TraverseMode.CAR);
+    }
+
+    private void removeEdge(Edge edge) {
+        edge.getFromVertex().removeOutgoing(edge);
+        edge.getToVertex().removeIncoming(edge);
     }
 }
