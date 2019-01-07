@@ -812,12 +812,6 @@
             <version>2.7.0</version>
         </dependency>
         -->
-        <!-- support for OpenTraffic data -->
-        <dependency>
-            <groupId>io.opentraffic</groupId>
-            <artifactId>traffic-engine</artifactId>
-            <version>0.2</version>
-        </dependency>
         <!-- OTP 2.0 will adopt routing methods based on those in R5. This also contains a serialization test framework. -->
         <dependency>
             <groupId>com.conveyal</groupId>
