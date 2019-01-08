@@ -464,6 +464,7 @@ public class Timetable implements Serializable {
                         } else {
                             if (delay == null) {
                                 newTimes.cancelArrivalTime(i);
+                                newTimes.updateArrivalDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
                                 if (newTimes.isCanceledArrival(i)) {
@@ -493,6 +494,7 @@ public class Timetable implements Serializable {
                         } else {
                             if (delay == null) {
                                 newTimes.cancelDepartureTime(i);
+                                newTimes.updateDepartureDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                                 if (newTimes.isCanceledDeparture(i)) {
@@ -586,7 +588,7 @@ public class Timetable implements Serializable {
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
-    
+
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
