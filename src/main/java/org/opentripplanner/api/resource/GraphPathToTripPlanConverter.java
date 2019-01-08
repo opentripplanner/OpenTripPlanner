@@ -747,7 +747,16 @@ public abstract class GraphPathToTripPlanConverter {
             }
             leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
 
-            leg.realTimeState = tripTimes.isCanceled() || tripTimes.isCanceledDeparture(leg.from.stopIndex) || tripTimes.isCanceledArrival(leg.to.stopIndex) ? RealTimeState.CANCELED : tripTimes.getRealTimeState();
+
+            if (tripTimes.isCanceled()) {
+                leg.realTimeState = RealTimeState.CANCELED;
+            } else if (leg.from.stopIndex != null && tripTimes.isCanceledDeparture(leg.from.stopIndex)) {
+                leg.realTimeState = RealTimeState.CANCELED;
+            } else if (leg.to.stopIndex != null && tripTimes.isCanceledArrival(leg.to.stopIndex)) {
+                leg.realTimeState = RealTimeState.CANCELED;
+            } else {
+                leg.realTimeState = tripTimes.getRealTimeState();
+            }
         }
     }
 

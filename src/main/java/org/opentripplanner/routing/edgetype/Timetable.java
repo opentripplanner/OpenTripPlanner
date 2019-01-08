@@ -70,11 +70,11 @@ public class Timetable implements Serializable {
      */
     private transient int minDwellTimes[];
 
-    /** 
-     * Helps determine whether a particular pattern is worth searching for departures at a given time. 
+    /**
+     * Helps determine whether a particular pattern is worth searching for departures at a given time.
      */
     private transient int minTime, maxTime;
-    
+
     /** Construct an empty Timetable. */
     public Timetable(TripPattern pattern) {
         this.pattern = pattern;
@@ -190,7 +190,7 @@ public class Timetable implements Serializable {
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search
-                if (depTime < 0) continue; 
+                if (depTime < 0) continue;
                 if (depTime >= adjustedTime && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
@@ -347,7 +347,7 @@ public class Timetable implements Serializable {
 
     /**
      * Set new trip times for trip given a trip index
-     * 
+     *
      * @param tripIndex trip index of trip
      * @param tt new trip times for trip
      * @return old trip times of trip
@@ -377,7 +377,7 @@ public class Timetable implements Serializable {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return null;
         }
-        
+
         // Though all timetables have the same trip ordering, some may have extra trips due to
         // the dynamic addition of unscheduled trips.
         // However, we want to apply trip updates on top of *scheduled* times
@@ -466,6 +466,9 @@ public class Timetable implements Serializable {
                                 newTimes.cancelArrivalTime(i);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
+                                if (newTimes.isCanceledArrival(i)) {
+                                    newTimes.unCancelArrivalTime(i);
+                                }
                             }
                         }
 
@@ -492,6 +495,9 @@ public class Timetable implements Serializable {
                                 newTimes.cancelDepartureTime(i);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
+                                if (newTimes.isCanceledDeparture(i)) {
+                                    newTimes.unCancelDepartureTime(i);
+                                }
                             }
                         }
                     }
@@ -507,7 +513,14 @@ public class Timetable implements Serializable {
                         newTimes.cancelDepartureTime(i);
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
+                        if (newTimes.isCanceledArrival(i)) {
+                            newTimes.unCancelArrivalTime(i);
+                        }
+
                         newTimes.updateDepartureDelay(i, delay);
+                        if (newTimes.isCanceledDeparture(i)) {
+                            newTimes.unCancelDepartureTime(i);
+                        }
                     }
                 }
             }
@@ -587,4 +600,4 @@ public class Timetable implements Serializable {
         }
     }
 
-} 
+}

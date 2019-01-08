@@ -465,9 +465,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public void cancelArrivalTime(int i) {
         canceledArrivalTimes.set(i);
     }
+    public void unCancelArrivalTime(int i) {
+        canceledArrivalTimes.clear(i);
+    }
 
     public void cancelDepartureTime(int i) {
         canceledDepartureTimes.set(i);
+    }
+
+    public void unCancelDepartureTime(int i) {
+        canceledDepartureTimes.clear(i);
     }
 
     public boolean isTimeCanceled(int i) {
