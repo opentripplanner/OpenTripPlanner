@@ -158,7 +158,7 @@ public class IndexAPI {
             return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
         }
     }
-   
+
    /** Return specific transit stop in the graph, by ID. */
    @GET
    @Path("/stops/{stopId}")
@@ -167,11 +167,11 @@ public class IndexAPI {
        Stop stop = index.stopForId.get(stopId);
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
+
    /** Return a list of all stops within a circle around the given coordinate. */
    @GET
    @Path("/stops")
@@ -198,7 +198,7 @@ public class IndexAPI {
            if (radius > MAX_STOP_SEARCH_RADIUS){
                radius = MAX_STOP_SEARCH_RADIUS;
            }
-           List<StopShort> stops = Lists.newArrayList(); 
+           List<StopShort> stops = Lists.newArrayList();
            Coordinate coord = new Coordinate(lon, lat);
            for (TransitStop stopVertex : streetIndex.getNearbyTransitStops(
                     new Coordinate(lon, lat), radius)) {
@@ -221,7 +221,7 @@ public class IndexAPI {
            for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
                stops.add(new StopShort(stopVertex.getStop()));
            }
-           return Response.status(Status.OK).entity(stops).build();           
+           return Response.status(Status.OK).entity(stops).build();
        }
    }
 
@@ -260,10 +260,11 @@ public class IndexAPI {
                                          @QueryParam("startTime") long startTime,
                                          @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
                                          @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
-                                         @QueryParam("omitNonPickups") boolean omitNonPickups) {
+                                         @QueryParam("omitNonPickups") boolean omitNonPickups,
+                                         @QueryParam("omitCanceled") boolean omitCanceled) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups, omitCanceled )).build();
     }
 
     /**
@@ -288,7 +289,7 @@ public class IndexAPI {
         List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups);
         return Response.status(Status.OK).entity(ret).build();
     }
-    
+
     /**
      * Return the generated transfers a stop in the graph, by stop ID
      */
@@ -296,7 +297,7 @@ public class IndexAPI {
     @Path("/stops/{stopId}/transfers")
     public Response getTransfers(@PathParam("stopId") String stopIdString) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
-        
+
         if (stop != null) {
             // get the transfers for the stop
             TransitStop v = index.stopVertexForStop.get(stop);
@@ -306,7 +307,7 @@ public class IndexAPI {
                     return edge instanceof SimpleTransfer;
                 }
             });
-            
+
             Collection<Transfer> out = Collections2.transform(transfers, new Function<Edge, Transfer> () {
                 @Override
                 public Transfer apply(Edge edge) {
@@ -314,13 +315,13 @@ public class IndexAPI {
                     return new Transfer((SimpleTransfer) edge);
                 }
             });
-            
+
             return Response.status(Status.OK).entity(out).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
     }
-    
+
    /** Return a list of all routes in the graph. */
    // with repeated hasStop parameters, replaces old routesBetweenStops
    @GET
@@ -352,7 +353,7 @@ public class IndexAPI {
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            return Response.status(Status.OK).entity(route).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -366,7 +367,7 @@ public class IndexAPI {
        if (route != null) {
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -384,7 +385,7 @@ public class IndexAPI {
                stops.addAll(pattern.getStops());
            }
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -402,12 +403,12 @@ public class IndexAPI {
                trips.addAll(pattern.getTrips());
            }
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
-   
+
+
     // Not implemented, results would be too voluminous.
     // @Path("/trips")
 
@@ -418,7 +419,7 @@ public class IndexAPI {
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            return Response.status(Status.OK).entity(trip).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -432,7 +433,7 @@ public class IndexAPI {
            TripPattern pattern = index.patternForTrip.get(trip);
            Collection<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -493,7 +494,7 @@ public class IndexAPI {
        TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            return Response.status(Status.OK).entity(new PatternDetail(pattern)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -505,7 +506,7 @@ public class IndexAPI {
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -518,7 +519,7 @@ public class IndexAPI {
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
@@ -547,7 +548,7 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
-    }    
+    }
 
     // TODO include pattern ID for each trip in responses
 
@@ -685,10 +686,10 @@ public class IndexAPI {
     private static class Transfer {
         /** The stop we are connecting to */
         public String toStopId;
-        
+
         /** the on-street distance of the transfer (meters) */
         public double distance;
-        
+
         /** Make a transfer from a simpletransfer edge from the graph. */
         public Transfer(SimpleTransfer e) {
             toStopId = GtfsLibrary.convertIdToString(((TransitStop) e.getToVertex()).getStopId());
