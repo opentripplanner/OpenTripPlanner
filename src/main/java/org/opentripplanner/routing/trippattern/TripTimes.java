@@ -84,6 +84,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     int[] departureTimes;
 
+    BitSet canceledArrivalTimes;
+
+    BitSet canceledDepartureTimes;
+
     /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
      * the stops. Despite the face that the StopPattern or TripPattern enclosing this TripTimes
@@ -114,6 +118,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
         final BitSet timepoints = new BitSet(nStops);
+
+        canceledArrivalTimes = new BitSet(nStops);
+        canceledDepartureTimes = new BitSet(nStops);
+
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
         int s = 0;
@@ -148,6 +156,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
+
+        canceledArrivalTimes = new BitSet(object.scheduledDepartureTimes.length);
+        canceledDepartureTimes = new BitSet(object.scheduledDepartureTimes.length);
     }
 
     /**
@@ -250,7 +261,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      *         information is actually available in this TripTimes.
      */
     public boolean isScheduled() {
-        return departureTimes == null && arrivalTimes == null;
+        return departureTimes == null && arrivalTimes == null && canceledArrivalTimes.isEmpty() && canceledDepartureTimes.isEmpty();
     }
 
     /**
@@ -331,9 +342,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** Cancel this entire trip */
     public void cancel() {
+        /*
         arrivalTimes = new int[getNumStops()];
         Arrays.fill(arrivalTimes, UNAVAILABLE);
         departureTimes = arrivalTimes;
+        */
+
+        canceledArrivalTimes.set(0, canceledArrivalTimes.size());
+        canceledDepartureTimes.set(0, canceledDepartureTimes.size());
 
         // Update the real-time state
         realTimeState = RealTimeState.CANCELED;
@@ -405,7 +421,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     * without updates for now (frequency trips don't have updates).
     */
     public TripTimes timeShift (final int stop, final int time, final boolean depart) {
-        if (arrivalTimes != null || departureTimes != null) return null;
+        if (arrivalTimes != null || departureTimes != null || !canceledDepartureTimes.isEmpty() || !canceledArrivalTimes.isEmpty()) return null;
         final TripTimes shifted = this.clone();
         // Adjust 0-based times to match desired stoptime.
         final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
@@ -423,6 +439,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return timepoints.get(stopIndex);
     }
 
+    public boolean isCanceledArrival (final int stopIndex) {
+       return canceledArrivalTimes.get(stopIndex);
+    }
+
+    public boolean isCanceledDeparture (final int stopIndex) {
+        return canceledDepartureTimes.get(stopIndex);
+    }
+
     /**
      * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.
      * Use hops rather than stops because:
@@ -436,5 +460,24 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             hasher.putInt(getScheduledArrivalTime(hop + 1));
         }
         return hasher.hash();
+    }
+
+    public void cancelArrivalTime(int i) {
+        canceledArrivalTimes.set(i);
+    }
+    public void unCancelArrivalTime(int i) {
+        canceledArrivalTimes.clear(i);
+    }
+
+    public void cancelDepartureTime(int i) {
+        canceledDepartureTimes.set(i);
+    }
+
+    public void unCancelDepartureTime(int i) {
+        canceledDepartureTimes.clear(i);
+    }
+
+    public boolean isTimeCanceled(int i) {
+        return isCanceledArrival(i) || isCanceledDeparture(i) || isCanceled();
     }
 }

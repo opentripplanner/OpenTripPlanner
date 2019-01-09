@@ -145,8 +145,8 @@ public class TripTimesTest {
                     updatedTripTimesA.getScheduledDepartureTime(i));
             assertEquals(originalTripTimes.getArrivalTime(i),
                     updatedTripTimesA.getScheduledArrivalTime(i));
-            assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getDepartureTime(i));
-            assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getArrivalTime(i));
+            assertTrue(updatedTripTimesA.isCanceledDeparture(i));
+            assertTrue(updatedTripTimesA.isCanceledArrival(i));
         }
     }
 

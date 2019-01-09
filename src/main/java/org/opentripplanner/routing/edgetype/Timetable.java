@@ -70,11 +70,11 @@ public class Timetable implements Serializable {
      */
     private transient int minDwellTimes[];
 
-    /** 
-     * Helps determine whether a particular pattern is worth searching for departures at a given time. 
+    /**
+     * Helps determine whether a particular pattern is worth searching for departures at a given time.
      */
     private transient int minTime, maxTime;
-    
+
     /** Construct an empty Timetable. */
     public Timetable(TripPattern pattern) {
         this.pattern = pattern;
@@ -149,8 +149,11 @@ public class Timetable implements Serializable {
         int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
+
+        boolean useCanceledTransit =  s0.getOptions().useCanceledTransit;
+
         for (TripTimes tt : tripTimes) {
-            if (tt.isCanceled()) continue;
+            if (tt.isCanceled() && !useCanceledTransit) continue;
             if ((tt.getNumStops() <= stopIndex)) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
@@ -158,7 +161,7 @@ public class Timetable implements Serializable {
             if (adjustedTime == -1) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
-                if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
+                if (tt.isCanceledDeparture(stopIndex) && !useCanceledTransit) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
                                            // now its not sure if this check should be still in place because there is a boolean field
                                            // for canceled trips
                 if (depTime >= adjustedTime && depTime < bestTime) {
@@ -167,7 +170,7 @@ public class Timetable implements Serializable {
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
-                if (arvTime < 0) continue;
+                if (tt.isCanceledArrival(stopIndex) && !useCanceledTransit) continue;
                 if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;
                     bestTime = arvTime;
@@ -187,7 +190,7 @@ public class Timetable implements Serializable {
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search
-                if (depTime < 0) continue; 
+                if (depTime < 0) continue;
                 if (depTime >= adjustedTime && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
@@ -344,7 +347,7 @@ public class Timetable implements Serializable {
 
     /**
      * Set new trip times for trip given a trip index
-     * 
+     *
      * @param tripIndex trip index of trip
      * @param tt new trip times for trip
      * @return old trip times of trip
@@ -374,7 +377,7 @@ public class Timetable implements Serializable {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return null;
         }
-        
+
         // Though all timetables have the same trip ordering, some may have extra trips due to
         // the dynamic addition of unscheduled trips.
         // However, we want to apply trip updates on top of *scheduled* times
@@ -460,9 +463,13 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelArrivalTime(i);
+                                newTimes.updateArrivalDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
+                                if (newTimes.isCanceledArrival(i)) {
+                                    newTimes.unCancelArrivalTime(i);
+                                }
                             }
                         }
 
@@ -486,9 +493,13 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelDepartureTime(i);
+                                newTimes.updateDepartureDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
+                                if (newTimes.isCanceledDeparture(i)) {
+                                    newTimes.unCancelDepartureTime(i);
+                                }
                             }
                         }
                     }
@@ -500,11 +511,18 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     if (delay == null) {
-                        newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                        newTimes.cancelArrivalTime(i);
+                        newTimes.cancelDepartureTime(i);
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
+                        if (newTimes.isCanceledArrival(i)) {
+                            newTimes.unCancelArrivalTime(i);
+                        }
+
                         newTimes.updateDepartureDelay(i, delay);
+                        if (newTimes.isCanceledDeparture(i)) {
+                            newTimes.unCancelDepartureTime(i);
+                        }
                     }
                 }
             }
@@ -570,7 +588,7 @@ public class Timetable implements Serializable {
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
-    
+
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
@@ -584,4 +602,4 @@ public class Timetable implements Serializable {
         }
     }
 
-} 
+}
