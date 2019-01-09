@@ -68,7 +68,6 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -760,8 +759,9 @@ public class IndexGraphQLSchema {
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
-                .name("useCanceledTransit")
-                .description("When true, return itineraries using canceled trips. Default value: false.")
+                .name("omitCanceled")
+                .description("When false, return itineraries using canceled trips. Default value: false.")
+                .defaultValue(true)
                 .type(Scalars.GraphQLBoolean)
                 .build())
             .argument(GraphQLArgument.newArgument()
@@ -1035,13 +1035,20 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitCanceled")
+                    .description("If false, returns also canceled trips")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(true)
+                    .build())
                 .dataFetcher(environment -> {
                     GraphIndex.DepartureRow departureRow = environment.getSource();
                     long startTime = environment.getArgument("startTime");
                     int timeRange = environment.getArgument("timeRange");
                     int maxDepartures = environment.getArgument("numberOfDepartures");
                     boolean omitNonPickups = environment.getArgument("omitNonPickups");
-                    return departureRow.getStoptimes(index, startTime, timeRange, maxDepartures, omitNonPickups);
+                    boolean omitCanceled = environment.getArgument("omitCanceled");
+                    return departureRow.getStoptimes(index, startTime, timeRange, maxDepartures, omitNonPickups, omitCanceled);
                 })
                 .build())
             .build();
@@ -1191,7 +1198,8 @@ public class IndexGraphQLSchema {
                         environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
                         environment.getArgument("numberOfDepartures"),
-                        environment.getArgument("omitNonPickups")))
+                        environment.getArgument("omitNonPickups"),
+                        environment.getArgument("omitCanceled")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("gtfsId")
@@ -1398,10 +1406,16 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
-		    .description("If true, only those departures which allow boarding are returned")
+		            .description("If true, only those departures which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("omitCanceled")
+                        .description("If false, returns also canceled trips")
+                        .type(Scalars.GraphQLBoolean)
+                        .defaultValue(true)
+                        .build())
                 .dataFetcher(environment -> {
                     Stop stop = environment.getSource();
                     if (stop.getLocationType() == 1) {
@@ -1414,7 +1428,8 @@ public class IndexGraphQLSchema {
                                     environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"),
-                                    environment.getArgument("omitNonPickups"))
+                                    environment.getArgument("omitNonPickups"),
+                                    environment.getArgument("omitCanceled"))
                                 .stream()
                             )
                             .collect(Collectors.toList());
@@ -1423,7 +1438,8 @@ public class IndexGraphQLSchema {
                         environment.getArgument("startTime"),
                         environment.getArgument("timeRange"),
                         environment.getArgument("numberOfDepartures"),
-                        environment.getArgument("omitNonPickups"));
+                        environment.getArgument("omitNonPickups"),
+                        environment.getArgument("omitCanceled"));
 
                 })
                 .build())
@@ -1450,9 +1466,15 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
-		    .description("If true, only those departures which allow boarding are returned")
+		            .description("If true, only those departures which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("omitCanceled")
+                    .description("If false, returns also canceled trips")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(true)
                     .build())
                 .dataFetcher(environment -> {
                     Stop stop = environment.getSource();
@@ -1466,7 +1488,8 @@ public class IndexGraphQLSchema {
                                     environment.getArgument("startTime"),
                                     environment.getArgument("timeRange"),
                                     environment.getArgument("numberOfDepartures"),
-                                    environment.getArgument("omitNonPickups"))
+                                    environment.getArgument("omitNonPickups"),
+                                    environment.getArgument("omitCanceled"))
                                     .stream()
                             );
                     }
@@ -1476,7 +1499,8 @@ public class IndexGraphQLSchema {
                             environment.getArgument("startTime"),
                             environment.getArgument("timeRange"),
                             environment.getArgument("numberOfDepartures"),
-                            environment.getArgument("omitNonPickups")
+                            environment.getArgument("omitNonPickups"),
+                            environment.getArgument("omitCanceled")
                         ).stream();
                     }
                     return stream.flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
@@ -3286,7 +3310,7 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((Leg)environment.getSource()).realTime)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("realTimeState")
+                .name("realtimeState")
                 .description("State of real-time data")
                 .type(realtimeStateEnum)
                 .dataFetcher(environment -> ((Leg)environment.getSource()).realTimeState)
