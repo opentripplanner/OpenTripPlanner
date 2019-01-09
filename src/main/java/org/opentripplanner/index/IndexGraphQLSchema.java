@@ -760,7 +760,7 @@ public class IndexGraphQLSchema {
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("omitCanceled")
-                .description("When false, return itineraries using canceled trips. Default value: false.")
+                .description("When false, return itineraries using canceled trips. Default value: true.")
                 .defaultValue(true)
                 .type(Scalars.GraphQLBoolean)
                 .build())
