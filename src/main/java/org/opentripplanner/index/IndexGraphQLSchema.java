@@ -1188,10 +1188,16 @@ public class IndexGraphQLSchema {
                     .build())
                 .argument(GraphQLArgument.newArgument()
                     .name("omitNonPickups")
-		    .description("If true, only those departures which allow boarding are returned")
+		            .description("If true, only those departures which allow boarding are returned")
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("omitCanceled")
+                        .description("If false, returns also canceled trips")
+                        .type(Scalars.GraphQLBoolean)
+                        .defaultValue(true)
+                        .build())
                 .dataFetcher(environment ->
                     index.stopTimesForPattern(environment.getSource(),
                         index.patternForId.get(environment.getArgument("id")),
@@ -1363,6 +1369,12 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLBoolean)
                     .defaultValue(false)
                     .build())
+            .argument(GraphQLArgument.newArgument()
+                    .name("omitCanceled")
+                    .description("If false, returns also canceled trips")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(true)
+                    .build())
                 .dataFetcher(environment -> {
                     ServiceDate date;
                     try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
@@ -1411,11 +1423,11 @@ public class IndexGraphQLSchema {
                     .defaultValue(false)
                     .build())
                 .argument(GraphQLArgument.newArgument()
-                        .name("omitCanceled")
-                        .description("If false, returns also canceled trips")
-                        .type(Scalars.GraphQLBoolean)
-                        .defaultValue(true)
-                        .build())
+                    .name("omitCanceled")
+                    .description("If false, returns also canceled trips")
+                    .type(Scalars.GraphQLBoolean)
+                    .defaultValue(true)
+                    .build())
                 .dataFetcher(environment -> {
                     Stop stop = environment.getSource();
                     if (stop.getLocationType() == 1) {
