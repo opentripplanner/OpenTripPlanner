@@ -162,6 +162,9 @@ class AreaGroup {
     }
 
     public OSMWithTags getSomeOSMObject() {
+        if (!areas.iterator().hasNext()) {
+            throw new IllegalArgumentException("No OSM object available.");
+        }
         return areas.iterator().next().parent;
     }
 }
