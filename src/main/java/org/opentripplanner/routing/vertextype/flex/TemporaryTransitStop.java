@@ -1,10 +1,7 @@
 package org.opentripplanner.routing.vertextype.flex;
 
-import com.google.common.collect.Iterables;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -14,8 +11,8 @@ public class TemporaryTransitStop extends TransitStop implements TemporaryVertex
     // stop is *at* a street vertex
     private StreetVertex streetVertex;
 
-    public TemporaryTransitStop(Graph graph, Stop stop, StreetVertex streetVertex) {
-        super(graph, stop);
+    public TemporaryTransitStop(Stop stop, StreetVertex streetVertex) {
+        super(null, stop);
         this.streetVertex = streetVertex;
     }
 

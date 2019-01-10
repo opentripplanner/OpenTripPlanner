@@ -278,7 +278,7 @@ public abstract class GtfsFlexGraphModifier {
         flagStop.setLon(v.getLon());
         flagStop.setName(name);
         flagStop.setLocationType(99);
-        TemporaryTransitStop flagTransitStop = new TemporaryTransitStop(graph, flagStop, v);
+        TemporaryTransitStop flagTransitStop = new TemporaryTransitStop(flagStop, v);
         rctx.temporaryVertices.add(flagTransitStop);
         return flagTransitStop;
     }
@@ -371,7 +371,7 @@ public abstract class GtfsFlexGraphModifier {
         if (transitStop.departVertex == null) {
             new TemporaryStreetTransitLink(transitStop.getStreetVertex(), transitStop, true);
 
-            transitStopDepart = new TemporaryTransitStopDepart(graph, transitStop.getStop(), transitStop);
+            transitStopDepart = new TemporaryTransitStopDepart(transitStop.getStop(), transitStop);
             rr.rctx.temporaryVertices.add(transitStopDepart);
             new TemporaryPreBoardEdge(transitStop, transitStopDepart);
 
@@ -384,7 +384,7 @@ public abstract class GtfsFlexGraphModifier {
 
     private TemporaryPatternDepartVertex createPatternDepartVertex(RoutingRequest rr, PatternHop hop, Stop stop) {
         TemporaryPatternDepartVertex patternDepartVertex =
-                new TemporaryPatternDepartVertex(graph, hop.getPattern(), hop.getStopIndex(), stop);
+                new TemporaryPatternDepartVertex(hop.getPattern(), hop.getStopIndex(), stop);
         rr.rctx.temporaryVertices.add(patternDepartVertex);
         return patternDepartVertex;
     }
@@ -407,7 +407,7 @@ public abstract class GtfsFlexGraphModifier {
         if (transitStop.arriveVertex == null) {
             new TemporaryStreetTransitLink(transitStop, transitStop.getStreetVertex(), true);
 
-            transitStopArrive = new TemporaryTransitStopArrive(graph, transitStop.getStop(), transitStop);
+            transitStopArrive = new TemporaryTransitStopArrive(transitStop.getStop(), transitStop);
             rr.rctx.temporaryVertices.add(transitStopArrive);
             new TemporaryPreAlightEdge(transitStopArrive, transitStop);
 
@@ -420,7 +420,7 @@ public abstract class GtfsFlexGraphModifier {
 
     private TemporaryPatternArriveVertex createPatternArriveVertex(RoutingRequest rr, FlexPatternHop hop, Stop stop) {
         TemporaryPatternArriveVertex patternArriveVertex =
-                new TemporaryPatternArriveVertex(graph, hop.getPattern(), hop.getStopIndex() + 1, stop);
+                new TemporaryPatternArriveVertex(hop.getPattern(), hop.getStopIndex() + 1, stop);
         rr.rctx.temporaryVertices.add(patternArriveVertex);
         return patternArriveVertex;
     }
