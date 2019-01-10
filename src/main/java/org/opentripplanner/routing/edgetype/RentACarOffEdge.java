@@ -13,11 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Vertex;
-
-import java.util.Set;
 
 /**
  * Dropping off a rented car edge.
@@ -31,18 +31,31 @@ public class RentACarOffEdge extends RentACarAbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RentACarOffEdge(Vertex from, Vertex to, Set<String> networks) {
-        super(from, to, networks);
+    public RentACarOffEdge(Vertex v, CarRentalStation station) {
+        super(v, station);
     }
 
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
+
+        if (!s0.isCarRentalDropoffAllowed(!station.isBorderDropoff))
+            return null;
+
+        // make sure there is at least one spot to park at the station
+        if (options.useCarRentalAvailabilityInformation && station.spacesAvailable == 0)
+            return null;
+
+        StateEditor s1e = s0.edit(this);
         if (options.arriveBy) {
-            return super.traverseRent(s0);
+            s1e.beginCarRenting(0, station.networks, !station.isBorderDropoff);
         } else {
-            return super.traverseDropoff(s0);
+            s1e.endCarRenting();
         }
+        s1e.incrementWeight(options.carRentalDropoffCost);
+        s1e.incrementTimeInSeconds(options.carRentalDropoffTime);
+        State s1 = s1e.makeState();
+        return s1;
     }
 
     public boolean equals(Object o) {

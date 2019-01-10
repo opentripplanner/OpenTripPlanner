@@ -312,9 +312,9 @@ public class StreetEdge extends Edge implements Cloneable {
             // Irrevocable transition from using hailed car to walking.
             // Final CAR check needed to prevent infinite recursion.
             if (
-                s0.isUsingHailedCar()
-                    && !getPermission().allows(TraverseMode.CAR)
-                    && currMode == TraverseMode.CAR
+                s0.isUsingHailedCar() &&
+                    !getPermission().allows(TraverseMode.CAR) &&
+                    currMode == TraverseMode.CAR
             ) {
                 if (!s0.isTNCStopAllowed()) {
                     return null;
@@ -327,10 +327,10 @@ public class StreetEdge extends Edge implements Cloneable {
             }
             // possible transition to hailing a car
             else if (
-                !s0.isUsingHailedCar()
-                    && getPermission().allows(TraverseMode.CAR)
-                    && currMode != TraverseMode.CAR
-                    && getTNCStopSuitability()
+                !s0.isUsingHailedCar() &&
+                    getPermission().allows(TraverseMode.CAR) &&
+                    currMode != TraverseMode.CAR &&
+                    getTNCStopSuitability()
             ) {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip
@@ -381,19 +381,51 @@ public class StreetEdge extends Edge implements Cloneable {
             // Irrevocable transition from using rented car to walking.
             // Final CAR check needed to prevent infinite recursion.
             if (
-                s0.isCarRenting()
-                    && !getPermission().allows(TraverseMode.CAR)
-                    && currMode == TraverseMode.CAR
-                ) {
-
-                // Make sure car rental dropoff is allowed at this location
-                if (!s0.isCarRentalDropoffAllowed()) {
-                    return null;
-                }
+                s0.isCarRenting() &&
+                    !getPermission().allows(TraverseMode.CAR) &&
+                    currMode == TraverseMode.CAR &&
+                    // if in "arrive by" mode, the search is progressing backwards while in a car
+                    // rental state, but encounters an edge that cannot be traversed using a car
+                    // before encountering a car rental pickup station.  Therefore, this search
+                    // cannot proceed.
+                    !options.arriveBy &&
+                    s0.isCarRentalDropoffAllowed(this, false)
+            ) {
                 editor = doTraverse(s0, options, TraverseMode.WALK);
                 if (editor != null) {
-                    editor.alightRentedCar(); // done with car rental use for now
+                    editor.endCarRenting(); // done with car rental use for now
                     return editor.makeState(); // return only the state with updated rental car usage
+                }
+            }
+            // possible transition to dropping off a floating car when in "arrive by" mode
+            else if (
+                !s0.isCarRenting() &&
+                    getPermission().allows(TraverseMode.CAR) &&
+                    currMode != TraverseMode.CAR &&
+                    options.arriveBy &&
+                    s0.isCarRentalDropoffAllowed(this, false)
+            ) {
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    // begin car rental usage.
+                    editorCar.incrementWeight(options.carRentalDropoffCost);
+                    editorCar.incrementTimeInSeconds(options.carRentalDropoffTime);
+                    editorCar.beginCarRenting(getDistance(), carNetworks, true);
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
                 }
             }
         }

@@ -513,9 +513,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String minTransitDistance;
 
-    // setting of allowing a dropoff anywhere regardless of a compatible car rental region
-    //  (ie planning a trip with a rental car with the intent to keep the car and drive it later)
-    public boolean allowCarRentalDropoffOutsideCarRentalRegion = false;
+    // setting of allowing a dropoff anywhere regardless of whether the dropoff point is a
+    // designated dropoff area or if driving a car with floating dropoff capabilities outside the
+    // car rental region.  This means the user is planning a trip with a rental car with the intent
+    // to keep the car and drive it back to an allowable dropoff point in a later trip.
+    public boolean allowCarRentalDropoffAnywhere = false;
 
     // allow custom shortest path search timeouts
     // set to -1 by default which means don't use a custom timeout

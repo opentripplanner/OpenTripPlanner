@@ -196,9 +196,9 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             }
             verticesByStation.put(station, vertex);
             if (station.allowPickup)
-                new RentACarOnEdge(vertex, vertex, station.networks);
+                new RentACarOnEdge(vertex, station);
             if (station.allowDropoff)
-                new RentACarOffEdge(vertex, vertex, station.networks);
+                new RentACarOffEdge(vertex, station);
         }
 
         public void applyRegions(Graph graph) {
@@ -290,7 +290,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                     return;
                 }
                 service.addCarRentalStation(station);
-                new RentACarOffEdge(vertex, vertex, networks);
+                new RentACarOffEdge(vertex, station);
             });
         }
 

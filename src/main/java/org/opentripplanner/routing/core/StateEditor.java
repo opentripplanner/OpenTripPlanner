@@ -592,16 +592,22 @@ public class StateEditor {
         child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
     }
 
-    public void alightRentedCar() {
+    public void endCarRenting() {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedCar = false;
         child.stateData.nonTransitMode = TraverseMode.WALK;
     }
 
-    public void boardRentedCar(double initialEdgeDistance) {
+    public void beginCarRenting(
+        double initialEdgeDistance,
+        Set<String> networks,
+        boolean rentedCarAllowsFloatingDropoffs
+    ) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedCar = true;
         child.stateData.nonTransitMode = TraverseMode.CAR;
+        child.stateData.carRentalNetworks = networks;
+        child.stateData.rentedCarAllowsFloatingDropoffs = rentedCarAllowsFloatingDropoffs;
         if (child.getOptions().arriveBy) {
             if (child.isEverBoarded()) {
                 child.stateData.hasRentedCarPreTransit = true;
@@ -639,11 +645,6 @@ public class StateEditor {
         } else {
             child.stateData.nonTransitMode = TraverseMode.WALK;
         }
-    }
-
-    public void setCarRentalNetwork(Set<String> networks) {
-        cloneStateDataAsNeeded();
-        child.stateData.carRentalNetworks = networks;
     }
 
     public void addRentedCar(String carId) {
