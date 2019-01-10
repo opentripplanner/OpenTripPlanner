@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -16,6 +18,7 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,72 @@ import java.util.Map;
  *
  * Note that the backward search does not happen in a separate thread. It is interleaved with the main search in a
  * ratio of N:1 iterations.
+ *
+ * This heuristic effectively makes traversal off non-transit vertices far away from the origin and
+ * destination impossible by returning an estimated weight of Inifinity for vertices not within
+ * walking or driving distance of the origin or destination.  The heuristic is initialized before
+ * the main graph search and attempts to discover all non-transit verticies up to a certain limit.
+ * Transit vertices are also explored, but only during the main graph search in the
+ * {@link InterleavedBidirectionalHeuristic#doSomeWork} method.  During the main graph search, this
+ * heuristic is asked to estimate a remaining weight which it derives from estimating weights on all
+ * types of vertices.
+ *
+ * The limits encountered are currently either the {@link RoutingRequest#maxWalkDistance} or the
+ * {@link RoutingRequest#maxPreTransitTime}.  The maxWalkDistance currently applies to both walking
+ * and bicycling.  When traversing the network in a car, the maxWalkDistance is not incremented.
+ * To mask off excessive travel by car, the maxPreTransitTime is used as a limiter.  However for
+ * driving a car after using transit (for example with either a TNC, car rental or ride and kiss)
+ * a limitation is added in {@link InterleavedBidirectionalHeuristic#streetSearch} to stop searching
+ * through the graph once the origin has been found.
+ *
+ * In order for this heuristic to return the proper estimated weights, it must be sensitive to the
+ * current mode.  In Park and Ride searches, the amount of vertices explored while driving will
+ * greatly outnumber those found while walking up to the maxWalkDistance assuming default parameter
+ * values.  Therefore in the {@link InterleavedBidirectionalHeuristic#estimateRemainingWeight}
+ * method, a mode-specific weight is returned when a non-transit vertex is being evaluated.
+ *
+ * Shown below are a few visualizations of what the heuristic will do in various searches.
+ *
+ * Key:
+ * O = origin vertex
+ * D = destination vertex
+ * W = reachable by walking up to maxWalkDistance
+ * C = reachable by car up to the maxPreTransitTime
+ * B = reachable by car or walking
+ * - = vertices unreachable by either mode
+ *
+ * In a simple TRANSIT,WALK search, only the vertices within walking distance are marked as
+ * reachable by the heuristic.
+ *
+ * ----------------
+ * ----WWW-----WWW-
+ * ----WOW-----WDW-
+ * ----WWW-----WWW-
+ * ----------------
+ *
+ * In a TRANSIT,WALK,CAR (park and ride) search, there will be vertices reachable by both walking
+ * and driving, some only by walking and some only reachable by driving.  The park and ride search
+ * does not allow driving after transit, so the vertices around the destination are only reachable
+ * by walking.
+ *
+ * ----CCC---------
+ * ---CBBBC----WWW-
+ * ---CBOWCC---WDW-
+ * ---CBWWCC---WWW-
+ * ----CCCC--------
+ *
+ * In a TRANSIT,WALK,CAR_HAIL (transit + TNC) search, there are many more vertices explored while
+ * searching from the destination in this current implementation.  The preTransitVertices may still
+ * look about the same as the above graphic, but the postBoardingWeights could look as follows:
+ *
+ * --------CCCCCCC-
+ * ------CCCCCCBBBC
+ * -----OCCCC--WDBC
+ * ------CCCCC-BWBC
+ * -------CCCCCCCCC
+ *
+ * This heuristic is espeically useful for large graphs, but could be turned off entirely for small
+ * graphs.
  */
 public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
@@ -67,17 +136,24 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     /** The vertex that the main search is working towards. */
     Vertex target;
 
-    /** All vertices within walking (or driving) distance of the origin (the vertex at which the main search begins). */
+    /**
+     * All vertices within walking (or driving) distance of the origin (the vertex at which the
+     * main search begins).
+     */
     Map<Vertex, VertexModeWeight> preTransitVertices;
 
     /**
-     * A lower bound on the weight of the lowest-cost path to the target (the vertex at which the main search ends)
-     * from each vertex within walking distance of the target. As the heuristic progressively improves, this map will
-     * include lower bounds on path weights for an increasing number of vertices on board transit.
-     * In order to reuse logic from the {@link InterleavedBidirectionalHeuristic#streetSearch} the
-     * weights per mode are stored as well.
+     * A lower bound on the weight of the lowest-cost path to the target (the vertex at which the
+     * main search ends) from each vertex within walking (or driving) distance of the target. This
+     * map used to also store transit vertex weights, but that data is now stored in
+     * {@link InterleavedBidirectionalHeuristic#transitVertexWeights}.
      */
     Map<Vertex, VertexModeWeight> postBoardingWeights;
+
+    /**
+     * A map of weights seen at only transit vertices.
+     */
+    TObjectDoubleMap<Vertex> transitVertexWeights;
 
     Graph graph;
 
@@ -134,6 +210,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // for trips near the cutoff.
         request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
         request.setMaxPreTransitTime(Integer.MAX_VALUE);
+
+        // initialize the transit vertices to be an empty map.  Transit vertices will be added later
+        // in the doSomeWork method.
+        transitVertexWeights = new TObjectDoubleHashMap<>(100, 0.5f, Double.POSITIVE_INFINITY);
+
         LOG.debug("initialized SSSP");
         request.rctx.debugOutput.finishedPrecalculating();
     }
@@ -142,14 +223,17 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * This function supplies the main search with an (under)estimate of the remaining path weight to the target.
      * No matter how much progress has been made on the reverse heuristic search, we must return an underestimate
      * of the cost to reach the target (i.e. the heuristic must be admissible).
-     * All on-street vertices within walking distance of the origin or destination will have been explored by the
-     * heuristic before the main search starts.
+     * All on-street vertices within walking (or driving) distance of the origin or destination will
+     * have been explored by the heuristic before the main search starts.
      */
     @Override
     public double estimateRemainingWeight (State s) {
         final Vertex v = s.getVertex();
-        if (v instanceof StreetLocation) {
-            // Temporary vertices (StreetLocations) might not be found in the street searches.
+        if (v instanceof StreetLocation || v instanceof TemporaryVertex) {
+            // Temporary vertices or StreetLocations might not be found in the street searches.
+            // These can be temporary vertices created for the origin or destination vertex or also
+            // the temporary vertices that link the split street to the origin/destination.  This
+            // can also include other vertices used to create items such as bike rental stations.
             // Zero is always an underestimate.
             return 0;
         }
@@ -162,8 +246,20 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         ) {
             // The main search is not on transit.
             if (s.isEverBoarded()) {
-                // If we have already ridden transit we must be near the destination. If not the map returns INF.
-                return getLowestPostBoardingWeightForVertex(v);
+                // If we have already ridden transit we must be near the destination. Return the
+                // mode-dependent weight found during the heuristic initialization or infinity if
+                // the vertex was unreachable during the heuristic initialization.
+                if (postBoardingWeights.containsKey(v)) {
+                    VertexModeWeight weight = postBoardingWeights.get(v);
+                    TraverseMode nonTransitMode = s.getNonTransitMode();
+                    if (nonTransitMode != null && nonTransitMode.isDriving()) {
+                        return weight.carWeight;
+                    } else {
+                        return weight.walkWeight;
+                    }
+                } else {
+                    return Double.POSITIVE_INFINITY;
+                }
             } else {
                 // We have not boarded transit yet. We have no idea what the weight to the target is,
                 // therefore if the heuristic reached this vertex in the initial search we return 0.
@@ -186,10 +282,13 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 }
             }
         } else {
-            // The main search is not currently on a street vertex, it's probably on transit.
-            // If the current part of the transit network has been explored, then return the stored lower bound.
-            // Otherwise return the highest lower bound yet seen -- this location must have a higher cost than that.
-            double h = getLowestPostBoardingWeightForVertex(v);
+            // The main search is not currently on a street vertex, it's on transit.  Or if some
+            // vertex has been reached that is not related to transit, this bit of code has likely
+            // been reached in error.  All non-transit vertices should instead be included in the
+            // corresponding if clause associated with the above else statement.  If the current
+            // vertex has been explored, then return the stored lower bound.  Otherwise return the
+            // highest lower bound yet seen -- this location must have a higher cost than that.
+            double h = transitVertexWeights.get(v);
             if (h == Double.POSITIVE_INFINITY) {
                 return maxWeightSeen;
             } else {
@@ -221,12 +320,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             maxWeightSeen = uWeight;
             // Now that this vertex is closed, we can store its weight for use as a lower bound / heuristic value.
             // We don't implement decrease-key operations though, so check whether a smaller value is already known.
-            double uWeightOld = getLowestPostBoardingWeightForVertex(u);
+            double uWeightOld = transitVertexWeights.get(u);
             if (uWeight < uWeightOld) {
                 // Including when uWeightOld is infinite because the vertex is not yet closed.
-                VertexModeWeight newWeight = new VertexModeWeight();
-                newWeight.walkWeight = uWeight;
-                postBoardingWeights.put(u, newWeight);
+                transitVertexWeights.put(u, uWeight);
             } else {
                 // The vertex was already closed. This time it necessarily has a higher weight, so skip it.
                 continue;
@@ -246,7 +343,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                     continue;
                 }
                 double vWeight = uWeight + edgeWeight;
-                double vWeightOld = getLowestPostBoardingWeightForVertex(v);
+                double vWeightOld = transitVertexWeights.get(v);
                 if (vWeight < vWeightOld) {
                     // Should only happen when vWeightOld is infinite because it is not yet closed.
                     transitQueue.insert(v, vWeight);
@@ -331,7 +428,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             // We don't test whether we're on an instanceof StreetVertex here because some other vertex types
             // (park and ride or bike rental related) that should also be explored and marked as usable.
-            // Record the cost to reach this vertex.
+
+            // Get the mode-dependent weights for the current vertex, or create an instance if this
+            // vertex hasn't been explored yet.
             VertexModeWeight weights;
             if (!vertices.containsKey(v)) {
                 weights = new VertexModeWeight();
@@ -339,15 +438,20 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             } else {
                 weights = vertices.get(v);
             }
+
+            // Set the weight depending on the current non-transit mode
             TraverseMode nonTransitMode = s.getNonTransitMode();
             if (nonTransitMode != null && s.getNonTransitMode().isDriving()) {
                 weights.carWeight = s.getWeight();
             } else {
                 weights.walkWeight = s.getWeight();
             }
-            // if searching from the target and traveling via car and the origin has been reached, immediately return
-            // the vertices so that the entire graph isn't searched.
+
+            // if searching from the target and traveling via car and the origin has been reached,
+            // immediately return the vertices so that the entire graph isn't searched.
             if (fromTarget && rr.modes.getCar() && v == rr.rctx.origin) break;
+
+            // Attempt to traverse all edges going in the direction desired
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
                 // arriveBy has been set to match actual directional behavior in this subsearch.
                 // Max walk distance cutoff or pre transit time cutoff will happen in the street
@@ -366,16 +470,12 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         return vertices;
     }
 
-    private double getLowestPostBoardingWeightForVertex(Vertex v) {
-        if (postBoardingWeights.containsKey(v)) {
-            VertexModeWeight weight = postBoardingWeights.get(v);
-            return Math.min(weight.carWeight, weight.walkWeight);
-        } else {
-            return Double.POSITIVE_INFINITY;
-        }
-    }
-
-    class VertexModeWeight {
+    /**
+     * A simple class to keep track of mode-specific weights at vertices explored during in the
+     * {@link InterleavedBidirectionalHeuristic#streetSearch} method.  Values are set to infinity
+     * by default to indicate an unreachable vertex.
+     */
+    static class VertexModeWeight {
         public double walkWeight = Double.POSITIVE_INFINITY;
         public double carWeight = Double.POSITIVE_INFINITY;
     }
