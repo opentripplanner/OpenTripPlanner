@@ -7,6 +7,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -38,8 +39,13 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
         setVehicleNetworks(parentEdge.getVehicleNetworks());
         setFloatingVehicleDropoffSuitability(parentEdge.getFloatingVehicleDropoffSuitability());
         this.parentEdge = parentEdge;
+
+        // Initialize length_mm from Geometry
+        if(getLength_mm() == 0) {
+            calculateLengthFromGeometry();
+        }
+        setElevationProfileUsingParents();
     }
-    
 
     //For testing only
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
@@ -197,5 +203,14 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
         return "PartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+    }
+
+    private void setElevationProfileUsingParents() {
+        setElevationProfile(
+                ElevationUtils.getPartialElevationProfile(
+                        getParentEdge().getElevationProfile(), 0, getDistance()
+                ),
+                false
+        );
     }
 }
