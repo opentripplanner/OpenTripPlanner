@@ -405,9 +405,7 @@ public class SimpleStreetSplitter {
                 edge);
         }
 
-        // make the edges
-        // TODO this is using the StreetEdge implementation of split, which will discard elevation information
-        // on edges that have it
+        // make the edges on edges that have it
         P2<StreetEdge> edges = edge.split(v, !temporarySplit);
 
         if (destructiveSplitting) {
