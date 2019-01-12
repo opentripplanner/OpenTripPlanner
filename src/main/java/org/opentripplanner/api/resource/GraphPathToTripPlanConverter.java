@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
@@ -959,6 +960,10 @@ public abstract class GraphPathToTripPlanConverter {
             if (forwardState.getBackMode() == null || !forwardState.getBackMode().isOnStreetNonTransit()) {
                 continue; // ignore STLs and the like
             }
+            // ignore ElevatorBoardEdges, narratives for elevators only come from ElevatorAlightEdges
+            if (edge instanceof ElevatorBoardEdge)
+                continue;
+
             Geometry geom = edge.getGeometry();
             if (geom == null) {
                 continue;
@@ -1169,9 +1174,7 @@ public abstract class GraphPathToTripPlanConverter {
                             // in this case, we're definitely staying on the same street 
                             // (since it's zag removal, the street names are the same)
                             lastStep.stayOn = true;
-                        }
-                                
-                        else {
+                        } else if (!twoBack.relativeDirection.equals(RelativeDirection.ELEVATOR)) {
                             // What is a zag? TODO write meaningful documentation for this.
                             // It appears to mean simplifying out several rapid turns in succession
                             // from the description.
