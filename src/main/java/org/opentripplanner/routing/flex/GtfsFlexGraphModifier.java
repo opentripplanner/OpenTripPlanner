@@ -149,7 +149,6 @@ public abstract class GtfsFlexGraphModifier {
      */
     public void createForwardHops(RoutingRequest request) {
         RoutingRequest forward = request.clone();
-        forward.excludeWalking = false;
         forward.setMode(getMode());
         forward.setArriveBy(false);
         // allow discovery of stations even with car mode
@@ -164,7 +163,6 @@ public abstract class GtfsFlexGraphModifier {
      */
     public void createBackwardHops(RoutingRequest request) {
         RoutingRequest backward = request.clone();
-        backward.excludeWalking = false;
         backward.setMode(getMode());
         backward.setArriveBy(true);
         backward.enterStationsWithCar = true;

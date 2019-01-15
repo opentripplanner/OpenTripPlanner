@@ -461,9 +461,6 @@ public abstract class RoutingResource {
         if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
             request.maxTransferWalkDistance = maxWalkDistance;
-            if (maxWalkDistance == 0.0) {
-                request.excludeWalking = true;
-            }
         }
 
         if (maxPreTransitTime != null)

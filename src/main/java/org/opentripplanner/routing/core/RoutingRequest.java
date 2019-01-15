@@ -575,14 +575,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean enterStationsWithCar = false;
 
     /**
-     * Totally exclude walking from trip plan results. This should likely be false for the
-     * majority of applications; however, when GTFS-Flex is enabled, customers may wish to avoid
-     * walking at all costs (perhaps due to age or disability), which can be accomodated via call-
-     * and-ride service.
-     */
-    public boolean excludeWalking = false;
-
-    /**
      * Minimum length in meters of partial hop edges. This parameter only applies to GTFS-Flex
      * routing, which must be explicitly turned on via the useFlexService parameter in router-
      * config.json.
@@ -1172,7 +1164,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && flexUseReservationServices == other.flexUseReservationServices
                 && flexUseEligibilityServices == other.flexUseEligibilityServices
                 && flexIgnoreDrtAdvanceBookMin == other.flexIgnoreDrtAdvanceBookMin
-                && excludeWalking == other.excludeWalking
                 && flexMinPartialHopLength == other.flexMinPartialHopLength
                 && clockTimeSec == other.clockTimeSec;
     }
@@ -1215,7 +1206,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + Boolean.hashCode(flexUseReservationServices) * 92429033
                 + Boolean.hashCode(flexUseEligibilityServices) * 7916959
                 + Boolean.hashCode(flexIgnoreDrtAdvanceBookMin) * 179992387
-                + Boolean.hashCode(excludeWalking) * 989684221
                 + Integer.hashCode(flexMinPartialHopLength) * 15485863
                 + Long.hashCode(clockTimeSec) * 833389
                 + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
@@ -1323,7 +1313,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
-        if (maxWalkDistance > 0) {
+        if (maxWalkDistance >= 0) {
             this.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
         }
