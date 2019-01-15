@@ -93,8 +93,10 @@ public class Place {
     public String bikeShareId;
 
     /**
-     * Type of board or alight. This will be "default" in most cases. Currently the only non-
-     * default values are for GTFS-Flex.
+     * This is an optional field which can be used to distinguish among ways a passenger's
+     * boarding or alighting at a stop can differ among services operated by a transit agency.
+     * This will be "default" in most cases. Currently the only non-default values are for
+     * GTFS-Flex board or alight types.
      */
     public BoardAlightType boardAlightType;
 

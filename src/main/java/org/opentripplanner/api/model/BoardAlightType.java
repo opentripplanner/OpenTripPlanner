@@ -1,9 +1,10 @@
 package org.opentripplanner.api.model;
 
 /**
- * Represent type of board/alight at a stop. The majority of boarding and alightings will be of
- * type "default" -- a regular boarding or alighting at a regular transit stop. Currently, the
- * only non-default types are related to GTFS-Flex, but this pattern can be extended as necessary.
+ * Distinguish between special ways a passenger may board or alight at a stop. The majority of
+ * boardings and alightings will be of type "default" -- a regular boarding or alighting at a
+ * regular transit stop. Currently, the only non-default types are related to GTFS-Flex, but this
+ * pattern can be extended as necessary.
  */
 public enum BoardAlightType {
 
@@ -13,7 +14,7 @@ public enum BoardAlightType {
     DEFAULT,
 
     /**
-     * A flag-stop boarding or alighting, e.g. flagging the bus down or a passegner asking the bus
+     * A flag-stop boarding or alighting, e.g. flagging the bus down or a passenger asking the bus
      * driver for a drop-off between stops. This is specific to GTFS-Flex.
      */
     FLAG_STOP,

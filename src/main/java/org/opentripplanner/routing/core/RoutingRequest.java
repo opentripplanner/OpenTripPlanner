@@ -497,9 +497,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * In GTFS-Flex, deviated-route and call-and-ride service can define a trip-level parameter
      * `drt_advance_book_min`, which determines how far in advance the flexible segment must be
-     * scheduled. OTP will ensure that recommended boardings on those services respect that
-     * constraint, unless this parameter is set to true, which may be desired for some
-     * applications.
+     * scheduled. If `flexIgnoreDrtAdvanceBookMin = false`, OTP will only provide itineraries which
+     * are feasible based on that constraint. For example, if the current time is 1:00pm and a
+     * particular service must be scheduled one hour in advance, the earliest time the service
+     * is usable is 2:00pm.
      */
     public boolean flexIgnoreDrtAdvanceBookMin = false;
 
@@ -600,8 +601,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     private StreetEdge splitEdge = null;
 
     /**
-     * Keep track of time of request. This is currently only used by the GTFS-Flex implementation.
-     * See the javadoc for flexIgnoreDrtAdvanceBookMin for more details.
+     * Keep track of epoch time the request was created by OTP. This is currently only used by the
+     * GTFS-Flex implementation.
+     *
+     * In GTFS-Flex, deviated-route and call-and-ride service can define a trip-level parameter
+     * `drt_advance_book_min`, which determines how far in advance the flexible segment must be
+     * scheduled. If `flexIgnoreDrtAdvanceBookMin = false`, OTP will only provide itineraries which
+     * are feasible based on that constraint. For example, if the current time is 1:00pm and a
+     * particular service must be scheduled one hour in advance, the earliest time the service
+     * is usable is 2:00pm.
      */
     public long clockTimeSec;
 
