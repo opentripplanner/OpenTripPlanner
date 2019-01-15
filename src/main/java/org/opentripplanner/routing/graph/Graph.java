@@ -56,7 +56,6 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -202,9 +201,6 @@ public class Graph implements Serializable {
 
     /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
     public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
-
-    /** A speed source for traffic data */
-    public transient StreetSpeedSnapshotSource streetSpeedSource;
     
     /** How should we cluster stops? By 'proximity' or 'ParentStation' */
     public StopClusterMode stopClusterMode = StopClusterMode.proximity;

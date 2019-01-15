@@ -1161,7 +1161,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
-                && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
                 && flexFlagStopExtraPenalty == other.flexFlagStopExtraPenalty
@@ -1218,7 +1217,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + Boolean.hashCode(flexIgnoreDrtAdvanceBookMin) * 179992387
                 + Boolean.hashCode(excludeWalking) * 989684221
                 + Integer.hashCode(flexMinPartialHopLength) * 15485863
-                + Long.hashCode(clockTimeSec) * 833389;
+                + Long.hashCode(clockTimeSec) * 833389
+                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
