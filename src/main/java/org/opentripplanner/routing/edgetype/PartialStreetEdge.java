@@ -30,20 +30,33 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
      */
     private StreetEdge parentEdge;
 
-    public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+    /**
+     * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
+     * The elevation data is calculated using the 'parentEdge' and given 'length'.
+     */
+    PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
                              LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
+        this.parentEdge = parentEdge;
         setCarSpeed(parentEdge.getCarSpeed());
         setCarNetworks(parentEdge.getCarNetworks());
         setFloatingCarDropoffSuitability(parentEdge.getFloatingCarDropoffSuitability());
         setVehicleNetworks(parentEdge.getVehicleNetworks());
         setFloatingVehicleDropoffSuitability(parentEdge.getFloatingVehicleDropoffSuitability());
-        this.parentEdge = parentEdge;
+        setElevationProfileUsingParents();
+    }
 
-        // Initialize length_mm from Geometry
-        if(getLength_mm() == 0) {
-            calculateLengthFromGeometry();
-        }
+    /**
+     * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
+     * The length is calculated using the provided geometry.
+     * The elevation data is calculated using the 'parentEdge' and the calculated 'length'.
+     */
+    PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+            LineString geometry, I18NString name) {
+        super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
+        this.parentEdge = parentEdge;
+        setCarSpeed(parentEdge.getCarSpeed());
+        calculateLengthFromGeometry();
         setElevationProfileUsingParents();
     }
 
@@ -136,7 +149,7 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
     public int getId() {
         return parentEdge.getId();
     }
-    
+
     /**
      * Have the inbound angle of  their parent.
      */
