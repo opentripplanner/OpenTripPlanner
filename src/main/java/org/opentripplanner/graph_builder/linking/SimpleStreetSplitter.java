@@ -393,19 +393,13 @@ public class SimpleStreetSplitter {
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
         if (temporarySplit) {
-            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y,
-                edge, endVertex);
-            if (edge.isWheelchairAccessible()) {
-                ((TemporarySplitterVertex) v).setWheelchairAccessible(true);
-            } else {
-                ((TemporarySplitterVertex) v).setWheelchairAccessible(false);
-            }
+            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y, edge, endVertex);
         } else {
-            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
-                edge);
+            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y, edge);
         }
 
-        // make the edges on edges that have it
+        // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
+        // existing vertices
         P2<StreetEdge> edges = edge.split(v, !temporarySplit);
 
         if (destructiveSplitting) {

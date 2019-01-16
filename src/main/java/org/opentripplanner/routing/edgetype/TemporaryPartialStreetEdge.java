@@ -27,9 +27,9 @@ final public class TemporaryPartialStreetEdge extends PartialStreetEdge implemen
         }
     }
 
-    public TemporaryPartialStreetEdge(StreetEdge parentEdge, TemporarySplitterVertex v1,
-        StreetVertex v2, LineString geometry, I18NString name, double length) {
-        super(parentEdge, v1, v2, geometry, name, length);
+    TemporaryPartialStreetEdge(StreetEdge parentEdge, TemporarySplitterVertex v1,
+        StreetVertex v2, LineString geometry, I18NString name) {
+        super(parentEdge, v1, v2, geometry, name);
 
         if (v1.isEndVertex()) {
             throw new IllegalStateException("A temporary edge is directed away from an end vertex");
@@ -45,9 +45,9 @@ final public class TemporaryPartialStreetEdge extends PartialStreetEdge implemen
         }
     }
 
-    public TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1,
-        TemporarySplitterVertex v2, LineString geometry, I18NString name, double length) {
-        super(parentEdge, v1, v2, geometry, name, length);
+    TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1,
+        TemporarySplitterVertex v2, LineString geometry, I18NString name) {
+        super(parentEdge, v1, v2, geometry, name);
 
         if (!v2.isEndVertex()) {
             throw new IllegalStateException("A temporary edge is directed towards a start vertex");
