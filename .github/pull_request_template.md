@@ -4,6 +4,7 @@ To be completed by pull request submitter:
 - [ ] **roadmap**: Check the [roadmap](https://github.com/orgs/opentripplanner/projects/1) for this feature or bug. If it is not already on the roadmap, PLC will discuss as part of the review process.
 - [ ] **tests**: Have you added relevant test coverage? Are all the tests passing on [the continuous integration service (Travis CI)](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Developers-Guide.md#continuous-integration)?
 - [ ] **formatting**: Have you followed the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/master/docs/Developers-Guide.md#code-style)? 
+- [ ] **documentation**: If you are adding a new configuration option, have you added an explanation to the [configuration documentation](docs/Configuration.md) tables and sections? 
 
 To be completed by @opentripplanner/plc:
 
