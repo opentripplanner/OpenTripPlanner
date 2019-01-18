@@ -458,9 +458,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     }
 
     /**
-     * A simple class to keep track of mode-specific weights at vertices explored during in the
-     * {@link InterleavedBidirectionalHeuristic#streetSearch} method.  Values are set to infinity
-     * by default to indicate an unreachable vertex.
+     * A simple class to keep track of mode-specific lower bound weights at vertices explored during
+     * the heuristic initialization in the {@link InterleavedBidirectionalHeuristic#streetSearch}
+     * method.  Values are set to infinity by default to indicate an unreachable vertex.  These
+     * values are then used in the {@link InterleavedBidirectionalHeuristic#estimateRemainingWeight}
+     * method.
      */
     static class VertexModeWeight {
         public double walkWeight = Double.POSITIVE_INFINITY;
