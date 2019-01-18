@@ -40,13 +40,6 @@ public class SampleVertex extends StreetVertex implements TemporaryVertex  {
     }
 
     @Override
-    public void dispose() {
-        for (Object temp : getOutgoing()) {
-            ((TemporaryEdge) temp).dispose();
-        }
-    }
-
-    @Override
     public String getLabel () {
         return "sample-" + getIndex();
     }

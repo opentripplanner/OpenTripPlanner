@@ -16,8 +16,7 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
 
     final private boolean endVertex;
 
-    public TemporarySplitterVertex(Graph g, String label, double x, double y, StreetEdge streetEdge,
-        boolean endVertex) {
+    public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge, boolean endVertex) {
         super(null, label, x, y, streetEdge);
         this.endVertex = endVertex;
     }
@@ -26,12 +25,7 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
     public void addIncoming(Edge edge) {
 
         if (edge instanceof TemporaryEdge) {
-            if (endVertex) {
-                super.addIncoming(edge);
-            } else {
-                super.addIncoming(edge);
-                //throw new UnsupportedOperationException("Can't add incoming edge to start vertex");
-            }
+            super.addIncoming(edge);
         } else {
             throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
         }
@@ -39,14 +33,8 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
 
     @Override
     public void addOutgoing(Edge edge) {
-
         if (edge instanceof TemporaryEdge) {
-            if (endVertex) {
-                super.addOutgoing(edge);
-                //throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
-            } else {
-                super.addOutgoing(edge);
-            }
+            super.addOutgoing(edge);
         } else {
             throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
         }
@@ -55,13 +43,6 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
     @Override
     public boolean isEndVertex() {
         return endVertex;
-    }
-
-    @Override
-    public void dispose() {
-        for (Object temp : endVertex ? getIncoming() : getOutgoing()) {
-            ((TemporaryEdge) temp).dispose();
-        }
     }
 
     public boolean isWheelchairAccessible() {
