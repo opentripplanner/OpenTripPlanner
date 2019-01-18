@@ -78,7 +78,7 @@ package org.opentripplanner.routing.util.elevation;
  *   −24,2  |  −45 %  |  3,41
  * </pre>
  */
-public class ToblersHickingFunction {
+public class ToblersHikingFunction {
 
     /**
      * The exponential growth factor in Tobler´s function.
@@ -103,7 +103,7 @@ public class ToblersHickingFunction {
      *                                   distance multiplier. Must be > 1.0. See the table in the class documentation
      *                                   for finding reasonable values for this constant.
      */
-    public ToblersHickingFunction(double walkDistMultiplierMaxLimit) {
+    public ToblersHikingFunction(double walkDistMultiplierMaxLimit) {
         if(walkDistMultiplierMaxLimit < 1.0) {
             throw new IllegalArgumentException("The 'walkDistMultiplierMaxLimit' is " + walkDistMultiplierMaxLimit +
                     ", but must be greater then 1.");

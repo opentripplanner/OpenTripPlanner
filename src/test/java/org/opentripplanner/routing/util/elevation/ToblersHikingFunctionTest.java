@@ -3,9 +3,9 @@ package org.opentripplanner.routing.util.elevation;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.routing.util.elevation.ToblersHickingFunctionTest.TestCase.tc;
+import static org.opentripplanner.routing.util.elevation.ToblersHikingFunctionTest.TestCase.tc;
 
-public class ToblersHickingFunctionTest {
+public class ToblersHikingFunctionTest {
 
     private static final double CUT_OFF_LIMIT = 3.2;
 
@@ -32,7 +32,7 @@ public class ToblersHickingFunctionTest {
                 tc(-45, CUT_OFF_LIMIT)
         };
 
-        ToblersHickingFunction f = new ToblersHickingFunction(CUT_OFF_LIMIT);
+        ToblersHikingFunction f = new ToblersHikingFunction(CUT_OFF_LIMIT);
 
         for (TestCase it : testCases) {
             double distMultiplier = f.calculateHorizontalWalkingDistanceMultiplier(it.dx, it.dh);
