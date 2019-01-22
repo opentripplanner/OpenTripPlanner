@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Frequency;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 
 public class FrequencyEntryTest {
 
@@ -35,13 +35,13 @@ public class FrequencyEntryTest {
 
     static {
         Trip trip = new Trip();
-        trip.setId(new AgencyAndId("agency", "testtrip"));
+        trip.setId(new FeedScopedId("agency", "testtrip"));
 
         List<StopTime> stopTimes = new ArrayList<StopTime>();
 
         int time = 0;
         for(int i = 0; i < STOP_NUM; ++i) {
-            AgencyAndId id = new AgencyAndId("agency", i+"");
+            FeedScopedId id = new FeedScopedId("agency", i+"");
 
             Stop stop= new Stop();
             stop.setId(id);
