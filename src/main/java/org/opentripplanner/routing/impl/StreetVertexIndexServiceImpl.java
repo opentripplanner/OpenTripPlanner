@@ -175,17 +175,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
                     street, fromv, base, geometries.first, name, lengthIn);
 
-            temporaryPartialStreetEdge.setElevationProfile(ElevationUtils
-                    .getPartialElevationProfile(street.getElevationProfile(), 0, lengthIn), false);
             temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
         } else {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
                     street, base, tov, geometries.second, name, lengthOut);
 
-            temporaryPartialStreetEdge.setElevationProfile(ElevationUtils
-                    .getPartialElevationProfile(street.getElevationProfile(), lengthIn,
-                    lengthIn + lengthOut), false);
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
             temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
         }
