@@ -429,9 +429,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     // TODO remove
     public boolean longDistance = false;
 
-    /** Should traffic congestion be considered when driving? */
-    public boolean useTraffic = true;
-
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
@@ -997,7 +994,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
-                && useTraffic == other.useTraffic
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation;
     }
@@ -1028,8 +1024,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Long(clampInitialWait).hashCode() * 209477
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
                 + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
-                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
