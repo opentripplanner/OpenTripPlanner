@@ -84,6 +84,7 @@ config key | description | value type | value default | notes
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
 `fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
 `elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
@@ -589,15 +590,6 @@ connect to a network resource is the `url` field.
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             "type": "websocket-gtfs-rt-updater"
-        },
-
-        // OpenTraffic data
-        {
-          "type": "opentraffic-updater",
-          "frequencySec": -1,
-          // relative to OTP's working directory, where is traffic data stored.
-          // Should have subdirectories z/x/y.traffic.pbf (i.e. a tile tree of traffic tiles)
-          "tileDirectory": "traffic"
         }
     ]
 }
