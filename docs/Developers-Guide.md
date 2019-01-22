@@ -175,7 +175,7 @@ are not included in mainline OTP.
 
 OpenTripPlanner uses the same code formatting and style as the [GeoTools](http://www.geotools.org/) and 
 [GeoServer](http://geoserver.org) projects. It's a minor variant of the
-[Sun coding convention](http://www.oracle.com/technetwork/java/codeconv-138413.html). Notably, **we do not use tabs** 
+[Sun coding convention](https://www.oracle.com/technetwork/java/codeconventions-150003.pdf). Notably, **we do not use tabs** 
 for indentation and we allow for lines up to 100 characters wide.
 
 The Eclipse formatter configuration supplied by the GeoTools project allows comments up to 150 characters wide.
