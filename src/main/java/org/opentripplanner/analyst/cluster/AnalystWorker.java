@@ -641,9 +641,7 @@ public class AnalystWorker implements Runnable {
         }
 
         if (Boolean.parseBoolean(config.getProperty("use-transport-networks", "false"))) {
-            // start R5 to work with transport networks
-            LOG.info("Transport network support enabled, deferring computation to R5");
-            com.conveyal.r5.analyst.cluster.AnalystWorker.main(args);
+            throw new UnsupportedOperationException("OTP no longer contains R5.");
         }
         else {
             try {
