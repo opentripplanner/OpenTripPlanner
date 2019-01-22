@@ -5,7 +5,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.conveyal.geojson.GeoJsonModule;
-import com.conveyal.r5.R5Main;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,7 +28,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.SampleSet;
-import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
@@ -212,7 +211,7 @@ public class AnalystWorker implements Runnable {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // ignore JSON fields that don't match target type
 
         /* Tell Jackson how to (de)serialize AgencyAndIds, which appear as map keys in routing requests. */
-        objectMapper.registerModule(AgencyAndIdSerializer.makeModule());
+        objectMapper.registerModule(FeedScopedIdSerializer.makeModule());
 
         /* serialize/deserialize qualified mode sets */
         objectMapper.registerModule(QualifiedModeSetSerializer.makeModule());

@@ -2,15 +2,12 @@ package org.opentripplanner.routing.trippattern;
 
 import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 
-import org.onebusaway.gtfs.model.Frequency;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Frequency;
 import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Uses a TripTimes to represent multiple trips following the same template at regular intervals.

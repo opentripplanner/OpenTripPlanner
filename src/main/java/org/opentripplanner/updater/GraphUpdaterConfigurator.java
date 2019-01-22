@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +10,6 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
-import org.opentripplanner.updater.traffic.OpenTrafficUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,18 +34,15 @@ public abstract class GraphUpdaterConfigurator {
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
     public static void setupGraph(Graph graph, JsonNode mainConfig) {
-        // Create a updater manager for this graph
-        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
         // TODO figure out how & when we will use embedded config in absence of main config.
         JsonNode embeddedConfig = null; // graph.routerConfig;
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
-        
-        // Apply configuration
-        // FIXME why are we returning the same updatermanager object that has been modified ? this method could just create it.
-        updaterManager = applyConfigurationToGraph(graph, updaterManager, mainConfig);
+
+        // Create a updater manager for this graph, and create updaters according to the JSON configuration.
+        GraphUpdaterManager updaterManager = createManagerFromConfig(graph, mainConfig);
 
         // Stop the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
@@ -72,12 +55,12 @@ public abstract class GraphUpdaterConfigurator {
     }
 
     /**
-     * @param graph
-     * @param updaterManager is the graph updater manager to which all updaters should be added
-     * @return reference to the same updaterManager as was given as input
+     * @param graph the graph that will be modified by these updaters
+     * @return a GraphUpdaterManager containing all the created updaters
      */
-    private static GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, JsonNode config) {
+    private static GraphUpdaterManager createManagerFromConfig(Graph graph, JsonNode config) {
 
+        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
         for (JsonNode configItem : config.path("updaters")) {
 
             // For each sub-node, determine which kind of updater is being created.
@@ -108,32 +91,29 @@ public abstract class GraphUpdaterConfigurator {
                 else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
                 }
-                else if (type.equals("opentraffic-updater")) {
-                    updater = new OpenTrafficUpdater();
-                }
             }
 
-            // Configure and activate the new updater.
-            try {
-                // Check whether no updater type was found
-                if (updater == null) {
-                    LOG.error("Unknown updater type: " + type);
-                } else {
-                    // Add manager as parent
+            if (updater == null) {
+                LOG.error("Unknown updater type: " + type);
+            } else {
+                try {
+                    // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
+                    // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
                     updater.setGraphUpdaterManager(updaterManager);
-                    // Configure updater if found and necessary
-                    if (updater instanceof JsonConfigurable) {
-                        ((JsonConfigurable) updater).configure(graph, configItem);
-                    }
-                    // Add graph updater to manager
+                    // All GraphUpdaters are JsonConfigurable - send them their config information.
+                    updater.configure(graph, configItem);
+                    // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
+                    updater.setup(graph);
+                    // Add graph updater to manager.
                     updaterManager.addUpdater(updater);
-                    LOG.info ("Configured GraphUpdater: {}", updater);
+                    LOG.info("Configured GraphUpdater: {}", updater);
+                } catch (Exception e) {
+                    LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
                 }
-            } catch (Exception e) {
-                LOG.error("Can't configure: " + configItem.asText(), e);
-                // Continue on to the next node
             }
         }
+        // Now that all the updaters are configured, kick them all off in their own threads.
+        updaterManager.startUpdaters();
         return updaterManager;
     }
 

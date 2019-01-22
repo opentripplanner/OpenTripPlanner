@@ -1,23 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -141,10 +128,10 @@ public class GraphPath {
         return states.getLast().getVertex();
     }
 
-    /** @return A list containing one AgencyAndId (trip_id) for each vehicle boarded in this path,
+    /** @return A list containing one trip_id for each vehicle boarded in this path,
      * in the chronological order they are boarded. */
-    public List<AgencyAndId> getTrips() {
-        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+    public List<FeedScopedId> getTrips() {
+        List<FeedScopedId> ret = new LinkedList<FeedScopedId>();
         Trip lastTrip = null;
         for (State s : states) {
             if (s.getBackEdge() != null) {

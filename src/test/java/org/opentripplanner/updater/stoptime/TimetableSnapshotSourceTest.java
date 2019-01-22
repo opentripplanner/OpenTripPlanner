@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.stoptime;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 import java.io.File;
 import java.text.ParseException;
@@ -29,10 +17,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.*;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.ServiceCalendar;
+import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -40,7 +36,7 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -53,7 +49,6 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 public class TimetableSnapshotSourceTest {
 
@@ -70,36 +65,36 @@ public class TimetableSnapshotSourceTest {
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
-        GtfsRelationalDao dao = context.getDao();
+        OtpTransitService transitService = context.getOtpTransitService();
 
         feedId = context.getFeedId().getId();
 
-        for (ShapePoint shapePoint : dao.getAllEntitiesForType(ShapePoint.class)) {
+        for (ShapePoint shapePoint : transitService.getAllShapePoints()) {
             shapePoint.getShapeId().setAgencyId(feedId);
         }
-        for (Route route : dao.getAllEntitiesForType(Route.class)) {
+        for (Route route : transitService.getAllRoutes()) {
             route.getId().setAgencyId(feedId);
         }
-        for (Stop stop : dao.getAllEntitiesForType(Stop.class)) {
+        for (Stop stop : transitService.getAllStops()) {
             stop.getId().setAgencyId(feedId);
         }
-        for (Trip trip : dao.getAllEntitiesForType(Trip.class)) {
+        for (Trip trip : transitService.getAllTrips()) {
             trip.getId().setAgencyId(feedId);
         }
-        for (ServiceCalendar serviceCalendar : dao.getAllEntitiesForType(ServiceCalendar.class)) {
+        for (ServiceCalendar serviceCalendar : transitService.getAllCalendars()) {
             serviceCalendar.getServiceId().setAgencyId(feedId);
         }
-        for (ServiceCalendarDate serviceCalendarDate : dao.getAllEntitiesForType(ServiceCalendarDate.class)) {
+        for (ServiceCalendarDate serviceCalendarDate : transitService.getAllCalendarDates()) {
             serviceCalendarDate.getServiceId().setAgencyId(feedId);
         }
-        for (FareAttribute fareAttribute : dao.getAllEntitiesForType(FareAttribute.class)) {
+        for (FareAttribute fareAttribute : transitService.getAllFareAttributes()) {
             fareAttribute.getId().setAgencyId(feedId);
         }
-        for (Pathway pathway : dao.getAllEntitiesForType(Pathway.class)) {
+        for (Pathway pathway : transitService.getAllPathways()) {
             pathway.getId().setAgencyId(feedId);
         }
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
 
@@ -117,8 +112,10 @@ public class TimetableSnapshotSourceTest {
 
     @Before
     public void setUp() {
-        graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         updater = new TimetableSnapshotSource(graph);
     }
 
@@ -141,8 +138,8 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
-        final AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
-        final AgencyAndId tripId2 = new AgencyAndId(feedId, "1.2");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
@@ -167,8 +164,8 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testHandleDelayedTrip() {
-        final AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
-        final AgencyAndId tripId2 = new AgencyAndId(feedId, "1.2");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
@@ -302,7 +299,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.stopForId.get(new AgencyAndId(feedId, "A"));
+        Stop stopA = graph.index.stopForId.get(new FeedScopedId(feedId, "A"));
         TransitStopDepart transitStopDepartA = graph.index.stopVertexForStop.get(stopA).departVertex;
         // Get trip pattern of last (most recently added) outgoing edge
         final List<Edge> outgoingEdges = (List<Edge>) transitStopDepartA.getOutgoing();
@@ -435,7 +432,7 @@ public class TimetableSnapshotSourceTest {
 
         // Original trip pattern
         {
-            final AgencyAndId tripId = new AgencyAndId(feedId, modifiedTripId);
+            final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
             final Trip trip = graph.index.tripForId.get(tripId);
             final TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
 
@@ -477,7 +474,7 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
-        final AgencyAndId tripId = new AgencyAndId(feedId, "1.1");
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);

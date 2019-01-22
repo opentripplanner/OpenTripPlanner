@@ -1,24 +1,11 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.FareRule;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -35,15 +22,15 @@ import java.util.Map;
 /**
  * Implements the default GTFS fare rules as described in
  * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
- * 
+ *
  * @author novalis
- * 
+ *
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
-    protected Map<AgencyAndId, FareRuleSet> regularFareRules = new HashMap<AgencyAndId, FareRuleSet>();
+    protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<FeedScopedId, FareRuleSet>();
 
     public FareService makeFareService() {
         DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
@@ -52,18 +39,18 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void processGtfs(GtfsRelationalDao dao) {
-        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), regularFareRules);
+    public void processGtfs(OtpTransitService transitService) {
+        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
     protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
-            Collection<FareRule> fareRules, Map<AgencyAndId, FareRuleSet> fareRuleSet) {
+            Collection<FareRule> fareRules, Map<FeedScopedId, FareRuleSet> fareRuleSet) {
         /*
          * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
          * rules attached to them.
          */
         for (FareAttribute fare : fareAttributes) {
-            AgencyAndId id = fare.getId();
+            FeedScopedId id = fare.getId();
             FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 fareRule = new FareRuleSet(fare);
@@ -80,7 +67,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
          */
         for (FareRule rule : fareRules) {
             FareAttribute fare = rule.getFare();
-            AgencyAndId id = fare.getId();
+            FeedScopedId id = fare.getId();
             FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 // Should never happen by design
@@ -98,7 +85,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             }
             Route route = rule.getRoute();
             if (route != null) {
-                AgencyAndId routeId = route.getId();
+                FeedScopedId routeId = route.getId();
                 fareRule.addRoute(routeId);
             }
         }
@@ -111,9 +98,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     /**
      * Build a specific FareServiceFactory given the config node, or fallback to the default if none
      * specified.
-     * 
+     *
      * Accept different formats. Examples:
-     * 
+     *
      * <pre>
      * { fares : "seattle" }
      * --------------------------
@@ -171,6 +158,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             break;
         case "bike-rental-time-based":
             retval = new TimeBasedBikeRentalFareServiceFactory();
+            break;
+        case "dutch":
+            retval = new DutchFareServiceFactory();
             break;
         case "san-francisco":
             retval = new SFBayFareServiceFactory();
