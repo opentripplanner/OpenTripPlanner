@@ -125,8 +125,8 @@ public class DateUtils implements DateConstants {
             }
 
             retVal = new int[] {hour, min, sec};
-        } catch (Exception e) {
-            LOG.info(time + " didn't parse", e);
+        } catch (Exception ignore) {
+            LOG.info("Time '{}' didn't parse", time);
             retVal = null;
         }
 
