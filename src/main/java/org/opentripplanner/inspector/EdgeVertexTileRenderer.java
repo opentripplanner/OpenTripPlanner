@@ -19,18 +19,18 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import com.jhlabs.awt.ShapeStroke;
 import com.jhlabs.awt.TextStroke;
-import com.vividsolutions.jts.awt.IdentityPointTransformation;
-import com.vividsolutions.jts.awt.PointShapeFactory;
-import com.vividsolutions.jts.awt.ShapeWriter;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
-import com.vividsolutions.jts.operation.buffer.OffsetCurveBuilder;
+import org.locationtech.jts.awt.IdentityPointTransformation;
+import org.locationtech.jts.awt.PointShapeFactory;
+import org.locationtech.jts.awt.ShapeWriter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.operation.buffer.BufferParameters;
+import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and

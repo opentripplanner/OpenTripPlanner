@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.graph;
 
 import com.conveyal.object_differ.ObjectDiffer;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
 import org.junit.Test;

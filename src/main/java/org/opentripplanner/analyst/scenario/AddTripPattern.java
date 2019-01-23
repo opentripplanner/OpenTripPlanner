@@ -2,8 +2,8 @@ package org.opentripplanner.analyst.scenario;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.analyst.core.Sample;

@@ -78,7 +78,8 @@
     </scm>
 
     <properties>
-        <geotools.version>10.5</geotools.version>
+        <geotools.version>20.1</geotools.version>
+        <geotools.wfs.version>16.5</geotools.wfs.version>
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -523,8 +524,13 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs</artifactId>
+            <artifactId>gt-opengis</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-wfs</artifactId>
+            <version>${geotools.wfs.version}</version>
         </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>

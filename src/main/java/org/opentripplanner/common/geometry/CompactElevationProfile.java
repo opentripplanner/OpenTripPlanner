@@ -2,8 +2,8 @@ package org.opentripplanner.common.geometry;
 
 import java.io.Serializable;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 /**
  * Compact elevation profile. To optimize storage, we use the following tricks:
