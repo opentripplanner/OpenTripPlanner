@@ -2,9 +2,12 @@
 
 ## 1.4 (in progress)
 
+- Remove Open Traffic prototype code (#2698)
+- Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
 - Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
 - Allow OTP to search more service days for transit service (#2592)
+- Allow itineraries in response to be sorted by duration (#2593)
 
 ## 1.3 (2018-08-03)
 

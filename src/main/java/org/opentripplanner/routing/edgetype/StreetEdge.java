@@ -17,7 +17,6 @@ import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -358,17 +357,16 @@ public class StreetEdge extends Edge implements Cloneable {
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), getMaxSlope());
-                // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
-                // for the walkspeed set by the user
-                double elevationUtilsSpeed = 4.0 / 3.0;
-                weight = costs * (elevationUtilsSpeed / speed);
+                double distance = getSlopeWalkSpeedEffectiveLength();
+                weight = distance / speed;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
                 if(weight > 100){
-                    double timeflat = length / speed;
-                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfile.getMaxSlope(), costs, weight, timeflat);
+                    double timeflat = length_mm / speed;
+
+
+                    System.out.format("line length: %.1f m, slope: %.3f ---> distance: %.1f , weight: %.1f , time (flat):  %.1f %n", getDistance(), getMaxSlope(), distance, weight, timeflat);
                 }
                 */
             }
@@ -546,18 +544,6 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            if (options.useTraffic) {
-                // the expected speed based on traffic
-                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
-
-                if (source != null) {
-                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
-
-                    if (!Double.isNaN(congestedSpeed))
-                        return congestedSpeed;
-                }
-            }
-
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
@@ -578,6 +564,10 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public double getSlopeWorkCostEffectiveLength() {
+        return getDistance();
+    }
+
+    public double getSlopeWalkSpeedEffectiveLength() {
         return getDistance();
     }
 
@@ -770,7 +760,7 @@ public class StreetEdge extends Edge implements Cloneable {
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
-    
+
     /** calculate the length of this street segement from its geometry */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;
@@ -847,23 +837,16 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         } else {
             if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, (TemporarySplitterVertex) v, geoms.first, name, 0);
-                e1.calculateLengthFromGeometry();
+                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, (TemporarySplitterVertex) v, (StreetVertex) tov, geoms.second, name, 0);
-                e2.calculateLengthFromGeometry();
+                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());
             }
         }
-
-
-
-
-
-        return new P2<StreetEdge>(e1, e2);
+        return new P2<>(e1, e2);
     }
 
     /**

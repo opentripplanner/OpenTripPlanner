@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class PartialStreetEdgeTest {
+public class TemporaryPartialStreetEdgeTest {
     
     private Graph graph;
     private IntersectionVertex v1, v2, v3, v4;
@@ -49,7 +49,7 @@ public class PartialStreetEdgeTest {
 
     @Test
     public void testConstruction() {
-        PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        TemporaryPartialStreetEdge pEdge = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistance());
 
         assertTrue(pEdge.isEquivalentTo(e1));
@@ -69,9 +69,9 @@ public class PartialStreetEdgeTest {
         options.setRoutingContext(graph, v1, v2);
 
         // Partial edge with same endpoints as the parent.
-        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistance());
-        PartialStreetEdge pEdge2 = new PartialStreetEdge(e2, v2, v3, e2.getGeometry(),
+        TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e2, v2, v3, e2.getGeometry(),
                 "partial e2", e2.getDistance());
 
         // Traverse both the partial and parent edges.
@@ -173,9 +173,9 @@ public class PartialStreetEdgeTest {
     
     @Test
     public void testReverseEdge() {
-        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistance());
-        PartialStreetEdge pEdge2 = new PartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
+        TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
                 "partial e2", e1Reverse.getDistance());
         
         assertFalse(e1.isReverseOf(pEdge1));
@@ -192,9 +192,11 @@ public class PartialStreetEdgeTest {
         assertTrue(pEdge2.isReverseOf(pEdge1));
     }
     
-    /****
-     * Private Methods
-     ****/
+    /* Private Methods */
+
+    static TemporaryPartialStreetEdge newTemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2, LineString geometry, String name, double length) {
+        return new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
+    }
 
     private IntersectionVertex vertex(String label, double lat, double lon) {
         IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
