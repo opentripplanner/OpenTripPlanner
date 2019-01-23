@@ -26,7 +26,16 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     public static final int TRANSFER_DURATION = 60 * 35; /* tranfers within 35 min won't require a new base fare */
 
     final Currency euros = Currency.getInstance("EUR");
-
+    
+    /**
+     * This overridden method completely ignores the Currency object supplied by the caller.
+     * This is because the caller in the superclass assumes the input data uses only one currency.
+     * However, Dutch data contains fares in both Euros and Dutch Railways fare units, with the added complexity
+     * that these pseudo-currency units do not have sub-units in the way Euros have cents, which leads to
+     * incorrect rounding and scaling etc.  While the fare rules consulted by this fare service do have a mix of EUR 
+     * and train pseudo-units, this Fare object is accumulating the monetary fare returned to the user and is known 
+     * to always be in Euros. See issue #2679 for discussion.
+     */
     @Override
     protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
                                    Collection<FareRuleSet> fareRules) {
