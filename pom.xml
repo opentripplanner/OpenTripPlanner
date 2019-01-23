@@ -779,13 +779,5 @@
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
-        <!-- Conveyal library for loading and storing GTFS transit data. -->
-        <!-- Note that we only use this in one place, org.opentripplanner.graph_builder.module.FakeGraph. -->
-        <!-- We should probably change that to use OBA or our internal GTFS model objects. -->
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>gtfs-lib</artifactId>
-            <version>3.0.6</version>
-        </dependency>
     </dependencies>
 </project>
