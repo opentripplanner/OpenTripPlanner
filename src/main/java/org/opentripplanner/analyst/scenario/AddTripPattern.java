@@ -43,7 +43,7 @@ public class AddTripPattern extends Modification {
     public transient TemporaryStop[] temporaryStops;
 
     /** GTFS mode (route_type), see constants at https://developers.google.com/transit/gtfs/reference/#routestxt */
-    public int mode = 3;
+    public int mode = 3; // Use BUS as default
 
     /** Create temporary stops associated with the given graph. Note that a given AddTripPattern can be associated only with a single graph. */
     public void materialize (Graph graph) {
