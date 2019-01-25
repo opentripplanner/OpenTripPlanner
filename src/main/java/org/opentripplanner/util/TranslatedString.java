@@ -55,13 +55,14 @@ public class TranslatedString implements I18NString, Serializable {
         else {
             I18NString ret;
             // Check if we only have one name, even under multiple languages
-            if (new HashSet<>(translations.values()).size() < 2) {
-                Iterator it = translations.values().iterator();
-                if (!it.hasNext()) {
-                    throw new IllegalArgumentException("Map of languages and translations is empty.");
-                }
+            long numberOfUniqValues = translations.values().stream().distinct().count();
+            if(numberOfUniqValues == 0) {
+                throw new IllegalArgumentException("Map of languages and translations is empty.");
+            }
+            else if(numberOfUniqValues == 1) {
                 ret = new NonLocalizedString(translations.values().iterator().next());
-            } else {
+            }
+            else {
                 ret = new TranslatedString(translations);
             }
             intern.put(translations, ret);
