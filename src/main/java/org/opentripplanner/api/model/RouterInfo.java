@@ -1,8 +1,5 @@
 package org.opentripplanner.api.model;
 
-import com.conveyal.geojson.GeometryDeserializer;
-import com.conveyal.geojson.GeometrySerializer;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +15,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.common.geometry.GeometryDeserializer;
+import org.opentripplanner.common.geometry.GeometrySerializer;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,8 +32,8 @@ public class RouterInfo {
     @XmlElement
     public String routerId;
     
-    @JsonSerialize(using=GeometrySerializer.class)
-    @JsonDeserialize(using=GeometryDeserializer.class)
+    @JsonSerialize(using= GeometrySerializer.class)
+    @JsonDeserialize(using= GeometryDeserializer.class)
     @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 

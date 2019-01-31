@@ -535,12 +535,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>jackson2-geojson</artifactId>
-            <version>0.8</version>
-        </dependency>
-
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
