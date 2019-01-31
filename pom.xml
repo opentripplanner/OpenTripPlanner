@@ -749,6 +749,12 @@
             <artifactId>graphql-java</artifactId>
             <version>2.2.0</version>
         </dependency>
+        <!-- Provides annotations like XmlElement indicating how classes should be serialized -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
         <!-- Support for OTP scripting -->
         <dependency>
             <groupId>bsf</groupId>
