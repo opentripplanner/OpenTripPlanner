@@ -82,7 +82,6 @@
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws.version>1.9.39</aws.version>
     </properties>
 
     <distributionManagement>
@@ -449,22 +448,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Amazon AWS client libraries -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ec2</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -475,13 +458,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <!-- AWS SDK uses Java commons logging. Redirect it to the slf4j API (we use the Logback implementation) -->
-        <!-- Why does this work? It seems like we'd need to declare JCL "provided" to avoid using the true JCL. -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
