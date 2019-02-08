@@ -1,5 +1,6 @@
 package org.opentripplanner.index;
 
+import com.google.transit.realtime.GtfsRealtime;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -170,6 +171,47 @@ public class IndexGraphQLSchema {
             .value("GREENWAYS", OptimizeType.GREENWAYS, "GREENWAYS")
             .value("TRIANGLE", OptimizeType.TRIANGLE, "**TRIANGLE** optimization type can be used to set relative preferences of optimization factors. See argument `triangle`.")
             .value("TRANSFERS", OptimizeType.TRANSFERS, "Deprecated, use argument `transferPenalty` to optimize for less transfers.")
+            .build();
+
+    public static GraphQLEnumType alertCauseEnum = GraphQLEnumType.newEnum()
+            .name("AlertCauseType")
+            .description("Cause of a alert")
+            .value("UNKNOWN_CAUSE", GtfsRealtime.Alert.Cause.UNKNOWN_CAUSE, "UNKNOWN_CAUSE")
+            .value("OTHER_CAUSE", GtfsRealtime.Alert.Cause.OTHER_CAUSE, "OTHER_CAUSE")
+            .value("TECHNICAL_PROBLEM", GtfsRealtime.Alert.Cause.TECHNICAL_PROBLEM, "TECHNICAL_PROBLEM")
+            .value("STRIKE", GtfsRealtime.Alert.Cause.STRIKE, "STRIKE")
+            .value("DEMONSTRATION", GtfsRealtime.Alert.Cause.DEMONSTRATION, "DEMONSTRATION")
+            .value("ACCIDENT", GtfsRealtime.Alert.Cause.ACCIDENT, "ACCIDENT")
+            .value("HOLIDAY", GtfsRealtime.Alert.Cause.HOLIDAY, "HOLIDAY")
+            .value("WEATHER", GtfsRealtime.Alert.Cause.WEATHER, "WEATHER")
+            .value("MAINTENANCE", GtfsRealtime.Alert.Cause.MAINTENANCE, "MAINTENANCE")
+            .value("CONSTRUCTION", GtfsRealtime.Alert.Cause.CONSTRUCTION, "CONSTRUCTION")
+            .value("POLICE_ACTIVITY", GtfsRealtime.Alert.Cause.POLICE_ACTIVITY, "POLICE_ACTIVITY")
+            .value("MEDICAL_EMERGENCY", GtfsRealtime.Alert.Cause.MEDICAL_EMERGENCY, "MEDICAL_EMERGENCY")
+            .build();
+
+    public static GraphQLEnumType alertEffectEnum = GraphQLEnumType.newEnum()
+            .name("AlertEffectType")
+            .description("Effect of a alert")
+            .value("NO_SERVICE", GtfsRealtime.Alert.Effect.NO_SERVICE, "NO_SERVICE")
+            .value("REDUCED_SERVICE", GtfsRealtime.Alert.Effect.REDUCED_SERVICE, "REDUCED_SERVICE")
+            .value("SIGNIFICANT_DELAYS", GtfsRealtime.Alert.Effect.SIGNIFICANT_DELAYS, "SIGNIFICANT_DELAYS")
+            .value("DETOUR", GtfsRealtime.Alert.Effect.DETOUR, "DETOUR")
+            .value("ADDITIONAL_SERVICE", GtfsRealtime.Alert.Effect.ADDITIONAL_SERVICE, "ADDITIONAL_SERVICE")
+            .value("MODIFIED_SERVICE", GtfsRealtime.Alert.Effect.MODIFIED_SERVICE, "MODIFIED_SERVICE")
+            .value("OTHER_EFFECT", GtfsRealtime.Alert.Effect.OTHER_EFFECT, "OTHER_EFFECT")
+            .value("UNKNOWN_EFFECT", GtfsRealtime.Alert.Effect.UNKNOWN_EFFECT, "UNKNOWN_EFFECT")
+            .value("STOP_MOVED", GtfsRealtime.Alert.Effect.STOP_MOVED, "STOP_MOVED")
+            .value("NO_EFFECT", GtfsRealtime.Alert.Effect.NO_EFFECT, "NO_EFFECT")
+            .build();
+
+    public static GraphQLEnumType alertSeverityLevelEnum = GraphQLEnumType.newEnum()
+            .name("AlertSeverityLevelType")
+            .description("Severity level of a alert")
+            .value("UNKNOWN_SEVERITY", GtfsRealtime.Alert.SeverityLevel.UNKNOWN_SEVERITY, "UNKNOWN_SEVERITY")
+            .value("INFO", GtfsRealtime.Alert.SeverityLevel.INFO, "INFO")
+            .value("WARNING", GtfsRealtime.Alert.SeverityLevel.WARNING, "WARNING")
+            .value("SEVERE", GtfsRealtime.Alert.SeverityLevel.SEVERE, "SEVERE")
             .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -893,19 +935,19 @@ public class IndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("alertEffect")
-                        .type(Scalars.GraphQLString)
+                        .type(alertEffectEnum)
                         .description("Alert effect")
                         .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().effect)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("alertCause")
-                        .type(Scalars.GraphQLString)
+                        .type(alertCauseEnum)
                         .description("Alert cause")
                         .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().cause)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("alsetSeverityLevel")
-                        .type(Scalars.GraphQLString)
+                        .name("alertSeverityLevel")
+                        .type(alertSeverityLevelEnum)
                         .description("Alert severity level")
                         .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().severityLevel)
                         .build())
