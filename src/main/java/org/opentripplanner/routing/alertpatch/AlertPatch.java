@@ -41,6 +41,8 @@ public class AlertPatch implements Serializable {
 
     private static final long serialVersionUID = 20140319L;
 
+    private int originalAlertHash;
+
     private String id;
 
     private Alert alert;
@@ -430,5 +432,13 @@ public class AlertPatch implements Serializable {
                 (route == null ? 0 : route.hashCode()) +
                 (alert == null ? 0 : alert.hashCode()) +
                 (feedId == null ? 0 : feedId.hashCode()));
+    }
+
+    public int getOriginalAlertHash() {
+        return originalAlertHash;
+    }
+
+    public void setOriginalAlertHash(int originalAlertHash) {
+        this.originalAlertHash = originalAlertHash;
     }
 }

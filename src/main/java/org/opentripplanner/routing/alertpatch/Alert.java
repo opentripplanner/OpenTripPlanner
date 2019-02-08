@@ -1,14 +1,15 @@
 package org.opentripplanner.routing.alertpatch;
 
+import com.google.transit.realtime.GtfsRealtime;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import java.util.Objects;
 
 @XmlType
 public class Alert implements Serializable {
@@ -30,6 +31,15 @@ public class Alert implements Serializable {
     //null means unknown
     @XmlElement
     public Date effectiveEndDate;
+
+    @XmlElement
+    public GtfsRealtime.Alert.Effect effect;
+
+    @XmlElement
+    public GtfsRealtime.Alert.Cause cause;
+
+    @XmlElement
+    public GtfsRealtime.Alert.SeverityLevel severityLevel;
 
     public static HashSet<Alert> newSimpleAlertSet(String text) {
         Alert note = createSimpleAlerts(text);
@@ -84,7 +94,11 @@ public class Alert implements Serializable {
     public String toString() {
         return "Alert('"
                 + (alertHeaderText != null ? alertHeaderText.toString()
-                        : alertDescriptionText != null ? alertDescriptionText.toString()
-                                : "?") + "')";
+                : alertDescriptionText != null ? alertDescriptionText.toString()
+                : "?") + "')";
+    }
+
+    public int getHashWithoutInformedEntities() {
+        return Objects.hash(alertDescriptionText, alertHeaderText, alertUrl, cause, effect, severityLevel);
     }
 }

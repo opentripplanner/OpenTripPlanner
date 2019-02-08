@@ -85,6 +85,11 @@ public class AlertsUpdateHandler {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
             periods.add(new TimePeriod(0, Long.MAX_VALUE));
         }
+
+        alertText.cause = alert.getCause();
+        alertText.effect = alert.getEffect();
+        alertText.severityLevel = alert.getSeverityLevel();
+
         for (EntitySelector informed : alert.getInformedEntityList()) {
             if (fuzzyTripMatcher != null && informed.hasTrip()) {
                 TripDescriptor trip = fuzzyTripMatcher.match(feedId, informed.getTrip());
@@ -141,6 +146,8 @@ public class AlertsUpdateHandler {
             patch.setAlert(alertText);
 
             patch.setId(patchId);
+
+            patch.setOriginalAlertHash(alertText.getHashWithoutInformedEntities());
             patchIds.add(patchId);
 
             alertPatchService.apply(patch);

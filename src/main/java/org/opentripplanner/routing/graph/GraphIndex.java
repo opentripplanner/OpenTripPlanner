@@ -1124,6 +1124,16 @@ public class GraphIndex {
             .collect(Collectors.toList());
     }
 
+    public List<AlertPatch> getAlertsForStop(Stop stop) {
+        return getAlertPatchStream()
+                .filter(alertPatch -> alertPatch.getStop() != null)
+                .filter(alertPatch -> {
+
+                    return stop.getId().equals(alertPatch.getStop());
+                })
+                .collect(Collectors.toList());
+    }
+
     public AlertPatch getAlertForId(String id) {
         return getAlertPatchStream().filter(alertPatch -> id.equals(alertPatch.getId())).findFirst().get();
     }
