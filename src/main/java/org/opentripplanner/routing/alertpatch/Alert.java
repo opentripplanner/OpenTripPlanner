@@ -4,12 +4,12 @@ import com.google.transit.realtime.GtfsRealtime;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import java.util.Objects;
 
 @XmlType
 public class Alert implements Serializable {
@@ -94,7 +94,11 @@ public class Alert implements Serializable {
     public String toString() {
         return "Alert('"
                 + (alertHeaderText != null ? alertHeaderText.toString()
-                        : alertDescriptionText != null ? alertDescriptionText.toString()
-                                : "?") + "')";
+                : alertDescriptionText != null ? alertDescriptionText.toString()
+                : "?") + "')";
+    }
+
+    public int getHashWithoutInformedEntities() {
+        return Objects.hash(alertDescriptionText, alertHeaderText, alertUrl, cause, effect, severityLevel);
     }
 }

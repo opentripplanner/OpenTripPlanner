@@ -146,6 +146,8 @@ public class AlertsUpdateHandler {
             patch.setAlert(alertText);
 
             patch.setId(patchId);
+
+            patch.setOriginalAlertHash(alertText.getHashWithoutInformedEntities());
             patchIds.add(patchId);
 
             alertPatchService.apply(patch);
