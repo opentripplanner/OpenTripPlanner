@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.alertpatch;
 
+import com.google.transit.realtime.GtfsRealtime;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -30,6 +31,25 @@ public class Alert implements Serializable {
     //null means unknown
     @XmlElement
     public Date effectiveEndDate;
+
+    private GtfsRealtime.Alert.Effect effect;
+    private String id;
+
+    public GtfsRealtime.Alert.Effect getEffect() {
+        return effect;
+    }
+
+    public void setEffect(GtfsRealtime.Alert.Effect effect) {
+        this.effect = effect;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public static HashSet<Alert> newSimpleAlertSet(String text) {
         Alert note = createSimpleAlerts(text);

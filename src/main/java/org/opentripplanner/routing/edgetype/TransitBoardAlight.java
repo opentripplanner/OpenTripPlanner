@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.Locale;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -132,7 +133,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
             return null;
-        };
+        }
+
+        for (AlertPatch alertPatch: options.getRoutingContext().graph.getAlertPatches(this)) {
+            if ((alertPatch.cannotBoard() || alertPatch.cannotAlight()) && alertPatch.displayDuring(s0)) {
+                return null;
+            }
+        }
 
         /*
          * Determine whether we are going onto or off of transit. Entering and leaving transit is

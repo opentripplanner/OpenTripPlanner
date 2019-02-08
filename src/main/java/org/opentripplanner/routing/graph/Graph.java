@@ -394,6 +394,21 @@ public class Graph implements Serializable {
         return new AlertPatch[0];
     }
 
+
+    /**
+     * Get {@link AlertPatch} array for the graph.
+     * @return The {@link AlertPatch} array for the graph
+     */
+    public AlertPatch[] getAllAlertPatches() {
+        Set<AlertPatch> result = new HashSet<>();
+
+        synchronized (alertPatches) {
+            this.alertPatches.values().forEach(result::addAll);
+        }
+
+        return result.toArray(new AlertPatch[0]);
+    }
+
     /**
      * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
      * {@link Edge}. This method is not thread-safe.

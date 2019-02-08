@@ -9,11 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import com.google.transit.realtime.GtfsRealtime;
+import org.opentripplanner.model.*;
 import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -38,6 +35,8 @@ public class AlertPatch implements Serializable {
     private static final long serialVersionUID = 20140319L;
 
     private String id;
+
+    private List<EnhancedAlert> enhancedAlerts = new ArrayList<>();
 
     private Alert alert;
 
@@ -82,6 +81,23 @@ public class AlertPatch implements Serializable {
         return false;
     }
 
+    private boolean serviceAffected() {
+        GtfsRealtime.Alert.Effect effect = getAlert().getEffect();
+        return GtfsRealtime.Alert.Effect.NO_SERVICE.equals(effect) || GtfsRealtime.Alert.Effect.DETOUR.equals(effect);
+    }
+
+    public boolean cannotRideThrough() {
+        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotRideThrough);
+    }
+
+    public boolean cannotBoard() {
+        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotBoard);
+    }
+
+    public boolean cannotAlight() {
+        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotAlight);
+    }
+
     @XmlElement
     public String getId() {
         return id;
@@ -89,6 +105,14 @@ public class AlertPatch implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<EnhancedAlert> getEnhancedAlerts() {
+        return enhancedAlerts;
+    }
+
+    public void setEnhancedAlerts(List<EnhancedAlert> enhancedAlerts) {
+        this.enhancedAlerts = enhancedAlerts;
     }
 
     public void apply(Graph graph) {
@@ -129,6 +153,12 @@ public class AlertPatch implements Serializable {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                             graph.addAlertPatch(tripPattern.boardEdges[i], this);
                             graph.addAlertPatch(tripPattern.alightEdges[i], this);
+                        }
+                    }
+
+                    for (int i = 0; i < tripPattern.hopEdges.length; i++) {
+                        if (stop == null || stop.equals(tripPattern.hopEdges[i].getEndStop())) {
+                            graph.addAlertPatch(tripPattern.hopEdges[i], this);
                         }
                     }
                 }
@@ -190,6 +220,12 @@ public class AlertPatch implements Serializable {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                             graph.removeAlertPatch(tripPattern.boardEdges[i], this);
                             graph.removeAlertPatch(tripPattern.alightEdges[i], this);
+                        }
+                    }
+
+                    for (int i = 0; i < tripPattern.hopEdges.length; i++) {
+                        if (stop == null || stop.equals(tripPattern.hopEdges[i].getEndStop())) {
+                            graph.removeAlertPatch(tripPattern.hopEdges[i], this);
                         }
                     }
                 }

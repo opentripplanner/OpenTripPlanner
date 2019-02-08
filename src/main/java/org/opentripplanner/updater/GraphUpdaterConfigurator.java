@@ -2,6 +2,7 @@ package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.alerts.GtfsEnhancedRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -81,6 +82,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
+                }
+                else if (type.equals("real-time-alerts-enhanced")) {
+                    updater = new GtfsEnhancedRealtimeAlertsUpdater();
                 }
                 else if (type.equals("example-updater")) {
                     updater = new ExampleGraphUpdater();
