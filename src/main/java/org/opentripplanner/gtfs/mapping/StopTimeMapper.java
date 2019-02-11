@@ -44,6 +44,12 @@ class StopTimeMapper {
         lhs.setDropOffType(rhs.getDropOffType());
         lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());
         lhs.setFarePeriodId(rhs.getFarePeriodId());
+        lhs.setContinuousPickup(rhs.getContinuousPickup());
+        lhs.setContinuousDropOff(rhs.getContinuousDropOff());
+        lhs.setStartServiceArea(rhs.getStartServiceArea());
+        lhs.setEndServiceArea(rhs.getEndServiceArea());
+        lhs.setStartServiceAreaRadius(rhs.getStartServiceAreaRadius());
+        lhs.setEndServiceAreaRadius(rhs.getEndServiceAreaRadius());
 
         // Skip mapping of proxy
         // private transient StopTimeProxy proxy;

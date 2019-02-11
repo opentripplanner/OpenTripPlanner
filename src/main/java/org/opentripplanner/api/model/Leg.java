@@ -247,6 +247,60 @@ public class Leg {
     @JsonSerialize
     public Boolean rentedBike;
 
+     /**
+      * True if this is a call-and-ride leg.
+      */
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean callAndRide;
+
+    /* For call-n-ride leg, supply maximum start time based on calculation. */
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar flexCallAndRideMaxStartTime = null;
+
+     /* For call-n-ride leg, supply minimum end time based on calculation. */
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar flexCallAndRideMinEndTime = null;
+
+    /** trip.drt_advance_book_min if this is a demand-response leg */
+    @XmlAttribute
+    @JsonSerialize
+    public double flexDrtAdvanceBookMin;
+
+     /**
+      *  Agency message if this is leg has a demand-response pickup and the Trip has
+      *  `drt_pickup_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexDrtPickupMessage;
+
+     /**
+      * Agency message if this is leg has a demand-response dropoff and the Trip has
+      * `drt_drop_off_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexDrtDropOffMessage;
+
+     /**
+      * Agency message if this is leg has a flag stop pickup and the Trip has
+      * `continuous_pickup_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexFlagStopPickupMessage;
+
+     /**
+      * Agency message if this is leg has a flag stop dropoff and the Trip has
+      * `continuous_drop_off_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexFlagStopDropOffMessage;
+
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg

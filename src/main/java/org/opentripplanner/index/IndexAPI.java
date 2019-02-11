@@ -8,6 +8,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
@@ -17,6 +18,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.AreaShort;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
@@ -597,6 +599,29 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
+    }
+
+    /**
+     * Return all GTFS-Flex area IDs. Areas are defined in GTFS-Flex to be a lat/lon polygon in
+     * which certain kinds of flex service take place (deviated-route and call-and-ride).
+     */
+    @GET
+    @Path("/flexAreas")
+    public Response getAllFlexAreas() {
+        List<FeedScopedId> ids = new ArrayList<>(index.flexAreasById.keySet());
+        return Response.status(Status.OK).entity(ids).build();
+    }
+
+    /** Return a specific GTFS-Flex area given an ID in Agency:ID format. */
+    @GET
+    @Path("/flexAreas/{id}")
+    public Response getFlexAreaByFeedId(@PathParam("id") String areaIdString) {
+        FeedScopedId id = GtfsLibrary.convertIdFromString(areaIdString);
+        Geometry area = index.flexAreasById.get(id);
+        if (area == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        return Response.status(Status.OK).entity(new AreaShort(id, area)).build();
     }
 
     @POST

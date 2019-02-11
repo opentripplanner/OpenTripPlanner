@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.BitSet;
 
 import java.util.Locale;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -21,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.locationtech.jts.geom.LineString;
-
 
 /**
  * Models boarding or alighting a vehicle - that is to say, traveling from a state off 
@@ -132,7 +132,15 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
             return null;
-        };
+        }
+
+        // if eligibility-restricted services are disallowed, check this route. Only supports 0/1 values.
+        if (!options.flexUseEligibilityServices) {
+            Route route = getPattern().route;
+            if (route.hasEligibilityRestricted() && route.getEligibilityRestricted() == 1) {
+                return null;
+            }
+        }
 
         /*
          * Determine whether we are going onto or off of transit. Entering and leaving transit is
@@ -160,6 +168,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
+            s1.setIsLastBoardAlightDeviated(isDeviated());
             if (boarding) {
                 int boardingTime = options.getBoardTime(this.getPattern().mode);
                 if (boardingTime != 0) {
@@ -175,6 +184,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     // TODO: should we have different cost for alighting and boarding compared to regular waiting?
                 }
             }
+            s1.incrementWeight(getExtraWeight(options));
 
             /* Determine the wait. */
             if (arrivalTimeAtStop > 0) { // FIXME what is this arrivalTimeAtStop?
@@ -214,6 +224,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }            
 
             s1.setBackMode(getMode());
+
             return s1.makeState();
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
@@ -243,26 +254,24 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
              * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
              */
-            TripPattern tripPattern = this.getPattern();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
-                Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
+                Timetable timetable = getPattern().getUpdatedTimetable(options, sd);
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
-                // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
-                // However, experiments seem to show very little measurable improvement here (due to cache locality?)
-                // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
-                /* Find the next or prev departure depending on final boolean parameter. */
-                TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
+                if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) {
+                    continue;
+                }
+                TripTimes tripTimes = getNextTrip(s0, sd, timetable);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
-                    int wait = boarding ? 
-                        (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
-                        (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
+                    int wait = calculateWait(s0, sd, tripTimes);
                     /* A trip was found. The wait should be non-negative. */
-                    if (wait < 0) LOG.error("Negative wait time when boarding.");
+                    if (wait < 0) {
+                        LOG.error("Negative wait time when boarding.");
+                    }
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
                         bestWait       = wait;
@@ -273,20 +282,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             if (bestWait < 0) return null; // no appropriate trip was found
             Trip trip = bestTripTimes.trip;
-
-            /* Check if route is preferred by the user. */
-            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
-            
-            /* Compute penalty for non-preferred transfers. */
-            int transferPenalty = 0;
-            /* If this is not the first boarding, then we are transferring. */
-            if (s0.isEverBoarded()) {
-                TransferTable transferTable = options.getRoutingContext().transferTable;
-                int transferTime = transferTable.getTransferTime(s0.getPreviousStop(), 
-                                   getStop(), s0.getPreviousTrip(), trip, boarding);
-                transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
-                                   options.nonpreferredTransferPenalty);
-            }            
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
@@ -310,9 +305,21 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             } else {
                 wait_cost *= options.waitReluctance;
             }
-            
-            s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(transferPenalty);
+
+            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
+
+            /* Compute penalty for non-preferred transfers. */
+            int transferPenalty = 0;
+            /* If this is not the first boarding, then we are transferring. */
+            if (s0.isEverBoarded()) {
+                TransferTable transferTable = options.getRoutingContext().transferTable;
+                int transferTime = transferTable.getTransferTime(s0.getPreviousStop(),
+                        getStop(), s0.getPreviousTrip(), trip, boarding);
+                transferPenalty  = transferTable.determineTransferPenalty(transferTime,
+                        options.nonpreferredTransferPenalty);
+            }
+
+            s1.incrementWeight(preferences_penalty + transferPenalty);
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
@@ -321,7 +328,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             } else {
                 s1.incrementWeight(wait_cost + options.getBoardCost(s0.getNonTransitMode()));
             }
-            
+
+            s1.incrementWeight(getExtraWeight(options));
+
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
@@ -336,10 +345,28 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 if (optimized == null) LOG.error("Null optimized state. This shouldn't happen.");
                 return optimized;
             }
-            
+
             /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
         }
+    }
+
+    public long getExtraWeight(RoutingRequest options) {
+        return 0;
+    }
+
+    public TripTimes getNextTrip(State s0, ServiceDay sd, Timetable timetable) {
+        return timetable.getNextTrip(s0, sd, stopIndex, boarding);
+    }
+
+    public int calculateWait(State s0, ServiceDay sd, TripTimes tripTimes) {
+        return boarding ?
+                (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
+                (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
+    }
+
+    public boolean isDeviated() {
+        return false;
     }
 
     /** @return the stop where this board/alight edge is located. */

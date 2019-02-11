@@ -33,9 +33,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,20 +111,36 @@ public class RoutingContext implements Cloneable {
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
 
+    /**
+     * Temporary vertices created during the request. This is needed for GTFS-Flex support. The other temporary vertices which are created have
+     * known locations (the endpoints of the search), but GTFS-Flex routing may require temporary vertices to be created at other places in the
+     * graph. Temporary vertices are request-specific need to be disposed of at the end-of-life of a request.
+     */
+    public Collection<Vertex> temporaryVertices = new ArrayList<>();
+
     /* CONSTRUCTORS */
 
     /**
      * Constructor that automatically computes origin/target from RoutingRequest.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph) {
-        this(routingRequest, graph, null, null, true);
+        this(routingRequest, graph, null, null, true, null);
+    }
+
+    /**
+     * Constructor that automatically computes origin/target from RoutingRequest, and sets the
+     * context's temporary vertices. This is needed for intermediate places, as a consequence of
+     * the check that temporary vertices are request-specific.
+     */
+    public RoutingContext(RoutingRequest routingRequest, Graph graph, Collection<Vertex> temporaryVertices) {
+        this(routingRequest, graph, null, null, true, temporaryVertices);
     }
 
     /**
      * Constructor that takes to/from vertices as input.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
-        this(routingRequest, graph, from, to, false);
+        this(routingRequest, graph, from, to, false, null);
     }
 
     /**
@@ -185,9 +203,10 @@ public class RoutingContext implements Cloneable {
      * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
      * 
      * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
+     * @param temporaryVerticesParam if not null, use this collection to keep track of temporary vertices.
      */
     private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
-            boolean findPlaces) {
+            boolean findPlaces, Collection<Vertex> temporaryVerticesParam) {
         if (graph == null) {
             throw new GraphNotFoundException();
         }
@@ -280,6 +299,14 @@ public class RoutingContext implements Cloneable {
             }
         }
 
+        // Add temporary subgraphs to the routing context. If `fromVertex` or `toVertex` are not
+        // tempoorary vertices, their subgraphs are empty, so this has no effect.
+        if (temporaryVerticesParam != null) {
+            temporaryVertices = temporaryVerticesParam;
+        }
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(fromVertex));
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(toVertex));
+
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
@@ -358,6 +385,7 @@ public class RoutingContext implements Cloneable {
                 addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
                         calendarService, agency.getId()));
             }
+
         }
     }
 
@@ -393,7 +421,7 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        TemporaryVertex.dispose(fromVertex);
-        TemporaryVertex.dispose(toVertex);
+       TemporaryVertex.disposeAll(temporaryVertices);
+       temporaryVertices.clear();
     }
 }

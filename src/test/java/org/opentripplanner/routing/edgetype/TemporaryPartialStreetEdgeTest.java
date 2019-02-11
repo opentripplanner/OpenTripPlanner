@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -109,6 +110,7 @@ public class TemporaryPartialStreetEdgeTest {
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(graph, v1, v2);
+        options.rctx.temporaryVertices.addAll(Arrays.asList(end, start));
 
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  

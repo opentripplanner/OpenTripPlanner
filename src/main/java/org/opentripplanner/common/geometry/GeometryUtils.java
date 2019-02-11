@@ -4,6 +4,8 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -180,5 +182,14 @@ public class GeometryUtils {
             coords[i++] = new Coordinate(p.getLatitude(), p.getLongitude());
         }
         return coords;
+    }
+
+    public static Geometry parseWkt(String wkt) {
+        try {
+            return new WKTReader(GeometryUtils.getGeometryFactory()).read(wkt);
+        } catch(ParseException e) {
+            LOG.error("Unable to parse wkt: " + e);
+        }
+        return null;
     }
 }
