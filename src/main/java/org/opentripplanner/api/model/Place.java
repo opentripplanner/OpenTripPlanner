@@ -8,6 +8,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -90,6 +91,19 @@ public class Place {
      * In case the vertex is of type Bike sharing station.
      */
     public String bikeShareId;
+
+    /**
+     * This is an optional field which can be used to distinguish among ways a passenger's
+     * boarding or alighting at a stop can differ among services operated by a transit agency.
+     * This will be "default" in most cases. Currently the only non-default values are for
+     * GTFS-Flex board or alight types.
+     */
+    public BoardAlightType boardAlightType;
+
+    /**
+     * Board or alight area for flag stops
+     */
+    public EncodedPolylineBean flagStopArea;
 
     /**
      * Returns the geometry in GeoJSON format

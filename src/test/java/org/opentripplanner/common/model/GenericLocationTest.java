@@ -3,7 +3,7 @@ package org.opentripplanner.common.model;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 public class GenericLocationTest {
 

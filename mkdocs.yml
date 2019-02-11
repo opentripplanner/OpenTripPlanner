@@ -32,6 +32,7 @@ pages:
     - Scripting: 'Scripting.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
+    - GTFS-Flex Routing: 'Flex.md'
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Architecture: 'Architecture.md'

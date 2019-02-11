@@ -13,22 +13,22 @@ import org.opensphere.geometry.triangulation.model.Edge;
 import org.opensphere.geometry.triangulation.model.Triangle;
 import org.opensphere.geometry.triangulation.model.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
-import com.vividsolutions.jts.triangulate.ConformingDelaunayTriangulationBuilder;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeSubdivision;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeTriangle;
-import com.vividsolutions.jts.util.UniqueCoordinateArrayFilter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.operation.linemerge.LineMerger;
+import org.locationtech.jts.triangulate.ConformingDelaunayTriangulationBuilder;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeSubdivision;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeTriangle;
+import org.locationtech.jts.util.UniqueCoordinateArrayFilter;
 
 /**
  * Computes a concave hull of a {@link Geometry} which is
@@ -179,11 +179,11 @@ public class ConcaveHull {
 		
 		Collection<QuadEdge> quadEdges = qes.getEdges();
 		List<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.createOn(qes);
-		Collection<com.vividsolutions.jts.triangulate.quadedge.Vertex> qeVertices = 
+		Collection<org.locationtech.jts.triangulate.quadedge.Vertex> qeVertices =
 			qes.getVertices(false);
 		
 		int iV = 0;
-		for (com.vividsolutions.jts.triangulate.quadedge.Vertex v : qeVertices) {
+		for (org.locationtech.jts.triangulate.quadedge.Vertex v : qeVertices) {
 			this.coordinates.put(v.getCoordinate(), iV);
 			this.vertices.put(iV, new Vertex(iV, v.getCoordinate()));
 			iV++;
