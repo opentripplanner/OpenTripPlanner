@@ -452,7 +452,7 @@ public class GraphIndex {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
                 int sidx = 0;
                 for (Stop currStop : pattern.stopPattern.stops) {
-                    if (currStop == stop) {
+                    if (currStop.getId().equals(stop.getId())) {
                         if(omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
                         for (TripTimes t : tt.tripTimes) {
                             if (!sd.serviceRunning(t.serviceCode)) continue;
