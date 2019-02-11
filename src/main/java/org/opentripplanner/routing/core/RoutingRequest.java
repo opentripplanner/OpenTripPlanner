@@ -1448,7 +1448,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         return new PathComparator(compareStartTimes);
     }
 
-    public Set<String> getAllowedFaresString() {
+    public String getAllowedFaresString() {
         return allowedFares == null ? "All zones allowed" : "Allowed zones: " + allowedFares.toString();
     }
 
