@@ -17,4 +17,5 @@ public interface HopEdge {
 
     void setGeometry(LineString geometry);
 
+    String getFeedId();
 }

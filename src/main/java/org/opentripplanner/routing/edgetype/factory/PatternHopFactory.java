@@ -17,6 +17,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FlexArea;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
@@ -24,6 +25,7 @@ import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPatternFlexFields;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
@@ -253,7 +255,9 @@ public class PatternHopFactory {
     private Map<FeedScopedId, LineString> geometriesByShapeId = new HashMap<FeedScopedId, LineString>();
 
     private Map<FeedScopedId, double[]> distancesByShapeId = new HashMap<FeedScopedId, double[]>();
-    
+
+    private Map<String, Geometry> flexAreasById = new HashMap<>();
+
     private FareServiceFactory fareServiceFactory;
 
     private Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
@@ -297,6 +301,9 @@ public class PatternHopFactory {
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
         // Perhaps it is to allow name collisions with previously loaded feeds.
         clearCachedData(); 
+
+        loadFlexAreaMap();
+        loadFlexAreasIntoGraph(graph);
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
@@ -368,8 +375,13 @@ public class PatternHopFactory {
                 directionId = -1;
             }
 
+            boolean hasFlexService = stopTimes.stream().anyMatch(this::stopTimeHasFlex);
+
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
-            StopPattern stopPattern = new StopPattern(stopTimes);
+            StopPattern stopPattern = new StopPattern(stopTimes, graph.deduplicator);
+            if (hasFlexService) {
+                stopPattern.setFlexFields(new StopPatternFlexFields(stopTimes, flexAreasById, graph.deduplicator));
+            }
             TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
@@ -1015,6 +1027,7 @@ public class PatternHopFactory {
         geometriesByShapeId.clear();
         distancesByShapeId.clear();
         geometriesByShapeSegmentKey.clear();
+        flexAreasById.clear();
     }
 
     private void loadTransfers(Graph graph) {
@@ -1292,10 +1305,18 @@ public class PatternHopFactory {
         StopTime prev = null;
         Iterator<StopTime> it = stopTimes.iterator();
         TIntList stopSequencesRemoved = new TIntArrayList();
+        double serviceAreaRadius = 0.0d;
+        String serviceAreaWkt = null;
         while (it.hasNext()) {
             StopTime st = it.next();
+            if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                serviceAreaRadius = st.getStartServiceAreaRadius();
+            }
+            if (st.getStartServiceArea() != null) {
+                serviceAreaWkt = st.getStartServiceArea().getWkt();
+            }
             if (prev != null) {
-                if (prev.getStop().equals(st.getStop())) {
+                if (prev.getStop().equals(st.getStop()) && serviceAreaRadius == 0.0d && serviceAreaWkt == null) {
                     // OBA gives us unmodifiable lists, but we have copied them.
 
                     // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
@@ -1313,6 +1334,12 @@ public class PatternHopFactory {
                 }
             }
             prev = st;
+            if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                serviceAreaRadius = 0.0d;
+            }
+            if (st.getEndServiceArea() != null) {
+                serviceAreaWkt = null;
+            }
         }
         return stopSequencesRemoved;
     }
@@ -1438,11 +1465,9 @@ public class PatternHopFactory {
         this.context = context;
     }
 
-
     public double getMaxStopToShapeSnapDistance() {
         return maxStopToShapeSnapDistance;
     }
-
 
     public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
         this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
@@ -1499,5 +1524,26 @@ public class PatternHopFactory {
 
             return expandedTransfers;
         }
+    }
+    private void loadFlexAreaMap() {
+        for (FlexArea flexArea : transitService.getAllAreas()) {
+            Geometry geometry = GeometryUtils.parseWkt(flexArea.getWkt());
+            flexAreasById.put(flexArea.getAreaId(), geometry);
+        }
+    }
+
+    private void loadFlexAreasIntoGraph(Graph graph) {
+        for (Map.Entry<String, Geometry> entry : flexAreasById.entrySet()) {
+            FeedScopedId id = new FeedScopedId(feedId.getId(), entry.getKey());
+            graph.flexAreasById.put(id, entry.getValue());
+        }
+    }
+
+    private boolean stopTimeHasFlex(StopTime st) {
+        return (st.getContinuousPickup() != 1 && st.getContinuousPickup() != StopTime.MISSING_VALUE)
+                || (st.getContinuousDropOff() != 1 && st.getContinuousDropOff() != StopTime.MISSING_VALUE)
+                || st.getStartServiceArea() != null || st.getEndServiceArea() != null
+                || st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE
+                || st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE;
     }
 }

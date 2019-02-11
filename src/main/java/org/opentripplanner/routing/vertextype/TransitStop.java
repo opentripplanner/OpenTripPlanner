@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.flex.TemporaryTransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +46,10 @@ public class TransitStop extends TransitStationStop {
         this.wheelchairEntrance = stop.getWheelchairBoarding() != 2;
         isEntrance = stop.getLocationType() == 2;
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-        graph.expandToInclude(stop.getLon(), stop.getLat());
+        // Temporary transit stops, needed for GTFS-Flex support, will not be added to the envelope.
+        if (graph != null) {
+            graph.expandToInclude(stop.getLon(), stop.getLat());
+        }
     }
 
     public boolean hasWheelchairEntrance() {
@@ -87,5 +93,25 @@ public class TransitStop extends TransitStationStop {
     
     public boolean isStreetLinkable() {
         return isEntrance() || !hasEntrances();
+    }
+
+    // We want to avoid a situation where results look like
+    // 1) call-and-ride from A to B
+    // 2) call-and-ride from A to real transit stop right next to B, walk to B
+    public boolean checkCallAndRideBoardAlightOk(State s0) {
+        RoutingContext rctx = s0.getOptions().rctx;
+        if (this == rctx.fromVertex || this == rctx.toVertex) {
+            return true;
+        }
+        if (!s0.isEverBoarded()) {
+            return false;
+        }
+        // only allow call-n-ride transfers at the same stop
+        return s0.getPreviousStop().equals(getStop());
+    }
+
+    public boolean checkCallAndRideStreetLinkOk(State s0) {
+        RoutingContext rctx = s0.getOptions().rctx;
+        return this == rctx.fromVertex || this == rctx.toVertex;
     }
 }
