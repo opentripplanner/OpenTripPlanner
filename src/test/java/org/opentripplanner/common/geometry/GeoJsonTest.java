@@ -153,36 +153,5 @@ public class GeoJsonTest {
 		Geometry regeom = mapper.reader(Geometry.class).readValue(json);
 		assertThat(regeom, equalTo(geom));
 	}
-	//
-	// @Test
-	// public void feature() {
-	// SimpleFeature feature = buildFeature();
-	// assertThat(
-	// toJson(feature),
-	// is("{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[102.0,2.0]},\"properties\":{\"name\":\"Hello, World\"},\"id\":\"fid-1\"}"));
-	// }
-	//
-	// @Test
-	// public void featureCollection() {
-	// SimpleFeatureCollection collection = FeatureCollections.newCollection();
-	// assertThat(toJson(collection),
-	// is("{\"type\":\"FeatureCollection\",\"features\":[]}"));
-	// }
-	//
-	// SimpleFeature buildFeature() {
-	// SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-	// typeBuilder.setName("poi");
-	// typeBuilder.setDefaultGeometry("location");
-	// typeBuilder.add("location", Point.class);
-	// typeBuilder.add("name", String.class);
-	// typeBuilder.nillable(true).add("etc", String.class);
-	// SimpleFeatureType featureType = typeBuilder.buildFeatureType();
-	// SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(
-	// featureType);
-	// featureBuilder.add(gf.createPoint(new Coordinate(102.0, 2.0)));
-	// featureBuilder.add("Hello, World");
-	// featureBuilder.add(null);
-	// SimpleFeature feature = featureBuilder.buildFeature("fid-1");
-	// return feature;
-	// }
+
 }
