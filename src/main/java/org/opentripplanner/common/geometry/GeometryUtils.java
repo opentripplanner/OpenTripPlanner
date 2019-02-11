@@ -1,9 +1,9 @@
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.linearref.LengthLocationMap;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.linearref.LengthLocationMap;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -98,7 +98,7 @@ public class GeometryUtils {
     }
 
     /**
-     * Adapted from com.vividsolutions.jts.geom.LineSegment 
+     * Adapted from org.locationtech.jts.geom.LineSegment
      * Combines segmentFraction and projectionFactor methods.
      */
     public static double segmentFraction(double x0, double y0, double x1, double y1, 

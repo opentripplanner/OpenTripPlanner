@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;

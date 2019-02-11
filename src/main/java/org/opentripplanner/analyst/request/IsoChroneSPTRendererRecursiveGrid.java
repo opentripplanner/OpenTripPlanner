@@ -19,7 +19,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Compute isochrones out of a shortest path tree request (RecursiveGrid isoline algorithm).
