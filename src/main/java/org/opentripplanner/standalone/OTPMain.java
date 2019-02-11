@@ -93,11 +93,10 @@ public class OTPMain {
     }
 
     /**
-     * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
-     * main method makes it possible to build graphs from web services or scripts, not just from the command line.
+     * A safe run method - making it safe to run it "as a library" without the risk of the whole JVM
+     * being shutdown by the "System.exit" call
      */
-    public void run() {
-
+    public void safeRun() throws ConfigurationException {
         // TODO do params.infer() here to ensure coherency?
 
         /* Create the top-level objects that represent the OTP server. */
@@ -118,7 +117,7 @@ public class OTPMain {
                 }
             } else {
                 LOG.error("An error occurred while building the graph. Exiting.");
-                System.exit(-1);
+                throw new ConfigurationException("An error occurred while building the graph. Exiting.");
             }
         }
 
@@ -171,7 +170,18 @@ public class OTPMain {
                 }
             }
         }
+    }
 
+    /**
+     * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
+     * main method makes it possible to build graphs from web services or scripts, not just from the command line.
+     */
+    public void run() {
+        try {
+            safeRun();
+        } catch (ConfigurationException e) {
+            System.exit(-1);
+        }
     }
 
     /**
