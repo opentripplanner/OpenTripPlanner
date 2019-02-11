@@ -1448,4 +1448,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         return new PathComparator(compareStartTimes);
     }
 
+    public String getAllowedFaresString() {
+        return allowedFares == null ? "All zones allowed" : "Allowed zones: " + allowedFares.toString();
+    }
+
 }
