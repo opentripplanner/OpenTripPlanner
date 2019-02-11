@@ -13,7 +13,6 @@ public class Serializable2DPackedCoordinateSequenceFactory implements Serializab
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
         return new PackedCoordinateSequence.Double(coordinates, 2);
-        //return new IntPackedCoordinateSequence(coordinates);
     }
 
     @Override
@@ -23,8 +22,7 @@ public class Serializable2DPackedCoordinateSequenceFactory implements Serializab
 
     @Override
     public CoordinateSequence create(int size, int dimension) {
-        throw new UnsupportedOperationException();
+        return new PackedCoordinateSequence.Double(size, dimension);
     }
-    
 
 }
