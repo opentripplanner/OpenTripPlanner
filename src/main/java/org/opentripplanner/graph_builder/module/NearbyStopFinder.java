@@ -131,19 +131,50 @@ public class NearbyStopFinder {
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
+
+        RoutingRequest wheelchairAccessibleRoutingRequest = new RoutingRequest(TraverseMode.WALK);
+        wheelchairAccessibleRoutingRequest.setWheelchairAccessible(true);
+        wheelchairAccessibleRoutingRequest.clampInitialWait = (0L);
+        wheelchairAccessibleRoutingRequest.setRoutingContext(graph, originVertex, null);
+
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
+        Set<Vertex> nonWheelchairRoutable = new HashSet<Vertex>();
+
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (targetVertex == originVertex) continue;
                 if (targetVertex instanceof TransitStop) {
-                    stopsFound.add(stopAtDistanceForState(state));
+                    StopAtDistance sd = stopAtDistanceForState(state, wheelchairAccessibleRoutingRequest);
+                    if (!sd.isWheelchairAccessible) {
+                        nonWheelchairRoutable.add(targetVertex);
+                    }
+                    stopsFound.add(sd);
                 }
             }
         }
+
+        if (nonWheelchairRoutable.size() > 0) {
+
+            /** second iteration, find wheelchair accessible routes **/
+            spt = earliestArrivalSearch.getShortestPathTree(wheelchairAccessibleRoutingRequest);
+
+            if (spt != null) {
+                for (State state : spt.getAllStates()) {
+                    Vertex targetVertex = state.getVertex();
+                    if (targetVertex == originVertex) continue;
+                    if (!nonWheelchairRoutable.contains(targetVertex)) continue;
+                    if (targetVertex instanceof TransitStop) {
+                        StopAtDistance sd = stopAtDistanceForState(state, wheelchairAccessibleRoutingRequest);
+                        stopsFound.add(sd);
+                    }
+                }
+            }
+        }
+
         /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         if (originVertex instanceof TransitStop) {
             stopsFound.add(new StopAtDistance((TransitStop)originVertex, 0));
@@ -182,6 +213,7 @@ public class NearbyStopFinder {
         public LineString  geom;
         public List<Edge>  edges;
         public int penaltySeconds = 0;
+        public boolean isWheelchairAccessible = true;
 
         public StopAtDistance(TransitStop tstop, double dist) {
             this.tstop = tstop;
@@ -213,7 +245,7 @@ public class NearbyStopFinder {
      *
      * TODO this should probably be merged with similar classes in Profile routing.
      */
-    public static StopAtDistance stopAtDistanceForState (State state) {
+    public static StopAtDistance stopAtDistanceForState(State state, RoutingRequest routingRequest) {
         double distance = 0.0;
         GraphPath graphPath = new GraphPath(state, false);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -245,6 +277,9 @@ public class NearbyStopFinder {
         while (s != null) {
             if (s.getWalkDistanceDelta() < 0.1 && s.getTimeDeltaSeconds() > 0) {
                 sd.increasePenaltySeconds(s.getTimeDeltaSeconds());
+            }
+            if (s.backEdge instanceof StreetEdge) {
+                sd.isWheelchairAccessible = sd.isWheelchairAccessible && ((StreetEdge)s.getBackEdge()).canTraverse(routingRequest,TraverseMode.WALK);
             }
             s = s.getBackState();
         }

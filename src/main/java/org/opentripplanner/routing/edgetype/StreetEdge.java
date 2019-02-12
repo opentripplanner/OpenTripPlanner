@@ -186,7 +186,7 @@ public class StreetEdge extends Edge implements Cloneable {
      * @param mode
      * @return
      */
-    private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
+    public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
                 return false;
@@ -636,7 +636,7 @@ public class StreetEdge extends Edge implements Cloneable {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
              */
 
-            // NOTE(flamholz): edge to be traversed decides equivalence. This is important since 
+            // NOTE(flamholz): edge to be traversed decides equivalence. This is important since
             // it might be a temporary edge that is equivalent to some graph edge.
             if (turnRestriction.type == TurnRestrictionType.ONLY_TURN) {
                 if (!e.isEquivalentTo(turnRestriction.to) && turnRestriction.modes.contains(mode) &&
