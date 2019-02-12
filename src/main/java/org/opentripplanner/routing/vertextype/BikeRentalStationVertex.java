@@ -84,6 +84,9 @@ public class BikeRentalStationVertex extends Vertex {
 
     /**
      * Determines whether this station can be used by a member or non-member at the given date and time.
+     *
+     * @param isSystemMember whether the person renting the bike is a member of the service (which may
+     *                       allow then to use the system over different extended hours than non-members).
      */
     public boolean isSystemActive(LocalDateTime dateTime, boolean isSystemMember) {
         // If no specific hours of operation were set, we assume the system is always active.

@@ -137,19 +137,22 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         }
     }
 
-    public static String convertStreamToString(java.io.InputStream is) {
+    /**
+     * Read the entire InputStream into a String.
+     */
+    private static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner scanner = null;
         String result="";
         try {
-           
+            // The delimiter is \A which means "beginning of input". That can't match anything later in the input.
+            // So it will read everything in to the end of the stream.
             scanner = new java.util.Scanner(is).useDelimiter("\\A");
             result = scanner.hasNext() ? scanner.next() : "";
             scanner.close();
-        }
-        finally
-        {
-           if(scanner!=null)
+        } finally {
+           if(scanner!=null) {
                scanner.close();
+           }
         }
         return result;
     }

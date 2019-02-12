@@ -2,10 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Set;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -65,10 +63,12 @@ public abstract class RentABikeAbstractEdge extends Edge {
         return s1b;
     }
 
-    // GBFS hours of operation are in fact in a specific timezone, so ideally the epoch instant should be
-    // interpreted within the isSystemActive method. This is ugly - we convert to the graph's default timezone.
-    // Because these bike rental edges are loop edges, we know the from and to vertices are the same
-    // bike rental station vertex and can grab either one.
+    /**
+     * GBFS hours of operation are in fact in a specific timezone, so ideally the epoch instant should be
+     * interpreted within the isSystemActive method. This is ugly - we convert to the graph's default timezone.
+     * Because these bike rental edges are loop edges, we know the from and to vertices are the same
+     * bike rental station vertex and can grab either one.
+    */
     private boolean stationInactive(State state) {
         LocalDateTime stateLocalDateTime = Instant.ofEpochMilli(state.getTimeInMillis())
                 .atZone(state.getOptions().rctx.graph.getTimeZone().toZoneId()).toLocalDateTime();

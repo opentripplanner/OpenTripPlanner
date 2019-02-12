@@ -4,12 +4,10 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 /**
  * Dropping off a rented bike edge.
- * 
  * Cost is the time to dropoff a bike.
  * 
  * @author laurent

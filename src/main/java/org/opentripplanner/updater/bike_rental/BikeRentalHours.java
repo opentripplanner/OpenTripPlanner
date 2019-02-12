@@ -29,11 +29,16 @@ public class BikeRentalHours {
     EnumSet<BikeShareUserType> userTypes = EnumSet.noneOf(BikeShareUserType.class);
     EnumSet<DayOfWeek> days = EnumSet.noneOf(DayOfWeek.class);
 
-    // These times actually do necessarily have a timezone attached via the required GBFS file system_information.json
-    // but OTP does not yet read that file. So we'll have to make the usual one-time-zone assumption.
+    // The start and end times of the period when people may use the bike share system always have a time zone attached
+    // in GBFS data, via the required GBFS file system_information.json. However, OTP does not yet read that file
+    // from the GBFS source data. Therefore we make the usual OTP assumption that all data is from a single time zone.
+
     LocalTime startTime;
     LocalTime endTime; // FIXME: the spec requires supporting times > 24 hours, up to 48 hours.
 
+    /**
+     * Load data about when a bike rental system can be used from GBFS format.
+     */
     public static BikeRentalHours fromJsonNode (JsonNode jsonNode) {
         BikeRentalHours rentalHours = new BikeRentalHours();
         for (JsonNode userTypeNode : jsonNode.path("user_types")) {
@@ -50,8 +55,12 @@ public class BikeRentalHours {
 
     /**
      * Check whether the given local DateTime falls within the time and days specified by this
-     * BikeRentalHours instance.
-     * TODO handle time zones (when OTP as a whole handles time zones properly)
+     * BikeRentalHours instance. TODO handle time zones (when OTP as a whole handles time zones properly)
+     *
+     * @param localDateTime the local date and time at which the person wants to rent a vehicle.
+     *
+     * @param isSystemMember whether the person renting the bike is a member of the service (which may
+     *                       allow then to use the system over different extended hours than non-members).
      */
     public boolean matches (LocalDateTime localDateTime, boolean isSystemMember) {
         DayOfWeek dayOfWeek = localDateTime.getDayOfWeek();

@@ -184,6 +184,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
      * This updater is also a little strange in that instead of returning a list of new objects, it
      * updates its own internal field that contains the operating hours, and provides methods to check
      * the contents of that list.
+     *
+     * Another way to implement this would be to make 2 abstract classes: `GenericJsonBikeRentalDataSource` with an
+     * abstract `processNodes()` method and `IndividualStationJsonBikeRentalDataSource`.
      */
     class GbfsSystemHoursDataSource extends GenericJsonBikeRentalDataSource {
 
