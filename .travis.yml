@@ -2,11 +2,6 @@ language: java
 
 jdk:
   - openjdk8
-  - openjdk11
-
-matrix:
-  allow_failures:
-    - jdk: openjdk11
     
 # Replace Travis's default Maven installation step with a no-op.
 # This avoids redundantly pre-running 'mvn install -DskipTests' every time.
