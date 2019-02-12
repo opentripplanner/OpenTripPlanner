@@ -83,6 +83,10 @@ public class OTPMain {
     /**
      * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
      * main method makes it possible to build graphs from web services or scripts, not just from the command line.
+     *
+     * @return
+     *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method will return when the web server shuts down;
+     *         false - if an error occurs while loading the graph;
      */
     public boolean run() {
 
@@ -105,7 +109,7 @@ public class OTPMain {
                     graphService.registerGraph("", new MemoryGraphSource("", graph));
                 }
             } else {
-                LOG.error("An error occurred while building the graph. Exiting.");
+                LOG.error("An error occurred while building the graph.");
                 return false;
             }
         }
