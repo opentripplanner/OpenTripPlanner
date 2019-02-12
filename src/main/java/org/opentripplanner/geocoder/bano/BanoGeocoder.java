@@ -2,7 +2,7 @@ package org.opentripplanner.geocoder.bano;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;

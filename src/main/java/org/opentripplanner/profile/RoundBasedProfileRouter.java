@@ -17,11 +17,11 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import org.mapdb.Fun.Tuple2;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.TimeSurface.RangeSet;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.profile.ProfileState.Type;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -244,14 +244,14 @@ public class RoundBasedProfileRouter {
             // avoid concurrent modification
             Set<TransitStop> touchedStopKeys = new HashSet<TransitStop>(store.keys());
             for (TransitStop tstop : touchedStopKeys) {
-                List<Tuple2<TransitStop, Integer>> accessTimes = Lists.newArrayList();
+                List<T2<TransitStop, Integer>> accessTimes = Lists.newArrayList();
                 
                 // find transfers for the stop
                 for (Edge e : tstop.getOutgoing()) {
                     if (e instanceof SimpleTransfer) {
                         SimpleTransfer t = (SimpleTransfer) e;
                         int time = (int) (t.getDistance() / request.walkSpeed);
-                        accessTimes.add(new Tuple2((TransitStop) e.getToVertex(), time));
+                        accessTimes.add(new T2((TransitStop) e.getToVertex(), time));
                     }
                 }
                 
@@ -268,20 +268,20 @@ public class RoundBasedProfileRouter {
                 HashSet<TripPattern> patternsAtSource = new HashSet<TripPattern>(graph.index.patternsForStop.get(tstop.getStop()));
                 
                 for (ProfileState ps : statesAtStop) {
-                    for (Tuple2<TransitStop, Integer> atime : accessTimes) {
-                        ProfileState ps2 = ps.propagate(atime.b);
+                    for (T2<TransitStop, Integer> atime : accessTimes) {
+                        ProfileState ps2 = ps.propagate(atime.second);
                         ps2.accessType = Type.TRANSFER;
-                        ps2.stop = atime.a;
+                        ps2.stop = atime.first;
                         // note that we do not reset pattern, as we still don't want to transfer from a pattern to itself.
                         // (TODO: is this true? loop routes?)
                         
-                        for (TripPattern patt : graph.index.patternsForStop.get(atime.a.getStop())) {
+                        for (TripPattern patt : graph.index.patternsForStop.get(atime.first.getStop())) {
                             // don't transfer to patterns that we can board at this stop.
                             if (patternsAtSource.contains(patt))
                                 continue;
                             
-                            if (atime.b < minBoardTime.get(patt)) {
-                                minBoardTime.put(patt, atime.b);
+                            if (atime.second < minBoardTime.get(patt)) {
+                                minBoardTime.put(patt, atime.second);
                                 optimalBoardState.put(patt, ps2);
                             }
                         }

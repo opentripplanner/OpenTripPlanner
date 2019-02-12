@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Class describing a location provided by clients of routing. Used to describe end points (origin, destination) of a routing request as well as any

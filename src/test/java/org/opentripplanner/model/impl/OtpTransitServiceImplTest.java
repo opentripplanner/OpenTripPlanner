@@ -24,7 +24,9 @@ import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
@@ -279,9 +281,10 @@ public class OtpTransitServiceImplTest {
         return date;
     }
 
-    private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().sorted(comparing(T::toString)).findFirst().get();
+    private static <T> T first(Collection<T> collection) {
+        List<T> items = new ArrayList<>(collection);
+        items.sort(comparing(Object::toString));
+        return items.isEmpty() ? null : items.get(0);
     }
 
     private static String toString(ShapePoint sp) {

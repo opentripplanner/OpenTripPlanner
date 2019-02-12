@@ -8,11 +8,11 @@ import java.util.List;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
-import com.vividsolutions.jts.util.AssertionFailedException;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.util.AssertionFailedException;
 
 public class MidblockMatchState extends MatchState {
 

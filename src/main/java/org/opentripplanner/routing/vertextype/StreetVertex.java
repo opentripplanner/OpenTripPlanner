@@ -5,7 +5,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
