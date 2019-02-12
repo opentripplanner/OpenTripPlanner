@@ -103,7 +103,7 @@ public class GraphIndexTest extends GtfsTest {
     public void testGraphQLSimple() {
         String query =
                 "query Agency{" +
-                "    agency(id: \"agency\"){" +
+                "    agency(id: \"FEED:agency\"){" +
                 "        name" +
                 "    }" +
                 "}";
@@ -120,7 +120,7 @@ public class GraphIndexTest extends GtfsTest {
         String query =
                 "query Agency{\n" +
                         "    viewer {" +
-                        "    agency(id: \"agency\"){\n" +
+                        "    agency(id: \"FEED:agency\"){\n" +
                         "        name\n" +
                         "        routes{\n" +
                         "            shortName" +
