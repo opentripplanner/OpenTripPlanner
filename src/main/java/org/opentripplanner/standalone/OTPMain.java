@@ -70,8 +70,9 @@ public class OTPMain {
         }
 
         OTPMain main = new OTPMain(params);
-        main.run();
-
+        if (!main.run()) {
+            System.exit(-1);
+        }
     }
 
     /* Constructor. */
@@ -83,7 +84,7 @@ public class OTPMain {
      * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
      * main method makes it possible to build graphs from web services or scripts, not just from the command line.
      */
-    public void run() {
+    public boolean run() {
 
         // TODO do params.infer() here to ensure coherency?
 
@@ -105,7 +106,7 @@ public class OTPMain {
                 }
             } else {
                 LOG.error("An error occurred while building the graph. Exiting.");
-                System.exit(-1);
+                return false;
             }
         }
 
@@ -151,7 +152,7 @@ public class OTPMain {
             while (true) { // Loop to restart server on uncaught fatal exceptions.
                 try {
                     grizzlyServer.run();
-                    return;
+                    return true;
                 } catch (Throwable throwable) {
                     LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
                             throwable.getClass().getSimpleName(), throwable);
@@ -159,6 +160,7 @@ public class OTPMain {
             }
         }
 
+        return true;
     }
 
     /**
