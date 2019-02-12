@@ -42,6 +42,7 @@ class RouteMapper {
         lhs.setBikesAllowed(rhs.getBikesAllowed());
         lhs.setSortOrder(rhs.getSortOrder());
         lhs.setBrandingUrl(rhs.getBrandingUrl());
+        lhs.setEligibilityRestricted(rhs.getEligibilityRestricted());
 
         return lhs;
     }

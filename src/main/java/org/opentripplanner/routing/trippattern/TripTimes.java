@@ -10,6 +10,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -95,6 +96,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     private final int[] stopSequences;
 
+    private final int[] continuousPickup;
+
+    private final int[] continuousDropOff;
+
+    private final double[] serviceAreaRadius;
+
+    private final String[] serviceArea;
+
     /**
      * The real-time state of this TripTimes.
      */
@@ -102,6 +111,20 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
+
+    /**
+     * Demand-Response Transit (DRT) service parameters. In GTFS-Flex, DRT transit is transit which
+     * is reserved in advance with the provider. This includes call-and-ride service, and
+     * potentially the deviated portion of deviated-fixed routes. For DRT, the travel time is
+     * calculated by applying formulas to the direct vehicle time. The following parameters give
+     * the maximum possible and average travel time formulas, given a direct vehicle time.
+     */
+
+    private DrtTravelTime maxTravelTime;
+
+    private DrtTravelTime avgTravelTime;
+
+    private double advanceBookMin = 0;
 
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
@@ -113,15 +136,50 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
+        final int[] continuousPickup = new int[nStops];
+        final int[] continuousDropOff = new int[nStops];
+        final double[] serviceAreaRadius = new double[nStops];
+        final String[] serviceArea = new String[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
+        double radius = 0;
+        String area = null;
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
             arrivals[s] = st.getArrivalTime() - timeShift;
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
+            continuousPickup[s] = st.getContinuousPickup();
+            continuousDropOff[s] = st.getContinuousDropOff();
+
+            if (st.getStartServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                radius = st.getStartServiceAreaRadius();
+            }
+            serviceAreaRadius[s] = radius;
+            if (st.getEndServiceAreaRadius() != StopTime.MISSING_VALUE) {
+                if (st.getEndServiceAreaRadius() != radius) {
+                    String message = String.format("Trip %s: start service area radius %g does not match end radius %g",
+                            st.getTrip().getId(), radius, st.getEndServiceAreaRadius());
+                    throw new IllegalArgumentException(message);
+                }
+                radius = 0;
+            }
+
+            if (st.getStartServiceArea() != null) {
+                area = st.getStartServiceArea().getAreaId();
+            }
+            serviceArea[s] = area;
+            if (st.getEndServiceArea() != null) {
+                if (!st.getEndServiceArea().getAreaId().equals(area)) {
+                    String message = String.format("Trip %s: start service area %s does not match end area %s",
+                            st.getTrip().getId(), area, st.getEndServiceArea());
+                    throw new IllegalArgumentException(message);
+                }
+                area = null;
+            }
+
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -133,6 +191,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+        this.continuousPickup = deduplicator.deduplicateIntArray(continuousPickup);
+        this.continuousDropOff = deduplicator.deduplicateIntArray(continuousDropOff);
+        this.serviceAreaRadius = deduplicator.deduplicateDoubleArray(serviceAreaRadius);
+        this.serviceArea = deduplicator.deduplicateStringArray(serviceArea);
+        if (trip.getDrtMaxTravelTime() != null) {
+            this.maxTravelTime = DrtTravelTime.fromSpec(trip.getDrtMaxTravelTime());
+        }
+        if (trip.getDrtAvgTravelTime() != null) {
+            this.avgTravelTime = DrtTravelTime.fromSpec(trip.getDrtAvgTravelTime());
+        }
+        this.advanceBookMin = trip.getDrtAdvanceBookMin();
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
@@ -148,6 +217,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
+        this.continuousPickup = object.continuousPickup;
+        this.continuousDropOff = object.continuousDropOff;
+        this.serviceAreaRadius = object.serviceAreaRadius;
+        this.serviceArea = object.serviceArea;
+        this.maxTravelTime = object.maxTravelTime;
+        this.avgTravelTime = object.avgTravelTime;
+        this.advanceBookMin = object.advanceBookMin;
     }
 
     /**
@@ -243,6 +319,56 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
     }
 
+    public int getCallAndRideBoardTime(int stop, long currTime, int directTime, ServiceDay sd, boolean useClockTime, long startClockTime) {
+        int travelTime = getDemandResponseMaxTime(directTime);
+        int minBoardTime = getArrivalTime(stop + 1) - travelTime;
+        int ret = (int) Math.min(Math.max(currTime, getDepartureTime(stop)), minBoardTime);
+        if (useClockTime) {
+            int clockTime = (int) (sd.secondsSinceMidnight(startClockTime) + Math.round(trip.getDrtAdvanceBookMin() * 60.0));
+            if (ret >= clockTime) {
+                return ret;
+            } else if (clockTime < minBoardTime) {
+                return clockTime;
+            } else {
+                return -1;
+            }
+        }
+        return ret;
+    }
+
+    public int getCallAndRideAlightTime(int stop, long currTime, int directTime, ServiceDay sd, boolean useClockTime, long startClockTime) {
+        int travelTime = getDemandResponseMaxTime(directTime);
+        int maxAlightTime = getDepartureTime(stop - 1) + travelTime;
+        int ret = (int) Math.max(Math.min(currTime, getArrivalTime(stop)), maxAlightTime);
+        if (useClockTime) {
+            int clockTime = (int) (sd.secondsSinceMidnight(startClockTime) + Math.round(trip.getDrtAdvanceBookMin() * 60.0));
+            // boarding time must be > clockTime
+            int boardTime = ret - travelTime;
+            if (boardTime >= clockTime) {
+                return ret;
+            }
+            ret += (clockTime - boardTime);
+            if (ret >= maxAlightTime) {
+                return -1;
+            }
+        }
+        return ret;
+    }
+
+    public int getDemandResponseMaxTime(int directTime) {
+        if (maxTravelTime != null) {
+            return (int) Math.round(maxTravelTime.process(directTime));
+        }
+        return directTime;
+    }
+
+    public int getDemandResponseAvgTime(int directTime) {
+        if (avgTravelTime != null) {
+            return (int) Math.round(avgTravelTime.process(directTime));
+        }
+        return directTime;
+    }
+
     /**
      * @return true if this TripTimes represents an unmodified, scheduled trip from a published
      *         timetable or false if it is a updated, cancelled, or otherwise modified one. This
@@ -270,6 +396,25 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     public void setRealTimeState(final RealTimeState realTimeState) {
         this.realTimeState = realTimeState;
+    }
+
+    /** Returns whether this stop allows continuous pickup */
+    public int getContinuousPickup(final int stop) {
+        return continuousPickup[stop];
+    }
+
+    /** Returns whether this stop allows continuous dropoff */
+    public int getContinuousDropOff(final int stop) {
+        return continuousDropOff[stop];
+    }
+
+    /** Returns associated dropoff/pickup radius for this stop*/
+    public double getServiceAreaRadius(final int stop) {
+        return serviceAreaRadius[stop];
+    }
+
+    public String getServiceArea(final int stop) {
+        return serviceArea[stop];
     }
 
     /** Used in debugging / dumping times. */
