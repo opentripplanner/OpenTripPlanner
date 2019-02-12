@@ -1,29 +1,17 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +105,12 @@ public class StateEditor {
         // if something was flagged incorrect, do not make a new state
         if (defectiveTraversal) {
             LOG.error("Defective traversal flagged on edge " + child.backEdge);
+            return null;
+        }
+
+        // Check TemporaryVertex on a different request
+        if ((getVertex() instanceof TemporaryVertex)
+            && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
             return null;
         }
 
@@ -240,6 +234,15 @@ public class StateEditor {
         child.preTransitTime += seconds;
     }
 
+    public void incrementCallAndRideTime(int seconds) {
+        if (seconds < 0) {
+            LOG.warn("A state's call-n-ride time is being incremented by a negative amount.");
+            defectiveTraversal = true;
+            return;
+        }
+        child.callAndRideTime += seconds;
+    }
+
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
@@ -253,7 +256,7 @@ public class StateEditor {
         child.stateData.tripTimes = tripTimes;
     }
 
-    public void setTripId(AgencyAndId tripId) {
+    public void setTripId(FeedScopedId tripId) {
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
     }
@@ -321,13 +324,13 @@ public class StateEditor {
         }
     }
 
-    public void setRoute(AgencyAndId routeId) {
+    public void setRoute(FeedScopedId routeId) {
         cloneStateDataAsNeeded();
         child.stateData.route = routeId;
         // unlike tripId, routeId is not set to null when alighting
         // but do a null check anyway
         if (routeId != null) {
-            AgencyAndId[] oldRouteSequence = child.stateData.routeSequence;
+            FeedScopedId[] oldRouteSequence = child.stateData.routeSequence;
             //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
             int oldLength = oldRouteSequence.length;
             child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
@@ -450,7 +453,7 @@ public class StateEditor {
         return child.getElapsedTimeSeconds();
     }
 
-    public AgencyAndId getTripId() {
+    public FeedScopedId getTripId() {
         return child.getTripId();
     }
 
@@ -462,7 +465,7 @@ public class StateEditor {
         return child.getZone();
     }
 
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return child.getRoute();
     }
 
@@ -490,6 +493,10 @@ public class StateEditor {
         return child.getPreTransitTime();
     }
 
+    public int getCallAndRideTime() {
+        return child.getCallAndRideTime();
+    }
+
     public Vertex getVertex() {
         return child.getVertex();
     }
@@ -515,6 +522,12 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.lastPattern = pattern;
     }
+
+    public void setIsLastBoardAlightDeviated(boolean isLastBoardAlightDeviated) {
+        cloneStateDataAsNeeded();
+        child.stateData.isLastBoardAlightDeviated = isLastBoardAlightDeviated;
+    }
+
     public void setOptions(RoutingRequest options) {
         cloneStateDataAsNeeded();
         child.stateData.opt = options;

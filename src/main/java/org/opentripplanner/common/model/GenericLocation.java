@@ -1,23 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.common.model;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Class describing a location provided by clients of routing. Used to describe end points (origin, destination) of a routing request as well as any
@@ -67,8 +54,10 @@ public class GenericLocation implements Cloneable, Serializable {
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
     // We want to ignore any number of non-digit characters at the beginning of the string, except
-    // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point). 
-    private static final Pattern _latLonPattern = Pattern.compile("[^[\\d&&[-|+|.]]]*(" + _doublePattern
+    // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point).
+    // Regex has been rewritten following https://bugs.openjdk.java.net/browse/JDK-8189343
+    // from "[^[\\d&&[-|+|.]]]*(" to "[\\D&&[^-+.]]*("
+    private static final Pattern _latLonPattern = Pattern.compile("[\\D&&[^-+.]]*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
     
     private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("

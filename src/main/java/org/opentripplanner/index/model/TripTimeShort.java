@@ -2,9 +2,9 @@ package org.opentripplanner.index.model;
 
 import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -15,7 +15,7 @@ import com.beust.jcommander.internal.Lists;
 public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
-    public AgencyAndId stopId;
+    public FeedScopedId stopId;
     public int stopIndex;
     public int stopCount;
     public int scheduledArrival = UNDEFINED ;
@@ -28,9 +28,13 @@ public class TripTimeShort {
     public boolean realtime = false;
     public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
     public long serviceDay;
-    public AgencyAndId tripId;
+    public FeedScopedId tripId;
     public String blockId;
     public String headsign;
+    public int continuousPickup;
+    public int continuousDropOff;
+    public double serviceAreaRadius;
+    public String serviceArea;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -50,6 +54,10 @@ public class TripTimeShort {
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);
+        continuousPickup   = tt.getContinuousPickup(i);
+        continuousDropOff  = tt.getContinuousDropOff(i);
+        serviceAreaRadius  = tt.getServiceAreaRadius(i);
+        serviceArea        = tt.getServiceArea(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {

@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
@@ -18,19 +5,18 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -43,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -578,9 +563,9 @@ public class TimetableSnapshotSource {
             route = new Route();
             // Use route id of trip descriptor if available
             if (tripUpdate.getTrip().hasRouteId()) {
-                route.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getRouteId()));
+                route.setId(new FeedScopedId(feedId, tripUpdate.getTrip().getRouteId()));
             } else {
-                route.setId(new AgencyAndId(feedId, tripId));
+                route.setId(new FeedScopedId(feedId, tripId));
             }
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
@@ -593,11 +578,11 @@ public class TimetableSnapshotSource {
 
         final Trip trip = new Trip();
         // TODO: which Agency ID to use? Currently use feed id.
-        trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
+        trip.setId(new FeedScopedId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
 
         // Find service ID running on this service date
-        final Set<AgencyAndId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+        final Set<FeedScopedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
         if (serviceIds.isEmpty()) {
             // No service id exists: return error for now
             LOG.warn("ADDED trip has service date for which no service id is available, skipping.");
@@ -694,10 +679,10 @@ public class TimetableSnapshotSource {
             }
         }
 
-        // TODO: filter/interpolate stop times like in GTFSPatternHopFactory?
+        // TODO: filter/interpolate stop times like in PatternHopFactory?
 
         // Create StopPattern
-        final StopPattern stopPattern = new StopPattern(stopTimes);
+        final StopPattern stopPattern = new StopPattern(stopTimes, graph.deduplicator);
 
         // Get cached trip pattern or create one if it doesn't exist yet
         final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
@@ -838,7 +823,7 @@ public class TimetableSnapshotSource {
             return false;
         } else {
             // Check whether service date is served by trip
-            final Set<AgencyAndId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+            final Set<FeedScopedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
             if (!serviceIds.contains(trip.getServiceId())) {
                 // TODO: should we support this and change service id of trip?
                 LOG.warn("MODIFIED trip has a service date that is not served by trip, skipping.");
@@ -945,7 +930,7 @@ public class TimetableSnapshotSource {
      * @return trip pattern or null if no trip pattern was found
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
+        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
         TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }
@@ -958,7 +943,7 @@ public class TimetableSnapshotSource {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = graphIndex.routeForId.get(new AgencyAndId(feedId, routeId));
+        Route route = graphIndex.routeForId.get(new FeedScopedId(feedId, routeId));
         return route;
     }
 
@@ -970,7 +955,7 @@ public class TimetableSnapshotSource {
      * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new AgencyAndId(feedId, tripId));
+        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
         return trip;
     }
 
@@ -982,7 +967,7 @@ public class TimetableSnapshotSource {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = graphIndex.stopForId.get(new AgencyAndId(feedId, stopId));
+        Stop stop = graphIndex.stopForId.get(new FeedScopedId(feedId, stopId));
         return stop;
     }
 

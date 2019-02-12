@@ -1,29 +1,24 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.spt;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
 
 /**
  * A shortest path on the graph.
@@ -141,10 +136,10 @@ public class GraphPath {
         return states.getLast().getVertex();
     }
 
-    /** @return A list containing one AgencyAndId (trip_id) for each vehicle boarded in this path,
+    /** @return A list containing one trip_id for each vehicle boarded in this path,
      * in the chronological order they are boarded. */
-    public List<AgencyAndId> getTrips() {
-        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+    public List<FeedScopedId> getTrips() {
+        List<FeedScopedId> ret = new LinkedList<FeedScopedId>();
         Trip lastTrip = null;
         for (State s : states) {
             if (s.getBackEdge() != null) {
@@ -213,4 +208,43 @@ public class GraphPath {
         return rctx;
     }
 
+    public LineString getGeometry() {
+        CoordinateArrayListSequence coordinates = makeCoordinates(edges.toArray(new Edge[0]));
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
+
+    /**
+     * Return the total duration, in seconds, of call-and-ride legs used in a trip plan. If no
+     * call-and-ride legs are used, the duration is 0.
+     */
+    public int getCallAndRideDuration() {
+        if (states.isEmpty() || !states.getFirst().getOptions().rctx.graph.useFlexService) {
+            return 0;
+        }
+        int duration = 0;
+        for (State s : states) {
+            if (s.getBackEdge() != null && s.getBackEdge() instanceof TemporaryDirectPatternHop) {
+                TemporaryDirectPatternHop hop = (TemporaryDirectPatternHop) s.getBackEdge();
+                duration += hop.getDirectVehicleTime();
+            }
+        }
+        return duration;
+    }
+
+    /**
+     * Get all trips used in the search which were call-and-ride trips. Call-and-ride is part of
+     * GTFS-Flex and must be explicitly turned on in the graph.
+     */
+    public List<FeedScopedId> getCallAndRideTrips() {
+        if (states.isEmpty() || !states.getFirst().getOptions().rctx.graph.useFlexService) {
+            return Collections.emptyList();
+        }
+        List<FeedScopedId> trips = new ArrayList<>();
+        for (State s : states) {
+            if (s.getBackEdge() != null && s.getBackEdge() instanceof TemporaryDirectPatternHop) {
+                trips.add(s.getBackTrip().getId());
+            }
+        }
+        return trips;
+    }
 }

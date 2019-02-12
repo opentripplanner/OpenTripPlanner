@@ -1,20 +1,10 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.vertextype;
 
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+
+import java.util.Random;
 
 public class PatternArriveVertex extends PatternStopVertex {
 
@@ -25,6 +15,11 @@ public class PatternArriveVertex extends PatternStopVertex {
         super(g, makeLabel(pattern, stopIndex), pattern, pattern.stopPattern.stops[stopIndex]);
     }
 
+    /** constructor for temporary trip patterns */
+    public PatternArriveVertex(Graph g, TripPattern pattern, int stopIndex, Stop stop) {
+        super(g, makeTemporaryLabel(pattern, stopIndex), pattern, stop);
+    }
+
     // constructor for frequency patterns is now missing
     // it is possible to have both a freq and non-freq pattern with the same stop pattern
 
@@ -32,5 +27,8 @@ public class PatternArriveVertex extends PatternStopVertex {
         return String.format("%s_%02d_A", pattern.code, stop);
     }
 
+    private static String makeTemporaryLabel(TripPattern pattern, int stop) {
+        return String.format("%s_%02d_A_%d", pattern.code + "_temp", stop, new Random().nextInt());
+    }
 
 }

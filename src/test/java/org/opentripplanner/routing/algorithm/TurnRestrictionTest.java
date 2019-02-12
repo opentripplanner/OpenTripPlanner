@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.Assert.*;
@@ -35,12 +22,12 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 public class TurnRestrictionTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     private Vertex topRight;
 
@@ -50,7 +37,7 @@ public class TurnRestrictionTest {
 
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
@@ -100,8 +87,8 @@ public class TurnRestrictionTest {
 
     @Test
     public void testHasExplicitTurnRestrictions() {
-        assertFalse(_graph.getTurnRestrictions(maple_main1).isEmpty());
-        assertTrue(_graph.getTurnRestrictions(broad1_2).isEmpty());
+        assertFalse(graph.getTurnRestrictions(maple_main1).isEmpty());
+        assertTrue(graph.getTurnRestrictions(broad1_2).isEmpty());
     }
     
     @Test
@@ -110,7 +97,7 @@ public class TurnRestrictionTest {
         options.carSpeed = 1.0;
         options.walkSpeed = 1.0;
 
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -135,7 +122,7 @@ public class TurnRestrictionTest {
         RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
         options.walkSpeed = 1.0;
         
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -160,7 +147,7 @@ public class TurnRestrictionTest {
         RoutingRequest options = new RoutingRequest(TraverseMode.CAR);
         options.carSpeed = 1.0;
 
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
@@ -186,7 +173,7 @@ public class TurnRestrictionTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 
@@ -211,7 +198,7 @@ public class TurnRestrictionTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        _graph.addTurnRestriction(from, restrict);
+        graph.addTurnRestriction(from, restrict);
     }
 
 }

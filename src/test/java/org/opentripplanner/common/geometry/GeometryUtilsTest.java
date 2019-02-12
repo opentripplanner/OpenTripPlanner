@@ -1,30 +1,23 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.common.geometry;
 
-import static org.junit.Assert.assertEquals;
-
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GeometryUtilsTest {
+
+    private static final double tolerance = 0.000001;
+
     @Test
     public final void testSplitGeometryAtFraction() {
         Coordinate[] coordinates = new Coordinate[4];
@@ -217,5 +210,22 @@ public class GeometryUtilsTest {
         sequence = coordinateSequenceFactory.create(referenceCoordinates[8][1]);
         geometry = new LineString(sequence, geometryFactory);
         assertEquals(geometry, results[8][1]);
+    }
+
+    @Test
+    public void testWkt() {
+        String wkt = "POLYGON((1.0 2.0,3.0 -4.0,-1.0 2.0, 1.0 2.0))";
+        Geometry geom = GeometryUtils.parseWkt(wkt);
+        assertTrue(geom instanceof Polygon);
+        Coordinate[] coords = geom.getCoordinates();
+        assertEquals(4, coords.length);
+        assertEquals(1.0, coords[0].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[0].getOrdinate(1), tolerance);
+        assertEquals(3.0, coords[1].getOrdinate(0), tolerance);
+        assertEquals(-4.0, coords[1].getOrdinate(1), tolerance);
+        assertEquals(-1.0, coords[2].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[2].getOrdinate(1), tolerance);
+        assertEquals(1.0, coords[3].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[3].getOrdinate(1), tolerance);
     }
 }
