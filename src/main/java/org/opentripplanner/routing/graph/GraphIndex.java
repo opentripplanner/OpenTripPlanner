@@ -1159,6 +1159,19 @@ public class GraphIndex {
         return null;
     }
 
+
+    public Agency getAgencyWithFeedScopeId(String agencyFeedScopeIdRaw) {
+        FeedScopedId agencyFeedScopeId = FeedScopedId.convertFromString(agencyFeedScopeIdRaw);
+
+        Map<String, Agency> feedAgencies = agenciesForFeedId.get(agencyFeedScopeId.getAgencyId());
+        if (feedAgencies == null) return null;
+
+        Agency agency = feedAgencies.get(agencyFeedScopeId.getId());
+
+        return agency;
+
+    }
+
     /**
      * Construct a set of all Agencies in this graph, spanning across all feed IDs.
      * I am creating this method only to allow merging pull request #2032 which adds GraphQL.

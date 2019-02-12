@@ -21,6 +21,10 @@ public final class Agency extends IdentityBean<String> {
 
     private String brandingUrl;
 
+    private String feedId;
+
+    private FeedScopedId feedScopeId;
+
     public Agency() {
     }
 
@@ -100,5 +104,18 @@ public final class Agency extends IdentityBean<String> {
 
     public String toString() {
         return "<Agency " + this.id + ">";
+    }
+
+    public String getFeedId() {
+        return feedId;
+    }
+
+    public void setFeedId(String feedId) {
+        this.feedId = feedId;
+        this.feedScopeId = new FeedScopedId(this.getFeedId(),this.getId());
+    }
+
+    public FeedScopedId getFeedScopeId() {
+        return this.feedScopeId;
     }
 }
