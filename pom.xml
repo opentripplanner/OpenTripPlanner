@@ -79,7 +79,8 @@
 
     <properties>
         <geotools.version>10.5</geotools.version>
-        <jackson.version>2.5.3</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
+        <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aws.version>1.9.39</aws.version>
     </properties>
@@ -463,11 +464,17 @@
             <artifactId>aws-java-sdk-sqs</artifactId>
             <version>${aws.version}</version>
         </dependency>
-        <!-- Fast drop-in serialization including compound value types (structs) for Java -->
+        <!-- Kryo serialization, used to save graphs to disk. -->
         <dependency>
-            <groupId>de.ruedigermoeller</groupId>
-            <artifactId>fst</artifactId>
-            <version>2.34</version>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <!-- Extra serializers for Kryo -->
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.42</version>
         </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
@@ -594,18 +601,18 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
         <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
 
         <!-- Jackson modules. -->
@@ -711,7 +718,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.17</version>
+            <version>1.18</version>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
@@ -805,17 +812,11 @@
             <version>2.7.0</version>
         </dependency>
         -->
-        <!-- support for OpenTraffic data -->
-        <dependency>
-            <groupId>io.opentraffic</groupId>
-            <artifactId>traffic-engine</artifactId>
-            <version>0.2</version>
-        </dependency>
-        <!-- R5 may eventually be an alternate routing option within OTP, and provides Graph serialization. -->
+        <!-- OTP 2.0 will adopt routing methods based on those in R5. This also contains a serialization test framework. -->
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>r5</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.4.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-simple</artifactId>
