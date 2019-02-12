@@ -35,6 +35,20 @@ public final class Trip extends IdentityBean<FeedScopedId> {
     /** Custom extension for KCM to specify a fare per-trip */
     private String fareId;
 
+    private String drtMaxTravelTime;
+
+    private String drtAvgTravelTime;
+
+    private double drtAdvanceBookMin;
+
+    private String drtPickupMessage;
+
+    private String drtDropOffMessage;
+
+    private String continuousPickupMessage;
+
+    private String continuousDropOffMessage;
+
     public Trip() {
     }
 
@@ -52,6 +66,13 @@ public final class Trip extends IdentityBean<FeedScopedId> {
         this.tripBikesAllowed = obj.tripBikesAllowed;
         this.bikesAllowed = obj.bikesAllowed;
         this.fareId = obj.fareId;
+        this.drtMaxTravelTime = obj.drtMaxTravelTime;
+        this.drtAvgTravelTime = obj.drtAvgTravelTime;
+        this.drtAdvanceBookMin = obj.drtAdvanceBookMin;
+        this.drtPickupMessage = obj.drtPickupMessage;
+        this.drtDropOffMessage = obj.drtDropOffMessage;
+        this.continuousPickupMessage = obj.continuousPickupMessage;
+        this.continuousDropOffMessage = obj.continuousDropOffMessage;
     }
 
     public FeedScopedId getId() {
@@ -168,6 +189,62 @@ public final class Trip extends IdentityBean<FeedScopedId> {
 
     public void setFareId(String fareId) {
         this.fareId = fareId;
+    }
+
+    public String getDrtMaxTravelTime() {
+        return drtMaxTravelTime;
+    }
+
+    public void setDrtMaxTravelTime(String drtMaxTravelTime) {
+        this.drtMaxTravelTime = drtMaxTravelTime;
+    }
+
+    public String getDrtAvgTravelTime() {
+        return drtAvgTravelTime;
+    }
+
+    public void setDrtAvgTravelTime(String drtAvgTravelTime) {
+        this.drtAvgTravelTime = drtAvgTravelTime;
+    }
+
+    public double getDrtAdvanceBookMin() {
+        return drtAdvanceBookMin;
+    }
+
+    public void setDrtAdvanceBookMin(double drtAdvanceBookMin) {
+        this.drtAdvanceBookMin = drtAdvanceBookMin;
+    }
+
+    public String getDrtPickupMessage() {
+        return drtPickupMessage;
+    }
+
+    public void setDrtPickupMessage(String drtPickupMessage) {
+        this.drtPickupMessage = drtPickupMessage;
+    }
+
+    public String getDrtDropOffMessage() {
+        return drtDropOffMessage;
+    }
+
+    public void setDrtDropOffMessage(String drtDropOffMessage) {
+        this.drtDropOffMessage = drtDropOffMessage;
+    }
+
+    public String getContinuousPickupMessage() {
+        return continuousPickupMessage;
+    }
+
+    public void setContinuousPickupMessage(String continuousPickupMessage) {
+        this.continuousPickupMessage = continuousPickupMessage;
+    }
+
+    public String getContinuousDropOffMessage() {
+        return continuousDropOffMessage;
+    }
+
+    public void setContinuousDropOffMessage(String continuousDropOffMessage) {
+        this.continuousDropOffMessage = continuousDropOffMessage;
     }
 
 }

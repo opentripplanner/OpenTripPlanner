@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.graph;
 
-import com.conveyal.r5.kryo.TIntArrayListSerializer;
-import com.conveyal.r5.kryo.TIntIntHashMapSerializer;
+import com.conveyal.kryo.TIntArrayListSerializer;
+import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -9,11 +9,11 @@ import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
-import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TIntArrayList;
@@ -47,6 +47,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.flex.FlexIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -57,7 +58,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.opentripplanner.util.InstanceCountingClassResolver;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +110,8 @@ public class Graph implements Serializable {
     public transient StreetVertexIndexService streetIndex;
 
     public transient GraphIndex index;
+
+    public transient FlexIndex flexIndex;
 
     private transient GeometryIndex geomIndex;
 
@@ -206,6 +208,12 @@ public class Graph implements Serializable {
 
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
+
+    /** Whether to use flex modes */
+    public boolean useFlexService = false;
+
+    /** Areas for flex service */
+    public Map<FeedScopedId, Geometry> flexAreasById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -687,6 +695,10 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
+        if (useFlexService ) {
+            this.flexIndex = new FlexIndex();
+            flexIndex.init(this);
+        }
     }
     
     public static Graph load(InputStream in) {
@@ -885,6 +897,10 @@ public class Graph implements Serializable {
         this.feedInfoForId.put(info.getId().toString(), info);
     }
 
+    public void addFlexArea(String feedId, String areaId, Polygon flexArea) {
+        this.flexAreasById.put(new FeedScopedId(feedId, areaId), flexArea);
+    }
+
     /**
      * Returns the time zone for the first agency in this graph. This is used to interpret times in API requests. The JVM default time zone cannot be
      * used because we support multiple graphs on one server via the routerId. Ideally we would want to interpret times in the time zone of the
@@ -1047,5 +1063,14 @@ public class Graph implements Serializable {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public void setUseFlexService(boolean useFlexService) {
+        // when passing in graph from memory, router config had not loaded when "index()" called
+        if (useFlexService && !this.useFlexService) {
+            this.flexIndex = new FlexIndex();
+            flexIndex.init(this);
+        }
+        this.useFlexService = useFlexService;
     }
 }

@@ -2,7 +2,7 @@ package org.opentripplanner.common.geometry;
 
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A generic indexed grid of TZ samples. TZ could be anything but is usually a vector of parameters.

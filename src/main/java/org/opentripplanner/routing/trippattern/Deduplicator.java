@@ -15,6 +15,7 @@ public class Deduplicator implements Serializable {
     private static final long serialVersionUID = 20140524L;
 
     private final Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
+    private final Map<DoubleArray, DoubleArray> canonicalDoubleArrays = Maps.newHashMap();
     private final Map<String, String> canonicalStrings = Maps.newHashMap();
     private final Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
     private final Map<StringArray, StringArray> canonicalStringArrays = Maps.newHashMap();
@@ -22,6 +23,7 @@ public class Deduplicator implements Serializable {
     /** Free up any memory used by the deduplicator. */
     public void reset() {
         canonicalIntArrays.clear();
+        canonicalDoubleArrays.clear();
         canonicalStrings.clear();
         canonicalBitSets.clear();
         canonicalStringArrays.clear();
@@ -35,6 +37,17 @@ public class Deduplicator implements Serializable {
         if (canonical == null) {
             canonical = intArray;
             canonicalIntArrays.put(canonical, canonical);
+        }
+        return canonical.array;
+    }
+
+    public double[] deduplicateDoubleArray(double[] original) {
+        if (original == null) return null;
+        DoubleArray doubleArray = new DoubleArray(original);
+        DoubleArray canonical = canonicalDoubleArrays.get(doubleArray);
+        if (canonical == null) {
+            canonical = doubleArray;
+            canonicalDoubleArrays.put(canonical, canonical);
         }
         return canonical.array;
     }
@@ -80,6 +93,25 @@ public class Deduplicator implements Serializable {
         public boolean equals (Object other) {
             if (other instanceof IntArray) {
                 return Arrays.equals(array, ((IntArray) other).array);
+            } else return false;
+        }
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(array);
+        }
+    }
+
+    /** A wrapper for a primitive double array. This is insane but necessary in Java. */
+    private class DoubleArray implements Serializable {
+        private static final long serialVersionUID = 20140524L;
+        final double[] array;
+        DoubleArray(double[] array) {
+            this.array = array;
+        }
+        @Override
+        public boolean equals (Object other) {
+            if (other instanceof DoubleArray) {
+                return Arrays.equals(array, ((DoubleArray) other).array);
             } else return false;
         }
         @Override

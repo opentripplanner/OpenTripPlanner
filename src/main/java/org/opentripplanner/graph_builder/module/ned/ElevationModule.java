@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
