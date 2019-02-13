@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.trippattern;
 
 import static org.junit.Assert.assertEquals;
@@ -22,32 +9,36 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
+import org.mockito.Matchers;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
 
+import static org.mockito.Mockito.*;
+
 public class TripTimesTest {
-    private static final AgencyAndId tripId = new AgencyAndId("agency", "testtrip");
+    private static final FeedScopedId tripId = new FeedScopedId("agency", "testtrip");
 
-    private static final AgencyAndId stop_a = new AgencyAndId("agency", "A"); // 0
-    private static final AgencyAndId stop_b = new AgencyAndId("agency", "B"); // 1
-    private static final AgencyAndId stop_c = new AgencyAndId("agency", "C"); // 2
-    private static final AgencyAndId stop_d = new AgencyAndId("agency", "D"); // 3
-    private static final AgencyAndId stop_e = new AgencyAndId("agency", "E"); // 4
-    private static final AgencyAndId stop_f = new AgencyAndId("agency", "F"); // 5
-    private static final AgencyAndId stop_g = new AgencyAndId("agency", "G"); // 6
-    private static final AgencyAndId stop_h = new AgencyAndId("agency", "H"); // 7
+    private static final FeedScopedId stop_a = new FeedScopedId("agency", "A"); // 0
+    private static final FeedScopedId stop_b = new FeedScopedId("agency", "B"); // 1
+    private static final FeedScopedId stop_c = new FeedScopedId("agency", "C"); // 2
+    private static final FeedScopedId stop_d = new FeedScopedId("agency", "D"); // 3
+    private static final FeedScopedId stop_e = new FeedScopedId("agency", "E"); // 4
+    private static final FeedScopedId stop_f = new FeedScopedId("agency", "F"); // 5
+    private static final FeedScopedId stop_g = new FeedScopedId("agency", "G"); // 6
+    private static final FeedScopedId stop_h = new FeedScopedId("agency", "H"); // 7
 
-    private static final AgencyAndId[] stops =
+    private static final FeedScopedId[] stops =
         {stop_a, stop_b, stop_c, stop_d, stop_e, stop_f, stop_g, stop_h};
 
     private static final TripTimes originalTripTimes;
@@ -241,5 +232,81 @@ public class TripTimesTest {
         for (int i = 0; i < stops.length; i++) {
             assertEquals(i, updatedTripTimes.getDwellTime(i));
         }
+    }
+
+    @Test
+    public void testCallAndRideBoardTime() {
+        // times: 0, 60, 120
+
+        ServiceDay sd = mock(ServiceDay.class);
+        when(sd.secondsSinceMidnight(Matchers.anyLong())).thenCallRealMethod();
+        int time;
+
+        // time before interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, false, 0);
+        assertEquals(60, time);
+
+        // time in interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 70, 20, sd, false, 0);
+        assertEquals(70, time);
+
+        // time would overlap end of interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 105, 20, sd, false, 0);
+        assertTrue(time < 105);
+
+        // time after end of interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 125, 20, sd, false, 0);
+        assertTrue(time < 105);
+
+        // clock time before
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 30);
+        assertEquals(60, time);
+
+        // clock time in interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 70);
+        assertEquals(70, time);
+
+        // clock time after interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 130);
+        assertTrue(time < 50);
+
+        // clock time would cause overlap
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 105);
+        assertTrue(time < 50);
+    }
+
+    @Test
+    public void testCallAndRideAlightTime() {
+        ServiceDay sd = mock(ServiceDay.class);
+        when(sd.secondsSinceMidnight(Matchers.anyLong())).thenCallRealMethod();
+        int time;
+
+        // time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 130, 20, sd, false, 0);
+        assertEquals(120, time);
+
+        // time in interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, false, 0);
+        assertEquals(110, time);
+
+        // time in interval, would cause overlap
+        time = originalTripTimes.getCallAndRideAlightTime(2, 65, 20, sd, false, 0);
+        assertTrue(time == -1 || time > 65);
+
+        // time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 55, 20, sd, false, 0);
+        assertTrue(time == -1 || time > 65);
+
+        // clock time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 130, 20, sd, true, 130);
+        assertEquals(-1, time);
+
+        // clock time before board
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, true, 85);
+        assertEquals(110, time);
+
+        // clock time after board
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, true, 100);
+        assertEquals(-1, time);
     }
 }

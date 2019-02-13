@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.api.model;
 
 import java.util.ArrayList;
@@ -23,7 +10,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -138,7 +125,7 @@ public class Leg {
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
      */
-    public AgencyAndId routeId = null;
+    public FeedScopedId routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
@@ -188,7 +175,7 @@ public class Leg {
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
-    public AgencyAndId tripId = null;
+    public FeedScopedId tripId = null;
     
     /**
      * For transit legs, the service date of the trip.
@@ -259,6 +246,60 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
+
+     /**
+      * True if this is a call-and-ride leg.
+      */
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean callAndRide;
+
+    /* For call-n-ride leg, supply maximum start time based on calculation. */
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar flexCallAndRideMaxStartTime = null;
+
+     /* For call-n-ride leg, supply minimum end time based on calculation. */
+    @XmlAttribute
+    @JsonSerialize
+    public Calendar flexCallAndRideMinEndTime = null;
+
+    /** trip.drt_advance_book_min if this is a demand-response leg */
+    @XmlAttribute
+    @JsonSerialize
+    public double flexDrtAdvanceBookMin;
+
+     /**
+      *  Agency message if this is leg has a demand-response pickup and the Trip has
+      *  `drt_pickup_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexDrtPickupMessage;
+
+     /**
+      * Agency message if this is leg has a demand-response dropoff and the Trip has
+      * `drt_drop_off_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexDrtDropOffMessage;
+
+     /**
+      * Agency message if this is leg has a flag stop pickup and the Trip has
+      * `continuous_pickup_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexFlagStopPickupMessage;
+
+     /**
+      * Agency message if this is leg has a flag stop dropoff and the Trip has
+      * `continuous_drop_off_message` defined.
+      */
+     @XmlAttribute
+     @JsonSerialize
+     public String flexFlagStopDropOffMessage;
 
     /**
      * Whether this leg is a transit leg or not.

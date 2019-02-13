@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.graph;
 
 import java.io.IOException;
@@ -28,7 +15,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import java.util.Locale;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -96,6 +83,17 @@ public abstract class Vertex implements Serializable, Cloneable {
     @Override
     public int hashCode() {
         return index;
+    }
+
+    // Stupid method for deserialization, initialize transient fields.
+    // Stopgap until old serialization methods are completely replaced.
+    public void initEdgeListsIfNeeded () {
+        if (this.outgoing == null) {
+            this.outgoing = new Edge[0];
+        }
+        if (this.incoming == null) {
+            this.incoming = new Edge[0];
+        }
     }
 
     /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */

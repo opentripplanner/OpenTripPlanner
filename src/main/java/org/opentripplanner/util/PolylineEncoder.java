@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.util;
 
 import java.util.AbstractList;
@@ -19,10 +6,10 @@ import java.util.List;
 
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiLineString;
 
 public class PolylineEncoder {
 
@@ -193,49 +180,49 @@ public class PolylineEncoder {
 
     private static class PointAdapterList extends AbstractList<Coordinate> {
 
-        private double[] _lat;
-        private double[] _lon;
-        private int _offset;
-        private int _length;
+        private double[] lat;
+        private double[] lon;
+        private int offset;
+        private int length;
 
         public PointAdapterList(double[] lat, double[] lon) {
             this(lat, lon, 0, lat.length);
         }
 
         public PointAdapterList(double[] lat, double[] lon, int offset, int length) {
-            _lat = lat;
-            _lon = lon;
-            _offset = offset;
-            _length = length;
+            this.lat = lat;
+            this.lon = lon;
+            this.offset = offset;
+            this.length = length;
         }
 
         @Override
         public Coordinate get(int index) {
-            return new Coordinate(_lon[_offset + index], _lat[_offset + index]);
+            return new Coordinate(lon[offset + index], lat[offset + index]);
         }
 
         @Override
         public int size() {
-            return _length;
+            return length;
         }
     }
 
     private static class CoordinateList extends AbstractList<Coordinate> {
 
-        private Coordinate[] _coordinates;
+        private Coordinate[] coordinates;
 
         public CoordinateList(Coordinate[] coordinates) {
-            _coordinates = coordinates;
+            this.coordinates = coordinates;
         }
 
         @Override
         public Coordinate get(int index) {
-            return _coordinates[index];
+            return coordinates[index];
         }
 
         @Override
         public int size() {
-            return _coordinates.length;
+            return coordinates.length;
         }
     }
 }

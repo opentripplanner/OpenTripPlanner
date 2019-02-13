@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.api.common;
 
 import java.util.*;
@@ -23,7 +10,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -232,10 +219,22 @@ public abstract class RoutingResource {
      */
     @QueryParam("bannedRoutes")
     protected String bannedRoutes;
+
+    /**
+     * Functions the same as bannnedRoutes, except only the listed routes are allowed.
+     */
+    @QueryParam("whiteListedRoutes")
+    protected String whiteListedRoutes;
     
     /** The comma-separated list of banned agencies. */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
+
+    /**
+     * Functions the same as banned agencies, except only the listed agencies are allowed.
+     */
+    @QueryParam("whiteListedAgencies")
+    protected String whiteListedAgencies;
     
     /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
@@ -347,6 +346,36 @@ public abstract class RoutingResource {
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
 
+    /*
+     * Control the size of flag-stop buffer returned in API response. This parameter only applies
+     * to GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     */
+    @QueryParam("flexFlagStopBufferSize")
+    protected Double flexFlagStopBufferSize;
+
+    /**
+     * Whether to use reservation-based services
+     */
+    @QueryParam("flexUseReservationServices")
+    protected Boolean flexUseReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services
+     */
+    @QueryParam("flexUseEligibilityServices")
+    protected Boolean flexUseEligibilityServices = true;
+
+    /**
+     * Whether to ignore DRT time limits.
+     *
+     * According to the GTFS-flex spec, demand-response transit (DRT) service must be reserved
+     * at least `drt_advance_book_min` minutes in advance. OTP not allow DRT service to be used
+     * inside that time window, unless this parameter is set to true.
+     */
+    @QueryParam("flexIgnoreDrtAdvanceBookMin")
+    protected Boolean flexIgnoreDrtAdvanceBookMin;
+
     @QueryParam("maxHours")
     private Double maxHours;
 
@@ -361,6 +390,13 @@ public abstract class RoutingResource {
      */
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
+
+    /**
+     * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
+     * otherwise it uses default sorting. More sorting methods may be added in the future.
+     */
+    @QueryParam("pathComparator")
+    private String pathComparator;
 
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -412,6 +448,8 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+
+            request.resetClockTime();
         }
 
         if (wheelchair != null)
@@ -502,10 +540,17 @@ public abstract class RoutingResource {
         if (bannedRoutes != null)
             request.setBannedRoutes(bannedRoutes);
 
+        if (whiteListedRoutes != null)
+            request.setWhiteListedRoutes(whiteListedRoutes);
+
         if (bannedAgencies != null)
             request.setBannedAgencies(bannedAgencies);
 
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
+        if (whiteListedAgencies != null)
+            request.setWhiteListedAgencies(whiteListedAgencies);
+
+        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
+      
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
@@ -565,10 +610,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = AgencyAndId.convertFromString(startTransitStopId);
+            request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = AgencyAndId.convertFromString(startTransitTripId);
+            request.startingTransitTripId = FeedScopedId.convertFromString(startTransitTripId);
 
         if (clampInitialWait != null)
             request.clampInitialWait = clampInitialWait;
@@ -582,6 +627,18 @@ public abstract class RoutingResource {
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
 
+        if (flexFlagStopBufferSize != null)
+            request.flexFlagStopBufferSize = flexFlagStopBufferSize;
+
+        if (flexUseReservationServices != null)
+            request.flexUseReservationServices = flexUseReservationServices;
+
+        if (flexUseEligibilityServices != null)
+            request.flexUseEligibilityServices = flexUseEligibilityServices;
+
+        if (flexIgnoreDrtAdvanceBookMin != null)
+            request.flexIgnoreDrtAdvanceBookMin = flexIgnoreDrtAdvanceBookMin;
+
         if (maxHours != null)
             request.maxHours = maxHours;
 
@@ -594,6 +651,9 @@ public abstract class RoutingResource {
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
 
+        if (pathComparator != null)
+            request.pathComparator = pathComparator;
+
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
         return request;
@@ -604,12 +664,12 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    private HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }
         
-        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
+        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {
             // TODO this apparently allows banning stops within a trip with integers. Why?
@@ -617,7 +677,7 @@ public abstract class RoutingResource {
             if (parts.length < 2) continue; // throw exception?
             String agencyIdString = parts[0];
             String tripIdString = parts[1];
-            AgencyAndId tripId = new AgencyAndId(agencyIdString, tripIdString);
+            FeedScopedId tripId = new FeedScopedId(agencyIdString, tripIdString);
             BannedStopSet bannedStops;
             if (parts.length == 2) {
                 bannedStops = BannedStopSet.ALL;

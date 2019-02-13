@@ -2,7 +2,7 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Sets;
-import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class Segment {
         }
     }
 
-    // Use AgencyAndId instead of String to get both since we are now multi-feed
+    // Use FeedScopedId instead of String to get both since we are now multi-feed
     public String from;
     public String to;
     public int walkTime;

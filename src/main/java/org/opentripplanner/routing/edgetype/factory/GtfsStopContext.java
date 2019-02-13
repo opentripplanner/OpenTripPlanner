@@ -1,25 +1,12 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype.factory;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
@@ -28,12 +15,12 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 /**
- *  Retains graph-wide information between GTFSPatternHopFactory runs on different feeds.
+ *  Retains graph-wide information between PatternHopFactory runs on different feeds.
  *  FIXME is there any legitimate reason to even do that? Wouldn't it be better to keep each GTFS completely isolated?
  */
 public class GtfsStopContext {
 
-    public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
+    public HashSet<FeedScopedId> stops = new HashSet<FeedScopedId>();
 
     // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
     public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();

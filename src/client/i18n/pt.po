@@ -1,5 +1,4 @@
 # Translations template for OpenTripPlanner.
-# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the OpenTripPlanner
 # project.
 # FIRST AUTHOR <tiagojjpedro@gmail.com>, 2015.

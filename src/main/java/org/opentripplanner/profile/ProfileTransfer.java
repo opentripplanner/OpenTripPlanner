@@ -1,7 +1,6 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

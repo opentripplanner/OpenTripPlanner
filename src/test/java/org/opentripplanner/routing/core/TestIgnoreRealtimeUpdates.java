@@ -1,20 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -42,9 +29,9 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Graph graph = new Graph();
         
         Stop stop1 = new Stop();
-        stop1.setId(new AgencyAndId("agency", "stop1"));
+        stop1.setId(new FeedScopedId("agency", "stop1"));
         Stop stop2 = new Stop();
-        stop2.setId(new AgencyAndId("agency", "stop2"));
+        stop2.setId(new FeedScopedId("agency", "stop2"));
         
         Vertex from = new TransitStop(graph, stop1);
         Vertex to = new TransitStop(graph, stop2);

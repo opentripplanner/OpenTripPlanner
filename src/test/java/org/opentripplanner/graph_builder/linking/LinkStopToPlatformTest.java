@@ -1,15 +1,15 @@
 package org.opentripplanner.graph_builder.linking;
 
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.junit.Before;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Graph;
@@ -26,22 +26,22 @@ public class LinkStopToPlatformTest {
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private Graph _graph;
+    private Graph graph;
 
     @Before
     public void before() {
 
         // Set up transit platform
 
-        _graph = new Graph();
+        graph = new Graph();
 
         ArrayList<IntersectionVertex> vertices = new ArrayList<IntersectionVertex>();
 
-        vertices.add(new IntersectionVertex(_graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
-        vertices.add(new IntersectionVertex(_graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
-        vertices.add(new IntersectionVertex(_graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
-        vertices.add(new IntersectionVertex(_graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
-        vertices.add(new IntersectionVertex(_graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
+        vertices.add(new IntersectionVertex(graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
+        vertices.add(new IntersectionVertex(graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
+        vertices.add(new IntersectionVertex(graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
+        vertices.add(new IntersectionVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
+        vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
         AreaEdgeList areaEdgeList = new AreaEdgeList();
 
@@ -60,11 +60,11 @@ public class LinkStopToPlatformTest {
         edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
         Stop stop = new Stop();
-        stop.setId(new AgencyAndId("TestAgency", "TestStop"));
+        stop.setId(new FeedScopedId("TestAgency", "TestStop"));
         stop.setLon(10.22213);
         stop.setLat(59.13545);
 
-        TransitStop transitStop = new TransitStop(_graph, stop);
+        TransitStop transitStop = new TransitStop(graph, stop);
     }
 
     /**
@@ -72,19 +72,19 @@ public class LinkStopToPlatformTest {
      */
     @Test
     public void testLinkStopWithoutExtraEdges() {
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
         splitter.link();
 
-        assertEquals(16, _graph.getEdges().size());
+        assertEquals(16, graph.getEdges().size());
     }
 
     @Test
     public void testLinkStopWithExtraEdges() {
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(_graph);
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
         splitter.setAddExtraEdgesToAreas(true);
         splitter.link();
 
-        assertEquals(38, _graph.getEdges().size());
+        assertEquals(38, graph.getEdges().size());
     }
 
     private AreaEdge createAreaEdge(IntersectionVertex v1, IntersectionVertex v2, AreaEdgeList area, String nameString) {

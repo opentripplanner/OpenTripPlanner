@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.shapefile;
 
 import java.util.ArrayList;
@@ -50,10 +37,10 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiLineString;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
@@ -63,9 +50,9 @@ import org.opentripplanner.util.NonLocalizedString;
 public class ShapefileStreetModule implements GraphBuilderModule {
     private static Logger log = LoggerFactory.getLogger(ShapefileStreetModule.class);
 
-    private FeatureSourceFactory _featureSourceFactory;
+    private FeatureSourceFactory featureSourceFactory;
 
-    private ShapefileStreetSchema _schema;
+    private ShapefileStreetSchema schema;
 
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
@@ -78,11 +65,11 @@ public class ShapefileStreetModule implements GraphBuilderModule {
     }
     
     public void setFeatureSourceFactory(FeatureSourceFactory factory) {
-        _featureSourceFactory = factory;
+        featureSourceFactory = factory;
     }
 
     public void setSchema(ShapefileStreetSchema schema) {
-        _schema = schema;
+        this.schema = schema;
     }
 
     @Override
@@ -90,7 +77,7 @@ public class ShapefileStreetModule implements GraphBuilderModule {
 
         try {
 
-            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = _featureSourceFactory
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = featureSourceFactory
                     .getFeatureSource();
             CoordinateReferenceSystem sourceCRS = featureSource.getInfo().getCRS();
 
@@ -111,20 +98,20 @@ public class ShapefileStreetModule implements GraphBuilderModule {
 
             HashMap<String, HashMap<Coordinate, Integer>> intersectionNameToId = new HashMap<String, HashMap<Coordinate, Integer>>();
 
-            SimpleFeatureConverter<String> streetIdConverter = _schema.getIdConverter();
-            SimpleFeatureConverter<String> streetNameConverter = _schema.getNameConverter();
-            SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = _schema
+            SimpleFeatureConverter<String> streetIdConverter = schema.getIdConverter();
+            SimpleFeatureConverter<String> streetNameConverter = schema.getNameConverter();
+            SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = schema
                     .getPermissionConverter();
-            SimpleFeatureConverter<String> noteConverter = _schema.getNoteConverter();
+            SimpleFeatureConverter<String> noteConverter = schema.getNoteConverter();
 
             HashMap<Coordinate, IntersectionVertex> intersectionsByLocation = 
                     new HashMap<Coordinate, IntersectionVertex>();
 
-            SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
+            SimpleFeatureConverter<P2<Double>> safetyConverter = schema.getBicycleSafetyConverter();
 
-            SimpleFeatureConverter<Boolean> slopeOverrideCoverter = _schema.getSlopeOverrideConverter();
+            SimpleFeatureConverter<Boolean> slopeOverrideCoverter = schema.getSlopeOverrideConverter();
 
-            SimpleFeatureConverter<Boolean> featureSelector = _schema.getFeatureSelector();
+            SimpleFeatureConverter<Boolean> featureSelector = schema.getFeatureSelector();
             
             // Keep track of features that are duplicated so we don't have duplicate streets
             Set<Object> seen = new HashSet<Object>();
@@ -237,16 +224,16 @@ public class ShapefileStreetModule implements GraphBuilderModule {
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);
         } finally {
-            _featureSourceFactory.cleanup();
+            featureSourceFactory.cleanup();
         }       
     }
 
     private HashMap<Coordinate, TreeSet<String>> getCoordinatesToStreetNames(
             List<SimpleFeature> features) {
         HashMap<Coordinate, TreeSet<String>> coordinateToStreets = new HashMap<Coordinate, TreeSet<String>>();
-        SimpleFeatureConverter<String> streetNameConverter = _schema.getNameConverter();
+        SimpleFeatureConverter<String> streetNameConverter = schema.getNameConverter();
 
-        SimpleFeatureConverter<Boolean> featureSelector = _schema.getFeatureSelector();
+        SimpleFeatureConverter<Boolean> featureSelector = schema.getFeatureSelector();
         Iterator<SimpleFeature> it = features.iterator();
         while (it.hasNext()) {
             SimpleFeature feature = it.next();
@@ -331,6 +318,6 @@ public class ShapefileStreetModule implements GraphBuilderModule {
 
     @Override
     public void checkInputs() {
-        _featureSourceFactory.checkInputs();
+        featureSourceFactory.checkInputs();
     }
 }

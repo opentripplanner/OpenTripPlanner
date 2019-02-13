@@ -1,20 +1,7 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -35,7 +22,7 @@ import static org.junit.Assert.*;
  */
 public class SimpleTraversalCostModelTest {
     
-    private Graph _graph;
+    private Graph graph;
     
     private RoutingRequest options;
 
@@ -43,7 +30,7 @@ public class SimpleTraversalCostModelTest {
     
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
         costModel = new SimpleIntersectionTraversalCostModel();
         
         // Initialize the routing request.
@@ -260,7 +247,7 @@ public class SimpleTraversalCostModelTest {
      ****/
 
     private IntersectionVertex vertex(String label, Coordinate coord, boolean hasLight) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, coord.y, coord.x);
+        IntersectionVertex v = new IntersectionVertex(graph, label, coord.y, coord.x);
         v.trafficLight = (hasLight);
         return v;
     }
