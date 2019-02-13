@@ -2253,12 +2253,8 @@ public class IndexGraphQLSchema {
                         .name("routes")
                         .description("List of routes operated by this agency")
                         .type(new GraphQLList(routeType))
-                        .dataFetcher(environment -> index.routeForId.values()
-                                .stream()
-                                .filter(route -> {
-                                    String feedId = ((Agency) environment.getSource()).getFeedId();
-                                    return route.getId().getAgencyId().equals(feedId) && route.getAgency().equals(environment.getSource());
-                                })
+                        .dataFetcher(environment -> index.routeForId.values()                                .stream()
+                                .filter(route -> route.getAgency().getFeedScopeId().equals(((Agency) environment.getSource()).getFeedScopeId()))
                                 .collect(Collectors.toList()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
