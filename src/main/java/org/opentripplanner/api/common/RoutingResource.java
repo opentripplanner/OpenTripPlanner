@@ -391,10 +391,6 @@ public abstract class RoutingResource {
     @QueryParam("geoidElevation")
     private Boolean geoidElevation;
 
-    /* If trip discovery mode (look out a week) should be used */
-    @QueryParam("serviceDayLookout")
-    private Integer serviceDayLookout;
-
     /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
      * otherwise it uses default sorting. More sorting methods may be added in the future.
@@ -654,9 +650,6 @@ public abstract class RoutingResource {
 
         if (geoidElevation != null)
             request.geoidElevation = geoidElevation;
-
-        if (serviceDayLookout != null)
-            request.setServiceDayLookout(serviceDayLookout);
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;

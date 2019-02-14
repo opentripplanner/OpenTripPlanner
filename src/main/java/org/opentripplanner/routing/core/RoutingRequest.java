@@ -564,8 +564,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
-    /** How many extra ServiceDays to look out (or back) */
-    public int serviceDayLookout = -1;
+    /**
+     * How many extra ServiceDays to look in the future (or back, if arriveBy=true)
+     *
+     * This parameter allows the configuration of how far, in service days, OTP should look for
+     * transit service when evaluating the next departure (or arrival) at a stop. In some cases,
+     * for example for services which run weekly or monthly, it may make sense to increase this
+     * value. Larger values will increase the search time. This does not affect a case where a
+     * trip starts multiple service days in the past (e.g. a multiday ferry trip will not be
+     * board-able after the 2nd day in the current implementation).
+     */
+    public int serviceDayLookout = 1;
 
     /** Which path comparator to use */
     public String pathComparator = null;
