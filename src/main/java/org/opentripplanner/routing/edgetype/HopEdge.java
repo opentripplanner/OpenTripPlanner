@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.model.Stop;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 /**
  * FrequencyHops and PatternHops have start/stop Stops
@@ -17,4 +17,5 @@ public interface HopEdge {
 
     void setGeometry(LineString geometry);
 
+    String getFeedId();
 }

@@ -4,9 +4,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.gml2.GMLWriter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.io.gml2.GMLWriter;
 
 public class GeometryAdapter extends XmlAdapter<String,Geometry> {
     public Geometry unmarshal(String val) throws Exception {
