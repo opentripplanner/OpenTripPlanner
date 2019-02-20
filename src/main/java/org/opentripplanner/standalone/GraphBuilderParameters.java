@@ -50,6 +50,11 @@ public class GraphBuilderParameters {
     public final boolean useTransfersTxt;
 
     /**
+     * Use both transfers.txt from GTFS and distance to create direct transfers between transit stops
+     */
+    public final boolean useBothGtfsAndDistance;
+
+    /**
      * Link GTFS stops to their parent stops.
      */
     public final boolean parentStopLinking;
@@ -194,6 +199,7 @@ public class GraphBuilderParameters {
         htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
+        useBothGtfsAndDistance = config.path("useBothGtfsAndDistance").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
         stopClusterMode = enumValueOf(config, "stopClusterMode", StopClusterMode.proximity);

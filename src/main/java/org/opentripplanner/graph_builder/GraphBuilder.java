@@ -293,7 +293,7 @@ public class GraphBuilder implements Runnable {
         }
         if ( hasGTFS ) {
             // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! builderParams.useTransfersTxt) {
+            if (!builderParams.useTransfersTxt || builderParams.useBothGtfsAndDistance) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
             }

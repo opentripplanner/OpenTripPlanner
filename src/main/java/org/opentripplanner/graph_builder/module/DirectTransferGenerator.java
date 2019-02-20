@@ -67,6 +67,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
             /* Skip stops that are entrances to stations or whose entrances are coded separately */
             if (!ts0.isStreetLinkable()) continue;
+
             if (++nLinkableStops % 1000 == 0) {
                 LOG.info("Linked {} stops", nLinkableStops);
             }
@@ -88,6 +89,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
                 if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
+                /* Don't link stops, which have already been linked through GTFS, unless they are from different agencies */
+                if ((sd.tstop.hasGtfsTransfers() || ts0.hasGtfsTransfers()) &&
+                        sd.tstop.getStopId().getAgencyId().equals(ts0.getStopId().getAgencyId()))
+                    continue;
                 new SimpleTransfer(ts0, sd.tstop, sd.dist, sd.geom, sd.edges);
                 n += 1;
             }

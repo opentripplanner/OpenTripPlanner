@@ -4,6 +4,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -67,6 +68,15 @@ public class TransitStop extends TransitStationStop {
         }
         return false;
     }
+
+    public boolean hasGtfsTransfers() {
+        for (Edge e : this.getOutgoing()) {
+            if (e instanceof TransferEdge || e instanceof PathwayEdge) {
+                return true;
+            }
+        }
+        return false;
+     }
 
     public int getStreetToStopTime() {
         return streetToStopTime;
