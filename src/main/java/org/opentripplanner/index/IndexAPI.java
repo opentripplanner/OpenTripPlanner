@@ -146,7 +146,7 @@ public class IndexAPI {
         if (agency == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         Collection<Route> agencyRoutes = new ArrayList<>();
         for (Route route: routes) {
-            if (route.getAgency() == agency) {
+            if (route.getAgency().getFeedScopeId().equals(agency.getFeedScopeId())) {
                 agencyRoutes.add(route);
             }
         }
