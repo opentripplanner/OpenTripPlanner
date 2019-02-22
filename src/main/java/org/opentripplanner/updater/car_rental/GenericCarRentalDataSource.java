@@ -232,7 +232,7 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
                 region.geometry = geometryCollection.union();
             } catch (IllegalArgumentException | IOException | UnsupportedGeometryException e1) {
                 e1.printStackTrace();
-                LOG.error("Could not deserialize geojson");
+                LOG.error("Could not deserialize GeoJSON for {}", networkName);
                 return new ArrayList<>();
             }
         }
