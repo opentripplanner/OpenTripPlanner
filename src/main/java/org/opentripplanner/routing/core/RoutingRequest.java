@@ -564,6 +564,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
+    /**
+     * How many extra ServiceDays to look in the future (or back, if arriveBy=true)
+     *
+     * This parameter allows the configuration of how far, in service days, OTP should look for
+     * transit service when evaluating the next departure (or arrival) at a stop. In some cases,
+     * for example for services which run weekly or monthly, it may make sense to increase this
+     * value. Larger values will increase the search time. This does not affect a case where a
+     * trip starts multiple service days in the past (e.g. a multiday ferry trip will not be
+     * board-able after the 2nd day in the current implementation).
+     */
+    public int serviceDayLookout = 1;
+
     /** Which path comparator to use */
     public String pathComparator = null;
 
@@ -1165,7 +1177,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && flexUseEligibilityServices == other.flexUseEligibilityServices
                 && flexIgnoreDrtAdvanceBookMin == other.flexIgnoreDrtAdvanceBookMin
                 && flexMinPartialHopLength == other.flexMinPartialHopLength
-                && clockTimeSec == other.clockTimeSec;
+                && clockTimeSec == other.clockTimeSec
+                && serviceDayLookout == other.serviceDayLookout;
     }
 
     /**
@@ -1208,7 +1221,10 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + Boolean.hashCode(flexIgnoreDrtAdvanceBookMin) * 179992387
                 + Integer.hashCode(flexMinPartialHopLength) * 15485863
                 + Long.hashCode(clockTimeSec) * 833389
-                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
+                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
+                + new Boolean(useTraffic).hashCode() * 10169
+                + Integer.hashCode(serviceDayLookout) * 31558519;
+
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1469,6 +1485,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void resetClockTime() {
         this.clockTimeSec = System.currentTimeMillis() / 1000;
+    }
+
+    public void setServiceDayLookout(int serviceDayLookout) {
+        this.serviceDayLookout = serviceDayLookout;
     }
 
     public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {

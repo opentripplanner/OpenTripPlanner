@@ -931,7 +931,24 @@ public class Graph implements Serializable {
         }
         return timeZone;
     }
-    
+
+    /**
+     * Return all TimeZones for all agencies in the graph
+     * @return collection of referenced timezones
+     */
+    public Collection<TimeZone> getAllTimeZones() {
+        List<TimeZone> timeZones = new ArrayList<>();
+        for (String feedId : getFeedIds()) {
+            for (Agency agency : getAgencies(feedId)) {
+                TimeZone timeZone = calendarService.getTimeZoneForAgencyId(agency.getId());
+                if (timeZone != null) {
+                    timeZones.add(timeZone);
+                }
+            }
+        }
+        return timeZones;
+    }
+
     /**
      * The timezone is cached by the graph. If you've done something to the graph that has the
      * potential to change the time zone, you should call this to ensure it is reset. 
