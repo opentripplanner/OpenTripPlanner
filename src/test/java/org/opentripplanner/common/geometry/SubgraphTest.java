@@ -1,21 +1,14 @@
 package org.opentripplanner.common.geometry;
 
 import org.junit.Test;
-import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 public class SubgraphTest {
 
@@ -33,7 +26,7 @@ public class SubgraphTest {
     assertEquals(subgraph.streetSize(), 1);
     assertEquals(subgraph.streetIterator().next().toString(), vertex.toString());
     assertEquals(subgraph.getRepresentativeVertex().toString(), vertex.toString());
-    assertNull(subgraph.getConvexHull());
+    assertEquals(subgraph.getConvexHull().getCoordinates().length, 1);
   }
 
   @Test
@@ -49,6 +42,6 @@ public class SubgraphTest {
     assertTrue(subgraph.contains(vertex));
     assertEquals(subgraph.stopSize(), 1);
     assertEquals(subgraph.stopIterator().next().toString(), vertex.toString());
-    assertNull(subgraph.getConvexHull());
+    assertEquals(subgraph.getConvexHull().getCoordinates().length, 1);
   }
 }
