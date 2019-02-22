@@ -84,11 +84,15 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 }
             }
 
-            /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
+            /* Make transfers to each nearby stop. */
             int n = 0;
-            for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
+            for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStops(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
                 if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
+
+                /* Skip stops, which are not street linkable */
+                if (!sd.tstop.isStreetLinkable()) continue;
+
                 /* Don't link stops, which have already been linked through GTFS, unless they are from different agencies */
                 if ((sd.tstop.hasGtfsTransfers() || ts0.hasGtfsTransfers()) &&
                         sd.tstop.getStopId().getAgencyId().equals(ts0.getStopId().getAgencyId()))
