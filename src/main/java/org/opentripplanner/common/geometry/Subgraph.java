@@ -1,17 +1,16 @@
 package org.opentripplanner.common.geometry;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPoint;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 
 public class Subgraph {
@@ -70,9 +69,9 @@ public class Subgraph {
     private static GeometryFactory gf = new GeometryFactory();
     public Geometry getConvexHull() {
         if (newVertexAdded) {
-            MultiPoint mp = gf.createMultiPoint(vertexCoords.toArray(new Coordinate[0]));
+            MultiPoint mp = gf.createMultiPointFromCoords(vertexCoords.toArray(new Coordinate[0]));
             newVertexAdded = false;
-            mp.convexHull();
+            convexHullAsGeom = mp.convexHull();
         }
         return convexHullAsGeom;
     }
