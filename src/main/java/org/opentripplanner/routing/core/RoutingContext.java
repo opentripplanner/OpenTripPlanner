@@ -34,12 +34,14 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -377,16 +379,29 @@ public class RoutingContext implements Cloneable {
             return;
         }
 
-        for (String feedId : graph.getFeedIds()) {
-            for (Agency agency : graph.getAgencies(feedId)) {
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
-                        calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
-                        calendarService, agency.getId()));
+        // In general, there should be a set of service days (yesterday, today, tomorrow) for every
+        // timezone in the graph. The parameter `serviceDayLookout` allows more service days to be
+        // added to search for future service (or past, if arriveBy=true). The furthest back trips
+        // can begin is 1 service day (e.g. a trip which started yesterday is usable today.) This
+        // does not address the case where a trip started multiple days ago (e.g. a multi-day ferry
+        // trip will not be board-able after day 2).
+        for (TimeZone timeZone : graph.getAllTimeZones()) {
+            // Add today
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, timeZone));
+            // Add one day previous (previous in the direction of the transit search, so yesterday if
+            // arriveBy=false and tomorrow if arriveBy=true
+            addIfNotExists(this.serviceDays, new ServiceDay(graph,
+                    opt.arriveBy ? serviceDate.next() : serviceDate.previous(),
+                    calendarService, timeZone));
+            // Add one or more days in the "forward" direction
+            ServiceDate sd = serviceDate;
+            int lookout = Math.max(1, opt.serviceDayLookout);
+            for (int i = 0; i < lookout; i++) {
+                sd = opt.arriveBy ? sd.previous() : sd.next();
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, sd, calendarService, timeZone));
             }
-
         }
+        serviceDays.sort(Comparator.comparing(ServiceDay::getServiceDate));
     }
 
     private static <T> void addIfNotExists(ArrayList<T> list, T item) {
