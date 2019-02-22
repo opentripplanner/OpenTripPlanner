@@ -402,6 +402,8 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
+        int roundedTime = (int) Math.ceil(time);
+
         /* Compute turn cost. */
         StreetEdge backPSE;
         if (backEdge != null && backEdge instanceof StreetEdge) {
@@ -451,8 +453,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
             }
 
-            long turnTime = (long) Math.ceil(realTurnCost);
-            time += turnTime;
+            int turnTime = (int) Math.ceil(realTurnCost);
+            roundedTime += turnTime;
             weight += options.turnReluctance * realTurnCost;
         }
         
@@ -469,7 +471,6 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        int roundedTime = (int) Math.ceil(time);
         if (options.kissAndRide || options.parkAndRide) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
@@ -749,12 +750,12 @@ public class StreetEdge extends Edge implements Cloneable {
      * TODO change everything to clockwise from North
      */
 	public int getInAngle() {
-		return this.inAngle * 180 / 128;
+		return (int) Math.round(this.inAngle * 180 / 128.0);
 	}
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle * 180 / 128;
+		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
