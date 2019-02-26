@@ -86,10 +86,9 @@ public class NearbyStopFinder {
      * origin vertex.
      */
     public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex) {
-
-        /* Track the closest stop on each pattern passing nearby. */
-        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closestStopForPattern =
-                new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
+        /* Track the closest stop on each pattern & wheelchair accessibility combo passing nearby. */
+        SimpleIsochrone.MinMap<PatterWheelchairComposite, StopAtDistance> closestStopForPattern =
+                new SimpleIsochrone.MinMap<PatterWheelchairComposite, StopAtDistance>();
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
@@ -99,7 +98,7 @@ public class NearbyStopFinder {
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
-                closestStopForPattern.putMin(pattern, stopAtDistance);
+                closestStopForPattern.putMin(new PatterWheelchairComposite(pattern, stopAtDistance.isWheelchairAccessible), stopAtDistance);
             }
         }
 
@@ -158,7 +157,6 @@ public class NearbyStopFinder {
         }
 
         if (nonWheelchairRoutable.size() > 0) {
-
             /** second iteration, find wheelchair accessible routes **/
             spt = earliestArrivalSearch.getShortestPathTree(wheelchairAccessibleRoutingRequest);
 
@@ -180,6 +178,7 @@ public class NearbyStopFinder {
             stopsFound.add(new StopAtDistance((TransitStop)originVertex, 0));
         }
         routingRequest.cleanup();
+        wheelchairAccessibleRoutingRequest.cleanup();
         return stopsFound;
 
     }
@@ -222,11 +221,15 @@ public class NearbyStopFinder {
 
         @Override
         public int compareTo(StopAtDistance that) {
-            return (int) (this.dist / 1.33 + this.penaltySeconds) - (int) (that.dist / 1.33 + this.penaltySeconds);
+            return this.comparisonWeight() - that.comparisonWeight();
+        }
+
+        public int comparisonWeight() {
+            return (int) (this.dist / 1.33 + this.penaltySeconds);
         }
 
         public String toString() {
-            return String.format("stop %s at %.1f meters", tstop, dist);
+            return String.format("stop %s at %.1f meters. wc: %s / ps: %s", tstop, dist, isWheelchairAccessible, penaltySeconds);
         }
 
         public void setPenaltySeconds(int penaltySeconds) {
@@ -237,6 +240,36 @@ public class NearbyStopFinder {
             this.penaltySeconds += penaltySecondsDelta;
         }
 
+    }
+
+    public static final class PatterWheelchairComposite  {
+
+        private final TripPattern tripPattern;
+        private final boolean isWheelchairAccessible;
+
+        PatterWheelchairComposite(TripPattern tripPattern, boolean isWheelchairAccessible) {
+            this.tripPattern = tripPattern;
+            this.isWheelchairAccessible = isWheelchairAccessible;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(tripPattern, isWheelchairAccessible);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PatterWheelchairComposite that = (PatterWheelchairComposite) o;
+            return isWheelchairAccessible == that.isWheelchairAccessible &&
+                    tripPattern.equals(that.tripPattern);
+        }
+
+        @Override
+        public String toString() {
+            return tripPattern.toString() + " / WC: " + Boolean.toString(isWheelchairAccessible);
+        }
     }
 
     /**

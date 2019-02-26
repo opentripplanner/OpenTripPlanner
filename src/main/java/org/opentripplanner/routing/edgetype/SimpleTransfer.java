@@ -112,7 +112,7 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public String toString() {
-        return "SimpleTransfer " + getName() + " (" + getDistance() + "m)";
+        return "SimpleTransfer " + getName() + " (" + getDistance() + "m / wc: " + Boolean.toString(isWheelchairAccessible()) + ", p: " + penaltySeconds + ")";
     }
 
     public boolean isWheelchairAccessible() {
