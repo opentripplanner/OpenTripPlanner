@@ -23,7 +23,9 @@ public class SimpleTransfer extends Edge {
     private int penaltySeconds;
 
     private double distance;
-    
+
+    private boolean isWheelchairAccessible;
+
     private LineString geometry;
     private List<Edge> edges;
 
@@ -41,6 +43,7 @@ public class SimpleTransfer extends Edge {
     public SimpleTransfer(TransitStop from, NearbyStopFinder.StopAtDistance sd) {
         this(from, sd.tstop, sd.dist, sd.geom, sd.edges);
         this.penaltySeconds = sd.penaltySeconds;
+        this.isWheelchairAccessible = sd.isWheelchairAccessible;
     }
 
     @Override
@@ -56,6 +59,10 @@ public class SimpleTransfer extends Edge {
             return null;
         }
         if(distance > s0.getOptions().maxTransferWalkDistance) {
+            return null;
+        }
+
+        if (s0.getOptions().wheelchairAccessible && !this.isWheelchairAccessible) {
             return null;
         }
         // Only transfer right after riding a vehicle.
@@ -77,7 +84,7 @@ public class SimpleTransfer extends Edge {
     public String getName() {
         return fromv.getName() + " => " + tov.getName();
     }
-    
+
     @Override
     public String getName(Locale locale) {
         //TODO: localize
@@ -86,16 +93,16 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest rr) {
-        int time = (int) (distance / rr.walkSpeed); 
+        int time = (int) (distance / rr.walkSpeed);
         return (time * rr.walkReluctance);
     }
-    
+
     @Override
     public double getDistance(){
     	return this.distance;
     }
-    
-    
+
+
     @Override
     public LineString getGeometry(){
 	   return this.geometry;
@@ -105,6 +112,14 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public String toString() {
-        return "SimpleTransfer " + getName() + " (" + getDistance() + "m)";
+        return "SimpleTransfer " + getName() + " (" + getDistance() + "m / wc: " + Boolean.toString(isWheelchairAccessible()) + ", p: " + penaltySeconds + ")";
+    }
+
+    public boolean isWheelchairAccessible() {
+        return isWheelchairAccessible;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        isWheelchairAccessible = wheelchairAccessible;
     }
 }

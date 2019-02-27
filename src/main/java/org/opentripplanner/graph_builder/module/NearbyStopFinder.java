@@ -86,10 +86,9 @@ public class NearbyStopFinder {
      * origin vertex.
      */
     public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex) {
-
-        /* Track the closest stop on each pattern passing nearby. */
-        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closestStopForPattern =
-                new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
+        /* Track the closest stop on each pattern & wheelchair accessibility combo passing nearby. */
+        SimpleIsochrone.MinMap<PatterWheelchairComposite, StopAtDistance> closestStopForPattern =
+                new SimpleIsochrone.MinMap<PatterWheelchairComposite, StopAtDistance>();
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
@@ -99,7 +98,7 @@ public class NearbyStopFinder {
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
-                closestStopForPattern.putMin(pattern, stopAtDistance);
+                closestStopForPattern.putMin(new PatterWheelchairComposite(pattern, stopAtDistance.isWheelchairAccessible), stopAtDistance);
             }
         }
 
@@ -131,24 +130,55 @@ public class NearbyStopFinder {
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
+
+        RoutingRequest wheelchairAccessibleRoutingRequest = new RoutingRequest(TraverseMode.WALK);
+        wheelchairAccessibleRoutingRequest.setWheelchairAccessible(true);
+        wheelchairAccessibleRoutingRequest.clampInitialWait = (0L);
+        wheelchairAccessibleRoutingRequest.setRoutingContext(graph, originVertex, null);
+
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
+        Set<Vertex> nonWheelchairRoutable = new HashSet<Vertex>();
+
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (targetVertex == originVertex) continue;
                 if (targetVertex instanceof TransitStop) {
-                    stopsFound.add(stopAtDistanceForState(state));
+                    StopAtDistance sd = stopAtDistanceForState(state, wheelchairAccessibleRoutingRequest);
+                    if (!sd.isWheelchairAccessible) {
+                        nonWheelchairRoutable.add(targetVertex);
+                    }
+                    stopsFound.add(sd);
                 }
             }
         }
+
+        if (nonWheelchairRoutable.size() > 0) {
+            /** second iteration, find wheelchair accessible routes **/
+            spt = earliestArrivalSearch.getShortestPathTree(wheelchairAccessibleRoutingRequest);
+
+            if (spt != null) {
+                for (State state : spt.getAllStates()) {
+                    Vertex targetVertex = state.getVertex();
+                    if (targetVertex == originVertex) continue;
+                    if (!nonWheelchairRoutable.contains(targetVertex)) continue;
+                    if (targetVertex instanceof TransitStop) {
+                        StopAtDistance sd = stopAtDistanceForState(state, wheelchairAccessibleRoutingRequest);
+                        stopsFound.add(sd);
+                    }
+                }
+            }
+        }
+
         /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         if (originVertex instanceof TransitStop) {
             stopsFound.add(new StopAtDistance((TransitStop)originVertex, 0));
         }
         routingRequest.cleanup();
+        wheelchairAccessibleRoutingRequest.cleanup();
         return stopsFound;
 
     }
@@ -182,6 +212,7 @@ public class NearbyStopFinder {
         public LineString  geom;
         public List<Edge>  edges;
         public int penaltySeconds = 0;
+        public boolean isWheelchairAccessible = true;
 
         public StopAtDistance(TransitStop tstop, double dist) {
             this.tstop = tstop;
@@ -190,11 +221,15 @@ public class NearbyStopFinder {
 
         @Override
         public int compareTo(StopAtDistance that) {
-            return (int) (this.dist / 1.33 + this.penaltySeconds) - (int) (that.dist / 1.33 + this.penaltySeconds);
+            return this.comparisonWeight() - that.comparisonWeight();
+        }
+
+        public int comparisonWeight() {
+            return (int) (this.dist / 1.33 + this.penaltySeconds);
         }
 
         public String toString() {
-            return String.format("stop %s at %.1f meters", tstop, dist);
+            return String.format("stop %s at %.1f meters. wc: %s / ps: %s", tstop, dist, isWheelchairAccessible, penaltySeconds);
         }
 
         public void setPenaltySeconds(int penaltySeconds) {
@@ -207,13 +242,43 @@ public class NearbyStopFinder {
 
     }
 
+    public static final class PatterWheelchairComposite  {
+
+        private final TripPattern tripPattern;
+        private final boolean isWheelchairAccessible;
+
+        PatterWheelchairComposite(TripPattern tripPattern, boolean isWheelchairAccessible) {
+            this.tripPattern = tripPattern;
+            this.isWheelchairAccessible = isWheelchairAccessible;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(tripPattern, isWheelchairAccessible);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PatterWheelchairComposite that = (PatterWheelchairComposite) o;
+            return isWheelchairAccessible == that.isWheelchairAccessible &&
+                    tripPattern.equals(that.tripPattern);
+        }
+
+        @Override
+        public String toString() {
+            return tripPattern.toString() + " / WC: " + Boolean.toString(isWheelchairAccessible);
+        }
+    }
+
     /**
      * Given a State at a TransitStop, bundle the TransitStop together with information about how far away it is
      * and the geometry of the path leading up to the given State.
      *
      * TODO this should probably be merged with similar classes in Profile routing.
      */
-    public static StopAtDistance stopAtDistanceForState (State state) {
+    public static StopAtDistance stopAtDistanceForState(State state, RoutingRequest routingRequest) {
         double distance = 0.0;
         GraphPath graphPath = new GraphPath(state, false);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -245,6 +310,9 @@ public class NearbyStopFinder {
         while (s != null) {
             if (s.getWalkDistanceDelta() < 0.1 && s.getTimeDeltaSeconds() > 0) {
                 sd.increasePenaltySeconds(s.getTimeDeltaSeconds());
+            }
+            if (s.backEdge instanceof StreetEdge) {
+                sd.isWheelchairAccessible = sd.isWheelchairAccessible && ((StreetEdge)s.getBackEdge()).canTraverse(routingRequest,TraverseMode.WALK);
             }
             s = s.getBackState();
         }
