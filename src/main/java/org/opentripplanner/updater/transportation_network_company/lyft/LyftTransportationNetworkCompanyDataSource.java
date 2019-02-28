@@ -149,10 +149,23 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
             return arrivalTimes;
         } else {
             LyftError error = mapper.readValue(connection.getErrorStream(), LyftError.class);
-            if (error.error.equals("no_service_in_area") || error.error.equals("ridetype_unavailable_in_region")) {
+            if (
+                error.error != null &&
+                    (error.error.equals("no_service_in_area") ||
+                        error.error.equals("ridetype_unavailable_in_region"))
+            ) {
+                LOG.warn(error.toString());
+                LOG.warn(
+                    "No Lyft service available at {}, {}",
+                    request.latitude,
+                    request.longitude
+                );
                 return Collections.emptyList();
             }
             LOG.error(error.toString());
+            if (error.error_description != null) {
+                throw new IOException(error.error_description);
+            }
             throw new IOException("received an error from the Lyft API");
         }
     }
@@ -209,6 +222,21 @@ public class LyftTransportationNetworkCompanyDataSource extends TransportationNe
             return estimates;
         } else {
             LyftError error = mapper.readValue(connection.getErrorStream(), LyftError.class);
+            if (
+                error.error != null &&
+                    (error.error.equals("no_service_in_area") ||
+                        error.error.equals("ridetype_unavailable_in_region"))
+            ) {
+                LOG.warn(error.toString());
+                LOG.warn(
+                    "No Lyft service available for trip from {}, {} to {}, {}",
+                    request.startPosition.latitude,
+                    request.startPosition.longitude,
+                    request.endPosition.latitude,
+                    request.endPosition.longitude
+                );
+                return Collections.emptyList();
+            }
             LOG.error(error.toString());
             if (error.error_description != null) {
                 throw new IOException(error.error_description);

@@ -42,6 +42,7 @@ import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -152,9 +153,11 @@ public abstract class GraphPathToTripPlanConverter {
                 // TODO: handle explicit distance case
             }
 
-            // Add TNC data after the filter stage so that OTP does not make requests to a rate-limited TNC API service
-            // for itineraries that ultimately never make it back to the requester.
-            addTNCData(exemplar, itinerary);
+            // Add TNC data after the filter stage so that OTP does not make requests to a
+            // rate-limited TNC API service for itineraries that ultimately never make it back to
+            // the requester. It is possible that TNC service may not actually be available, so if
+            // the method returns false, don't include this itinerary in the results.
+            if (!addTNCData(exemplar, itinerary)) continue;
             plan.addItinerary(itinerary);
         }
 
@@ -418,15 +421,18 @@ public abstract class GraphPathToTripPlanConverter {
     /**
      * Adds TNC data to legs with {@link Leg#hailedCar}=true. This makes asynchronous, concurrent requests to the TNC
      * provider's API for price and ETA estimates and associates this data with its respective TNC leg.
+     *
+     * @return boolean. If false, this means that the availability of TNC service cannot be confirmed.
      */
-    private static void addTNCData(
+    private static boolean addTNCData(
         GraphPath path,
         Itinerary itinerary
     ) {
         Graph graph = path.getRoutingContext().graph;
         RoutingRequest request = path.states.getFirst().getOptions();
         String companies = request.companies;
-        if (companies == null) return;
+        if (companies == null)
+            return false;
         // Store async tasks in lists for any TNC legs that need info.
         List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();
         List<Callable<List<RideEstimate>>> priceEstimateTasks = new ArrayList<>();
@@ -459,9 +465,17 @@ public abstract class GraphPathToTripPlanConverter {
             priceEstimateTasks.add(() -> service.getRideEstimates(companies, finalFrom, leg.to));
             arrivalEstimateTasks.add(() -> service.getArrivalTimes(companies, finalFrom));
         }
+
+        // This variable is used to keep track of whether an API error was encountered thus calling
+        // into question whether the TNC trip is possible at all. This typically happens when a TNC
+        // company says that it does not provide service at an error. Since the TNC companies don't
+        // have readily available APIs it's kinda anyone's best guess as to whether TNC service is
+        // available somewhere, but for the most part OTP assumes that TNC service is available
+        // within walking distance of transit.
+        boolean encounteredError = false;
         if (tncLegs.size() > 0) {
-            // Use a thread pool so that requests are asynchronous and concurrent. # of threads should accommodate
-            // 2x however many TNC legs there are.
+            // Use a thread pool so that requests are asynchronous and concurrent. # of threads
+            // should accommodate 2x however many TNC legs there are.
             ExecutorService pool = Executors.newFixedThreadPool(tncLegs.size() * 2);
 
             try {
@@ -503,21 +517,28 @@ public abstract class GraphPathToTripPlanConverter {
                         }
                     }
                     if (bestArrivalTime == null || bestRideEstimate == null) {
-                        // FIXME: This should probably result in the itinerary not being possible
-                        throw new Exception("Could not find either/both an arrival or ride estimate for a leg in the journey");
+                        // this occurs when TNC service is actually not available at a certain
+                        // location which results in empty responses for arrival and ride estimates.
+                        // The error thrown here is caught within this method below.
+                        throw new TransportationNetworkCompanyAvailabilityException();
                     }
                     tncLegs.get(i).tncData = new TransportationNetworkCompanySummary(
                         bestRideEstimate,
                         bestArrivalTime
                     );
                 }
+            } catch (TransportationNetworkCompanyAvailabilityException e) {
+                LOG.warn("Removing itinerary due to TNC unavailability");
+                encounteredError = true;
             } catch (Exception e) {
                 LOG.error("Error fetching TNC data");
                 e.printStackTrace();
+                encounteredError = true;
             }
             // Shutdown thread pool.
             pool.shutdown();
         }
+        return !encounteredError;
     }
 
     private static void addFrequencyFields(State[] states, Leg leg) {

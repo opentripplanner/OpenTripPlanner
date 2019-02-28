@@ -96,6 +96,14 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
             );
         }
 
+        if (arrivalTimes.size() == 0) {
+            LOG.warn(
+                "No Uber service available at {}, {}",
+                position.latitude,
+                position.longitude
+            );
+        }
+
         return arrivalTimes;
     }
 
@@ -142,6 +150,16 @@ public class UberTransportationNetworkCompanyDataSource extends TransportationNe
                 price.product_id,
                 productIsWheelChairAccessible(price.product_id)
             ));
+        }
+
+        if (estimates.size() == 0) {
+            LOG.warn(
+                "No Uber service available for trip from {}, {} to {}, {}",
+                request.startPosition.latitude,
+                request.startPosition.longitude,
+                request.endPosition.latitude,
+                request.endPosition.longitude
+            );
         }
 
         return estimates;
