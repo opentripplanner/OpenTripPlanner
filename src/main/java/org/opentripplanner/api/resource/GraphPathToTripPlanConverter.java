@@ -431,8 +431,11 @@ public abstract class GraphPathToTripPlanConverter {
         Graph graph = path.getRoutingContext().graph;
         RoutingRequest request = path.states.getFirst().getOptions();
         String companies = request.companies;
-        if (companies == null)
-            return false;
+        if (companies == null) {
+            // no companies, therefore this request doesn't have any TNC data to add. Return true
+            // to indicate no need for removal of this itinerary.
+            return true;
+        }
         // Store async tasks in lists for any TNC legs that need info.
         List<Callable<List<ArrivalTime>>> arrivalEstimateTasks = new ArrayList<>();
         List<Callable<List<RideEstimate>>> priceEstimateTasks = new ArrayList<>();
