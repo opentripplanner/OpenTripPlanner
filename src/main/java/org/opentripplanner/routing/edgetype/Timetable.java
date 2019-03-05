@@ -509,21 +509,6 @@ public class Timetable implements Serializable {
                     } else {
                         update = null;
                     }
-                } else {
-                    if (delay == null) {
-                        newTimes.cancelArrivalTime(i);
-                        newTimes.cancelDepartureTime(i);
-                    } else {
-                        newTimes.updateArrivalDelay(i, delay);
-                        if (newTimes.isCanceledArrival(i)) {
-                            newTimes.unCancelArrivalTime(i);
-                        }
-
-                        newTimes.updateDepartureDelay(i, delay);
-                        if (newTimes.isCanceledDeparture(i)) {
-                            newTimes.unCancelDepartureTime(i);
-                        }
-                    }
                 }
             }
             if (update != null) {
