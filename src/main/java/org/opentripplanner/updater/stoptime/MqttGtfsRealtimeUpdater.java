@@ -17,6 +17,7 @@ import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +92,12 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         MqttConnectOptions connOpts = new MqttConnectOptions();
         connOpts.setCleanSession(true);
         connOpts.setAutomaticReconnect(true);
+        URI parsedUrl = new URI(url);
+        if (parsedUrl.getUserInfo() != null) {
+            String[] userinfo = parsedUrl.getUserInfo().split(":");
+            connOpts.setUserName(userinfo[0]);
+            connOpts.setPassword(userinfo[1].toCharArray());
+        }
         client.setCallback(new Callback());
 
         LOG.debug("Connecting to broker: " + url);
