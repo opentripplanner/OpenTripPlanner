@@ -107,7 +107,7 @@ public class OtpsRoutingRequest {
     }
 
     public void setBannedRoutes(String routeSpecList) {
-        req.bannedRoutes = RouteMatcher.parse(routeSpecList);
+        req.bannedRoutes.parseAddRoutes(routeSpecList);
     }
 
     public void setMaxTransfers(int maxTransfers) {

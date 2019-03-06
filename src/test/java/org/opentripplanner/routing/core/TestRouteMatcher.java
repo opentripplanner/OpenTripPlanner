@@ -27,49 +27,59 @@ public class TestRouteMatcher extends TestCase {
         assertFalse(emptyMatcher.matches(r1b));
         assertFalse(emptyMatcher.matches(r2));
 
-        RouteMatcher matcherR1i = RouteMatcher.parse("A1__42");
+        RouteMatcher matcherR1i = RouteMatcher.emptyMatcher();
+        matcherR1i.parseAddRoutes("A1__42");
         assertTrue(matcherR1i.matches(r1));
         assertFalse(matcherR1i.matches(r1b));
         assertFalse(matcherR1i.matches(r2));
 
-        RouteMatcher matcherR2n = RouteMatcher.parse("A1_R2");
+        RouteMatcher matcherR2n = RouteMatcher.emptyMatcher();
+        matcherR2n.parseAddRoutes("A1_R2");
         assertFalse(matcherR2n.matches(r1));
         assertFalse(matcherR2n.matches(r1b));
         assertTrue(matcherR2n.matches(r2));
 
-        RouteMatcher matcherR1R2 = RouteMatcher.parse("A1_R1,A1__43,A2__43");
+        RouteMatcher matcherR1R2 = RouteMatcher.emptyMatcher();
+        matcherR1R2.parseAddRoutes("A1_R1,A1__43,A2__43");
         assertTrue(matcherR1R2.matches(r1));
         assertFalse(matcherR1R2.matches(r1b));
         assertTrue(matcherR1R2.matches(r2));
 
-        RouteMatcher matcherR1n = RouteMatcher.parse("_R1");
+        RouteMatcher matcherR1n = RouteMatcher.emptyMatcher();
+        matcherR1n.parseAddRoutes("_R1");
         assertTrue(matcherR1n.matches(r1));
         assertTrue(matcherR1n.matches(r1b));
         assertFalse(matcherR1n.matches(r2));
 
-        RouteMatcher matcherR1R1bR2 = RouteMatcher.parse("A1_R1,A2_R1,A1_R2");
+        RouteMatcher matcherR1R1bR2 = RouteMatcher.emptyMatcher();
+        matcherR1R1bR2.parseAddRoutes("A1_R1,A2_R1,A1_R2");
         assertTrue(matcherR1R1bR2.matches(r1));
         assertTrue(matcherR1R1bR2.matches(r1b));
         assertTrue(matcherR1R1bR2.matches(r2));
 
-        RouteMatcher matcherR3e = RouteMatcher.parse("A1_R3 b");
+        RouteMatcher matcherR3e = RouteMatcher.emptyMatcher();
+        matcherR3e.parseAddRoutes("A1_R3 b");
         assertFalse(matcherR3e.matches(r1));
         assertFalse(matcherR3e.matches(r1b));
         assertFalse(matcherR3e.matches(r2));
         assertTrue(matcherR3e.matches(r3));
 
-        RouteMatcher nullList = RouteMatcher.parse(null);
-        assertTrue(nullList == RouteMatcher.emptyMatcher());
+        RouteMatcher nullList = RouteMatcher.emptyMatcher();
+        nullList.parseAddRoutes(null);
+        assertTrue(nullList.equals(RouteMatcher.emptyMatcher()));
 
-        RouteMatcher emptyList = RouteMatcher.parse("");
-        assertTrue(emptyList == RouteMatcher.emptyMatcher());
+        RouteMatcher emptyList = RouteMatcher.emptyMatcher();
+        emptyList.parseAddRoutes("");
+        assertTrue(emptyList.equals(RouteMatcher.emptyMatcher()));
 
-        RouteMatcher degenerate = RouteMatcher.parse(",,,");
-        assertTrue(degenerate == RouteMatcher.emptyMatcher());
+        RouteMatcher degenerate = RouteMatcher.emptyMatcher();
+        degenerate.parseAddRoutes(",,,");
+        assertTrue(degenerate.equals(RouteMatcher.emptyMatcher()));
 
         boolean thrown = false;
         try {
-            RouteMatcher badMatcher = RouteMatcher.parse("A1_R1_42");
+            RouteMatcher badMatcher = RouteMatcher.emptyMatcher();
+            badMatcher.parseAddRoutes("A1_R1_42");
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
@@ -79,12 +89,14 @@ public class TestRouteMatcher extends TestCase {
         r1c.setId(new FeedScopedId("A_1", "R_42"));
         r1c.setShortName("R_42");
 
-        RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");
+        RouteMatcher matcherR1c = RouteMatcher.emptyMatcher();
+        matcherR1c.parseAddRoutes("A\\_1_R 42");
         assertTrue(matcherR1c.matches(r1c));
         assertFalse(matcherR1c.matches(r1));
         assertFalse(matcherR1c.matches(r1b));
 
-        RouteMatcher matcherR1c2 = RouteMatcher.parse("A\\_1__R\\_42");
+        RouteMatcher matcherR1c2 = RouteMatcher.emptyMatcher();
+        matcherR1c2.parseAddRoutes("A\\_1__R\\_42");
         assertTrue(matcherR1c2.matches(r1c));
         assertFalse(matcherR1c2.matches(r1));
         assertFalse(matcherR1c2.matches(r1b));
