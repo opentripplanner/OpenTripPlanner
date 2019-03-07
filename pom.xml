@@ -8,7 +8,7 @@
 
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -78,10 +78,11 @@
     </scm>
 
     <properties>
-        <geotools.version>10.5</geotools.version>
-        <jackson.version>2.5.3</jackson.version>
+        <geotools.version>20.1</geotools.version>
+        <geotools.wfs.version>16.5</geotools.wfs.version>
+        <jackson.version>2.9.7</jackson.version>
+        <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws.version>1.9.39</aws.version>
     </properties>
 
     <distributionManagement>
@@ -101,19 +102,25 @@
                 <filtering>true</filtering>
             </resource>
             <resource>
-                <!-- shell scripts to start up OTP, need to be filtered to get JAR file name -->
-                <directory>src/scripts</directory>
-                <filtering>true</filtering>
-                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
-                <targetPath>../..</targetPath>
-            </resource>
-            <resource>
                 <directory>src/client</directory>
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
         </resources>
-
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
+                <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
+                <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
+                <directory>src/scripts</directory>
+                <filtering>true</filtering>
+                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
+                <targetPath>../..</targetPath>
+            </testResource>
+        </testResources>
         <pluginManagement>
             <plugins>
                 <!-- m2eclipse lifecycle mapping configuration. This controls which Maven build goals should
@@ -224,6 +231,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -433,31 +441,14 @@
             <name>Conveyal Maven Repository</name>
             <url>https://maven.conveyal.com/</url>
         </repository>
+        <repository>
+            <id>onebusaway-releases</id>
+            <name>Onebusaway Releases Repo</name>
+            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <!-- Amazon AWS client libraries -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ec2</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <!-- Fast drop-in serialization including compound value types (structs) for Java -->
-        <dependency>
-            <groupId>de.ruedigermoeller</groupId>
-            <artifactId>fst</artifactId>
-            <version>2.34</version>
-        </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -470,26 +461,6 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
-        <!-- AWS SDK uses Java commons logging. Redirect it to the slf4j API (we use the Logback implementation) -->
-        <!-- Why does this work? It seems like we'd need to declare JCL "provided" to avoid using the true JCL. -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <!-- Guava provides improved collections, among other things. -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <!-- Trove provides optimized map/set collections for native types (int, long...) -->
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
         <dependency>
@@ -529,8 +500,13 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs</artifactId>
+            <artifactId>gt-opengis</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-wfs</artifactId>
+            <version>${geotools.wfs.version}</version>
         </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
@@ -544,7 +520,7 @@
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
             <version>1.2</version>
-            <!-- We explicitely exclude jackson-core/databind as we use a more recent
+            <!-- We explicitly exclude jackson-core/databind as we use a more recent
                  version than the one geojson-jackson depends on, and the two seems to
                  be somehow incompatible. -->
             <exclusions>
@@ -557,12 +533,6 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>jackson2-geojson</artifactId>
-            <version>0.8</version>
         </dependency>
 
         <!-- TESTING -->
@@ -578,23 +548,29 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
-
+        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Guava, Trove, and Kryo. -->
+        <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>kryo-tools</artifactId>
+            <version>1.2.0</version>
+        </dependency>
         <!-- Jersey annontation-driven REST web services (JAX-RS implementation) -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
         <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>2.18</version>
+            <version>${jersey.version}</version>
         </dependency>
 
         <!-- Jackson modules. -->
@@ -650,7 +626,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.3.5-conveyal-SNAPSHOT-2</version>
+            <version>1.3.41</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -700,7 +676,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.17</version>
+            <version>1.18</version>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
@@ -773,45 +749,17 @@
             <artifactId>graphql-java</artifactId>
             <version>2.2.0</version>
         </dependency>
+        <!-- Provides annotations like XmlElement indicating how classes should be serialized -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
         <!-- Support for OTP scripting -->
         <dependency>
             <groupId>bsf</groupId>
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
-        <!--
-            Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
-            Therefore we don't include them by default. You can either update the POM in your fork to include the
-            scripting dependencies, or simply download them and add them to the classpath on the command line.
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.3.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-        -->
-        <!-- support for OpenTraffic data -->
-        <dependency>
-            <groupId>io.opentraffic</groupId>
-            <artifactId>traffic-engine</artifactId>
-            <version>0.2</version>
-        </dependency>
-        <!-- R5 may eventually be an alternate routing option within OTP, and provides Graph serialization. -->
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>r5</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-simple</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
-
 </project>

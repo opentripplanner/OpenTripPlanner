@@ -1,9 +1,9 @@
 package org.opentripplanner.index;
 
 import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.LineString;
 import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
@@ -19,12 +19,12 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -211,7 +211,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new AgencyAndId(
+                .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
                     ((Stop) environment.getSource()).getParentStation())))
                 .build())
@@ -273,7 +273,7 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLString)
                     .build())
                 .dataFetcher(environment -> {
-                    try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
+                    try {  // TODO: Add our own scalar types for at least serviceDate and FeedId
                         return index.getStopTimesForStop(
                             (Stop) environment.getSource(),
                             ServiceDate.parseString(environment.getArgument("date")),

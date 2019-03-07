@@ -1,22 +1,9 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.linearref.LengthLocationMap;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.linearref.LengthLocationMap;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -109,7 +96,7 @@ public class GeometryUtils {
     }
 
     /**
-     * Adapted from com.vividsolutions.jts.geom.LineSegment 
+     * Adapted from org.locationtech.jts.geom.LineSegment
      * Combines segmentFraction and projectionFactor methods.
      */
     public static double segmentFraction(double x0, double y0, double x1, double y1, 

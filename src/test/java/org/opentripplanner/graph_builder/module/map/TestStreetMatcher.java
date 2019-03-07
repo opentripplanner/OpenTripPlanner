@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.map;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +11,6 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -33,9 +19,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -43,12 +29,12 @@ import org.opentripplanner.util.NonLocalizedString;
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
 
-    private Graph _graph;
+    private Graph graph;
 
     @Before
     public void before() {
 
-        _graph = new Graph();
+        graph = new Graph();
 
         vertex("56th_24th", 47.669457, -122.387577);
         vertex("56th_22nd", 47.669462, -122.384739);
@@ -101,7 +87,7 @@ public class TestStreetMatcher {
         
         LineString geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470);
 
-        StreetMatcher matcher = new StreetMatcher(_graph);
+        StreetMatcher matcher = new StreetMatcher(graph);
 
         List<Edge> match = matcher.match(geometry);
         assertNotNull(match);
@@ -144,14 +130,14 @@ public class TestStreetMatcher {
      ****/
 
     private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
+        SimpleVertex v = new SimpleVertex(graph, label, lat, lon);
         return v;
     }
 
     private void edges(String... vLabels) {
         for (int i = 0; i < vLabels.length - 1; i++) {
-            StreetVertex vA = (StreetVertex) _graph.getVertex(vLabels[i]);
-            StreetVertex vB = (StreetVertex) _graph.getVertex(vLabels[i + 1]);
+            StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
+            StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
 
             new SimpleEdge(vA, vB);
             new SimpleEdge(vB, vA);

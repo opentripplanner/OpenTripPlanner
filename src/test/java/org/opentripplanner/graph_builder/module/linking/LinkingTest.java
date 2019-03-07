@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.module.linking;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -27,8 +27,6 @@ import static org.junit.Assert.*;
 import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 public class LinkingTest {
-    /** maximum difference in walk distance, in meters, that is acceptable between the graphs */
-    public static final int EPSILON = 1;
 
     /**
      * Ensure that splitting edges yields edges that are identical in length for forward and back edges.

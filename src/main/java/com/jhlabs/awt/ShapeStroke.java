@@ -1,19 +1,7 @@
 /*
-Copyright 2006 Jerry Huxtable
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-
+  This file is based on code copied from project Java Image Processing, JH Labs,
+  see the LICENSE file for further information.
+*/
 package com.jhlabs.awt;
 
 import java.awt.Shape;
@@ -28,10 +16,10 @@ import java.awt.geom.Rectangle2D;
  * Stroke that draw a shape.
  * 
  * Slightly adapted to OTP from original source.
- * 
+ *
  * @see <a
  *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
- * 
+ *
  */
 public class ShapeStroke implements Stroke {
     private Shape theShape;

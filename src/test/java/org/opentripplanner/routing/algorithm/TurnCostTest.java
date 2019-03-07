@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.Assert.*;
@@ -36,12 +23,12 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 public class TurnCostTest {
 
-    private Graph _graph;
+    private Graph graph;
 
     private Vertex topRight;
 
@@ -53,7 +40,7 @@ public class TurnCostTest {
 
     @Before
     public void before() {
-        _graph = new Graph();
+        graph = new Graph();
 
         // Graph for a fictional grid city with turn restrictions
         StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
@@ -134,7 +121,7 @@ public class TurnCostTest {
     @Test
     public void testForwardDefaultNoTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         checkForwardRouteDuration(options, 300);
@@ -144,7 +131,7 @@ public class TurnCostTest {
     public void testForwardDefaultConstTurnCosts() {
         RoutingRequest options = proto.clone();
         options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         // Since we traverse 3 intersections, the total cost should be 330.
@@ -172,7 +159,7 @@ public class TurnCostTest {
     public void testForwardCarNoTurnCosts() {
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 3x100 + 1x50 = 300.
         GraphPath path = checkForwardRouteDuration(options, 350);
@@ -192,7 +179,7 @@ public class TurnCostTest {
         RoutingRequest options = proto.clone();
         options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(_graph, topRight, bottomLeft);
+        options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 3x100 + 1x50 = 350.
         // Since there are 3 turns, the total cost should be 380.
@@ -219,7 +206,7 @@ public class TurnCostTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 
@@ -250,7 +237,7 @@ public class TurnCostTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        _graph.addTurnRestriction(from, restrict);
+        graph.addTurnRestriction(from, restrict);
     }
 
 }

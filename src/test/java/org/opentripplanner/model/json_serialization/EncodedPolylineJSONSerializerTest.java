@@ -1,9 +1,9 @@
 package org.opentripplanner.model.json_serialization;
 
 import com.fasterxml.jackson.core.*;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -458,6 +458,11 @@ public class EncodedPolylineJSONSerializerTest extends TestCase {
         @Override
         public String getValueAsString(String s) throws IOException {
             return stringProducer.get();
+        }
+
+        @Override
+        public boolean hasToken(JsonToken t) {
+            return false;
         }
     }
 }

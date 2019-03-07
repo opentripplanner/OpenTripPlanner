@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.map;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Route;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;

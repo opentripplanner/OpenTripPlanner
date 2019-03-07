@@ -12,20 +12,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FeedInfo;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.index.IndexGraphQLSchema;
@@ -72,10 +66,10 @@ public class GraphIndex {
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
-    public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
-    public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
+    public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+    public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
@@ -87,7 +81,7 @@ public class GraphIndex {
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
-    private final Map<AgencyAndId,Integer> serviceCodes;
+    private final Map<FeedScopedId,Integer> serviceCodes;
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -217,7 +211,7 @@ public class GraphIndex {
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
-        for (AgencyAndId serviceId : calendarService.getServiceIdsOnDate(date)) {
+        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
             if (n < 0) continue;
             services.set(n);
@@ -421,7 +415,7 @@ public class GraphIndex {
      * I am creating this method only to allow merging pull request #2032 which adds GraphQL.
      * Note that if the same agency ID is defined in several feeds, this will return one of them
      * at random. That is obviously not the right behavior. The problem is that agencies are
-     * not currently keyed on an AgencyAndId object, but on separate feedId and id Strings.
+     * not currently keyed on an FeedScopedId object, but on separate feedId and id Strings.
      * A real fix will involve replacing or heavily modifying the OBA GTFS loader, which is now
      * possible since we have forked it.
      */
