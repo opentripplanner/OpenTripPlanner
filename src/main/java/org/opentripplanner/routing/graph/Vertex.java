@@ -78,6 +78,17 @@ public abstract class Vertex implements Serializable, Cloneable {
         return sb.toString();
     }
 
+    // Initialize transient fields upon deserialization. There should be a better way to do this.
+    // Stopgap until old serialization methods are completely replaced.
+    public void initEdgeListsIfNeeded () {
+        if (this.outgoing == null) {
+            this.outgoing = new Edge[0];
+        }
+        if (this.incoming == null) {
+            this.incoming = new Edge[0];
+        }
+    }
+
     /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */
 
     /**

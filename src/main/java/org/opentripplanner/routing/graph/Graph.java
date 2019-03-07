@@ -614,6 +614,9 @@ public class Graph implements Serializable {
             Vertex toVertex = e.getToVertex();
             graph.vertices.put(fromVertex.getLabel(), fromVertex);
             graph.vertices.put(toVertex.getLabel(), toVertex);
+            // Compensating for the fact that we're not using the standard Java de/serialization methods.
+            fromVertex.initEdgeListsIfNeeded();
+            toVertex.initEdgeListsIfNeeded();
             fromVertex.addOutgoing(e);
             toVertex.addIncoming(e);
         }
