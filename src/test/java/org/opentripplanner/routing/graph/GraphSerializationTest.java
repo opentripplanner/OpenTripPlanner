@@ -41,6 +41,7 @@ public class GraphSerializationTest {
         // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
         // Remove the transit stations, which have no edges and won't survive serialization.
+        // These are buffered into a list to prevent concurrent modification (removal while iterating).
         List<Vertex> transitVertices = originalGraph.getVertices().stream()
                 .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
         transitVertices.forEach(originalGraph::remove);
