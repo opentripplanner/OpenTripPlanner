@@ -68,6 +68,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The end location */
     public GenericLocation to;
 
+    /** If true, the tree will be allowed to grow in all directions, rather than being directed toward a single target. */
+    public boolean oneToMany = false;
+
     /** An ordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
 

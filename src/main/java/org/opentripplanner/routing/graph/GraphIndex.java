@@ -167,6 +167,7 @@ public class GraphIndex {
         rr.from = new GenericLocation(lat, lon);
         // FIXME requires destination to be set, not necessary for analyst
         rr.to = new GenericLocation(lat, lon);
+        rr.oneToMany = true;
         rr.setRoutingContext(graph);
         rr.walkSpeed = 1;
         rr.dominanceFunction = new DominanceFunction.LeastWalk();

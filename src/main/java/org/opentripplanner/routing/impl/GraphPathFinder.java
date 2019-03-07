@@ -96,7 +96,7 @@ public class GraphPathFinder {
         // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
         RemainingWeightHeuristic reversedSearchHeuristic;
-        if (options.disableRemainingWeightHeuristic) {
+        if (options.disableRemainingWeightHeuristic || options.oneToMany) {
             heuristic = new TrivialRemainingWeightHeuristic();
             reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
