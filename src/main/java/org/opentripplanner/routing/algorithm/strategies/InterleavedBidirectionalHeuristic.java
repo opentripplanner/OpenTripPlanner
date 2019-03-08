@@ -427,11 +427,14 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
 
             // Set the weight depending on the current non-transit mode
+            // Always keep the minimum weight for a lower-bound estimate of weight. This is to avoid
+            // situations where a vertex could be traversed twice with a different mode for example
+            // with a bicycle rental trip.
             TraverseMode nonTransitMode = s.getNonTransitMode();
             if (nonTransitMode != null && s.getNonTransitMode().isDriving()) {
-                weights.carWeight = s.getWeight();
+                weights.carWeight = Math.min(s.getWeight(), weights.carWeight);
             } else {
-                weights.walkWeight = s.getWeight();
+                weights.walkWeight = Math.min(s.getWeight(), weights.walkWeight);
             }
 
             // if searching from the target and traveling via car and the origin has been reached,
