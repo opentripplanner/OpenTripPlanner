@@ -176,6 +176,13 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     // A cache of pre-transit remaining weights based on a vertex as a key
     private Map<Vertex, Double> preTransitRemainingWeightEstimates;
 
+    // A threshold in meters beyond which the pre-transit euclidean heuristic is applied in order
+    // to save time with trip calculations
+    private final double PRE_TRANSIT_EUCLIDEAN_WALK_DISTANCE_THRESHOLD = 5000; // TODO determine a good value empirically
+
+    // A flag for whether the pre-transit euclidean heuristic should be used
+    private boolean useEuclideanRemainingWeightEstimateForPreTransitVertices;
+
 
     /**
      * Before the main search begins, the heuristic must search on the streets around the origin and destination.
@@ -213,11 +220,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             return; // Search timed out
         }
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
-        // once street searches are done, raise the limits to max
-        // because hard walk limiting is incorrect and is observed to cause problems
-        // for trips near the cutoff.
-        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
-        request.setMaxPreTransitTime(Integer.MAX_VALUE);
 
         // initialize the transit vertices to be an empty map.  Transit vertices will be added later
         // in the doSomeWork method.
@@ -229,6 +231,22 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
         // Initialize the pre-transit remaining weight cache
         preTransitRemainingWeightEstimates = new HashMap<>();
+
+        // In most transit+walk searches, the max walk distance is low enough that there will not be
+        // a noticeable slowdown by exploring all pre-transit vertices. However when the CAR mode is
+        // enabled or the maxWalkDistance is higher, many thousands of extra vertices could be
+        // explored during the graph search which can noticeably slow down the graph search.
+        // Therefore, for those cases this flag is activated so that a euclidean heuristic will be
+        // used to estimate the remaining weight in order to not search through all possible
+        // pretransit vertices.
+        useEuclideanRemainingWeightEstimateForPreTransitVertices = request.modes.getCar() ||
+            request.maxWalkDistance > PRE_TRANSIT_EUCLIDEAN_WALK_DISTANCE_THRESHOLD;
+
+        // once street searches are done, raise the limits to max
+        // because hard walk limiting is incorrect and is observed to cause problems
+        // for trips near the cutoff.
+        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        request.setMaxPreTransitTime(Integer.MAX_VALUE);
 
         LOG.debug("initialized SSSP");
         request.rctx.debugOutput.finishedPrecalculating();
@@ -296,19 +314,23 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     }
 
     /**
-     * Calculates the estimated pre-transit remaining weight for a vertex. If the vertex was visited
+     * Calculate the estimated pre-transit remaining weight for a vertex. If the vertex was visited
      * by a certain mode during the streetSearch it will have a non-infinite value which indicates
      * that it was reachable (within the maxWalkDistance for mode combinations that exclude CAR or
      * within the maxPreTransitTime for mode combos that do include the CAR mode). If the vertex was
      * not reachable, the method always returns Infinity which results in the vertex not being
-     * explored further in the graph search. If the vertex was reachable, a euclidean remaining
-     * weight is calculated (and stored in a cache) based off of the remaining distance and the
-     * speed that the remaining distance could be covered.
+     * explored further in the graph search. If the vertex was reachable, a non-infinite value is
+     * returned. If the useEuclideanRemainingWeightEstimateForPreTransitVertices flag is set to
+     * true, a euclidean remaining weight is calculated (and stored in a cache) based off of the
+     * remaining distance and the speed that the remaining distance could be covered. Otherwise, it
+     * is assumed that all pre-transit vertices are equally as likely to have the same remaining
+     * weight to the target, so an underestimate of 0 is returned.
      */
     private double getPreTransitRemainingWeightEstimate(Vertex v, double preTransitStreetSearchWeight) {
         return preTransitStreetSearchWeight == Double.POSITIVE_INFINITY
                ? Double.POSITIVE_INFINITY
-               : preTransitRemainingWeightEstimates.computeIfAbsent(
+               : useEuclideanRemainingWeightEstimateForPreTransitVertices
+                 ? preTransitRemainingWeightEstimates.computeIfAbsent(
                    v,
                    (vertex) -> SphericalDistanceLibrary.fastDistance(
                        v.getLat(),
@@ -316,7 +338,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                        target.getLat(),
                        target.getLon()
                    ) / remainingDistanceSpeed
-               );
+                 )
+                 : 0;
     }
 
     @Override
