@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.standalone.Router;
@@ -52,8 +38,6 @@ public class InputStreamGraphSource implements GraphSource {
 
     private long graphLastModified = 0L;
 
-    private LoadLevel loadLevel;
-
     private Object preEvictMutex = new Boolean(false);
 
     /**
@@ -65,32 +49,22 @@ public class InputStreamGraphSource implements GraphSource {
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
     /**
-     * @param routerId
-     * @param path
-     * @param loadLevel
      * @return A GraphSource loading graph from the file system under a base path.
      */
-    public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
-            LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new FileStreams(path));
+    public static InputStreamGraphSource newFileGraphSource(String routerId, File path) {
+        return new InputStreamGraphSource(routerId, new FileStreams(path));
     }
 
     /**
-     * @param routerId
-     * @param path
-     * @param loadLevel
      * @return A GraphSource loading graph from an embedded classpath resources (a graph bundled
      *         inside a pre-packaged WAR for example).
      */
-    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
-            LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathStreams(path));
+    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path) {
+        return new InputStreamGraphSource(routerId, new ClasspathStreams(path));
     }
 
-    private InputStreamGraphSource(String routerId, LoadLevel loadLevel,
-            Streams streams) {
+    private InputStreamGraphSource(String routerId, Streams streams) {
         this.routerId = routerId;
-        this.loadLevel = loadLevel;
         this.streams = streams;
     }
 
@@ -206,8 +180,7 @@ public class InputStreamGraphSource implements GraphSource {
         try (InputStream is = streams.getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
-                newGraph = Graph.load(new ObjectInputStream(is), loadLevel,
-                        streetVertexIndexFactory);
+                newGraph = Graph.load(is);
             } catch (Exception ex) {
                 LOG.error("Exception while loading graph '{}'.", routerId, ex);
                 return null;
@@ -332,16 +305,13 @@ public class InputStreamGraphSource implements GraphSource {
 
         public File basePath;
 
-        public LoadLevel loadLevel = LoadLevel.FULL;
-
         public FileFactory(File basePath) {
             this.basePath = basePath;
         }
 
         @Override
         public GraphSource createGraphSource(String routerId) {
-            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId),
-                    loadLevel);
+            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId));
         }
 
         @Override

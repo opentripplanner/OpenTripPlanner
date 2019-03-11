@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
@@ -30,7 +17,6 @@ import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -559,18 +545,6 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            if (options.useTraffic) {
-                // the expected speed based on traffic
-                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
-
-                if (source != null) {
-                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
-
-                    if (!Double.isNaN(congestedSpeed))
-                        return congestedSpeed;
-                }
-            }
-
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);

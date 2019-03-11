@@ -1,25 +1,12 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
@@ -39,7 +26,6 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -88,7 +74,7 @@ public class RoutingContext implements Cloneable {
     // public final Calendar calendar;
     public final CalendarService calendarService;
 
-    public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
+    public final Map<FeedScopedId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<FeedScopedId, Set<ServiceDate>>();
 
     public RemainingWeightHeuristic remainingWeightHeuristic;
 
@@ -96,9 +82,6 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
-
-    /** A snapshot of street speeds for looking up real-time or historical traffic data */
-    public final StreetSpeedSnapshot streetSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -154,7 +137,7 @@ public class RoutingContext implements Cloneable {
         for (Edge e : Iterables.concat(u.getIncoming(), u.getOutgoing())) {
             uIds.add(e.getId());
         }
-        
+
         // Intesection of edge IDs between u and v.
         uIds.retainAll(vIds);
         Set<Integer> overlappingIds = uIds;
@@ -236,13 +219,6 @@ public class RoutingContext implements Cloneable {
             calendarService = null;
         }
 
-        // do the same for traffic
-        if (graph.streetSpeedSource != null)
-            this.streetSpeedSnapshot = graph.streetSpeedSource.getSnapshot();
-        else
-            this.streetSpeedSnapshot = null;
-
-
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -303,7 +279,7 @@ public class RoutingContext implements Cloneable {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
-        
+
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
@@ -412,10 +388,12 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Tear down this routing context, removing any temporary edges.
+     * Tear down this routing context, removing any temporary edges from
+     * the "permanent" graph objects. This enables all temporary objects
+     * for garbage collection.
      */
     public void destroy() {
-        if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
-        if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
+        TemporaryVertex.dispose(fromVertex);
+        TemporaryVertex.dispose(toVertex);
     }
 }

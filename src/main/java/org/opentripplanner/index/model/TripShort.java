@@ -3,16 +3,16 @@ package org.opentripplanner.index.model;
 import java.util.Collection;
 import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
 
 import com.beust.jcommander.internal.Lists;
 
 public class TripShort {
 
-    public AgencyAndId id;
+    public FeedScopedId id;
     public String tripHeadsign;
-    public AgencyAndId serviceId;
+    public FeedScopedId serviceId;
     public String shapeId;
     public Integer direction;
 
@@ -22,7 +22,7 @@ public class TripShort {
         id = trip.getId();
         tripHeadsign = trip.getTripHeadsign();
         serviceId = trip.getServiceId();
-        AgencyAndId shape = trip.getShapeId();
+        FeedScopedId shape = trip.getShapeId();
         shapeId = shape == null ? null : shape.getId();
         String directionId = trip.getDirectionId();
         direction = directionId == null ? null : Integer.parseInt(directionId);

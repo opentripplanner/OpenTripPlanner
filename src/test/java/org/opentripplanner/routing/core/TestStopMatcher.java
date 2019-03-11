@@ -1,22 +1,9 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 
 public class TestStopMatcher extends TestCase {
 
@@ -25,9 +12,9 @@ public class TestStopMatcher extends TestCase {
      */
     public void testStopMatcher() {
         Stop s1 = new Stop();
-        s1.setId(new AgencyAndId("A1", "42"));
+        s1.setId(new FeedScopedId("A1", "42"));
         Stop s2 = new Stop();
-        s2.setId(new AgencyAndId("A1", "43"));
+        s2.setId(new FeedScopedId("A1", "43"));
 
         StopMatcher emptyMatcher = StopMatcher.emptyMatcher();
         assertFalse(emptyMatcher.matches(s1));
@@ -69,12 +56,12 @@ public class TestStopMatcher extends TestCase {
      */
     public void testStopMatcherParents() {
         Stop parent = new Stop();
-        parent.setId(new AgencyAndId("A1", "10"));
+        parent.setId(new FeedScopedId("A1", "10"));
         Stop s1 = new Stop();
-        s1.setId(new AgencyAndId("A1", "42"));
+        s1.setId(new FeedScopedId("A1", "42"));
         s1.setParentStation("10");
         Stop s2 = new Stop();
-        s2.setId(new AgencyAndId("A1", "43"));
+        s2.setId(new FeedScopedId("A1", "43"));
         s2.setParentStation("10");
         
         StopMatcher matcherParent = StopMatcher.parse("A1:10");

@@ -2,17 +2,22 @@ package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.profile.StopClusterMode;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * These are parameters that when changed, necessitate a Graph rebuild.
  * They are distinct from the RouterParameters which can be applied to a pre-built graph or on the fly at runtime.
  * Eventually both classes may be initialized from the same config file so make sure there is no overlap
  * in the JSON keys used.
- *
+ * <p>
  * These used to be command line parameters, but there were getting to be too many of them and besides, we want to
  * allow different graph builder configuration for each Graph.
  * <p>
@@ -21,7 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class GraphBuilderParameters {
 
-    public static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
+    private static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
 
     /**
      * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
@@ -53,6 +58,16 @@ public class GraphBuilderParameters {
      * Create direct transfers between the constituent stops of each parent station.
      */
     public final boolean stationTransfers;
+
+    /**
+     * Stop clusters can be built in one of two ways, either by geographical proximity and name, or
+     * according to a parent/child station topology, if it exists.
+     * <ul>
+     * <li>"parentStation" See {@link GraphIndex#clusterByParentStation()}</li>
+     * <li>"proximity" See {@link GraphIndex#clusterByProximityAndName()}. This is the default value.</li>
+     * </ul>
+     */
+    public final StopClusterMode stopClusterMode;
 
     /**
      * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -94,6 +109,13 @@ public class GraphBuilderParameters {
     public final S3BucketConfig elevationBucket;
 
     /**
+     * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+     * are defined in meters in the source data. If, for example, decimetres are used in the source data,
+     * this should be set to 0.1.
+    */
+    public final double elevationUnitMultiplier;
+
+    /**
      * A specific fares service to use.
      */
     public final FareServiceFactory fareServiceFactory;
@@ -102,7 +124,7 @@ public class GraphBuilderParameters {
      * A custom OSM namer to use.
      */
     public final CustomNamer customNamer;
-    
+
     /**
      * Custom OSM way properties
      */
@@ -127,13 +149,13 @@ public class GraphBuilderParameters {
      * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
      */
     public int maxInterlineDistance = 200;
-    
+
     /**
      * This field indicates the pruning threshold for islands without stops.
      * Any such island under this size will be pruned.
      */
     public final int pruningThresholdIslandWithoutStops;
-    
+
     /**
      * This field indicates the pruning threshold for islands with stops.
      * Any such island under this size will be pruned.
@@ -158,6 +180,11 @@ public class GraphBuilderParameters {
     public final double maxTransferDistance;
 
     /**
+     * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
+     */
+    public final Boolean extraEdgesStopPlatformLink;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -169,6 +196,7 @@ public class GraphBuilderParameters {
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
+        stopClusterMode = enumValueOf(config, "stopClusterMode", StopClusterMode.proximity);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
@@ -177,6 +205,7 @@ public class GraphBuilderParameters {
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
+        elevationUnitMultiplier = config.path("elevationUnitMultiplier").asDouble(1);
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
         wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));
@@ -190,6 +219,20 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
+        extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
     }
 
+
+    @SuppressWarnings("unchecked")
+    static <T extends Enum<T>> T enumValueOf(JsonNode config, String propertyName, T defaultValue) {
+        String valueAsString = config.path(propertyName).asText(defaultValue.name());
+        try {
+            return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
+        }
+        catch (IllegalArgumentException ignore) {
+            List<? extends Enum> legalValues = Arrays.asList(defaultValue.getClass().getEnumConstants());
+            throw new IllegalArgumentException("The graph build parameter " + propertyName
+                    + " value '" + valueAsString + "' is not in legal. Expected one of " + legalValues + ".");
+        }
+    }
 }

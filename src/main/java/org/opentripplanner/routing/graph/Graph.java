@@ -1,36 +1,35 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.graph;
 
-
+import com.conveyal.r5.kryo.TIntArrayListSerializer;
+import com.conveyal.r5.kryo.TIntIntHashMapSerializer;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import gnu.trove.impl.hash.TIntHash;
+import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.FeedInfo;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
+import org.opentripplanner.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
@@ -38,7 +37,9 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -52,12 +53,11 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.InstanceCountingClassResolver;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +102,6 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    private boolean debugData = true;
-
     // TODO this would be more efficient if it was just an array.
     private transient Map<Integer, Vertex> vertexById;
 
@@ -117,13 +115,13 @@ public class Graph implements Serializable {
 
     private transient SampleFactory sampleFactory;
 
-    public final Deduplicator deduplicator = new Deduplicator();
+    public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
+    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
@@ -199,18 +197,15 @@ public class Graph implements Serializable {
 
     /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
     public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
-
-    /** A speed source for traffic data */
-    public transient StreetSpeedSnapshotSource streetSpeedSource;
     
-    /** How should we cluster stops? */
-    public String stopClusterMode = "proximity";
+    /** How should we cluster stops? By 'proximity' or 'ParentStation' */
+    public StopClusterMode stopClusterMode = StopClusterMode.proximity;
 
     /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<AgencyAndId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();
@@ -535,7 +530,7 @@ public class Graph implements Serializable {
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
-        for (AgencyAndId sid : data.getServiceIds()) {
+        for (FeedScopedId sid : data.getServiceIds()) {
             agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.
@@ -666,51 +661,19 @@ public class Graph implements Serializable {
 
     /* (de) serialization */
 
-    public enum LoadLevel {
-        BASIC, FULL, DEBUG;
-    }
-
-    public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
+    public static Graph load(File file) throws IOException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
-        // cannot use getClassLoader() in static context
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-        return load(in, level);
-    }
-
-    public static Graph load(ClassLoader classLoader, File file, LoadLevel level)
-            throws IOException, ClassNotFoundException {
-        LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
-        ObjectInputStream in = new GraphObjectInputStream(new BufferedInputStream(
-                new FileInputStream(file)), classLoader);
-        return load(in, level);
-    }
-
-    public static Graph load(InputStream is, LoadLevel level) throws ClassNotFoundException,
-            IOException {
-        return load(new ObjectInputStream(is), level);
+        return load(new FileInputStream(file));
     }
 
     /**
-     * Default load. Uses DefaultStreetVertexIndexFactory.
-     * @param in
-     * @param level
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public static Graph load(ObjectInputStream in, LoadLevel level) throws IOException,
-            ClassNotFoundException {
-        return load(in, level, new DefaultStreetVertexIndexFactory());
-    }
-    
-    /** 
      * Perform indexing on vertices, edges, and timetables, and create transient data structures.
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
      * allows passing graphs from graphbuilder to server in memory, without a round trip through
      * serialization. 
      * TODO: do we really need a factory for different street vertex indexes?
      */
-    public void index(StreetVertexIndexFactory indexFactory) {
+    public void index (StreetVertexIndexFactory indexFactory) {
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
@@ -726,54 +689,36 @@ public class Graph implements Serializable {
         this.index = new GraphIndex(this);
     }
     
-    /**
-     * Loading which allows you to specify StreetVertexIndexFactory and inject other implementation.
-     * @param in
-     * @param level
-     * @param indexFactory
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    @SuppressWarnings("unchecked")
-    public static Graph load(ObjectInputStream in, LoadLevel level,
-            StreetVertexIndexFactory indexFactory) throws IOException, ClassNotFoundException {
-        try {
-            Graph graph = (Graph) in.readObject();
-            LOG.debug("Basic graph info read.");
-            if (graph.graphVersionMismatch())
-                throw new RuntimeException("Graph version mismatch detected.");
-            if (level == LoadLevel.BASIC)
-                return graph;
-            // vertex edge lists are transient to avoid excessive recursion depth
-            // vertex list is transient because it can be reconstructed from edges
-            LOG.debug("Loading edges...");
-            List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();
-            
-            for (Edge e : edges) {
-                graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-                graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
-            }
-
-            LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-            graph.index(indexFactory);
-
-            if (level == LoadLevel.FULL) {
-                return graph;
-            }
-            
-            if (graph.debugData) {
-                graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
-                LOG.debug("Debug info read.");
-            } else {
-                LOG.warn("Graph file does not contain debug data.");
-            }
-            return graph;
-        } catch (InvalidClassException ex) {
-            LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
-            throw new IllegalStateException("Stored Graph version error", ex);
+    public static Graph load(InputStream in) {
+        // TODO store version information, halt load if versions mismatch
+        Input input = new Input(in);
+        Kryo kryo = makeKryo();
+        Graph graph = (Graph) kryo.readClassAndObject(input);
+        LOG.debug("Basic graph info read.");
+        if (graph.graphVersionMismatch()) {
+            throw new RuntimeException("Graph version mismatch detected.");
         }
+        // Vertex edge lists are transient to avoid excessive recursion depth during serialization.
+        // vertex list is transient because it can be reconstructed from edges.
+        LOG.debug("Loading edges...");
+        List<Edge> edges = (ArrayList<Edge>) kryo.readClassAndObject(input);
+        graph.vertices = new ConcurrentHashMap<>(); // why is this concurrent?
+
+        for (Edge e : edges) {
+            Vertex fromVertex = e.getFromVertex();
+            Vertex toVertex = e.getToVertex();
+            graph.vertices.put(fromVertex.getLabel(), fromVertex);
+            graph.vertices.put(toVertex.getLabel(), toVertex);
+            // Compensating for the fact that we're not using the standard Java de/serialization methods.
+            fromVertex.initEdgeListsIfNeeded();
+            toVertex.initEdgeListsIfNeeded();
+            fromVertex.addOutgoing(e);
+            toVertex.addIncoming(e);
+        }
+
+        LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+        graph.index(new DefaultStreetVertexIndexFactory());
+        return graph;
     }
 
     /**
@@ -809,23 +754,65 @@ public class Graph implements Serializable {
         }
     }
 
+    /**
+     * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same configuration.
+     * This allows us to use identically configured instances for serialization and deserialization.
+     *
+     * When configuring serializers, there's a difference between kryo.register() and kryo.addDefaultSerializer().
+     * The latter will set the default for a whole tree of classes. The former matches only the specified class.
+     * By default Kryo will serialize all the non-transient fields of an instance. If the class has its own overridden
+     * Java serialization methods Kryo will not automatically use those, a JavaSerializer must be registered.
+     */
+    public static Kryo makeKryo() {
+        // For generating a histogram of serialized classes with associated serializers:
+        // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
+        Kryo kryo = new Kryo();
+        // Allow serialization of unrecognized classes, for which we haven't manually set up a serializer.
+        // We might actually want to manually register a serializer for every class, to be safe.
+        kryo.setRegistrationRequired(false);
+        kryo.setReferences(true);
+        kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
+        kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
+        kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
+        // Kryo's default instantiation and deserialization of BitSets leaves them empty.
+        // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
+        // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
+        kryo.register(BitSet.class, new JavaSerializer());
+        // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
+        // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
+        // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
+        kryo.register(HashBiMap.class, new HashBiMapSerializer());
+        // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
+        // FIXME we're importing all the contributed kryo-serializers just for this one serializer
+        try {
+            Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
+            kryo.addDefaultSerializer(unmodifiableCollection , UnmodifiableCollectionsSerializer.class);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?
+        // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
+        // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
+        // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
+        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
+        return kryo;
+    }
+
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
-                new FileOutputStream(file)));
         try {
-            save(out);
-            out.close();
-        } catch (RuntimeException e) {
-            out.close();
+            save(new FileOutputStream(file));
+        } catch (Exception e) {
             file.delete(); // remove half-written file
             throw e;
         }
     }
 
-    public void save(ObjectOutputStream out) throws IOException {
+    public void save(OutputStream outputStream) {
+        Kryo kryo = makeKryo();
         LOG.debug("Consolidating edges...");
+        Output output = new Output(outputStream);
         // this is not space efficient
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
         for (Vertex v : getVertices()) {
@@ -838,37 +825,12 @@ public class Graph implements Serializable {
         LOG.debug("Assigning vertex/edge ID numbers...");
         this.rebuildVertexAndEdgeIndices();
         LOG.debug("Writing edges...");
-        out.writeObject(this);
-        out.writeObject(edges);
-        if (debugData) {
-            // should we make debug info generation conditional?
-            LOG.debug("Writing debug data...");
-            out.writeObject(this.graphBuilderAnnotations);
-            out.writeObject(this.vertexById);
-            out.writeObject(this.edgeById);
-        } else {
-            LOG.debug("Skipping debug data.");
-        }
+        kryo.writeClassAndObject(output, this);
+        kryo.writeClassAndObject(output, edges);
+        output.close();
         LOG.info("Graph written.");
-    }
-
-    /* deserialization for org.opentripplanner.customize */
-    private static class GraphObjectInputStream extends ObjectInputStream {
-        ClassLoader classLoader;
-
-        public GraphObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
-            super(in);
-            this.classLoader = classLoader;
-        }
-
-        @Override
-        public Class<?> resolveClass(ObjectStreamClass osc) {
-            try {
-                return Class.forName(osc.getName(), false, classLoader);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        // Summarize serialized classes and associated serializers:
+        // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
     }
 
     public Integer getIdForEdge(Edge edge) {
@@ -879,9 +841,7 @@ public class Graph implements Serializable {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
             if (data != null) {
-                CalendarServiceImpl calendarService = new CalendarServiceImpl();
-                calendarService.setData(data);
-                this.calendarService = calendarService;
+                this.calendarService = new CalendarServiceImpl(data);
             }
         }
         return this.calendarService;
@@ -1052,7 +1012,6 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

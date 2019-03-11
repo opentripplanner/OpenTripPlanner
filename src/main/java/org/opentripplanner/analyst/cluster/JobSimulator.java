@@ -6,13 +6,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.opentripplanner.profile.ProfileRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class JobSimulator {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.registerModule(AgencyAndIdSerializer.makeModule());
+        mapper.registerModule(FeedScopedIdSerializer.makeModule());
         mapper.registerModule(QualifiedModeSetSerializer.makeModule());
         mapper.registerModule(JodaLocalDateSerializer.makeModule());
         mapper.registerModule(TraverseModeSetSerializer.makeModule());
