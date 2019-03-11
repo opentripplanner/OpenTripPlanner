@@ -234,6 +234,11 @@ public abstract class RoutingResource {
     @QueryParam("unpreferredAgencies")
     protected String unpreferredAgencies;
 
+    /** Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing
+     * to wait for route that is unpreferred. */
+    @QueryParam("useUnpreferredRoutesPenalty")
+    protected Integer useUnpreferredRoutesPenalty;
+
     /** Whether intermediate stops -- those that the itinerary passes in a vehicle, but
      *  does not board or alight at -- should be returned in the response.  For example,
      *  on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and
@@ -539,6 +544,9 @@ public abstract class RoutingResource {
 
         if (unpreferredAgencies != null)
             request.setUnpreferredAgencies(unpreferredAgencies);
+
+        if (useUnpreferredRoutesPenalty != null)
+            request.setUseUnpreferredRoutesPenalty(useUnpreferredRoutesPenalty);
 
         if (walkBoardCost != null)
             request.setWalkBoardCost(walkBoardCost);

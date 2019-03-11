@@ -221,6 +221,7 @@ public class GraphQlPlanner {
         callWith.argument("preferred.agencies", request::setPreferredAgencies);
         callWith.argument("unpreferred.routes", request::setUnpreferredRoutes);
         callWith.argument("unpreferred.agencies", request::setUnpreferredAgencies);
+        callWith.argument("unpreferred.useUnpreferredRoutesPenalty", request::setUseUnpreferredRoutesPenalty);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
         callWith.argument("bikeBoardCost", request::setBikeBoardCost);
         callWith.argument("banned.routes", request::setBannedRoutes);

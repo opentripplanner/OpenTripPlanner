@@ -684,7 +684,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
-        if(penalty < 0) penalty = 0;
+        if (penalty < 0) {
+            penalty = 0;
+        }
         this.otherThanPreferredRoutesPenalty = penalty;
     }
 
@@ -704,6 +706,13 @@ public class RoutingRequest implements Cloneable, Serializable {
                 this.unpreferredRoutes.parseAddRoutes(s);
             }
         }
+    }
+
+    public void setUseUnpreferredRoutesPenalty(int penalty) {
+        if (penalty < 0) {
+            penalty = 0;
+        }
+        this.useUnpreferredRoutesPenalty = penalty;
     }
 
     public void setBannedRoutes(String s) {

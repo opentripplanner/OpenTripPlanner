@@ -437,6 +437,11 @@ public class IndexGraphQLSchema {
                         .description("A comma-separated list of ids of the agencies unpreferred by the user.")
                         .type(Scalars.GraphQLString)
                         .build())
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("useUnpreferredRoutesPenalty")
+                        .description("Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing to wait for route that is unpreferred.")
+                        .type(Scalars.GraphQLInt)
+                        .build())
                 .build();
 
         GraphQLInputObjectType bannedInputType = GraphQLInputObjectType.newInputObject()
