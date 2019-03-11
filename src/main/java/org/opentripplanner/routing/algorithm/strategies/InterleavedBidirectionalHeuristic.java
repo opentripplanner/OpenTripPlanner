@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -169,6 +170,20 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     // True when the entire transit network has been explored by the reverse search.
     boolean finished = false;
 
+    // The speed for calculating the pre-transit remaining weight with a euclidean heuristic
+    private double remainingDistanceSpeed;
+
+    // A cache of pre-transit remaining weights based on a vertex as a key
+    private Map<Vertex, Double> preTransitRemainingWeightEstimates;
+
+    // A threshold in meters beyond which the pre-transit euclidean heuristic is applied in order
+    // to save time with trip calculations
+    private final double PRE_TRANSIT_EUCLIDEAN_WALK_DISTANCE_THRESHOLD = 5000; // TODO determine a good value empirically
+
+    // A flag for whether the pre-transit euclidean heuristic should be used
+    private boolean useEuclideanRemainingWeightEstimateForPreTransitVertices;
+
+
     /**
      * Before the main search begins, the heuristic must search on the streets around the origin and destination.
      * This also sets up the initial states for the reverse search through the transit network, which progressively
@@ -205,15 +220,33 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             return; // Search timed out
         }
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
-        // once street searches are done, raise the limits to max
-        // because hard walk limiting is incorrect and is observed to cause problems 
-        // for trips near the cutoff.
-        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
-        request.setMaxPreTransitTime(Integer.MAX_VALUE);
 
         // initialize the transit vertices to be an empty map.  Transit vertices will be added later
         // in the doSomeWork method.
         transitVertexWeights = new TObjectDoubleHashMap<>(100, 0.5f, Double.POSITIVE_INFINITY);
+
+        // Set the remaining distance speed to the upper bound speed of the modes available in the
+        // routing request.
+        remainingDistanceSpeed = request.getStreetSpeedUpperBound();
+
+        // Initialize the pre-transit remaining weight cache
+        preTransitRemainingWeightEstimates = new HashMap<>();
+
+        // In most transit+walk searches, the max walk distance is low enough that there will not be
+        // a noticeable slowdown by exploring all pre-transit vertices. However when the CAR mode is
+        // enabled or the maxWalkDistance is higher, many thousands of extra vertices could be
+        // explored during the graph search which can noticeably slow down the graph search.
+        // Therefore, for those cases this flag is activated so that a euclidean heuristic will be
+        // used to estimate the remaining weight in order to not search through all possible
+        // pretransit vertices.
+        useEuclideanRemainingWeightEstimateForPreTransitVertices = request.modes.getCar() ||
+            request.maxWalkDistance > PRE_TRANSIT_EUCLIDEAN_WALK_DISTANCE_THRESHOLD;
+
+        // once street searches are done, raise the limits to max
+        // because hard walk limiting is incorrect and is observed to cause problems
+        // for trips near the cutoff.
+        request.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        request.setMaxPreTransitTime(Integer.MAX_VALUE);
 
         LOG.debug("initialized SSSP");
         request.rctx.debugOutput.finishedPrecalculating();
@@ -229,16 +262,9 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     @Override
     public double estimateRemainingWeight (State s) {
         final Vertex v = s.getVertex();
-        if (v instanceof StreetLocation || v instanceof TemporaryVertex) {
-            // Temporary vertices or StreetLocations might not be found in the street searches.
-            // These can be temporary vertices created for the origin or destination vertex or also
-            // the temporary vertices that link the split street to the origin/destination.  This
-            // can also include other vertices used to create items such as bike rental stations.
-            // Zero is always an underestimate.
-            return 0;
-        } else if (v instanceof TransitVertex) {
+        if (v instanceof TransitVertex) {
             // The main search is on transit. If the current vertex has been explored during the
-            // doSomeWork method, then return the stored lower bound.  Otherwise return the highest
+            // doSomeWork method, then return the stored lower bound. Otherwise return the highest
             // lower bound yet seen -- this location must have a higher cost than that.
             double h = transitVertexWeights.get(v);
             if (h == Double.POSITIVE_INFINITY) {
@@ -246,28 +272,31 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             } else {
                 return h;
             }
+        } else if (v instanceof StreetLocation || v instanceof TemporaryVertex) {
+            // Temporary vertices or StreetLocations might not be found in the street searches.
+            // These can be temporary vertices created for the origin or destination vertex or also
+            // the temporary vertices that link the split street to the origin/destination. This
+            // can also include other vertices used to create items such as bike rental stations.
+            // Zero is always an underestimate.
+            return 0;
         } else if (!s.isEverBoarded() && preTransitVertices.containsKey(v)) {
-            // We have not boarded transit yet. We have no idea what the weight to the target is,
-            // therefore if the heuristic reached this vertex in the initial search we return 0.
-            // However, we also need to check the vertex weight with respect to the current
-            // mode being used.  This differentiation is needed because during the pretransit
-            // search, lots of vertices could be explored in a driving state and not a walking
-            // state.  Therefore, these vertices are only reachable by car need to be assigned
-            // an infinite weight when encountered in walk mode.  If the mode-dependent lower bound
-            // weight is Infinity, return Infinity as this vertex was unreachable during the
-            // heuristic initialization with the current mode.
-            // We could also use a Euclidean heuristic here.
+            // The current search state is not on transit, is not a temporary vertex and hasn't
+            // boarded transit yet. Calculate the remaining weight of the vertex based on the
+            // current non-transit mode. This differentiation is needed because during the
+            // pre-transit search, the same vertex could be explored in a driving state or a
+            // walking state or both. Therefore, the vertices need to be assigned different weights
+            // for when a vertex is unreachable via a specific mode.
             VertexModeWeight weight = preTransitVertices.get(v);
             TraverseMode nonTransitMode = s.getNonTransitMode();
             if (nonTransitMode != null && nonTransitMode.isDriving()) {
-                return weight.carWeight == Double.POSITIVE_INFINITY ? Double.POSITIVE_INFINITY : 0;
+                return getPreTransitRemainingWeightEstimate(v, weight.carWeight);
             } else {
-                return weight.walkWeight == Double.POSITIVE_INFINITY ? Double.POSITIVE_INFINITY : 0;
+                return getPreTransitRemainingWeightEstimate(v, weight.walkWeight);
             }
         } else if (s.isEverBoarded() && postTransitVertices.containsKey(v)) {
             // The main search has boarded transit and is on a vertex that was reachable during the
-            // post-transit heuristic initialization.  Return the mode-dependent lower bound weight
-            // found during the heuristic initialization.  This can return Infinity if this vertex
+            // post-transit heuristic initialization. Return the mode-dependent lower bound weight
+            // found during the heuristic initialization. This can return Infinity if this vertex
             // was unreachable during the heuristic initialization with the current mode.
             VertexModeWeight weight = postTransitVertices.get(v);
             TraverseMode nonTransitMode = s.getNonTransitMode();
@@ -282,6 +311,35 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // been explored during the appropriate pre or post transit initialization of the heuristic.
         // Therefore, it is unreachable.
         return Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Calculate the estimated pre-transit remaining weight for a vertex. If the vertex was visited
+     * by a certain mode during the streetSearch it will have a non-infinite value which indicates
+     * that it was reachable (within the maxWalkDistance for mode combinations that exclude CAR or
+     * within the maxPreTransitTime for mode combos that do include the CAR mode). If the vertex was
+     * not reachable, the method always returns Infinity which results in the vertex not being
+     * explored further in the graph search. If the vertex was reachable, a non-infinite value is
+     * returned. If the useEuclideanRemainingWeightEstimateForPreTransitVertices flag is set to
+     * true, a euclidean remaining weight is calculated (and stored in a cache) based off of the
+     * remaining distance and the speed that the remaining distance could be covered. Otherwise, it
+     * is assumed that all pre-transit vertices are equally as likely to have the same remaining
+     * weight to the target, so an underestimate of 0 is returned.
+     */
+    private double getPreTransitRemainingWeightEstimate(Vertex v, double preTransitStreetSearchWeight) {
+        return preTransitStreetSearchWeight == Double.POSITIVE_INFINITY
+               ? Double.POSITIVE_INFINITY
+               : useEuclideanRemainingWeightEstimateForPreTransitVertices
+                 ? preTransitRemainingWeightEstimates.computeIfAbsent(
+                   v,
+                   (vertex) -> SphericalDistanceLibrary.fastDistance(
+                       v.getLat(),
+                       v.getLon(),
+                       target.getLat(),
+                       target.getLon()
+                   ) / remainingDistanceSpeed
+               )
+                 : 0;
     }
 
     @Override
@@ -427,16 +485,21 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
 
             // Set the weight depending on the current non-transit mode
+            // Always keep the minimum weight for a lower-bound estimate of weight. This is to avoid
+            // situations where a vertex could be traversed twice with a different mode for example
+            // with a bicycle rental trip.
             TraverseMode nonTransitMode = s.getNonTransitMode();
             if (nonTransitMode != null && s.getNonTransitMode().isDriving()) {
-                weights.carWeight = s.getWeight();
+                weights.carWeight = Math.min(s.getWeight(), weights.carWeight);
             } else {
-                weights.walkWeight = s.getWeight();
+                weights.walkWeight = Math.min(s.getWeight(), weights.walkWeight);
             }
 
             // if searching from the target and traveling via car and the origin has been reached,
             // immediately return the vertices so that the entire graph isn't searched.
-            if (fromTarget && rr.modes.getCar() && v == rr.rctx.origin) break;
+            if (fromTarget && rr.modes.getCar() && v == rr.rctx.origin) {
+                break;
+            }
 
             // Attempt to traverse all edges going in the direction desired
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
