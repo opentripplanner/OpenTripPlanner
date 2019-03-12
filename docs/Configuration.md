@@ -479,6 +479,9 @@ connect to a network resource is the `url` field.
         "carDropoffTime": 240
     },
 
+    // Optional key that defines which default route preference rules are used from RoutePreferencesSource
+    "routePreferenceSettings": "HSL",
+
     "updaters": [
 
         // GTFS-RT service alerts (frequent polling)
