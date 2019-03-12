@@ -493,14 +493,14 @@ public class Timetable implements Serializable {
                                 return null;
                             }
                         } else {
-                                if (delay == null) {
-                                    newTimes.cancelDepartureTime(i);
-                                    newTimes.updateDepartureDelay(i, TripTimes.UNAVAILABLE);
-                                } else {
-                                    newTimes.updateDepartureDelay(i, delay);
-                                    if (newTimes.isCanceledDeparture(i)) {
-                                        newTimes.unCancelDepartureTime(i);
-                                    }
+                            if (delay == null) {
+                                newTimes.cancelDepartureTime(i);
+                                newTimes.updateDepartureDelay(i, TripTimes.UNAVAILABLE);
+                            } else {
+                                newTimes.updateDepartureDelay(i, delay);
+                                if (newTimes.isCanceledDeparture(i)) {
+                                    newTimes.unCancelDepartureTime(i);
+                                }
                             }
                         }
                     }
