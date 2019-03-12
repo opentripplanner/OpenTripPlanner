@@ -216,14 +216,15 @@ public class GraphQlPlanner {
         callWith.argument("arriveBy", request::setArriveBy);
         request.showIntermediateStops = true;
         callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(this::toGenericLocation).collect(Collectors.toList()));
-        callWith.argument("preferred.routes", request::setPreferredRoutes);
+        callWith.argument("preferred.routes", request::addPreferredRoutes);
         callWith.argument("preferred.otherThanPreferredRoutesPenalty", request::setOtherThanPreferredRoutesPenalty);
         callWith.argument("preferred.agencies", request::setPreferredAgencies);
-        callWith.argument("unpreferred.routes", request::setUnpreferredRoutes);
+        callWith.argument("unpreferred.routes", request::addUnpreferredRoutes);
         callWith.argument("unpreferred.agencies", request::setUnpreferredAgencies);
+        callWith.argument("unpreferred.useUnpreferredRoutesPenalty", request::setUseUnpreferredRoutesPenalty);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
         callWith.argument("bikeBoardCost", request::setBikeBoardCost);
-        callWith.argument("banned.routes", request::setBannedRoutes);
+        callWith.argument("banned.routes", request::addBannedRoutes);
         callWith.argument("banned.agencies", request::setBannedAgencies);
         callWith.argument("banned.trips", (String v) -> request.bannedTrips = RoutingResource.makeBannedTripMap(v));
         callWith.argument("banned.stops", request::setBannedStops);

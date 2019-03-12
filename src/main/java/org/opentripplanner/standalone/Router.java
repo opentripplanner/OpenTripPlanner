@@ -14,6 +14,7 @@ import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.routepreferences.RoutePreferencesSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -161,6 +162,15 @@ public class Router {
                 if (alightTimes.has(mode.name())) {
                     graph.alightTimes.put(mode, alightTimes.get(mode.name()).asInt(0));
                 }
+            }
+        }
+
+        JsonNode routePreferenceSettingsNode = config.get("routePreferenceSettings");
+        if (routePreferenceSettingsNode != null) {
+            String routePreferenceSettingsName = routePreferenceSettingsNode.textValue();
+            if (routePreferenceSettingsName != null) {
+                RoutePreferencesSource.fromConfig(routePreferenceSettingsName).setRoutePreferences(
+                        this.defaultRoutingRequest, this.graph);
             }
         }
 

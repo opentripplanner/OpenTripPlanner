@@ -27,13 +27,8 @@ public class TestBanning extends TestCase {
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
 
         String feedId = graph.getFeedIds().iterator().next();
-        RoutingRequest options = new RoutingRequest();
         Vertex start = graph.getVertex(feedId + ":8371");
         Vertex end = graph.getVertex(feedId + ":8374");
-        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
-        // must set routing context _after_ options is fully configured (time)
-        options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = null;
 
         /*
          * The MAX Red, Blue, and Green lines all run along the same trackage between the stops 8374 and 8371. Together, they form the white line. No,
@@ -42,12 +37,16 @@ public class TestBanning extends TestCase {
         String[][] maxLines = { { "MAX Red Line", null }, { "MAX Blue Line", null },
                 { "MAX Green Line", null }, { null, "90" }, { null, "100" }, { null, "200" } };
         for (int i = 0; i < maxLines.length; ++i) {
+            RoutingRequest options = new RoutingRequest();
+            options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
+            // must set routing context _after_ options is fully configured (time)
+            options.setRoutingContext(graph, start, end);
             String lineName = maxLines[i][0];
             String lineId = maxLines[i][1];
             String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-                options.setBannedRoutes(routeSpecStr);
-            spt = aStar.getShortestPathTree(options);
+            options.addBannedRoutes(routeSpecStr);
+            ShortestPathTree spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {
@@ -59,6 +58,7 @@ public class TestBanning extends TestCase {
                         if (j != i) {
                             if (e.getName().equals(maxLines[j][0])) {
                                 foundMaxLine = true;
+                                break;
                             }
                         }
                     }
@@ -73,13 +73,8 @@ public class TestBanning extends TestCase {
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
 
         String feedId = graph.getFeedIds().iterator().next();
-        RoutingRequest options = new RoutingRequest();
         Vertex start = graph.getVertex(feedId + ":8371");
         Vertex end = graph.getVertex(feedId + ":8374");
-        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
-        // must set routing context _after_ options is fully configured (time)
-        options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = null;
 
         /*
          * Same as testBannedRoutes, only for whitelisted routes. The last three entries in maxLines are removed, because
@@ -88,12 +83,16 @@ public class TestBanning extends TestCase {
         String[][] maxLines = { { "MAX Red Line", null }, { "MAX Blue Line", null },
                 { "MAX Green Line", null } };
         for (int i = 0; i < maxLines.length; ++i) {
+            RoutingRequest options = new RoutingRequest();
+            options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
+            // must set routing context _after_ options is fully configured (time)
+            options.setRoutingContext(graph, start, end);
             String lineName = maxLines[i][0];
             String lineId = maxLines[i][1];
             String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-            options.setWhiteListedRoutes(routeSpecStr);
-            spt = aStar.getShortestPathTree(options);
+            options.addWhiteListedRoutes(routeSpecStr);
+            ShortestPathTree spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {

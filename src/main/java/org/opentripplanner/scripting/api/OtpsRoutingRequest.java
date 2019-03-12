@@ -5,7 +5,6 @@ import java.util.Date;
 
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
@@ -107,7 +106,7 @@ public class OtpsRoutingRequest {
     }
 
     public void setBannedRoutes(String routeSpecList) {
-        req.bannedRoutes = RouteMatcher.parse(routeSpecList);
+        req.bannedRoutes.addRoutes(routeSpecList);
     }
 
     public void setMaxTransfers(int maxTransfers) {
