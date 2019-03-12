@@ -531,7 +531,7 @@ public abstract class RoutingResource {
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
 
         if (preferredRoutes != null)
-            request.setPreferredRoutes(preferredRoutes);
+            request.addPreferredRoutes(preferredRoutes);
 
         if (otherThanPreferredRoutesPenalty != null)
             request.setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
@@ -540,7 +540,7 @@ public abstract class RoutingResource {
             request.setPreferredAgencies(preferredAgencies);
 
         if (unpreferredRoutes != null)
-            request.setUnpreferredRoutes(unpreferredRoutes);
+            request.addUnpreferredRoutes(unpreferredRoutes);
 
         if (unpreferredAgencies != null)
             request.setUnpreferredAgencies(unpreferredAgencies);
@@ -555,10 +555,10 @@ public abstract class RoutingResource {
             request.setBikeBoardCost(bikeBoardCost);
 
         if (bannedRoutes != null)
-            request.setBannedRoutes(bannedRoutes);
+            request.addBannedRoutes(bannedRoutes);
 
         if (whiteListedRoutes != null)
-            request.setWhiteListedRoutes(whiteListedRoutes);
+            request.addWhiteListedRoutes(whiteListedRoutes);
 
         if (bannedAgencies != null)
             request.setBannedAgencies(bannedAgencies);

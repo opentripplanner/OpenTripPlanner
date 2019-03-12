@@ -53,7 +53,7 @@ public class RouteMatcher implements Cloneable, Serializable {
      * @return A RouteMatcher
      * @throws IllegalArgumentException If the string representation is invalid.
      */
-    public void parseAddRoutes(String routeSpecList) {
+    public void addRoutes(String routeSpecList) {
         if (routeSpecList == null) {
             return;
         }

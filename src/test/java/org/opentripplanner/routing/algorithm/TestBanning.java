@@ -45,7 +45,7 @@ public class TestBanning extends TestCase {
             String lineId = maxLines[i][1];
             String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-            options.setBannedRoutes(routeSpecStr);
+            options.addBannedRoutes(routeSpecStr);
             ShortestPathTree spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
@@ -91,7 +91,7 @@ public class TestBanning extends TestCase {
             String lineId = maxLines[i][1];
             String routeSpecStr = feedId + "_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-            options.setWhiteListedRoutes(routeSpecStr);
+            options.addWhiteListedRoutes(routeSpecStr);
             ShortestPathTree spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {

@@ -672,13 +672,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setPreferredRoutes(String s) {
+    public void addPreferredRoutes(String s) {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
 
             if (s != null && !s.equals("")) {
-                this.preferredRoutes.parseAddRoutes(s);
+                this.preferredRoutes.addRoutes(s);
             }
         }
     }
@@ -697,13 +697,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setUnpreferredRoutes(String s) {
+    public void addUnpreferredRoutes(String s) {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
 
             if (s != null && !s.equals("")) {
-                this.unpreferredRoutes.parseAddRoutes(s);
+                this.unpreferredRoutes.addRoutes(s);
             }
         }
     }
@@ -715,20 +715,20 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.useUnpreferredRoutesPenalty = penalty;
     }
 
-    public void setBannedRoutes(String s) {
+    public void addBannedRoutes(String s) {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
 
             if (s != null && !s.equals("")) {
-                this.bannedRoutes.parseAddRoutes(s);
+                this.bannedRoutes.addRoutes(s);
             }
         }
     }
 
-    public void setWhiteListedRoutes(String s) {
+    public void addWhiteListedRoutes(String s) {
         if (!s.isEmpty()) {
-            this.whiteListedRoutes.parseAddRoutes(s);
+            this.whiteListedRoutes.addRoutes(s);
         }
     }
 

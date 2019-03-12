@@ -28,58 +28,58 @@ public class TestRouteMatcher extends TestCase {
         assertFalse(emptyMatcher.matches(r2));
 
         RouteMatcher matcherR1i = RouteMatcher.emptyMatcher();
-        matcherR1i.parseAddRoutes("A1__42");
+        matcherR1i.addRoutes("A1__42");
         assertTrue(matcherR1i.matches(r1));
         assertFalse(matcherR1i.matches(r1b));
         assertFalse(matcherR1i.matches(r2));
 
         RouteMatcher matcherR2n = RouteMatcher.emptyMatcher();
-        matcherR2n.parseAddRoutes("A1_R2");
+        matcherR2n.addRoutes("A1_R2");
         assertFalse(matcherR2n.matches(r1));
         assertFalse(matcherR2n.matches(r1b));
         assertTrue(matcherR2n.matches(r2));
 
         RouteMatcher matcherR1R2 = RouteMatcher.emptyMatcher();
-        matcherR1R2.parseAddRoutes("A1_R1,A1__43,A2__43");
+        matcherR1R2.addRoutes("A1_R1,A1__43,A2__43");
         assertTrue(matcherR1R2.matches(r1));
         assertFalse(matcherR1R2.matches(r1b));
         assertTrue(matcherR1R2.matches(r2));
 
         RouteMatcher matcherR1n = RouteMatcher.emptyMatcher();
-        matcherR1n.parseAddRoutes("_R1");
+        matcherR1n.addRoutes("_R1");
         assertTrue(matcherR1n.matches(r1));
         assertTrue(matcherR1n.matches(r1b));
         assertFalse(matcherR1n.matches(r2));
 
         RouteMatcher matcherR1R1bR2 = RouteMatcher.emptyMatcher();
-        matcherR1R1bR2.parseAddRoutes("A1_R1,A2_R1,A1_R2");
+        matcherR1R1bR2.addRoutes("A1_R1,A2_R1,A1_R2");
         assertTrue(matcherR1R1bR2.matches(r1));
         assertTrue(matcherR1R1bR2.matches(r1b));
         assertTrue(matcherR1R1bR2.matches(r2));
 
         RouteMatcher matcherR3e = RouteMatcher.emptyMatcher();
-        matcherR3e.parseAddRoutes("A1_R3 b");
+        matcherR3e.addRoutes("A1_R3 b");
         assertFalse(matcherR3e.matches(r1));
         assertFalse(matcherR3e.matches(r1b));
         assertFalse(matcherR3e.matches(r2));
         assertTrue(matcherR3e.matches(r3));
 
         RouteMatcher nullList = RouteMatcher.emptyMatcher();
-        nullList.parseAddRoutes(null);
+        nullList.addRoutes(null);
         assertTrue(nullList.equals(RouteMatcher.emptyMatcher()));
 
         RouteMatcher emptyList = RouteMatcher.emptyMatcher();
-        emptyList.parseAddRoutes("");
+        emptyList.addRoutes("");
         assertTrue(emptyList.equals(RouteMatcher.emptyMatcher()));
 
         RouteMatcher degenerate = RouteMatcher.emptyMatcher();
-        degenerate.parseAddRoutes(",,,");
+        degenerate.addRoutes(",,,");
         assertTrue(degenerate.equals(RouteMatcher.emptyMatcher()));
 
         boolean thrown = false;
         try {
             RouteMatcher badMatcher = RouteMatcher.emptyMatcher();
-            badMatcher.parseAddRoutes("A1_R1_42");
+            badMatcher.addRoutes("A1_R1_42");
         } catch (IllegalArgumentException e) {
             thrown = true;
         }
@@ -90,13 +90,13 @@ public class TestRouteMatcher extends TestCase {
         r1c.setShortName("R_42");
 
         RouteMatcher matcherR1c = RouteMatcher.emptyMatcher();
-        matcherR1c.parseAddRoutes("A\\_1_R 42");
+        matcherR1c.addRoutes("A\\_1_R 42");
         assertTrue(matcherR1c.matches(r1c));
         assertFalse(matcherR1c.matches(r1));
         assertFalse(matcherR1c.matches(r1b));
 
         RouteMatcher matcherR1c2 = RouteMatcher.emptyMatcher();
-        matcherR1c2.parseAddRoutes("A\\_1__R\\_42");
+        matcherR1c2.addRoutes("A\\_1__R\\_42");
         assertTrue(matcherR1c2.matches(r1c));
         assertFalse(matcherR1c2.matches(r1));
         assertFalse(matcherR1c2.matches(r1b));
