@@ -416,7 +416,7 @@ public class Timetable implements Serializable {
 
             int numStops = newTimes.getNumStops();
             Integer delay = null;
-
+            boolean hasMatched = false;
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;
                 if (update != null) {
@@ -428,6 +428,7 @@ public class Timetable implements Serializable {
                 }
 
                 if (match) {
+                    hasMatched = true;
                     StopTimeUpdate.ScheduleRelationship scheduleRelationship =
                             update.hasScheduleRelationship() ? update.getScheduleRelationship()
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
@@ -510,18 +511,20 @@ public class Timetable implements Serializable {
                         update = null;
                     }
                 } else {
-                    if (delay == null) {
-                        newTimes.cancelArrivalTime(i);
-                        newTimes.cancelDepartureTime(i);
-                    } else {
-                        newTimes.updateArrivalDelay(i, delay);
-                        if (newTimes.isCanceledArrival(i)) {
-                            newTimes.unCancelArrivalTime(i);
-                        }
+                    if (hasMatched) {
+                        if (delay == null) {
+                            newTimes.cancelArrivalTime(i);
+                            newTimes.cancelDepartureTime(i);
+                        } else {
+                            newTimes.updateArrivalDelay(i, delay);
+                            if (newTimes.isCanceledArrival(i)) {
+                                newTimes.unCancelArrivalTime(i);
+                            }
 
-                        newTimes.updateDepartureDelay(i, delay);
-                        if (newTimes.isCanceledDeparture(i)) {
-                            newTimes.unCancelDepartureTime(i);
+                            newTimes.updateDepartureDelay(i, delay);
+                            if (newTimes.isCanceledDeparture(i)) {
+                                newTimes.unCancelDepartureTime(i);
+                            }
                         }
                     }
                 }
