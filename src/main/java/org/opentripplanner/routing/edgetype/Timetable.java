@@ -504,6 +504,16 @@ public class Timetable implements Serializable {
         if (tripDescriptor.hasScheduleRelationship() && tripDescriptor.getScheduleRelationship()
                 == TripDescriptor.ScheduleRelationship.CANCELED) {
             newTimes.cancel();
+        } else if (tripUpdate.getStopTimeUpdateList().isEmpty() && tripUpdate.hasDelay()) {
+            int numStops = newTimes.getNumStops();
+
+            int delay = tripUpdate.getDelay();
+
+            for (int i = 0; i < numStops; i++) {
+                newTimes.updateArrivalDelay(i, delay);
+                newTimes.updateDepartureDelay(i, delay);
+            }
+
         } else {
             // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
             Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();

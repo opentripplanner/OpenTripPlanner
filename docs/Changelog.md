@@ -11,6 +11,7 @@
 - Add support for GTFS-flex services: flag stops, deviated-route service, and call-and-ride (#2603)
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
+- Add support for GTFS-rt TripUpdate feeds which use TripUpdate.delay field (#2733)
 
 ## 1.3 (2018-08-03)
 

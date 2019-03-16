@@ -319,8 +319,8 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        if (tripUpdate.getStopTimeUpdateCount() < 1) {
-            LOG.warn("TripUpdate contains no updates, skipping.");
+        if (tripUpdate.getStopTimeUpdateCount() < 1 && !tripUpdate.hasDelay()) {
+            LOG.warn("TripUpdate contains no updates and delay is not set, skipping.");
             return false;
         }
 

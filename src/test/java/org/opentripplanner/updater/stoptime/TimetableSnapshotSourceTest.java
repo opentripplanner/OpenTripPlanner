@@ -163,7 +163,7 @@ public class TimetableSnapshotSourceTest {
     }
 
     @Test
-    public void testHandleDelayedTrip() {
+    public void testHandleDelayedTripWithStopTimeUpdates() {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.tripForId.get(tripId);
@@ -192,6 +192,47 @@ public class TimetableSnapshotSourceTest {
 
         arrivalBuilder.setDelay(1);
         departureBuilder.setDelay(1);
+
+        final TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
+
+        final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        final Timetable schedule = snapshot.resolve(pattern, null);
+        assertNotSame(forToday, schedule);
+        assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+        assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
+        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
+        assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+
+        assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
+        assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
+    }
+
+    @Test
+    public void testHandleDelayedTripWithDelay() {
+        final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
+        final Trip trip = graph.index.tripForId.get(tripId);
+        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
+
+        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId("1.1");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+
+        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        tripUpdateBuilder.setDelay(1);
 
         final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
