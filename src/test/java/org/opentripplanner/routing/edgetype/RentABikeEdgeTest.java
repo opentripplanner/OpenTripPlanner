@@ -16,12 +16,15 @@ import static org.junit.Assert.*;
 
 public class RentABikeEdgeTest {
 
-    private enum Direction {ARRIVE_BY, DEPART_AT};
+    private enum Direction {ARRIVE_BY, DEPART_AT}
 
     private Graph graph;
+
     private RoutingRequest proto;
+
     private BikeRentalStationVertex stationVertex;
-    private Set<String> networkSet = new HashSet<String>();
+
+    private Set<String> networkSet = new HashSet<>();
 
     @Before
     public void before() {
@@ -30,7 +33,7 @@ public class RentABikeEdgeTest {
         proto = new RoutingRequest();
         proto.useBikeRentalAvailabilityInformation = true;
         proto.setModes(TraverseModeSet.allModes());
-        proto.setRoutingContext(graph, stationVertex,null);
+        proto.setRoutingContext(graph, stationVertex, null);
 
         BikeRentalStation station = new BikeRentalStation();
         station.id = "bikeRentalTestId";
@@ -42,7 +45,7 @@ public class RentABikeEdgeTest {
         station.bikesAvailable = 1;
         station.realTimeData = true;
 
-        networkSet.addAll(Arrays.asList(new String[]{"testNetwork"}));
+        networkSet.addAll(Arrays.asList("testNetwork"));
         stationVertex = new BikeRentalStationVertex(graph, station);
 
         new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
@@ -50,7 +53,8 @@ public class RentABikeEdgeTest {
 
     @Test
     public void rentABikeOnEdge_traverse_departAt_walking_bikesAvailable_shouldSucceed() {
-        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
+        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex,
+                networkSet);
         State s0 = createState(Direction.DEPART_AT, TraverseMode.WALK);
 
         State s1 = rentABikeOnEdge.traverse(s0);
@@ -60,7 +64,8 @@ public class RentABikeEdgeTest {
 
     @Test
     public void rentABikeOnEdge_traverse_departAt_walking_bikesUnavailable_shouldFail() {
-        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
+        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex,
+                networkSet);
         State s0 = createState(Direction.DEPART_AT, TraverseMode.WALK);
         stationVertex.setBikesAvailable(0);
 
@@ -71,7 +76,8 @@ public class RentABikeEdgeTest {
 
     @Test
     public void rentABikeOnEdge_traverse_arriveBy_biking_bikesUnavailable_shouldFail() {
-        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
+        RentABikeOnEdge rentABikeOnEdge = new RentABikeOnEdge(stationVertex, stationVertex,
+                networkSet);
         State s0 = createState(Direction.DEPART_AT, TraverseMode.BICYCLE);
         stationVertex.setBikesAvailable(0);
 
@@ -82,7 +88,8 @@ public class RentABikeEdgeTest {
 
     @Test
     public void rentABikeOffEdge_traverse_departAt_walking_spacesUnavailable_shouldFail() {
-        RentABikeOffEdge rentABikeOffEdge = new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
+        RentABikeOffEdge rentABikeOffEdge = new RentABikeOffEdge(stationVertex, stationVertex,
+                networkSet);
         State s0 = createState(Direction.DEPART_AT, TraverseMode.BICYCLE);
         stationVertex.setSpacesAvailable(0);
 
@@ -93,7 +100,8 @@ public class RentABikeEdgeTest {
 
     @Test
     public void rentABikeOffEdge_traverse_arriveBy_walking_spacesUnavailable_shouldFail() {
-        RentABikeOffEdge rentABikeOffEdge = new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
+        RentABikeOffEdge rentABikeOffEdge = new RentABikeOffEdge(stationVertex, stationVertex,
+                networkSet);
         State s0 = createState(Direction.ARRIVE_BY, TraverseMode.WALK);
         stationVertex.setSpacesAvailable(0);
 
@@ -104,13 +112,9 @@ public class RentABikeEdgeTest {
 
     private State createState(Direction direction, TraverseMode mode) {
         RoutingRequest options = proto.clone();
-        if (direction == Direction.DEPART_AT) {
-            options.arriveBy = false;
-        } else {
-            options.arriveBy = true;
-        }
+        options.arriveBy = direction != Direction.DEPART_AT;
         options.setModes(TraverseModeSet.allModes());
-        options.setRoutingContext(graph, stationVertex,null);
+        options.setRoutingContext(graph, stationVertex, null);
 
         StateEditor stateEditor = new StateEditor(options, stationVertex);
         if (mode != TraverseMode.WALK) {
