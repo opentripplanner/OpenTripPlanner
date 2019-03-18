@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.HashSet;
+
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -28,8 +30,15 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
-    public SmooveBikeRentalDataSource() {
+    private String networkName;
+
+    public SmooveBikeRentalDataSource(String networkName) {
         super("result");
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "Smoove";
+        }
     }
 
     /**
@@ -56,6 +65,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
         station.state = node.path("style").asText();
+        station.networks = new HashSet<String>();
+        station.networks.add(this.networkName);
         try {
             station.y = Double.parseDouble(node.path("coordinates").asText().split(",")[0].trim());
             station.x = Double.parseDouble(node.path("coordinates").asText().split(",")[1].trim());
