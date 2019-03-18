@@ -44,6 +44,8 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
@@ -54,6 +56,8 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 
 public class IndexGraphQLSchema {
+
+    private static final Logger LOG = LoggerFactory.getLogger(IndexGraphQLSchema.class);
 
     public static String experimental(String message) {
         return String.format("**This API is experimental and might change without further notice**  \n %s", message);
@@ -2999,10 +3003,50 @@ public class IndexGraphQLSchema {
                                 .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("trips")
-                        .description("Get all trips")
-                        .type(new GraphQLList(tripType))
-                        .dataFetcher(environment -> new ArrayList<>(index.tripForId.values()))
+                        .name("triptimes")
+                        .argument(GraphQLArgument.newArgument()
+                                .name("feedId")
+                                .description("ID of the feed")
+                                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("serviceDate")
+                                .description("Date for which the trips are returned. Format: YYYYMMDD.")
+                                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("realtimeState")
+                                .description("State of real-time data. Default: CANCELED.")
+                                .type(realtimeStateEnum)
+                                .build())
+                        .description("Get all triptimes")
+                        .type(new GraphQLList(stoptimeType))
+                        .dataFetcher(environment -> {
+                            try {
+                                final String feedId = environment.getArgument("feedId");
+                                final ServiceDate serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
+                                final RealTimeState realtimeState = environment.getArgument("realtimeState") != null ? environment.getArgument("realtimeState") : RealTimeState.CANCELED;
+                                final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
+                                return index.tripsForFeedId.get(feedId)
+                                        .stream()
+                                        .flatMap(trip -> {
+                                            TripPattern pattern = index.patternForTrip.get(trip);
+                                            Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern, serviceDate) : pattern.scheduledTimetable;
+                                            return timetable.tripTimes
+                                                    .stream()
+                                                    .filter(tripTimes -> tripTimes.getRealTimeState() == realtimeState)
+                                                    .map(tripTimes -> {
+                                                        ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate,
+                                                                index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
+                                                        return new TripTimeShort(tripTimes, 0, pattern.getStop(0), serviceDay);
+                                                    });
+                                        })
+                                        .distinct()
+                                        .collect(Collectors.toList());
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("trip")

@@ -99,6 +99,7 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -139,6 +140,7 @@ public class GraphIndex {
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<FeedScopedId, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<String, Trip> tripsForFeedId = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
@@ -242,6 +244,9 @@ public class GraphIndex {
                     patternsForStop.put(stop, pattern);
                 }
             }
+        }
+        for (Trip trip : tripForId.values()) {
+            tripsForFeedId.put(trip.getId().getAgencyId(), trip);
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);

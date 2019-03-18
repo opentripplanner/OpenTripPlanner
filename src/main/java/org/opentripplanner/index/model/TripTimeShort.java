@@ -1,6 +1,7 @@
 package org.opentripplanner.index.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -82,6 +83,42 @@ public class TripTimeShort {
             out.add(new TripTimeShort(times, i, table.pattern.getStop(i), serviceDay));
         }
         return out;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(
+                stopId,
+                stopIndex,
+                stopCount,
+                scheduledArrival,
+                realtimeArrival,
+                arrivalDelay,
+                scheduledDeparture,
+                realtimeDeparture,
+                departureDelay,
+                timepoint,
+                realtime,
+                tripId,
+                realtimeState,
+                blockId,
+                headsign,
+                serviceDay
+                );
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TripTimeShort other = (TripTimeShort) obj;
+        return this.hashCode() == other.hashCode();
     }
     
 }
