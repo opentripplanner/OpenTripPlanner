@@ -44,8 +44,6 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
@@ -56,8 +54,6 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 
 public class IndexGraphQLSchema {
-
-    private static final Logger LOG = LoggerFactory.getLogger(IndexGraphQLSchema.class);
 
     public static String experimental(String message) {
         return String.format("**This API is experimental and might change without further notice**  \n %s", message);
@@ -3011,7 +3007,7 @@ public class IndexGraphQLSchema {
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("serviceDate")
-                                .description("Date for which the trips are returned. Format: YYYYMMDD.")
+                                .description("Date for which the TripTimes are returned. Format: YYYYMMDD.")
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
@@ -3025,7 +3021,8 @@ public class IndexGraphQLSchema {
                             try {
                                 final String feedId = environment.getArgument("feedId");
                                 final ServiceDate serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
-                                final RealTimeState realtimeState = environment.getArgument("realtimeState") != null ? environment.getArgument("realtimeState") : RealTimeState.CANCELED;
+                                final RealTimeState realTimeState = environment.getArgument("realtimeState");
+                                final RealTimeState state = realTimeState != null ? realTimeState : RealTimeState.CANCELED;
                                 final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
                                 return index.tripsForFeedId.get(feedId)
                                         .stream()
