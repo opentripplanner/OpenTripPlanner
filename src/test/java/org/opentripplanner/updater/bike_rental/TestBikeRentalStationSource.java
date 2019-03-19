@@ -30,7 +30,7 @@ public class TestBikeRentalStationSource extends TestCase {
     }
 
     public void testSmoove() {
-        SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource();
+        SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(null);
         source.setUrl("file:src/test/resources/bike/smoove.json");
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
@@ -49,6 +49,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(60.167913, hamn.y);
         assertEquals(11, hamn.spacesAvailable);
         assertEquals(1, hamn.bikesAvailable);
+        assertEquals("[Smoove]", hamn.networks.toString());
 
         BikeRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
@@ -65,5 +66,13 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(5, foo.spacesAvailable);
         assertEquals(5, foo.bikesAvailable);
         // Ignores mismatch with total_slots
+
+        // Test giving network name to data source
+        SmooveBikeRentalDataSource sourceWithCustomNetwork = new SmooveBikeRentalDataSource("Helsinki");
+        sourceWithCustomNetwork.setUrl("file:src/test/resources/bike/smoove.json");
+        assertTrue(sourceWithCustomNetwork.update());
+        List<BikeRentalStation> rentalStationsWithCustomNetwork = sourceWithCustomNetwork.getStations();
+        BikeRentalStation hamnWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
+        assertEquals("[Helsinki]", hamnWithCustomNetwork.networks.toString());
     }
 }

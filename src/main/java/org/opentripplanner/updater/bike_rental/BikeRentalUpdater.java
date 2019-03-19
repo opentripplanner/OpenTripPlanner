@@ -87,8 +87,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new GenericKmlBikeRentalDataSource();
             } else if (sourceType.equals("sf-bay-area")) {
                 source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
-            } else if (sourceType.equals("smoove")) {
-                source = new SmooveBikeRentalDataSource();
             } else if (sourceType.equals("share-bike")) {
                 source = new ShareBikeRentalDataSource();
             } else if (sourceType.equals("uip-bike")) {
@@ -96,7 +94,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             } else if (sourceType.equals("gbfs")) {
                 source = new GbfsBikeRentalDataSource(networkName);
             } else if (sourceType.equals("smoove")) {
-                source = new SmooveBikeRentalDataSource();
+                source = new SmooveBikeRentalDataSource(networkName);
             } else if (sourceType.equals("bicimad")) {
                 source = new BicimadBikeRentalDataSource();
             }
