@@ -3015,7 +3015,7 @@ public class IndexGraphQLSchema {
                                 .description("State of real-time data. Default: CANCELED.")
                                 .type(realtimeStateEnum)
                                 .build())
-                        .description("Get all triptimes")
+                        .description("Get TripTimes with specific RealtimeState")
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
                             try {
@@ -3026,18 +3026,24 @@ public class IndexGraphQLSchema {
                                 final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
                                 return index.tripsForFeedId.get(feedId)
                                         .stream()
-                                        .flatMap(trip -> {
-                                            TripPattern pattern = index.patternForTrip.get(trip);
-                                            Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern, serviceDate) : pattern.scheduledTimetable;
-                                            return timetable.tripTimes
-                                                    .stream()
-                                                    .filter(tripTimes -> tripTimes.getRealTimeState() == realtimeState)
-                                                    .map(tripTimes -> {
-                                                        ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate,
-                                                                index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
-                                                        return new TripTimeShort(tripTimes, 0, pattern.getStop(0), serviceDay);
-                                                    });
+                                        .map(trip -> {
+                                            final TripPattern pattern = index.patternForTrip.get(trip);
+                                            final Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern, serviceDate) : pattern.scheduledTimetable;
+                                            return timetable;
                                         })
+                                        .filter(timetable -> timetable.serviceDate != null)
+                                        .flatMap(timetable -> timetable.tripTimes
+                                            .stream()
+                                            .filter(tripTimes -> tripTimes.getRealTimeState() == state)
+                                            .map(tripTimes -> {
+                                                final int stopIndex = 0;
+                                                final String agencyId = tripTimes.trip.getRoute().getAgency().getId();
+                                                final Stop stop = timetable.pattern.getStop(stopIndex);
+                                                final CalendarService calendarService = index.graph.getCalendarService();
+                                                final ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate, calendarService, agencyId);
+                                                return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
+                                            })
+                                        )
                                         .distinct()
                                         .collect(Collectors.toList());
                             } catch (Exception e) {
