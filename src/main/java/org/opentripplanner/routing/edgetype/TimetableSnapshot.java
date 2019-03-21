@@ -160,6 +160,21 @@ public class TimetableSnapshot {
         return pattern.scheduledTimetable;
     }
 
+    public Timetable resolve(TripPattern pattern) {
+        SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
+
+        if (sortedTimetables != null) {
+            for (Timetable timetable : sortedTimetables) {
+                if (timetable != null) {
+                    LOG.trace("returning modified timetable");
+                    return timetable;
+                }
+            }
+        }
+
+        return pattern.scheduledTimetable;
+    }
+
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
      * or the originally scheduled timetable if there are no updates in this snapshot.

@@ -3028,7 +3028,7 @@ public class IndexGraphQLSchema {
                                         .stream()
                                         .map(trip -> {
                                             final TripPattern pattern = index.patternForTrip.get(trip);
-                                            final Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern, serviceDate) : pattern.scheduledTimetable;
+                                            final Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern) : pattern.scheduledTimetable;
                                             return timetable;
                                         })
                                         .filter(timetable -> timetable.serviceDate != null)
