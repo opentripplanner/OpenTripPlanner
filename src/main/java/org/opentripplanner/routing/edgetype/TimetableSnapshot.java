@@ -160,21 +160,6 @@ public class TimetableSnapshot {
         return pattern.scheduledTimetable;
     }
 
-    public Timetable resolve(TripPattern pattern) {
-        SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
-
-        if (sortedTimetables != null) {
-            for (Timetable timetable : sortedTimetables) {
-                if (timetable != null) {
-                    LOG.trace("returning modified timetable");
-                    return timetable;
-                }
-            }
-        }
-
-        return pattern.scheduledTimetable;
-    }
-
     public Collection<Timetable> getTimetables(TripPattern pattern) {
         SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
         return sortedTimetables;
