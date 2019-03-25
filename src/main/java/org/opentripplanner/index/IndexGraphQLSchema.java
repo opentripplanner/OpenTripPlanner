@@ -3093,7 +3093,7 @@ public class IndexGraphQLSchema {
                                             .filter(tripTimes -> tripTimes.getRealTimeState() == RealTimeState.CANCELED)
                                             .map(tripTimes -> {
                                                 final int stopIndex = 0;
-                                                final String agencyId = tripTimes.trip.getRoute().getAgency().getId();
+                                                final String agencyId = tripTimes.trip.getId().getAgencyId();
                                                 final Stop stop = timetable.pattern.getStop(stopIndex);
                                                 final CalendarService calendarService = index.graph.getCalendarService();
                                                 final ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate, calendarService, agencyId);
