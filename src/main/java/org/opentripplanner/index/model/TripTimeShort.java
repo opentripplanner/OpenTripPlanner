@@ -85,27 +85,26 @@ public class TripTimeShort {
         return out;
     }
 
-
     @Override
     public int hashCode() {
         int result = Objects.hash(
-                stopId,
-                stopIndex,
-                stopCount,
-                scheduledArrival,
-                realtimeArrival,
-                arrivalDelay,
-                scheduledDeparture,
-                realtimeDeparture,
-                departureDelay,
-                timepoint,
-                realtime,
-                tripId,
-                realtimeState,
-                blockId,
-                headsign,
-                serviceDay
-                );
+            stopId,
+            tripId,
+            realtimeState,
+            blockId,
+            headsign,
+            Integer.valueOf(stopIndex),
+            Integer.valueOf(stopCount),
+            Integer.valueOf(scheduledArrival),
+            Integer.valueOf(realtimeArrival),
+            Integer.valueOf(arrivalDelay),
+            Integer.valueOf(scheduledDeparture),
+            Integer.valueOf(realtimeDeparture),
+            Integer.valueOf(departureDelay),
+            Boolean.valueOf(timepoint),
+            Boolean.valueOf(realtime),
+            Long.valueOf(serviceDay)
+        );
         return result;
     }
 
@@ -118,7 +117,32 @@ public class TripTimeShort {
         if (getClass() != obj.getClass())
             return false;
         TripTimeShort other = (TripTimeShort) obj;
-        return this.hashCode() == other.hashCode();
+        boolean result = stopIndex == other.stopIndex &&
+                stopCount == other.stopCount &&
+                scheduledArrival == other.scheduledArrival &&
+                realtimeArrival == other.realtimeArrival &&
+                arrivalDelay == other.arrivalDelay &&
+                scheduledDeparture == other.scheduledDeparture &&
+                realtimeDeparture == other.realtimeDeparture &&
+                departureDelay == other.departureDelay &&
+                timepoint == other.timepoint &&
+                realtime == other.realtime &&
+                serviceDay == other.serviceDay;
+        if (stopId != null) {
+            result &= stopId.equals(other.stopId);
+        }
+        if (tripId != null) {
+            result &= tripId.equals(other.tripId);
+        }
+        if (realtimeState != null) {
+            result &= realtimeState.equals(other.realtimeState);
+        }
+        if (blockId != null) {
+            result &= blockId.equals(other.blockId);
+        }
+        if (headsign != null) {
+            result &= headsign.equals(other.headsign);
+        }
+        return result;
     }
-    
 }
