@@ -610,7 +610,7 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> queryParameters, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+    public Response getGraphQL (HashMap<String, Object> queryParameters, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
 
         String query = (String) queryParameters.get("query");
         Object queryVariables = queryParameters.getOrDefault("variables", null);
@@ -635,7 +635,7 @@ public class IndexAPI {
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL (String query, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
+    public Response getGraphQL (String query, @Context HttpHeaders httpHeaders, @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") long maxResolves) {
        return index.getGraphQLResponse(query, router, null, null, timeout, maxResolves, httpHeaders.getRequestHeaders());
     }
 
