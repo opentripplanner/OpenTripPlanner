@@ -47,6 +47,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -2999,57 +3000,10 @@ public class IndexGraphQLSchema {
                                 .get(FeedScopedId.convertFromString(environment.getArgument("id"))))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("triptimes")
-                        .argument(GraphQLArgument.newArgument()
-                                .name("feedId")
-                                .description("ID of the feed")
-                                .type(new GraphQLNonNull(Scalars.GraphQLString))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("serviceDate")
-                                .description("Date for which the TripTimes are returned. Format: YYYYMMDD.")
-                                .type(new GraphQLNonNull(Scalars.GraphQLString))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("realtimeState")
-                                .description("State of real-time data. Default: CANCELED.")
-                                .type(realtimeStateEnum)
-                                .build())
-                        .description("Get TripTimes with specific RealtimeState")
-                        .type(new GraphQLList(stoptimeType))
-                        .dataFetcher(environment -> {
-                            try {
-                                final String feedId = environment.getArgument("feedId");
-                                final ServiceDate serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
-                                final RealTimeState realTimeState = environment.getArgument("realtimeState");
-                                final RealTimeState state = realTimeState != null ? realTimeState : RealTimeState.CANCELED;
-                                final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
-                                return index.tripsForFeedId.get(feedId)
-                                        .stream()
-                                        .map(trip -> {
-                                            final TripPattern pattern = index.patternForTrip.get(trip);
-                                            final Timetable timetable = (snapshot != null) ? snapshot.resolve(pattern) : pattern.scheduledTimetable;
-                                            return timetable;
-                                        })
-                                        .filter(timetable -> timetable.serviceDate != null)
-                                        .flatMap(timetable -> timetable.tripTimes
-                                            .stream()
-                                            .filter(tripTimes -> tripTimes.getRealTimeState() == state)
-                                            .map(tripTimes -> {
-                                                final int stopIndex = 0;
-                                                final String agencyId = tripTimes.trip.getRoute().getAgency().getId();
-                                                final Stop stop = timetable.pattern.getStop(stopIndex);
-                                                final CalendarService calendarService = index.graph.getCalendarService();
-                                                final ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate, calendarService, agencyId);
-                                                return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
-                                            })
-                                        )
-                                        .distinct()
-                                        .collect(Collectors.toList());
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        })
+                        .name("trips")
+                        .description("Get all trips")
+                        .type(new GraphQLList(tripType))
+                        .dataFetcher(environment -> new ArrayList<>(index.tripForId.values()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("trip")
@@ -3099,6 +3053,55 @@ public class IndexGraphQLSchema {
                             } catch (ParseException e) {
                                 return null; // Invalid date format
                             }
+                        })
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("cancelledTripTimes")
+                        .argument(GraphQLArgument.newArgument()
+                                .name("feedId")
+                                .description("ID of the feed.")
+                                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("serviceDate")
+                                .description("Date for which the TripTimes are returned. Format: YYYYMMDD. Default: returns all cancelled TripTimes.")
+                                .type(Scalars.GraphQLString)
+                                .build())
+                        .description("Get cancelled TripTimes.")
+                        .type(new GraphQLList(stoptimeType))
+                        .dataFetcher(environment -> {
+                            final String feedId = environment.getArgument("feedId");
+                            ServiceDate maybeServiceDate = null;
+                            try {
+                                maybeServiceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
+                            } catch (Exception e) {
+
+                            }
+                            final ServiceDate serviceDate = maybeServiceDate;
+                            final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
+                            final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
+                            return index.tripsForFeedId.get(feedId)
+                                    .stream()
+                                    .flatMap(trip -> {
+                                        final TripPattern pattern = index.patternForTrip.get(trip);
+                                        final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
+                                        return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
+                                    })
+                                    .filter(timetable -> (serviceDate != null) ? serviceDate.equals(timetable.serviceDate) : timetable.serviceDate != null)
+                                    .flatMap(timetable -> timetable.tripTimes
+                                            .stream()
+                                            .filter(tripTimes -> tripTimes.getRealTimeState() == RealTimeState.CANCELED)
+                                            .map(tripTimes -> {
+                                                final int stopIndex = 0;
+                                                final String agencyId = tripTimes.trip.getRoute().getAgency().getId();
+                                                final Stop stop = timetable.pattern.getStop(stopIndex);
+                                                final CalendarService calendarService = index.graph.getCalendarService();
+                                                final ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate, calendarService, agencyId);
+                                                return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
+                                            })
+                                    )
+                                    .distinct()
+                                    .collect(Collectors.toList());
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
