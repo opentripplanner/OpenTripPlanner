@@ -8,16 +8,18 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
- * 
+ *
  * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only.
  * Support for other matching expression can be easily added later on.
  */
 public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
-
+    private static final Logger LOG = LoggerFactory.getLogger(RouteMatcher.class);
     /* Set of full matching route ids (agency ID + route ID) */
     private HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
 
@@ -41,7 +43,7 @@ public class RouteMatcher implements Cloneable, Serializable {
 
     /**
      * Adds routes to this RouteMatcher from a string representation.
-     * 
+     *
      * @param routeSpecList A comma-separated list of route spec, each of the format
      *        [agencyId]_[routeName]_[routeId] Please note that this format is not really intuitive
      *        as it does not follow the OBA-gtfslib AgencyAndId standard ('agencyID_routeId'). This
@@ -57,13 +59,17 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (routeSpecList == null) {
             return;
         }
+        if (routeSpecList.isEmpty()) {
+            return;
+        }
         for (String element : routeSpecList.split(",")) {
             if (element.length() == 0)
                 continue;
             // FIXME regexes with no comments
             String[] routeSpec = element.split("(?<!\\\\)_", 3);
             if (routeSpec.length != 2 && routeSpec.length != 3) {
-                throw new IllegalArgumentException("Wrong route spec format: " + element);
+                LOG.info("Wrong route spec format: " + element);
+                return;
             }
             routeSpec[0] = routeSpec[0].replace("\\_", "_");
             routeSpec[1] = routeSpec[1].replace("\\_", " ");
@@ -92,7 +98,8 @@ public class RouteMatcher implements Cloneable, Serializable {
                 // Case 3: specified route name only
                 routeNames.add(routeName);
             } else {
-                throw new IllegalArgumentException("Wrong route spec format: " + element);
+                LOG.info("Wrong route spec format: " + element);
+                return;
             }
 
             containsNames = !CollectionUtils.isEmpty(agencyIdAndRouteNames) ||

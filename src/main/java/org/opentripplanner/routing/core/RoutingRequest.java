@@ -676,10 +676,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
-
-            if (s != null && !s.equals("")) {
-                this.preferredRoutes.addRoutes(s);
-            }
+            this.preferredRoutes.addRoutes(s);
         }
     }
 
@@ -701,10 +698,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
-
-            if (s != null && !s.equals("")) {
-                this.unpreferredRoutes.addRoutes(s);
-            }
+            this.unpreferredRoutes.addRoutes(s);
         }
     }
 
@@ -719,10 +713,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (!s.isEmpty()) {
             //RouteMatcher expects route ids in format [FeedId]__[RouteId] -> replace ":" in ids with "__"
             s = s.replaceAll(":", "__");
-
-            if (s != null && !s.equals("")) {
-                this.bannedRoutes.addRoutes(s);
-            }
+            this.bannedRoutes.addRoutes(s);
         }
     }
 

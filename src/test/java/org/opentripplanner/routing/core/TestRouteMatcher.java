@@ -76,15 +76,11 @@ public class TestRouteMatcher extends TestCase {
         degenerate.addRoutes(",,,");
         assertTrue(degenerate.equals(RouteMatcher.emptyMatcher()));
 
-        boolean thrown = false;
-        try {
-            RouteMatcher badMatcher = RouteMatcher.emptyMatcher();
-            badMatcher.addRoutes("A1_R1_42");
-        } catch (IllegalArgumentException e) {
-            thrown = true;
-        }
-        assertTrue(thrown);
-        
+
+        RouteMatcher badMatcher = RouteMatcher.emptyMatcher();
+        badMatcher.addRoutes("A1_R1_42");
+        assertTrue(badMatcher.isEmpty());
+
         Route r1c = new Route();
         r1c.setId(new FeedScopedId("A_1", "R_42"));
         r1c.setShortName("R_42");
