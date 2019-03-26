@@ -761,5 +761,17 @@
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <!-- For RAPTOR routing -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>r5</artifactId>
+            <version>4.5.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-simple</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 </project>
