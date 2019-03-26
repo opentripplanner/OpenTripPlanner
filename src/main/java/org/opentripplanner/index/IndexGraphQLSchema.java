@@ -379,6 +379,16 @@ public class IndexGraphQLSchema {
         return null;
     }
 
+    private ServiceDate parseISODateString(final String dateString) {
+        ServiceDate date = null;
+        if (dateString != null) {
+            try {
+                date = ServiceDate.parseString(dateString.replace("-", ""));
+            } catch (ParseException | NullPointerException e) {}
+        }
+        return date;
+    }
+
     @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
         createPlanType(index);
