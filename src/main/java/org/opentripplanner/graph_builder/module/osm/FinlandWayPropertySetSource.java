@@ -32,9 +32,6 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
 	@Override
 	public void populateProperties(WayPropertySet props) {
-        // Allow routing on highway=service & access=private
-        props.setProperties("highway=service;access=private", StreetTraversalPermission.ALL);
-
         // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
         props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
                 2.06);
