@@ -3074,9 +3074,7 @@ public class IndexGraphQLSchema {
                             ServiceDate serviceDate = null;
                             try {
                                 serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
-                            } catch (ParseException e) {
-
-                            }
+                            } catch (ParseException | NullPointerException e) {}
                             return index.getTripTimes(feedId, serviceDate, RealTimeState.CANCELED);
                         })
                         .build())
