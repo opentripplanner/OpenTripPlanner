@@ -3068,24 +3068,33 @@ public class IndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("cancelledTripTimes")
                         .argument(GraphQLArgument.newArgument()
-                                .name("feedId")
-                                .description("ID of the feed.")
+                                .name("feed")
+                                .description("Feed ID for which TripTimes are returned. Required.")
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
-                                .name("serviceDate")
-                                .description("Date for which the TripTimes are returned. Format: YYYYMMDD. Default: returns all cancelled TripTimes.")
+                                .name("onDate")
+                                .description("Only TripTimes that are scheduled on onDate are returned. Format: yyyy-MM-dd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
                                 .type(Scalars.GraphQLString)
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("afterDate")
+                                .description("Only TripTimes that have scheduled last stop arrival on or after afterDate (inclusive) are returned (i.e. TripTimes which are running on afterDate or will run after afterDate according to the schedule). Format: yyyy-MM-dd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
+                                .type(Scalars.GraphQLString)
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("afterTime")
+                                .description("Only TripTimes that have scheduled last stop arrival on or after afterTime (inclusive) are returned (i.e. TripTimes which are running at afterTime or will run after afterTime according to the schedule). Format: seconds since midnight of the departure date. Default: TripTimes are returned for all times. Either onDate or afterDate should be provided if afterTime is provided.")
+                                .type(Scalars.GraphQLInt)
                                 .build())
                         .description("Get cancelled TripTimes.")
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
-                            final String feedId = environment.getArgument("feedId");
-                            ServiceDate serviceDate = null;
-                            try {
-                                serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
-                            } catch (ParseException | NullPointerException e) {}
-                            return index.getTripTimes(feedId, serviceDate, RealTimeState.CANCELED);
+                            final String feed = environment.getArgument("feed");
+                            final ServiceDate onDate = parseISODateString(environment.getArgument("onDate"));
+                            final ServiceDate afterDate = parseISODateString(environment.getArgument("afterDate"));
+                            final Integer afterTime = environment.getArgument("afterTime");
+                            return index.getTripTimes(feed, onDate, afterDate, afterTime, RealTimeState.CANCELED);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()

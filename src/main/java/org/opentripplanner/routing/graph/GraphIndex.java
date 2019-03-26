@@ -1203,26 +1203,47 @@ public class GraphIndex {
      * @param realTimeState: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does NOT return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
      * @return List of TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
      */
-    public List<TripTimeShort> getTripTimes(final String feedId, final ServiceDate serviceDate, final RealTimeState realTimeState) {
+    public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate onDate, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
+        if (afterTime != null && onDate == null && afterDate == null) {
+            throw new IllegalArgumentException("Either onDate or afterDate should be provided if afterTime is provided");
+        }
+        if (onDate != null && afterDate != null) {
+            throw new IllegalArgumentException("Only either onDate or afterDate should be provided, not both.");
+        }
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
         final CalendarService calendarService = graph.getCalendarService();
-        return tripsForFeedId.get(feedId)
+        return tripsForFeedId.get(feed)
                 .stream()
                 .flatMap(trip -> {
                     final TripPattern pattern = patternForTrip.get(trip);
                     final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
                     return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
                 })
-                .filter(timetable -> (serviceDate != null) ? serviceDate.equals(timetable.serviceDate) : timetable.serviceDate != null)
+                .filter(timetable -> {
+                    if (onDate != null) {
+                        return onDate.equals(timetable.serviceDate);
+                    } else if (afterDate != null && timetable.serviceDate != null) {
+                        return timetable.serviceDate.compareTo(afterDate) >= 0;
+                    }
+                    return timetable.serviceDate != null;
+                })
                 .flatMap(timetable -> timetable.tripTimes
                         .stream()
-                        .filter(tripTimes -> tripTimes.getRealTimeState() == realTimeState)
+                        .filter(tripTimes -> {
+                            boolean filter = tripTimes.getRealTimeState() == state;
+                            if (afterTime != null) {
+                                if (onDate != null || (afterDate != null && timetable.serviceDate.compareTo(afterDate) == 0)) {
+                                    filter &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= afterTime;
+                                }
+                            }
+                            return filter;
+                        })
                         .map(tripTimes -> {
                             final int stopIndex = 0;
-                            final String agencyId = tripTimes.trip.getId().getAgencyId();
                             final Stop stop = timetable.pattern.getStop(stopIndex);
+                            final String agencyId = tripTimes.trip.getId().getAgencyId();
                             final ServiceDay serviceDay = serviceDaysByAgency.computeIfAbsent(agencyId, aId -> new ServiceDay(graph, timetable.serviceDate, calendarService, aId));
                             return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
                         })
