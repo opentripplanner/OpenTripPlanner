@@ -3071,37 +3071,13 @@ public class IndexGraphQLSchema {
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
                             final String feedId = environment.getArgument("feedId");
-                            ServiceDate maybeServiceDate = null;
+                            ServiceDate serviceDate = null;
                             try {
-                                maybeServiceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
-                            } catch (Exception e) {
+                                serviceDate = ServiceDate.parseString(environment.getArgument("serviceDate"));
+                            } catch (ParseException e) {
 
                             }
-                            final ServiceDate serviceDate = maybeServiceDate;
-                            final TimetableSnapshot snapshot = (index.graph.timetableSnapshotSource != null) ? index.graph.timetableSnapshotSource.getTimetableSnapshot() : null;
-                            final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
-                            return index.tripsForFeedId.get(feedId)
-                                    .stream()
-                                    .flatMap(trip -> {
-                                        final TripPattern pattern = index.patternForTrip.get(trip);
-                                        final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
-                                        return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
-                                    })
-                                    .filter(timetable -> (serviceDate != null) ? serviceDate.equals(timetable.serviceDate) : timetable.serviceDate != null)
-                                    .flatMap(timetable -> timetable.tripTimes
-                                            .stream()
-                                            .filter(tripTimes -> tripTimes.getRealTimeState() == RealTimeState.CANCELED)
-                                            .map(tripTimes -> {
-                                                final int stopIndex = 0;
-                                                final String agencyId = tripTimes.trip.getId().getAgencyId();
-                                                final Stop stop = timetable.pattern.getStop(stopIndex);
-                                                final CalendarService calendarService = index.graph.getCalendarService();
-                                                final ServiceDay serviceDay = new ServiceDay(index.graph, timetable.serviceDate, calendarService, agencyId);
-                                                return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
-                                            })
-                                    )
-                                    .distinct()
-                                    .collect(Collectors.toList());
+                            return index.getTripTimes(feedId, serviceDate, RealTimeState.CANCELED);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()

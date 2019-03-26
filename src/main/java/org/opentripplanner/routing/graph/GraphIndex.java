@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -1192,5 +1193,33 @@ public class GraphIndex {
 
     public Collection<TicketType> getAllTicketTypes() {
         return ticketTypesForId.values();
+    }
+
+    public List<TripTimeShort> getTripTimes(final String feedId, final ServiceDate serviceDate, final RealTimeState realTimeState) {
+        final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
+        final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
+        final CalendarService calendarService = graph.getCalendarService();
+        return tripsForFeedId.get(feedId)
+                .stream()
+                .flatMap(trip -> {
+                    final TripPattern pattern = patternForTrip.get(trip);
+                    final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
+                    return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
+                })
+                .filter(timetable -> (serviceDate != null) ? serviceDate.equals(timetable.serviceDate) : timetable.serviceDate != null)
+                .flatMap(timetable -> timetable.tripTimes
+                        .stream()
+                        .filter(tripTimes -> tripTimes.getRealTimeState() == realTimeState)
+                        .map(tripTimes -> {
+                            final int stopIndex = 0;
+                            final String agencyId = tripTimes.trip.getId().getAgencyId();
+                            final Stop stop = timetable.pattern.getStop(stopIndex);
+                            final ServiceDay serviceDay = serviceDaysByAgency.computeIfAbsent(agencyId, aId -> new ServiceDay(graph, timetable.serviceDate, calendarService, aId));
+                            return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
+                        })
+                )
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
