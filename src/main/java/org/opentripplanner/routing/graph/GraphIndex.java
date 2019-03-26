@@ -1195,6 +1195,14 @@ public class GraphIndex {
         return ticketTypesForId.values();
     }
 
+    /**
+     * Method for getting TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
+     *
+     * @param feedId: Feed ID, e.g. "HSL". Not null (otherwise will just return empty List).
+     * @param serviceDate: ServiceDate for which TripTimeShort objects are returned. If null, returns TripTimeShort objects filtered by realTimeState for all dates.
+     * @param realTimeState: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does NOT return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
+     * @return List of TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
+     */
     public List<TripTimeShort> getTripTimes(final String feedId, final ServiceDate serviceDate, final RealTimeState realTimeState) {
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
