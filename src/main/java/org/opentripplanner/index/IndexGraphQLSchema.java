@@ -379,16 +379,6 @@ public class IndexGraphQLSchema {
         return null;
     }
 
-    private ServiceDate parseISODateString(final String dateString) {
-        ServiceDate date = null;
-        if (dateString != null) {
-            try {
-                date = ServiceDate.parseString(dateString.replace("-", ""));
-            } catch (ParseException | NullPointerException e) {}
-        }
-        return date;
-    }
-
     @SuppressWarnings("unchecked")
     public IndexGraphQLSchema(GraphIndex index) {
         createPlanType(index);
@@ -3074,7 +3064,7 @@ public class IndexGraphQLSchema {
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("afterDate")
-                                .description("Only TripTimes that have scheduled last stop arrival on or after afterDate (inclusive) are returned (i.e. TripTimes which are running on afterDate or will run after afterDate according to the schedule). Format: yyyy-MM-dd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
+                                .description("Only TripTimes that have scheduled last stop arrival on or after afterDate (inclusive) are returned (i.e. TripTimes which are running on afterDate or will run after afterDate according to the schedule). Format: yyyy-MM-dd or yyyyMMdd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
                                 .type(Scalars.GraphQLString)
                                 .build())
                         .argument(GraphQLArgument.newArgument()
@@ -3086,8 +3076,24 @@ public class IndexGraphQLSchema {
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
                             final String feed = environment.getArgument("feed");
-                            final ServiceDate afterDate = parseISODateString(environment.getArgument("afterDate"));
+                            final String afterDateString = environment.getArgument("afterDate");
+                            ServiceDate afterDate = null;
+                            if (afterDateString != null) {
+                                try {
+                                    afterDate = ServiceDate.parseString(afterDateString.replace("-", ""));
+                                } catch (ParseException | NullPointerException e) {
+                                    throw new IllegalArgumentException("Error parsing afterDate.");
+                                }
+                            }
                             final Integer afterTime = environment.getArgument("afterTime");
+                            if (afterTime != null) {
+                                if (afterTime < 0) {
+                                    throw new IllegalArgumentException("afterTime cannot be negative number.");
+                                }
+                                if (afterDate == null) {
+                                    throw new IllegalArgumentException("afterDate should be provided if afterTime is provided.");
+                                }
+                            }
                             return index.getTripTimes(feed, afterDate, afterTime, RealTimeState.CANCELED);
                         })
                         .build())

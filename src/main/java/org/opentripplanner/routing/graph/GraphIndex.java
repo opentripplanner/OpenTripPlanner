@@ -1208,15 +1208,6 @@ public class GraphIndex {
      * @return List of TripTimeShort objects filtered by feed, afterDate, afterTime and state.
      */
     public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
-        if (feed == null) {
-            throw new IllegalArgumentException("feed should be provided.");
-        }
-        if (state == null) {
-            throw new IllegalArgumentException("state should be provided.");
-        }
-        if (afterTime != null && afterDate == null) {
-            throw new IllegalArgumentException("afterDate should be provided if afterTime is provided.");
-        }
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
