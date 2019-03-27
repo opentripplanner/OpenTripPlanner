@@ -1198,17 +1198,24 @@ public class GraphIndex {
     /**
      * Method for getting TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
      *
-     * @param feedId: Feed ID, e.g. "HSL". Not null (otherwise will just return empty List).
-     * @param serviceDate: ServiceDate for which TripTimeShort objects are returned. If null, returns TripTimeShort objects filtered by realTimeState for all dates.
-     * @param realTimeState: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does NOT return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
-     * @return List of TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
+     * @param feed: Feed ID. Not null.
+     * @param afterDate: TripTimeShort objects that have scheduled last stop arrival times on or after this ServiceDate
+     *                 are returned. If null, returns TripTimeShort objects for all dates.
+     * @param afterTime: TripTimeShort objects that have scheduled last stop arrival times at or after this time on
+     *                 afterDate are returned. TripTimeShort objects on dates later than afterDate are returned
+     *                 regardless of afterTime. If null, returns TripTimeShort objects for all times.
+     * @param state: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does not return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
+     * @return List of TripTimeShort objects filtered by feed, afterDate, afterTime and state.
      */
-    public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate onDate, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
-        if (afterTime != null && onDate == null && afterDate == null) {
-            throw new IllegalArgumentException("Either onDate or afterDate should be provided if afterTime is provided");
+    public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
+        if (feed == null) {
+            throw new IllegalArgumentException("feed should be provided.");
         }
-        if (onDate != null && afterDate != null) {
-            throw new IllegalArgumentException("Only either onDate or afterDate should be provided, not both.");
+        if (state == null) {
+            throw new IllegalArgumentException("state should be provided.");
+        }
+        if (afterTime != null && afterDate == null) {
+            throw new IllegalArgumentException("afterDate should be provided if afterTime is provided.");
         }
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
@@ -1222,9 +1229,7 @@ public class GraphIndex {
                     return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
                 })
                 .filter(timetable -> {
-                    if (onDate != null) {
-                        return onDate.equals(timetable.serviceDate);
-                    } else if (afterDate != null && timetable.serviceDate != null) {
+                    if (afterDate != null && timetable.serviceDate != null) {
                         return timetable.serviceDate.compareTo(afterDate) >= 0;
                     }
                     return timetable.serviceDate != null;
@@ -1233,10 +1238,8 @@ public class GraphIndex {
                         .stream()
                         .filter(tripTimes -> {
                             boolean filter = tripTimes.getRealTimeState() == state;
-                            if (afterTime != null) {
-                                if (onDate != null || (afterDate != null && timetable.serviceDate.compareTo(afterDate) == 0)) {
-                                    filter &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= afterTime;
-                                }
+                            if (afterTime != null && timetable.serviceDate.compareTo(afterDate) == 0) {
+                                filter &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= afterTime;
                             }
                             return filter;
                         })

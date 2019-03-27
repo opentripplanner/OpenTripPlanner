@@ -3073,11 +3073,6 @@ public class IndexGraphQLSchema {
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
-                                .name("onDate")
-                                .description("Only TripTimes that are scheduled on onDate are returned. Format: yyyy-MM-dd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
-                                .type(Scalars.GraphQLString)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
                                 .name("afterDate")
                                 .description("Only TripTimes that have scheduled last stop arrival on or after afterDate (inclusive) are returned (i.e. TripTimes which are running on afterDate or will run after afterDate according to the schedule). Format: yyyy-MM-dd. Default: TripTimes are returned for all dates. Only either onDate or afterDate should be provided, not both.")
                                 .type(Scalars.GraphQLString)
@@ -3091,10 +3086,9 @@ public class IndexGraphQLSchema {
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
                             final String feed = environment.getArgument("feed");
-                            final ServiceDate onDate = parseISODateString(environment.getArgument("onDate"));
                             final ServiceDate afterDate = parseISODateString(environment.getArgument("afterDate"));
                             final Integer afterTime = environment.getArgument("afterTime");
-                            return index.getTripTimes(feed, onDate, afterDate, afterTime, RealTimeState.CANCELED);
+                            return index.getTripTimes(feed, afterDate, afterTime, RealTimeState.CANCELED);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
