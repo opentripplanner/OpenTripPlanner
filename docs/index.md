@@ -5,7 +5,7 @@ _This documentation is targeted primarily at the OTP development community and m
 
 **OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). The code is under active development with a variety of [deployments](Deployments) around the world.
 
-If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
+If you want to get started right away running your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tutorial) page.
 
 ## External Technical Documentation
 
