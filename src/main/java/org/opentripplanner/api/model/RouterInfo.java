@@ -9,11 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.locationtech.jts.geom.Geometry;
 
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.common.geometry.GeometrySerializer;
@@ -24,26 +19,20 @@ import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
-@XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
 
     private final BikeRentalStationService service;
 
-    @XmlElement
     public String routerId;
     
     @JsonSerialize(using= GeometrySerializer.class)
     @JsonDeserialize(using= GeometryDeserializer.class)
-    @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 
-    @XmlElement
     public Date buildTime;
 
-    @XmlElement
     public long transitServiceStarts;
 
-    @XmlElement
     public long transitServiceEnds;
 
     public HashSet<TraverseMode> transitModes;
