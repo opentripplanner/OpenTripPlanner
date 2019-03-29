@@ -1,7 +1,11 @@
 # Changelog
 
-## 1.4 (in progress)
 
+## 2.0 (in progress)
+- Fix XML response serialization (#2685)
+
+## 1.4 ( not merged into 2.x !!! )
+(TODO: Merge or delete, and move bullet to 2.x list of changes) 
 - Remove Open Traffic prototype code (#2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)

@@ -31,8 +31,6 @@ import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -140,7 +138,7 @@ public class TripPattern implements Cloneable, Serializable {
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    @XmlElement int[] perStopFlags;
+    int[] perStopFlags;
 
     /**
      * A set of serviceIds with at least one trip in this pattern.
@@ -217,7 +215,6 @@ public class TripPattern implements Cloneable, Serializable {
         return trips.get(tripIndex);
     }
 
-    @XmlTransient
     public List<Trip> getTrips() {
         return trips;
     }
