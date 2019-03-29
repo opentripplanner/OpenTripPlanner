@@ -1,6 +1,7 @@
 package org.opentripplanner.index.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -83,5 +84,65 @@ public class TripTimeShort {
         }
         return out;
     }
-    
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(
+            stopId,
+            tripId,
+            realtimeState,
+            blockId,
+            headsign,
+            Integer.valueOf(stopIndex),
+            Integer.valueOf(stopCount),
+            Integer.valueOf(scheduledArrival),
+            Integer.valueOf(realtimeArrival),
+            Integer.valueOf(arrivalDelay),
+            Integer.valueOf(scheduledDeparture),
+            Integer.valueOf(realtimeDeparture),
+            Integer.valueOf(departureDelay),
+            Boolean.valueOf(timepoint),
+            Boolean.valueOf(realtime),
+            Long.valueOf(serviceDay)
+        );
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TripTimeShort other = (TripTimeShort) obj;
+        boolean result = stopIndex == other.stopIndex &&
+                stopCount == other.stopCount &&
+                scheduledArrival == other.scheduledArrival &&
+                realtimeArrival == other.realtimeArrival &&
+                arrivalDelay == other.arrivalDelay &&
+                scheduledDeparture == other.scheduledDeparture &&
+                realtimeDeparture == other.realtimeDeparture &&
+                departureDelay == other.departureDelay &&
+                timepoint == other.timepoint &&
+                realtime == other.realtime &&
+                serviceDay == other.serviceDay;
+        if (stopId != null) {
+            result &= stopId.equals(other.stopId);
+        }
+        if (tripId != null) {
+            result &= tripId.equals(other.tripId);
+        }
+        if (realtimeState != null) {
+            result &= realtimeState.equals(other.realtimeState);
+        }
+        if (blockId != null) {
+            result &= blockId.equals(other.blockId);
+        }
+        if (headsign != null) {
+            result &= headsign.equals(other.headsign);
+        }
+        return result;
+    }
 }

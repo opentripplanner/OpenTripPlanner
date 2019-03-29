@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -99,6 +100,7 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -139,6 +141,7 @@ public class GraphIndex {
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<FeedScopedId, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<String, Trip> tripsForFeedId = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<TransitStop>();
     public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
@@ -242,6 +245,9 @@ public class GraphIndex {
                     patternsForStop.put(stop, pattern);
                 }
             }
+        }
+        for (Trip trip : tripForId.values()) {
+            tripsForFeedId.put(trip.getId().getAgencyId(), trip);
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
@@ -1187,5 +1193,56 @@ public class GraphIndex {
 
     public Collection<TicketType> getAllTicketTypes() {
         return ticketTypesForId.values();
+    }
+
+    /**
+     * Method for getting TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
+     *
+     * @param feed: Feed ID. Not null.
+     * @param afterDate: TripTimeShort objects that have scheduled last stop arrival times on or after this ServiceDate
+     *                 are returned. If null, returns TripTimeShort objects for all dates.
+     * @param afterTime: TripTimeShort objects that have scheduled last stop arrival times at or after this time on
+     *                 afterDate are returned. TripTimeShort objects on dates later than afterDate are returned
+     *                 regardless of afterTime. If null, returns TripTimeShort objects for all times.
+     * @param state: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does not return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
+     * @return List of TripTimeShort objects filtered by feed, afterDate, afterTime and state.
+     */
+    public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
+        final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
+        final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
+        final CalendarService calendarService = graph.getCalendarService();
+        return tripsForFeedId.get(feed)
+                .stream()
+                .flatMap(trip -> {
+                    final TripPattern pattern = patternForTrip.get(trip);
+                    final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
+                    return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
+                })
+                .filter(timetable -> {
+                    if (afterDate != null && timetable.serviceDate != null) {
+                        return timetable.serviceDate.compareTo(afterDate) >= 0;
+                    }
+                    return timetable.serviceDate != null;
+                })
+                .flatMap(timetable -> timetable.tripTimes
+                        .stream()
+                        .filter(tripTimes -> {
+                            boolean filter = tripTimes.getRealTimeState() == state;
+                            if (afterTime != null && timetable.serviceDate.compareTo(afterDate) == 0) {
+                                filter &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= afterTime;
+                            }
+                            return filter;
+                        })
+                        .map(tripTimes -> {
+                            final int stopIndex = 0;
+                            final Stop stop = timetable.pattern.getStop(stopIndex);
+                            final String agencyId = tripTimes.trip.getId().getAgencyId();
+                            final ServiceDay serviceDay = serviceDaysByAgency.computeIfAbsent(agencyId, aId -> new ServiceDay(graph, timetable.serviceDate, calendarService, aId));
+                            return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
+                        })
+                )
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

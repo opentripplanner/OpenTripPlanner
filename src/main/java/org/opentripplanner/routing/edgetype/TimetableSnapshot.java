@@ -160,6 +160,11 @@ public class TimetableSnapshot {
         return pattern.scheduledTimetable;
     }
 
+    public Collection<Timetable> getTimetables(TripPattern pattern) {
+        SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
+        return sortedTimetables;
+    }
+
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
      * or the originally scheduled timetable if there are no updates in this snapshot.
