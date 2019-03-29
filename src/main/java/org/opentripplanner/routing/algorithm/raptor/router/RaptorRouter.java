@@ -14,7 +14,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptor.itinerary.ParetoItinerary;
 import org.opentripplanner.routing.algorithm.raptor.street_router.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.street_router.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.OtpRRDataProvider;
@@ -41,6 +40,7 @@ public class RaptorRouter {
     private final TransitLayer transitLayer;
     private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
 
+    //TODO Naming
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
         double startTime = System.currentTimeMillis();
         this.otpRRDataProvider = new OtpRRDataProvider(transitLayer, request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
@@ -75,10 +75,13 @@ public class RaptorRouter {
             @Override public int searchThreadPoolSize() { return 0; }
         };
 
+        // TODO: Reuse service
         RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(tuningParameters);
 
         int departureTime = Instant.ofEpochMilli(request.dateTime * 1000).atZone(ZoneId.systemDefault()).toLocalTime().toSecondOfDay();
 
+        // TODO Expose parameters
+        // TODO Remove parameters from API
         RequestBuilder builder = new RequestBuilder();
         builder.profile(RangeRaptorProfile.MULTI_CRITERIA)
                 .searchParams()
@@ -86,9 +89,10 @@ public class RaptorRouter {
                 .searchWindowInSeconds(40  * 60)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
-                .boardSlackInSeconds(60)
+                .boardSlackInSeconds(request.boardSlack)
                 .timetableEnabled(false);
 
+        //TODO Check in combination with timetableEnabled
         builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
 
         RangeRaptorRequest rangeRaptorRequest = builder.build();
@@ -109,26 +113,10 @@ public class RaptorRouter {
                 .map(p -> itineraryMapper.createItinerary(request, p, accessTransfers, egressTransfers))
                 .collect(Collectors.toList());
 
-        //filterByParetoSet(itineraries);
-
         TripPlan tripPlan = itineraryMapper.createTripPlan(request, itineraries);
 
         LOG.info("Creating itineraries took {} ms", System.currentTimeMillis() - startItineraries);
 
         return tripPlan;
-    }
-
-    private void filterByParetoSet(Collection<Itinerary> itineraries) {
-        ParetoSet<ParetoItinerary> paretoSet = new ParetoSet<>(ParetoItinerary.paretoComperator());
-        List<ParetoItinerary> paretoItineraries = itineraries.stream()
-                .map(ParetoItinerary::new)
-                .collect(Collectors.toList());
-
-        paretoItineraries.forEach(p -> {
-            p.initParetoVector();
-            paretoSet.add(p);
-        });
-        itineraries.clear();
-        itineraries.addAll(paretoSet);
     }
 }

@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AccessEgressRouter {
+public abstract class AccessEgressRouter {
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
+
+    // TODO Switch with generic A star
     public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
         rr.maxWalkDistance = 2000;
         rr.softWalkLimiting = false;
@@ -85,8 +87,8 @@ public class AccessEgressRouter {
                 }
             }
         }
-        LOG.debug("Heuristric street search hit {} vertices.", transitStopsFound.size());
-        LOG.debug("Heuristric street search hit {} transit stops.", transitQueue.size());
+        LOG.debug("Street search hit {} vertices.", transitStopsFound.size());
+        LOG.debug("Street search hit {} transit stops.", transitQueue.size());
 
         Map<Stop, Transfer> result = new HashMap<>();
         for (Map.Entry<TransitStop, Transfer> entry : transitStopsFound.entrySet()) {

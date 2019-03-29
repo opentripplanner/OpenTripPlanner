@@ -49,6 +49,8 @@ public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
         return tripSchedules.size();
     }
 
+    //TODO Should these be implemented?
+
     @Override
     public int hashCode() {
         return Objects.hash(tripPattern, tripSchedules);

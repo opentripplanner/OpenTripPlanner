@@ -5,13 +5,13 @@ import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
 
 public class TransferR5Adapter implements TransferLeg {
 
-    private final int duration;
+    private final int durationInSeconds;
 
     private final Transfer transfer;
 
     TransferR5Adapter(Transfer transfer, double walkSpeed) {
         this.transfer = transfer;
-        this.duration = (int) Math.round(transfer.getDistance() / walkSpeed);
+        this.durationInSeconds = (int) Math.round(transfer.getDistance() / walkSpeed);
     }
 
     @Override
@@ -21,6 +21,6 @@ public class TransferR5Adapter implements TransferLeg {
 
     @Override
     public int durationInSeconds() {
-        return this.duration;
+        return this.durationInSeconds;
     }
 }

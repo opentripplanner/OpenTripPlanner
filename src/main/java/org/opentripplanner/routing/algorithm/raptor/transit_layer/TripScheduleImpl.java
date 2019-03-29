@@ -21,6 +21,8 @@ public class TripScheduleImpl implements TripSchedule {
 
     private final Trip originalTrip;
 
+    //TODO via Trip
+    //TODO naming
     private final TripPattern originalTripPattern;
 
     private final int serviceCode;
@@ -41,6 +43,7 @@ public class TripScheduleImpl implements TripSchedule {
         return departures[stopPosInPattern];
     }
 
+    //TODO Implement. Throw OperationNotSupportedException
     @Override
     public String debugInfo() {
         return null;

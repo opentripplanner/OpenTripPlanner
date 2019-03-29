@@ -5,14 +5,14 @@ import org.locationtech.jts.geom.Coordinate;
 import java.util.List;
 
 public class Transfer {
-    private int stop;
+    private int toStop;
 
-    private final int distance;
+    private final int distance; // TODO Add units in the name of the field
 
     private final List<Coordinate> coordinates;
 
-    public Transfer(int stop, int distance, List<Coordinate> coordinates) {
-        this.stop = stop;
+    public Transfer(int toStop, int distance, List<Coordinate> coordinates) {
+        this.toStop = toStop;
         this.distance = distance;
         this.coordinates = coordinates;
     }
@@ -21,7 +21,8 @@ public class Transfer {
         return coordinates;
     }
 
-    public int stop() { return stop; }
+    //TODO getToStop
+    public int stop() { return toStop; }
 
     public int getDistance() {
         return distance;
