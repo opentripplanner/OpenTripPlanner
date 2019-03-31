@@ -69,14 +69,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     }
 
     /**
-     * Have the ID of their parent.
-     */
-    @Override
-    public int getId() {
-        return parentEdge.getId();
-    }
-
-    /**
      * Have the inbound angle of  their parent.
      */
     @Override

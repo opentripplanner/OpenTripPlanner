@@ -1,4 +1,4 @@
-package org.opentripplanner.profile;
+package org.opentripplanner.model;
 
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 

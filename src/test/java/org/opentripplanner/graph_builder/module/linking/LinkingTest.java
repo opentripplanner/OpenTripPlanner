@@ -6,22 +6,15 @@ import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import jersey.repackaged.com.google.common.collect.Maps;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -29,15 +22,11 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import static org.junit.Assert.*;
 import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 public class LinkingTest {
-    /** maximum difference in walk distance, in meters, that is acceptable between the graphs */
-    public static final int EPSILON = 1;
 
     /**
      * Ensure that splitting edges yields edges that are identical in length for forward and back edges.
@@ -115,55 +104,6 @@ public class LinkingTest {
             assertEquals(exemplar.getToVertex().getLat(), oe.getToVertex().getLat(), 1e-10);
             assertEquals(exemplar.getToVertex().getLon(), oe.getToVertex().getLon(), 1e-10);
         }
-
-        // compare the stop tree caches
-        g1.index(new DefaultStreetVertexIndexFactory());
-        g2.index(new DefaultStreetVertexIndexFactory());
-
-        g1.rebuildVertexAndEdgeIndices();
-        g2.rebuildVertexAndEdgeIndices();
-
-        StopTreeCache s1 = g1.index.getStopTreeCache();
-        StopTreeCache s2 = g2.index.getStopTreeCache();
-
-        // convert the caches to be by stop label
-        Map<String, int[]> l1 = cacheByLabel(s1);
-        Map<String, int[]> l2 = cacheByLabel(s2);
-
-        // do the comparison
-        for (Entry<String, int[]> e : l1.entrySet()) {
-            // graph 2 should contain all stops in graph 1 (and a few more)
-            assertTrue(l2.containsKey(e.getKey()));
-
-            TObjectIntMap<String> g1t = jaggedArrayToVertexMap(e.getValue(), g1);
-            TObjectIntMap<String> g2t = jaggedArrayToVertexMap(l2.get(e.getKey()), g2);
-
-            for (TObjectIntIterator<String> it = g1t.iterator(); it.hasNext();) {
-                it.advance();
-
-                assertTrue(g2t.containsKey(it.key()));
-
-                int newv = g2t.get(it.key());
-
-                assertTrue("At " + it.key() + " from stop " + g1.getVertex(e.getKey()) + ", difference in walk distances: " + it.value() + "m without extra stops,"  + newv + "m with",
-                        Math.abs(it.value() - newv) <= EPSILON);
-            }
-        }
-    }
-
-    private TObjectIntMap<String> jaggedArrayToVertexMap(int[] value, Graph g) {
-        TObjectIntMap<String> ret = new TObjectIntHashMap<String>();
-
-        for (int i = 0; i < value.length; i++) {
-            Vertex v = g.getVertexById(value[i++]);
-
-            if (!v.getLabel().startsWith("osm:node"))
-                continue;
-
-            ret.put(v.getLabel(), value[i]);
-        }
-
-        return ret;
     }
 
     private static Collection<Edge> stls (Collection<Edge> edges) {
@@ -176,14 +116,4 @@ public class LinkingTest {
         });
     }
 
-    /** get the stop tree cache indexed by label */
-    public static Map<String, int[]> cacheByLabel (StopTreeCache c) {
-        Map<String, int[]> ret = Maps.newHashMap();
-
-        for (Entry<TransitStop, int[]> e : c.distancesForStop.entrySet()) {
-            ret.put(e.getKey().getLabel(), e.getValue());
-        }
-
-        return ret;
-    }
 }

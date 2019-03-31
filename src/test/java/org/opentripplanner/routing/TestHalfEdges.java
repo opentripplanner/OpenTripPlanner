@@ -119,8 +119,6 @@ public class TestHalfEdges {
         station1.addMode(TraverseMode.RAIL);
         station2.addMode(TraverseMode.RAIL);
         
-        graph.rebuildVertexAndEdgeIndices();
-
         //Linkers aren't run otherwise in testNetworkLinker
         graph.hasStreets = true;
         graph.hasTransit = true;

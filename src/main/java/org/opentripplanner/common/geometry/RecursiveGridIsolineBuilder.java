@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.opentripplanner.analyst.request.SampleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

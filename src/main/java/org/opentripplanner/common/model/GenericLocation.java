@@ -27,11 +27,6 @@ public class GenericLocation implements Cloneable, Serializable {
     public final String place;
     
     /**
-     * The ID of the edge this location is on if any.
-     */
-    public Integer edgeId;
-
-    /**
      * Coordinates of the place, if provided.
      */
     public Double lat;
@@ -63,8 +58,6 @@ public class GenericLocation implements Cloneable, Serializable {
     private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("
             + _doublePattern + ")\\D*");
 
-    private static final Pattern _edgeIdPattern = Pattern.compile("\\D*edgeId=(\\d+)\\D*");
-    
     /**
      * Constructs an empty GenericLocation.
      */
@@ -129,10 +122,6 @@ public class GenericLocation implements Cloneable, Serializable {
             this.heading = Double.parseDouble(matcher.group(1));
         }
         
-        matcher = _edgeIdPattern.matcher(place);
-        if (matcher.find()) {
-            this.edgeId = Integer.parseInt(matcher.group(1));
-        }
     }
 
     /**
@@ -187,14 +176,6 @@ public class GenericLocation implements Cloneable, Serializable {
         return this.lat != null && this.lng != null;
     }
     
-    /**
-     * Returns true if getEdgeId would not return null.
-     * @return
-     */
-    public boolean hasEdgeId() {
-        return this.edgeId != null;
-    }
-    
     public NamedPlace getNamedPlace() {
         return new NamedPlace(this.name, this.place);
     }
@@ -237,9 +218,6 @@ public class GenericLocation implements Cloneable, Serializable {
         sb.append("<GenericLocation lat,lng=").append(this.lat).append(",").append(this.lng);
         if (this.hasHeading()) {
             sb.append(" heading=").append(this.heading);
-        }
-        if (this.hasEdgeId()) {
-            sb.append(" edgeId=").append(this.edgeId);
         }
         sb.append(">");
         return sb.toString();

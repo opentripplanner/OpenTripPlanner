@@ -20,12 +20,10 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
-import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -564,39 +562,6 @@ public class IndexAPI {
     public Response getServices(@PathParam("serviceId") String serviceId) {
         // TODO complete: index.serviceForId.get(serviceId);
         return Response.status(Status.OK).entity("NONE").build();
-    }
-
-    /**
-     * Return all clusters of stops.
-     * A cluster is not the same thing as a GTFS parent station.
-     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
-     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
-     */
-    @GET
-    @Path("/clusters")
-    public Response getAllStopClusters () {
-        index.clusterStopsAsNeeded();
-        // use 'detail' field common to all API methods in this class
-        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), detail);
-        return Response.status(Status.OK).entity(scl).build();
-    }
-
-    /**
-     * Return a cluster of stops by its ID.
-     * A cluster is not the same thing as a GTFS parent station.
-     * Clusters are an unsupported experimental feature that was added to assist in "profile routing".
-     * As such the stop clustering method probably only works right with one or two GTFS data sets in the world.
-     */
-    @GET
-    @Path("/clusters/{clusterId}")
-    public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
-        index.clusterStopsAsNeeded();
-        StopCluster cluster = index.stopClusterForId.get(clusterIdString);
-        if (cluster != null) {
-            return Response.status(Status.OK).entity(new StopClusterDetail(cluster, true)).build();
-        } else {
-            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        }
     }
 
     @POST

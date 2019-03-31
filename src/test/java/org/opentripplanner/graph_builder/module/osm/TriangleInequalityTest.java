@@ -45,9 +45,6 @@ public class TriangleInequalityTest {
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(graph, extra);
-
-        // Need to set up the index because buildGraph doesn't do it.
-        graph.rebuildVertexAndEdgeIndices();
     }
     
     @Before

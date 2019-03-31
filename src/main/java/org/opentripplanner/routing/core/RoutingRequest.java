@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -26,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -70,6 +67,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** The end location */
     public GenericLocation to;
+
+    /** If true, the tree will be allowed to grow in all directions, rather than being directed toward a single target. */
+    public boolean oneToMany = false;
 
     /** An ordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
@@ -332,9 +332,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
 
-    /** when true, do not use goal direction or stop at the target, build a full SPT */
-    public boolean batch = false;
-
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
@@ -594,7 +591,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
     public double getMaxWalkDistance() {
-        if (modes.isTransit() || (batch && !softWalkLimiting)) {
+        if (modes.isTransit()) {
             return maxWalkDistance;
         } else {
             return Double.MAX_VALUE;            
@@ -914,132 +911,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public RoutingContext getRoutingContext() {
         return this.rctx;
-    }
-
-    /**
-     * Equality does not mean that the fields of the two RoutingRequests are identical, but that they will produce the same SPT. This is particularly
-     * important when the batch field is set to 'true'. Does not consider the RoutingContext, to allow SPT caching. Intermediate places are also not
-     * included because the TSP solver will factor a single intermediate places routing request into several routing requests without intermediates
-     * before searching.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RoutingRequest))
-            return false;
-        RoutingRequest other = (RoutingRequest) o;
-        if (this.batch != other.batch)
-            return false;
-        boolean endpointsMatch;
-        if (this.batch) {
-            if (this.arriveBy) {
-                endpointsMatch = to.equals(other.to);
-            } else {
-                endpointsMatch = from.equals(other.from);
-            }
-        } else {
-            endpointsMatch = ((from == null && other.from == null) || from.equals(other.from))
-                    && ((to == null && other.to == null) || to.equals(other.to));
-        }
-        return endpointsMatch
-                && dateTime == other.dateTime
-                && arriveBy == other.arriveBy
-                && numItineraries == other.numItineraries // should only apply in non-batch?
-                && walkSpeed == other.walkSpeed
-                && bikeSpeed == other.bikeSpeed
-                && carSpeed == other.carSpeed
-                && maxWeight == other.maxWeight
-                && worstTime == other.worstTime
-                && maxTransfers == other.maxTransfers
-                && modes.equals(other.modes)
-                && wheelchairAccessible == other.wheelchairAccessible
-                && optimize.equals(other.optimize)
-                && maxWalkDistance == other.maxWalkDistance
-                && maxTransferWalkDistance == other.maxTransferWalkDistance
-                && maxPreTransitTime == other.maxPreTransitTime
-                && transferPenalty == other.transferPenalty
-                && maxSlope == other.maxSlope
-                && walkReluctance == other.walkReluctance
-                && waitReluctance == other.waitReluctance
-                && waitAtBeginningFactor == other.waitAtBeginningFactor
-                && walkBoardCost == other.walkBoardCost
-                && bikeBoardCost == other.bikeBoardCost
-                && bannedRoutes.equals(other.bannedRoutes)
-                && bannedTrips.equals(other.bannedTrips)
-                && preferredRoutes.equals(other.preferredRoutes)
-                && unpreferredRoutes.equals(other.unpreferredRoutes)
-                && transferSlack == other.transferSlack
-                && boardSlack == other.boardSlack
-                && alightSlack == other.alightSlack
-                && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
-                && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
-                && triangleSafetyFactor == other.triangleSafetyFactor
-                && triangleSlopeFactor == other.triangleSlopeFactor
-                && triangleTimeFactor == other.triangleTimeFactor
-                && stairsReluctance == other.stairsReluctance
-                && elevatorBoardTime == other.elevatorBoardTime
-                && elevatorBoardCost == other.elevatorBoardCost
-                && elevatorHopTime == other.elevatorHopTime
-                && elevatorHopCost == other.elevatorHopCost
-                && bikeSwitchTime == other.bikeSwitchTime
-                && bikeSwitchCost == other.bikeSwitchCost
-                && bikeRentalPickupTime == other.bikeRentalPickupTime
-                && bikeRentalPickupCost == other.bikeRentalPickupCost
-                && bikeRentalDropoffTime == other.bikeRentalDropoffTime
-                && bikeRentalDropoffCost == other.bikeRentalDropoffCost
-                && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
-                && extensions.equals(other.extensions)
-                && clampInitialWait == other.clampInitialWait
-                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
-                && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
-                && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
-                && Objects.equal(startingTransitTripId, other.startingTransitTripId)
-                && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation;
-    }
-
-    /**
-     * Equality and hashCode should not consider the routing context, to allow SPT caching.
-     * When adding fields to the hash code, pick a random large prime number that's not yet in use.
-     */
-    @Override
-    public int hashCode() {
-        int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
-                + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + modes.hashCode()
-                + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
-                + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
-                + new Double(maxTransferWalkDistance).hashCode()
-                + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
-                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + new Double(waitAtBeginningFactor).hashCode() * 15485863
-                + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
-                + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
-                + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
-                + new Double(triangleSafetyFactor).hashCode() * 195233277
-                + new Double(triangleSlopeFactor).hashCode() * 136372361
-                + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321
-                + maxPreTransitTime * 63061489
-                + new Long(clampInitialWait).hashCode() * 209477
-                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
-                + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
-                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
-        if (batch) {
-            hashCode *= -1;
-            // batch mode, only one of two endpoints matters
-            if (arriveBy) {
-                hashCode += to.hashCode() * 1327144003;
-            } else {
-                hashCode += from.hashCode() * 524287;
-            }
-            hashCode += numItineraries; // why is this only present here?
-        } else {
-            // non-batch, both endpoints matter
-            hashCode += from.hashCode() * 524287;
-            hashCode += to.hashCode() * 1327144003;
-        }
-        return hashCode;
     }
 
     /** Tear down any routing context (remove temporary edges from edge lists) */
