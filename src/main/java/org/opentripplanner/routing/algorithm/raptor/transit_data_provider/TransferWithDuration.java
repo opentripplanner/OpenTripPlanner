@@ -3,15 +3,15 @@ package org.opentripplanner.routing.algorithm.raptor.transit_data_provider;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
 
-public class TransferR5Adapter implements TransferLeg {
+public class TransferWithDuration implements TransferLeg {
 
-    private final int durationInSeconds;
+    private final int durationSeconds;
 
     private final Transfer transfer;
 
-    TransferR5Adapter(Transfer transfer, double walkSpeed) {
+    public TransferWithDuration(Transfer transfer, double walkSpeed) {
         this.transfer = transfer;
-        this.durationInSeconds = (int) Math.round(transfer.getDistance() / walkSpeed);
+        this.durationSeconds = (int) Math.round(transfer.getDistanceMeters() / walkSpeed);
     }
 
     @Override
@@ -21,6 +21,6 @@ public class TransferR5Adapter implements TransferLeg {
 
     @Override
     public int durationInSeconds() {
-        return this.durationInSeconds;
+        return this.durationSeconds;
     }
 }

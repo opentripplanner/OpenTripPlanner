@@ -149,7 +149,7 @@ public class ItineraryMapper {
         leg.to.stopId = accessToStop.getId();
         leg.to.vertexType = VertexType.TRANSIT;
         leg.legGeometry = PolylineEncoder.createEncodings(accessPath.getCoordinates());
-        leg.distance = (double)accessPath.getDistance();
+        leg.distance = (double)accessPath.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps test
         return leg;
     }
@@ -211,7 +211,7 @@ public class ItineraryMapper {
         leg.to.stopId = transferToStop.getId();
         leg.to.vertexType = VertexType.TRANSIT;
         leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
-        leg.distance = (double)transfer.getDistance();
+        leg.distance = (double)transfer.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps
         return leg;
     }
@@ -243,7 +243,7 @@ public class ItineraryMapper {
             leg.to = new Place(request.to.lng, request.to.lat, "Coordinate");
         }
         leg.legGeometry = PolylineEncoder.createEncodings(egressPath.getCoordinates());
-        leg.distance = (double)egressPath.getDistance();
+        leg.distance = (double)egressPath.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps
         return leg;
     }

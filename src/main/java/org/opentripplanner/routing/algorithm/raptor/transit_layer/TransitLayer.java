@@ -10,15 +10,15 @@ import java.util.Map;
 public class TransitLayer {
 
     /** Transit data required for routing */
-    public Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
+    Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
     /** Index of outer list is from stop index, inner list index has no specific meaning. To stop index is a field of the
      * Transfer object.
      */
-    public List<List<Transfer>> transferByStopIndex;
+    List<List<Transfer>> transferByStopIndex;
 
     /** Maps to original graph to retrieve additional data */
-    public List<Stop> stopsByIndex;
-    public Map<Stop, Integer> indexByStop;
+    List<Stop> stopsByIndex;
+    Map<Stop, Integer> indexByStop;
 
     public int getStopCount() { return stopsByIndex.size(); }
 

@@ -27,8 +27,9 @@ import java.util.Map;
 public abstract class AccessEgressRouter {
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
+    private AccessEgressRouter() {}
 
-    // TODO Switch with generic A star
+    // TODO Switch with generic A star (abyrd)
     public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
         rr.maxWalkDistance = 2000;
         rr.softWalkLimiting = false;
@@ -43,7 +44,6 @@ public abstract class AccessEgressRouter {
         }
 
         ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
-        // TODO use normal OTP search for this.
         BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);
@@ -98,6 +98,7 @@ public abstract class AccessEgressRouter {
         return result;
     }
 
+    // TODO Polylines to each stop needs to be saved after switching to generic a star
     private static Transfer createTransfer(State state, boolean fromTarget) {
         State originalState = state;
         List<Coordinate> points = new ArrayList<>();

@@ -7,13 +7,13 @@ import java.util.List;
 public class Transfer {
     private int toStop;
 
-    private final int distance; // TODO Add units in the name of the field
+    private final int distanceMeters; // TODO Add units in the name of the field
 
     private final List<Coordinate> coordinates;
 
-    public Transfer(int toStop, int distance, List<Coordinate> coordinates) {
+    public Transfer(int toStop, int distanceMeters, List<Coordinate> coordinates) {
         this.toStop = toStop;
-        this.distance = distance;
+        this.distanceMeters = distanceMeters;
         this.coordinates = coordinates;
     }
 
@@ -24,7 +24,7 @@ public class Transfer {
     //TODO getToStop
     public int stop() { return toStop; }
 
-    public int getDistance() {
-        return distance;
+    public int getDistanceMeters() {
+        return distanceMeters;
     }
 }

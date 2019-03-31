@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
+import org.opentripplanner.api.model.Itinerary;
 import com.conveyal.r5.otp2.RangeRaptorService;
 import com.conveyal.r5.otp2.api.path.Path;
 import com.conveyal.r5.otp2.api.request.Optimization;
@@ -9,14 +10,12 @@ import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
-import com.conveyal.r5.otp2.util.paretoset.ParetoSet;
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.street_router.AccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptor.street_router.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.OtpRRDataProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +37,18 @@ public class RaptorRouter {
     private final TransitDataProvider<TripSchedule> otpRRDataProvider;
     private final TransitLayer transitLayer;
     private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
+    private static RangeRaptorService<TripSchedule> rangeRaptorService;
 
     //TODO Naming
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
+        // TODO Probably load these parameters from router-config
+        if (rangeRaptorService == null) {
+            TuningParameters tuningParameters = new TuningParameters() {
+                @Override public int maxNumberOfTransfers() { return request.maxTransfers; }
+                @Override public int searchThreadPoolSize() { return 0; }
+            };
+            rangeRaptorService = new RangeRaptorService<>(tuningParameters);
+        }
         double startTime = System.currentTimeMillis();
         this.otpRRDataProvider = new OtpRRDataProvider(transitLayer, request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
                 5, request.modes, request.walkSpeed);
@@ -60,9 +67,10 @@ public class RaptorRouter {
         Map<Stop, Transfer> egressTransfers =
             AccessEgressRouter.streetSearch(request, true, Integer.MAX_VALUE);
 
-        TransferToAccessEgressLegMapper mapper = new TransferToAccessEgressLegMapper(transitLayer);
-        Collection<TransferLeg> accessTimes = mapper.map(accessTransfers, request.walkSpeed);
-        Collection<TransferLeg> egressTimes = mapper.map(egressTransfers, request.walkSpeed);
+        Collection<TransferLeg> accessTimes = accessTransfers.values().stream()
+                .map(t -> new TransferWithDuration(t, request.walkSpeed)).collect(Collectors.toList());
+        Collection<TransferLeg> egressTimes = egressTransfers.values().stream()
+                .map(t -> new TransferWithDuration(t, request.walkSpeed)).collect(Collectors.toList());
 
         LOG.info("Access/egress routing took {} ms", System.currentTimeMillis() - startTimeAccessEgress);
 
@@ -70,14 +78,7 @@ public class RaptorRouter {
 
         double startTimeRouting = System.currentTimeMillis();
 
-        TuningParameters tuningParameters = new TuningParameters() {
-            @Override public int maxNumberOfTransfers() { return request.maxTransfers; }
-            @Override public int searchThreadPoolSize() { return 0; }
-        };
-
-        // TODO: Reuse service
-        RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(tuningParameters);
-
+        // TODO Time zones
         int departureTime = Instant.ofEpochMilli(request.dateTime * 1000).atZone(ZoneId.systemDefault()).toLocalTime().toSecondOfDay();
 
         // TODO Expose parameters
@@ -99,7 +100,9 @@ public class RaptorRouter {
 
         /* Route transit */
 
-        Collection<Path<TripSchedule>> paths = new ArrayList<>(rangeRaptorService.route(rangeRaptorRequest, this.otpRRDataProvider));
+        // We know this cast is correct because we have instantiated rangeRaptorService as RangeRaptorService<TripSchedule>
+        @SuppressWarnings("unchecked")
+        Collection<Path<TripSchedule>> paths = rangeRaptorService.route(rangeRaptorRequest, this.otpRRDataProvider);
 
         LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
