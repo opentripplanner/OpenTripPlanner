@@ -14,11 +14,12 @@ public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
     private final TripPattern tripPattern;
     private final List<List<TripSchedule>> tripSchedules;
     private static final int SECONDS_OF_DAY = 86400;
-
+    private final int numberOfTripPatterns;
 
     public TripPatternForDates(TripPattern tripPattern, List<List<TripSchedule>> tripSchedulesPerDay) {
         this.tripPattern = tripPattern;
         this.tripSchedules = tripSchedulesPerDay;
+        this.numberOfTripPatterns = tripSchedules.stream().mapToInt(t -> t.size()).sum();
     }
 
     public TripPattern getTripPattern() {
@@ -52,6 +53,6 @@ public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
 
     @Override
     public int numberOfTripSchedules() {
-        return tripSchedules.stream().mapToInt(t -> t.size()).sum();
+        return numberOfTripPatterns;
     }
 }
