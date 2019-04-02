@@ -25,6 +25,10 @@ public final class Transfer implements Serializable {
 
     private int minTransferTime = MISSING_VALUE;
 
+    private int minWheelchairTime = MISSING_VALUE;
+
+    private int wheelchairTransfer;
+
     public Transfer() {
     }
 
@@ -37,6 +41,8 @@ public final class Transfer implements Serializable {
         this.toTrip = obj.toTrip;
         this.transferType = obj.transferType;
         this.minTransferTime = obj.minTransferTime;
+        this.minWheelchairTime = obj.minWheelchairTime;
+        this.wheelchairTransfer = obj.wheelchairTransfer;
     }
 
     public Stop getFromStop() {
@@ -109,6 +115,22 @@ public final class Transfer implements Serializable {
 
     public void clearMinTransferTime() {
         this.minTransferTime = MISSING_VALUE;
+    }
+
+    public int getMinWheelchairTime() {
+        return minWheelchairTime;
+    }
+
+    public void setMinWheelchairTime(int minWheelchairTime) {
+        this.minWheelchairTime = minWheelchairTime;
+    }
+
+    public int getWheelchairTransfer() {
+        return wheelchairTransfer;
+    }
+
+    public void setWheelchairTransfer(int wheelchairTransfer) {
+        this.wheelchairTransfer = wheelchairTransfer;
     }
 
     public String toString() {

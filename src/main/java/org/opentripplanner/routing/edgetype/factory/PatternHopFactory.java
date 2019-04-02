@@ -1431,6 +1431,29 @@ public class PatternHopFactory {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
             LineString geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
+
+            // check if we know for sure that transfer is accessible
+            if (transfer.getWheelchairTransfer() == 1) {
+
+                // check if we should have two different versions of the edge (accessible and inaccessible)
+                if (transfer.getMinWheelchairTime() > 0 && transfer.getTransferType() == 2 && transfer.getMinWheelchairTime() != time) {
+
+                    // if yes then mark current edge as inaccessible and create additional accessible edge with different weight
+                    transferEdge.setWheelchairAccessible(false);
+
+                    TransferEdge accessibleEdge = new TransferEdge(fromv, tov, distance, transfer.getMinWheelchairTime());
+                    accessibleEdge.setGeometry(geometry);
+                    accessibleEdge.setWheelchairAccessible(true);
+                }
+                else {
+
+                    // if not then simply mark current edge as accessible
+                    transferEdge.setWheelchairAccessible(true);
+                }
+            }
+            else {
+                transferEdge.setWheelchairAccessible(false);
+            }
         }
     }
 

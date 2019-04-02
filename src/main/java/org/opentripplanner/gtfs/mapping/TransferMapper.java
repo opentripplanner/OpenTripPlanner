@@ -43,6 +43,8 @@ class TransferMapper {
         lhs.setToTrip(tripMapper.map(rhs.getToTrip()));
         lhs.setTransferType(rhs.getTransferType());
         lhs.setMinTransferTime(rhs.getMinTransferTime());
+        lhs.setMinWheelchairTime(rhs.getMinWheelchairTime());
+        lhs.setWheelchairTransfer(rhs.getWheelchairTransfer());
 
         return lhs;
     }
