@@ -12,6 +12,7 @@ import java.util.List;
  * TripPattern. This is to improve performance for searching, as each TripPattern is searched only once per round.
  */
 
+//TODO This needs to be fixed and tests added
 public class MergeTripPatternForDates {
     public static List<TripPatternForDates> merge(List<List<TripPatternForDate>> tripPatternForDateList) {
         List<TripPatternForDates> tripPatternForDates = new ArrayList<>();
