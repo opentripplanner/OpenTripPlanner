@@ -51,7 +51,7 @@ public class RaptorRouter {
         }
         double startTime = System.currentTimeMillis();
         this.otpRRDataProvider = new OtpRRDataProvider(transitLayer, request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                5, request.modes, request.walkSpeed);
+                2, request.modes, request.walkSpeed);
         LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
         this.transitLayer = transitLayer;
     }
