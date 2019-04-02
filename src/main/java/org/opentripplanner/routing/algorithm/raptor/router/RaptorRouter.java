@@ -14,8 +14,8 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.street_router.AccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptor.street_router.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.OtpRRDataProvider;
-import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
@@ -67,10 +67,10 @@ public class RaptorRouter {
         Map<Stop, Transfer> egressTransfers =
             AccessEgressRouter.streetSearch(request, true, Integer.MAX_VALUE);
 
-        Collection<TransferLeg> accessTimes = accessTransfers.values().stream()
-                .map(t -> new TransferWithDuration(t, request.walkSpeed)).collect(Collectors.toList());
-        Collection<TransferLeg> egressTimes = egressTransfers.values().stream()
-                .map(t -> new TransferWithDuration(t, request.walkSpeed)).collect(Collectors.toList());
+        TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(transitLayer);
+
+        Collection<TransferLeg> accessTimes = accessEgressLegMapper.map(accessTransfers, request.walkSpeed);
+        Collection<TransferLeg> egressTimes = accessEgressLegMapper.map(egressTransfers, request.walkSpeed);
 
         LOG.info("Access/egress routing took {} ms", System.currentTimeMillis() - startTimeAccessEgress);
 
