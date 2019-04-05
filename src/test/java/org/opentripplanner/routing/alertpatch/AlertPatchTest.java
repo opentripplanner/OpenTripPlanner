@@ -197,7 +197,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The route note");
         rnp1.setAlert(note1);
         rnp1.setId("id1");
-        rnp1.setRoute(new AgencyAndId("agency", "18"));
+        rnp1.setRoute(new FeedScopedId("agency", "18"));
         rnp1.setDirectionId(1);
         rnp1.apply(graph);
 
@@ -208,7 +208,7 @@ public class AlertPatchTest extends TestCase {
         Alert note2 = Alert.createSimpleAlerts("The 2nd route note");
         rnp2.setAlert(note2);
         rnp2.setId("id1");
-        rnp2.setRoute(new AgencyAndId("agency", "18"));
+        rnp2.setRoute(new FeedScopedId("agency", "18"));
         rnp2.setDirectionId(0);
         rnp2.apply(graph);
 
