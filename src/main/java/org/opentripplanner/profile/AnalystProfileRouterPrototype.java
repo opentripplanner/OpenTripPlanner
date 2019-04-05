@@ -6,7 +6,7 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;

@@ -1,20 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +25,15 @@ public class Fare {
 
     /**
      * A mapping from {@link FareType} to a list of {@link FareComponent}.
+     * The FareComponents are stored in an array instead of a list because JAXB doesn't know how to deal with
+     * interfaces when serializing a trip planning response, and List is an interface.
+     * See https://stackoverflow.com/a/1119241/778449
      */
-    public HashMap<FareType, List<FareComponent>> details;
+    public HashMap<FareType, FareComponent[]> details;
 
     public Fare() {
-        fare = new HashMap<FareType, Money>();
-        details = new HashMap<FareType, List<FareComponent>>();
+        fare = new HashMap<>();
+        details = new HashMap<>();
     }
 
     public Fare(Fare aFare) {
@@ -64,7 +55,7 @@ public class Fare {
     }
 
     public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
-        details.put(fareType, newDetails);
+        details.put(fareType, newDetails.toArray(new FareComponent[newDetails.size()]));
     }
 
     public Money getFare(FareType type) {
@@ -72,7 +63,7 @@ public class Fare {
     }
 
     public List<FareComponent> getDetails(FareType type) {
-        return details.get(type);
+        return Arrays.asList(details.get(type));
     }
 
     public void addCost(int surcharge) {

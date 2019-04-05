@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
@@ -83,8 +70,9 @@ public class OTPMain {
         }
 
         OTPMain main = new OTPMain(params);
-        main.run();
-
+        if (!main.run()) {
+            System.exit(-1);
+        }
     }
 
     /* Constructor. */
@@ -95,8 +83,12 @@ public class OTPMain {
     /**
      * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
      * main method makes it possible to build graphs from web services or scripts, not just from the command line.
+     *
+     * @return
+     *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method will return when the web server shuts down;
+     *         false - if an error occurs while loading the graph;
      */
-    public void run() {
+    public boolean run() {
 
         // TODO do params.infer() here to ensure coherency?
 
@@ -117,8 +109,8 @@ public class OTPMain {
                     graphService.registerGraph("", new MemoryGraphSource("", graph));
                 }
             } else {
-                LOG.error("An error occurred while building the graph. Exiting.");
-                System.exit(-1);
+                LOG.error("An error occurred while building the graph.");
+                return false;
             }
         }
 
@@ -164,7 +156,7 @@ public class OTPMain {
             while (true) { // Loop to restart server on uncaught fatal exceptions.
                 try {
                     grizzlyServer.run();
-                    return;
+                    return true;
                 } catch (Throwable throwable) {
                     LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
                             throwable.getClass().getSimpleName(), throwable);
@@ -172,6 +164,7 @@ public class OTPMain {
             }
         }
 
+        return true;
     }
 
     /**

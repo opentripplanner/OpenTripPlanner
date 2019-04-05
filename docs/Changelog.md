@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.4 (in progress)
+
+- Remove Open Traffic prototype code (#2698)
+- Docs: improve configuration documentation
+- Update onebusaway-gtfs to latest version from OBA project (#2636)
+- Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
+- Allow OTP to search more service days for transit service (#2592)
+- Allow itineraries in response to be sorted by duration (#2593)
+- Add support for GTFS-flex services: flag stops, deviated-route service, and call-and-ride (#2603)
+- Fix reverse optimization bug (#2653, #2411)
+- Remove CarFreeAtoZ from list of deployments
+
+## 1.3 (2018-08-03)
+
+- Fix stop linking to only one edge of platform (#2472)
+- Log and allow changing number of HTTP handler threads
+- Update Dutch base fare from 89 to 90 cents (#2608)
+- Add Dutch fare service (#2571)
+- Revise unit tests to use less memory
+- Run all graph updater setup methods sequentially (#2545)
+- Allow vehicle rental systems with cars (stopgap parameter on bike rental)
+- Bump R5 version to get newer gtfs-lib and FST serialization
+- Move stopClusterMode parameter from routing config to build config (#2558)
+- Update encrypted Maven artifact signing key (it expired)
+- Clean up logging
+- Remove/update deprecated HTTPClient, add missing SSL ciphers (#2451)
+- Make maxTransfer options configurable through scripting API (#2507)
+- Fix scripts when entity IDs contain colons (#2474)
+- Add HTML report for stops more than 20m from linked road (#2460)
+- Update fares in NycFareServiceImpl (#2466)
+- Compact legs NPE fix (#2449) (#2490)
+- Docs: elevation data configuration, USGS DEM files
+- Docs: Update list of deployments
+- Docs: API, list of deployments, usage stats and tutorials
+- Docs: Update leadership committee listing following Boston Summit
+- Docs: Update OTP logo (Thanks Kate Chanba!)
+
 ## 1.2 (2017-09-18)
 
 - Add support for consuming GBFS bike-rental availability feeds. #2458

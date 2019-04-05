@@ -1,8 +1,8 @@
 language: java
-# OpenTripPlanner requires Java 8 and Travis doesn't (yet) support OpenJDK 8
+
 jdk:
-  - oraclejdk8
-  
+  - openjdk8
+    
 # Replace Travis's default Maven installation step with a no-op.
 # This avoids redundantly pre-running 'mvn install -DskipTests' every time.
 install: true
@@ -42,3 +42,24 @@ notifications:
 # Decrypt and import the artifact signing certificate before running the build
 before_install:
   - if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then openssl aes-256-cbc -K $encrypted_9918733fe303_key -iv $encrypted_9918733fe303_iv -in maven-artifact-signing-key.asc.enc -out maven-artifact-signing-key.asc -d && gpg --import --batch maven-artifact-signing-key.asc; fi
+before_deploy:
+# Get branch name of current branch for use in jar name: https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
+- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+# Copy shaded jar over to deploy dir as git-described jar (either version or version+commit) and branch-specific jar.
+- mkdir deploy
+- cp target/*-shaded.jar deploy/otp-$(git describe --always).jar
+- cp target/*-shaded.jar deploy/otp-latest-$BRANCH.jar
+deploy:
+  provider: s3
+  skip_cleanup: true
+  # AWS CI user: opentripplanner-ci
+  access_key_id: AKIAJEQQINNZK2IDHMJQ
+  secret_access_key:
+    secure: CCRXXGZ0RXSUQaVKHFlZjleEygesT3ec/rHUf28l7lw1XxOZBZulONqydL45OIQUM26JYge2SK+rMJfcN38qPVHXVbYQgGdcKnCQN76Kxj3MoNbMXrrvaKPZZq6jP0TOTHUTIh4TGO5Bu5nM6fV7zcySCFchC6yMF9EC90jDDns=
+  # Upload jars found in local directory to s3 bucket
+  local-dir: deploy
+  bucket: opentripplanner-builds
+  acl: public_read
+  on:
+    repo: opentripplanner/OpenTripPlanner
+    all_branches: true

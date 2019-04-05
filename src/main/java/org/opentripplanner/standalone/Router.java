@@ -153,14 +153,13 @@ public class Router {
                 }
             }
         }
-        
-        JsonNode stopClusterMode = config.get("stopClusterMode");
-        if (stopClusterMode != null) {
-            graph.stopClusterMode = stopClusterMode.asText();    
-        } else {
-            graph.stopClusterMode = "proximity";
+
+        /* Set whether to use flex service */
+        JsonNode useFlexService = config.get("useFlexService");
+        if (useFlexService != null) {
+            graph.setUseFlexService(useFlexService.asBoolean(false));
         }
-        
+
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);
 
@@ -202,5 +201,4 @@ public class Router {
         logger.setAdditive(false);
         return logger;
     }
-
 }

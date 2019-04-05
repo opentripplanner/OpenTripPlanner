@@ -1,21 +1,9 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import java.io.File;
@@ -26,16 +14,16 @@ import java.util.TimeZone;
 import com.google.common.collect.Iterables;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -54,7 +42,7 @@ public class TimetableTest {
     private static Graph graph;
     private AStar aStar = new AStar();
     private static GtfsContext context;
-    private static Map<AgencyAndId, TripPattern> patternIndex;
+    private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
     private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
@@ -66,12 +54,14 @@ public class TimetableTest {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class,
-                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
 
-        patternIndex = new HashMap<AgencyAndId, TripPattern>();
+        patternIndex = new HashMap<FeedScopedId, TripPattern>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding)
@@ -83,7 +73,7 @@ public class TimetableTest {
             }
         }
         
-        pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
         timetable = pattern.scheduledTimetable;
     }
 
@@ -97,7 +87,7 @@ public class TimetableTest {
 
         String feedId = graph.getFeedIds().iterator().next();
 
-        int trip_1_1_index = timetable.getTripIndex(new AgencyAndId("agency", "1.1"));
+        int trip_1_1_index = timetable.getTripIndex(new FeedScopedId("agency", "1.1"));
 
         Vertex stop_a = graph.getVertex(feedId + ":A");
         Vertex stop_c = graph.getVertex(feedId + ":C");

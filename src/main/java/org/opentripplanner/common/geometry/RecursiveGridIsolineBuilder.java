@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.common.geometry;
 
 import java.util.ArrayDeque;
@@ -28,12 +15,12 @@ import org.opentripplanner.analyst.request.SampleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.algorithm.CGAlgorithms;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  * Compute isoline based on a zFunc and a set of initial coverage points P0={(x,y)} to seed the
@@ -247,14 +234,13 @@ public class RecursiveGridIsolineBuilder {
 
     private Geometry debugGeometry = null;
         
-    // private List<Coordinate> __p0List;
+    // private List<Coordinate> p0List;
 
     /**
      * Create an object to compute isochrones. One may call several time isochronify on the same
      * IsoChronificator object, this will re-use the z = f(x,y) sampling if possible, as they are
      * kept in cache.
      * 
-     * @param request Parameters for the computation
      * @param center Center point (eg origin)
      * @param fz Function returning the z-value for a xy-coordinate
      * @param p0List Initial set of coverage points to seed the heuristics
@@ -271,7 +257,7 @@ public class RecursiveGridIsolineBuilder {
          * so it only needs to be not too far off to prevent int indexes from overflowing.
          */
         this.center = center;
-        // this.__p0List = p0List;
+        // this.p0List = p0List;
 
         LOG.debug("Center={} dX={} dY={}", this.center, dX, dY);
         this.fz = fz;
@@ -426,7 +412,7 @@ public class RecursiveGridIsolineBuilder {
                 Coordinate B = getCoordinate(e.B.index);
                 debugGeom.add(geomFactory.createLineString(new Coordinate[] { A, B }));
             }
-            // for (Coordinate p0 : __p0List) {
+            // for (Coordinate p0 : p0List) {
             // debugGeom.add(geomFactory.createPoint(p0));
             // }
         }

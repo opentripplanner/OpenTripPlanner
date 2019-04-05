@@ -1,29 +1,15 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import junit.framework.TestCase;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.linearref.LinearLocation;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -35,7 +21,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -121,13 +106,13 @@ public class TestHalfEdges {
         s1.setName("transitVertex 1");
         s1.setLon(-74.005);
         s1.setLat(40.0099999);
-        s1.setId(new AgencyAndId("A", "fleem station"));
+        s1.setId(new FeedScopedId("A", "fleem station"));
 
         Stop s2 = new Stop();
         s2.setName("transitVertex 2");
         s2.setLon(-74.002);
         s2.setLat(40.0099999);
-        s2.setId(new AgencyAndId("A", "morx station"));
+        s2.setId(new FeedScopedId("A", "morx station"));
 
         station1 = new TransitStop(graph, s1);
         station2 = new TransitStop(graph, s2);
@@ -398,7 +383,6 @@ public class TestHalfEdges {
 
         req.setWheelchairAccessible(true);
 
-        start.dispose();
         start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
@@ -415,7 +399,6 @@ public class TestHalfEdges {
         assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
-        start.dispose();
     }
 
     @Test
@@ -429,7 +412,6 @@ public class TestHalfEdges {
         TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.00, -74.00), null, true);
         assertNotNull(some);
-        some.dispose();
 
         // test that the closest vertex finder correctly splits streets
         TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocation(
@@ -439,7 +421,6 @@ public class TestHalfEdges {
                 start.isWheelchairAccessible());
 
         Collection<Edge> edges = start.getOutgoing();
-        start.dispose();
         assertEquals(2, edges.size());
 
         RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
@@ -448,7 +429,6 @@ public class TestHalfEdges {
         assertNotNull(end);
 
         edges = end.getIncoming();
-        end.dispose();
         assertEquals(2, edges.size());
 
 

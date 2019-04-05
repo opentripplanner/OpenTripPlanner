@@ -1,27 +1,4 @@
-/*
- * This file is part of the OpenSphere project which aims to
- * develop geospatial algorithms.
- * 
- * Copyright (C) 2012 Eric Grosso
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * For more information, contact:
- * Eric Grosso, eric.grosso.os@gmail.com
- * 
- */
+/* This file is based on code copied from project OpenSphere, see the LICENSE file for further information. */
 package org.opensphere.geometry.algorithm;
 
 import java.util.ArrayList;
@@ -36,22 +13,22 @@ import org.opensphere.geometry.triangulation.model.Edge;
 import org.opensphere.geometry.triangulation.model.Triangle;
 import org.opensphere.geometry.triangulation.model.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
-import com.vividsolutions.jts.triangulate.ConformingDelaunayTriangulationBuilder;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeSubdivision;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeTriangle;
-import com.vividsolutions.jts.util.UniqueCoordinateArrayFilter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.operation.linemerge.LineMerger;
+import org.locationtech.jts.triangulate.ConformingDelaunayTriangulationBuilder;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeSubdivision;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeTriangle;
+import org.locationtech.jts.util.UniqueCoordinateArrayFilter;
 
 /**
  * Computes a concave hull of a {@link Geometry} which is
@@ -202,11 +179,11 @@ public class ConcaveHull {
 		
 		Collection<QuadEdge> quadEdges = qes.getEdges();
 		List<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.createOn(qes);
-		Collection<com.vividsolutions.jts.triangulate.quadedge.Vertex> qeVertices = 
+		Collection<org.locationtech.jts.triangulate.quadedge.Vertex> qeVertices =
 			qes.getVertices(false);
 		
 		int iV = 0;
-		for (com.vividsolutions.jts.triangulate.quadedge.Vertex v : qeVertices) {
+		for (org.locationtech.jts.triangulate.quadedge.Vertex v : qeVertices) {
 			this.coordinates.put(v.getCoordinate(), iV);
 			this.vertices.put(iV, new Vertex(iV, v.getCoordinate()));
 			iV++;

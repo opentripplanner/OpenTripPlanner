@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.io.File;
@@ -25,16 +12,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -47,7 +33,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -59,7 +45,9 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.TestUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
+
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 public class TestPatternHopFactory extends TestCase {
 
@@ -74,9 +62,12 @@ public class TestPatternHopFactory extends TestCase {
         graph = new Graph();
 
         feedId = context.getFeedId().getId();
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        graph.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getOtpTransitService())
+        );
         
         String[] stops = {
                 feedId + ":A",
@@ -332,17 +323,17 @@ public class TestPatternHopFactory extends TestCase {
         // create dummy routes and trips
         // In tests we don't patch entities with the feed id, only default agency id is used.
         Route fromRoute = new Route();
-        fromRoute.setId(new AgencyAndId("agency", "1"));
+        fromRoute.setId(new FeedScopedId("agency", "1"));
         Trip fromTrip = new Trip();
-        fromTrip.setId(new AgencyAndId("agency", "1.1"));
+        fromTrip.setId(new FeedScopedId("agency", "1.1"));
         fromTrip.setRoute(fromRoute);
         Route toRoute = new Route();
-        toRoute.setId(new AgencyAndId("agency", "2"));
+        toRoute.setId(new FeedScopedId("agency", "2"));
         Trip toTrip = new Trip();
-        toTrip.setId(new AgencyAndId("agency", "2.1"));
+        toTrip.setId(new FeedScopedId("agency", "2.1"));
         toTrip.setRoute(toRoute);
         Trip toTrip2 = new Trip();
-        toTrip2.setId(new AgencyAndId("agency", "2.2"));
+        toTrip2.setId(new FeedScopedId("agency", "2.2"));
         toTrip2.setRoute(toRoute);
         
         // find stops
