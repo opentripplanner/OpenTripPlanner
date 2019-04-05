@@ -36,7 +36,7 @@ public class AlertPatch implements Serializable {
 
     private String id;
 
-    private List<EnhancedAlert> enhancedAlerts = new ArrayList<>();
+    private List<String> activities = Arrays.asList("RIDE", "BOARD", "EXIT");
 
     private Alert alert;
 
@@ -87,15 +87,15 @@ public class AlertPatch implements Serializable {
     }
 
     public boolean cannotRideThrough() {
-        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotRideThrough);
+        return serviceAffected() && activities.contains("RIDE");
     }
 
     public boolean cannotBoard() {
-        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotBoard);
+        return serviceAffected() && activities.contains("BOARD");
     }
 
     public boolean cannotAlight() {
-        return serviceAffected() && enhancedAlerts.stream().anyMatch(EnhancedAlert::cannotAlight);
+        return serviceAffected() && activities.contains("EXIT");
     }
 
     @XmlElement
@@ -107,12 +107,12 @@ public class AlertPatch implements Serializable {
         this.id = id;
     }
 
-    public List<EnhancedAlert> getEnhancedAlerts() {
-        return enhancedAlerts;
+    public List<String> getActivities() {
+        return activities;
     }
 
-    public void setEnhancedAlerts(List<EnhancedAlert> enhancedAlerts) {
-        this.enhancedAlerts = enhancedAlerts;
+    public void setActivities(List<String> activities) {
+        this.activities = activities;
     }
 
     public void apply(Graph graph) {

@@ -1,59 +1,45 @@
 package org.opentripplanner.updater.alerts;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.transit.realtime.GtfsRealtime;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.EnhancedAlert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+
 
 public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(GtfsEnhancedRealtimeAlertsUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
+    private Long lastTimestamp = Long.MIN_VALUE;
+
     private String url;
 
-    private Map<String, List<EnhancedAlert>> alertDetails;
+    private String feedId;
 
-    private final String AGENCY_ID = "1";
+    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    @Override
-    protected void runPolling() {
-        try {
-            InputStream data = HttpUtils.getData(url);
-            if (data == null) {
-                throw new RuntimeException("Failed to get data from url " + url);
-            }
+    private AlertPatchService alertPatchService;
 
-            alertDetails = parseJson(IOUtils.toString(data));
-            updaterManager.execute(this::updateGraph);
-        } catch (Exception e) {
-            LOG.error("Error reading enhanced feed from " + url, e);
-        }
-    }
+    private long earlyStart;
 
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) {
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
-        LOG.info("Creating enhanced alert feed updater running every {} seconds: {}", pollingPeriodSeconds, url);
-    }
+    private AlertsUpdateHandler updateHandler = null;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -61,79 +47,200 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) {}
-
-    @Override
-    public void teardown() {}
-
-    public String toString() {
-        return "GtfsEnhancedRealtimeAlertsUpdater(" + url + ")";
+    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+        // TODO: add options to choose different patch services
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        this.alertPatchService = alertPatchService;
+        String url = config.path("url").asText();
+        if (url == null) {
+            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
+        }
+        this.url = url;
+        this.earlyStart = config.path("earlyStartSec").asInt(0);
+        this.feedId = config.path("feedId").asText();
+        if (config.path("fuzzyTripMatching").asBoolean(false)) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+        }
+        LOG.info("Creating enhanced real-time alert (json) updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
 
-    private Map<String, List<EnhancedAlert>> parseJson(String jsonString) throws Exception {
-        Map<String, List<EnhancedAlert>> result = new HashMap<>();
+    @Override
+    public void setup(Graph graph) {
+        if (updateHandler == null) {
+            updateHandler = new AlertsUpdateHandler();
+        }
+        updateHandler.setEarlyStart(earlyStart);
+        updateHandler.setFeedId(feedId);
+        updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
+    }
 
+    @Override
+    protected void runPolling() {
+        try {
+            InputStream data = HttpUtils.getData(url);
+            if (data == null) {
+                throw new RuntimeException("Failed to get json data from url " + url);
+            }
+
+            final FeedMessage feed = parseJson(IOUtils.toString(data));
+
+            long feedTimestamp = feed.getHeader().getTimestamp();
+            if (feedTimestamp <= lastTimestamp) {
+                LOG.info("Ignoring feed with an old timestamp.");
+                return;
+            }
+
+            // Handle update in graph writer runnable
+            updaterManager.execute(new GraphWriterRunnable() {
+                @Override
+                public void run(Graph graph) {
+                    updateHandler.update(feed);
+                }
+            });
+
+            lastTimestamp = feedTimestamp;
+        } catch (Exception e) {
+            LOG.error("Error reading enhanced gtfs-realtime json feed from " + url, e);
+        }
+    }
+
+    private FeedMessage parseJson(String data) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode json = mapper.readTree(jsonString);
+        JsonNode json = mapper.readTree(data);
 
-        for (JsonNode node: json.get("entity")) {
-            JsonNode alert = node.get("alert");
+        JsonNode headerNode = json.get("header");
+        GtfsRealtime.FeedHeader header = GtfsRealtime.FeedHeader
+                .newBuilder()
+                .setTimestamp(headerNode.get("timestamp").longValue())
+                .setGtfsRealtimeVersion(headerNode.get("gtfs_realtime_version").textValue())
+                .build();
+
+        FeedMessage.Builder result = FeedMessage
+                .newBuilder()
+                .setHeader(header);
+
+        for (JsonNode entity: json.get("entity")) {
+            JsonNode alert = entity.get("alert");
+
             if (alert == null) {
                 continue;
             }
 
-
-            JsonNode informedEntity = alert.get("informed_entity");
-            if (informedEntity == null) {
-                continue;
-            }
-
-            String id = node.get("id").textValue();
-
-            List<EnhancedAlert> enhancedAlerts = new ArrayList<>();
-
-            for (JsonNode ie: informedEntity) {
-                EnhancedAlert enhancedAlert = new EnhancedAlert();
-
-                if (ie.hasNonNull("route_id")) {
-                    enhancedAlert.setRoute(new FeedScopedId(AGENCY_ID, ie.get("route_id").textValue()));
-                }
-                if (ie.hasNonNull("stop_id")) {
-                    enhancedAlert.setStop(new FeedScopedId(AGENCY_ID, ie.get("stop_id").textValue()));
-                }
-                if (ie.hasNonNull("trip") && ie.get("trip").hasNonNull("trip_id")) {
-                    enhancedAlert.setTrip(new FeedScopedId(AGENCY_ID, ie.get("trip").get("trip_id").textValue()));
-                }
-
-                List<EnhancedAlert.AffectedActivity> activities = new ArrayList<>();
-
-                for (JsonNode activity: ie.get("activities")) {
-                    activities.add(EnhancedAlert.AffectedActivity.valueOf(activity.textValue()));
-                }
-
-                enhancedAlert.setActivities(activities);
-
-                enhancedAlerts.add(enhancedAlert);
-            }
-
-            result.put(id, enhancedAlerts);
+            result.addEntity(parseEntity(entity));
         }
 
-        return result;
+        return result.build();
     }
 
-    private void updateGraph(Graph graph) {
-        for (AlertPatch alertPatch: graph.getAllAlertPatches()) {
-            List<EnhancedAlert> newAlerts = new ArrayList<>();
+    private GtfsRealtime.FeedEntity parseEntity(JsonNode entity) {
+        JsonNode alertNode = entity.get("alert");
 
-            List<EnhancedAlert> enhancedAlerts = alertDetails.get(alertPatch.getAlert().getId());
-            for (EnhancedAlert alert: enhancedAlerts) {
-                if (alert.appliesTo(alertPatch)) {
-                    newAlerts.add(alert);
-                }
+        GtfsRealtime.Alert.Builder alert = GtfsRealtime.Alert
+                .newBuilder()
+                .setDescriptionText(parseTranslatedString(alertNode.get("description_text")));
+
+        if (alertNode.get("effect") != null) {
+            alert.setEffect(GtfsRealtime.Alert.Effect.valueOf(alertNode.get("effect").textValue()));
+        }
+
+        if (alertNode.get("url") != null) {
+            alert.setUrl(parseTranslatedString(alertNode.get("url")));
+        }
+
+        if (alertNode.get("active_period") != null) {
+            for (JsonNode period : alertNode.get("active_period")) {
+                alert.addActivePeriod(parsePeriod(period));
+            }
+        }
+
+        if (alertNode.get("informed_entity") != null) {
+            for (JsonNode ie : alertNode.get("informed_entity")) {
+                alert.addInformedEntity(parseInformedEntity(ie));
+            }
+        }
+
+        return GtfsRealtime.FeedEntity
+                .newBuilder()
+                .setId(entity.get("id").textValue())
+                .setAlert(alert.build())
+                .build();
+    }
+
+    private GtfsRealtime.EntitySelector parseInformedEntity(JsonNode ie) {
+        GtfsRealtime.EntitySelector.Builder builder = GtfsRealtime.EntitySelector
+                .newBuilder();
+
+        if (ie.get("agency_id") != null) {
+            builder.setAgencyId(ie.get("agency_id").textValue());
+        }
+
+        if (ie.get("route_type") != null) {
+            builder.setRouteType(ie.get("route_type").intValue());
+        }
+
+        if (ie.get("route_id") != null) {
+            builder.setRouteId(ie.get("route_id").textValue());
+        }
+
+        if (ie.get("stop_id") != null) {
+            builder.setStopId(ie.get("stop_id").textValue());
+        }
+
+        JsonNode tripNode = ie.get("trip");
+        if (tripNode != null) {
+            GtfsRealtime.TripDescriptor.Builder tripBuilder = GtfsRealtime.TripDescriptor
+                    .newBuilder()
+                    .setTripId(tripNode.get("trip_id").textValue())
+                    .setRouteId(tripNode.get("route_id").textValue());
+
+            if (tripNode.get("direction_id") != null) {
+                tripBuilder.setDirectionId(tripNode.get("direction_id").intValue());
             }
 
-            alertPatch.setEnhancedAlerts(newAlerts);
+            builder.setTrip(tripBuilder.build());
         }
+
+        List<String> activities = new ArrayList<>();
+        for (JsonNode activity: ie.get("activities")) {
+            activities.add(activity.textValue());
+        }
+        builder.setActivities(activities);
+
+        return builder.build();
+    }
+
+    private GtfsRealtime.TimeRange parsePeriod(JsonNode period) {
+        GtfsRealtime.TimeRange.Builder builder = GtfsRealtime.TimeRange
+                .newBuilder()
+                .setStart(period.get("start").longValue());
+
+        if (period.get("end") != null) {
+            builder.setEnd(period.get("end").longValue());
+        }
+
+        return builder.build();
+    }
+
+    private GtfsRealtime.TranslatedString parseTranslatedString(JsonNode node) {
+        GtfsRealtime.TranslatedString.Builder builder = GtfsRealtime.TranslatedString.newBuilder();
+
+        for (JsonNode translation: node.get("translation")) {
+            builder.addTranslation(GtfsRealtime.TranslatedString.Translation
+                    .newBuilder()
+                    .setLanguage(translation.get("language").textValue())
+                    .setText(translation.get("text").textValue())
+                    .build());
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    public void teardown() {
+    }
+
+    public String toString() {
+        return "GtfsEnhancedRealtimeAlertsUpdater(" + url + ")";
     }
 }

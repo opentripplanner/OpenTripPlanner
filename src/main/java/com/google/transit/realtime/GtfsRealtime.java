@@ -17443,6 +17443,9 @@ public final class GtfsRealtime {
      */
     com.google.protobuf.ByteString
         getStopIdBytes();
+
+    java.util.List<java.lang.String> getActivities();
+
   }
   /**
    * Protobuf type {@code transit_realtime.EntitySelector}
@@ -17768,6 +17771,20 @@ public final class GtfsRealtime {
       }
     }
 
+    private java.util.List<java.lang.String> activities_;
+
+    public void setActivities(java.util.List<java.lang.String> activities) {
+      activities_ = activities;
+    }
+
+    public java.util.List<java.lang.String> getActivities() {
+      return activities_;
+    }
+
+    public boolean hasActivities() {
+      return activities_ != null && !activities_.isEmpty();
+    }
+
     private void initFields() {
       agencyId_ = "";
       routeId_ = "";
@@ -18034,6 +18051,7 @@ public final class GtfsRealtime {
         }
         result.stopId_ = stopId_;
         result.bitField0_ = to_bitField0_;
+        result.activities_ = activities_;
         onBuilt();
         return result;
       }
@@ -18222,6 +18240,16 @@ public final class GtfsRealtime {
         agencyId_ = value;
         onChanged();
         return this;
+      }
+
+      private java.util.List<java.lang.String> activities_;
+
+      public void setActivities(java.util.List<java.lang.String> activities) {
+        activities_ = activities;
+      }
+
+      public java.util.List<java.lang.String> getActivities() {
+        return activities_;
       }
 
       // optional string route_id = 2;

@@ -139,6 +139,10 @@ public class AlertsUpdateHandler {
             if (agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);
             }
+            if (informed.hasActivities()) {
+                patch.setActivities(informed.getActivities());
+            }
+
             patch.setTimePeriods(periods);
             patch.setAlert(alertText);
 
