@@ -1196,43 +1196,57 @@ public class GraphIndex {
     }
 
     /**
-     * Method for getting TripTimeShort objects filtered by feed ID, ServiceDate and RealTimeState.
+     * Method for getting TripTimeShort objects.
      *
-     * @param feed: Feed ID. Not null.
-     * @param afterDate: TripTimeShort objects that have scheduled last stop arrival times on or after this ServiceDate
-     *                 are returned. If null, returns TripTimeShort objects for all dates.
-     * @param afterTime: TripTimeShort objects that have scheduled last stop arrival times at or after this time on
-     *                 afterDate are returned. TripTimeShort objects on dates later than afterDate are returned
-     *                 regardless of afterTime. If null, returns TripTimeShort objects for all times.
-     * @param state: RealTimeState by which returned TripTimeShort objects filtered. Not null. Does not return RealTimeState.SCHEDULED TripTimeShort objects unless there have been trip updates for them.
-     * @return List of TripTimeShort objects filtered by feed, afterDate, afterTime and state.
+     * @param patterns TripPattern objects that are filtered to produce TripTimeShort objects.
+     * @param minDate Only TripTimeShort objects scheduled to run on minDate or after are returned.
+     * @param maxDate Only TripTimeShort objects scheduled to run on maxDate or before are returned.
+     * @param timeType Type of time filter. The time is provided with minTime and/or maxTime.
+     * @param minTime Only TripTimeShort objects scheduled to run at minTime or after are returned. If timeType equals
+     *                to DEPARTURE then minTime refers to the departure time of the first stop and if timeType equals to
+     *                ARRIVAL then it refers to the arrival time of the last stop.
+     * @param maxTime Only TripTimeShort objects scheduled to run at maxTime or before are returned. If timeType equals
+     *                to DEPARTURE then maxTime refers to the departure time of the first stop and if timeType equals to
+     *                ARRIVAL then it refers to the arrival time of the last stop.
+     * @param state Only TripTimeShort objects with this RealTimeState are returned. Not null. Does not return SCHEDULED
+     *              TripTimeShort objects unless there have been trip updates on them.
+     * @return List of TripTimeShort objects.
      */
-    public List<TripTimeShort> getTripTimes(final String feed, final ServiceDate afterDate, final Integer afterTime, final RealTimeState state) {
+    public List<TripTimeShort> getTripTimes(final Collection<TripPattern> patterns, final ServiceDate minDate, final ServiceDate maxDate, final IndexGraphQLSchema.CancelledTripTimesTimeType timeType, final Integer minTime, final Integer maxTime, final RealTimeState state) {
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
         final CalendarService calendarService = graph.getCalendarService();
-        return tripsForFeedId.get(feed)
-                .stream()
-                .flatMap(trip -> {
-                    final TripPattern pattern = patternForTrip.get(trip);
+        return patterns.stream()
+                .flatMap(pattern -> {
                     final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
                     return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();
                 })
                 .filter(timetable -> {
-                    if (afterDate != null && timetable.serviceDate != null) {
-                        return timetable.serviceDate.compareTo(afterDate) >= 0;
+                    // date filter
+                    boolean isValid = timetable.serviceDate != null;
+                    if (timetable.serviceDate != null) {
+                        if (minDate != null) {
+                            isValid &= timetable.serviceDate.compareTo(minDate) >= 0;
+                        }
+                        if (maxDate != null) {
+                            isValid &= timetable.serviceDate.compareTo(maxDate) <= 0;
+                        }
                     }
-                    return timetable.serviceDate != null;
+                    return isValid;
                 })
-                .flatMap(timetable -> timetable.tripTimes
-                        .stream()
+                .flatMap(timetable -> timetable.tripTimes.stream()
                         .filter(tripTimes -> {
-                            boolean filter = tripTimes.getRealTimeState() == state;
-                            if (afterTime != null && timetable.serviceDate.compareTo(afterDate) == 0) {
-                                filter &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= afterTime;
+                            // time and state filter
+                            boolean isValid = tripTimes.getRealTimeState() == state;
+                            int stopIndex = timeType == IndexGraphQLSchema.CancelledTripTimesTimeType.DEPARTURE ? 0 : tripTimes.getNumStops() - 1;
+                            if (minTime != null && timetable.serviceDate.compareTo(minDate) == 0) {
+                                isValid &= tripTimes.getScheduledArrivalTime(stopIndex) >= minTime;
                             }
-                            return filter;
+                            if (maxTime != null && timetable.serviceDate.compareTo(minDate) == 0) {
+                                isValid &= tripTimes.getScheduledArrivalTime(stopIndex) <= maxTime;
+                            }
+                            return isValid;
                         })
                         .map(tripTimes -> {
                             final int stopIndex = 0;
