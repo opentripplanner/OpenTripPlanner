@@ -47,7 +47,6 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
