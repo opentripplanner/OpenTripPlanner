@@ -425,7 +425,10 @@ public abstract class RoutingResource {
 
     @QueryParam("heuristicStepsPerMainStep")
     private Integer heuristicStepsPerMainStep;
-
+    
+    @QueryParam("allowedBikeRentalNetworks")
+    private String allowedBikeRentalNetworks;
+    
     /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
      * otherwise it uses default sorting. More sorting methods may be added in the future.
@@ -694,7 +697,10 @@ public abstract class RoutingResource {
 
         if (heuristicStepsPerMainStep != null)
             request.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
-
+        
+        if (allowedBikeRentalNetworks != null)
+            request.setAllowedBikeRentalNetworks(allowedBikeRentalNetworks);
+        
         if (pathComparator != null)
             request.pathComparator = pathComparator;
 
