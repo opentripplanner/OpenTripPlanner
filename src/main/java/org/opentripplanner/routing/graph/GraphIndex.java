@@ -1236,14 +1236,14 @@ public class GraphIndex {
                         .filter(tripTimes -> {
                             // time and state filter
                             boolean isValid = tripTimes.getRealTimeState() == state;
-                            if (timetable.serviceDate.compareTo(minDate) == 0) {
+                            if (minDate != null && timetable.serviceDate.compareTo(minDate) == 0) {
                                 if (minDepartureTime != null) {
                                     isValid &= tripTimes.getScheduledArrivalTime(0) >= minDepartureTime;
                                 } else if (minArrivalTime != null) {
                                     isValid &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= minArrivalTime;
                                 }
                             }
-                            if (timetable.serviceDate.compareTo(maxDate) == 0) {
+                            if (maxDate != null && timetable.serviceDate.compareTo(maxDate) == 0) {
                                 if (maxDepartureTime != null) {
                                     isValid &= tripTimes.getScheduledArrivalTime(0) <= maxDepartureTime;
                                 } else if (maxArrivalTime != null) {
