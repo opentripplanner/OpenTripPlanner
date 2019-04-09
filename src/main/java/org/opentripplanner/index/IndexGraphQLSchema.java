@@ -3192,11 +3192,13 @@ public class IndexGraphQLSchema {
                             Collection<TripPattern> patterns;
                             if (feedIds != null) {
                                 patterns = feedIds.stream()
+                                        .distinct()
                                         .flatMap(feedId -> index.patternsForFeedId.get(feedId).stream())
                                         .distinct()
                                         .collect(Collectors.toList());
                             } else if (routeIds != null) {
                                 patterns = routeIds.stream()
+                                        .distinct()
                                         .flatMap(routeId -> {
                                             final Route route = index.routeForId.get(FeedScopedId.convertFromString(routeId));
                                             return index.patternsForRoute.get(route).stream();
@@ -3205,11 +3207,13 @@ public class IndexGraphQLSchema {
                                         .collect(Collectors.toList());
                             } else if (patternIds != null) {
                                 patterns = patternIds.stream()
+                                        .distinct()
                                         .map(patternId -> index.patternForId.get(patternId))
                                         .distinct()
                                         .collect(Collectors.toList());
                             } else if (tripIds != null) {
                                 patterns = tripIds.stream()
+                                        .distinct()
                                         .map(tripId -> {
                                             final Trip trip = index.tripForId.get(FeedScopedId.convertFromString(tripId));
                                             return index.patternForTrip.get(trip);
