@@ -300,7 +300,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Set of unpreferred agencies for given user. */
     public HashSet<String> unpreferredAgencies = new HashSet<String>();
-
+    
+    /** Set of bike rental networks that should be used in routing. */
+    public Set<String> allowedBikeRentalNetworks = null;
+    
     /**
      * Penalty added for using every unpreferred route. We return number of seconds that we are willing to wait for preferred route.
      */
@@ -701,7 +704,15 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.unpreferredRoutes.addRoutes(s);
         }
     }
-
+    
+    public void setAllowedBikeRentalNetworks(String s) {
+        allowedBikeRentalNetworks = new HashSet<>();
+        
+        if (!s.isEmpty()) {
+            Collections.addAll(allowedBikeRentalNetworks, s.split(","));
+        }
+    }
+    
     public void setUseUnpreferredRoutesPenalty(int penalty) {
         if (penalty < 0) {
             penalty = 0;
