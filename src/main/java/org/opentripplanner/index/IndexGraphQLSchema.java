@@ -214,28 +214,6 @@ public class IndexGraphQLSchema {
             .value("SEVERE", GtfsRealtime.Alert.SeverityLevel.SEVERE, "SEVERE")
             .build();
 
-    public enum CancelledTripTimesResourceType {
-        FEED, ROUTE, PATTERN, TRIP
-    }
-
-    private static GraphQLEnumType cancelledTripTimesResourceType = GraphQLEnumType.newEnum()
-            .name("CancelledTripTimesResourceType")
-            .value("FEED", CancelledTripTimesResourceType.FEED, "Feed feedId.")
-            .value("ROUTE", CancelledTripTimesResourceType.ROUTE, "Route gtfsId.")
-            .value("PATTERN", CancelledTripTimesResourceType.PATTERN, "Pattern code.")
-            .value("TRIP", CancelledTripTimesResourceType.TRIP, "Trip gtfsId.")
-            .build();
-
-    public enum CancelledTripTimesTimeType {
-        DEPARTURE, ARRIVAL
-    }
-
-    private static GraphQLEnumType cancelledTripTimesTimeType = GraphQLEnumType.newEnum()
-            .name("CancelledTripTimesTimeType")
-            .value("DEPARTURE", CancelledTripTimesTimeType.DEPARTURE, "First stop departure time.")
-            .value("ARRIVAL", CancelledTripTimesTimeType.ARRIVAL, "Last stop arrival time.")
-            .build();
-
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType feedType = new GraphQLTypeReference("Feed");
@@ -3079,14 +3057,24 @@ public class IndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("cancelledTripTimes")
                         .argument(GraphQLArgument.newArgument()
-                                .name("resourceType")
-                                .description("Cancelled trip times can be filtered by different resources which can be FEED, ROUTE, PATTERN or TRIP. ID of the resource is provided with the resourceId parameter.")
-                                .type(cancelledTripTimesResourceType)
+                                .name("feeds")
+                                .description("Feed feedIds (e.g. HSL).")
+                                .type(new GraphQLList(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
-                                .name("resourceId")
-                                .description("ID of the resource. For resource type FEED this is the feedId (e.g. HSL), for ROUTE the gtfsId (e.g. HSL:1098), for PATTERN the code (e.g. HSL:1098:1:01) and for TRIP the gtfsId (e.g. HSL:1098_20190405_Ma_2_1455).")
-                                .type(Scalars.GraphQLString)
+                                .name("routes")
+                                .description("Route gtfsIds (e.g. HSL:1098).")
+                                .type(new GraphQLList(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("patterns")
+                                .description("TripPattern codes (e.g. HSL:1098:1:01).")
+                                .type(new GraphQLList(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("trips")
+                                .description("Trip gtfsIds (e.g. HSL:1098_20190405_Ma_2_1455).")
+                                .type(new GraphQLList(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("minDate")
@@ -3099,38 +3087,39 @@ public class IndexGraphQLSchema {
                                 .type(Scalars.GraphQLString)
                                 .build())
                         .argument(GraphQLArgument.newArgument()
-                                .name("timeType")
-                                .description("Cancelled trip times can be filtered by time of service day. The type of the time filter can be DEPARTURE or ARRIVAL. The time is provided with minTime and/or maxTime parameters.")
-                                .type(cancelledTripTimesTimeType)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("minTime")
-                                .description("Only cancelled trip times scheduled to run at minTime or after are returned. If timeType equals to DEPARTURE then minTime refers to the departure time of the first stop and if timeType equals to ARRIVAL then it refers to the arrival time of the last stop. Format: seconds since midnight of minDate.")
+                                .name("minDepartureTime")
+                                .description("Only cancelled trip times that have first stop departure time at minDepartureTime or after are returned. Format: seconds since midnight of minDate.")
                                 .type(Scalars.GraphQLInt)
                                 .build())
                         .argument(GraphQLArgument.newArgument()
-                                .name("maxTime")
-                                .description("Only cancelled trip times scheduled to run at maxTime or before are returned. If timeType equals to DEPARTURE then maxTime refers to the departure time of the first stop and if timeType equals to ARRIVAL then it refers to the arrival time of the last stop. Format: seconds since midnight of maxDate.")
+                                .name("maxDepartureTime")
+                                .description("Only cancelled trip times that have first stop departure time at maxDepartureTime or before are returned. Format: seconds since midnight of maxDate.")
+                                .type(Scalars.GraphQLInt)
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("minArrivalTime")
+                                .description("Only cancelled trip times that have last stop arrival time at minArrivalTime or after are returned. Format: seconds since midnight of minDate.")
+                                .type(Scalars.GraphQLInt)
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
+                                .name("maxArrivalTime")
+                                .description("Only cancelled trip times that have last stop arrival time at maxArrivalTime or before are returned. Format: seconds since midnight of maxDate.")
                                 .type(Scalars.GraphQLInt)
                                 .build())
                         .description("Get cancelled TripTimes.")
                         .type(new GraphQLList(stoptimeType))
                         .dataFetcher(environment -> {
-                            final CancelledTripTimesResourceType resourceType = environment.getArgument("resourceType");
-                            final String resourceId = environment.getArgument("resourceId");
                             final String minDateString = environment.getArgument("minDate");
                             final String maxDateString = environment.getArgument("maxDate");
-                            final CancelledTripTimesTimeType timeType = environment.getArgument("timeType");
-                            final Integer minTime = environment.getArgument("minTime");
-                            final Integer maxTime = environment.getArgument("maxTime");
+                            final Integer minDepartureTime = environment.getArgument("minDepartureTime");
+                            final Integer maxDepartureTime = environment.getArgument("maxDepartureTime");
+                            final Integer minArrivalTime = environment.getArgument("minArrivalTime");
+                            final Integer maxArrivalTime = environment.getArgument("maxArrivalTime");
                             ServiceDate minDate = parseDateString(minDateString);
                             ServiceDate maxDate = parseDateString(maxDateString);
 
-                            if (resourceId != null && resourceType == null) {
-                                throw new IllegalArgumentException("resourceType should be provided if resourceId is provided.");
-                            }
-                            if (resourceId == null && resourceType != null) {
-                                throw new IllegalArgumentException("resourceId should be provided if resourceType is provided.");
+                            if (getParameterCount(environment, "feeds", "routes", "patterns", "trips") > 1) {
+                                throw new IllegalArgumentException("feeds, routes, patterns and trips cannot be provided at the same time.");
                             }
                             if (minDateString != null && minDate == null) {
                                 throw new IllegalArgumentException("Error parsing minDate.");
@@ -3138,58 +3127,99 @@ public class IndexGraphQLSchema {
                             if (maxDateString != null && maxDate == null) {
                                 throw new IllegalArgumentException("Error parsing maxDate.");
                             }
-                            if ((minTime != null || maxTime != null) && timeType == null) {
-                                throw new IllegalArgumentException("timeType should be provided if minTime or maxTime is provided.");
+                            if (minDepartureTime != null && minArrivalTime != null) {
+                                throw new IllegalArgumentException("minDepartureTime and minArrivalTime cannot be provided at the same time.");
                             }
-                            if ((minTime == null && maxTime == null) && timeType != null) {
-                                throw new IllegalArgumentException("minTime or maxTime should be provided if timeType is provided.");
+                            if (maxDepartureTime != null && maxArrivalTime != null) {
+                                throw new IllegalArgumentException("maxDepartureTime and maxArrivalTime cannot be provided at the same time.");
                             }
-                            if (minTime != null) {
-                                if (minTime < 0) {
-                                    throw new IllegalArgumentException("minTime cannot be negative number.");
+                            if (minDepartureTime != null) {
+                                if (minDepartureTime < 0) {
+                                    throw new IllegalArgumentException("minDepartureTime cannot be negative number.");
                                 }
                                 if (minDate == null) {
-                                    throw new IllegalArgumentException("minDate should be provided if minTime is provided.");
+                                    throw new IllegalArgumentException("minDate should be provided if minDepartureTime is provided.");
                                 }
                             }
-                            if (maxTime != null) {
-                                if (maxTime < 0) {
-                                    throw new IllegalArgumentException("maxTime cannot be negative number.");
+                            if (maxDepartureTime != null) {
+                                if (maxDepartureTime < 0) {
+                                    throw new IllegalArgumentException("maxDepartureTime cannot be negative number.");
                                 }
                                 if (maxDate == null) {
-                                    throw new IllegalArgumentException("maxDate should be provided if maxTime is provided.");
+                                    throw new IllegalArgumentException("maxDate should be provided if maxDepartureTime is provided.");
+                                }
+                            }
+                            if (minArrivalTime != null) {
+                                if (minArrivalTime < 0) {
+                                    throw new IllegalArgumentException("minArrivalTime cannot be negative number.");
+                                }
+                                if (minDate == null) {
+                                    throw new IllegalArgumentException("minDate should be provided if minArrivalTime is provided.");
+                                }
+                            }
+                            if (maxArrivalTime != null) {
+                                if (maxArrivalTime < 0) {
+                                    throw new IllegalArgumentException("maxArrivalTime cannot be negative number.");
+                                }
+                                if (maxDate == null) {
+                                    throw new IllegalArgumentException("maxDate should be provided if maxArrivalTime is provided.");
                                 }
                             }
                             if (minDate != null && maxDate != null) {
                                 if (minDate.compareTo(maxDate) > 0) {
                                     throw new IllegalArgumentException("minDate cannot be greater than maxDate.");
                                 }
-                                if (minDate.compareTo(maxDate) == 0 && minTime != null && maxTime != null && minTime > maxTime) {
-                                    throw new IllegalArgumentException("minTime cannot be greater than maxTime if minDate equals maxDate.");
+                                else if (minDate.compareTo(maxDate) == 0) {
+                                    if (minDepartureTime != null && maxDepartureTime != null && minDepartureTime > maxDepartureTime) {
+                                        throw new IllegalArgumentException("minDepartureTime cannot be greater than maxDepartureTime if minDate equals maxDate.");
+                                    }
+                                    if (minArrivalTime != null && maxArrivalTime != null && minArrivalTime > maxArrivalTime) {
+                                        throw new IllegalArgumentException("minArrivalTime cannot be greater than maxArrivalTime if minDate equals maxDate.");
+                                    }
+                                    if (minDepartureTime != null && maxArrivalTime != null && minDepartureTime > maxArrivalTime) {
+                                        throw new IllegalArgumentException("minDepartureTime cannot be greater than maxArrivalTime if minDate equals maxDate.");
+                                    }
+                                    if (minArrivalTime != null && maxDepartureTime != null && minArrivalTime > maxDepartureTime) {
+                                        throw new IllegalArgumentException("minArrivalTime cannot be greater than maxDepartureTime if minDate equals maxDate.");
+                                    }
                                 }
                             }
 
+                            final List<String> feedIds = environment.getArgument("feeds");
+                            final List<String> routeIds = environment.getArgument("routes");
+                            final List<String> patternIds = environment.getArgument("patterns");
+                            final List<String> tripIds = environment.getArgument("trips");
                             Collection<TripPattern> patterns;
-                            switch (resourceType) {
-                                case FEED:
-                                    patterns = index.patternsForFeedId.get(resourceId);
-                                    break;
-                                case ROUTE:
-                                    final Route route = index.routeForId.get(FeedScopedId.convertFromString(resourceId));
-                                    patterns = index.patternsForRoute.get(route);
-                                    break;
-                                case PATTERN:
-                                    patterns = Arrays.asList(index.patternForId.get(resourceId));
-                                    break;
-                                case TRIP:
-                                    final Trip trip = index.tripForId.get(FeedScopedId.convertFromString(resourceId));
-                                    patterns = Arrays.asList(index.patternForTrip.get(trip));
-                                    break;
-                                default:
-                                    patterns = index.patternForId.values();
-                                    break;
+                            if (feedIds != null) {
+                                patterns = feedIds.stream()
+                                        .flatMap(feedId -> index.patternsForFeedId.get(feedId).stream())
+                                        .distinct()
+                                        .collect(Collectors.toList());
+                            } else if (routeIds != null) {
+                                patterns = routeIds.stream()
+                                        .flatMap(routeId -> {
+                                            final Route route = index.routeForId.get(FeedScopedId.convertFromString(routeId));
+                                            return index.patternsForRoute.get(route).stream();
+                                        })
+                                        .distinct()
+                                        .collect(Collectors.toList());
+                            } else if (patternIds != null) {
+                                patterns = patternIds.stream()
+                                        .map(patternId -> index.patternForId.get(patternId))
+                                        .distinct()
+                                        .collect(Collectors.toList());
+                            } else if (tripIds != null) {
+                                patterns = tripIds.stream()
+                                        .map(tripId -> {
+                                            final Trip trip = index.tripForId.get(FeedScopedId.convertFromString(tripId));
+                                            return index.patternForTrip.get(trip);
+                                        })
+                                        .distinct()
+                                        .collect(Collectors.toList());
+                            } else {
+                                patterns = index.patternForId.values();
                             }
-                            return index.getTripTimes(patterns, minDate, maxDate, timeType, minTime, maxTime, RealTimeState.CANCELED);
+                            return index.getTripTimes(patterns, minDate, maxDate, minDepartureTime, maxDepartureTime, minArrivalTime, maxArrivalTime, RealTimeState.CANCELED);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3370,6 +3400,15 @@ public class IndexGraphQLSchema {
             } catch (ParseException | NullPointerException e) {}
         }
         return date;
+    }
+
+    private int getParameterCount(final DataFetchingEnvironment environment, final String... parameters) {
+        final List<String> parameterList = Arrays.asList(parameters);
+        final int parameterCount = environment.getArguments().entrySet().stream()
+                .filter(entrySet ->  parameterList.contains(entrySet.getKey()) && entrySet.getValue() != null)
+                .collect(Collectors.toList())
+                .size();
+        return parameterCount;
     }
 
     private List<FeedScopedId> toIdList(List<String> ids) {

@@ -1197,18 +1197,19 @@ public class GraphIndex {
      * @param patterns TripPattern objects that are filtered to produce TripTimeShort objects.
      * @param minDate Only TripTimeShort objects scheduled to run on minDate or after are returned.
      * @param maxDate Only TripTimeShort objects scheduled to run on maxDate or before are returned.
-     * @param timeType Type of time filter. The time is provided with minTime and/or maxTime.
-     * @param minTime Only TripTimeShort objects scheduled to run at minTime or after are returned. If timeType equals
-     *                to DEPARTURE then minTime refers to the departure time of the first stop and if timeType equals to
-     *                ARRIVAL then it refers to the arrival time of the last stop.
-     * @param maxTime Only TripTimeShort objects scheduled to run at maxTime or before are returned. If timeType equals
-     *                to DEPARTURE then maxTime refers to the departure time of the first stop and if timeType equals to
-     *                ARRIVAL then it refers to the arrival time of the last stop.
+     * @param minDepartureTime Only TripTimeShort objects that have first stop departure time at minDepartureTime or
+     *                         after are returned.
+     * @param maxDepartureTime Only TripTimeShort objects that have first stop departure time at maxDepartureTime or
+     *                         before are returned.
+     * @param minArrivalTime Only TripTimeShort objects that have last stop arrival time at minArrivalTime or after are
+     *                       returned.
+     * @param maxArrivalTime Only TripTimeShort objects that have last stop arrival time at maxArrivalTime or before are
+     *                       returned.
      * @param state Only TripTimeShort objects with this RealTimeState are returned. Not null. Does not return SCHEDULED
      *              TripTimeShort objects unless there have been trip updates on them.
      * @return List of TripTimeShort objects.
      */
-    public List<TripTimeShort> getTripTimes(final Collection<TripPattern> patterns, final ServiceDate minDate, final ServiceDate maxDate, final IndexGraphQLSchema.CancelledTripTimesTimeType timeType, final Integer minTime, final Integer maxTime, final RealTimeState state) {
+    public List<TripTimeShort> getTripTimes(final Collection<TripPattern> patterns, final ServiceDate minDate, final ServiceDate maxDate, final Integer minDepartureTime, final Integer maxDepartureTime, final Integer minArrivalTime, final Integer maxArrivalTime, final RealTimeState state) {
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
@@ -1235,12 +1236,19 @@ public class GraphIndex {
                         .filter(tripTimes -> {
                             // time and state filter
                             boolean isValid = tripTimes.getRealTimeState() == state;
-                            int stopIndex = timeType == IndexGraphQLSchema.CancelledTripTimesTimeType.DEPARTURE ? 0 : tripTimes.getNumStops() - 1;
-                            if (minTime != null && timetable.serviceDate.compareTo(minDate) == 0) {
-                                isValid &= tripTimes.getScheduledArrivalTime(stopIndex) >= minTime;
+                            if (timetable.serviceDate.compareTo(minDate) == 0) {
+                                if (minDepartureTime != null) {
+                                    isValid &= tripTimes.getScheduledArrivalTime(0) >= minDepartureTime;
+                                } else if (minArrivalTime != null) {
+                                    isValid &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) >= minArrivalTime;
+                                }
                             }
-                            if (maxTime != null && timetable.serviceDate.compareTo(minDate) == 0) {
-                                isValid &= tripTimes.getScheduledArrivalTime(stopIndex) <= maxTime;
+                            if (timetable.serviceDate.compareTo(maxDate) == 0) {
+                                if (maxDepartureTime != null) {
+                                    isValid &= tripTimes.getScheduledArrivalTime(0) <= maxDepartureTime;
+                                } else if (maxArrivalTime != null) {
+                                    isValid &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) <= maxArrivalTime;
+                                }
                             }
                             return isValid;
                         })
