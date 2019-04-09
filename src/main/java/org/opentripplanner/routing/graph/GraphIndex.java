@@ -1256,7 +1256,8 @@ public class GraphIndex {
                             final int stopIndex = 0;
                             final Stop stop = timetable.pattern.getStop(stopIndex);
                             final String agencyId = tripTimes.trip.getId().getAgencyId();
-                            final ServiceDay serviceDay = serviceDaysByAgency.computeIfAbsent(agencyId, aId -> new ServiceDay(graph, timetable.serviceDate, calendarService, aId));
+                            final String agencyIdServiceDate = agencyId + "_" + timetable.serviceDate.getAsString();
+                            final ServiceDay serviceDay = serviceDaysByAgency.computeIfAbsent(agencyIdServiceDate, key -> new ServiceDay(graph, timetable.serviceDate, calendarService, agencyId));
                             return new TripTimeShort(tripTimes, stopIndex, stop, serviceDay);
                         })
                 )
