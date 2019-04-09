@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.alertpatch;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -10,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author novalis
  *
  */
-@XmlType
 public class TimePeriod {
     public TimePeriod(long start, long end) {
         this.startTime = start;
@@ -20,11 +16,9 @@ public class TimePeriod {
     public TimePeriod() {
     }
 
-    @XmlAttribute
     @JsonSerialize
     public long startTime;
 
-    @XmlAttribute
     @JsonSerialize
     public long endTime;
 
