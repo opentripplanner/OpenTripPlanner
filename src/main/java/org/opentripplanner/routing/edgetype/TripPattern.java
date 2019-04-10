@@ -706,6 +706,7 @@ public class TripPattern implements Cloneable, Serializable {
 
     @Override
     public int hashCode() {
+        if (code == null) return super.hashCode();
         return Objects.hash(code);
     }
 
@@ -714,6 +715,7 @@ public class TripPattern implements Cloneable, Serializable {
         if (this == other) return true;
         if (other == null) return false;
         if (getClass() != other.getClass()) return false;
+        if (code == null) return super.equals(other);
         return code.equals(((TripPattern) other).code);
     }
 
