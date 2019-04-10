@@ -1294,6 +1294,7 @@ public class IndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("zoneId")
+                        .description("ID of the zone where this stop is located")
                         .type(Scalars.GraphQLString)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
