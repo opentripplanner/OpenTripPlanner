@@ -14,15 +14,12 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A transit vehicle's journey between departure at one stop and arrival at the next.
  * This version represents a set of such journeys specified by a TripPattern.
  */
 public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge {
-    private static final Logger LOG = LoggerFactory.getLogger(PatternHop.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -71,7 +68,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
         for (AlertPatch alertPatch: options.getRoutingContext().graph.getAlertPatches(this)) {
             if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(state0)) {
-                LOG.warn("Trip affected by alert " + alertPatch.getId() + ": " + alertPatch.getAlert().toString());
                 return null;
             }
         }
@@ -107,7 +103,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
         for (AlertPatch alertPatch: options.getRoutingContext().graph.getAlertPatches(this)) {
             if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(s0)) {
-                LOG.warn("Trip affected by alert " + alertPatch.getId() + ": " + alertPatch.getAlert().toString());
                 return null;
             }
         }

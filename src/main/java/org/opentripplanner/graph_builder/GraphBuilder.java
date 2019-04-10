@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -183,7 +184,10 @@ public class GraphBuilder implements Runnable {
         routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
 
-        for (File file : dir.listFiles()) {
+        File[] files = dir.listFiles();
+        Arrays.sort(files);
+
+        for (File file : files) {
             switch (InputFileType.forFile(file)) {
                 case GTFS:
                     LOG.info("Found GTFS file {}", file);

@@ -83,10 +83,7 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
                 throw new RuntimeException("Failed to get json data from url " + url);
             }
 
-            String stringData = IOUtils.toString(data);
-            LOG.info("Read enhanced json stream from " + url + " : " + stringData);
-
-            final FeedMessage feed = parseJson(stringData);
+            final FeedMessage feed = parseJson(IOUtils.toString(data));
 
             long feedTimestamp = feed.getHeader().getTimestamp();
             if (feedTimestamp <= lastTimestamp) {
@@ -101,8 +98,6 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
                     updateHandler.update(feed);
                 }
             });
-
-            LOG.info(feed.getEntityCount() + " alerts parsed");
 
             lastTimestamp = feedTimestamp;
         } catch (Exception e) {
