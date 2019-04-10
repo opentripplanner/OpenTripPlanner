@@ -1266,6 +1266,10 @@ public class GraphIndex {
                         })
                 )
                 .distinct()
+                .sorted(Comparator
+                        .comparing((TripTimeShort tripTimeShort) -> tripTimeShort.serviceDay)
+                        .thenComparing((TripTimeShort tripTimeShort) -> tripTimeShort.scheduledDeparture)
+                )
                 .collect(Collectors.toList());
     }
 }
