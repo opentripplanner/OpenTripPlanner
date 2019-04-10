@@ -15,4 +15,5 @@ public class TicketType {
         return rs.getFareAttribute().getPrice();
     }
 
+    public String getCurrency() { return rs.getFareAttribute().getCurrencyType(); }
 }
