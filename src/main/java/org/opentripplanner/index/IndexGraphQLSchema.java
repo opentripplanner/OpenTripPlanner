@@ -2436,6 +2436,12 @@ public class IndexGraphQLSchema {
                         .type(Scalars.GraphQLString)
                         .dataFetcher(environment -> ((TicketType) environment.getSource()).getCurrency())
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("zones")
+                        .description("List of zones where this ticket is valid.\n  Corresponds to field `zoneId` in **Stop** type.")
+                        .type(GraphQLList.list(GraphQLNonNull.nonNull(Scalars.GraphQLString)))
+                        .dataFetcher(environment -> ((TicketType)environment.getSource()).getZones())
+                        .build())
                 .build();
 
 
