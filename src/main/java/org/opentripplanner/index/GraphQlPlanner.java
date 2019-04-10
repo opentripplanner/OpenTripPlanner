@@ -258,7 +258,12 @@ public class GraphQlPlanner {
             request.setModes(request.modes);
         }
 
-        if (hasArgument(environment, "ticketTypes")) {
+        if (hasArgument(environment,  "allowedTicketTypes")) {
+            request.allowedFares = Sets.newHashSet();
+            ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
+        }
+
+        if (hasArgument(environment, "ticketTypes") && !hasArgument(environment, "allowedTicketTypes")) {
             String ticketTypes = environment.getArgument("ticketTypes"); // comma separated list e.g. "HSL_esp,HSL_van"
             request.allowedFares = Sets.newHashSet(ticketTypes);
             request.allowedFares.addAll(request.allowedFares.stream().map(val -> val.replaceFirst("_", ":")).collect(Collectors.toList()));
