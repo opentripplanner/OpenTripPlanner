@@ -5,13 +5,13 @@ OpenTripPlanner is a member project of the [Software Freedom Conservancy](https:
 |Name | Affiliation |
 |-----|-------------|
 | Sean Barbeau      | University of South Florida |
-| Torbjørn Barslett | Ruter Oslo |
 | Sheldon Brown     | Cambridge Systematics |
-| Andrew Byrd       | PlannerStack Foundation |
+| Andrew Byrd       | Plannerstack (Netherlands) |
 | Drew Dara-Abrams  | Interline |
 | David Emory       | Conveyal |
-| Tuukka Hastrup    | Helsingin Seudun Liikenne |
-| Frank Purcell     | TriMet |
+| Thomas Gran | Ruter & Entur (Norway) |
+| Tuukka Hastrup    | Maanteeamet (Estonia) |
+| Frank Purcell     | TriMet (Portland, Oregon) |
 | David Turner      | ex-OpenPlans |
 
 The PLC holds a quarterly video conference on the first Thursday of June, September, December, and March. An agenda is prepared as a collaborative document in advance of each quarterly meeting. These meetings are held at 9AM US Pacific time to accommodate members in the US Pacific, US Eastern, and Central European time zones.
