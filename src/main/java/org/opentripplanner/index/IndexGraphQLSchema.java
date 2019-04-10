@@ -45,6 +45,8 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -2417,7 +2419,16 @@ public class IndexGraphQLSchema {
                         .name("price")
                         .description("Price of the ticket in currency that is specified in `currency` field")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((TicketType) environment.getSource()).getPrice())
+                        .dataFetcher(environment -> {
+                            TicketType ticketType = environment.getSource();
+
+                            int fractionDigits = Currency.getInstance(ticketType.getCurrency()).getDefaultFractionDigits();
+                            if (fractionDigits == -1) {
+                                fractionDigits = 2;
+                            }
+
+                            return BigDecimal.valueOf(ticketType.getPrice()).setScale(fractionDigits, RoundingMode.HALF_UP).doubleValue();
+                        })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("currency")
