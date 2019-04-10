@@ -1195,6 +1195,7 @@ public class GraphIndex {
      * Method for getting TripTimeShort objects.
      *
      * @param patterns TripPattern objects that are filtered to produce TripTimeShort objects.
+     * @param tripIds List of trip gtfsIds that are used to filter TripTimeShort objects
      * @param minDate Only TripTimeShort objects scheduled to run on minDate or after are returned.
      * @param maxDate Only TripTimeShort objects scheduled to run on maxDate or before are returned.
      * @param minDepartureTime Only TripTimeShort objects that have first stop departure time at minDepartureTime or
@@ -1209,7 +1210,7 @@ public class GraphIndex {
      *              TripTimeShort objects unless there have been trip updates on them.
      * @return List of TripTimeShort objects.
      */
-    public List<TripTimeShort> getTripTimes(final Collection<TripPattern> patterns, final ServiceDate minDate, final ServiceDate maxDate, final Integer minDepartureTime, final Integer maxDepartureTime, final Integer minArrivalTime, final Integer maxArrivalTime, final RealTimeState state) {
+    public List<TripTimeShort> getTripTimes(final Collection<TripPattern> patterns, final List<String> tripIds, final ServiceDate minDate, final ServiceDate maxDate, final Integer minDepartureTime, final Integer maxDepartureTime, final Integer minArrivalTime, final Integer maxArrivalTime, final RealTimeState state) {
         final TimetableSnapshot snapshot = (graph.timetableSnapshotSource != null) ? graph.timetableSnapshotSource.getTimetableSnapshot() : null;
         final ConcurrentHashMap<TripPattern, Collection<Timetable>> timetableForPattern = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
@@ -1249,6 +1250,9 @@ public class GraphIndex {
                                 } else if (maxArrivalTime != null) {
                                     isValid &= tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1) <= maxArrivalTime;
                                 }
+                            }
+                            if (tripIds != null) {
+                                isValid &= tripIds.contains(tripTimes.trip.getId().toString());
                             }
                             return isValid;
                         })

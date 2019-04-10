@@ -3223,7 +3223,7 @@ public class IndexGraphQLSchema {
                             } else {
                                 patterns = index.patternForId.values();
                             }
-                            return index.getTripTimes(patterns, minDate, maxDate, minDepartureTime, maxDepartureTime, minArrivalTime, maxArrivalTime, RealTimeState.CANCELED);
+                            return index.getTripTimes(patterns, tripIds, minDate, maxDate, minDepartureTime, maxDepartureTime, minArrivalTime, maxArrivalTime, RealTimeState.CANCELED);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
