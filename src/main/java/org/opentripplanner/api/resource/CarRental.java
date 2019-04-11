@@ -29,12 +29,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -52,7 +49,7 @@ public class CarRental {
             @QueryParam("upperRight") String upperRight,
             @PathParam("routerId") String routerId,
             @QueryParam("locale") String locale_param,
-            @QueryParam("companies") String companies
+            @QueryParam("company") String company
     ) {
         Router router = otpServer.getRouter(routerId);
         if (router == null) return null;
@@ -67,15 +64,11 @@ public class CarRental {
         }
         Collection<CarRentalStation> stations = carRentalService.getCarRentalStations();
         List<CarRentalStation> out = new ArrayList<>();
-        Set<String> validCompanies = new HashSet<>();
-        if (companies != null) {
-            validCompanies.addAll(Arrays.asList(companies.toLowerCase().split(",")));
-        }
         for (CarRentalStation station : stations) {
             if (envelope.contains(station.x, station.y) &&
                 (station.x != 0 && station.y != 0) &&
                 !station.isBorderDropoff &&
-                stationContainsAtLeastOneNetwork(station, validCompanies)
+                (company == null || station.networks.contains(company))
             ) {
                 CarRentalStation station_localized = station.clone();
                 station_localized.locale = locale;
@@ -85,21 +78,6 @@ public class CarRental {
         CarRentalStationList carRentalStationList = new CarRentalStationList();
         carRentalStationList.stations = out;
         return carRentalStationList;
-    }
-
-    private boolean stationContainsAtLeastOneNetwork(
-        CarRentalStation station,
-        Set<String> validCompanies
-    ) {
-        // assuming that if query param not passed, resulting number of companies is 0 and therefore
-        // any company is valid
-        if (validCompanies.size() == 0) return true;
-        // find out if the car rental station network matches the given list of companies
-        for (String network : station.networks) {
-            if (validCompanies.contains(network)) return true;
-        }
-        // doesn't meet filter criteria
-        return false;
     }
 
     /** Envelopes are in latitude, longitude format */

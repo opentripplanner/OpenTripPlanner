@@ -1398,10 +1398,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     }
 
-    public void setTransportationNetworkCompanies(String companies) {
-        this.companies = companies;
-    }
-
     public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
         if ("duration".equals(pathComparator)) {
             return new DurationComparator();

@@ -20,7 +20,7 @@ public class ReachNowCarRentalDataSource extends GenericCarRentalDataSource {
 
     @Override
     public void configure(Graph graph, JsonNode jsonNode) throws Exception {
-        this.networkName = "reachnow";
+        this.networkName = "REACHNOW";
         super.configure(jsonNode);
     }
 
@@ -47,7 +47,7 @@ public class ReachNowCarRentalDataSource extends GenericCarRentalDataSource {
         reachNowVehicle.isFloatingCar = true;
         reachNowVehicle.licensePlate = vehicle.get("licensePlate").asText();
         reachNowVehicle.name = new NonLocalizedString(vehicle.get("licensePlate").asText());
-        reachNowVehicle.networks = new HashSet<>(Arrays.asList("reachnow"));
+        reachNowVehicle.networks = new HashSet<>(Arrays.asList(networkName));
         reachNowVehicle.spacesAvailable = 0;
         reachNowVehicle.x = vehicle.path("location").path("lng").asDouble();
         reachNowVehicle.y = vehicle.path("location").path("lat").asDouble();

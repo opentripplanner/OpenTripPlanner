@@ -660,7 +660,7 @@ public abstract class RoutingResource {
                 throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
             }
 
-            request.setTransportationNetworkCompanies(companies);
+            request.companies = companies;
 
             TransportationNetworkCompanyService service =
                 router.graph.getService(TransportationNetworkCompanyService.class);
@@ -719,6 +719,14 @@ public abstract class RoutingResource {
             ) {
                 request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
             }
+        }
+
+        if (
+            companies != null &&
+                this.modes != null &&
+                this.modes.qModes.contains(new QualifiedMode("CAR_RENT"))
+        ) {
+            request.companies = companies;
         }
 
         if (pathComparator != null)
