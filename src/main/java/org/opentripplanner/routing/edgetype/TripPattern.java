@@ -704,19 +704,4 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
-    @Override
-    public int hashCode() {
-        if (code == null) return super.hashCode();
-        return Objects.hash(code);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (other == null) return false;
-        if (getClass() != other.getClass()) return false;
-        if (code == null) return super.equals(other);
-        return code.equals(((TripPattern) other).code);
-    }
-
 }
