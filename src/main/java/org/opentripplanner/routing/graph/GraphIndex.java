@@ -1216,6 +1216,8 @@ public class GraphIndex {
         final ConcurrentHashMap<String, ServiceDay> serviceDaysByAgency = new ConcurrentHashMap<>();
         final CalendarService calendarService = graph.getCalendarService();
         return patterns.stream()
+                .distinct()
+                .filter(Objects::nonNull)
                 .flatMap(pattern -> {
                     final Collection<Timetable> timetables = timetableForPattern.computeIfAbsent(pattern, p -> (snapshot != null) ? snapshot.getTimetables(p) : null);
                     return ((timetables != null) ? timetables : Arrays.asList(pattern.scheduledTimetable)).stream();

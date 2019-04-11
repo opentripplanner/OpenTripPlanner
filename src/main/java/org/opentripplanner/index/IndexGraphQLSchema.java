@@ -3194,7 +3194,6 @@ public class IndexGraphQLSchema {
                                 patterns = feedIds.stream()
                                         .distinct()
                                         .flatMap(feedId -> index.patternsForFeedId.get(feedId).stream())
-                                        .distinct()
                                         .collect(Collectors.toList());
                             } else if (routeIds != null) {
                                 patterns = routeIds.stream()
@@ -3203,13 +3202,11 @@ public class IndexGraphQLSchema {
                                             final Route route = index.routeForId.get(FeedScopedId.convertFromString(routeId));
                                             return index.patternsForRoute.get(route).stream();
                                         })
-                                        .distinct()
                                         .collect(Collectors.toList());
                             } else if (patternIds != null) {
                                 patterns = patternIds.stream()
                                         .distinct()
                                         .map(patternId -> index.patternForId.get(patternId))
-                                        .distinct()
                                         .collect(Collectors.toList());
                             } else if (tripIds != null) {
                                 patterns = tripIds.stream()
@@ -3218,11 +3215,11 @@ public class IndexGraphQLSchema {
                                             final Trip trip = index.tripForId.get(FeedScopedId.convertFromString(tripId));
                                             return index.patternForTrip.get(trip);
                                         })
-                                        .distinct()
                                         .collect(Collectors.toList());
                             } else {
                                 patterns = index.patternForId.values();
                             }
+
                             return index.getTripTimes(patterns, tripIds, minDate, maxDate, minDepartureTime, maxDepartureTime, minArrivalTime, maxArrivalTime, RealTimeState.CANCELED);
                         })
                         .build())
