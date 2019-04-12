@@ -97,6 +97,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new SmooveBikeRentalDataSource(networkName);
             } else if (sourceType.equals("bicimad")) {
                 source = new BicimadBikeRentalDataSource();
+            } else if (sourceType.equals("samocat")) {
+                source = new SamocatScooterRentalDataSource(networkName);
             }
         }
 
