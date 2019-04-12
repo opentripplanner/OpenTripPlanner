@@ -1065,7 +1065,11 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
                 && this.carParkCarLegWeight == other.carParkCarLegWeight
-                && itineraryFiltering == other.itineraryFiltering;
+                && itineraryFiltering == other.itineraryFiltering
+                && allowedFares == null ? other.allowedFares == null
+                        : allowedFares.equals(other.allowedFares)
+                && allowedBikeRentalNetworks == null ? other.allowedBikeRentalNetworks == null
+                        : allowedBikeRentalNetworks.equals(other.allowedBikeRentalNetworks);
     }
 
     /**
