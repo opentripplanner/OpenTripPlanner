@@ -3600,6 +3600,7 @@ public class IndexGraphQLSchema {
                                 .description("Component of the fare (i.e. ticket) for a part of the itinerary")
                                 .field(GraphQLFieldDefinition.newFieldDefinition()
                                         .name("fareId")
+                                        .description("ID of the ticket type. Corresponds to `fareId` in **TicketType**.")
                                         .type(Scalars.GraphQLString)
                                         .dataFetcher(environment -> GtfsLibrary
                                                 .convertIdToString(((FareComponent) environment.getSource()).fareId))
