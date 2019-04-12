@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ *
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -207,7 +207,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -279,7 +279,7 @@ public class StateEditor {
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /** 
+    /**
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
@@ -392,7 +392,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
@@ -512,7 +512,7 @@ public class StateEditor {
         child.stateData.serviceDay = day;
     }
 
-    public void setBikeRentalNetwork(Set<String> networks) {
+    public void setBikeRentalNetworks(Set<String> networks) {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
     }

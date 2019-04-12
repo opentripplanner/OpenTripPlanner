@@ -35,7 +35,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 
-        // Invalid station without coordinates shoulf be ignored, so only 3
+        // Invalid station without coordinates should be ignored, so only 3
         assertEquals(3, rentalStations.size());
         for (BikeRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
@@ -49,7 +49,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(60.167913, hamn.y);
         assertEquals(11, hamn.spacesAvailable);
         assertEquals(1, hamn.bikesAvailable);
-        assertEquals("[Smoove]", hamn.networks.toString());
+        assertEquals("[smoove]", hamn.networks.toString());
 
         BikeRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
