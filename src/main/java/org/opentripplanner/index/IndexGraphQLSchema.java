@@ -818,6 +818,11 @@ public class IndexGraphQLSchema {
                         .description("Whether legs should be compacted by performing a reversed search.  \n **Experimental argument, will be removed!**")
                         .type(Scalars.GraphQLBoolean)
                         .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("allowedBikeRentalNetworks")
+                        .description("Which bike rental networks can be used. By default, all networks are allowed.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
                 .dataFetcher(environment -> new GraphQlPlanner(index).plan(environment))
                 .build();
 
