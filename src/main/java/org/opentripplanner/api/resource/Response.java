@@ -9,7 +9,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 
-/** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
+/** Represents a trip planner response, will be serialized into JSON by Jersey */
 public class Response {
 
     /** A dictionary of the parameters provided in the request that triggered this response. */

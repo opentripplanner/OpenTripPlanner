@@ -31,12 +31,12 @@ public class AlertPatcher {
     /**
      * Return a list of all patches that apply to a given stop
      *
-     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+     * @return Returns a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
      */
     @GET
     @Path("/stopPatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public AlertPatchResponse getStopPatches(@QueryParam("agency") String agency,
             @QueryParam("id") String id) {
 
@@ -51,12 +51,12 @@ public class AlertPatcher {
     /**
      * Return a list of all patches that apply to a given route
      *
-     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+     * @return Returns a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
      */
     @GET
     @Path("/routePatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public AlertPatchResponse getRoutePatches(@QueryParam("agency") String agency,
             @QueryParam("id") String id) {
 
@@ -72,8 +72,8 @@ public class AlertPatcher {
     @RolesAllowed("user")
     @POST
     @Path("/patch")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
     public AlertPatchCreationResponse createPatches(AlertPatchSet alertPatches) {
         AlertPatchCreationResponse response = new AlertPatchCreationResponse();
         for (AlertPatch alertPatch : alertPatches.alertPatches) {

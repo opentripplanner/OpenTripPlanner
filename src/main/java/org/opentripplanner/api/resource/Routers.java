@@ -93,11 +93,10 @@ public class Routers {
 
     /** 
      * Returns a list of routers and their bounds. 
-     * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
-     * on the Accept header in the HTTP request.
+     * @return a representation of the graphs and their geographic bounds in JSON.
      */
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
         for (String id : otpServer.getRouterIds()) {
@@ -115,7 +114,7 @@ public class Routers {
      * @returns status code 200 if the routerId is registered, otherwise a 404.
      */
     @GET @Path("{routerId}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public RouterInfo getGraphId(@PathParam("routerId") String routerId) {
         // factor out build one entry
         RouterInfo routerInfo = getRouterInfo(routerId);

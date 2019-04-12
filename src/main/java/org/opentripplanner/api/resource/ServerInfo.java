@@ -22,7 +22,7 @@ public class ServerInfo {
     private static final ServerInfo SERVER_INFO = new ServerInfo();
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public static ServerInfo getServerInfo() {
         return SERVER_INFO;
     }    

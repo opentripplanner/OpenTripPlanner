@@ -99,7 +99,7 @@ public class GraphInspectorTileResource extends RoutingResource {
      * @return 
      */
     @GET @Path("layers")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({ MediaType.APPLICATION_JSON })
     public InspectorLayersList getLayers() {
 
         Router router = otpServer.getRouter(routerId);
