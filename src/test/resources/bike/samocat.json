@@ -1,0 +1,83 @@
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    24.9355143,
+                    60.1637284
+                ]
+            },
+            "properties": {
+                "station_id": "0451",
+                "city": "Helsinki",
+                "country": "FI",
+                "address": "Testikuja 3",
+                "rack_sum": 12,
+                "free_racks": 0,
+                "available_devices": 0
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    24.958877,
+                    60.194449
+                ]
+            },
+            "properties": {
+                "station_id": "0450",
+                "city": "Helsinki",
+                "country": "FI",
+                "address": "Footie 3",
+                "rack_sum": 12,
+                "free_racks": 3,
+                "available_devices": 4
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    24.9537278,
+                    60.2177349
+                ]
+            },
+            "properties": {
+                "station_id": "3451",
+                "city": "Helsinki",
+                "country": "FI",
+                "address": "Bartie 10",
+                "rack_sum": 12,
+                "free_racks": 5,
+                "available_devices": 1
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    null,
+                    null
+                ]
+            },
+            "properties": {
+                "station_id": "3451",
+                "city": "Helsinki",
+                "country": "FI",
+                "address": "Nulltie 1",
+                "rack_sum": 12,
+                "free_racks": 5,
+                "available_devices": 1
+            }
+        }
+    ]
+}
