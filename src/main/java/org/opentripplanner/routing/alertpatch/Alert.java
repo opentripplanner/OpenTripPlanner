@@ -7,28 +7,19 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-
-@XmlType
 public class Alert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;
 
-    @XmlElement
     public I18NString alertHeaderText;
 
-    @XmlElement
     public I18NString alertDescriptionText;
 
-    @XmlElement
     public I18NString alertUrl;
 
     //null means unknown
-    @XmlElement
     public Date effectiveStartDate;
 
     //null means unknown
-    @XmlElement
     public Date effectiveEndDate;
 
     public static HashSet<Alert> newSimpleAlertSet(String text) {

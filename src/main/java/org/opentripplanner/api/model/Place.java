@@ -1,13 +1,12 @@
 package org.opentripplanner.api.model;
 
 import java.util.Calendar;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement; 
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -56,25 +55,21 @@ public class Place {
      */
     public Calendar departure = null;
 
-    @XmlAttribute
     @JsonSerialize
     public String orig;
 
-    @XmlAttribute
     @JsonSerialize
     public String zoneId;
 
     /**
      * For transit trips, the stop index (numbered from zero from the start of the trip
      */
-    @XmlAttribute
     @JsonSerialize
     public Integer stopIndex;
 
     /**
      * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
      */
-    @XmlAttribute
     @JsonSerialize
     public Integer stopSequence;
 
@@ -82,7 +77,6 @@ public class Place {
      * Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop)
      * Mostly used for better localization of bike sharing and P+R station names
      */
-    @XmlAttribute
     @JsonSerialize
     public VertexType vertexType;
 
@@ -92,10 +86,22 @@ public class Place {
     public String bikeShareId;
 
     /**
+     * This is an optional field which can be used to distinguish among ways a passenger's
+     * boarding or alighting at a stop can differ among services operated by a transit agency.
+     * This will be "default" in most cases. Currently the only non-default values are for
+     * GTFS-Flex board or alight types.
+     */
+    public BoardAlightType boardAlightType;
+
+    /**
+     * Board or alight area for flag stops
+     */
+    public EncodedPolylineBean flagStopArea;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */
-    @XmlElement
     String getGeometry() {
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }

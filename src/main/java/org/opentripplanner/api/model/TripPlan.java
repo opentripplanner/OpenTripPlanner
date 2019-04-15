@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElementWrapper;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -23,7 +21,6 @@ public class TripPlan {
     public Place to = null;
 
     /** A list of possible itineraries */
-    @XmlElementWrapper(name="itineraries") //TODO: why don't we just change the variable name?
     @JsonProperty(value="itineraries")
     public List<Itinerary> itinerary = new ArrayList<Itinerary>();
 

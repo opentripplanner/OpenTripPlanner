@@ -59,6 +59,8 @@ public class StateData implements Cloneable {
 
     protected TripPattern lastPattern;
 
+    protected boolean isLastBoardAlightDeviated = false;
+
     protected ServiceDay serviceDay;
 
     protected TraverseMode nonTransitMode;

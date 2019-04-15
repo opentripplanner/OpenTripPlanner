@@ -56,7 +56,9 @@ public class State implements Cloneable {
 
     // The current distance traveled in a transportation network company vehicle
     public double transportationNetworkCompanyDriveDistance;
-    
+
+    int callAndRideTime = 0;
+
     private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
     /* CONSTRUCTORS */
@@ -313,6 +315,10 @@ public class State implements Cloneable {
 
     public int getPreTransitTime() {
         return preTransitTime;
+    }
+
+    public int getCallAndRideTime() {
+        return callAndRideTime;
     }
 
     public Vertex getVertex() {
@@ -644,6 +650,10 @@ public class State implements Cloneable {
     /** @return the last TripPattern used in this path (which is set when leaving the vehicle). */
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
+    }
+
+    public boolean isLastBoardAlightDeviated() {
+        return stateData.isLastBoardAlightDeviated;
     }
 
     public ServiceDay getServiceDay() {

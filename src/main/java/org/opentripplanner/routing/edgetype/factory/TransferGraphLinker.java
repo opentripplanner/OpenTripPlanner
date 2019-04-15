@@ -13,8 +13,8 @@ import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 /** Link graph based on transfers.txt.  Intended for testing */
 @Deprecated

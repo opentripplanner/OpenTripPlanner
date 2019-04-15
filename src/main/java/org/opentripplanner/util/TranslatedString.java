@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,9 +55,14 @@ public class TranslatedString implements I18NString, Serializable {
         else {
             I18NString ret;
             // Check if we only have one name, even under multiple languages
-            if (new HashSet<>(translations.values()).size() < 2) {
+            long numberOfUniqValues = translations.values().stream().distinct().count();
+            if(numberOfUniqValues == 0) {
+                throw new IllegalArgumentException("Map of languages and translations is empty.");
+            }
+            else if(numberOfUniqValues == 1) {
                 ret = new NonLocalizedString(translations.values().iterator().next());
-            } else {
+            }
+            else {
                 ret = new TranslatedString(translations);
             }
             intern.put(translations, ret);

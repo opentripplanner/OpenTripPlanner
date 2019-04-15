@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
@@ -58,10 +58,19 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private double distanceBetweenSamplesM = 10;
 
+
+    /**
+     * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+     * are defined in meters in the source data. If, for example, decimetres are used in the source data,
+     * this should be set to 0.1 in build-config.json.
+     */
+    private double elevationUnitMultiplier = 1;
+
     public ElevationModule() { /* This makes me a "bean" */ };
     
-    public ElevationModule(ElevationGridCoverageFactory factory) {
+    public ElevationModule(ElevationGridCoverageFactory factory, double elevationUnitMultiplier) {
         this.setGridCoverageFactory(factory);
+        this.elevationUnitMultiplier = elevationUnitMultiplier;
     }
 
     public List<String> provides() {
@@ -441,7 +450,7 @@ public class ElevationModule implements GraphBuilderModule {
             nPointsOutsideDEM += 1;
         }
         nPointsEvaluated += 1;
-        return values[0];
+        return values[0] * elevationUnitMultiplier;
     }
 
     @Override
