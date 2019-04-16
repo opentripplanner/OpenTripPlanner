@@ -2,6 +2,7 @@ package org.opentripplanner.api.resource;
 
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -45,7 +47,11 @@ public class TransportationNetworkCompanyResource {
             requireParameter(companies, "companies");
             ApiPlace fromPlace = getPlace(from, "from");
             TransportationNetworkCompanyService service = getService(routerId);
-            response.setEtaEstimates(service.getArrivalTimes(fromPlace.lat, fromPlace.lon, companies));
+            List<ArrivalTime> arrivalTimes = service.getArrivalTimes(fromPlace.lat, fromPlace.lon, companies);
+            if (arrivalTimes.size() == 0)
+                throw new Exception("Could not find any arrival estimates for the specified companies and ridetypes");
+            response.setEtaEstimates(arrivalTimes);
+
         } catch (Exception e) {
             response.setError(e);
         }
@@ -73,7 +79,10 @@ public class TransportationNetworkCompanyResource {
             ApiPlace fromPlace = getPlace(from, "from");
             ApiPlace toPlace = getPlace(to, "to");
             TransportationNetworkCompanyService service = getService(routerId);
-            response.setRideEstimate(service.getRideEstimate(company, rideType, fromPlace, toPlace));
+            List<RideEstimate> rideEstimates = service.getRideEstimates(company, fromPlace, toPlace);
+            if (rideEstimates.size() == 0)
+                throw new Exception("Could not find any ride estimates for the specified company and ridetype");
+            response.setRideEstimate(rideEstimates.get(0));
         } catch (Exception e) {
             response.setError(e);
         }

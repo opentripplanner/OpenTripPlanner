@@ -20,51 +20,39 @@ public abstract class TransportationNetworkCompanyDataSource {
     private Cache<RideEstimateRequest, List<RideEstimate>> rideEstimateCache =
         CacheBuilder.newBuilder().expireAfterWrite(cacheTimeSeconds, TimeUnit.SECONDS).build();
 
-    public abstract TransportationNetworkCompany getType();
+    protected String wheelChairAccessibleRideType;
+
+    // Abstract method to return the TransportationNetworkCompany enum type
+    public abstract TransportationNetworkCompany getTransportationNetworkCompanyType();
 
     // get the next arrivals for a specific location
-    public List<ArrivalTime> getArrivalTimes(double latitude, double longitude) throws ExecutionException {
-        Position position = new Position(truncateValue(latitude), truncateValue(longitude));
+    public List<ArrivalTime> getArrivalTimes(
+        double latitude,
+        double longitude
+    ) throws ExecutionException {
+        Position position = new Position(latitude, longitude);
         return arrivalTimeCache.get(position, () -> queryArrivalTimes(position));
     }
 
     protected abstract List<ArrivalTime> queryArrivalTimes(Position position) throws IOException;
 
-    // get the estimated trip time
-    public RideEstimate getRideEstimate(
-        String rideType,
+    // get the estimated trip time for a specific rideType
+    public List<RideEstimate> getRideEstimates(
         double startLatitude,
         double startLongitude,
         double endLatitude,
         double endLongitude
     ) throws ExecutionException {
         // Truncate lat/lon values in order to reduce the number of API requests made.
-        double roundedStartLat = truncateValue(startLatitude);
-        double roundedStartLon = truncateValue(startLongitude);
-        double roundedEndLat = truncateValue(endLatitude);
-        double roundedEndLon = truncateValue(endLongitude);
-        RideEstimateRequest request = new RideEstimateRequest(roundedStartLat, roundedStartLon, roundedEndLat, roundedEndLon);
-        List<RideEstimate> rideEstimates = rideEstimateCache.get(request, () -> queryRideEstimates(request));
-
-
-        for (RideEstimate rideEstimate : rideEstimates) {
-            if (rideEstimate.rideType.equals(rideType)) {
-                return rideEstimate;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Truncate double values by the specified precision factor.
-     */
-    private static double truncateValue(double value) {
-        double precisionFactor = 10000.0;
-        return Math.round(value * precisionFactor) / precisionFactor;
+        RideEstimateRequest request = new RideEstimateRequest(startLatitude, startLongitude, endLatitude, endLongitude);
+        return rideEstimateCache.get(request, () -> queryRideEstimates(request));
     }
 
     protected abstract List<RideEstimate> queryRideEstimates(
         RideEstimateRequest request
     ) throws IOException;
+
+    protected boolean productIsWheelChairAccessible(String productId) {
+        return productId.equals(wheelChairAccessibleRideType);
+    }
 }

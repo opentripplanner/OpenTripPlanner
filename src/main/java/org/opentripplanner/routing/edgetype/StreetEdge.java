@@ -310,15 +310,29 @@ public class StreetEdge extends Edge implements Cloneable {
             ) {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip
-
-                // TODO TNC - This needs to be fixed, commented out
-                // Vertex toVertex = options.rctx.toVertex;
-                // if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
-                //        (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
-                //    return state;
-                //}
-
-
+                Vertex toVertex = options.rctx.toVertex;
+                if (
+                    // arriveBy searches
+                    (
+                        options.arriveBy && (
+                            // forbid hailing car a 2nd time post transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit()) ||
+                                // forbid hailing car a 2nd time pre transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit())
+                        )
+                    ) ||
+                    // depart at searches
+                    (
+                        !options.arriveBy && (
+                            // forbid hailing car a 2nd time pre transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                                // forbid hailing car a 2nd time post transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())
+                        )
+                    )
+                ) {
+                    return state;
+                }
                 StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
                 StateEditor editorNonCar = doTraverse(s0, options, currMode);
                 if (editorCar != null) {
@@ -544,7 +558,45 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         if (!traverseMode.isDriving()) {
-            s1.incrementWalkDistance(getEffectiveBikeDistance());
+            s1.incrementWalkDistance(getDistanceMeters());
+        }
+
+        // On itineraries with car mode enabled, limit both walking and driving before transit,
+        // either soft or hard. We can safely assume no limit on driving after transit as most TNC
+        // companies will drive outside of the pickup boundaries.
+        if (
+            options.kissAndRide ||
+                options.parkAndRide ||
+                options.useTransportationNetworkCompany
+        ) {
+            if (options.arriveBy) {
+                if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
+            } else {
+                if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
+            }
+            if (s1.isMaxPreTransitTimeExceeded(options)) {
+                if (options.softPreTransitLimiting) {
+                    weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
+                            options.maxPreTransitTime, options.preTransitPenalty,
+                                    options.preTransitOverageRate);
+                } else return null;
+            }
+        }
+        
+        /* Apply a strategy for avoiding walking too far, either soft (weight increases) or hard limiting (pruning). */
+        if (s1.weHaveWalkedTooFar(options)) {
+
+            // if we're using a soft walk-limit
+            if( options.softWalkLimiting ){
+                // just slap a penalty for the overage onto s1
+                weight += calculateOverageWeight(s0.getWalkDistance(), s1.getWalkDistance(),
+                        options.getMaxWalkDistance(), options.softWalkPenalty,
+                                options.softWalkOverageRate);
+            } else {
+                // else, it's a hard limit; bail
+                LOG.debug("Too much walking. Bailing.");
+                return null;
+            }
         }
 
         s1.incrementTimeInSeconds(roundedTime);

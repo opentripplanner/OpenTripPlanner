@@ -23,6 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LyftTransportationNetworkCompanyDataSourceTest {
 
@@ -94,14 +95,24 @@ public class LyftTransportationNetworkCompanyDataSourceTest {
                 )
         );
 
-        RideEstimate rideTime = source.getRideEstimate(
-            "lyft",
+        List<RideEstimate> rideEstimates = source.getRideEstimates(
             1.2,
             3.4,
             1.201,
             3.401
         );
 
-        assertEquals(rideTime.duration, 913);
+        RideEstimate estimate = null;
+        for (RideEstimate rideEstimate : rideEstimates) {
+            if (rideEstimate.rideType.equals("lyft")) {
+                estimate = rideEstimate;
+                break;
+            }
+        }
+
+        assertNotNull(estimate);
+        assertEquals(10.52, estimate.minCost, 0.001);
+        assertEquals(17.55, estimate.maxCost, 0.001);
+        assertEquals(estimate.duration, 913);
     }
 }

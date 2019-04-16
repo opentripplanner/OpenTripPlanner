@@ -7,8 +7,8 @@ public class LyftError {
     @Override
     public String toString() {
         return "LyftError{" +
-            "error='" + error + '\'' +
-            ", error_description='" + error_description + '\'' +
+            "error='" + (error != null ? error : "null") + '\'' +
+            ", error_description='" + (error_description != null ? error_description : "null") + '\'' +
             '}';
     }
 }
