@@ -56,12 +56,9 @@ public class TransportationNetworkCompanyUpdater implements GraphUpdater {
         String sourceType = config.path("sourceType").asText();
         if (sourceType != null) {
             if (sourceType.equals("uber")) {
-                source = new UberTransportationNetworkCompanyDataSource(config.path("serverToken").asText());
+                source = new UberTransportationNetworkCompanyDataSource(config);
             } else if (sourceType.equals("lyft")) {
-                source = new LyftTransportationNetworkCompanyDataSource(
-                    config.path("clientId").asText(),
-                    config.path("clientSecret").asText()
-                );
+                source = new LyftTransportationNetworkCompanyDataSource(config);
             }
         }
 

@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-import static org.opentripplanner.api.resource.TransportationNetworkCompanyResource.ACCEPTED_RIDE_TYPES;
-
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -356,6 +354,36 @@ public abstract class RoutingResource {
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
 
+    /*
+     * Control the size of flag-stop buffer returned in API response. This parameter only applies
+     * to GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     */
+    @QueryParam("flexFlagStopBufferSize")
+    protected Double flexFlagStopBufferSize;
+
+    /**
+     * Whether to use reservation-based services
+     */
+    @QueryParam("flexUseReservationServices")
+    protected Boolean flexUseReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services
+     */
+    @QueryParam("flexUseEligibilityServices")
+    protected Boolean flexUseEligibilityServices = true;
+
+    /**
+     * Whether to ignore DRT time limits.
+     *
+     * According to the GTFS-flex spec, demand-response transit (DRT) service must be reserved
+     * at least `drt_advance_book_min` minutes in advance. OTP not allow DRT service to be used
+     * inside that time window, unless this parameter is set to true.
+     */
+    @QueryParam("flexIgnoreDrtAdvanceBookMin")
+    protected Boolean flexIgnoreDrtAdvanceBookMin;
+
     @QueryParam("maxHours")
     private Double maxHours;
 
@@ -451,6 +479,8 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+
+            request.resetClockTime();
         }
 
         if (wheelchair != null)
@@ -628,6 +658,18 @@ public abstract class RoutingResource {
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
 
+        if (flexFlagStopBufferSize != null)
+            request.flexFlagStopBufferSize = flexFlagStopBufferSize;
+
+        if (flexUseReservationServices != null)
+            request.flexUseReservationServices = flexUseReservationServices;
+
+        if (flexUseEligibilityServices != null)
+            request.flexUseEligibilityServices = flexUseEligibilityServices;
+
+        if (flexIgnoreDrtAdvanceBookMin != null)
+            request.flexIgnoreDrtAdvanceBookMin = flexIgnoreDrtAdvanceBookMin;
+
         if (maxHours != null)
             request.maxHours = maxHours;
 
@@ -672,12 +714,12 @@ public abstract class RoutingResource {
 
             try {
                 arrivalEstimates = service.getArrivalTimes(
+                    companies,
                     new Place(
                         request.from.lng,
                         request.from.lat,
                         request.from.name
-                    ),
-                    companies
+                    )
                 );
             } catch (Exception e) {
                 e.printStackTrace();
@@ -687,17 +729,19 @@ public abstract class RoutingResource {
                 );
             }
 
-            // iterate through results and find earliest ETA of an acceptable ride type
+            /**
+             * iterate through results and find earliest ETA of an acceptable ride type
+             * this also checks if any of the ride types are wheelchair accessible or not
+             * if the request requires a wheelchair accessible ride and no arrival estimates are
+             * found, then the TransportationNetworkCompanyAvailabilityException will be thrown.
+             */
             int earliestEta = Integer.MAX_VALUE;
             for (ArrivalTime arrivalEstimate : arrivalEstimates) {
-                for (String rideType : ACCEPTED_RIDE_TYPES) {
-                    if (
-                        arrivalEstimate.productId.equals(rideType) &&
-                        arrivalEstimate.estimatedSeconds < earliestEta
-                    ) {
-                        earliestEta = arrivalEstimate.estimatedSeconds;
-                        break;
-                    }
+                if (
+                    arrivalEstimate.estimatedSeconds < earliestEta &&
+                        request.wheelchairAccessible == arrivalEstimate.wheelchairAccessible
+                ) {
+                    earliestEta = arrivalEstimate.estimatedSeconds;
                 }
             }
 

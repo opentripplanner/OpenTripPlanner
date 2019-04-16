@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.location;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
@@ -44,12 +44,5 @@ final public class TemporaryStreetLocation extends StreetLocation implements Tem
     @Override
     public boolean isEndVertex() {
         return endVertex;
-    }
-
-    @Override
-    public void dispose() {
-        for (Object temp : endVertex ? getIncoming() : getOutgoing()) {
-            ((TemporaryEdge) temp).dispose();
-        }
     }
 }

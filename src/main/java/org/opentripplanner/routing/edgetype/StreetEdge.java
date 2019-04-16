@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
@@ -19,14 +19,12 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -323,8 +321,26 @@ public class StreetEdge extends Edge implements Cloneable {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip
                 Vertex toVertex = options.rctx.toVertex;
-                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
-                        (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                if (
+                    // arriveBy searches
+                    (
+                        options.arriveBy && (
+                            // forbid hailing car a 2nd time post transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit()) ||
+                                // forbid hailing car a 2nd time pre transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit())
+                        )
+                    ) ||
+                    // depart at searches
+                    (
+                        !options.arriveBy && (
+                            // forbid hailing car a 2nd time pre transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                                // forbid hailing car a 2nd time post transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())
+                        )
+                    )
+                ) {
                     return state;
                 }
                 StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
@@ -449,17 +465,16 @@ public class StreetEdge extends Edge implements Cloneable {
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), getMaxSlope());
-                // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
-                // for the walkspeed set by the user
-                double elevationUtilsSpeed = 4.0 / 3.0;
-                weight = costs * (elevationUtilsSpeed / speed);
+                double distance = getSlopeWalkSpeedEffectiveLength();
+                weight = distance / speed;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
                 if(weight > 100){
-                    double timeflat = length / speed;
-                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfile.getMaxSlope(), costs, weight, timeflat);
+                    double timeflat = length_mm / speed;
+
+
+                    System.out.format("line length: %.1f m, slope: %.3f ---> distance: %.1f , weight: %.1f , time (flat):  %.1f %n", getDistance(), getMaxSlope(), distance, weight, timeflat);
                 }
                 */
             }
@@ -494,6 +509,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
         }
+
+        int roundedTime = (int) Math.ceil(time);
 
         /* Compute turn cost. */
         StreetEdge backPSE;
@@ -558,8 +575,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
 
-            long turnTime = (long) Math.ceil(realTurnCost);
-            time += turnTime;
+            int turnTime = (int) Math.ceil(realTurnCost);
+            roundedTime += turnTime;
             weight += options.turnReluctance * realTurnCost;
         }
         
@@ -575,9 +592,14 @@ public class StreetEdge extends Edge implements Cloneable {
             s1.incrementWalkDistance(getDistance());
         }
 
-        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        int roundedTime = (int) Math.ceil(time);
-        if (options.kissAndRide || options.parkAndRide) {
+        // On itineraries with car mode enabled, limit both walking and driving before transit,
+        // either soft or hard. We can safely assume no limit on driving after transit as most TNC
+        // companies will drive outside of the pickup boundaries.
+        if (
+            options.kissAndRide ||
+                options.parkAndRide ||
+                options.useTransportationNetworkCompany
+        ) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {
@@ -651,18 +673,6 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            if (options.useTraffic) {
-                // the expected speed based on traffic
-                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
-
-                if (source != null) {
-                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
-
-                    if (!Double.isNaN(congestedSpeed))
-                        return congestedSpeed;
-                }
-            }
-
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
@@ -683,6 +693,10 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public double getSlopeWorkCostEffectiveLength() {
+        return getDistance();
+    }
+
+    public double getSlopeWalkSpeedEffectiveLength() {
         return getDistance();
     }
 
@@ -898,18 +912,18 @@ public class StreetEdge extends Edge implements Cloneable {
      * TODO change everything to clockwise from North
      */
 	public int getInAngle() {
-		return this.inAngle * 180 / 128;
+		return (int) Math.round(this.inAngle * 180 / 128.0);
 	}
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle * 180 / 128;
+		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
-    
+
     /** calculate the length of this street segement from its geometry */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;
@@ -986,23 +1000,16 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         } else {
             if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, (TemporarySplitterVertex) v, geoms.first, name, 0);
-                e1.calculateLengthFromGeometry();
+                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, (TemporarySplitterVertex) v, (StreetVertex) tov, geoms.second, name, 0);
-                e2.calculateLengthFromGeometry();
+                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());
             }
         }
-
-
-
-
-
-        return new P2<StreetEdge>(e1, e2);
+        return new P2<>(e1, e2);
     }
 
     /**

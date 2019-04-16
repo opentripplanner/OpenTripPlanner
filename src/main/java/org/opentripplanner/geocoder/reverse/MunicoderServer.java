@@ -8,8 +8,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-/*import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;*/
+/*import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;*/
 
 
 @Path("/municoder")

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -37,13 +37,6 @@ public class SampleVertex extends StreetVertex implements TemporaryVertex  {
 
     public SampleVertex (Graph g, Coordinate c) {
         super(g, null, c, null);
-    }
-
-    @Override
-    public void dispose() {
-        for (Object temp : getOutgoing()) {
-            ((TemporaryEdge) temp).dispose();
-        }
     }
 
     @Override

@@ -15,15 +15,22 @@ package org.opentripplanner.api.resource;
 
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.opentripplanner.api.param.QueryParameter.checkRangeInclusive;
 import static org.opentripplanner.api.resource.ServerInfo.Q;
@@ -55,7 +62,11 @@ public class TransportationNetworkCompanyResource {
             requireParameter(companies, "companies");
             Place fromPlace = getPlace(from, "from");
             TransportationNetworkCompanyService service = getService(routerId);
-            response.setEtaEstimates(service.getArrivalTimes(fromPlace, companies));
+            List<ArrivalTime> arrivalTimes = service.getArrivalTimes(companies, fromPlace);
+            if (arrivalTimes.size() == 0)
+                throw new Exception("Could not find any arrival estimates for the specified companies and ridetypes");
+            response.setEtaEstimates(arrivalTimes);
+
         } catch (Exception e) {
             response.setError(e);
         }
@@ -83,7 +94,10 @@ public class TransportationNetworkCompanyResource {
             Place fromPlace = getPlace(from, "from");
             Place toPlace = getPlace(to, "to");
             TransportationNetworkCompanyService service = getService(routerId);
-            response.setRideEstimate(service.getRideEstimate(company, rideType, fromPlace, toPlace));
+            List<RideEstimate> rideEstimates = service.getRideEstimates(company, fromPlace, toPlace);
+            if (rideEstimates.size() == 0)
+                throw new Exception("Could not find any ride estimates for the specified company and ridetype");
+            response.setRideEstimate(rideEstimates.get(0));
         } catch (Exception e) {
             response.setError(e);
         }

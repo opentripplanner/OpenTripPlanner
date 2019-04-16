@@ -18,13 +18,16 @@ import org.opentripplanner.updater.transportation_network_company.Transportation
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class TransportationNetworkCompanyService implements Serializable {
 
@@ -34,24 +37,24 @@ public class TransportationNetworkCompanyService implements Serializable {
         new HashMap<>();
 
     public void addSource(TransportationNetworkCompanyDataSource source) {
-        sources.put(source.getType(), source);
+        sources.put(source.getTransportationNetworkCompanyType(), source);
     }
 
+    /**
+     * Get the ETA estimates from the specified TNC companies
+     *
+     * @param companies  A comma-separated string listing the companies to request from
+     * @param place  The pickup point from which to request an ETA from
+     * @return A list of ArrivalEstimates.  If none are found, or no companies match, an empty list will be returned.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public List<ArrivalTime> getArrivalTimes(
-        Place place,
-        String companies
+        String companies, Place place
     ) throws ExecutionException, InterruptedException {
-
         List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
-        List<TransportationNetworkCompanyDataSource> companiesToRequestFrom
-            = new ArrayList<>();
-
-        // parse list of tnc companies
-        for (String company : companies.split(",")) {
-            companiesToRequestFrom.add(getTransportationNetworkCompanyDataSource(company));
-        }
-
+        List<TransportationNetworkCompanyDataSource> companiesToRequestFrom = parseCompanies(companies);
         if (companiesToRequestFrom.size() == 0) {
             return arrivalTimes;
         }
@@ -59,12 +62,12 @@ public class TransportationNetworkCompanyService implements Serializable {
         LOG.debug("Finding TNC arrival times for {} companies", companiesToRequestFrom.size());
 
         // add a request for all matching companies
-        ExecutorService pool = Executors.newFixedThreadPool(10);
+        ExecutorService pool = Executors.newFixedThreadPool(companiesToRequestFrom.size());
         List<Callable<List<ArrivalTime>>> tasks = new ArrayList<>();
 
         for (TransportationNetworkCompanyDataSource transportationNetworkCompany : companiesToRequestFrom) {
             tasks.add(() -> {
-                LOG.debug("Finding TNC arrival times for {} ({},{})", transportationNetworkCompany.getType(), place.lat, place.lon);
+                LOG.debug("Finding TNC arrival times for {} ({},{})", transportationNetworkCompany.getTransportationNetworkCompanyType(), place.lat, place.lon);
                 return transportationNetworkCompany.getArrivalTimes(place.lat, place.lon);
             });
         }
@@ -81,29 +84,81 @@ public class TransportationNetworkCompanyService implements Serializable {
         return arrivalTimes;
     }
 
-    public RideEstimate getRideEstimate(
-        String company,
-        String rideType,
+    private List<TransportationNetworkCompanyDataSource> parseCompanies(String companies) {
+        List<TransportationNetworkCompanyDataSource> companyDataSources = new ArrayList<>();
+
+        // parse list of tnc companies
+        for (String company : companies.split(",")) {
+            companyDataSources.add(getTransportationNetworkCompanyDataSource(company));
+        }
+
+        if (companyDataSources.size() == 0) {
+            LOG.warn("No Transportation Network Companies matched in companies query of `{}`", companies);
+        }
+
+        return companyDataSources;
+    }
+
+    public List<RideEstimate> getRideEstimates(
+        String companies,
         Place fromPlace,
         Place toPlace
-    ) throws IOException, ExecutionException {
-        TransportationNetworkCompanyDataSource source = getTransportationNetworkCompanyDataSource(company);
-        return source.getRideEstimate(rideType, fromPlace.lat, fromPlace.lon, toPlace.lat, toPlace.lon);
+    ) throws ExecutionException, InterruptedException {
+        List<RideEstimate> rideEstimates = new ArrayList<>();
+
+        List<TransportationNetworkCompanyDataSource> companiesToRequestFrom = parseCompanies(companies);
+        if (companiesToRequestFrom.size() == 0) {
+            return rideEstimates;
+        }
+
+        // add a request for all matching companies
+        ExecutorService pool = Executors.newFixedThreadPool(companiesToRequestFrom.size());
+        List<Callable<List<RideEstimate>>> tasks = new ArrayList<>();
+
+        for (TransportationNetworkCompanyDataSource transportationNetworkCompany : companiesToRequestFrom) {
+            tasks.add(() -> {
+                LOG.debug(
+                    "Finding TNC ride/price estimates for {} for trip ({},{}) -> ({},{})",
+                    transportationNetworkCompany.getTransportationNetworkCompanyType(),
+                    fromPlace.lat,
+                    fromPlace.lon,
+                    toPlace.lat,
+                    toPlace.lon
+                );
+                return transportationNetworkCompany.getRideEstimates(
+                    fromPlace.lat,
+                    fromPlace.lon,
+                    toPlace.lat,
+                    toPlace.lon
+                );
+            });
+        }
+
+        List<Future<List<RideEstimate>>> results = pool.invokeAll(tasks);
+
+        LOG.debug("Collecting results");
+
+        for (Future<List<RideEstimate>> future : results) {
+            rideEstimates.addAll(future.get());
+        }
+        pool.shutdown();
+
+        return rideEstimates;
     }
 
     private TransportationNetworkCompanyDataSource getTransportationNetworkCompanyDataSource(String company) {
         TransportationNetworkCompany co = TransportationNetworkCompany.valueOf(company);
         if (co == null) {
             throw new UnsupportedOperationException("Transportation Network Company value " +
-                company +
-                " is not a valid type"
+                                                        company +
+                                                        " is not a valid type"
             );
         }
 
         if (!sources.containsKey(co)) {
             throw new UnsupportedOperationException("Transportation Network Company value " +
-                company +
-                " is not configured in this router"
+                                                        company +
+                                                        " is not configured in this router"
             );
         }
 

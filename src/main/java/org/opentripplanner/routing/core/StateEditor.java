@@ -7,6 +7,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,12 @@ public class StateEditor {
         // if something was flagged incorrect, do not make a new state
         if (defectiveTraversal) {
             LOG.error("Defective traversal flagged on edge " + child.backEdge);
+            return null;
+        }
+
+        // Check TemporaryVertex on a different request
+        if ((getVertex() instanceof TemporaryVertex)
+            && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
             return null;
         }
 
@@ -225,6 +232,15 @@ public class StateEditor {
             return;
         }
         child.preTransitTime += seconds;
+    }
+
+    public void incrementCallAndRideTime(int seconds) {
+        if (seconds < 0) {
+            LOG.warn("A state's call-n-ride time is being incremented by a negative amount.");
+            defectiveTraversal = true;
+            return;
+        }
+        child.callAndRideTime += seconds;
     }
 
     public void incrementNumBoardings() {
@@ -487,6 +503,10 @@ public class StateEditor {
         return child.getPreTransitTime();
     }
 
+    public int getCallAndRideTime() {
+        return child.getCallAndRideTime();
+    }
+
     public Vertex getVertex() {
         return child.getVertex();
     }
@@ -512,6 +532,12 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.lastPattern = pattern;
     }
+
+    public void setIsLastBoardAlightDeviated(boolean isLastBoardAlightDeviated) {
+        cloneStateDataAsNeeded();
+        child.stateData.isLastBoardAlightDeviated = isLastBoardAlightDeviated;
+    }
+
     public void setOptions(RoutingRequest options) {
         cloneStateDataAsNeeded();
         child.stateData.opt = options;
@@ -554,28 +580,37 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = true;
         child.stateData.nonTransitMode = TraverseMode.CAR;
+        RoutingRequest options = child.getOptions();
         if (child.isEverBoarded()) {
-            child.stateData.hasHailedCarPostTransit = true;
+            if (options.arriveBy) {
+                child.stateData.hasHailedCarPreTransit = true;
+            } else {
+                child.stateData.hasHailedCarPostTransit = true;
+            }
         } else {
-            child.stateData.hasHailedCarPreTransit = true;
-            RoutingRequest options = child.getContext().opt;
-            // add the earliest ETA of a TNC vehicle if using "departing at" mode and if before transit.
-            // This uses the ETA of a TNC vehicle at the origin, so this code is making the assumption that the ETA
-            // estimate obtained for the origin is applicable at other places and times so long as transit has not been
-            // boarded yet.  The way to obtain ETA estimates for every possible street and vertex would involve making
-            // potentially hundreds of thousands of http requests to existing TNC API endpoints.  It sure would be nice
-            // if there were a way to download network-wide ETA estimates in a single request, but that option currently
-            // does not exist.
-            //
-            // FIXME: If a non-transit mode travels a significant distance from the origin prior to boarding a TNC, the
-            // ETA will still be added when it probably shouldn't be.
-            if (
-                    !options.arriveBy &&
-                            options.transportationNetworkCompanyEtaAtOrigin > -1 &&
-                            !child.stateData.everBoarded
-            ) {
-                // increment the time by the ETA at the origin.
-                incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
+            if (options.arriveBy) {
+                child.stateData.hasHailedCarPostTransit = true;
+            } else {
+                child.stateData.hasHailedCarPreTransit = true;
+
+                // add the earliest ETA of a TNC vehicle if using "departing at" mode and if before
+                // transit. This uses the ETA of a TNC vehicle at the origin, so this code is making
+                // the assumption that the ETA estimate obtained for the origin is applicable at
+                // other places and times so long as transit has not been boarded yet.  The way to
+                // obtain ETA estimates for every possible street and vertex would involve making
+                // potentially hundreds of thousands of http requests to existing TNC API endpoints.
+                // It sure would be nice if there were a way to download network-wide ETA estimates
+                // in a single request, but that option currently does not exist.
+                //
+                // FIXME: If a non-transit mode travels a significant distance from the origin prior
+                //  to boarding a TNC, the ETA will still be added when it probably shouldn't be.
+                if (
+                    options.transportationNetworkCompanyEtaAtOrigin > -1 &&
+                        !child.stateData.everBoarded
+                ) {
+                    // increment the time by the ETA at the origin.
+                    incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
+                }
             }
         }
         // Add the initial TNC distance as the first StreetEdge traversed is done so while the usingHailedCar flag is
