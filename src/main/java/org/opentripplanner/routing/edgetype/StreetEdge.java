@@ -19,7 +19,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
@@ -312,8 +311,26 @@ public class StreetEdge extends Edge implements Cloneable {
                 // perform extra checks to prevent entering a tnc vehicle if a car has already been
                 // hailed in the pre or post transit part of trip
                 Vertex toVertex = options.rctx.toVertex;
-                if ((!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
-                        (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())) {
+                if (
+                    // arriveBy searches
+                    (
+                        options.arriveBy && (
+                            // forbid hailing car a 2nd time post transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit()) ||
+                                // forbid hailing car a 2nd time pre transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit())
+                        )
+                    ) ||
+                    // depart at searches
+                    (
+                        !options.arriveBy && (
+                            // forbid hailing car a 2nd time pre transit
+                            (!s0.isEverBoarded() && s0.stateData.hasHailedCarPreTransit()) ||
+                                // forbid hailing car a 2nd time post transit
+                                (s0.isEverBoarded() && s0.stateData.hasHailedCarPostTransit())
+                        )
+                    )
+                ) {
                     return state;
                 }
                 StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
@@ -544,8 +561,14 @@ public class StreetEdge extends Edge implements Cloneable {
             s1.incrementWalkDistance(getDistance());
         }
 
-        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        if (options.kissAndRide || options.parkAndRide) {
+        // On itineraries with car mode enabled, limit both walking and driving before transit,
+        // either soft or hard. We can safely assume no limit on driving after transit as most TNC
+        // companies will drive outside of the pickup boundaries.
+        if (
+            options.kissAndRide ||
+                options.parkAndRide ||
+                options.useTransportationNetworkCompany
+        ) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {
