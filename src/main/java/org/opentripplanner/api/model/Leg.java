@@ -221,7 +221,6 @@ public class Leg {
     @JsonSerialize
     public Boolean rentedCar;
 
-    @XmlAttribute
     @JsonSerialize
     public Boolean hailedCar;
 

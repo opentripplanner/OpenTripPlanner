@@ -16,10 +16,10 @@ package org.opentripplanner.updater.car_rental;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
@@ -77,7 +77,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
         // verify integrity of region, by checking if a particular point exists inside it
         assertEquals(
             true,
-            region.geometry.contains(geometryFactory.createPoint(new Coordinate( -122.64759, 45.530162)))
+            region.geometry.contains(geometryFactory.createPoint(new Coordinate(-122.64759, 45.530162)))
         );
     }
 }

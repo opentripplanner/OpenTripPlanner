@@ -2,10 +2,10 @@ package org.opentripplanner.updater.car_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geojson.Feature;
 import org.geojson.GeoJsonObject;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.car_rental.CarFuelType;
@@ -50,7 +50,7 @@ public class Car2GoCarRentalDataSource implements CarRentalDataSource, JsonConfi
             GeometryFactory geometryFactory = new GeometryFactory();
             CarRentalRegion entireEarthRegion = new CarRentalRegion();
             entireEarthRegion.network = "car2go";
-            entireEarthRegion.geometry = geometryFactory.toGeometry(new Envelope(-180,180,-90,90));
+            entireEarthRegion.geometry = geometryFactory.toGeometry(new Envelope(-180, 180, -90, 90));
             regions = Arrays.asList(entireEarthRegion);
         } else {
             regions = parseRegionJson(regionJson);
