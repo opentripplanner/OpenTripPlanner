@@ -656,9 +656,9 @@ public class StreetEdge extends Edge implements Cloneable {
                     // if kiss/park and ride, check if car has not yet been parked
                     ((options.kissAndRide || options.parkAndRide) && !s0.isCarParked()) ||
                         // if car rentals are enabled, check if a car has been rented before transit
-                        (options.allowCarRental && s0.stateData.hasRentedCarPreTransit()) ||
+                        (options.allowCarRental && !s0.stateData.hasRentedCarPreTransit()) ||
                         // if car hailing is enabled, check if a car has been hailed before transit
-                        (options.useTransportationNetworkCompany && s0.stateData.hasRentedCarPreTransit())
+                        (options.useTransportationNetworkCompany && !s0.stateData.hasHailedCarPreTransit())
                 ) {
                     s1.incrementPreTransitTime(roundedTime);
                 }
