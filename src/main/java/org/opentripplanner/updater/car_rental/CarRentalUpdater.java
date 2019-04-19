@@ -34,13 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CarRentalUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(CarRentalUpdater.class);
-
-    private static final String DEFAULT_NETWORK_LIST = "default";
 
     private static DecimalFormat format = new DecimalFormat("##.000000");
 
@@ -48,11 +45,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
     private SimpleStreetSplitter linker;
 
-    private String network = "default";
-
-    // processedRegions is a set of car network names. It keeps track of regions that are already
-    // applied to the graph, so we don't apply them again.
-    private Set<String> processedRegions = new HashSet<>();
+    private String network;
 
     private CarRentalStationService service;
 
@@ -64,39 +57,39 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() throws Exception {
-        LOG.debug("Updating car rental stations from " + source);
-        if (!source.update()) {
-            LOG.debug("No updates");
-            return;
+        LOG.debug("Updating car rental stations and regions from " + source);
+        List<CarRentalRegion> regions = new ArrayList<>();
+        List<CarRentalStation> stations = new ArrayList<>();
+        if (source.updateStations()) {
+            stations = source.getStations();
+        } else {
+            LOG.debug("No station updates");
         }
-        List<CarRentalStation> stations = source.getStations();
-        List<CarRentalRegion> regions = source.getRegions();
 
-        // Filter out the regions that are already applied.
-        regions = regions.stream()
-            .filter(c -> !processedRegions.contains(c.network))
-            .collect(Collectors.toList());
+        if (source.updateRegions()) {
+            regions = source.getRegions();
+        } else {
+            LOG.debug("No region updates");
+        }
 
         // Create graph writer runnable to apply these stations and regions to the graph
         updaterManager.execute(new CarRentalGraphWriterRunnable(stations, regions));
-
-        if (!regions.isEmpty()) {
-            regions.forEach(r -> processedRegions.add(r.network));
-        }
     }
 
     @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        String sourceType = config.path("sourceType").asText();
+        network = config.path("sourceType").asText();
         CarRentalDataSource source = null;
-        if (sourceType != null) {
-            if (sourceType.equals("car2go")) {
+        if (network != null) {
+            if (network.equals("car2go")) {
                 source = new Car2GoCarRentalDataSource();
+            } else if (network.equals("reachnow")) {
+                source = new ReachNowCarRentalDataSource();
             }
         }
 
         if (source == null) {
-            throw new IllegalArgumentException("Unknown car rental source type: " + sourceType);
+            throw new IllegalArgumentException("Unknown car rental source type: " + network);
         } else if (source instanceof JsonConfigurable) {
             ((JsonConfigurable) source).configure(graph, config);
         }
@@ -105,7 +98,6 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up car rental updater.");
         this.graph = graph;
         this.source = source;
-        this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating car rental updater running once only (non-polling): {}", source);
         } else {
@@ -157,13 +149,9 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             // Apply stations to graph
             Set<CarRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
-            LOG.info("Updating {} rental car stations.", stations.size());
+            LOG.info("Updating {} rental car stations for network {}.", stations.size(), network);
             /* add any new stations and update car counts for existing stations */
             for (CarRentalStation station : stations) {
-                if (station.networks == null) {
-                    /* API did not provide a network list, use default */
-                    station.networks = defaultNetworks;
-                }
                 service.addCarRentalStation(station);
                 stationSet.add(station);
                 CarRentalStationVertex vertex = verticesByStation.get(station);
@@ -211,9 +199,9 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             }
             verticesByStation.put(station, vertex);
             if (station.allowPickup)
-                new RentACarOnEdge(vertex, vertex, station.networks);
+                new RentACarOnEdge(vertex, station);
             if (station.allowDropoff)
-                new RentACarOffEdge(vertex, vertex, station.networks);
+                new RentACarOffEdge(vertex, station);
         }
 
         public void applyRegions(Graph graph) {
@@ -305,7 +293,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                     return;
                 }
                 service.addCarRentalStation(station);
-                new RentACarOffEdge(vertex, vertex, networks);
+                new RentACarOffEdge(vertex, station);
             });
         }
 

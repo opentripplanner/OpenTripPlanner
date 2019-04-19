@@ -93,8 +93,13 @@ public class StateData implements Cloneable {
 
     public Set<String> bikeRentalNetworks;
 
-    public Set<String> carRentalNetworks;
-    public Set<String> rentedCars = new HashSet<>();
+    protected Set<String> carRentalNetworks;
+
+    // The ids of cars that have been rented so far
+    protected Set<String> rentedCars = new HashSet<>();
+
+    // whether the currently rented car can be dropped off anywhere inside a car rental region
+    protected boolean rentedCarAllowsFloatingDropoffs;
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
@@ -130,4 +135,8 @@ public class StateData implements Cloneable {
     public boolean hasRentedCarPostTransit() { return hasRentedCarPostTransit; }
 
     public boolean hasRentedCarPreTransit() { return hasRentedCarPreTransit; }
+
+    public boolean rentedCarAllowsFloatingDropoffs() { return rentedCarAllowsFloatingDropoffs; }
+
+    public Set<String> getRentedCars() { return rentedCars; }
 }

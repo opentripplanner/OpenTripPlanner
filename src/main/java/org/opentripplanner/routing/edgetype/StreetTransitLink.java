@@ -118,11 +118,20 @@ public class StreetTransitLink extends Edge {
                     return null;
                 }
             } else if (req.allowCarRental && s0.isCarRenting()) {
-                // check to see if transit may be used after parking rented car
-                if (s0.isCarRentalDropoffAllowed()) {
-                    s1.alightRentedCar();
-                } else {
+                // check to see if transit may be used after transitioning out of a car rental
+                if (req.arriveBy) {
+                    // the search backwards has yet to reach a rental car.  Therefore the search
+                    // must continue so a rental car can be found to pickup.
                     return null;
+                } else {
+                    if (s0.isCarRentalDropoffAllowed(false)) {
+                        // floating rental car dropoff allowed.  Exit the car and get onto transit.
+                        s1.endCarRenting();
+                        s1.incrementWeight(req.carRentalDropoffCost);
+                        s1.incrementTimeInSeconds(req.carRentalDropoffTime);
+                    } else {
+                        return null;
+                    }
                 }
             } else {
                 return null;

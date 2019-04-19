@@ -37,10 +37,6 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 @Path("/routers/{routerId}/transportation_network_company")
 public class TransportationNetworkCompanyResource {
-    public static final String[] ACCEPTED_RIDE_TYPES = {
-        "lyft", // standard lyft pickup
-        "a6eef2e1-c99a-436f-bde9-fefb9181c0b0" // uberX
-    };
     private static final Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyResource.class);
 
     @Context

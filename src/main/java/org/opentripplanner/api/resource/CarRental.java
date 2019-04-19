@@ -48,7 +48,9 @@ public class CarRental {
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
             @PathParam("routerId") String routerId,
-            @QueryParam("locale") String locale_param) {
+            @QueryParam("locale") String locale_param,
+            @QueryParam("company") String company
+    ) {
 
         Router router = otpServer.getRouter(routerId);
         if (router == null) return null;
@@ -66,7 +68,8 @@ public class CarRental {
         for (CarRentalStation station : stations) {
             if (envelope.contains(station.x, station.y) &&
                 (station.x != 0 && station.y != 0) &&
-                !station.isBorderDropoff
+                !station.isBorderDropoff &&
+                (company == null || station.networks.contains(company))
             ) {
                 CarRentalStation station_localized = station.clone();
                 station_localized.locale = locale;

@@ -20,9 +20,13 @@ import java.util.List;
 
 public interface CarRentalDataSource {
 
-    /** Update the data from the source;
+    /** Update the regions from the source;
      * returns true if there might have been changes */
-    boolean update();
+    boolean updateRegions();
+
+    /** Update the stations from the source;
+     * returns true if there might have been changes */
+    boolean updateStations();
 
     /**
      * @return a List of all currently known car rental stations. The updater will use this to update the Graph.

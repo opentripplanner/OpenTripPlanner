@@ -625,7 +625,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // initial value of -1 indicates ETA is not available
     public int transportationNetworkCompanyEtaAtOrigin = -1;
 
-    // A common separated list of the allowable TNC companies to query
+    // A common separated list of the allowable TNC or car rental companies to query
     public String companies;
 
     // If request date is invalid, apply the provided strategy to come up with a valid date.
@@ -665,9 +665,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double minimumCarRentalDistance = 804.672;
 
-    // setting of allowing a dropoff anywhere regardless of a compatible car rental region
-    //  (ie planning a trip with a rental car with the intent to keep the car and drive it later)
-    public boolean allowCarRentalDropoffOutsideCarRentalRegion = false;
+    // setting of allowing a dropoff anywhere regardless of whether the dropoff point is a
+    // designated dropoff area or if driving a car with floating dropoff capabilities outside the
+    // car rental region.  This means the user is planning a trip with a rental car with the intent
+    // to keep the car and drive it back to an allowable dropoff point in a later trip.
+    public boolean allowCarRentalDropoffAnywhere = false;
 
     /**
      * Keep track of epoch time the request was created by OTP. This is currently only used by the
@@ -1592,9 +1594,4 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return new PathComparator(compareStartTimes);
     }
-
-    public void setTransportationNetworkCompanies(String companies) {
-        this.companies = companies;
-    }
-
 }

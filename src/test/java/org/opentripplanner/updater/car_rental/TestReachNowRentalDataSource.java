@@ -18,69 +18,49 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.routing.car_rental.CarFuelType;
-import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 
-import java.io.IOException;
 import java.util.List;
 
-public class TestCar2GoCarRentalDataSource extends TestCase {
+public class TestReachNowRentalDataSource extends TestCase {
     private ObjectMapper mapper = new ObjectMapper();
     private ObjectNode config;
 
     @BeforeClass
     public void setUp() {
         config = mapper.createObjectNode();
-        config.put("vehiclesUrl", "file:src/test/resources/car/car2go.json");
+        config.put("vehiclesUrl", "file:src/test/resources/car/reachNowVehicles.json");
         config.put("regionsUrl", "file:src/test/resources/car/region.json");
     }
 
     @Test
-    public void testParseVehiclesJson() {
-        Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
-        car2GoCarRentalDataSource.configure(null, config);
+    public void testParseVehiclesJson() throws Exception {
+        ReachNowCarRentalDataSource reachNowCarRentalDataSource = new ReachNowCarRentalDataSource();
+        reachNowCarRentalDataSource.configure(null, config);
 
         // update data source and consume vehicles json
-        assertTrue(car2GoCarRentalDataSource.updateStations());
-        List<CarRentalStation> rentalStations = car2GoCarRentalDataSource.getStations();
-        assertEquals(3, rentalStations.size());
+        assertTrue(reachNowCarRentalDataSource.updateStations());
+        List<CarRentalStation> rentalStations = reachNowCarRentalDataSource.getStations();
+        assertEquals(2, rentalStations.size());
         for (CarRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
         }
 
         // make sure the first vehicle looks like it should
         CarRentalStation firstVehicle = rentalStations.get(0);
-        assertEquals("6623 SE 17th Ave, Portland, OR 97202, USA", firstVehicle.address);
+        assertEquals("3123 SE 62nd Ave", firstVehicle.address);
         assertEquals(true, firstVehicle.allowPickup);
         assertEquals(false, firstVehicle.allowDropoff);
-        assertEquals(CarFuelType.GASOLINE, firstVehicle.fuelType);
+        assertEquals(CarFuelType.ELECTRIC, firstVehicle.fuelType);
         assertEquals(1, firstVehicle.carsAvailable);
-        assertEquals("TEST1", firstVehicle.id);
+        assertEquals("958", firstVehicle.id);
         assertEquals(true, firstVehicle.isFloatingCar);
         assertEquals("TEST1", firstVehicle.licensePlate);
         assertEquals("TEST1", firstVehicle.name.toString());
-        assertEquals(true, firstVehicle.networks.contains("CAR2GO"));
+        assertEquals(true, firstVehicle.networks.contains("REACHNOW"));
         assertEquals(0, firstVehicle.spacesAvailable);
-        assertEquals(-122.64797026, firstVehicle.x);
-        assertEquals(45.47517085, firstVehicle.y);
-    }
-
-    @Test
-    public void testParseRegionJson() throws IOException {
-        Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
-        car2GoCarRentalDataSource.configure(null, config);
-
-        assertTrue(car2GoCarRentalDataSource.updateRegions());
-        CarRentalRegion firstRegion = car2GoCarRentalDataSource.getRegions().get(0);
-
-        // verify integrity of region, by checking if a particular point exists inside it
-        GeometryFactory geometryFactory = new GeometryFactory();
-        assertEquals(
-            true,
-            firstRegion.geometry.contains(geometryFactory.createPoint(new Coordinate(-122.64759, 45.530162)))
-        );
+        assertEquals(-122.599453, firstVehicle.x);
+        assertEquals(45.499904, firstVehicle.y);
     }
 }

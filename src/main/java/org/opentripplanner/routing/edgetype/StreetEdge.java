@@ -367,18 +367,51 @@ public class StreetEdge extends Edge implements Cloneable {
             // Irrevocable transition from using rented car to walking.
             // Final CAR check needed to prevent infinite recursion.
             if (
-                s0.isCarRenting()
-                    && !getPermission().allows(TraverseMode.CAR)
-                    && currMode == TraverseMode.CAR
+                s0.isCarRenting() &&
+                    !getPermission().allows(TraverseMode.CAR) &&
+                    currMode == TraverseMode.CAR &&
+                    // if in "arrive by" mode, the search is progressing backwards while in a car
+                    // rental state, but encounters an edge that cannot be traversed using a car
+                    // before encountering a car rental pickup station.  Therefore, this search
+                    // cannot proceed.
+                    !options.arriveBy &&
+                    s0.isCarRentalDropoffAllowed(this, false)
             ) {
-                // Make sure car rental dropoff is allowed at this location
-                if (!s0.isCarRentalDropoffAllowed()) {
-                    return null;
-                }
                 editor = doTraverse(s0, options, TraverseMode.WALK);
                 if (editor != null) {
-                    editor.alightRentedCar(); // done with car rental use for now
+                    editor.endCarRenting(); // done with car rental use for now
                     return editor.makeState(); // return only the state with updated rental car usage
+                }
+            }
+            // possible transition of dropping off a floating car when in "arrive by" mode
+            else if (
+                !s0.isCarRenting() &&
+                    getPermission().allows(TraverseMode.CAR) &&
+                    currMode != TraverseMode.CAR &&
+                    options.arriveBy &&
+                    s0.isCarRentalDropoffAllowed(this, false)
+            ) {
+                StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
+                StateEditor editorNonCar = doTraverse(s0, options, currMode);
+                if (editorCar != null) {
+                    // begin car rental usage.
+                    editorCar.incrementWeight(options.carRentalDropoffCost);
+                    editorCar.incrementTimeInSeconds(options.carRentalDropoffTime);
+                    editorCar.beginCarRenting(getDistance(), carNetworks, true);
+                    if (editorNonCar != null) {
+                        // make the forkState be of the non-car mode so it's possible to build walk steps
+                        State forkState = editorNonCar.makeState();
+                        if (forkState != null) {
+                            forkState.addToExistingResultChain(editorCar.makeState());
+                            return forkState; // return both in-car and out-of-car states
+                        } else {
+                            // if the non-car state is non traversable or something, return just the car state
+                            return editorCar.makeState();
+                        }
+                    } else {
+                        // if the non-car state is non traversable or something, return just the car state
+                        return editorCar.makeState();
+                    }
                 }
             }
         }
@@ -598,12 +631,15 @@ public class StreetEdge extends Edge implements Cloneable {
         if (
             options.kissAndRide ||
                 options.parkAndRide ||
-                options.useTransportationNetworkCompany
+                options.useTransportationNetworkCompany ||
+                options.allowCarRental
         ) {
             if (options.arriveBy) {
                 if (
                     // if kiss/park and ride, check if car has not yet been parked
                     ((options.kissAndRide || options.parkAndRide) && !s0.isCarParked()) ||
+                        // if car rentals are enabled, check if a car has been rented before transit
+                        (options.allowCarRental && !s0.stateData.hasRentedCarPreTransit()) ||
                         // if car hailing is enabled, check if a car has been hailed before transit
                         (options.useTransportationNetworkCompany && !s0.stateData.hasHailedCarPreTransit())
                 ) {
