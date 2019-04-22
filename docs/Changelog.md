@@ -12,6 +12,7 @@
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
+- Add API endpoint for fetching Park and Rides (#1412)
 
 ## 1.3 (2018-08-03)
 
