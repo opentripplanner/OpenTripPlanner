@@ -13,15 +13,19 @@
 
 package org.opentripplanner.api.resource;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -68,7 +72,7 @@ public class ParkAndRide {
             // Check if vertex is within maxTransitDistance of a stop (if specified)
             if (maxTransitDistance != null) {
                 List<TransitStop> stops = router.graph.streetIndex.getNearbyTransitStops(
-                        new Coordinate(v.getX(), v.getY()), maxTransitDistance);
+                    new Coordinate(v.getX(), v.getY()), maxTransitDistance);
                 if (stops.isEmpty()) continue;
             }
 
