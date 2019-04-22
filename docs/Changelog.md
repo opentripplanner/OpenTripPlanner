@@ -12,6 +12,7 @@
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
+- Improve walking directions that use elevators (#2748)
 
 ## 1.3 (2018-08-03)
 
