@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.street_router;
 
-import com.conveyal.r5.profile.otp2.api.transit.TransferLeg;
+import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
