@@ -606,7 +606,10 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
-    /**
+    @QueryParam("onlyTransitTrips")
+    private Boolean onlyTransitTrips;
+
+    /*
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
      * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
@@ -896,8 +899,13 @@ public abstract class RoutingResource {
             }
         }
 
-        if (pathComparator != null)
+        if (pathComparator != null) {
             request.pathComparator = pathComparator;
+        }
+
+        if (onlyTransitTrips != null) {
+            request.onlyTransitTrips = onlyTransitTrips;
+        }
 
         if(debugItineraryFilter != null ) {
             request.debugItineraryFilter = debugItineraryFilter;
