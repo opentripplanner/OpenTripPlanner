@@ -1,10 +1,10 @@
-package org.opentripplanner.routing.algorithm.raptor.street_router;
+package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TransferWithDuration;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
 
 import java.util.ArrayList;
 import java.util.Collection;

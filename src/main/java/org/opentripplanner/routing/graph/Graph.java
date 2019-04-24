@@ -44,8 +44,8 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayerMapper;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -630,8 +630,7 @@ public class Graph implements Serializable {
 
         /** Create transit layer for Raptor routing */
         LOG.info("Creating transit layer for Raptor routing.");
-        TransitLayerMapper transitLayerMapper = new TransitLayerMapper();
-        this.transitLayer = transitLayerMapper.map(this);
+        this.transitLayer = TransitLayerMapper.map(this);
     }
     
     public static Graph load(InputStream in) {

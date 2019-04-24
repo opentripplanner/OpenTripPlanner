@@ -1,11 +1,12 @@
-package org.opentripplanner.routing.algorithm.raptor.transit_data_provider;
+package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import com.conveyal.r5.otp2.api.transit.IntIterator;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
 import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.time.LocalDate;
@@ -23,35 +24,53 @@ import static java.util.stream.Collectors.toList;
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer, but filters it by
  * dates and modes per request. Transfers durations are pre-calculated per request based on walk speed.
  */
-
-public class OtpRRDataProvider implements TransitDataProvider<TripSchedule> {
+public class RaptorRoutingRequestTransitData implements TransitDataProvider<TripSchedule> {
 
     private TransitLayer transitLayer;
 
-    /** Active trip patterns by stop index */
+    /**
+     * Active trip patterns by stop index
+     */
     private List<List<TripPatternForDates>> activeTripPatternsPerStop;
 
-    /** Transfers by stop index */
+    /**
+     * Transfers by stop index
+     */
     private List<List<TransferLeg>> transfers;
 
-    public OtpRRDataProvider(TransitLayer transitLayer, LocalDate startDate, int dayRange, TraverseModeSet transitModes,
-                              double walkSpeed) {
+    public RaptorRoutingRequestTransitData(
+            TransitLayer transitLayer,
+            LocalDate startDate,
+            int dayRange,
+            TraverseModeSet transitModes,
+            double walkSpeed
+    ) {
         this.transitLayer = transitLayer;
-        List<List<TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(startDate, dayRange, transitModes);
-        List<TripPatternForDates> tripPatternForDateList = MergeTripPatternForDates.merge(tripPatternForDates);
+
+        List<List<TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
+                startDate, dayRange, transitModes
+        );
+        List<TripPatternForDates> tripPatternForDateList = MergeTripPatternForDates
+                .merge(tripPatternForDates);
+
         setTripPatternsPerStop(tripPatternForDateList);
+
         calculateTransferDuration(walkSpeed);
     }
 
-    /** Gets all the transfers starting at a given stop */
-    @Override
-    public Iterator<TransferLeg> getTransfers(int stopIndex) {
+    /**
+     * Gets all the transfers starting at a given stop
+     */
+    @Override public Iterator<TransferLeg> getTransfers(int stopIndex) {
         return transfers.get(stopIndex).iterator();
     }
 
-    /** Gets all the unique trip patterns touching a set of stops */
-    @Override
-    public Iterator<? extends TripPatternInfo<TripSchedule>> patternIterator(IntIterator stops) {
+    /**
+     * Gets all the unique trip patterns touching a set of stops
+     */
+    @Override public Iterator<? extends TripPatternInfo<TripSchedule>> patternIterator(
+            IntIterator stops
+    ) {
         Set<TripPatternInfo<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
         int stopIndex = stops.next();
         while (stopIndex > 0) {
@@ -61,24 +80,31 @@ public class OtpRRDataProvider implements TransitDataProvider<TripSchedule> {
         return activeTripPatternsForGivenStops.iterator();
     }
 
-    @Override
-    public int numberOfStops() {
+    @Override public int numberOfStops() {
         return transitLayer.getStopCount();
     }
 
-    private List<TripPatternForDate> setActiveTripPatterns(LocalDate date, TraverseModeSet transitModes) {
+    private List<TripPatternForDate> listActiveTripPatterns(LocalDate date,
+            TraverseModeSet transitModes) {
 
         return transitLayer.getTripPatternsForDate(date).stream()
                 .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
                 .collect(toList());
     }
 
-    private List<List<TripPatternForDate>> getTripPatternsForDateRange(LocalDate startDate, int dayRange, TraverseModeSet transitModes) {
+    private List<List<TripPatternForDate>> getTripPatternsForDateRange(
+            LocalDate startDate,
+            int dayRange,
+            TraverseModeSet transitModes
+    ) {
         List<List<TripPatternForDate>> tripPatternForDates = new ArrayList<>();
-        // Start at yesterdays date to account for trips that cross midnight. This is also accounted for in TripPatternForDates.
-        for (LocalDate currentDate = startDate.minusDays(1); currentDate.isBefore(startDate.plusDays(dayRange)); currentDate = currentDate.plusDays(1)) {
-            tripPatternForDates.add(setActiveTripPatterns(currentDate, transitModes));
+
+        // Start at yesterdays date to account for trips that cross midnight. This is also
+        // accounted for in TripPatternForDates.
+        for (int d=-1; d < dayRange-1; ++d) {
+            tripPatternForDates.add(listActiveTripPatterns(startDate.plusDays(d), transitModes));
         }
+
         return tripPatternForDates;
     }
 
@@ -88,7 +114,7 @@ public class OtpRRDataProvider implements TransitDataProvider<TripSchedule> {
                 .limit(numberOfStops()).collect(Collectors.toList());
 
         for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
-            for (int i : tripPatternForDateList.getTripPattern().getStopPattern()) {
+            for (int i : tripPatternForDateList.getTripPattern().getStopIndexes()) {
                 this.activeTripPatternsPerStop.get(i).add(tripPatternForDateList);
             }
         }
@@ -96,7 +122,7 @@ public class OtpRRDataProvider implements TransitDataProvider<TripSchedule> {
 
     private void calculateTransferDuration(double walkSpeed) {
         this.transfers = transitLayer.getTransferByStopIndex().stream()
-                .map(t ->  t.stream().map(s -> new TransferWithDuration(s, walkSpeed)).collect(Collectors.<TransferLeg>toList()))
-                .collect(toList());
+                .map(t -> t.stream().map(s -> new TransferWithDuration(s, walkSpeed))
+                        .collect(Collectors.<TransferLeg>toList())).collect(toList());
     }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptor.transit_layer;
+package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.locationtech.jts.geom.Coordinate;
 

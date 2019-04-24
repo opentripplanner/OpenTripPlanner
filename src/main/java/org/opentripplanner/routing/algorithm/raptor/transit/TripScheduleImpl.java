@@ -1,7 +1,6 @@
-package org.opentripplanner.routing.algorithm.raptor.transit_layer;
+package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TripSchedule;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 /**
@@ -26,7 +25,7 @@ public class TripScheduleImpl implements TripSchedule {
 
     private final int serviceCode;
 
-    TripScheduleImpl(int[] arrivals, int[] departures, Trip originalTrip, TripPattern originalTripPattern, int serviceCode) {
+    public TripScheduleImpl(int[] arrivals, int[] departures, Trip originalTrip, TripPattern originalTripPattern, int serviceCode) {
         this.arrivals = arrivals;
         this.departures = departures;
         this.originalTrip = originalTrip;
@@ -47,22 +46,17 @@ public class TripScheduleImpl implements TripSchedule {
         throw new UnsupportedOperationException();
     }
 
-    public void setArrival(int stopPosInPattern, int value) {
-        arrivals[stopPosInPattern] = value;
-    }
-
-    public void setDeparture(int stopPosInPattern, int value) {
-        departures[stopPosInPattern] = value;
-    }
-
+    @Override
     public Trip getOriginalTrip() {
         return originalTrip;
     }
 
+    @Override
     public TripPattern getOriginalTripPattern() {
         return originalTripPattern;
     }
 
+    @Override
     public int getServiceCode() {
         return serviceCode;
     }

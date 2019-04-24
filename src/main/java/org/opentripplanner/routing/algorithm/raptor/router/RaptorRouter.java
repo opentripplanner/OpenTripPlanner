@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import org.opentripplanner.api.model.Itinerary;
 import com.conveyal.r5.otp2.RangeRaptorService;
 import com.conveyal.r5.otp2.api.path.Path;
 import com.conveyal.r5.otp2.api.request.Optimization;
@@ -10,20 +9,22 @@ import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptor.street_router.AccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptor.street_router.TransferToAccessEgressLegMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.OtpRRDataProvider;
-import org.opentripplanner.routing.algorithm.raptor.transit_data_provider.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
@@ -37,21 +38,18 @@ public class RaptorRouter {
     private final TransitDataProvider<TripSchedule> otpRRDataProvider;
     private final TransitLayer transitLayer;
     private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
-    private static RangeRaptorService<TripSchedule> rangeRaptorService;
+
+    private static final RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(
+            // TODO - Load turning parameters from config file
+            new TuningParameters() {}
+    );
 
     //TODO Naming
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
-        // TODO Probably load these parameters from router-config
-        if (rangeRaptorService == null) {
-            TuningParameters tuningParameters = new TuningParameters() {
-                @Override public int maxNumberOfTransfers() { return request.maxTransfers; }
-                @Override public int searchThreadPoolSize() { return 0; }
-            };
-            rangeRaptorService = new RangeRaptorService<>(tuningParameters);
-        }
         double startTime = System.currentTimeMillis();
-        this.otpRRDataProvider = new OtpRRDataProvider(transitLayer, request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                2, request.modes, request.walkSpeed);
+        this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
+                transitLayer, startDate(request),2, request.modes, request.walkSpeed
+        );
         LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
         this.transitLayer = transitLayer;
     }
@@ -121,5 +119,9 @@ public class RaptorRouter {
         LOG.info("Creating itineraries took {} ms", System.currentTimeMillis() - startItineraries);
 
         return tripPlan;
+    }
+
+    private LocalDate startDate(RoutingRequest request) {
+        return request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

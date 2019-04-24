@@ -1,9 +1,9 @@
-package org.opentripplanner.routing.algorithm.raptor.street_router;
+package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.algorithm.raptor.transit_layer.Transfer;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
