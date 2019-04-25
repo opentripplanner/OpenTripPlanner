@@ -107,6 +107,8 @@ public class GtfsModule implements GraphBuilderModule {
                 OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(loadBundle(gtfsBundle));
 
                 calendarService.addData(builder);
+
+                // NB! The calls below have side effects - the builder state is updated!
                 repairStopTimesForEachTrip(graph, builder.getStopTimesSortedByTrip());
                 createTripPatterns(graph, builder, calendarService);
 
@@ -142,10 +144,16 @@ public class GtfsModule implements GraphBuilderModule {
 
     /* Private Methods */
 
+    /**
+     * This method have side-effects, the {@code stopTimesByTrip} is updated.
+     */
     private void repairStopTimesForEachTrip(Graph graph, TripStopTimes stopTimesByTrip) {
         new RepairStopTimesForEachTripOperation(stopTimesByTrip, graph).run();
     }
 
+    /**
+     * This method have side-effects, the {@code builder} is updated with new TripPatterns.
+     */
     private void createTripPatterns(Graph graph, OtpTransitServiceBuilder builder, CalendarService calendarService) {
         GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
                 builder, graph, graph.deduplicator, calendarService
