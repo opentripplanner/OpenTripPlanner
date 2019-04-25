@@ -71,8 +71,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /**
      * Create a read only version of the {@link OtpTransitService}.
-     *
-     * @see OtpTransitServiceBuilder Use builder to create an new OtpTransitDao.
      */
     OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
         this.agencies = nullSafeUnmodifiableList(builder.getAgencies());
