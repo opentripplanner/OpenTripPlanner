@@ -10,6 +10,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
@@ -17,10 +18,9 @@ import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class OtpTransitServiceBuilder {
 
     private final EntityMap<FeedScopedId, Stop> stopsById = new EntityMap<>();
 
-    private final SortedMultimap<Trip, StopTime> stopTimesByTrip = new SortedMultimap<>();
+    private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class OtpTransitServiceBuilder {
         return stopsById;
     }
 
-    public SortedMultimap<Trip, StopTime> getStopTimesSortedByTrip() {
+    public TripStopTimes getStopTimesSortedByTrip() {
         return stopTimesByTrip;
     }
 
@@ -181,7 +181,7 @@ public class OtpTransitServiceBuilder {
     }
 
     public void regenerateIndexes() {
-        trips.reindex();
+        this.trips.reindex();
         this.stopsById.reindex();
         this.routesById.reindex();
         this.stopTimesByTrip.reindex();

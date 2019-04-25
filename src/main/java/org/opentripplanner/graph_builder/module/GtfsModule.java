@@ -1,17 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -27,24 +16,33 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.model.impl.SortedMultimap;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.BikeAccess;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
-import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder;
 
@@ -144,9 +142,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     /* Private Methods */
 
-    private void repairStopTimesForEachTrip(
-            Graph graph, SortedMultimap<org.opentripplanner.model.Trip, StopTime> stopTimesByTrip
-    ) {
+    private void repairStopTimesForEachTrip(Graph graph, TripStopTimes stopTimesByTrip) {
         new RepairStopTimesForEachTripOperation(stopTimesByTrip, graph).run();
     }
 

@@ -2,8 +2,6 @@ package org.opentripplanner.gtfs;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
 import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
@@ -11,7 +9,9 @@ import org.opentripplanner.graph_builder.annotation.HopZeroTime;
 import org.opentripplanner.graph_builder.annotation.NegativeDwellTime;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
 import org.opentripplanner.graph_builder.annotation.RepeatedStops;
-import org.opentripplanner.model.impl.SortedMultimap;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +32,11 @@ public class RepairStopTimesForEachTripOperation {
 
     private static final int SECONDS_IN_HOUR = 60 * 60;
 
-    private final SortedMultimap<Trip, StopTime> stopTimesByTrip;
+    private final TripStopTimes stopTimesByTrip;
 
     private AddBuilderAnnotation builderAnnotation;
 
-    public RepairStopTimesForEachTripOperation(SortedMultimap<Trip, StopTime> stopTimesByTrip, AddBuilderAnnotation builderAnnotation) {
+    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, AddBuilderAnnotation builderAnnotation) {
         this.stopTimesByTrip = stopTimesByTrip;
         this.builderAnnotation = builderAnnotation;
     }

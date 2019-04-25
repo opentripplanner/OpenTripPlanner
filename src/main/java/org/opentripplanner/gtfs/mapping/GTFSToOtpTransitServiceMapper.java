@@ -2,7 +2,6 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.model.StopTime;
 
 
 
@@ -68,10 +67,7 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
         builder.getStops().addAll(stopMapper.map(data.getAllStops()));
-        builder.getStopTimesSortedByTrip().addAll(
-                stopTimeMapper.map(data.getAllStopTimes()),
-                StopTime::getTrip
-        );
+        builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTrips().addAll(tripMapper.map(data.getAllTrips()));
 
