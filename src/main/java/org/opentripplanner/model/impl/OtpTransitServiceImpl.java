@@ -2,10 +2,10 @@
 package org.opentripplanner.model.impl;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -83,8 +82,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.pathways = nullSafeUnmodifiableList(builder.getPathways());
         this.serviceIds = nullSafeUnmodifiableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
-        this.stopsById = unmodifiableMap(builder.getStops().asMap());
-        this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asMap();
+        this.stopsById = builder.getStops().asImmutableMap();
+        this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = nullSafeUnmodifiableList(builder.getTransfers());
         this.tripPatterns = nullSafeUnmodifiableList(builder.getTripPatterns().values());
         this.trips = nullSafeUnmodifiableList(builder.getTrips().values());

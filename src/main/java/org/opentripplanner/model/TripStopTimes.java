@@ -45,15 +45,23 @@ public class TripStopTimes {
         map.replace(key, sort(list));
     }
 
-    public Map<Trip, List<StopTime>> asMap() {
-        return Collections.unmodifiableMap(map);
+    /**
+     * Return a copy of the internal map. Changes in the source are not reflected
+     * in the destination (returned Map), and visa versa.
+     * <p/>
+     * The returned map is immutable.
+     */
+    public Map<Trip, List<StopTime>> asImmutableMap() {
+        return Collections.unmodifiableMap(new HashMap<>(map));
     }
 
     public int size() {
         return map.size();
     }
 
-    /** Return a iterable set of keys. */
+    /**
+     * Return a iterable set of keys. Please do not remove keys the effect is undefined.
+     */
     public Iterable<Trip> keys() {
         return map.keySet();
     }

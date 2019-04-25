@@ -4,10 +4,18 @@ import org.opentripplanner.model.IdentityBean;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityMap<I extends Serializable, E extends IdentityBean<I>> {
+/**
+ * The purpose of this class is to provide a map from id to the corresponding entity.
+ * It is simply an index of entities.
+ *
+ * @param <I> the entity id type
+ * @param <E> the entity type
+ */
+public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
 
     private final Map<I, E> map = new HashMap<>();
 
@@ -29,11 +37,13 @@ public class EntityMap<I extends Serializable, E extends IdentityBean<I>> {
     }
 
     /**
-     * Return a copy of the internal map. Changes in source (EntityMap) are not reflected
+     * Return a copy of the internal map. Changes in the source are not reflected
      * in the destination (returned Map), and visa versa.
+     * <p/>
+     * The returned map is immutable.
      */
-    public Map<I, E> asMap() {
-        return new HashMap<>(map);
+    Map<I, E> asImmutableMap() {
+        return Collections.unmodifiableMap(new HashMap<>(map));
     }
 
     public boolean containsKey(I id) {
@@ -45,7 +55,11 @@ public class EntityMap<I extends Serializable, E extends IdentityBean<I>> {
         return map.toString();
     }
 
-    public void reindex() {
+    /**
+     * For Entities with mutable ids the internal map becomes invalid after the ids are changed.
+     * So to fix this, this method allows the caller to reindex the internal map.
+     */
+    void reindex() {
         HashMap<I, E> temp = new HashMap<>(map);
         map.clear();
         map.putAll(temp);

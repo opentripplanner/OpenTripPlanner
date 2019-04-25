@@ -145,7 +145,7 @@ public class GenerateTripPatternsOperation {
         try {
             return Integer.parseInt(trip.getDirectionId());
         } catch (NumberFormatException e) {
-            LOG.debug("Trip {} does not have direction id, defaults to -1");
+            LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
         }
         return UNKNOWN_DIRECTION_ID;
     }

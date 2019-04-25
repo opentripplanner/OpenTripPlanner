@@ -50,17 +50,17 @@ public class OtpTransitServiceBuilder {
 
     private final List<Pathway> pathways = new ArrayList<>();
 
-    private final EntityMap<FeedScopedId, Route> routesById = new EntityMap<>();
+    private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
 
     private final List<ShapePoint> shapePoints = new ArrayList<>();
 
-    private final EntityMap<FeedScopedId, Stop> stopsById = new EntityMap<>();
+    private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
-    private final EntityMap<FeedScopedId, Trip> trips = new EntityMap<>();
+    private final EntityById<FeedScopedId, Trip> trips = new EntityById<>();
 
     private final ListMultimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
@@ -105,7 +105,7 @@ public class OtpTransitServiceBuilder {
         return pathways;
     }
 
-    public EntityMap<FeedScopedId, Route> getRoutes() {
+    public EntityById<FeedScopedId, Route> getRoutes() {
         return routesById;
     }
 
@@ -113,7 +113,7 @@ public class OtpTransitServiceBuilder {
         return shapePoints;
     }
 
-    public EntityMap<FeedScopedId, Stop> getStops() {
+    public EntityById<FeedScopedId, Stop> getStops() {
         return stopsById;
     }
 
@@ -125,7 +125,7 @@ public class OtpTransitServiceBuilder {
         return transfers;
     }
 
-    public EntityMap<FeedScopedId, Trip> getTrips() {
+    public EntityById<FeedScopedId, Trip> getTrips() {
         return trips;
     }
 
