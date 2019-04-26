@@ -73,18 +73,18 @@ class OtpTransitServiceImpl implements OtpTransitService {
      * Create a read only version of the {@link OtpTransitService}.
      */
     OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
-        this.agencies = nullSafeUnmodifiableList(builder.getAgencies());
-        this.fareAttributes = nullSafeUnmodifiableList(builder.getFareAttributes());
-        this.fareRules = nullSafeUnmodifiableList(builder.getFareRules());
-        this.feedInfos = nullSafeUnmodifiableList(builder.getFeedInfos());
-        this.pathways = nullSafeUnmodifiableList(builder.getPathways());
-        this.serviceIds = nullSafeUnmodifiableList(builder.findAllServiceIds());
+        this.agencies = immutableList(builder.getAgencies());
+        this.fareAttributes = immutableList(builder.getFareAttributes());
+        this.fareRules = immutableList(builder.getFareRules());
+        this.feedInfos = immutableList(builder.getFeedInfos());
+        this.pathways = immutableList(builder.getPathways());
+        this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
         this.stopsById = builder.getStops().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
-        this.transfers = nullSafeUnmodifiableList(builder.getTransfers());
-        this.tripPatterns = nullSafeUnmodifiableList(builder.getTripPatterns().values());
-        this.trips = nullSafeUnmodifiableList(builder.getTrips().values());
+        this.transfers = immutableList(builder.getTransfers());
+        this.tripPatterns = immutableList(builder.getTripPatterns().values());
+        this.trips = immutableList(builder.getTrips().values());
     }
 
     @Override
@@ -119,7 +119,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     @Override
     public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-        return nullSafeUnmodifiableList(shapePointsByShapeId.get(shapeId));
+        return immutableList(shapePointsByShapeId.get(shapeId));
     }
 
     @Override
@@ -130,17 +130,17 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public List<Stop> getStopsForStation(Stop station) {
         ensureStopForStations();
-        return nullSafeUnmodifiableList(stopsByStation.get(station));
+        return immutableList(stopsByStation.get(station));
     }
 
     @Override
     public Collection<Stop> getAllStops() {
-        return nullSafeUnmodifiableList(stopsById.values());
+        return immutableList(stopsById.values());
     }
 
     @Override
     public List<StopTime> getStopTimesForTrip(Trip trip) {
-        return nullSafeUnmodifiableList(stopTimesByTrip.get(trip));
+        return immutableList(stopTimesByTrip.get(trip));
     }
 
     @Override
@@ -185,7 +185,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
         return map;
     }
 
-    private static <T> List<T> nullSafeUnmodifiableList(Collection<T> c) {
+    /**
+     * Convert the given collection into a new immutable List.
+     */
+    private static <T> List<T> immutableList(Collection<T> c) {
         List<T> list;
         if (c instanceof List) {
             list = (List<T>) c;
