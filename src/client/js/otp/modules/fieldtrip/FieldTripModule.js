@@ -600,13 +600,12 @@ otp.modules.fieldtrip.FieldTripModule =
         }, this));
     },
 
-    editGroupSize: function(request, numStudents, numChaperones, minimumAge, maximumAge) {
+    editGroupSize: function(request, numStudents, numFreeStudents, numChaperones) {
         this.serverRequest('/fieldtrip/setRequestGroupSize', 'POST', {
             requestId: request.id,
             numStudents: numStudents,
-            numChaperones: numChaperones,
-            minimumAge: minimumAge,
-            maximumAge: maximumAge
+            numFreeStudents: numFreeStudents,
+            numChaperones: numChaperones
         }, _.bind(function(data) {
             this.loadRequests();
         }, this));

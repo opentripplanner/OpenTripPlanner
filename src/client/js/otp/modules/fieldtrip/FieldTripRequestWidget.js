@@ -72,6 +72,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             else if(context.notes[i].type === "operational") context.operationalNotes.push(context.notes[i]);
         }
 
+        // Populate number paid & free students
+        if(!context.numFreeStudents) context.numFreeStudents = 0
+        context.numPaidStudents = context.numStudents - context.numFreeStudents
+
         if(this.content) this.content.remove();
         this.content = ich['otp-fieldtrip-request'](context).appendTo(this.mainDiv);
 
@@ -144,7 +148,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             if(outboundTrip) context.outboundItineraries = outboundTrip.groupItineraries;
             if(inboundTrip) context.inboundItineraries = inboundTrip.groupItineraries;
 
-            console.log(context);
+            // Populate number paid & free students
+            if(!context.numFreeStudents) context.numFreeStudents = 0
+            context.numPaidStudents = context.numStudents - context.numFreeStudents
+
             var content = ich['otp-fieldtrip-printablePlan'](context);
 
             // populate itin details
@@ -273,9 +280,8 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
     showGroupSizeDialog : function() {
         var this_ = this;
         var dialog = ich['otp-fieldtrip-groupSizeDialog']({
-            numStudents : this_.request.numStudents,
-            minimumAge : this_.request.minimumAge,
-            maximumAge : this_.request.maximumAge,
+            numPaidStudents : this_.request.numStudents - (this_.request.numFreeStudents || 0),
+            numFreeStudents : this_.request.numFreeStudents || 0,
             numChaperones : this_.request.numChaperones
         }).dialog({
             title : "Edit Group Size",
@@ -286,11 +292,16 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         });
 
         dialog.find(".okButton").button().click(function() {
-            var numStudents = dialog.find(".numStudents").val();
-            var numChaperones = dialog.find(".numChaperones").val();
-            var minimumAge = dialog.find(".minimumAge").val();
-            var maximumAge = dialog.find(".maximumAge").val();
-            this_.module.editGroupSize(this_.request, numStudents, numChaperones, minimumAge, maximumAge);
+            var numPaidStudents = parseInt(dialog.find(".numPaidStudents").val());
+            numPaidStudents = isNaN(numPaidStudents) ? 0 : numPaidStudents
+
+            var numFreeStudents = parseInt(dialog.find(".numFreeStudents").val());
+            numFreeStudents = isNaN(numFreeStudents) ? 0 : numFreeStudents
+
+            var numChaperones = parseInt(dialog.find(".numChaperones").val());
+            numChaperones = isNaN(numChaperones) ? 0 : numChaperones
+
+            this_.module.editGroupSize(this_.request, (numPaidStudents + numFreeStudents), numFreeStudents, numChaperones);
             dialog.dialog("close");
         });
 
