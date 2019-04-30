@@ -7,7 +7,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import java.util.List;
 
 /**
- * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedules
+ * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
  * refers to days in order.
  */
 public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
@@ -16,14 +16,14 @@ public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
 
     private final TripPattern tripPattern;
 
-    private final List<List<TripSchedule>> tripSchedules;
+    private final List<List<TripSchedule>> tripSchedulesByDay;
 
     private final int numberOfTripPatterns;
 
-    TripPatternForDates(TripPattern tripPattern, List<List<TripSchedule>> tripSchedulesPerDay) {
+    TripPatternForDates(TripPattern tripPattern, List<List<TripSchedule>> tripSchedulesByDay) {
         this.tripPattern = tripPattern;
-        this.tripSchedules = tripSchedulesPerDay;
-        this.numberOfTripPatterns = tripSchedules.stream().mapToInt(List::size).sum();
+        this.tripSchedulesByDay = tripSchedulesByDay;
+        this.numberOfTripPatterns = this.tripSchedulesByDay.stream().mapToInt(List::size).sum();
     }
 
     public TripPattern getTripPattern() {
@@ -38,13 +38,9 @@ public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
         return tripPattern.getStopIndexes().length;
     }
 
-    List<List<TripSchedule>> getTripSchedules() {
-        return this.tripSchedules;
-    }
-
     @Override public TripSchedule getTripSchedule(int index) {
         int dayOffset = -1; // Start at yesterday to account for trips that cross midnight.
-        for (List<TripSchedule> tripScheduleList : tripSchedules) {
+        for (List<TripSchedule> tripScheduleList : tripSchedulesByDay) {
             if (index < tripScheduleList.size()) {
                 return new TripScheduleWithOffset(
                         tripScheduleList.get(index),dayOffset * SECONDS_OF_DAY

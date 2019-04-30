@@ -23,7 +23,7 @@ public class TripPattern {
 
     public int getId() { return id; }
 
-    public Collection<TripSchedule> getTripSchedules() {
+    public List<TripSchedule> getTripSchedules() {
         return tripSchedules;
     }
 

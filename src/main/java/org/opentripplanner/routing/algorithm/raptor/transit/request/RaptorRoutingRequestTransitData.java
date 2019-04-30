@@ -10,15 +10,12 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer, but filters it by
@@ -47,7 +44,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
     ) {
         this.transitLayer = transitLayer;
 
-        List<List<TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
+        List<Map<Integer, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
                 startDate, dayRange, transitModes
         );
         List<TripPatternForDates> tripPatternForDateList = MergeTripPatternForDates
@@ -84,26 +81,30 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
         return transitLayer.getStopCount();
     }
 
-    private List<TripPatternForDate> listActiveTripPatterns(LocalDate date,
+    private Map<Integer, TripPatternForDate> listActiveTripPatterns(LocalDate date,
             TraverseModeSet transitModes) {
 
         return transitLayer.getTripPatternsForDate(date).stream()
                 .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
-                .collect(toList());
+                .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
     }
 
-    private List<List<TripPatternForDate>> getTripPatternsForDateRange(
+    private List<Map<Integer, TripPatternForDate>> getTripPatternsForDateRange(
             LocalDate startDate,
             int dayRange,
             TraverseModeSet transitModes
     ) {
-        List<List<TripPatternForDate>> tripPatternForDates = new ArrayList<>();
+        List<Map<Integer, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
+
+        Map<Integer, TripPatternForDate> tripPatternForDateById;
 
         // Start at yesterdays date to account for trips that cross midnight. This is also
         // accounted for in TripPatternForDates.
         for (int d=-1; d < dayRange-1; ++d) {
             tripPatternForDates.add(listActiveTripPatterns(startDate.plusDays(d), transitModes));
         }
+
+
 
         return tripPatternForDates;
     }
