@@ -31,7 +31,7 @@ class PathwayMapper {
         Pathway lhs = new Pathway();
 
         lhs.setId(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
-        lhs.setPathwayType(rhs.getPathwayType());
+        lhs.setPathwayMode(rhs.getPathwayMode());
         lhs.setFromStop(stopMapper.map(rhs.getFromStop()));
         lhs.setToStop(stopMapper.map(rhs.getToStop()));
         lhs.setTraversalTime(rhs.getTraversalTime());

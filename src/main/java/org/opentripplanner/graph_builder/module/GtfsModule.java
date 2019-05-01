@@ -14,16 +14,7 @@ import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.IdentityBean;
-import org.onebusaway.gtfs.model.Pathway;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -215,6 +206,15 @@ public class GtfsModule implements GraphBuilderModule {
         }
         for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
             stop.getId().setAgencyId(reader.getDefaultAgencyId());
+        }
+        for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
+            if (stop.getLat() == Stop.MISSING_VALUE && stop.getLon() == Stop.MISSING_VALUE) {
+                // if certain stop doesn't have coordinates, we use parent stop's coordinates
+                AgencyAndId key = new AgencyAndId(reader.getDefaultAgencyId(), stop.getParentStation());
+                Stop parent = store.getEntityForId(Stop.class, key);
+                stop.setLat(parent.getLat());
+                stop.setLon(parent.getLon());
+            }
         }
         for (Trip trip : store.getAllEntitiesForType(Trip.class)) {
             trip.getId().setAgencyId(reader.getDefaultAgencyId());

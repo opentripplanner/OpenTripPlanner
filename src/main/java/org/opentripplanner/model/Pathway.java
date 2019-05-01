@@ -9,7 +9,7 @@ public final class Pathway extends IdentityBean<FeedScopedId> {
 
     private FeedScopedId id;
 
-    private int pathwayType;
+    private int pathwayMode;
 
     private Stop fromStop;
 
@@ -29,12 +29,12 @@ public final class Pathway extends IdentityBean<FeedScopedId> {
         this.id = id;
     }
 
-    public void setPathwayType(int pathwayType) {
-        this.pathwayType = pathwayType;
+    public void setPathwayMode(int pathwayMode) {
+        this.pathwayMode = pathwayMode;
     }
 
-    public int getPathwayType() {
-        return pathwayType;
+    public int getPathwayMode() {
+        return pathwayMode;
     }
 
     public void setFromStop(Stop fromStop) {
