@@ -12,6 +12,7 @@
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
+- Refactor InterleavedBidirectionalHeuristic (#2671
 
 ## 1.3 (2018-08-03)
 
@@ -63,7 +64,6 @@
 - Optionally compact ("reverse-optimize") results with complete reverse search #2449
 - Add updater for urbaninfrastructure city bikes #2448
 - Miscellaneous documentation updates
-- Refactor InterleavedBidirectionalHeuristic #2671
 
 ## 1.1 (2017-03-16)
 
