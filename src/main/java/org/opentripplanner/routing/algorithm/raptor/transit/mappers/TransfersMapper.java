@@ -32,7 +32,8 @@ class TransfersMapper {
                 if (edge instanceof SimpleTransfer) {
                     double distance = edge.getDistance();
 
-                    Transfer transfer = new Transfer(stopIndex, (int) distance,
+                    int toStopIndex = stopsByIndex.indexOf(((TransitStop) edge.getToVertex()).getStop());
+                    Transfer transfer = new Transfer(toStopIndex, (int) distance,
                             Arrays.asList(edge.getGeometry().getCoordinates()));
 
                     list.add(transfer);
