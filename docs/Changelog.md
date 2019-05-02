@@ -12,6 +12,7 @@
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
+- Refactor InterleavedBidirectionalHeuristic (#2671)
 - Correctly calculation elevation profile for partial street edges
 
 ## 1.3 (2018-08-03)
