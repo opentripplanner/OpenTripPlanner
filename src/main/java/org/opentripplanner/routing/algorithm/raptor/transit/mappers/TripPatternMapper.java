@@ -59,7 +59,7 @@ class TripPatternMapper {
     ) {
         HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate = new HashMap<>();
 
-        for (LocalDate localDate : serviceCodesByLocalDates.keys()) {
+        for (LocalDate localDate : serviceCodesByLocalDates.keySet()) {
             Set<Integer> services = new HashSet<>(serviceCodesByLocalDates.get(localDate));
 
             List<TripPattern> filteredPatterns = services
