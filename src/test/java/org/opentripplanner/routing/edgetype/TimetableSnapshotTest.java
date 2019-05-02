@@ -8,7 +8,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
-import java.io.File;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -35,23 +34,23 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 
 public class TimetableSnapshotTest {
-    private static Graph graph;
-    private static GtfsContext context;
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
     @BeforeClass
     public static void setUp() throws Exception {
-        context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
-        graph = new Graph();
+        Graph graph = new Graph();
+        GtfsContext context = GtfsContextBuilder
+                .contextBuilder(ConstantsForTests.FAKE_GTFS)
+                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .build();
 
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(
-                CalendarServiceData.class, createCalendarServiceData(context.getOtpTransitService())
-        );
+        graph.putService(CalendarServiceData.class, createCalendarServiceData(context.getTransitBuilder()));
 
-        patternIndex = new HashMap<FeedScopedId, TripPattern>();
+        patternIndex = new HashMap<>();
+
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding) continue;

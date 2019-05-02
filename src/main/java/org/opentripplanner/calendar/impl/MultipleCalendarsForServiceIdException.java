@@ -1,5 +1,5 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model.impl;
+package org.opentripplanner.calendar.impl;
 
 import org.opentripplanner.model.FeedScopedId;
 

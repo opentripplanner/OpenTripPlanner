@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -20,7 +20,6 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
@@ -41,7 +40,6 @@ public class TimetableTest {
     
     private static Graph graph;
     private AStar aStar = new AStar();
-    private static GtfsContext context;
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
@@ -51,17 +49,17 @@ public class TimetableTest {
     @BeforeClass
     public static void setUp() throws Exception {
 
-        context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+        GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
         graph = new Graph();
 
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class,
-                createCalendarServiceData(context.getOtpTransitService())
+                createCalendarServiceData(context.getTransitBuilder())
         );
 
-        patternIndex = new HashMap<FeedScopedId, TripPattern>();
+        patternIndex = new HashMap<>();
         for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding)

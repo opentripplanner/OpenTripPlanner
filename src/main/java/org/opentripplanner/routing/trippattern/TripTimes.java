@@ -3,7 +3,7 @@ package org.opentripplanner.routing.trippattern;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.List;
+import java.util.Collection;
 
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -107,7 +107,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
      */
-    public TripTimes(final Trip trip, final List<StopTime> stopTimes, final Deduplicator deduplicator) {
+    public TripTimes(final Trip trip, final Collection<StopTime> stopTimes, final Deduplicator deduplicator) {
         this.trip = trip;
         final int nStops = stopTimes.size();
         final int[] departures = new int[nStops];
@@ -115,7 +115,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] sequences  = new int[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
-        timeShift = stopTimes.get(0).getArrivalTime();
+        timeShift = stopTimes.iterator().next().getArrivalTime();
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -154,7 +154,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * @return either an array of headsigns (one for each stop on this trip) or null if the
      * headsign is the same at all stops (including null) and can be found in the Trip object.
      */
-    private String[] makeHeadsignsArray(final List<StopTime> stopTimes) {
+    private String[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
         final String tripHeadsign = trip.getTripHeadsign();
         boolean useStopHeadsigns = false;
         if (tripHeadsign == null) {

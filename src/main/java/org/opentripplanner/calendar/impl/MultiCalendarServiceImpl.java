@@ -4,7 +4,9 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.LocalizedServiceId;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+
+import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarSrvDataWithoutDatesForLocalizedSrvId;
 
 /**
  * This is actually kind of a hack, and assumes that there is only one copy of CalendarServiceData
@@ -19,9 +21,12 @@ public class MultiCalendarServiceImpl extends CalendarServiceImpl {
         super(new CalendarServiceData());
     }
 
-    public void addData(CalendarServiceData data, OtpTransitService transitService) {
+
+    public void addData(OtpTransitServiceBuilder transitBuilder) {
+        CalendarServiceData data = createCalendarSrvDataWithoutDatesForLocalizedSrvId(transitBuilder);
         CalendarServiceData _data = super.getData();
-        for (Agency agency : transitService.getAllAgencies()) {
+
+        for (Agency agency : transitBuilder.getAgencies()) {
             String agencyId = agency.getId();
             _data.putTimeZoneForAgencyId(agencyId, data.getTimeZoneForAgencyId(agencyId));
         }

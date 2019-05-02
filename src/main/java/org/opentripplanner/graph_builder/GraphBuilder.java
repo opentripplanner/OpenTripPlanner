@@ -310,7 +310,7 @@ public class GraphBuilder implements Runnable {
      * We want to detect even those that are not graph builder inputs so we can effectively warn when unrecognized file
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
-    private static enum InputFileType {
+    private enum InputFileType {
         GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
