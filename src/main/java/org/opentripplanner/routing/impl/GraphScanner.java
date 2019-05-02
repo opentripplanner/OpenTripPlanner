@@ -1,5 +1,10 @@
 package org.opentripplanner.routing.impl;
 
+import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.routing.services.GraphService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,11 +14,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.services.GraphService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Scan for graphs under the base directory and auto-register them.
@@ -26,7 +26,7 @@ public class GraphScanner {
     private static final int AUTOSCAN_PERIOD_SEC = 10;
 
     /** Where to look for graphs. Defaults to 'graphs' under the OTP server base path. */
-    public File basePath = null;
+    private final File basePath;
 
     /** A list of routerIds to automatically register and load at startup */
     public List<String> autoRegister;

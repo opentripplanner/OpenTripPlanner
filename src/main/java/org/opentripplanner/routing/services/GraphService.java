@@ -43,7 +43,7 @@ public class GraphService {
      */
     private static final boolean AUTORELOAD_PREEVICT = false;
 
-    private Map<String, GraphSource> graphSources = new HashMap<>();
+    private final Map<String, GraphSource> graphSources = new HashMap<>();
 
     private static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
 
