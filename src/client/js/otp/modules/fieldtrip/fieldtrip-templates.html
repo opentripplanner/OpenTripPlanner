@@ -64,10 +64,7 @@
             <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;
             <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
             <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
-            <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
-                {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
-                <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}
-                &nbsp;<span style="font-size: .8em">[<a href="#" class="changeGroupSizeLink">Change</a>]</span><br>
+            <b>Students (Age 7+)</b>: {{numPaidStudents}} / <b>Students (Age <7)</b>: {{numFreeStudents}} / <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}&nbsp;<span style="font-size: .8em">[<a href="#" class="changeGroupSizeLink">Change</a>]</span><br>
             <b>Start Address</b>: {{startLocation}}<br>
             <b>Time Arriving at Destination</b>: {{arriveDestinationTime}}<br>
             <b>Time Leaving at Destination</b>: {{leaveDestinationTime}}<br>
@@ -251,9 +248,9 @@
                 <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;
                 <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
                 <b>Email</b>: {{#emailAddress}}{{emailAddress}}{{/emailAddress}}{{^emailAddress}}N/A{{/emailAddress}}<br>
-                <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
-                    {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) /
-                    <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+                <b>Students Age 7 and Over</b>: {{numPaidStudents}}<br>
+                <b>Students Age 6 and Under</b>: {{numFreeStudents}}<br>
+                <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
                 {{#classpassId}}
                     <b>Class Pass ID</b>: {{classpassId}}<br>
                 {{/classpassId}}
@@ -409,13 +406,12 @@
     <div style="position: relative;">
         <div class="otp-dialogContent">
             <div style="margin-top: 6px;">
-                Number of Students:&nbsp;
-                <input class='numStudents' style='display: inline; width: 50px;' type="text" value="{{numStudents}}" />
+                Number of Students 7 and Over:&nbsp;
+                <input class='numPaidStudents' style='display: inline; width: 50px;' type="text" value="{{numPaidStudents}}" />
             </div>
             <div style="margin-top: 6px;">
-                Student Age Range:&nbsp;
-                <input class='minimumAge' style='display: inline; width: 50px;' type="text" value="{{minimumAge}}" /> to
-                <input class='maximumAge' style='display: inline; width: 50px;' type="text" value="{{maximumAge}}" />
+                Number of Students 6 and Under:&nbsp;
+                <input class='numFreeStudents' style='display: inline; width: 50px;' type="text" value="{{numFreeStudents}}" />
             </div>
             <div style="margin-top: 6px;">
                 Number of Chaperones:&nbsp;

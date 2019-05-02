@@ -20,7 +20,7 @@ public class Car2GoCarRentalDataSource extends GenericCarRentalDataSource {
 
     @Override
     public void configure(Graph graph, JsonNode jsonNode) {
-        this.networkName = "car2go";
+        this.networkName = "CAR2GO";
         super.configure(jsonNode);
     }
 
@@ -48,7 +48,7 @@ public class Car2GoCarRentalDataSource extends GenericCarRentalDataSource {
         car2go.isFloatingCar = true;
         car2go.licensePlate = vehicle.get("plate").asText();
         car2go.name = new NonLocalizedString(vehicle.get("plate").asText());
-        car2go.networks = new HashSet<>(Arrays.asList("car2go"));
+        car2go.networks = new HashSet<>(Arrays.asList(networkName));
         car2go.spacesAvailable = 0;
         car2go.x = vehicle.path("geoCoordinate").path("longitude").asDouble();
         car2go.y = vehicle.path("geoCoordinate").path("latitude").asDouble();

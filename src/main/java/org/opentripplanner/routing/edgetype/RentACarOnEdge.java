@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import com.google.common.collect.Sets;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -50,6 +51,18 @@ public class RentACarOnEdge extends RentACarAbstractEdge {
         // don't use the same pickup station twice
         if (s0.stateData.getRentedCars().contains(station.id))
             return null;
+
+        // make sure the car being rented is within a network compatible with the request
+        if (
+            !hasCompatibleNetworks(
+                options.companies != null
+                    ? Sets.newHashSet(options.companies.split(","))
+                    : null,
+                station.networks
+            )
+        ) {
+            return null;
+        }
 
         StateEditor s1e = s0.edit(this);
         if (options.arriveBy) {

@@ -71,13 +71,9 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
         if (vehiclesUrl == null) {
             throw new IllegalArgumentException("Missing mandatory 'vehiclesUrl' configuration.");
         }
-        this.setVehiclesUrl(vehiclesUrl);
+        this.vehiclesUrl = vehiclesUrl;
         this.setRegionsFromConfig(config);
     }
-
-    public void setRegionsUrl(String url) { this.regionsUrl = url; }
-
-    public void setVehiclesUrl(String url) { this.vehiclesUrl = url; }
 
     /**
      * Update the allowable dropoff regions for the car rental datasource.

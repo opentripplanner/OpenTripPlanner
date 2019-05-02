@@ -13,7 +13,10 @@
 
 package org.opentripplanner.updater.car_rental;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import junit.framework.TestCase;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
@@ -21,10 +24,20 @@ import org.opentripplanner.routing.car_rental.CarRentalStation;
 import java.util.List;
 
 public class TestReachNowRentalDataSource extends TestCase {
+    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectNode config;
+
+    @BeforeClass
+    public void setUp() {
+        config = mapper.createObjectNode();
+        config.put("vehiclesUrl", "file:src/test/resources/car/reachNowVehicles.json");
+        config.put("regionsUrl", "file:src/test/resources/car/region.json");
+    }
+
     @Test
-    public void testParseVehiclesJson() {
+    public void testParseVehiclesJson() throws Exception {
         ReachNowCarRentalDataSource reachNowCarRentalDataSource = new ReachNowCarRentalDataSource();
-        reachNowCarRentalDataSource.setVehiclesUrl("file:src/test/resources/car/reachNowVehicles.json");
+        reachNowCarRentalDataSource.configure(null, config);
 
         // update data source and consume vehicles json
         assertTrue(reachNowCarRentalDataSource.updateStations());
@@ -45,7 +58,7 @@ public class TestReachNowRentalDataSource extends TestCase {
         assertEquals(true, firstVehicle.isFloatingCar);
         assertEquals("TEST1", firstVehicle.licensePlate);
         assertEquals("TEST1", firstVehicle.name.toString());
-        assertEquals(true, firstVehicle.networks.contains("reachnow"));
+        assertEquals(true, firstVehicle.networks.contains("REACHNOW"));
         assertEquals(0, firstVehicle.spacesAvailable);
         assertEquals(-122.599453, firstVehicle.x);
         assertEquals(45.499904, firstVehicle.y);

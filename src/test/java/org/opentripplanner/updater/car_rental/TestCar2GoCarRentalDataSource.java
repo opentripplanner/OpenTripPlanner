@@ -13,9 +13,12 @@
 
 package org.opentripplanner.updater.car_rental;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import junit.framework.TestCase;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
@@ -25,10 +28,20 @@ import java.io.IOException;
 import java.util.List;
 
 public class TestCar2GoCarRentalDataSource extends TestCase {
+    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectNode config;
+
+    @BeforeClass
+    public void setUp() {
+        config = mapper.createObjectNode();
+        config.put("vehiclesUrl", "file:src/test/resources/car/car2go.json");
+        config.put("regionsUrl", "file:src/test/resources/car/region.json");
+    }
+
     @Test
     public void testParseVehiclesJson() {
         Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
-        car2GoCarRentalDataSource.setVehiclesUrl("file:src/test/resources/car/car2go.json");
+        car2GoCarRentalDataSource.configure(null, config);
 
         // update data source and consume vehicles json
         assertTrue(car2GoCarRentalDataSource.updateStations());
@@ -49,7 +62,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
         assertEquals(true, firstVehicle.isFloatingCar);
         assertEquals("TEST1", firstVehicle.licensePlate);
         assertEquals("TEST1", firstVehicle.name.toString());
-        assertEquals(true, firstVehicle.networks.contains("car2go"));
+        assertEquals(true, firstVehicle.networks.contains("CAR2GO"));
         assertEquals(0, firstVehicle.spacesAvailable);
         assertEquals(-122.64797026, firstVehicle.x);
         assertEquals(45.47517085, firstVehicle.y);
@@ -58,7 +71,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
     @Test
     public void testParseRegionJson() throws IOException {
         Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
-        car2GoCarRentalDataSource.setRegionsUrl("file:src/test/resources/car/region.json");
+        car2GoCarRentalDataSource.configure(null, config);
 
         assertTrue(car2GoCarRentalDataSource.updateRegions());
         CarRentalRegion firstRegion = car2GoCarRentalDataSource.getRegions().get(0);
