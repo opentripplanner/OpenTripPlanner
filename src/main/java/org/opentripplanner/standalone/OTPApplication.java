@@ -4,19 +4,24 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
-import org.opentripplanner.api.resource.*;
+import org.opentripplanner.api.resource.AlertPatcher;
+import org.opentripplanner.api.resource.BikeRental;
+import org.opentripplanner.api.resource.ExternalGeocoderResource;
+import org.opentripplanner.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.api.resource.PlannerResource;
+import org.opentripplanner.api.resource.Routers;
+import org.opentripplanner.api.resource.ServerInfo;
+import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -72,9 +77,7 @@ public class OTPApplication extends Application {
             IndexAPI.class,
             ExternalGeocoderResource.class,
             BikeRental.class,
-            ExternalGeocoderResource.class,
             AlertPatcher.class,
-            PlannerResource.class,
             Routers.class,
             ServerInfo.class,
             GraphInspectorTileResource.class,

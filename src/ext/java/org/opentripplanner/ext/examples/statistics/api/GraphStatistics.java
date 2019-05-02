@@ -10,19 +10,19 @@ public class GraphStatistics {
         this.nStationsInGraph = nStationsInGraph;
     }
 
-    public int getnStopsInGraph() {
+    public int getNStopsInGraph() {
         return nStopsInGraph;
     }
 
-    public void setnStopsInGraph(int nStopsInGraph) {
+    public void setNStopsInGraph(int nStopsInGraph) {
         this.nStopsInGraph = nStopsInGraph;
     }
 
-    public int getnStationsInGraph() {
+    public int getNStationsInGraph() {
         return nStationsInGraph;
     }
 
-    public void setnStationsInGraph(int nStationsInGraph) {
+    public void setNStationsInGraph(int nStationsInGraph) {
         this.nStationsInGraph = nStationsInGraph;
     }
 
