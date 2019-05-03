@@ -126,10 +126,12 @@ public class AlertPatch implements Serializable {
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
         if (route != null && stop == null && trip == null && serviceAffected()) {
-            LOG.warn("Route {} ({}) is skipped entirely due to alert {}",
+            LOG.warn("Route {} ({}) is skipped entirely due to alert {} ({}) - ignoring",
                     route.getId().getId(),
                     route.getShortName(),
-                    this.alert.getId());
+                    this.alert.getId(),
+                    this.alert.getEffect());
+            return;
         }
 
         if (route != null || trip != null || agency != null) {
