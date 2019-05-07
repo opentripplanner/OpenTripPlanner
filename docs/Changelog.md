@@ -13,6 +13,7 @@
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
 - Refactor InterleavedBidirectionalHeuristic (#2671)
+- Refactor StreetSplitter (#2758)
 
 ## 1.3 (2018-08-03)
 
