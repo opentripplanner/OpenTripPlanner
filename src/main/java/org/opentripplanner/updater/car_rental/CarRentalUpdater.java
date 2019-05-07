@@ -6,7 +6,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.car_rental.CarRentalStationService;
@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+
 public class CarRentalUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(CarRentalUpdater.class);
@@ -43,7 +45,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
     private Graph graph;
 
-    private SimpleStreetSplitter linker;
+    private StreetSplitter splitter;
 
     private String network;
 
@@ -113,7 +115,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph);
+        splitter = graph.streetIndex.getStreetSplitter();
 
         service = graph.getService(CarRentalStationService.class, true);
     }
@@ -190,7 +192,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
         private void makeVertex(Graph graph, CarRentalStation station) {
             CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-            if (!linker.link(vertex)) {
+            if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
                 // the toString includes the text "Car rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
@@ -285,7 +287,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             coordToNetworksMap.forEach((coord, networks) -> {
                 CarRentalStation station = makeDropOffStation(coord, networks);
                 CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-                if (!linker.link(vertex)) {
+                if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }
