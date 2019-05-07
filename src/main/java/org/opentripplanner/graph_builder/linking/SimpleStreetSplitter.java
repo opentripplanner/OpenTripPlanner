@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -82,7 +83,7 @@ public class SimpleStreetSplitter implements StreetSplitter {
 
     private Boolean addExtraEdgesToAreas = false;
 
-    private StreetEdgeFactory edgeFactory;
+    private StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     public static final int WARNING_DISTANCE_METERS = 20;
 
