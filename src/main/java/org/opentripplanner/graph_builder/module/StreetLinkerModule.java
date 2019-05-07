@@ -46,7 +46,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
             LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
             SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
             linker.setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
-            linker.link();
+            linker.linkAllStationsToGraph();
         }
         //Calculates convex hull of a graph which is shown in routerInfo API point
         graph.calculateConvexHull();

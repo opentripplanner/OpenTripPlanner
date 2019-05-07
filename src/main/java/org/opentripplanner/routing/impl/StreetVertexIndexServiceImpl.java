@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.impl;
 
 
-import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -15,9 +14,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraversalRequirements;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,8 +27,6 @@ import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,10 +91,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null, false);
+            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null);
         } else {
             simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
-                (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree, false);
+                    (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree);
         }
 
     }
@@ -325,8 +321,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                                        boolean endVertex) {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
-            //return getClosestVertex(loc, options, endVertex);
-            return simpleStreetSplitter.getClosestVertex(loc, options, endVertex);
+            return simpleStreetSplitter.linkOriginDestination(loc, options, endVertex);
         }
 
         // No Coordinate available.
@@ -375,5 +370,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
 
         return v;
+    }
+
+    @Override
+    public StreetSplitter getStreetSplitter() {
+        return simpleStreetSplitter;
     }
 }
