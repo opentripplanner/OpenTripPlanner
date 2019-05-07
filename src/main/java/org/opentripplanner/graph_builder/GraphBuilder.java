@@ -23,8 +23,8 @@ import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.OTPConfiguration;
 import org.opentripplanner.standalone.S3BucketConfig;
+import org.opentripplanner.standalone.config.GraphConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +122,7 @@ public class GraphBuilder implements Runnable {
      * note of all command line options this is only using  params.inMemory params.preFlight
      * and params.build directory
      */
-    public static GraphBuilder create(CommandLineParameters params, OTPConfiguration config) {
+    public static GraphBuilder create(CommandLineParameters params, GraphConfig config) {
         LOG.info("Wiring up and configuring graph builder task.");
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
@@ -285,7 +285,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
-            if (OTPConfiguration.isConfigFile(name)) return CONFIG;
+            if (GraphConfig.isGraphConfigFile(name)) return CONFIG;
             return OTHER;
         }
     }

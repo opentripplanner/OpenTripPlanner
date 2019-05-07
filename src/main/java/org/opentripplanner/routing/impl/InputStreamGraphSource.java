@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.standalone.OTPConfiguration;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import java.io.InputStream;
  */
 public class InputStreamGraphSource implements GraphSource {
 
-    public static final String GRAPH_FILENAME = "Graph.obj";
+    static final String GRAPH_FILENAME = "Graph.obj";
 
     private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
@@ -39,27 +40,18 @@ public class InputStreamGraphSource implements GraphSource {
 
     private long graphLastModified = 0L;
 
-    private Object preEvictMutex = new Boolean(false);
+    private final Object preEvictMutex = Boolean.FALSE;
 
-    /**
-     * The current used input stream implementation for getting graph data source.
-     */
-    private Streams streams;
-
-    private final File baseDir;
+    private final GraphConfig config;
 
 
     /**
-     * @return A GraphSource loading graph from the file system under a base path.
+     * Create GraphSource loading graph from the file system using the graph config with graph
+     * base path.
      */
-    static InputStreamGraphSource newFileGraphSource(String routerId, File path) {
-        return new InputStreamGraphSource(routerId, path);
-    }
-
-    private InputStreamGraphSource(String routerId, File path) {
+    InputStreamGraphSource(String routerId, GraphConfig config) {
         this.routerId = routerId;
-        this.baseDir = path;
-        this.streams = new FileStreams(path);
+        this.config = config;
     }
 
     @Override
@@ -79,8 +71,8 @@ public class InputStreamGraphSource implements GraphSource {
     public boolean reload(boolean force, boolean preEvict) {
         /* We synchronize on 'this' to prevent multiple reloads from being called at the same time */
         synchronized (this) {
-            long lastModified = streams.getLastModified();
-            boolean doReload = force ? true : checkAutoReload(lastModified);
+            long lastModified = getLastModified();
+            boolean doReload = force || checkAutoReload(lastModified);
             if (!doReload)
                 return true;
             if (preEvict) {
@@ -171,7 +163,7 @@ public class InputStreamGraphSource implements GraphSource {
      */
     private Router loadGraph() {
         final Graph newGraph;
-        try (InputStream is = streams.getGraphInputStream()) {
+        try (InputStream is = getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
                 newGraph = Graph.load(is);
@@ -187,46 +179,22 @@ public class InputStreamGraphSource implements GraphSource {
         }
 
         // Load configuration from disk or use the embedded configuration as fallback.
-        OTPConfiguration otpConfiguration = new OTPConfiguration(baseDir);
-        JsonNode config = otpConfiguration.routerConfig(newGraph.routerConfig);
+        JsonNode jsonConfig = config.routerConfig(newGraph.routerConfig);
 
         Router newRouter = new Router(routerId, newGraph);
-        newRouter.startup(config);
+        newRouter.startup(jsonConfig);
         return newRouter;
     }
 
-    /**
-     * InputStreamGraphSource delegates to some actual implementation the fact of getting the input
-     * stream and checking the last modification timestamp for a given routerId.
-     * FIXME this seems like a lot of boilerplate just to switch between FileInputStream and getResourceAsStream
-     * a couple of conditional blocks and a boolean field "onClasspath" might do the trick.
-     */
-    private interface Streams {
-        InputStream getGraphInputStream() throws IOException;
-
-        long getLastModified();
+    private InputStream getGraphInputStream() throws IOException {
+        File graphFile = new File(config.getPath(), GRAPH_FILENAME);
+        LOG.debug("Loading graph from file '{}'", graphFile.getPath());
+        return new FileInputStream(graphFile);
     }
 
-    private static class FileStreams implements Streams {
-
-        private File path;
-
-        private FileStreams(File path) {
-            this.path = path;
-        }
-
-        @Override
-        public InputStream getGraphInputStream() throws IOException {
-            File graphFile = new File(path, GRAPH_FILENAME);
-            LOG.debug("Loading graph from file '{}'", graphFile.getPath());
-            return new FileInputStream(graphFile);
-        }
-
-        @Override
-        public long getLastModified() {
-            // Note: this returns 0L if the file does not exists
-            return new File(path, GRAPH_FILENAME).lastModified();
-        }
+    private long getLastModified() {
+        // Note: this returns 0L if the file does not exists
+        return new File(config.getPath(), GRAPH_FILENAME).lastModified();
     }
 
     /**
@@ -236,15 +204,20 @@ public class InputStreamGraphSource implements GraphSource {
 
         private static final Logger LOG = LoggerFactory.getLogger(FileFactory.class);
 
-        public File basePath;
 
-        public FileFactory(File basePath) {
+        private final OTPConfiguration otpConfiguration;
+        private final File basePath;
+
+        public FileFactory(OTPConfiguration otpConfiguration, File basePath) {
+            this.otpConfiguration = otpConfiguration;
             this.basePath = basePath;
         }
 
         @Override
         public GraphSource createGraphSource(String routerId) {
-            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId));
+            return new InputStreamGraphSource(
+                    routerId, otpConfiguration.getGraphConfig(getBasePath(routerId))
+            );
         }
 
         @Override

@@ -49,23 +49,22 @@ public class GraphService {
 
     private String defaultRouterId = "";
 
-    public GraphSource.Factory graphSourceFactory;
+    public final GraphSource.Factory graphSourceFactory;
 
     private ScheduledExecutorService scanExecutor;
 
     public GraphService() {
-        this(false);
+        this(false, null);
     }
 
-    public GraphService(boolean autoReload) {
+    public GraphService(boolean autoReload, GraphSource.Factory graphSourceFactory) {
+        this.graphSourceFactory = graphSourceFactory;
         if (autoReload) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
-            scanExecutor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    autoReloadScan();
-                }
-            }, AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS);
+            scanExecutor.scheduleWithFixedDelay(
+                    this::autoReloadScan,
+                    AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS
+            );
         }
     }
 

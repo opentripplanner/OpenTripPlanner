@@ -11,9 +11,9 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPConfiguration;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,9 +88,15 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Context OTPServer otpServer;
+    private final OTPServer otpServer;
+    private final OTPConfiguration otpConfiguration;
 
-    /** 
+    public Routers(@Context OTPServer otpServer, @Context OTPConfiguration otpConfiguration) {
+        this.otpServer = otpServer;
+        this.otpConfiguration = otpConfiguration;
+    }
+
+    /**
      * Returns a list of routers and their bounds. 
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
      * on the Accept header in the HTTP request.
@@ -254,8 +260,10 @@ public class Routers {
         CommandLineParameters params = otpServer.params.clone();
         params.build = tempDir;
         params.inMemory = true;
-        
-        GraphBuilder graphBuilder = GraphBuilder.create(params, new OTPConfiguration(params.build));
+
+        GraphBuilder graphBuilder = GraphBuilder.create(
+                params, otpConfiguration.getGraphConfig(params.build)
+        );
         
         graphBuilder.run();
         

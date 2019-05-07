@@ -9,20 +9,11 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
+import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
-import org.opentripplanner.api.resource.AlertPatcher;
-import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.ExternalGeocoderResource;
-import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.api.resource.PlannerResource;
-import org.opentripplanner.api.resource.Routers;
-import org.opentripplanner.api.resource.ServerInfo;
-import org.opentripplanner.api.resource.UpdaterStatusResource;
-import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,10 +44,11 @@ public class OTPApplication extends Application {
      * The OTPServer provides entry points to OTP routing functionality for a collection of OTPRouters.
      * It provides a Java API, not an HTTP API.
      * The OTPApplication wraps an OTPServer in a Jersey (JAX-RS) Application, configuring an HTTP API.
+     *
      * @param server The OTP server to wrap
      * @param secure Should this server require authentication over HTTPS to access secure resources, e.g. /routers?
      */
-    public OTPApplication (OTPServer server, boolean secure) {
+    OTPApplication (OTPServer server, boolean secure) {
         this.server = server;
         this.secure = secure;
     }
@@ -71,35 +63,28 @@ public class OTPApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = Sets.newHashSet();
-        classes.addAll(Arrays.asList(
-            /* Jersey resource classes: define web services, i.e. an HTTP API. */
-            PlannerResource.class,
-            IndexAPI.class,
-            ExternalGeocoderResource.class,
-            BikeRental.class,
-            AlertPatcher.class,
-            Routers.class,
-            ServerInfo.class,
-            GraphInspectorTileResource.class,
-            UpdaterStatusResource.class,
-            /* Features and Filters: extend Jersey, manipulate requests and responses. */
-            CorsFilter.class,
-            MultiPartFeature.class
-        ));
-        
+
+        // Add API Endpoints defined in the api package
+        classes.addAll(APIEndpoints.listAPIEndpoints());
+
+        /* Features and Filters: extend Jersey, manipulate requests and responses. */
+        classes.add(CorsFilter.class);
+        classes.add(MultiPartFeature.class);
+
         if (this.secure) {
             // A filter that converts HTTP Basic authentication headers into a Jersey SecurityContext
             classes.add(AuthFilter.class);
             // Enforce roles annotations defined by JSR-250 (allow access to API methods based on the SecurityContext)
             classes.add(RolesAllowedDynamicFeature.class);
         }
-        
         return classes;
     }
 
     /**
-     * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
-     * However, these are single instances that will be reused for all requests (they are singleton-scoped).
+     * Like getClasses, this method declares web resources, providers, and features to the JAX-RS
+     * implementation. However, these are single instances that will be reused for all requests
+     * (they are singleton-scoped).
+     * <p/>
      * See https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
      * Leave <Object> out of method signature to avoid confusing the Guava type inference.
      */
@@ -120,16 +105,15 @@ public class OTPApplication extends Application {
     }
 
     /**
-     * Enabling tracing allows us to see how web resource names were matched from the client, in headers.
-     * Disable auto-discovery of features because it's extremely obnoxious to debug and interacts
-     * in confusing ways with manually registered features.
+     * Enabling tracing allows us to see how web resource names were matched from the client, in
+     * headers. Disable auto-discovery of features because it's extremely obnoxious to debug and
+     * interacts in confusing ways with manually registered features.
      */
-    // @Override
+    @Override
     public Map<String, Object> getProperties() {
         Map<String, Object> props = Maps.newHashMap();
         props.put(ServerProperties.TRACING, Boolean.TRUE);
         props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
         return props;
     }
-
 }
