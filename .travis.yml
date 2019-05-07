@@ -9,24 +9,13 @@ jdk:
 install: true
 
 # Replace Travis's default build step.
-# Run all Maven phases at once up through verify, install, and deploy.
-script: |
-  # only (attempt to) deploy non-pull request commits to the master branch or to tags
-  if [[ "$TRAVIS_PULL_REQUEST" = false ]] && [[ "$TRAVIS_BRANCH" = master || ! -z "$TRAVIS_TAG" ]]; then
-    mvn clean deploy --settings maven-settings.xml
-  else
-    # otherwise, just run test suite
-    mvn clean verify --settings maven-settings.xml -B -V -Dgpg.skip
-  fi
+# Only run the test suite
+script:  mvn clean verify --settings maven-settings.xml -B -V -Dgpg.skip
 
 # Secure envs are OSSRH_JIRA_USERNAME, OSSRH_JIRA_PASSWORD, GPG_KEY_NAME, GPG_PASSPHRASE
 env:
   global:
   - JAVA_OPTS=-Xmx2g
-  - secure: SR50xh5n9H9ML20NM9QK3Y7rS1xzmMgLtp8Hke7fPL4QsCvdd1CTXTIjGPtCNzvEx0zUKIx1vO0s5mwnB0KyhTzwI8t5xvw7RErp7v7WiskKVKVkCu6EPDsTH1d3iQpF4QAFy/07HehCvGtObh3XnOYZKRfoxpY3/n9y/DxuKp8=
-  - secure: R8kd55l4UXde9pa6POKFFFmkp4N7KD03vCAiT5dEOvDDKBRIGo1n7Yn+txIhpe8VJVYDqAxOUdW9yZO29GWvjNTiFmDqbvC4GuzWqU+Am1Dfmi5Udmmswcy4CTeoNqKchhNn69EhphdFsKE+JzCZIJSo4+Gl0jAqxMBE13ghlBw=
-  - secure: LV+MX/r5l/ycNS1fQNxdzBLyGLnAsG8G3APWsvqb0Sou/fPncwjfGV178jxPUULhb8VAex+MIJsBObrQGD4vdvqBI9ASPHReplANLYrsAAzTm0bPkkyQCs37cDq9ORsETnR9j8m8G/0+8bxH81WOOEv56h4fiQog5z3cBbSGdh0=
-  - secure: cAXIX+Op0EXl3GHX5qCOGHrFQpPlvVSq8mh5zqABSICsMQHUgTyOgSNUykOdrOarjM2y2H1+Yu2MfLtu2v1hAS/zSzAswx+7T7xwptsX1bd+QX2s9+3q4OgG/97Il3Dqhbf9mGqxJyfWP4iD1Ry9IIlsIGk/coe877mkZCbKb2s=
 
 # If sudo is disabled, CI runs on container based infrastructure (allows caching &c.)
 sudo: false
@@ -39,7 +28,3 @@ cache:
 # Notify us of the build status on the Slack channel
 notifications:
   webhooks: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea27dd3c6a102d/286c079f-6085-4aa0-8f8d-e2a3e8d1f568
-
-# Decrypt and import the artifact signing certificate before running the build
-before_install:
-  - if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then openssl aes-256-cbc -K $encrypted_9918733fe303_key -iv $encrypted_9918733fe303_iv -in maven-artifact-signing-key.asc.enc -out maven-artifact-signing-key.asc -d && gpg --import --batch maven-artifact-signing-key.asc; fi
