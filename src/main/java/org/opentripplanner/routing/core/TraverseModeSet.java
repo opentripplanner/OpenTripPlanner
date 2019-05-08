@@ -103,14 +103,14 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_SUBWAY;
         case RAIL:
             return MODE_RAIL;
-        case AIRPLANE:
-            return MODE_AIRPLANE;
         case SHARE_TAXI:
             return MODE_SHARE_TAXI;
         case TROLLEY:
             return MODE_TROLLEY;
         case TRANSIT:
             return MODE_TRANSIT;
+        case AIRPLANE:
+            return MODE_AIRPLANE;
         }
         return 0;
     }
@@ -339,6 +339,17 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public boolean contains(TraverseMode mode) {
         return (modes & getMaskForMode(mode)) != 0;
     }
+
+    public boolean contains(TraverseMode...mode) {
+        boolean res = false;
+
+        for (TraverseMode m : mode) {
+            res |= (modes & getMaskForMode(m)) != 0;
+        }
+
+        return res;
+    }
+
 
     public boolean get(int modeMask) {
         return (modes & modeMask) != 0;

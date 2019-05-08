@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import javax.xml.bind.annotation.XmlType;
 
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ public enum TraverseMode {
 
     private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
             new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
+
+    public static TraverseMode BUS_TYPE_TRANSPORT[] = {TraverseMode.BUS, TraverseMode.SHARE_TAXI, TraverseMode.TROLLEY};
 
     public static Set<TraverseMode> internSet (Set<TraverseMode> modeSet) {
         if (modeSet == null)
@@ -48,4 +51,8 @@ public enum TraverseMode {
         return this == CAR;
     }
 
+    public boolean isBusType()
+    {
+        return this == TraverseMode.BUS || this == TraverseMode.SHARE_TAXI || this == TraverseMode.TROLLEY;
+    }
 }

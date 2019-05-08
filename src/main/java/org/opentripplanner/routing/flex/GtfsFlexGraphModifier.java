@@ -30,7 +30,6 @@ import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -446,7 +445,7 @@ public abstract class GtfsFlexGraphModifier {
     }
 
     private Vertex findCarAccessibleVertex(RoutingRequest opt, Vertex vertex, boolean arriveBy) {
-        if (vertex instanceof TransitStop && ((TransitStop) vertex).getModes().contains(TraverseMode.BUS)) {
+        if (vertex instanceof TransitStop && ((TransitStop) vertex).getModes().contains(TraverseMode.BUS_TYPE_TRANSPORT)) {
             return vertex;
         }
         return new CarPermissionSearch(opt, arriveBy).findVertexWithPermission(vertex, TraverseMode.CAR);

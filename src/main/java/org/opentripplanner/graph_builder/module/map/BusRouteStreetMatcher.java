@@ -56,7 +56,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
         // Why do we need to iterate over the routes? Why not just patterns?
         for (Route route : graph.index.routeForId.values()) {
             for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
-                if (pattern.mode == TraverseMode.BUS) {
+                if (pattern.mode.isBusType()) {
                     /* we can only match geometry to streets on bus routes */
                     log.debug("Matching {}", pattern);
                     //If there are no shapes in GTFS pattern geometry is generated
