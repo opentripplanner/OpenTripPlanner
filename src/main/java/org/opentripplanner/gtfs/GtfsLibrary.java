@@ -74,6 +74,12 @@ public class GtfsLibrary {
         } else if (routeType >= 500 && routeType < 700) { //Metro Service and Underground Service
             return TraverseMode.SUBWAY;
         } else if (routeType >= 700 && routeType < 900) { //Bus Service and Trolleybus service
+            if (routeType == 800) {
+                return TraverseMode.TROLLEY;
+            }
+            if (routeType == 717) {
+                return TraverseMode.SHARE_TAXI;
+            }
             return TraverseMode.BUS;
         } else if (routeType >= 900 && routeType < 1000) { //Tram service
             return TraverseMode.TRAM;
