@@ -4,19 +4,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class GraphStatisticsResourceTest {
     private static final String QUERY_STATISTICS = "query S {\n  graphStatistics {\n    stops\n  }\n}\n";
@@ -25,12 +24,14 @@ public class GraphStatisticsResourceTest {
     private String expResult;
 
     @Before public void setUp() throws Exception {
-        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+        GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
         Graph graph = new Graph();
-        PatternHopFactory factory = new PatternHopFactory(context);
-        factory.run(graph);
-        graph.putService(CalendarServiceData.class,
-                createCalendarServiceData(context.getOtpTransitService()));
+        PatternHopFactory hl = new PatternHopFactory(context);
+        hl.run(graph);
+        graph.putService(
+                CalendarServiceData.class,
+                createCalendarServiceData(context.getTransitBuilder())
+        );
         graph.index(new DefaultStreetVertexIndexFactory());
 
         long expStops = graph.index.stopForId.size();
