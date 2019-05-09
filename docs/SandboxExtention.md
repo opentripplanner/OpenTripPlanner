@@ -38,7 +38,7 @@ Here is a list of features implemented as OTP Sandbox Extensions. TODO - Disclai
   should be added in the test directory: `src/ext-test`
 - To integrate the new feature into OTP you may have to create new extension points in the main 
   code. 
-- Create a readme file (`src/ext/java/org/opentripplanner/ext/<extension name>/<Extension Name>.md` 
+- Create a readme file (`docs/sandbox/<Extension Name>.md` 
   package including:
     - Contact info 
     - Change log
@@ -52,13 +52,16 @@ Here is a list of features implemented as OTP Sandbox Extensions. TODO - Disclai
 - Anyone can request the feature to be merged into the main code. An approval from the PLC and a 
   new review is then required. The reviewers may request any changes, including API changes. 
 - If an extension is taken into core/main OTP the API may change, no BACKWARD compatibility is 
-  guaranteed. 
+  guaranteed. I.e. the reviewers may require changes at the time it is merged, so clients may have 
+  to change after the merge.
 - The feature submitters is responsible for maintaining and testing the extension code, but do not
-  need to provide any guarantees or support. 
+  need to provide any guarantees or support. It the extention is merged into the main code the 
+  author will in fact need to provide support and maintenance.
 - When someone at a later point in time want to change the main code the only thing they are
   responsible for - with regard to the extension code - is:
   - that it compiles.
-  - that the unit tests run. If a test is not easy to fix, it can be tagged with @Ignore.
+  - that the unit tests run. If a test is not easy to fix, it can be tagged with @Ignore. If ignored
+    it would be polite to notify the author. 
 - Changes to the main OTP API that cannot be toggled _in_ must be clearly marked/tagged as part of 
   an experimental feature and documented - This code is subject to review.
 - If a feature is old and not maintained it can be removed 1 month after notifying the submitter 
