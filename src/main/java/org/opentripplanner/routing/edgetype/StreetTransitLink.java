@@ -129,6 +129,10 @@ public class StreetTransitLink extends Edge {
                         return null;
                     }
                 }
+            } else {
+                // above conditions not satisfied or the request is a Park & Ride or regular driving without transit.
+                // Return null to avoid transition
+                return null;
             }
         }
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
