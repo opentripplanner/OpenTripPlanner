@@ -1,35 +1,34 @@
-package org.opentripplanner.updater.example;
+package org.opentripplanner.ext.examples.updater;
 
-import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This class shows an example of how to implement a graph updater. Besides implementing the methods
- * of the interface GraphUpdater, the updater also needs to be registered in the function
- * GraphUpdaterConfigurator.applyConfigurationToGraph.
- * 
+ * of the interface {@link GraphUpdater}, the updater also needs to be registered in
+ * 'router-config.json'.
+ * <p/>
+ * See the configuration documentation.
+ * <p/>
  * This example is suited for streaming updaters. For polling updaters it is better to use the
  * abstract base class PollingGraphUpdater. The class ExamplePollingGraphUpdater shows an example of
  * this.
- * 
- * Usage example ('example' name is an example) in the file 'Graph.properties':
- * 
+ * <p/>
+ * Usage example in the file 'router-config.json':
  * <pre>
- * example.type = example-updater
- * example.frequencySec = 60
- * example.url = https://api.updater.com/example-updater
+ * {
+ *    "type": "example-updater",
+ *    "frequencySec": 60,
+ *    "url": "https://api.updater.com/example-updater"
+ * }
  * </pre>
  * 
  * @see ExamplePollingGraphUpdater
- * @see GraphUpdaterConfigurator.applyConfigurationToGraph
  */
 public class ExampleGraphUpdater implements GraphUpdater {
 
