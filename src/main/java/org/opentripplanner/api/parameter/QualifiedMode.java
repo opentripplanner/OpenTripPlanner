@@ -54,6 +54,8 @@ public class QualifiedMode implements Serializable {
         if (usingTransit && this.mode == TraverseMode.CAR) {
             if (this.qualifiers.contains(Qualifier.PARK)) {
                 req.parkAndRide = true;
+                // require transit to be used in Park & Ride, otherwise it'd just be a "Park" query
+                req.onlyTransitTrips = true;
             } else if (this.qualifiers.contains(Qualifier.HAIL)) {
                 req.useTransportationNetworkCompany = true;
                 req.driveTimeReluctance = 1.75;
@@ -64,6 +66,8 @@ public class QualifiedMode implements Serializable {
                 req.driveDistanceReluctance = 0.2;
             } else {
                 req.kissAndRide = true;
+                // require transit to be used in Kiss & Ride, otherwise it'd just be a "Kiss" query
+                req.onlyTransitTrips = true;
             }
             req.modes.setWalk(true); // need to walk after dropping the car off
         }
