@@ -120,7 +120,6 @@ public class ItineraryMapper {
         itinerary.endTime = createCalendar(egressPathLeg.toTime());
         itinerary.duration = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
         itinerary.waitingTime = itinerary.duration - itinerary.walkTime - itinerary.transitTime;
-        itinerary.walkDistance = itinerary.legs.stream().mapToDouble(l -> l.distance).sum();
 
         return itinerary;
     }
