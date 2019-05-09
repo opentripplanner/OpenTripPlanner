@@ -624,7 +624,6 @@ public class SimpleStreetSplitter implements StreetSplitter {
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
         boolean linkWithSingleMode = true;
-        TraverseModeSet linkingModeSet = null;
 
         //It can be null in tests
         if (options != null) {
@@ -655,7 +654,7 @@ public class SimpleStreetSplitter implements StreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!linkToGraph(closest, nonTransitMode, options, NON_DESTRUCTIVE_SPLIT)) {
+        if(linkWithSingleMode && !linkToGraph(closest, nonTransitMode, options, NON_DESTRUCTIVE_SPLIT)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;
