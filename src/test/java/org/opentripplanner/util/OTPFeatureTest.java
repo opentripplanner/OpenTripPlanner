@@ -26,7 +26,7 @@ public class OTPFeatureTest {
         // OTPFeatures are global, make sure to copy values, and
         // restore them after the test
         for (OTPFeature it : OTPFeature.values()) {
-            backupValues.put(it, it.on());
+            backupValues.put(it, it.isOn());
         }
     }
 
@@ -42,16 +42,16 @@ public class OTPFeatureTest {
         // If set
         subject.set(true);
         // then expect
-        assertTrue(subject.on());
-        assertFalse(subject.off());
+        assertTrue(subject.isOn());
+        assertFalse(subject.isOff());
     }
 
     @Test public void off() {
         // If set
         subject.set(false);
         // then expect
-        assertFalse(subject.on());
-        assertTrue(subject.off());
+        assertFalse(subject.isOn());
+        assertTrue(subject.isOff());
     }
 
     @Test public void valueAsString() {
@@ -93,9 +93,9 @@ public class OTPFeatureTest {
         OTPFeature.configure(config);
 
         // Then
-        assertTrue(OTPFeature.APIAlertPatcher.on());
-        assertTrue(OTPFeature.APIBikeRental.off());
-        assertTrue(OTPFeature.APIExternalGeocoder.on());
-        assertTrue(OTPFeature.APIGraphInspectorTile.off());
+        assertTrue(OTPFeature.APIAlertPatcher.isOn());
+        assertTrue(OTPFeature.APIBikeRental.isOff());
+        assertTrue(OTPFeature.APIExternalGeocoder.isOn());
+        assertTrue(OTPFeature.APIGraphInspectorTile.isOff());
     }
 }

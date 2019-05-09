@@ -8,8 +8,7 @@
 ## Available extensions
 Here is a list of features implemented as OTP Sandbox Extensions. TODO - Disclaimer on usage.
 
-- [Examples](../src/ext/java/org/opentripplanner/ext/examples/README.md) - Sandbox examples on how 
-  to implement extensions.
+- [Examples](sandbox/Examples.md) - Sandbox examples on how to implement extensions.
 
 
 ## Terminology

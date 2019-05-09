@@ -8,13 +8,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
@@ -24,6 +17,13 @@ import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -33,10 +33,9 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.HttpToGraphQLMapper;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -51,14 +50,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import static org.opentripplanner.util.HttpToGraphQLMapper.mapHttpQuerryParamsToQLParams;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -66,8 +65,6 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
-    @SuppressWarnings("unused")
-    private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
     private static final String MSG_404 = "FOUR ZERO FOUR";
     private static final String MSG_400 = "FOUR HUNDRED";
@@ -568,23 +565,11 @@ public class IndexAPI {
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphQL (HashMap<String, Object> queryParameters) {
-        String query = (String) queryParameters.get("query");
-        Object queryVariables = queryParameters.getOrDefault("variables", null);
-        String operationName = (String) queryParameters.getOrDefault("operationName", null);
-        Map<String, Object> variables;
-        if (queryVariables instanceof Map) {
-            variables = (Map) queryVariables;
-        } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
-            try {
-                variables = deserializer.readValue((String) queryVariables, Map.class);
-            } catch (IOException e) {
-                LOG.error("Variables must be a valid json object");
-                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
-            }
-        } else {
-            variables = new HashMap<>();
+        HttpToGraphQLMapper.QlRequestParams qlReq = mapHttpQuerryParamsToQLParams(queryParameters, deserializer);
+        if(qlReq.isFailed()) {
+            return qlReq.getFailedResponse();
         }
-        return index.getGraphQLResponse(query, variables, operationName);
+        return index.getGraphQLResponse(qlReq.query, qlReq.variables, qlReq.operationName);
     }
 
     @POST

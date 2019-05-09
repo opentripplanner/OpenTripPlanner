@@ -10,10 +10,12 @@
 ### April 2019 (in progress)
 
 - Initial setup of the first new OTP Sandbox Extension
+- Added a simple GraphQL API for retrieving Graph statistics
 
 
 ## Documentation
 
+### Graph Statistics Resource
 This extension show how to create a web endpoint to get some simple statistics: 
 - Number of stops in the graph
 - Number of stations in the graph

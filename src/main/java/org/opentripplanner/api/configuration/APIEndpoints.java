@@ -8,6 +8,7 @@ import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
+import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.util.OTPFeature;
 
@@ -23,6 +24,7 @@ import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.util.OTPFeature.APIRouters;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
+import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
 
 /**
  * Configure API resource endpoints.
@@ -36,7 +38,7 @@ public class APIEndpoints {
         add(PlannerResource.class);
         add(IndexAPI.class);
 
-        // Add feature enabled APIs, some of these are enabled by default, some is not.
+        // Add feature enabled APIs, these can be enabled by default, some is not.
         // See the OTPFeature enum for details.
         addIfEnabled(APIExternalGeocoder, ExternalGeocoderResource.class);
         addIfEnabled(APIBikeRental, BikeRental.class);
@@ -45,6 +47,9 @@ public class APIEndpoints {
         addIfEnabled(APIServerInfo, ServerInfo.class);
         addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
         addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
+
+        // Sandbox extension APIs
+        addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
     }
 
     /**
@@ -67,7 +72,7 @@ public class APIEndpoints {
      * @param resource   the resource to enable if feature is enabled.
      */
     private void addIfEnabled(OTPFeature apiFeature, Class<?> resource) {
-        if (apiFeature.on()) {
+        if (apiFeature.isOn()) {
             add(resource);
         }
     }

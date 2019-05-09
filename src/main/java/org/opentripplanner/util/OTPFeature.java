@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to be able to turn features on and off.
@@ -19,12 +21,13 @@ public enum OTPFeature {
     APIRouters(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),
-    APIUpdaterStatus(true);
+    APIUpdaterStatus(true),
+
+    // Sandbox extension features - Must be turned OFF by default
+    SandboxExampleAPIGraphStatistics(false);
 
     private static final String VALUE_ON = "on";
     private static final String VALUE_OFF = "off";
-    private static final String VALUE_ENABLE = "enable";
-    private static final String VALUE_DISABLE = "disable";
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
@@ -37,14 +40,14 @@ public enum OTPFeature {
     /**
      * Return {@code true} if feature is turned 'on'.
      */
-    public boolean on() {
+    public boolean isOn() {
         return enabled;
     }
 
     /**
      * Return {@code true} if feature is turned 'off'.
      */
-    public boolean off() {
+    public boolean isOff() {
         return !enabled;
     }
 
@@ -70,6 +73,7 @@ public enum OTPFeature {
         for (OTPFeature feature : values()) {
             setFeatureFromConfig(feature, features.path(feature.name()));
         }
+        logFeatureSetup();
     }
 
 
@@ -80,32 +84,30 @@ public enum OTPFeature {
             boolean featureValue = isOn(node.asText(feature.valueAsString()), feature.name());
             if (featureValue != feature.enabled) {
                 feature.set(featureValue);
-                logFeature(feature);
-            } else {
-                logFeatureDefault(feature);
             }
-        } else {
-            logFeatureDefault(feature);
         }
     }
 
-    private static void logFeature(OTPFeature feature) {
-        LOG.info("Feature '{}' is '{}'.", feature.name(), feature.valueAsString());
+    private static void logFeatureSetup() {
+        LOG.info("Features turned 'on': \n\t" + valuesAsString(true));
+        LOG.info("Features turned 'off': \n\t" + valuesAsString(false));
     }
 
-    private static void logFeatureDefault(OTPFeature feature) {
-        LOG.info("Feature '{}' is '{}' (default).", feature.name(), feature.valueAsString());
+    private static String valuesAsString(boolean enabled) {
+        return Arrays.stream(values())
+                .filter(it -> it.enabled == enabled)
+                .map(Enum::name)
+                .collect(Collectors.joining("\n\t"));
     }
 
     private static boolean isOn(String value, String key) {
-        if (match(value, VALUE_ON) || match(value, VALUE_ENABLE)) {
+        if (match(value, VALUE_ON)) {
             return true;
-        } else if (match(value, VALUE_OFF) || match(value, VALUE_DISABLE)) {
+        } else if (match(value, VALUE_OFF)) {
             return false;
         }
         throw new IllegalArgumentException(
-                "Feature values is not 'on'/'enable' or 'off'/'disable'. Unable to parse "
-                        + "value for feature: " + key
+                "Feature values is not 'on' or 'off'. Unable to parse value for feature: " + key
         );
     }
 
