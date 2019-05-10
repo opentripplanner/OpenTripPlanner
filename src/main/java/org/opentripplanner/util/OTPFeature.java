@@ -26,9 +26,6 @@ public enum OTPFeature {
     // Sandbox extension features - Must be turned OFF by default
     SandboxExampleAPIGraphStatistics(false);
 
-    private static final String VALUE_ON = "on";
-    private static final String VALUE_OFF = "off";
-
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
     OTPFeature(boolean defaultEnabled) {
@@ -59,17 +56,10 @@ public enum OTPFeature {
     }
 
     /**
-     * Return "on" if feature is enabled, if not return "off".
-     */
-    public String valueAsString() {
-        return enabled ? VALUE_ON : VALUE_OFF;
-    }
-
-    /**
      * Configure features using given JSON.
      */
     public static void configure(@NotNull JsonNode otpConfig) {
-        JsonNode features = otpConfig.path("features");
+        JsonNode features = otpConfig.path("featuresEnabled");
         for (OTPFeature feature : values()) {
             setFeatureFromConfig(feature, features.path(feature.name()));
         }
@@ -81,16 +71,22 @@ public enum OTPFeature {
 
     private static void setFeatureFromConfig(OTPFeature feature, JsonNode node) {
         if (!node.isMissingNode()) {
-            boolean featureValue = isOn(node.asText(feature.valueAsString()), feature.name());
-            if (featureValue != feature.enabled) {
-                feature.set(featureValue);
+            if(node.isBoolean()) {
+                feature.set(node.booleanValue());
+            }
+            else {
+                throw new IllegalArgumentException(
+                        "Feature values is not boolean 'true' or 'false'." +
+                        " Unable to parse value for feature '" + feature.name() + "'. Value: '" +
+                        node.asText() + "'"
+                );
             }
         }
     }
 
     private static void logFeatureSetup() {
-        LOG.info("Features turned 'on': \n\t" + valuesAsString(true));
-        LOG.info("Features turned 'off': \n\t" + valuesAsString(false));
+        LOG.info("Features turned on: \n\t" + valuesAsString(true));
+        LOG.info("Features turned off: \n\t" + valuesAsString(false));
     }
 
     private static String valuesAsString(boolean enabled) {
@@ -98,23 +94,5 @@ public enum OTPFeature {
                 .filter(it -> it.enabled == enabled)
                 .map(Enum::name)
                 .collect(Collectors.joining("\n\t"));
-    }
-
-    private static boolean isOn(String value, String key) {
-        if (match(value, VALUE_ON)) {
-            return true;
-        } else if (match(value, VALUE_OFF)) {
-            return false;
-        }
-        throw new IllegalArgumentException(
-                "Feature values is not 'on' or 'off'. Unable to parse value for feature: " + key
-        );
-    }
-
-    /**
-     * Return true if the given value matches, ignoring case, the given expected value.
-     */
-    private static boolean match(String value, @NotNull String expected) {
-        return expected.equalsIgnoreCase(value);
     }
 }

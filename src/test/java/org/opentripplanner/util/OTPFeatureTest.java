@@ -11,13 +11,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class OTPFeatureTest {
-
-
     private OTPFeature subject = OTPFeature.APIBikeRental;
     private Map<OTPFeature, Boolean> backupValues = new HashMap<>();
 
@@ -54,17 +51,6 @@ public class OTPFeatureTest {
         assertTrue(subject.isOff());
     }
 
-    @Test public void valueAsString() {
-        // If set
-        subject.set(true);
-        // then expect
-        assertEquals("on", subject.valueAsString());
-        // If set
-        subject.set(false);
-        // then expect
-        assertEquals("off", subject.valueAsString());
-    }
-
     @Test public void allowOTPFeaturesToBeConfigurableFromJSON() throws IOException {
         // Use a mapper to create a JSON configuration
         ObjectMapper mapper = new ObjectMapper();
@@ -74,9 +60,9 @@ public class OTPFeatureTest {
         // Given the following config
         JsonNode config = mapper.readTree(
         "{\n"
-                + "  features : {\n"
-                + "    APIAlertPatcher : 'on',\n"
-                + "    APIBikeRental : 'off'\n"
+                + "  featuresEnabled : {\n"
+                + "    APIAlertPatcher : true,\n"
+                + "    APIBikeRental : false\n"
                 + "  }\n"
                 + "}\n"
         );

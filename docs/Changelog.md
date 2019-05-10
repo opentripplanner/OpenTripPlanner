@@ -1,9 +1,9 @@
 # Changelog
 
-## 2.0
+## 2.0 (in progress)
 - Sandbox for experimental features (#2745)
 
-## 1.4 (Not released before branching of 2.x) TODO OTP2 - What should we write here?
+## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
