@@ -28,18 +28,18 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.DESTRUCTIVE_SPLIT;
 
-public class SimpleStreetSplitterTest {
+public class StreetSplitterTest {
     private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
-    private SimpleStreetSplitter spySimpleStreetSplitter;
+    private StreetSplitter spyStreetSplitter;
 
 
     @Before
     public void buildSpy(){
         Graph graph = new Graph();
-        SimpleStreetSplitter simpleStreetSplitter = new SimpleStreetSplitter(graph, null, null);
-        spySimpleStreetSplitter = spy(simpleStreetSplitter);
+        StreetSplitter streetSplitter = new StreetSplitter(graph, null, null);
+        spyStreetSplitter = spy(streetSplitter);
     }
 
     /**
@@ -53,8 +53,8 @@ public class SimpleStreetSplitterTest {
         routingRequest.setMode(TraverseMode.CAR);
         routingRequest.parkAndRide = true;
 
-        spySimpleStreetSplitter.linkOriginDestination(genericLocation, routingRequest, true);
-        verify(spySimpleStreetSplitter).linkToGraph(any(Vertex.class), eq(TraverseMode.WALK), eq(routingRequest), eq(false));
+        spyStreetSplitter.linkOriginDestination(genericLocation, routingRequest, true);
+        verify(spyStreetSplitter).linkToGraph(any(Vertex.class), eq(TraverseMode.WALK), eq(routingRequest), eq(false));
     }
 
     /**
