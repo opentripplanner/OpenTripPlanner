@@ -1,13 +1,14 @@
 package org.opentripplanner.graph_builder.module;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.File;
@@ -130,9 +131,13 @@ public class FakeGraph {
         }
     }
 
-    /** link the stops in the graph */
-    public static void link (Graph g) {
-        SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
+    /**
+     * Index the graph and then link all stations in the graph.
+     */
+    public static void indexGraphAndLinkStations (Graph g) {
+        // creating a new DefaultStreetVertexIndexFactory results in setting the streetIndex on the graph.
+        g.index(new DefaultStreetVertexIndexFactory());
+        StreetSplitter linker = (StreetSplitter) g.streetIndex.getStreetSplitter();
         linker.linkAllStationsToGraph();
     }
 

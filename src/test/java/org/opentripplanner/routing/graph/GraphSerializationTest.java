@@ -44,7 +44,6 @@ public class GraphSerializationTest {
         List<Vertex> transitVertices = originalGraph.getVertices().stream()
                 .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
         transitVertices.forEach(originalGraph::remove);
-        originalGraph.index(new DefaultStreetVertexIndexFactory());
         // The cached timezone in the graph is transient and lazy-initialized.
         // Previous tests may have caused a timezone to be cached.
         originalGraph.clearTimeZone();

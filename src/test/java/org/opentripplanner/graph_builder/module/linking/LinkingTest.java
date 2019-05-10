@@ -3,14 +3,14 @@ package org.opentripplanner.graph_builder.module.linking;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import jersey.repackaged.com.google.common.collect.Maps;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -21,7 +21,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -32,8 +31,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static org.junit.Assert.*;
-import static org.opentripplanner.graph_builder.module.FakeGraph.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
+import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
+import static org.opentripplanner.graph_builder.module.FakeGraph.indexGraphAndLinkStations;
 
 public class LinkingTest {
     /** maximum difference in walk distance, in meters, that is acceptable between the graphs */
@@ -90,12 +94,12 @@ public class LinkingTest {
         // build the graph without the added stops
         Graph g1 = buildGraphNoTransit();
         addRegularStopGrid(g1);
-        link(g1);
+        indexGraphAndLinkStations(g1);
 
         Graph g2 = buildGraphNoTransit();
         addExtraStops(g2);
         addRegularStopGrid(g2);
-        link(g2);
+        indexGraphAndLinkStations(g2);
 
         // compare the linkages
         for (TransitStop ts : Iterables.filter(g1.getVertices(), TransitStop.class)) {
@@ -117,12 +121,6 @@ public class LinkingTest {
         }
 
         // compare the stop tree caches
-        g1.index(new DefaultStreetVertexIndexFactory());
-        g2.index(new DefaultStreetVertexIndexFactory());
-
-        g1.rebuildVertexAndEdgeIndices();
-        g2.rebuildVertexAndEdgeIndices();
-
         StopTreeCache s1 = g1.index.getStopTreeCache();
         StopTreeCache s2 = g2.index.getStopTreeCache();
 

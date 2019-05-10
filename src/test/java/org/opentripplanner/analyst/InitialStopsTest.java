@@ -12,9 +12,11 @@ import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
-import static org.opentripplanner.graph_builder.module.FakeGraph.*;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addTransitMultipleLines;
+import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
+import static org.opentripplanner.graph_builder.module.FakeGraph.indexGraphAndLinkStations;
 
 /**
  * Test the code that finds initial transit stops.
@@ -35,8 +37,7 @@ public class InitialStopsTest extends TestCase {
         Graph g = buildGraphNoTransit();
         addRegularStopGrid(g);
         addTransitMultipleLines(g);
-        link(g);
-        g.index(new DefaultStreetVertexIndexFactory());
+        indexGraphAndLinkStations(g);
 
         ProfileRequest req = new ProfileRequest();
         req.fromLon = req.toLon = -83.0118;
@@ -94,8 +95,7 @@ public class InitialStopsTest extends TestCase {
         Graph g = buildGraphNoTransit();
         addRegularStopGrid(g);
         addTransitMultipleLines(g);
-        link(g);
-        g.index(new DefaultStreetVertexIndexFactory());
+        indexGraphAndLinkStations(g);
 
         ProfileRequest req = new ProfileRequest();
         req.fromLon = req.toLon = -83.0118;

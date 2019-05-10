@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
+import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1469,7 +1469,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * But throws TrivialPathException if same edge is split in origin/destination search.
      *
-     * used in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
+     * used in {@link StreetSplitter} in {@link StreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
      * @param edge
      */
     public void canSplitEdge(StreetEdge edge) {

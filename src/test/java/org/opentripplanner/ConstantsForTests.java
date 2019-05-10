@@ -1,22 +1,21 @@
 package org.opentripplanner;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.HashMap;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
@@ -130,8 +129,6 @@ public class ConstantsForTests {
             new DirectTransferGenerator(2000).buildGraph(g, new HashMap<>());
 
             new StreetLinkerModule().buildGraph(g, new HashMap<>());
-
-            g.index(new DefaultStreetVertexIndexFactory());
 
             return g;
         } catch(Exception ex) {

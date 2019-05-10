@@ -682,6 +682,11 @@ public class Graph implements Serializable {
      * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index (StreetVertexIndexFactory indexFactory) {
+        if (streetIndex != null) {
+            throw new UnsupportedOperationException(
+                "A streetIndex has already been defined. Can't you just reuse the existing one?"
+            );
+        }
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
