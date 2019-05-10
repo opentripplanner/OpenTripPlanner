@@ -55,8 +55,13 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         if(this.request.leaveDestinationTime) context.leaveDestinationTime = moment(this.request.leaveDestinationTime).format(otp.config.timeFormat);
         if(this.request.arriveSchoolTime) context.arriveSchoolTime = moment(this.request.arriveSchoolTime).format(otp.config.timeFormat);
 
-        if(this.request.paymentPreference === "own_tickets") context.paymentPreference = "Will use own tickets";
-        else if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
+        if(this.request.ticketType === "own_tickets") context.ticketType = "Will use own tickets";
+        else if(this.request.ticketType === "hop_new") context.ticketType = "Will purchase new Hop Card";
+        else if(this.request.ticketType === "hop_reload") context.ticketType = "Will reload existing Hop Card";
+
+        context.paymentPreference = "N/A";
+        if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
+        else if(this.request.paymentPreference === "phone_cc") context.paymentPreference = "Will call in credit card info to TriMet";
         else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
         else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
 
@@ -160,7 +165,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
-                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass Hop Card # ' + req.classpassId + ')';
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -170,7 +175,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
-                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass Hop Card # ' + req.classpassId + ')';
                     content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -195,10 +200,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 this_.module.setClasspassId(this_.request, classpassId);
             }
         });
+        this.content.find('.updatePaymentButton').click(function(evt) {
+            this_.showUpdatePaymentDialog();
+        });
         this.content.find('.addNoteButton').click(function(evt) {
-            /*otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
-                this_.module.addNote(this_.request, input, "internal");
-            });*/
             this_.showNoteDialog();
         });
 
@@ -243,6 +248,42 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             var text = dialog.find(".textarea").val();
             var type = dialog.find('input:radio[name=type]:checked').val();
             this_.module.addNote(this_.request, text, type);
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },
+
+    showUpdatePaymentDialog : function() {
+        var this_ = this;
+
+        var dialog = ich['otp-fieldtrip-paymentDialog']({
+            classpassId: this.request.classpassId,
+            paymentPreference: this.request.paymentPreference,
+            ccName: this.request.ccName,
+            ccType: this.request.ccType,
+            ccLastFour: this.request.ccLastFour,
+            checkNumber: this.request.checkNumber,
+        }).dialog({
+            title : "Update Payment Info",
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 400
+        });
+
+        dialog.find(".okButton").button().click(function() {
+            this_.module.setPaymentInfo(this_.request,
+              dialog.find(".classpassId").val(),
+              dialog.find(".paymentPreference").val(),
+              dialog.find(".ccType").val(),
+              dialog.find(".ccName").val(),
+              dialog.find(".ccLastFour").val(),
+              dialog.find(".checkNumber").val()
+            );
+
             dialog.dialog("close");
         });
 

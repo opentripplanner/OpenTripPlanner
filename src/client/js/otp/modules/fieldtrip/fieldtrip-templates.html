@@ -71,13 +71,22 @@
             <b>Time Due Back at School</b>: {{arriveSchoolTime}}<br>
             <b>Intermediate Locations</b>:
                 {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
+            <b>Ticket Type</b>: {{ticketType}}<br>
             <b>Payment Preference</b>: {{paymentPreference}}<br>
             {{#requireInvoice}}<span style="color: white; background: #800;">&nbsp;{{/requireInvoice}}
             <b>Invoice Required?</b>:
                 {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}
             {{#requireInvoice}}&nbsp;</span>{{/requireInvoice}}<br>
-            <b>Class Pass ID</b>:
-                {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
+            <b>Class Pass Hop Card #</b>:
+                {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br />
+            <b>Credit Card Type</b>:
+                {{#ccType}}{{ccType}}{{/ccType}}{{^ccType}}(None){{/ccType}}<br />
+            <b>Name on Credit Card</b>:
+                {{#ccName}}{{ccName}}{{/ccName}}{{^ccName}}(None){{/ccName}}<br />
+            <b>Credit Card Last 4 Digits</b>:
+                {{#ccLastFour}}{{ccLastFour}}{{/ccLastFour}}{{^ccLastFour}}(None){{/ccLastFour}}<br />
+            <b>Check/Money Order Number</b>:
+                {{#checkNumber}}{{checkNumber}}{{/checkNumber}}{{^checkNumber}}(None){{/checkNumber}}<br />
 
             <b>Teacher Notes:</b>
                 {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}&nbsp;<span style="font-size: .8em">[<a href="#" class="editTeacherNotesLink">Edit</a>]</span><br>
@@ -165,7 +174,7 @@
         <div class="otp-fieldTrip-requestWidget-bottomRow">
             <div style="text-align:center;">
                 <button class="cancelRequestButton">Cancel Request</button>
-                <button class="setClasspassButton">Set Class Pass ID</button>
+                <button class="updatePaymentButton">Update Payment Info</button>
                 <button class="addNoteButton">Add Note</button>
             </div>
             <div style="text-align:center; margin-top: 6px;">
@@ -252,7 +261,7 @@
                 <b>Students Age 6 and Under</b>: {{numFreeStudents}}<br>
                 <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
                 {{#classpassId}}
-                    <b>Class Pass ID</b>: {{classpassId}}<br>
+                    <b>Class Pass Hop Card #</b>: {{classpassId}}<br>
                 {{/classpassId}}
 
                 <i>Request submitted: {{timeStamp}}</i>
@@ -323,6 +332,50 @@
     </div>
 </script>
 
+<script id="otp-fieldtrip-paymentDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            <div style="margin-top: 12px;">
+                Class Pass Hop Card #:<br />
+                <input class="classpassId" type="text" style="margin-top: 4px;" value="{{classpassId}}" />
+            </div>
+
+            <div style="margin-top: 12px;">
+                Payment Preference:<br />
+                <select class="paymentPreference">
+                  <option value="phone_cc">Credit Card / Phone</option>
+                  <option value="fax_cc">Credit Card / Fax</option>
+                  <option value="mail_check">Check / Money Order</option>
+                </select>
+            </div>
+
+            <div style="margin-top: 12px;">
+                Credit Card Type:<br />
+                <input class="ccType" type="text" style="margin-top: 4px;" value="{{ccType}}" />
+            </div>
+
+            <div style="margin-top: 12px;">
+                Name on Credit Card:<br />
+                <input class="ccName" type="text" style="margin-top: 4px;" value="{{ccName}}" />
+            </div>
+
+            <div style="margin-top: 12px;">
+                Last 4 Digits of Credit Card:<br />
+                <input class="ccLastFour" type="text" style="margin-top: 4px;" value="{{ccLastFour}}" />
+            </div>
+
+            <div style="margin-top: 12px;">
+                Check/Money Order Number:<br />
+                <input class="checkNumber" type="text" style="margin-top: 4px;" value="{{checkNumber}}" />
+            </div>
+
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
+        </div>
+    </div>
+</script>
 
 <script id="otp-fieldtrip-searchWidget" type="text/html">
     <div class="searchTabs notDraggable" style="position: absolute; top: 30px; bottom: 10px; left: 10px; right: 10px;">
