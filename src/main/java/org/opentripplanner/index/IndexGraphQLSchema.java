@@ -208,10 +208,10 @@ public class IndexGraphQLSchema {
     public static GraphQLEnumType alertSeverityLevelEnum = GraphQLEnumType.newEnum()
             .name("AlertSeverityLevelType")
             .description("Severity level of a alert")
-            .value("UNKNOWN_SEVERITY", GtfsRealtime.Alert.SeverityLevel.UNKNOWN_SEVERITY, "UNKNOWN_SEVERITY")
-            .value("INFO", GtfsRealtime.Alert.SeverityLevel.INFO, "INFO")
-            .value("WARNING", GtfsRealtime.Alert.SeverityLevel.WARNING, "WARNING")
-            .value("SEVERE", GtfsRealtime.Alert.SeverityLevel.SEVERE, "SEVERE")
+            .value("UNKNOWN_SEVERITY", GtfsRealtime.Alert.SeverityLevel.UNKNOWN_SEVERITY, "Severity of alert is unknown")
+            .value("INFO", GtfsRealtime.Alert.SeverityLevel.INFO, "Info alerts are used for informational messages that should not have a significant effect on user's journey, for example: A single entrance to a metro station is temporarily closed.")
+            .value("WARNING", GtfsRealtime.Alert.SeverityLevel.WARNING, "Warning alerts are used when a single stop or route has a disruption that can affect user's journey, for example: All trams on a specific route are running with irregular schedules.")
+            .value("SEVERE", GtfsRealtime.Alert.SeverityLevel.SEVERE, "Severe alerts are used when a significant part of public transport services is affected, for example: All train services are cancelled due to technical problems.")
             .build();
 
     private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
