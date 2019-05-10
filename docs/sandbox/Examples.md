@@ -19,7 +19,6 @@
 ### Graph Statistics Resource
 This extension show how to create a web endpoint to get some simple statistics: 
 - Number of stops in the graph
-- Number of stations in the graph
  
 ### Graph Example Updaters
 There is two example updaters, see the Java doc for more information on how to implement 
