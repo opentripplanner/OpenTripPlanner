@@ -27,7 +27,6 @@ public class CalendarServiceData implements Serializable {
     private Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
     /**
-     * @param agencyId
      * @return the time zone for the specified agencyId, or null if the agency was
      *         not found
      */
@@ -64,11 +63,10 @@ public class CalendarServiceData implements Serializable {
         serviceDates = Collections.unmodifiableList(serviceDates);
         serviceDatesByServiceId.put(serviceId, serviceDates);
         for (ServiceDate serviceDate : serviceDates) {
-            Set<FeedScopedId> serviceIds = serviceIdsByDate.get(serviceDate);
-            if (serviceIds == null) {
-                serviceIds = new HashSet<>();
-                serviceIdsByDate.put(serviceDate, serviceIds);
-            }
+            Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(
+                    serviceDate,
+                    k -> new HashSet<>()
+            );
             serviceIds.add(serviceId);
         }
     }

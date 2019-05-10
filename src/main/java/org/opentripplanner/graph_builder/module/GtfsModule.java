@@ -1,17 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -31,20 +20,31 @@ import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.BikeAccess;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
+import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarSrvDataWithoutDatesForLocalizedSrvId;
-import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToOTPTransitService;
+import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder;
 
 public class GtfsModule implements GraphBuilderModule {
 
@@ -60,11 +60,11 @@ public class GtfsModule implements GraphBuilderModule {
     /** will be applied to all bundles which do not have the useCached property set */
     private Boolean useCached;
 
-    Set<String> agencyIdsSeen = Sets.newHashSet();
+    private Set<String> agencyIdsSeen = Sets.newHashSet();
 
-    int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
+    private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
-    public List<GtfsBundle> gtfsBundles;
+    private List<GtfsBundle> gtfsBundles;
 
     public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; }
 
@@ -92,7 +92,6 @@ public class GtfsModule implements GraphBuilderModule {
         graph.clearTimeZone();
 
         MultiCalendarServiceImpl calendarService = new MultiCalendarServiceImpl();
-        GtfsStopContext stopContext = new GtfsStopContext();
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
@@ -105,24 +104,15 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
                 }
 
-                OtpTransitService transitService = mapGtfsDaoToOTPTransitService(loadBundle(gtfsBundle));
+                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(loadBundle(gtfsBundle));
 
-                GtfsContext context = GtfsLibrary
-                        .createContext(gtfsBundle.getFeedId(), transitService, calendarService);
+                calendarService.addData(builder);
 
-                PatternHopFactory hf = new PatternHopFactory(context);
+                // NB! The calls below have side effects - the builder state is updated!
+                repairStopTimesForEachTrip(graph, builder.getStopTimesSortedByTrip());
+                createTripPatterns(graph, builder, calendarService);
 
-                hf.setStopContext(stopContext);
-                hf.setFareServiceFactory(fareServiceFactory);
-                hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
-
-                calendarService.addData(
-                        createCalendarSrvDataWithoutDatesForLocalizedSrvId(transitService),
-                        transitService
-                );
-
-                hf.subwayAccessTime = gtfsBundle.subwayAccessTime;
-                hf.maxInterlineDistance = gtfsBundle.maxInterlineDistance;
+                PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());
                 hf.run(graph);
 
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
@@ -151,9 +141,38 @@ public class GtfsModule implements GraphBuilderModule {
 
     }
 
-    /****
-     * Private Methods
-     ****/
+
+    /* Private Methods */
+
+    /**
+     * This method have side-effects, the {@code stopTimesByTrip} is updated.
+     */
+    private void repairStopTimesForEachTrip(Graph graph, TripStopTimes stopTimesByTrip) {
+        new RepairStopTimesForEachTripOperation(stopTimesByTrip, graph).run();
+    }
+
+    /**
+     * This method have side-effects, the {@code builder} is updated with new TripPatterns.
+     */
+    private void createTripPatterns(Graph graph, OtpTransitServiceBuilder builder, CalendarService calendarService) {
+        GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
+                builder, graph, graph.deduplicator, calendarService
+        );
+        buildTPOp.run();
+        graph.hasFrequencyService = graph.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();
+        graph.hasScheduledService = graph.hasScheduledService || buildTPOp.hasScheduledTrips();
+    }
+
+    private PatternHopFactory createPatternHopFactory(GtfsBundle bundle, OtpTransitService transitService) {
+        return new PatternHopFactory(
+                bundle.getFeedId(),
+                transitService,
+                fareServiceFactory,
+                bundle.getMaxStopToShapeSnapDistance(),
+                bundle.subwayAccessTime,
+                bundle.maxInterlineDistance
+        );
+    }
 
     private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle)
             throws IOException {
@@ -391,5 +410,4 @@ public class GtfsModule implements GraphBuilderModule {
             bundle.checkInputs();
         }
     }
-
 }

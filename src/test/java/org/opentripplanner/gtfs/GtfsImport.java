@@ -8,25 +8,28 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import java.io.File;
 import java.io.IOException;
 
-public class GtfsImport {
-
+class GtfsImport {
 
     private GtfsFeedId feedId = null;
 
-    private GtfsRelationalDaoImpl dao = null;
+    private GtfsMutableRelationalDao dao = null;
 
-    public GtfsImport(File path) throws IOException {
+    GtfsImport(String defaultFeedId, File path) throws IOException {
         GtfsReader reader = new GtfsReader();
         reader.setInputLocation(path);
-        readFeedId(reader);
+
+        if(defaultFeedId != null) {
+            reader.setDefaultAgencyId(defaultFeedId);
+        }
+        readFeedId(defaultFeedId, reader);
         readDao(reader);
     }
 
-    public GtfsMutableRelationalDao getDao() {
+    GtfsMutableRelationalDao getDao() {
         return dao;
     }
 
-    public GtfsFeedId getFeedId() {
+    GtfsFeedId getFeedId() {
         return feedId;
     }
 
@@ -40,8 +43,13 @@ public class GtfsImport {
         reader.run();
     }
 
-    private void readFeedId(GtfsReader reader) {
-        feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
+    private void readFeedId(String defaultFeedId, GtfsReader reader) {
+        if(defaultFeedId == null) {
+            feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
+        }
+        else {
+            feedId = new GtfsFeedId.Builder().id(defaultFeedId).build();
+        }
     }
 
 }
