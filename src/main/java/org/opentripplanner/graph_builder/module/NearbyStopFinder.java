@@ -5,7 +5,6 @@ import com.beust.jcommander.internal.Sets;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -20,7 +19,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -28,7 +27,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
@@ -56,16 +57,8 @@ public class NearbyStopFinder {
      * network or straight line distance based on the presence of OSM street data in the graph.
      */
     public NearbyStopFinder(Graph graph, double radiusMeters) {
-        this (graph, radiusMeters, graph.hasStreets);
-    }
-
-    /**
-     * Construct a NearbyStopFinder for the given graph and search radius.
-     * @param useStreets if true, search via the street network instead of using straight-line distance.
-     */
-    public NearbyStopFinder(Graph graph, double radiusMeters, boolean useStreets) {
         this.graph = graph;
-        this.useStreets = useStreets;
+        this.useStreets = graph.hasStreets;
         this.radiusMeters = radiusMeters;
         if (useStreets) {
             earliestArrivalSearch = new EarliestArrivalSearch();
@@ -74,8 +67,10 @@ public class NearbyStopFinder {
             // but we don't have much of a choice here. Use the default walking speed to convert.
             earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
-            // FIXME use the vertex index already in the graph if it exists.
-            streetIndex = new StreetVertexIndexServiceImpl(graph);
+            if (graph.streetIndex == null) {
+                graph.index(new DefaultStreetVertexIndexFactory());
+            }
+            streetIndex = graph.streetIndex;
         }
     }
 

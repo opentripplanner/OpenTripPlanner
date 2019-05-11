@@ -191,14 +191,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * If one need to store transit edges in the index, we could improve the hash grid
              * rasterizing splitting long segments.
              */
-            for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternEdge || e instanceof SimpleTransfer)
-                    continue;
-                LineString geometry = e.getGeometry();
-                if (geometry == null) {
-                    continue;
+            synchronized (this) {
+                // place a lock here in order to ensure writes are thread-safe to the edgeTree
+                for (Edge e : gv.getOutgoing()) {
+                    if (e instanceof PatternEdge || e instanceof SimpleTransfer)
+                        continue;
+                    LineString geometry = e.getGeometry();
+                    if (geometry == null) {
+                        continue;
+                    }
+                    edgeTree.insert(geometry, e);
                 }
-                edgeTree.insert(geometry, e);
             }
             if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
