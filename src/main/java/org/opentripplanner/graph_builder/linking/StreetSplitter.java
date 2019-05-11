@@ -84,9 +84,19 @@ public class StreetSplitter {
 
     public static final int WARNING_DISTANCE_METERS = 20;
 
-    // DESTRUCTIVE_SPLIT means edges are split and new edges are created (used when linking transit stops etc. during graph building)
-    // NON_DESTRUCTIVE_SPLIT means new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
+    /**
+     * DESTRUCTIVE_SPLIT means edges are split and new edges and vertices are created. This should occur when linking
+     * transit stops etc. during graph building or inserting floating bicycles in a bikeshare system in realtime into
+     * the graph. When these splits occur, a spatial index of all edges should be kept updated, otherwise there will
+     * appear to be snapping issues as observed in https://github.com/opentripplanner/OpenTripPlanner/issues/2758.
+     */
     public static final boolean DESTRUCTIVE_SPLIT = true;
+
+    /**
+     * NON_DESTRUCTIVE_SPLIT means new temporary edges and vertices are created and no edges are deleted. This is used
+     * in individual requests when temporarily inserting the origin/destination into the graph. The spatial index of
+     * street edges should not be updated to include these temporary edges.
+     */
     public static final boolean NON_DESTRUCTIVE_SPLIT = false;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
@@ -188,7 +198,9 @@ public class StreetSplitter {
     }
 
     /**
-     *  Link this vertex into the graph
+     *  Link this vertex into the graph (ie, connect the vertex to other vertices in the graph by creating one or more
+     *  new edges/vertexes which are then connected to the other vertices/edges of the graph.
+     *
      * @param vertex The vertex to be linked.
      * @param traverseModeSet The traverse modes.
      * @param options The routing options.
