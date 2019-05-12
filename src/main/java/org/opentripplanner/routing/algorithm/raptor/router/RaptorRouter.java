@@ -88,7 +88,7 @@ public class RaptorRouter {
         builder.profile(RangeRaptorProfile.MULTI_CRITERIA)
                 .searchParams()
                 .earliestDepartureTime(departureTime)
-                .searchWindowInSeconds(40  * 60)
+                .searchWindowInSeconds(request.raptorSearchWindow)
                 .latestArrivalTime(departureTime + 12 * 60 * 60)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
