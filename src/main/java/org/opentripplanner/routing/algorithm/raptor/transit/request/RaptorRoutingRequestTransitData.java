@@ -10,12 +10,19 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.localDateForStartOfTime;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer, but filters it by
@@ -35,20 +42,25 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
      */
     private List<List<TransferLeg>> transfers;
 
+    private final ZonedDateTime startOfTime;
+
     public RaptorRoutingRequestTransitData(
             TransitLayer transitLayer,
-            LocalDate startDate,
+            ZonedDateTime startOfTime,
             int dayRange,
             TraverseModeSet transitModes,
             double walkSpeed
     ) {
         this.transitLayer = transitLayer;
+        this.startOfTime = startOfTime;
+
+        LocalDate localDate = localDateForStartOfTime(startOfTime);
 
         List<Map<Integer, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
-                startDate, dayRange, transitModes
+                localDate, dayRange, transitModes
         );
         List<TripPatternForDates> tripPatternForDateList = MergeTripPatternForDates
-                .merge(tripPatternForDates);
+                .merge(tripPatternForDates, startOfTime);
 
         setTripPatternsPerStop(tripPatternForDateList);
 
@@ -79,6 +91,10 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
         return transitLayer.getStopCount();
     }
 
+    public ZonedDateTime getStartOfTime() {
+        return startOfTime;
+    }
+
     private Map<Integer, TripPatternForDate> listActiveTripPatterns(LocalDate date,
             TraverseModeSet transitModes) {
 
@@ -94,15 +110,11 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
     ) {
         List<Map<Integer, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
 
-        Map<Integer, TripPatternForDate> tripPatternForDateById;
-
         // Start at yesterdays date to account for trips that cross midnight. This is also
         // accounted for in TripPatternForDates.
         for (int d=-1; d < dayRange-1; ++d) {
             tripPatternForDates.add(listActiveTripPatterns(startDate.plusDays(d), transitModes));
         }
-
-
 
         return tripPatternForDates;
     }

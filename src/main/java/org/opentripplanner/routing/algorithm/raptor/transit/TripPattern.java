@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class TripPattern {
     private final int id;
@@ -40,5 +40,26 @@ public class TripPattern {
      */
     public int stopIndex(int stopPositionInPattern) {
         return stopIndexes[stopPositionInPattern];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TripPattern that = (TripPattern) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "TripPattern{" +
+                "id=" + id +
+                ", transitMode=" + transitMode +
+                '}';
     }
 }

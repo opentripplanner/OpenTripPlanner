@@ -25,13 +25,11 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -42,12 +40,21 @@ public class ItineraryMapper {
 
     private final RoutingRequest request;
 
-    public ItineraryMapper(TransitLayer transitLayer, RoutingRequest request) {
+    private final ZonedDateTime startOfTime;
+
+    private final Map<Stop, Transfer> accessTransfers;
+
+    private final Map<Stop, Transfer> egressTransfers;
+
+    public ItineraryMapper(TransitLayer transitLayer, ZonedDateTime startOfTime, RoutingRequest request, Map<Stop, Transfer> accessTransfers, Map<Stop, Transfer> egressTransfers) {
         this.transitLayer = transitLayer;
+        this.startOfTime = startOfTime;
         this.request = request;
+        this.accessTransfers = accessTransfers;
+        this.egressTransfers = egressTransfers;
     }
 
-    public TripPlan createTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
+    public TripPlan createTripPlan(List<Itinerary> itineraries) {
         Place from = new Place();
         Place to = new Place();
         if (!itineraries.isEmpty()) {
@@ -55,17 +62,17 @@ public class ItineraryMapper {
             to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
         }
         TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-        itineraries = itineraries.stream().sorted((i1, i2) -> i1.endTime.compareTo(i2.endTime))
+        itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
                 .limit(request.numItineraries).collect(Collectors.toList());
         tripPlan.itinerary = itineraries;
         return tripPlan;
     }
 
-    public Itinerary createItinerary(RoutingRequest request, Path<TripSchedule> path, Map<Stop, Transfer> accessPaths, Map<Stop, Transfer> egressPaths) {
+    public Itinerary createItinerary(Path<TripSchedule> path) {
         Itinerary itinerary = new Itinerary();
 
         // Map access leg
-        Leg accessLeg = mapAccessLeg(request, path.accessLeg(), accessPaths);
+        Leg accessLeg = mapAccessLeg(request, path.accessLeg(), accessTransfers);
 
 
         if (accessLeg.distance > 0) {
@@ -106,7 +113,7 @@ public class ItineraryMapper {
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
 
-        Leg egressLeg = mapEgressLeg(request, egressPathLeg, egressPaths);
+        Leg egressLeg = mapEgressLeg(request, egressPathLeg, egressTransfers);
 
         if (egressLeg.distance > 0) {
             itinerary.walkDistance += egressLeg.distance;
@@ -253,15 +260,11 @@ public class ItineraryMapper {
         return leg;
     }
 
-    private Calendar createCalendar(int timeinSeconds) {
-        Date date = request.getDateTime();
-        LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo")); // TODO: Get time zone from request
-        calendar.set(localDate.getYear(), localDate.getMonth().getValue() - 1, localDate.getDayOfMonth()
-                , 0, 0, 0);
-        calendar.add(Calendar.SECOND, timeinSeconds);
-        return calendar;
+    private Calendar createCalendar(int timeInSeconds) {
+        ZonedDateTime zdt = startOfTime.plusSeconds(timeInSeconds);
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
+        c.setTimeInMillis(zdt.toInstant().toEpochMilli());
+        return c;
     }
 
     private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {

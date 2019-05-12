@@ -2,8 +2,10 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -11,19 +13,20 @@ import java.util.List;
  * refers to days in order.
  */
 public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
-    // TODO - This fails for when switching between summer/winter time
-    private static final int SECONDS_OF_DAY = 86400;
 
     private final TripPattern tripPattern;
 
-    private final List<List<TripSchedule>> tripSchedulesByDay;
+    private final TripPatternForDate[] tripPatternForDates;
+
+    private final int[] offsets;
 
     private final int numberOfTripSchedules;
 
-    TripPatternForDates(TripPattern tripPattern, List<List<TripSchedule>> tripSchedulesByDay) {
+    TripPatternForDates(TripPattern tripPattern, List<TripPatternForDate> tripPatternForDates, List<Integer> offsets) {
         this.tripPattern = tripPattern;
-        this.tripSchedulesByDay = tripSchedulesByDay;
-        this.numberOfTripSchedules = this.tripSchedulesByDay.stream().mapToInt(List::size).sum();
+        this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[]{});
+        this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+        this.numberOfTripSchedules = Arrays.stream(this.tripPatternForDates).mapToInt(TripPatternForDate::numberOfTripSchedules).sum();
     }
 
     public TripPattern getTripPattern() {
@@ -39,15 +42,12 @@ public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
     }
 
     @Override public TripSchedule getTripSchedule(int index) {
-        int dayOffset = -1; // Start at yesterday to account for trips that cross midnight.
-        for (List<TripSchedule> tripScheduleList : tripSchedulesByDay) {
-            if (index < tripScheduleList.size()) {
-                return new TripScheduleWithOffset(
-                        tripScheduleList.get(index),dayOffset * SECONDS_OF_DAY
-                );
+        for (int i = 0; i < tripPatternForDates.length; i++) {
+            TripPatternForDate tripPatternForDate = tripPatternForDates[i];
+            if (index < tripPatternForDate.numberOfTripSchedules()) {
+                return new TripScheduleWithOffset(tripPatternForDate.getTripSchedule(index), offsets[i]);
             }
-            index -= tripScheduleList.size();
-            dayOffset++;
+            index -= tripPatternForDate.numberOfTripSchedules();
         }
         throw new IndexOutOfBoundsException("Index out of bound: " + index);
     }

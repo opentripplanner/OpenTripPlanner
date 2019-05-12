@@ -79,7 +79,7 @@ class TripPatternMapper {
                         .collect(Collectors.toList());
 
                 TripPatternForDate tripPatternForDate = new TripPatternForDate(
-                        tripPattern, tripSchedules
+                        tripPattern, tripSchedules, localDate
                 );
 
                 tripPatternsForDate.add(tripPatternForDate);

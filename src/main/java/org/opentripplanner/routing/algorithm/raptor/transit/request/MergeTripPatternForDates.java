@@ -2,10 +2,14 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 /**
  * This class merges several a list of TripPatterns for several consecutive dates into a single
@@ -17,7 +21,7 @@ import java.util.stream.Collectors;
 //TODO Add test
 public class MergeTripPatternForDates {
 
-    public static List<TripPatternForDates> merge(List<Map<Integer, TripPatternForDate>> tripPatternForDateList) {
+    public static List<TripPatternForDates> merge(List<Map<Integer, TripPatternForDate>> tripPatternForDateList, ZonedDateTime startOfTime) {
         List<TripPatternForDates> combinedList = new ArrayList<>();
 
         Map<Integer, TripPattern> allTripPatternsById = tripPatternForDateList.stream().flatMap(t -> t.values().stream())
@@ -26,17 +30,18 @@ public class MergeTripPatternForDates {
                 .collect(Collectors.toMap(TripPattern::getId, t -> t));
 
         for (Map.Entry<Integer, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
-            List<List<TripSchedule>> tripSchedulesList = new ArrayList<>();
+            List<TripPatternForDate> tripPatterns = new ArrayList<>();
+            List<Integer> offsets = new ArrayList<>();
 
             for (Map<Integer, TripPatternForDate> tripPatternById : tripPatternForDateList) {
                 TripPatternForDate tripPatternForDate = tripPatternById.get(patternEntry.getKey());
-                tripSchedulesList.add(
-                        tripPatternForDate == null ?
-                                new ArrayList<>() :
-                                tripPatternForDate.getTripSchedules());
+                if (tripPatternForDate != null) {
+                    tripPatterns.add(tripPatternForDate);
+                    offsets.add(secondsSinceStartOfTime(startOfTime, tripPatternForDate.getLocalDate()));
+                }
             }
 
-            combinedList.add(new TripPatternForDates(patternEntry.getValue(), tripSchedulesList));
+            combinedList.add(new TripPatternForDates(patternEntry.getValue(), tripPatterns, offsets));
         }
 
         return combinedList;
