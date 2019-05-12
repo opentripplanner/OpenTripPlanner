@@ -69,10 +69,8 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
             IntIterator stops
     ) {
         Set<TripPatternInfo<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
-        int stopIndex = stops.next();
-        while (stopIndex > 0) {
-            activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stopIndex));
-            stopIndex = stops.next();
+        while (stops.hasNext()) {
+            activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
         }
         return activeTripPatternsForGivenStops.iterator();
     }

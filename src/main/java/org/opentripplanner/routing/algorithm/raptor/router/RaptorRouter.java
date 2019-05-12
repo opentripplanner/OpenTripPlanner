@@ -86,6 +86,7 @@ public class RaptorRouter {
                 .searchParams()
                 .earliestDepartureTime(departureTime)
                 .searchWindowInSeconds(40  * 60)
+                .latestArrivalTime(departureTime + 12 * 60 * 60)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
                 .boardSlackInSeconds(request.boardSlack)

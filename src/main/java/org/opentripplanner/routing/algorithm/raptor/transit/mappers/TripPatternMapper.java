@@ -66,6 +66,7 @@ class TripPatternMapper {
                     .stream()
                     .map(patternsByServiceCode::get)
                     .flatMap(Collection::stream)
+                    .distinct()
                     .collect(Collectors.toList());
 
             List<TripPatternForDate> tripPatternsForDate = new ArrayList<>();

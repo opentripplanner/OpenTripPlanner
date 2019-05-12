@@ -21,8 +21,9 @@ public class MergeTripPatternForDates {
         List<TripPatternForDates> combinedList = new ArrayList<>();
 
         Map<Integer, TripPattern> allTripPatternsById = tripPatternForDateList.stream().flatMap(t -> t.values().stream())
+                .map(TripPatternForDate::getTripPattern)
                 .distinct()
-                .collect(Collectors.toMap(t -> t.getTripPattern().getId(), TripPatternForDate::getTripPattern));
+                .collect(Collectors.toMap(TripPattern::getId, t -> t));
 
         for (Map.Entry<Integer, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
             List<List<TripSchedule>> tripSchedulesList = new ArrayList<>();
