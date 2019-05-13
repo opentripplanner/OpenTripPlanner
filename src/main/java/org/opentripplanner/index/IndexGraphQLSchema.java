@@ -944,6 +944,20 @@ public class IndexGraphQLSchema {
                         .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertUrl)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("alertUrlTranslations")
+                        .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(translatedStringType))))
+                        .description("Url with more information in all different available languages")
+                        .dataFetcher(environment -> {
+                            AlertPatch alertPatch = environment.getSource();
+                            Alert alert = alertPatch.getAlert();
+                            if (alert.alertUrl instanceof TranslatedString) {
+                                return ((TranslatedString) alert.alertUrl).getTranslations();
+                            } else {
+                                return emptyList();
+                            }
+                        })
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("alertEffect")
                         .type(alertEffectEnum)
                         .description("Alert effect")
