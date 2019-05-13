@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -301,12 +302,11 @@ public class ItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            if (boarded) {
+                transitLegCoordinates.addAll(Arrays.asList(tripPattern.hopEdges[j - 1].getGeometry().getCoordinates()));
+            }
             if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
                 boarded = true;
-            }
-            if (boarded) {
-                transitLegCoordinates.add(new Coordinate(tripPattern.stopPattern.stops[j].getLon(),
-                        tripPattern.stopPattern.stops[j].getLat()));
             }
             if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
                 break;
