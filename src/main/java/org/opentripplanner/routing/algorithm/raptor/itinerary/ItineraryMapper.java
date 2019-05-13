@@ -108,7 +108,7 @@ public class ItineraryMapper {
         Leg egressLeg = mapEgressLeg(request, egressPathLeg, egressPaths);
 
         if (egressLeg.distance > 0) {
-            itinerary.walkDistance = egressLeg.distance;
+            itinerary.walkDistance += egressLeg.distance;
             itinerary.addLeg(egressLeg);
         }
 
