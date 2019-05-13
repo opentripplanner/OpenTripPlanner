@@ -96,9 +96,9 @@ public class ItineraryMapper {
                 itinerary.addLeg(transferLeg);
 
                 // Increment counters
-                itinerary.transfers++;
                 itinerary.walkTime += pathLeg.duration();
             }
+
             pathLeg = pathLeg.nextLeg();
         }
 
@@ -116,6 +116,7 @@ public class ItineraryMapper {
         itinerary.walkTime += egressPathLeg.toTime() - egressPathLeg.fromTime();
 
         // Map general itinerary fields
+        itinerary.transfers = path.numberOfTransfers();
         itinerary.startTime = createCalendar(path.accessLeg().fromTime());
         itinerary.endTime = createCalendar(egressPathLeg.toTime());
         itinerary.duration = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
