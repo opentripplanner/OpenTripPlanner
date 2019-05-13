@@ -19,7 +19,6 @@ import java.util.List;
 // TODO - The mapping needs better tests
 public class MappingTest {
     private static final String NETEX_DIR = "src/test/resources/netex";
-
     private static final String NETEX_FILENAME = "netex_minimal.zip";
 
     private static OtpTransitServiceBuilder otpBuilder;
