@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +122,9 @@ public class RaptorRouter {
         TripPlan tripPlan = itineraryMapper.createTripPlan(itineraries);
 
         LOG.info("Creating itineraries took {} ms", System.currentTimeMillis() - startItineraries);
+        if (tripPlan.itinerary.isEmpty()) {
+            throw new PathNotFoundException();
+        }
 
         return tripPlan;
     }
