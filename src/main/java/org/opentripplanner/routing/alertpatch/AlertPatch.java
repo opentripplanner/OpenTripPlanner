@@ -13,11 +13,14 @@ import com.google.transit.realtime.GtfsRealtime;
 import org.opentripplanner.model.*;
 import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,9 +168,15 @@ public class AlertPatch implements Serializable {
                         }
                     }
 
-                    for (int i = 0; i < tripPattern.hopEdges.length; i++) {
-                        if (stop == null || stop.equals(tripPattern.hopEdges[i].getEndStop())) {
-                            graph.addAlertPatch(tripPattern.hopEdges[i], this);
+                    for (int i = 0; i < tripPattern.dwellEdges.length; i++) {
+                        PatternDwell dwellEdge = tripPattern.dwellEdges[i];
+
+                        if (dwellEdge != null) {
+                            Stop fromv = ((PatternArriveVertex) dwellEdge.getFromVertex()).getStop();
+                            Stop tov = ((PatternDepartVertex) dwellEdge.getToVertex()).getStop();
+                            if (stop == null || (stop.equals(fromv) && stop.equals(tov))) {
+                                graph.addAlertPatch(tripPattern.dwellEdges[i], this);
+                            }
                         }
                     }
                 }
@@ -232,9 +241,15 @@ public class AlertPatch implements Serializable {
                         }
                     }
 
-                    for (int i = 0; i < tripPattern.hopEdges.length; i++) {
-                        if (stop == null || stop.equals(tripPattern.hopEdges[i].getEndStop())) {
-                            graph.removeAlertPatch(tripPattern.hopEdges[i], this);
+                    for (int i = 0; i < tripPattern.dwellEdges.length; i++) {
+                        PatternDwell dwellEdge = tripPattern.dwellEdges[i];
+
+                        if (dwellEdge != null) {
+                            Stop fromv = ((PatternArriveVertex) dwellEdge.getFromVertex()).getStop();
+                            Stop tov = ((PatternDepartVertex) dwellEdge.getToVertex()).getStop();
+                            if (stop == null || (stop.equals(fromv) && stop.equals(tov))) {
+                                graph.removeAlertPatch(tripPattern.dwellEdges[i], this);
+                            }
                         }
                     }
                 }

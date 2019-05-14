@@ -5,7 +5,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -66,12 +65,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             }
         }
 
-        for (AlertPatch alertPatch: options.getRoutingContext().graph.getAlertPatches(this)) {
-            if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(state0)) {
-                return null;
-            }
-        }
-
     	int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
@@ -97,12 +90,6 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         if (!options.bannedStopsHard.isEmpty()) {
             if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
                     || options.bannedStopsHard.matches(((PatternStopVertex) tov).getStop())) {
-                return null;
-            }
-        }
-
-        for (AlertPatch alertPatch: options.getRoutingContext().graph.getAlertPatches(this)) {
-            if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(s0)) {
                 return null;
             }
         }

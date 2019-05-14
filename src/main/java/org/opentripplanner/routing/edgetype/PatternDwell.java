@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Locale;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -50,6 +51,12 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     }
 
     public State traverse(State state0) {
+        for (AlertPatch alertPatch: state0.getOptions().getRoutingContext().graph.getAlertPatches(this)) {
+            if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(state0)) {
+                return null;
+            }
+        }
+
         //int trip = state0.getTrip();
         TripTimes tripTimes = state0.getTripTimes();
         int dwellTime = tripTimes.getDwellTime(stopIndex);
@@ -62,6 +69,12 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
 
     @Override
     public State optimisticTraverse(State s0) {
+        for (AlertPatch alertPatch: s0.getOptions().getRoutingContext().graph.getAlertPatches(this)) {
+            if (alertPatch.cannotRideThrough() && alertPatch.displayDuring(s0)) {
+                return null;
+            }
+        }
+
         int dwellTime = getPattern().scheduledTimetable.getBestDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
