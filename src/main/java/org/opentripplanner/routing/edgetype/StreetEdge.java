@@ -784,7 +784,51 @@ public class StreetEdge extends Edge implements Cloneable {
      * Calculate the approximate travel time for a given distance with a given slope, available sustained power output,
      * weight, rolling resistance, aerodynamic drag and bounds on min/max speeds.
      *
-     * http://www.kreuzotter.de/english/espeed.htm
+     * This calculation is made using a formula derived from the equations relating to determing total resistive force
+     * that is needed to be overcome to maintain a certain velocity. The website at
+     * http://www.kreuzotter.de/english/espeed.htm goes into great detail regarding this and presents the following
+     * equation which also appears on other websites such as https://www.gribble.org/cycling/power_v_speed.html.
+     *
+     * P = Cm * V * (Cd * A * ρ/2 * (V + W) ^ 2 + Frg + V * Crvn)
+     *
+     * where:
+     * P = power in watts
+     * Cm = Coefficient for power transmission losses and losses due to tire slippage
+     * V = velocity in m/s
+     * Cd = Coefficient of aerodynamic drag
+     * A = frontal area in m^2
+     * ρ = air density in kg/m^3
+     * W = wind speed in m/s (if positive this is a headwind, if negative this is a tailwind)
+     * Frg = Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
+     * Crvn = The coefficient for the dynamic rolling resistance, normalized to road inclination.
+     *
+     * This equation is then rearranged in an attempt to solve for V on their website as the following:
+     *
+     * V^3 + V^2 * 2 * (W + Crvn / (Cd * A * ρ)) + V * (W^2 + (2 * Frg) / (Cd * A * ρ)) - (2 * P) / (Cm * Cd * A * ρ) = 0
+     *
+     * Then, using the cardanic formulae, the following solutions are found:
+     *
+     * a = (W^3 - Crvn^3) / 27 - (W * (5 * W * Crvn + (8 * Crvn^2) / (Cd * A * ρ) - 6 * Frg)) / (9 * Cd * A * ρ) + (2 * Frg * Crvn) / (3 * (Cd * A * ρ)^2) + P / (Cm * Cd * A * ρ)
+     * b = (2 / (9 * Cd * A * ρ)) * (3 * Frg - 4 * W * Crvn - (W^2) * Cd * A * ρ/2 - (2 * Crvn) / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 ≥ 0:
+     * V = cbrt(a + sqrt(a^2 + b^3)) + cbrt(a - sqrt(a^2 + b^3)) - (2 / 3) * (W + Crvn / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 < 0:
+     * V = 2 * sqrt(-b) * cos((1 / 3) * arccos(a / sqrt(-b^3)) - (2 / 3) * (W + Crvn / (Cd * A * ρ))
+     *
+     * Although it could be possible to try to estimate wind speed using weather data, for now wind speed is assumed to
+     * be 0. Therefore, the above equations can be changed to exlude the parts where the wind speed being 0 would cause
+     * various components to no longer be needed. Thus these solutions are used:
+     *
+     * a = (- Crvn^3) / 27 + (2 * Frg * Crvn) / (3 * (Cd * A * ρ)^2) + P / (Cm * Cd * A * ρ)
+     * b = (2 / (9 * Cd * A * ρ)) * (3 * Frg - (2 * Crvn) / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 ≥ 0:
+     * V = cbrt(a + sqrt(a^2 + b^3)) + cbrt(a - sqrt(a^2 + b^3)) - (2 / 3) * (Crvn / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 < 0:
+     * V = 2 * sqrt(-b) * cos((1 / 3) * arccos(a / sqrt(-b^3)) - (2 / 3) * (Crvn / (Cd * A * ρ))
      *
      * @param watts The sustained power ouptut in watts
      * @param weight The total weight required to be moved that includes the rider(s), their belongings and the vehicle
@@ -818,7 +862,7 @@ public class StreetEdge extends Edge implements Cloneable {
         watts = watts * 0.9;
 
         // The coefficient for the dynamic rolling resistance, normalized to road inclination.
-        // This value could be precomputed
+        // This value could be precalculated during graph build
         double Crvn = ElevationUtils.getDynamicRollingResistance(beta);
 
         // Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
