@@ -49,7 +49,6 @@ import java.util.Set;
  * 
  */
 public class StreetEdge extends Edge implements Cloneable {
-
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private static final long serialVersionUID = 2L;
@@ -456,7 +455,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
         if (!canTraverse(options, traverseMode)) {
-            if (traverseMode == TraverseMode.BICYCLE) {
+            if (traverseMode == TraverseMode.BICYCLE || traverseMode == TraverseMode.MICROMOBILITY) {
                 return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
             }
             return null;
@@ -470,6 +469,9 @@ public class StreetEdge extends Edge implements Cloneable {
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
             weight = getSlopeSpeedEffectiveLength() / speed;
+        } else if (traverseMode.equals(TraverseMode.MICROMOBILITY)) {
+            time = calculateMicromobilityTravelTime(options);
+            weight = time;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
             time = getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
@@ -759,6 +761,117 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public double timeLowerBound(RoutingRequest options) {
         return this.getDistance() / options.getStreetSpeedUpperBound();
+    }
+
+    /**
+     * Calculates the travel time of the edge depending on the power, weight and road type. Since we don't know any info
+     * about elevation, calculate the travel time assuming travel on a road with flat slope at sea level.
+     */
+    public double calculateMicromobilityTravelTime(RoutingRequest options) {
+        return calculateMicromobilityTravelTime(
+            options.watts,
+            options.weight,
+            Math.atan(0),
+            0.005, // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
+            ElevationUtils.ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT,
+            options.minimumMicromobilitySpeed,
+            options.maximumMicromobilitySpeed,
+            getDistance()
+        );
+    }
+
+    /**
+     * Calculate the approximate travel time for a given distance with a given slope, available sustained power output,
+     * weight, rolling resistance, aerodynamic drag and bounds on min/max speeds.
+     *
+     * http://www.kreuzotter.de/english/espeed.htm
+     *
+     * @param watts The sustained power ouptut in watts
+     * @param weight The total weight required to be moved that includes the rider(s), their belongings and the vehicle
+     *               weight.
+     * @param beta ("beta") Inclination angle, = arctan(grade/100). It's probably not a huge time savings and would use
+     *             more memory, but additional precalculations from this value could be made.
+     * @param Cr The coefficient of rolling resistance. This can also be used to model the difficulty of traveling over
+     *           bumpy roadways. See this wikipedia page for a list of coefficients by various surface types:
+     *           https://en.wikipedia.org/wiki/Rolling_resistance#Rolling_resistance_coefficient_examples
+     * @param Cdap The product of the coefficient of aerodynamic drag, frontal area and air density
+     * @param minSpeed The minimum speed that the micromobility should travel at in cases where the slope is too steep
+     *                 or the vehicle has ran out of energy.
+     * @param maxSpeed The maximum speed the vehicle can travel at on steep downhills.
+     * @param distance The distance that will be traveled using all of the above parameters.
+     * @return the travel time in seconds
+     */
+    public static double calculateMicromobilityTravelTime(
+        double watts,
+        double weight,
+        double beta,
+        double Cr,
+        double Cdap,
+        double minSpeed,
+        double maxSpeed,
+        double distance
+    ) {
+        // assume that end-users will not account for drivetrain inefficencies and will use the default power rating of
+        // the vehicle. This adjusts the power downward slightly to account for drivetrain inefficencies and also that
+        // in an urban environment the user may not always be traveling with the maximum available sustained power due
+        // to traffic, personal perference, etc
+        watts = watts * 0.9;
+
+        // The coefficient for the dynamic rolling resistance, normalized to road inclination.
+        // This value could be precomputed
+        double Crvn = ElevationUtils.getDynamicRollingResistance(beta);
+
+        // Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
+        double Frg = ElevationUtils.GRAVITATIONAL_ACCELERATION_CONSTANT *
+            weight *
+            // These cosine and sine calculations could be precalculated during graph build
+            (Cr * Math.cos(beta) + Math.sin(beta));
+
+        double a = (
+            -Math.pow(Crvn, 3) / 27.0
+        ) + (
+            (2.0 * Frg * Crvn) /
+                (3.0 * Math.pow(Cdap, 2))
+        ) + (
+            watts / Cdap
+        );
+        double b = (
+            2.0 / (9.0 * Cdap)
+        ) * (
+            3.0 * Frg -
+                (
+                    (2.0 * Crvn) / Cdap
+                )
+        );
+
+        double cardanicCheck = Math.pow(a, 2) + Math.pow(b, 3);
+        double rollingDragComponent = 2.0 / 3.0 * Crvn / Cdap;
+        double speed;
+        if (cardanicCheck >= 0) {
+            double cardanicCheckSqrt = Math.sqrt(cardanicCheck);
+            speed = Math.cbrt(a + cardanicCheckSqrt) +
+                Math.cbrt(a - cardanicCheckSqrt) -
+                rollingDragComponent;
+        } else {
+            speed = 2.0 *
+                Math.sqrt(-b) *
+                Math.cos(1.0 / 3.0 * Math.acos(a / Math.sqrt(Math.pow(-b, 3)))) -
+                rollingDragComponent;
+        }
+
+        // on steep uphills, the calculated velocity could be slower than the minimum speed. Use the minimum speed in
+        // that case.
+        speed = Math.max(
+            // on steep downhills, the calculated velocity can easily be faster than the max vehicle speed, so cap the
+            // speed at the given maximum speed
+            Math.min(
+                speed,
+                maxSpeed
+            ),
+            minSpeed
+        );
+
+        return distance / speed;
     }
 
     public double getSlopeSpeedEffectiveLength() {

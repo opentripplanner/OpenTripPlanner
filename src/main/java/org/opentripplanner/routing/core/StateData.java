@@ -111,6 +111,8 @@ public class StateData implements Cloneable {
             nonTransitMode = TraverseMode.WALK;
         else if (modes.getBicycle())
             nonTransitMode = TraverseMode.BICYCLE;
+        else if (modes.getMicromobility())
+            nonTransitMode = TraverseMode.MICROMOBILITY;
         else
             nonTransitMode = null;
     }

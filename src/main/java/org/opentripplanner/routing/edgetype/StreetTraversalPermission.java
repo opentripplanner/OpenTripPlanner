@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.EnumSet;
-
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Who can traverse a street in a single direction.
@@ -69,7 +69,7 @@ public enum StreetTraversalPermission {
     public boolean allows(TraverseModeSet modes) {
         if (modes.getWalk() && allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
-        } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
+        } else if ((modes.getBicycle() || modes.getMicromobility()) && allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         } else if (modes.getCar() && allows(StreetTraversalPermission.CAR)) {
             return true;
@@ -83,7 +83,10 @@ public enum StreetTraversalPermission {
     public boolean allows(TraverseMode mode) {
         if (mode == TraverseMode.WALK && allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
-        } else if (mode == TraverseMode.BICYCLE && allows(StreetTraversalPermission.BICYCLE)) {
+        } else if (
+            (mode == TraverseMode.BICYCLE || mode == TraverseMode.MICROMOBILITY) &&
+                allows(StreetTraversalPermission.BICYCLE)
+        ) {
             return true;
         } else if (mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR)) {
             return true;

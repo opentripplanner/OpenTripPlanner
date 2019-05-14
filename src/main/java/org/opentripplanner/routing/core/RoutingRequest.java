@@ -130,10 +130,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
 
-    /** max walk/bike speed along streets, in meters per second */
+    /** max modal speed along streets, in meters per second */
     public double walkSpeed;
 
     public double bikeSpeed;
+
+    public double maximumMicromobilitySpeed;
+
+    public double minimumMicromobilitySpeed;
 
     public double carSpeed;
 
@@ -527,6 +531,21 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Which path comparator to use */
     public String pathComparator = null;
 
+    /**
+     * the maximum sustained power output of a micromobility vehicle in watts
+     * Theoretically, this could also model human power.
+     * The default is set to 250 watts.
+     **/
+    public double watts = 250;
+
+    /**
+     * The total weight of the micromobility vehicle + rider in kilograms.
+     * The default is set to 105 kilograms. This assumes a North-American average weight of 80kgs and then 25kgs for
+     * vehicle weight.
+     * https://en.wikipedia.org/wiki/Human_body_weight#Average_weight_around_the_world
+     */
+    public double weight = 105;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -540,6 +559,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
+        // https://electricbikereview.com/forum/threads/what-are-electric-bike-classes-and-why-do-they-matter.22738/
+        maximumMicromobilitySpeed = 12.5; // 12.5 m/s, ~28 mph, the maximum speed allowed by class 3 electric bicycles
+        // 0.8 m/s, ~1.8mph, an unpleasantly slow speed that assumes walking with a micromobility vehicle that either
+        // can't travel up a grade or is out of energy
+        minimumMicromobilitySpeed = 0.8;
         // http://en.wikipedia.org/wiki/Speed_limit
         carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
         setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
@@ -1179,6 +1203,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             return bikeSpeed;
         case CAR:
             return carSpeed;
+        case MICROMOBILITY:
+            return maximumMicromobilitySpeed;
         default:
             break;
         }
@@ -1190,6 +1216,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         // Assume carSpeed > bikeSpeed > walkSpeed
         if (modes.getCar())
             return carSpeed;
+        if (modes.getMicromobility())
+            return maximumMicromobilitySpeed;
         if (modes.getBicycle())
             return bikeSpeed;
         return walkSpeed;
