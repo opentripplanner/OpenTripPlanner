@@ -54,7 +54,7 @@ public class TransitLayerMapper {
         stopsByIndex = mapStopsByIndex();
         indexByStop = mapIndexByStop(stopsByIndex);
         tripPatternsByStopByDate = mapTripPatterns(indexByStop);
-        transferByStopIndex = mapTransfers(graph.index.stopVertexForStop, stopsByIndex);
+        transferByStopIndex = mapTransfers(graph.index.stopVertexForStop, stopsByIndex, indexByStop);
 
         LOG.info("Mapping complete.");
 
