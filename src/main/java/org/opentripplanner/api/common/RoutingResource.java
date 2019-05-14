@@ -397,6 +397,14 @@ public abstract class RoutingResource {
     @QueryParam("onlyTransitTrips")
     private Boolean onlyTransitTrips;
 
+    // the amount of watts a Micromobility vehicle can sustainably output
+    @QueryParam("watts")
+    private Double watts;
+
+    // the weight of the Micromobility vehicle and all things transported by the vehicle including the rider
+    @QueryParam("weight")
+    private Double weight;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -734,6 +742,12 @@ public abstract class RoutingResource {
 
         if (onlyTransitTrips != null)
             request.onlyTransitTrips = onlyTransitTrips;
+
+        if (watts != null)
+            request.watts = watts;
+
+        if (weight != null)
+            request.weight = weight;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

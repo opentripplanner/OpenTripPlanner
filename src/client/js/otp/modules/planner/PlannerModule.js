@@ -362,6 +362,8 @@ otp.modules.planner.PlannerModule =
             if(this.numItineraries) queryParams.numItineraries = this.numItineraries;
             if(this.minTransferTime) queryParams.minTransferTime = this.minTransferTime;
             if(this.showIntermediateStops) queryParams.showIntermediateStops = this.showIntermediateStops;
+            if(this.watts) queryParams.watts = this.watts;
+            if(this.weight) queryParams.weight = this.weight;
 
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
@@ -613,6 +615,7 @@ otp.modules.planner.PlannerModule =
         if(mode === "TRAM") return '#800';
         if(mode === "CAR") return '#444';
         if(mode === "AIRPLANE") return '#f0f';
+        if(mode === "MICROMOBILITY") return '#FCEF1B';
         return '#aaa';
     },
 
