@@ -49,4 +49,8 @@ public class TripScheduleWithOffset implements TripSchedule {
     public int getServiceCode() {
         return this.tripSchedule.getServiceCode();
     }
+
+    public int getSecondsOffset() {
+        return secondsOffset;
+    }
 }

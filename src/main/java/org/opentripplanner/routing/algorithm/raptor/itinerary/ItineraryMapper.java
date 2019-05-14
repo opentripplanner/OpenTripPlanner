@@ -25,12 +25,11 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -41,12 +40,21 @@ public class ItineraryMapper {
 
     private final RoutingRequest request;
 
-    public ItineraryMapper(TransitLayer transitLayer, RoutingRequest request) {
+    private final ZonedDateTime startOfTime;
+
+    private final Map<Stop, Transfer> accessTransfers;
+
+    private final Map<Stop, Transfer> egressTransfers;
+
+    public ItineraryMapper(TransitLayer transitLayer, ZonedDateTime startOfTime, RoutingRequest request, Map<Stop, Transfer> accessTransfers, Map<Stop, Transfer> egressTransfers) {
         this.transitLayer = transitLayer;
+        this.startOfTime = startOfTime;
         this.request = request;
+        this.accessTransfers = accessTransfers;
+        this.egressTransfers = egressTransfers;
     }
 
-    public TripPlan createTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
+    public TripPlan createTripPlan(List<Itinerary> itineraries) {
         Place from = new Place();
         Place to = new Place();
         if (!itineraries.isEmpty()) {
@@ -54,17 +62,17 @@ public class ItineraryMapper {
             to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
         }
         TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-        itineraries = itineraries.stream().sorted((i1, i2) -> i1.endTime.compareTo(i2.endTime))
+        itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
                 .limit(request.numItineraries).collect(Collectors.toList());
         tripPlan.itinerary = itineraries;
         return tripPlan;
     }
 
-    public Itinerary createItinerary(RoutingRequest request, Path<TripSchedule> path, Map<Stop, Transfer> accessPaths, Map<Stop, Transfer> egressPaths) {
+    public Itinerary createItinerary(Path<TripSchedule> path) {
         Itinerary itinerary = new Itinerary();
 
         // Map access leg
-        Leg accessLeg = mapAccessLeg(request, path.accessLeg(), accessPaths);
+        Leg accessLeg = mapAccessLeg(request, path.accessLeg(), accessTransfers);
 
 
         if (accessLeg.distance > 0) {
@@ -96,16 +104,16 @@ public class ItineraryMapper {
                 itinerary.addLeg(transferLeg);
 
                 // Increment counters
-                itinerary.transfers++;
                 itinerary.walkTime += pathLeg.duration();
             }
+
             pathLeg = pathLeg.nextLeg();
         }
 
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
 
-        Leg egressLeg = mapEgressLeg(request, egressPathLeg, egressPaths);
+        Leg egressLeg = mapEgressLeg(request, egressPathLeg, egressTransfers);
 
         if (egressLeg.distance > 0) {
             itinerary.walkDistance += egressLeg.distance;
@@ -116,11 +124,11 @@ public class ItineraryMapper {
         itinerary.walkTime += egressPathLeg.toTime() - egressPathLeg.fromTime();
 
         // Map general itinerary fields
+        itinerary.transfers = path.numberOfTransfers();
         itinerary.startTime = createCalendar(path.accessLeg().fromTime());
         itinerary.endTime = createCalendar(egressPathLeg.toTime());
         itinerary.duration = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
         itinerary.waitingTime = itinerary.duration - itinerary.walkTime - itinerary.transitTime;
-        itinerary.walkDistance = itinerary.legs.stream().mapToDouble(l -> l.distance).sum();
 
         return itinerary;
     }
@@ -181,6 +189,10 @@ public class ItineraryMapper {
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distance = getDistanceFromCoordinates(transitLegCoordinates);
+
+        if (request.showIntermediateStops) {
+            leg.stop = extractIntermediateStops(pathLeg);
+        }
 
         leg.route = route.getLongName();
         leg.routeId = route.getId();
@@ -248,15 +260,43 @@ public class ItineraryMapper {
         return leg;
     }
 
-    private Calendar createCalendar(int timeinSeconds) {
-        Date date = request.getDateTime();
-        LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+    private Calendar createCalendar(int timeInSeconds) {
+        ZonedDateTime zdt = startOfTime.plusSeconds(timeInSeconds);
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
+        c.setTimeInMillis(zdt.toInstant().toEpochMilli());
+        return c;
+    }
 
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo")); // TODO: Get time zone from request
-        calendar.set(localDate.getYear(), localDate.getMonth().getValue() - 1, localDate.getDayOfMonth()
-                , 0, 0, 0);
-        calendar.add(Calendar.SECOND, timeinSeconds);
-        return calendar;
+    private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
+        List<Place> places = new ArrayList<>();
+        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
+        TripSchedule tripSchedule = pathLeg.trip();
+        boolean boarded = false;
+        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
+                break;
+            }
+            if (boarded) {
+                Stop stop = tripPattern.stopPattern.stops[j];
+                Place place = new Place();
+                place.name = stop.getName();
+                place.lon = stop.getLon();
+                place.lat = stop.getLat();
+                place.stopId = stop.getId();
+                place.stopCode = stop.getCode();
+                place.platformCode = stop.getPlatformCode();
+                place.zoneId = stop.getZoneId();
+                place.stopIndex = j;
+                // TODO: fill out stopSequence
+                place.arrival = createCalendar(tripSchedule.arrival(j));
+                place.departure = createCalendar(tripSchedule.departure(j));
+                places.add(place);
+            }
+            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
+                boarded = true;
+            }
+        }
+        return places;
     }
 
     private List<Coordinate> extractTransitLegCoordinates(TransitPathLeg<TripSchedule> pathLeg) {
@@ -265,12 +305,11 @@ public class ItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            if (boarded) {
+                transitLegCoordinates.addAll(Arrays.asList(tripPattern.hopEdges[j - 1].getGeometry().getCoordinates()));
+            }
             if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
                 boarded = true;
-            }
-            if (boarded) {
-                transitLegCoordinates.add(new Coordinate(tripPattern.stopPattern.stops[j].getLon(),
-                        tripPattern.stopPattern.stops[j].getLat()));
             }
             if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
                 break;

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,11 +13,14 @@ import java.util.Objects;
 public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
     private final TripPattern tripPattern;
 
-    private final List<TripSchedule> tripSchedules;
+    private final TripSchedule[] tripSchedules;
 
-    public TripPatternForDate(TripPattern tripPattern, List<TripSchedule> tripSchedules) {
+    private final LocalDate localDate;
+
+    public TripPatternForDate(TripPattern tripPattern, List<TripSchedule> tripSchedules, LocalDate localDate) {
         this.tripPattern = tripPattern;
-        this.tripSchedules = tripSchedules;
+        this.tripSchedules = tripSchedules.toArray(new TripSchedule[]{});
+        this.localDate = localDate;
     }
 
     public TripPattern getTripPattern() {
@@ -32,21 +36,19 @@ public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
     }
 
     @Override public TripSchedule getTripSchedule(int i) {
-        return tripSchedules.get(i);
+        return tripSchedules[i];
     }
 
-    public List<TripSchedule> getTripSchedules() {
-        return this.tripSchedules;
+    public LocalDate getLocalDate() {
+        return localDate;
     }
 
     @Override public int numberOfTripSchedules() {
-        return tripSchedules.size();
+        return tripSchedules.length;
     }
 
-    //TODO Should these be implemented?
-
     @Override public int hashCode() {
-        return Objects.hash(tripPattern, tripSchedules);
+        return Objects.hash(tripPattern, tripSchedules, localDate);
     }
 
     @Override public boolean equals(Object o) {
@@ -56,5 +58,13 @@ public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
             return false;
         TripPatternForDate that = (TripPatternForDate) o;
         return this.getTripPattern().getId() == that.getTripPattern().getId();
+    }
+
+    @Override
+    public String toString() {
+        return "TripPatternForDate{" +
+                "tripPattern=" + tripPattern +
+                ", localDate=" + localDate +
+                '}';
     }
 }

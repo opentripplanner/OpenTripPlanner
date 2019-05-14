@@ -8,7 +8,6 @@ import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
-import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
@@ -18,25 +17,26 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAcce
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
+
 /**
  * Does a complete transit search, including access and egress legs.
  */
 public class RaptorRouter {
-    private final TransitDataProvider<TripSchedule> otpRRDataProvider;
-    private final TransitLayer transitLayer;
     private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
 
     private static final RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(
@@ -44,11 +44,16 @@ public class RaptorRouter {
             new TuningParameters() {}
     );
 
+    private final RaptorRoutingRequestTransitData otpRRDataProvider;
+
+    private final TransitLayer transitLayer;
+
     //TODO Naming
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
         double startTime = System.currentTimeMillis();
+        ZonedDateTime startOfTime = calculateStartOfTime(request);
         this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
-                transitLayer, startDate(request),2, request.modes, request.walkSpeed
+                transitLayer, startOfTime, 2, request.modes, request.walkSpeed
         );
         LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
         this.transitLayer = transitLayer;
@@ -76,8 +81,7 @@ public class RaptorRouter {
 
         double startTimeRouting = System.currentTimeMillis();
 
-        // TODO Time zones
-        int departureTime = Instant.ofEpochMilli(request.dateTime * 1000).atZone(ZoneId.systemDefault()).toLocalTime().toSecondOfDay();
+        int departureTime = secondsSinceStartOfTime(otpRRDataProvider.getStartOfTime(), request.getDateTime().toInstant());
 
         // TODO Expose parameters
         // TODO Remove parameters from API
@@ -85,7 +89,8 @@ public class RaptorRouter {
         builder.profile(RangeRaptorProfile.MULTI_CRITERIA)
                 .searchParams()
                 .earliestDepartureTime(departureTime)
-                .searchWindowInSeconds(40  * 60)
+                .searchWindowInSeconds(request.raptorSearchWindow)
+                .latestArrivalTime(departureTime + 12 * 60 * 60)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
                 .boardSlackInSeconds(request.boardSlack)
@@ -108,20 +113,25 @@ public class RaptorRouter {
 
         double startItineraries = System.currentTimeMillis();
 
-        ItineraryMapper itineraryMapper = new ItineraryMapper(transitLayer, request);
+        ItineraryMapper itineraryMapper = new ItineraryMapper(transitLayer, otpRRDataProvider.getStartOfTime(), request, accessTransfers, egressTransfers);
 
         List<Itinerary> itineraries = paths.stream()
-                .map(p -> itineraryMapper.createItinerary(request, p, accessTransfers, egressTransfers))
+                .map(itineraryMapper::createItinerary)
                 .collect(Collectors.toList());
 
-        TripPlan tripPlan = itineraryMapper.createTripPlan(request, itineraries);
+        TripPlan tripPlan = itineraryMapper.createTripPlan(itineraries);
 
         LOG.info("Creating itineraries took {} ms", System.currentTimeMillis() - startItineraries);
+        if (tripPlan.itinerary.isEmpty()) {
+            throw new PathNotFoundException();
+        }
 
         return tripPlan;
     }
 
-    private LocalDate startDate(RoutingRequest request) {
-        return request.getDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    private ZonedDateTime calculateStartOfTime(RoutingRequest request) {
+        ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
+        ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
+        return DateMapper.asStartOfService(zdt);
     }
 }
