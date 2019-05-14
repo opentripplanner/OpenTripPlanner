@@ -182,6 +182,10 @@ public class ItineraryMapper {
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distance = getDistanceFromCoordinates(transitLegCoordinates);
 
+        if (request.showIntermediateStops) {
+            leg.stop = extractIntermediateStops(pathLeg);
+        }
+
         leg.route = route.getLongName();
         leg.routeId = route.getId();
         leg.agencyName = route.getAgency().getName();
@@ -257,6 +261,38 @@ public class ItineraryMapper {
                 , 0, 0, 0);
         calendar.add(Calendar.SECOND, timeinSeconds);
         return calendar;
+    }
+
+    private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
+        List<Place> places = new ArrayList<>();
+        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
+        TripSchedule tripSchedule = pathLeg.trip();
+        boolean boarded = false;
+        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
+                break;
+            }
+            if (boarded) {
+                Stop stop = tripPattern.stopPattern.stops[j];
+                Place place = new Place();
+                place.name = stop.getName();
+                place.lon = stop.getLon();
+                place.lat = stop.getLat();
+                place.stopId = stop.getId();
+                place.stopCode = stop.getCode();
+                place.platformCode = stop.getPlatformCode();
+                place.zoneId = stop.getZoneId();
+                place.stopIndex = j;
+                // TODO: fill out stopSequence
+                place.arrival = createCalendar(tripSchedule.arrival(j));
+                place.departure = createCalendar(tripSchedule.departure(j));
+                places.add(place);
+            }
+            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
+                boarded = true;
+            }
+        }
+        return places;
     }
 
     private List<Coordinate> extractTransitLegCoordinates(TransitPathLeg<TripSchedule> pathLeg) {
