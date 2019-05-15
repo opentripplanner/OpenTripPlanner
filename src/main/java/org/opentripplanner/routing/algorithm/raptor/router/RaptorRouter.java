@@ -12,8 +12,8 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
+import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -66,9 +66,9 @@ public class RaptorRouter {
         double startTimeAccessEgress = System.currentTimeMillis();
 
         Map<Stop, Transfer> accessTransfers =
-            AccessEgressRouter.streetSearch(request, false, Integer.MAX_VALUE);
+            AccessEgressRouter.streetSearch(request, false, 2000);
         Map<Stop, Transfer> egressTransfers =
-            AccessEgressRouter.streetSearch(request, true, Integer.MAX_VALUE);
+            AccessEgressRouter.streetSearch(request, true, 2000);
 
         TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(transitLayer);
 
@@ -106,6 +106,8 @@ public class RaptorRouter {
         // We know this cast is correct because we have instantiated rangeRaptorService as RangeRaptorService<TripSchedule>
         @SuppressWarnings("unchecked")
         Collection<Path<TripSchedule>> paths = rangeRaptorService.route(rangeRaptorRequest, this.otpRRDataProvider);
+
+        LOG.info("Found {} itineraries", paths.size());
 
         LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
