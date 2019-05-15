@@ -1,18 +1,20 @@
 package org.opentripplanner.routing.impl;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The primary implementation of the GraphSource interface. The graph is loaded from a serialized
@@ -21,7 +23,7 @@ import java.io.*;
  */
 public class InputStreamGraphSource implements GraphSource {
 
-    public static final String GRAPH_FILENAME = "Graph.obj";
+    static final String GRAPH_FILENAME = "Graph.obj";
 
     private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
@@ -38,34 +40,18 @@ public class InputStreamGraphSource implements GraphSource {
 
     private long graphLastModified = 0L;
 
-    private Object preEvictMutex = new Boolean(false);
+    private final Object preEvictMutex = Boolean.FALSE;
+
+    private final GraphConfig config;
+
 
     /**
-     * The current used input stream implementation for getting graph data source.
+     * Create GraphSource loading graph from the file system using the graph config with graph
+     * base path.
      */
-    private Streams streams;
-
-    // TODO Why do we need a factory? There is a single one implementation.
-    private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
-
-    /**
-     * @return A GraphSource loading graph from the file system under a base path.
-     */
-    public static InputStreamGraphSource newFileGraphSource(String routerId, File path) {
-        return new InputStreamGraphSource(routerId, new FileStreams(path));
-    }
-
-    /**
-     * @return A GraphSource loading graph from an embedded classpath resources (a graph bundled
-     *         inside a pre-packaged WAR for example).
-     */
-    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path) {
-        return new InputStreamGraphSource(routerId, new ClasspathStreams(path));
-    }
-
-    private InputStreamGraphSource(String routerId, Streams streams) {
+    InputStreamGraphSource(String routerId, GraphConfig config) {
         this.routerId = routerId;
-        this.streams = streams;
+        this.config = config;
     }
 
     @Override
@@ -85,8 +71,8 @@ public class InputStreamGraphSource implements GraphSource {
     public boolean reload(boolean force, boolean preEvict) {
         /* We synchronize on 'this' to prevent multiple reloads from being called at the same time */
         synchronized (this) {
-            long lastModified = streams.getLastModified();
-            boolean doReload = force ? true : checkAutoReload(lastModified);
+            long lastModified = getLastModified();
+            boolean doReload = force || checkAutoReload(lastModified);
             if (!doReload)
                 return true;
             if (preEvict) {
@@ -177,7 +163,7 @@ public class InputStreamGraphSource implements GraphSource {
      */
     private Router loadGraph() {
         final Graph newGraph;
-        try (InputStream is = streams.getGraphInputStream()) {
+        try (InputStream is = getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
                 newGraph = Graph.load(is);
@@ -192,108 +178,23 @@ public class InputStreamGraphSource implements GraphSource {
             return null;
         }
 
-        // Decorate the graph TODO how are we "decorating" it? This appears to refer to loading its configuration.
-        // Even if a config file is not present on disk one could be bundled inside.
-        try (InputStream is = streams.getConfigInputStream()) {
-            JsonNode config = MissingNode.getInstance();
-            // TODO reuse the exact same JSON loader from OTPConfigurator
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            if (is != null) {
-                config = mapper.readTree(is);
-            } else if (newGraph.routerConfig != null) {
-                config = mapper.readTree(newGraph.routerConfig);
-            }
-            Router newRouter = new Router(routerId, newGraph);
-            newRouter.startup(config);
-            return newRouter;
-        } catch (IOException e) {
-            LOG.error("Can't read config file.");
-            LOG.error(e.getMessage());
-            return null;
-        }
+        // Load configuration from disk or use the embedded configuration as fallback.
+        JsonNode jsonConfig = config.routerConfig(newGraph.routerConfig);
+
+        Router newRouter = new Router(routerId, newGraph);
+        newRouter.startup(jsonConfig);
+        return newRouter;
     }
 
-    /**
-     * InputStreamGraphSource delegates to some actual implementation the fact of getting the input
-     * stream and checking the last modification timestamp for a given routerId.
-     * FIXME this seems like a lot of boilerplate just to switch between FileInputStream and getResourceAsStream
-     * a couple of conditional blocks and a boolean field "onClasspath" might do the trick.
-     */
-    private interface Streams {
-        public abstract InputStream getGraphInputStream() throws IOException;
-
-        public abstract InputStream getConfigInputStream() throws IOException;
-
-        public abstract long getLastModified();
+    private InputStream getGraphInputStream() throws IOException {
+        File graphFile = new File(config.getPath(), GRAPH_FILENAME);
+        LOG.debug("Loading graph from file '{}'", graphFile.getPath());
+        return new FileInputStream(graphFile);
     }
 
-    private static class FileStreams implements Streams {
-
-        private File path;
-
-        private FileStreams(File path) {
-            this.path = path;
-        }
-
-        @Override
-        public InputStream getGraphInputStream() throws IOException {
-            File graphFile = new File(path, GRAPH_FILENAME);
-            LOG.debug("Loading graph from file '{}'", graphFile.getPath());
-            return new FileInputStream(graphFile);
-        }
-
-        @Override
-        public InputStream getConfigInputStream() throws IOException {
-            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
-            if (configFile.canRead()) {
-                LOG.debug("Loading config from file '{}'", configFile.getPath());
-                return new FileInputStream(configFile);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public long getLastModified() {
-            // Note: this returns 0L if the file does not exists
-            return new File(path, GRAPH_FILENAME).lastModified();
-        }
-    }
-
-    private static class ClasspathStreams implements Streams {
-
-        private File path;
-
-        private ClasspathStreams(File path) {
-            this.path = path;
-        }
-
-        @Override
-        public InputStream getGraphInputStream() {
-            File graphFile = new File(path, GRAPH_FILENAME);
-            LOG.debug("Loading graph from classpath at '{}'", graphFile.getPath());
-            return Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(graphFile.getPath());
-        }
-
-        @Override
-        public InputStream getConfigInputStream() {
-            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
-            LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
-            return Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(configFile.getPath());
-        }
-
-        /**
-         * For a packaged classpath resources we assume the data won't change, so returning always
-         * 0L basically disable auto-reload in that case.
-         */
-        @Override
-        public long getLastModified() {
-            return 0L;
-        }
+    private long getLastModified() {
+        // Note: this returns 0L if the file does not exists
+        return new File(config.getPath(), GRAPH_FILENAME).lastModified();
     }
 
     /**
@@ -303,15 +204,20 @@ public class InputStreamGraphSource implements GraphSource {
 
         private static final Logger LOG = LoggerFactory.getLogger(FileFactory.class);
 
-        public File basePath;
 
-        public FileFactory(File basePath) {
+        private final OTPConfiguration otpConfiguration;
+        private final File basePath;
+
+        public FileFactory(OTPConfiguration otpConfiguration, File basePath) {
+            this.otpConfiguration = otpConfiguration;
             this.basePath = basePath;
         }
 
         @Override
         public GraphSource createGraphSource(String routerId) {
-            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId));
+            return new InputStreamGraphSource(
+                    routerId, otpConfiguration.getGraphConfig(getBasePath(routerId))
+            );
         }
 
         @Override

@@ -1,5 +1,11 @@
 package org.opentripplanner.routing.impl;
 
+import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.config.OTPConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,11 +15,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.services.GraphService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Scan for graphs under the base directory and auto-register them.
@@ -26,7 +27,15 @@ public class GraphScanner {
     private static final int AUTOSCAN_PERIOD_SEC = 10;
 
     /** Where to look for graphs. Defaults to 'graphs' under the OTP server base path. */
-    public File basePath = null;
+    private final File basePath;
+
+    /** The GraphService where register graphs to */
+    private final GraphService graphService;
+
+    /** The OTP Configuration to use for creating new routers */
+    private final OTPConfiguration configuration;
+
+    private final ScheduledExecutorService scanExecutor;
 
     /** A list of routerIds to automatically register and load at startup */
     public List<String> autoRegister;
@@ -34,17 +43,16 @@ public class GraphScanner {
     /** The default router, none by default */
     public String defaultRouterId = null;
 
-    /** The GraphService where register graphs to */
-    private GraphService graphService;
-
-    private ScheduledExecutorService scanExecutor;
-
-    public GraphScanner(GraphService graphService, File basePath, boolean autoScan) {
+    public GraphScanner(
+            GraphService graphService,
+            OTPConfiguration configuration,
+            File basePath,
+            boolean autoScan
+    ) {
         this.graphService = graphService;
+        this.configuration = configuration;
         this.basePath = basePath;
-        if (autoScan) {
-            scanExecutor = Executors.newSingleThreadScheduledExecutor();
-        }
+        this.scanExecutor = autoScan ? Executors.newSingleThreadScheduledExecutor() : null;
     }
 
     /**
@@ -64,8 +72,9 @@ public class GraphScanner {
             LOG.info("Attempting to automatically register routerIds {}", autoRegister);
             LOG.info("Graph files will be sought in paths relative to {}", basePath);
             for (String routerId : routerIds) {
-                InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
-                        routerId, getBasePath(routerId));
+                InputStreamGraphSource graphSource = new InputStreamGraphSource(
+                        routerId, configuration.getGraphConfig(getBasePath(routerId))
+                );
                 graphService.registerGraph(routerId, graphSource);
             }
         } else {
@@ -74,12 +83,9 @@ public class GraphScanner {
         if (scanExecutor != null) {
             LOG.info("Auto-scan mode activated, looking in {}", basePath);
             autoScan();
-            scanExecutor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    autoScan();
-                }
-            }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
+            scanExecutor.scheduleWithFixedDelay(
+                    this::autoScan, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS
+            );
         }
     }
 
@@ -114,8 +120,9 @@ public class GraphScanner {
             LOG.info("Found new routers to register: {}",
                     Arrays.toString(graphToRegister.toArray()));
             for (String routerId : graphToRegister) {
-                InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
-                        routerId, getBasePath(routerId));
+                InputStreamGraphSource graphSource = new InputStreamGraphSource(
+                        routerId, configuration.getGraphConfig(getBasePath(routerId))
+                );
                 // Can be null here if the file has been removed in the meantime.
                 graphService.registerGraph(routerId, graphSource);
             }

@@ -1,0 +1,1 @@
+This is a test resource, to verify the ext-test resources is available on the test classpath.

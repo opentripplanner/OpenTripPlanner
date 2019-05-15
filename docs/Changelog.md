@@ -1,7 +1,9 @@
 # Changelog
 
-## 1.4 (in progress)
+## 2.0 (in progress)
+- Sandbox for experimental features (#2745)
 
+## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)

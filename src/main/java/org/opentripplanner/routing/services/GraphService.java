@@ -43,29 +43,28 @@ public class GraphService {
      */
     private static final boolean AUTORELOAD_PREEVICT = false;
 
-    private Map<String, GraphSource> graphSources = new HashMap<>();
+    private final Map<String, GraphSource> graphSources = new HashMap<>();
 
     private static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
 
     private String defaultRouterId = "";
 
-    public GraphSource.Factory graphSourceFactory;
+    public final GraphSource.Factory graphSourceFactory;
 
     private ScheduledExecutorService scanExecutor;
 
     public GraphService() {
-        this(false);
+        this(false, null);
     }
 
-    public GraphService(boolean autoReload) {
+    public GraphService(boolean autoReload, GraphSource.Factory graphSourceFactory) {
+        this.graphSourceFactory = graphSourceFactory;
         if (autoReload) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
-            scanExecutor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    autoReloadScan();
-                }
-            }, AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS);
+            scanExecutor.scheduleWithFixedDelay(
+                    this::autoReloadScan,
+                    AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS
+            );
         }
     }
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.services;
 
-import java.io.InputStream;
-
 import org.opentripplanner.standalone.Router;
+
+import java.io.InputStream;
 
 /**
  * A class responsible of graph creation / ownership.
@@ -18,13 +18,13 @@ public interface GraphSource {
      * 
      * @see GraphService
      */
-    public interface Factory {
+    interface Factory {
 
         /**
          * @param routerId Id of the router.
          * @return a new GraphSource for the given routerId.
          */
-        public GraphSource createGraphSource(String routerId);
+        GraphSource createGraphSource(String routerId);
 
         /**
          * Save the graph data, but don't load it in memory. The file location is based on the
@@ -36,7 +36,7 @@ public interface GraphSource {
          * @param is graph data as input stream
          * @return true if the operation succedded, false otherwise (will catch IOExceptions).
          */
-        public boolean save(String routerId, InputStream is);
+        boolean save(String routerId, InputStream is);
     }
 
     /**
