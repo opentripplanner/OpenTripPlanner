@@ -2,7 +2,7 @@ sudo: required
 branches:
   only:
     - master
-    - /201[7-9][0-1][0-9][0-3][0-9]/
+    - /20(1[7-9]|2[0-9])[0-1][0-9][0-3][0-9]/
 
 services: docker
 install: true
