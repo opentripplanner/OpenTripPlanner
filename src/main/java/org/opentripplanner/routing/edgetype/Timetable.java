@@ -464,7 +464,6 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.cancelArrivalTime(i);
                                 newTimes.updateArrivalDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
@@ -494,7 +493,6 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.cancelDepartureTime(i);
                                 newTimes.updateDepartureDelay(i, TripTimes.UNAVAILABLE);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
