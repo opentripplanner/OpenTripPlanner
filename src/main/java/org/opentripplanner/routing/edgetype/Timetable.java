@@ -433,11 +433,7 @@ public class Timetable implements Serializable {
                     StopTimeUpdate.ScheduleRelationship scheduleRelationship =
                             update.hasScheduleRelationship() ? update.getScheduleRelationship()
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
-                    if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
-                        LOG.warn("Partially canceled trips are unsupported by this method." +
-                                " Skipping TripUpdate.");
-                        return null;
-                    } else if (scheduleRelationship ==
+                    if (scheduleRelationship ==
                             StopTimeUpdate.ScheduleRelationship.NO_DATA) {
                         newTimes.updateArrivalDelay(i, 0);
                         newTimes.updateDepartureDelay(i, 0);
@@ -523,6 +519,11 @@ public class Timetable implements Serializable {
                                 }
                             }
                         }
+                    }
+
+                    if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
+                        newTimes.cancelArrivalTime(i);
+                        newTimes.cancelDepartureTime(i);
                     }
 
                     if (updates.hasNext()) {
