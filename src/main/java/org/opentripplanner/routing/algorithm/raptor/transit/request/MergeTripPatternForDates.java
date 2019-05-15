@@ -23,11 +23,13 @@ public class MergeTripPatternForDates {
     public static List<TripPatternForDates> merge(List<Map<Integer, TripPatternForDate>> tripPatternForDateList, ZonedDateTime startOfTime) {
         List<TripPatternForDates> combinedList = new ArrayList<>();
 
+        // Extract all distinct TripPatterns across the search days
         Map<Integer, TripPattern> allTripPatternsById = tripPatternForDateList.stream().flatMap(t -> t.values().stream())
                 .map(TripPatternForDate::getTripPattern)
                 .distinct()
                 .collect(Collectors.toMap(TripPattern::getId, t -> t));
 
+        // For each TripPattern, time expand each TripPatternForDate and merge into a single TripPatternForDates
         for (Map.Entry<Integer, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
             List<TripPatternForDate> tripPatterns = new ArrayList<>();
             List<Integer> offsets = new ArrayList<>();
