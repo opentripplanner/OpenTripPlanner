@@ -88,10 +88,6 @@ class TripPatternMapper {
             tripPatternsByStopByDate.put(localDate, tripPatternsForDate);
         }
 
-        // Sort by TripPattern for easier merging in RaptorRoutingRequestTransitData
-        for (List<TripPatternForDate> list : tripPatternsByStopByDate.values()) {
-            list.sort(Comparator.comparingInt(p -> p.getTripPattern().getId()));
-        }
         return tripPatternsByStopByDate;
     }
 
