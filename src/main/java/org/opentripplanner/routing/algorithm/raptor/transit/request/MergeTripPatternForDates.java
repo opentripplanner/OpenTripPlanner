@@ -18,7 +18,6 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateM
  * for searching, as each TripPattern is searched only once per round.
  */
 
-//TODO Add test
 public class MergeTripPatternForDates {
 
     public static List<TripPatternForDates> merge(List<Map<Integer, TripPatternForDate>> tripPatternForDateList, ZonedDateTime startOfTime) {
