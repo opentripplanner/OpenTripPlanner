@@ -86,17 +86,17 @@ public class RaptorRouter {
         // TODO Expose parameters
         // TODO Remove parameters from API
         RequestBuilder builder = new RequestBuilder();
-        builder.profile(RangeRaptorProfile.MULTI_CRITERIA)
+        builder.profile(RangeRaptorProfile.STANDARD)
                 .searchParams()
                 .earliestDepartureTime(departureTime)
                 .searchWindowInSeconds(request.raptorSearchWindow)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
                 .boardSlackInSeconds(request.boardSlack)
-                .timetableEnabled(false);
+                .timetableEnabled(true);
 
         //TODO Check in combination with timetableEnabled
-        builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+        //builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
 
         RangeRaptorRequest rangeRaptorRequest = builder.build();
 
