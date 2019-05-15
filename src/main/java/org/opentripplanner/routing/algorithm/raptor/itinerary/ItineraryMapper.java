@@ -24,6 +24,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -46,6 +48,8 @@ public class ItineraryMapper {
 
     private final Map<Stop, Transfer> egressTransfers;
 
+    private static Logger LOG = LoggerFactory.getLogger(ItineraryMapper.class);
+
     public ItineraryMapper(TransitLayer transitLayer, ZonedDateTime startOfTime, RoutingRequest request, Map<Stop, Transfer> accessTransfers, Map<Stop, Transfer> egressTransfers) {
         this.transitLayer = transitLayer;
         this.startOfTime = startOfTime;
@@ -65,6 +69,7 @@ public class ItineraryMapper {
         itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
                 .limit(request.numItineraries).collect(Collectors.toList());
         tripPlan.itinerary = itineraries;
+        LOG.info("Returning {} itineraries", itineraries.size());
         return tripPlan;
     }
 
