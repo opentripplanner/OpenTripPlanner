@@ -469,9 +469,6 @@ public class StreetEdge extends Edge implements Cloneable {
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
             weight = getSlopeSpeedEffectiveLength() / speed;
-        } else if (traverseMode.equals(TraverseMode.MICROMOBILITY)) {
-            time = calculateMicromobilityTravelTime(options);
-            weight = time;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
             time = getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
@@ -749,6 +746,20 @@ public class StreetEdge extends Edge implements Cloneable {
             }
 
             return calculateCarSpeed(options);
+        } else if (traverseMode == TraverseMode.MICROMOBILITY) {
+            return Math.min(
+                calculateMicromobilitySpeed(
+                    options.watts,
+                    options.weight,
+                    Math.atan(0), // 0 slope beta
+                    0.005, // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
+                    ElevationUtils.ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT,
+                    options.minimumMicromobilitySpeed,
+                    options.maximumMicromobilitySpeed
+                ),
+                // Micromobility vehicles must also obey the car speed limit
+                carSpeed
+            );
         }
         return options.getSpeed(traverseMode);
     }
@@ -761,23 +772,6 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public double timeLowerBound(RoutingRequest options) {
         return this.getDistance() / options.getStreetSpeedUpperBound();
-    }
-
-    /**
-     * Calculates the travel time of the edge depending on the power, weight and road type. Since we don't know any info
-     * about elevation, calculate the travel time assuming travel on a road with flat slope at sea level.
-     */
-    public double calculateMicromobilityTravelTime(RoutingRequest options) {
-        return calculateMicromobilityTravelTime(
-            options.watts,
-            options.weight,
-            Math.atan(0),
-            0.005, // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
-            ElevationUtils.ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT,
-            options.minimumMicromobilitySpeed,
-            options.maximumMicromobilitySpeed,
-            getDistance()
-        );
     }
 
     /**
@@ -842,24 +836,22 @@ public class StreetEdge extends Edge implements Cloneable {
      * @param minSpeed The minimum speed that the micromobility should travel at in cases where the slope is too steep
      *                 or the vehicle has ran out of energy.
      * @param maxSpeed The maximum speed the vehicle can travel at on steep downhills.
-     * @param distance The distance that will be traveled using all of the above parameters.
      * @return the travel time in seconds
      */
-    public static double calculateMicromobilityTravelTime(
+    public static double calculateMicromobilitySpeed(
         double watts,
         double weight,
         double beta,
         double Cr,
         double Cdap,
         double minSpeed,
-        double maxSpeed,
-        double distance
+        double maxSpeed
     ) {
         // assume that end-users will not account for drivetrain inefficencies and will use the default power rating of
-        // the vehicle. This adjusts the power downward slightly to account for drivetrain inefficencies and also that
-        // in an urban environment the user may not always be traveling with the maximum available sustained power due
-        // to traffic, personal perference, etc
-        watts = watts * 0.9;
+        // the vehicle. This adjusts the power downward  to account for drivetrain inefficencies. An assumption is also
+        // made that due to use in an urban environment the user may not always be traveling with the maximum available
+        // sustained power due to traffic, personal perference, etc
+        watts = watts * 0.8;
 
         // The coefficient for the dynamic rolling resistance, normalized to road inclination.
         // This value could be precalculated during graph build
@@ -915,7 +907,7 @@ public class StreetEdge extends Edge implements Cloneable {
             minSpeed
         );
 
-        return distance / speed;
+        return speed;
     }
 
     public double getSlopeSpeedEffectiveLength() {
