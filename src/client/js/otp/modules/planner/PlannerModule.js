@@ -364,6 +364,8 @@ otp.modules.planner.PlannerModule =
             if(this.showIntermediateStops) queryParams.showIntermediateStops = this.showIntermediateStops;
             if(this.watts) queryParams.watts = this.watts;
             if(this.weight) queryParams.weight = this.weight;
+            if(this.minimumMicromobilitySpeed) queryParams.minimumMicromobilitySpeed = this.minimumMicromobilitySpeed;
+            if(this.maximumMicromobilitySpeed) queryParams.maximumMicromobilitySpeed = this.maximumMicromobilitySpeed;
 
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;

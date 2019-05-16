@@ -1031,6 +1031,8 @@ otp.widgets.tripoptions.Micromobility =
 
         var html = '<div class="notDraggable">Watts: <input id="'+this.id+'-watts-value" type="text" style="width:30px;" value="250" />';
         html += '<div class="notDraggable">Weight (kg): <input id="'+this.id+'-weight-value" type="text" style="width:30px;" value="105" />';
+        html += '<div class="notDraggable">Min Speed (m/s): <input id="'+this.id+'-minspeed-value" type="text" style="width:30px;" value="0.8" />';
+        html += '<div class="notDraggable">Max Speed (m/s): <input id="'+this.id+'-maxspeed-value" type="text" style="width:30px;" value="12.5" />';
         html += "</div>"
 
         this.setContent(html);
@@ -1049,6 +1051,16 @@ otp.widgets.tripoptions.Micromobility =
                 watts : parseFloat($('#'+this_.id+'-weight-value').val()),
             });
         });
+        $('#'+this.id+'-minspeed-value').change(function() {
+            this_.tripWidget.inputChanged({
+                minimumMicromobilitySpeed : parseFloat($('#'+this_.id+'-minspeed-value').val()),
+            });
+        });
+        $('#'+this.id+'-maxspeed-value').change(function() {
+            this_.tripWidget.inputChanged({
+                maximumMicromobilitySpeed : parseFloat($('#'+this_.id+'-maxspeed-value').val()),
+            });
+        });
     },
 
     restorePlan : function(planData) {
@@ -1059,6 +1071,14 @@ otp.widgets.tripoptions.Micromobility =
         var weightVal = parseFloat(planData.queryParams.weight)
         if(!isNaN(weightVal)) {
             $('#'+this.id+'-weight-value').val(weightVal);
+        }
+        var minSpeedVal = parseFloat(planData.queryParams.minimumMicromobilitySpeed)
+        if(!isNaN(minSpeedVal)) {
+            $('#'+this.id+'-minSpeed-value').val(minSpeedVal);
+        }
+        var maxSpeedVal = parseFloat(planData.queryParams.maximumMicromobilitySpeed)
+        if(!isNaN(maxSpeedVal)) {
+            $('#'+this.id+'-maxSpeed-value').val(maxSpeedVal);
         }
     },
 
