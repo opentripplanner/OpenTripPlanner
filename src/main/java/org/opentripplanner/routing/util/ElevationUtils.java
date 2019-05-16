@@ -6,6 +6,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -187,9 +188,20 @@ public class ElevationUtils {
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
             log.error("Too small edge, returning neutral slope costs.");
-            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false);
+            return new SlopeCosts(
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                1.0,
+                false,
+                new byte[]{0},
+                new short[]{(short) trueLength},
+                new float[]{(float) getDragResistiveForceComponent(0)}
+            );
         }
         double lengthMultiplier = trueLength / flatLength;
+        List<GradientBin> gradients = new ArrayList<>();
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -197,6 +209,36 @@ public class ElevationUtils {
                 continue;
             }
             double slope = rise / run;
+
+            // store gradients for use in micromobility calculations
+            // Micromobility speed calculations can handle extreme slopes. However, cap them at 100% or -100%.
+            int iGradient = slope < -1
+                ? -100
+                : slope > 1
+                ? 100
+                : (int) Math.round(slope * 100.0);
+
+            // add to existing gradient bin
+            boolean gradientAdded = false;
+            double minCoordinatesAltitude = Math.min(coordinates[i + 1].x, coordinates[i].x);
+            for (GradientBin bin : gradients) {
+                if (bin.gradient == iGradient) {
+                    bin.distance += run;
+                    // always use the minimum altitude for maximum air density to underestimate travel time
+                    bin.minAltitude = Math.min(bin.minAltitude, minCoordinatesAltitude);
+                    gradientAdded = true;
+                    break;
+                }
+            }
+            // or create new bin for new gradient
+            if (!gradientAdded) {
+                GradientBin bin = new GradientBin();
+                bin.gradient = iGradient;
+                bin.distance = run;
+                bin.minAltitude = minCoordinatesAltitude;
+                gradients.add(bin);
+            }
+
             // Baldwin St in Dunedin, NZ, is the steepest street
             // on earth, and has a grade of 35%.  So for streets
             // which allow cars, we set the limit to 35%.  Footpaths
@@ -226,12 +268,33 @@ public class ElevationUtils {
                 slopeSafetyCost += safetyCost;
             }
         }
+
+        // convert gradient info into arrays of primitives
+        byte[] gradientsArr = new byte[gradients.size()];
+        short[] gradientLengthsArr = new short[gradients.size()];
+        float[] gradientCdas = new float[gradients.size()];
+        for (int i = 0; i < gradients.size(); i++) {
+            GradientBin bin = gradients.get(i);
+            gradientsArr[i] = (byte) bin.gradient;
+            gradientLengthsArr[i] = (short) bin.distance;
+            gradientCdas[i] = (float) getDragResistiveForceComponent(bin.minAltitude);
+        }
+
         /*
          * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
          * length of the street edge which is the flat one.
          */
-        return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
-                slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
+        return new SlopeCosts(
+            slopeSpeedEffectiveLength / flatLength,
+            slopeWorkCost / flatLength,
+            slopeSafetyCost,
+            maxSlope,
+            lengthMultiplier,
+            flattened,
+            gradientsArr,
+            gradientLengthsArr,
+            gradientCdas
+        );
     }
 
     /** constants for slope computation */
@@ -488,5 +551,11 @@ public class ElevationUtils {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    private static class GradientBin {
+        public int gradient;
+        public double distance;
+        public double minAltitude;
     }
 }

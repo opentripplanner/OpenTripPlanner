@@ -753,7 +753,7 @@ public class StreetEdge extends Edge implements Cloneable {
                     options.watts,
                     options.weight,
                     Math.atan(0), // 0 slope beta
-                    0.005, // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
+                    getRollingResistanceCoefficient(),
                     ElevationUtils.ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT,
                     options.minimumMicromobilitySpeed,
                     options.maximumMicromobilitySpeed
@@ -763,6 +763,11 @@ public class StreetEdge extends Edge implements Cloneable {
             );
         }
         return options.getSpeed(traverseMode);
+    }
+
+    // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
+    public double getRollingResistanceCoefficient() {
+        return 0.005;
     }
 
     @Override

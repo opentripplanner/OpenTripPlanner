@@ -828,8 +828,56 @@ public class GraphPathToTripPlanConverterTest {
         State s58Onboard = e57.traverse(s56Onboard);
         State s60Onboard = e59.traverse(s58Onboard);
 
-        return new GraphPath[] {new GraphPath(s60Forward, false),
-                new GraphPath(s0Backward, false), new GraphPath(s60Onboard, false)};
+        // forward traversal of all edges using Micromobility
+        RoutingRequest forwardOptionsMM = new RoutingRequest("MICROMOBILITY_RENT,TRANSIT");
+        // TODO: add more edges with micromobility rental
+        RoutingContext forwardContextMM = new RoutingContext(forwardOptionsMM, graph, v0, v4);
+
+        forwardContextMM.serviceDays = new ArrayList<ServiceDay>(1);
+        forwardContextMM.serviceDays.add(serviceDay);
+
+        forwardOptionsMM.rctx = forwardContextMM;
+        forwardOptionsMM.dateTime = 0L;
+        forwardOptionsMM.bikeRentalPickupTime = 4;
+        forwardOptionsMM.bikeRentalDropoffTime = 2;
+
+        // Forward traversal of all edges
+        State s0ForwardMM = new State(forwardOptionsMM);
+        State s2ForwardMM = e1.traverse(s0ForwardMM);
+        State s4ForwardMM = e3.traverse(s2ForwardMM);
+        State s6ForwardMM = e5.traverse(s4ForwardMM);
+        State s8ForwardMM = e7.traverse(s6ForwardMM);
+        // the below creates a null state because depTime >= adjustedTime in {@link Timetable.getNextTrip} somehow
+        // State s10ForwardMM = e9.traverse(s8ForwardMM);
+        // TODO: add more edges with micromobility rental
+
+        // backward traversal of all edges using Micromobility
+        RoutingRequest backwardOptionsMM = new RoutingRequest("MICROMOBILITY_RENT,TRANSIT");
+        // TODO: add more edges with micromobility rental
+        RoutingContext backwardContextMM = new RoutingContext(backwardOptionsMM, graph, v4, v0);
+
+        backwardContextMM.serviceDays = new ArrayList<ServiceDay>(1);
+        backwardContextMM.serviceDays.add(serviceDay);
+
+        backwardOptionsMM.rctx = backwardContextMM;
+        backwardOptionsMM.dateTime = 60L;
+        backwardOptionsMM.bikeRentalPickupTime = 4;
+        backwardOptionsMM.bikeRentalDropoffTime = 2;
+        backwardOptionsMM.setArriveBy(true);
+
+        // Backward traversal of all edges
+        // TODO: add more edges with micromobility rental
+        State s4BackwardMM = new State(backwardOptionsMM);
+        State s2BackwardMM = e3.traverse(s4BackwardMM);
+        State s0BackwardMM = e1.traverse(s2BackwardMM);
+
+        return new GraphPath[] {
+            new GraphPath(s60Forward, false),
+            new GraphPath(s0Backward, false),
+            new GraphPath(s60Onboard, false),
+            new GraphPath(s4ForwardMM, false),
+            new GraphPath(s0BackwardMM, false)
+        };
     }
 
     /**
