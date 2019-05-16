@@ -627,7 +627,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
-        if (modes.getBicycle()) {
+        if (modes.getBicycle() || modes.getMicromobility()) {
             // This alternate routing request is used when we get off a bike to take a shortcut and are
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
@@ -639,6 +639,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
+            bikeWalkingOptions.modes.setMicromobility(false);
             bikeWalkingOptions.modes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
             bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;

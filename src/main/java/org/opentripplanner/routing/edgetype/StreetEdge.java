@@ -613,8 +613,9 @@ public class StreetEdge extends Edge implements Cloneable {
         }
         
 
-        if (walkingBike || TraverseMode.BICYCLE.equals(traverseMode)) {
-            if (!(backWalkingBike || TraverseMode.BICYCLE.equals(backMode))) {
+        // add a cost for switching modes. This assumes that it's not possible to make Bicycle <> Micromobility switches
+        if (walkingBike || TraverseMode.BICYCLE.equals(traverseMode) || TraverseMode.MICROMOBILITY.equals(traverseMode)) {
+            if (!(backWalkingBike || TraverseMode.BICYCLE.equals(backMode) || TraverseMode.MICROMOBILITY.equals(backMode))) {
                 s1.incrementTimeInSeconds(options.bikeSwitchTime);
                 s1.incrementWeight(options.bikeSwitchCost);
             }
