@@ -41,6 +41,7 @@ public class StreetWithElevationEdge extends StreetEdge {
     // there can be numerous elevation differences of gradients within an edge, these are approximations based off of
     // the minimum altitude seen for the corresonding gradient on this edge. This is an overestimate of aerodynamic
     // drag.
+    // TODO just use one Cda for the minimum altitude, this is overkill
     private float[] gradientCdas;
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -123,6 +124,9 @@ public class StreetWithElevationEdge extends StreetEdge {
         // calculate the travel time it would tak to traverse each gradient
         double distance = 0;
         double time = 0;
+
+        // TODO: figure out why this is null sometimes
+        if (gradients == null) return super.calculateSpeed(options, traverseMode, timeMillis);
 
         for (int i = 0; i < gradients.length; i++) {
             distance += gradientLengths[i];
