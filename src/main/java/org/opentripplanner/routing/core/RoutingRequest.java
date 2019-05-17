@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.core;
 
-import com.google.common.base.Objects;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -845,6 +844,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest clone() {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
+            clone.modes = modes.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();

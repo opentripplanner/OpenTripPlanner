@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Route;
@@ -31,11 +30,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
@@ -76,21 +73,6 @@ public class ItineraryMapper {
         this.request = request;
         this.accessTransfers = accessTransfers;
         this.egressTransfers = egressTransfers;
-    }
-
-    public TripPlan createTripPlan(List<Itinerary> itineraries) {
-        Place from = new Place();
-        Place to = new Place();
-        if (!itineraries.isEmpty()) {
-            from = itineraries.get(0).legs.get(0).from;
-            to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
-        }
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-        itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
-                .limit(request.numItineraries).collect(Collectors.toList());
-        tripPlan.itinerary = itineraries;
-        LOG.info("Returning {} itineraries", itineraries.size());
-        return tripPlan;
     }
 
     public Itinerary createItinerary(Path<TripSchedule> path) {
