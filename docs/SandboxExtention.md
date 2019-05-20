@@ -9,6 +9,7 @@
 Here is a list of features implemented as OTP Sandbox Extensions. TODO - Disclaimer on usage.
 
 - [Examples](sandbox/Examples.md) - Sandbox examples on how to implement extensions.
+- [Transfer analyser](sandbox/transferanalyzer.md) - Graph builder module for analyzing transfer routing
 
 
 ## Terminology

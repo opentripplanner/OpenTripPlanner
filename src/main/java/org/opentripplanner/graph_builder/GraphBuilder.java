@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
@@ -249,6 +250,9 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {
+            if (builderParams.analyzeTransfers) {
+                graphBuilder.addModule(new DirectTransferAnalyzer(builderParams.maxTransferDistance));
+            }
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
