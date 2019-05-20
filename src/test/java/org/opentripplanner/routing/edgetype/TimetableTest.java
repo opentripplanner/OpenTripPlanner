@@ -282,7 +282,8 @@ public class TimetableTest {
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
-        // update trip arrival time at first stop and make departure time incoherent at second stop
+        // update trip arrival time at first stop and make departure time incoherent at second stop,
+        // changes should be propagated backwards
         tripDescriptorBuilder = TripDescriptor.newBuilder();
         tripDescriptorBuilder.setTripId("1.1");
         tripDescriptorBuilder.setScheduleRelationship(
@@ -303,6 +304,6 @@ public class TimetableTest {
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
         updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-        assertNull(updatedTripTimes);
+        assertNotNull(updatedTripTimes);
     }
 }
