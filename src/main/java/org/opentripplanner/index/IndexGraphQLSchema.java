@@ -1440,7 +1440,7 @@ public class IndexGraphQLSchema {
                                 .name("omitCanceled")
                                 .description("If false, returns also canceled trips")
                                 .type(Scalars.GraphQLBoolean)
-                                .defaultValue(true)
+                                .defaultValue(false)
                                 .build())
                         .dataFetcher(environment -> {
                             ServiceDate date;
@@ -1451,15 +1451,16 @@ public class IndexGraphQLSchema {
                             }
                             Stop stop = environment.getSource();
                             boolean omitNonPickups = environment.getArgument("omitNonPickups");
+                            boolean omitCanceled = environment.getArgument("omitCanceled");
                             if (stop.getLocationType() == 1) {
                                 // Merge all stops if this is a station
                                 return index.stopsForParentStation
                                         .get(stop.getId())
                                         .stream()
-                                        .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date, omitNonPickups).stream())
+                                        .flatMap(singleStop -> index.getStopTimesForStop(singleStop, date, omitNonPickups, omitCanceled).stream())
                                         .collect(Collectors.toList());
                             }
-                            return index.getStopTimesForStop(stop, date, omitNonPickups);
+                            return index.getStopTimesForStop(stop, date, omitNonPickups, omitCanceled);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()

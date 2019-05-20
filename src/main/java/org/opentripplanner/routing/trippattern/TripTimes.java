@@ -480,4 +480,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public boolean isTimeCanceled(int i) {
         return isCanceledArrival(i) || isCanceledDeparture(i) || isCanceled();
     }
+
+    public void propagateDelayBackwards(Integer firstDelay) {
+        int numStops = this.getNumStops();
+
+        for (int i = 0; i < numStops; i++) {
+            if (this.getArrivalDelay(i) != 0) {
+                break;
+            }
+
+            this.updateArrivalDelay(i, firstDelay);
+            this.updateDepartureDelay(i, firstDelay);
+        }
+    }
+
 }

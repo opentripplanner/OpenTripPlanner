@@ -861,9 +861,10 @@ public class GraphIndex {
      *
      * @param stop Stop object to perform the search for
      * @param serviceDate Return all departures for the specified date
+     * @param omitCanceled
      * @return
      */
-    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
+    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate, boolean omitNonPickups, boolean omitCanceled) {
         List<StopTimesInPattern> ret = new ArrayList<>();
         TimetableSnapshot snapshot = null;
         if (graph.timetableSnapshotSource != null) {
@@ -885,6 +886,7 @@ public class GraphIndex {
                     if(omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
                     for (TripTimes t : tt.tripTimes) {
                         if (!sd.serviceRunning(t.serviceCode)) continue;
+                        if (omitCanceled && t.isTimeCanceled(sidx)) continue;
                         stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
                     }
                 }
