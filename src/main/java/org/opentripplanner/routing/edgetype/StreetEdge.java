@@ -134,12 +134,19 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private Set<String> carNetworks;
 
+    /**
+     * A set of vehicle networks where this edge is located inside their service regions.
+     */
+    private Set<String> vehicleNetworks;
+
     // whether or not this street is a good place to board or alight a TNC vehicle
     private boolean suitableForTNCStop = true;
 
     // whether or not this street is a good place to dropoff a floating car rental
     private boolean suitableForFloatingCarRentalDropoff = true;
 
+    // whether or not this street is a good place to dropoff a floating car rental
+    private boolean suitableForFloatingVehicleRentalDropoff = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -1097,9 +1104,13 @@ public class StreetEdge extends Edge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
+    public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
 
-	public Set<String> getCarNetworks() { return carNetworks; }
+    public Set<String> getCarNetworks() { return carNetworks; }
+
+    public void setVehicleNetworks(Set<String> networks) { vehicleNetworks = networks; }
+
+    public Set<String> getVehicleNetworks() { return vehicleNetworks; }
 
     public void setTNCStopSuitability(boolean isSuitable) {
         this.suitableForTNCStop = isSuitable;
@@ -1113,7 +1124,13 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public boolean getFloatingCarDropoffSuitability() { return suitableForFloatingCarRentalDropoff; }
 
-	public boolean isSlopeOverride() {
+    public void setFloatingVehicleDropoffSuitability(boolean isSuitable) {
+        this.suitableForFloatingVehicleRentalDropoff = isSuitable;
+    }
+
+    public boolean getFloatingVehicleDropoffSuitability() { return suitableForFloatingVehicleRentalDropoff; }
+
+    public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 
@@ -1288,5 +1305,23 @@ public class StreetEdge extends Edge implements Cloneable {
             return false;
         }
         return carNetworks.contains(carNetwork);
+    }
+
+    public boolean addVehicleNetwork(String vehicleNetwork) {
+        if (vehicleNetworks == null) {
+            synchronized (this) {
+                if (vehicleNetworks == null) {
+                    vehicleNetworks = new HashSet<>();
+                }
+            }
+        }
+        return vehicleNetworks.add(vehicleNetwork);
+    }
+
+    public boolean containsVehicleNetwork(String vehicleNetwork) {
+        if (vehicleNetworks == null){
+            return false;
+        }
+        return vehicleNetworks.contains(vehicleNetwork);
     }
 }

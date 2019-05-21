@@ -1,0 +1,21 @@
+{
+  "last_updated": 1558419096,
+  "ttl": 0,
+  "data": {
+    "en": {
+      "feeds": [{
+        "name": "system_information",
+        "url": "https://data.lime.bike/api/partners/v1/gbfs/portland/system_information"
+      }, {
+        "name": "station_information",
+        "url": "https://data.lime.bike/api/partners/v1/gbfs/portland/station_information"
+      }, {
+        "name": "station_status",
+        "url": "https://data.lime.bike/api/partners/v1/gbfs/portland/station_status"
+      }, {
+        "name": "free_bike_status",
+        "url": "https://data.lime.bike/api/partners/v1/gbfs/portland/free_bike_status"
+      }]
+    }
+  }
+}

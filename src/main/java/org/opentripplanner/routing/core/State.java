@@ -14,6 +14,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,9 @@ public class State implements Cloneable {
 
     // The current distance traveled in a car rental
     public double carRentalDriveDistance;
+
+    // The current distance traveled in a vehicle rental
+    public double vehicleRentalDistance;
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
@@ -1018,4 +1022,106 @@ public class State implements Cloneable {
         }
         return getLastSeenStreetEdge(state.backState);
     }
+
+    /**
+     * Helper method for checking if a vehicle rental dropoff is possible at the last seen StreetEdge.
+     * If the droppingOffAtDesignatedDropoffArea is true, then the last seen StreetEdge is
+     * irrelevant.
+     */
+    public boolean isVehicleRentalDropoffAllowed(boolean droppingOffAtDesignatedDropoffArea) {
+        return isVehicleRentalDropoffAllowed(
+            droppingOffAtDesignatedDropoffArea ? null : getLastSeenStreetEdge(this),
+            droppingOffAtDesignatedDropoffArea
+        );
+    }
+
+    /**
+     * Check if the current search state would allow for the dropoff of a rental vehicle.  If in "arrive
+     * by" mode, the search is proceeding backwards and might reach a potential spot where a rental
+     * vehicle could be dropped off.  In "depart at" searches, this is checking if the rental vehicle
+     * currently being rented could be dropped off at this point.
+     *
+     * @param theEdge  The StreetEdge that the rental vehicle could be dropped off at.
+     * @param droppingOffAtDesignatedDropoffArea  Whether the vehicle is being dropped off at a
+     *                                            designated vehicle rental dropoff area.
+     * @return
+     */
+    public boolean isVehicleRentalDropoffAllowed(
+        StreetEdge theEdge,
+        boolean droppingOffAtDesignatedDropoffArea
+    ) {
+        RoutingRequest options = this.stateData.opt;
+
+        // To rent a vehicle, we need to have vehicle rental allowed in request.
+        if (!options.allowVehicleRental)
+            return false;
+
+        if (options.arriveBy) {
+            // make sure a vehicle is not currently being rented.
+            if (this.isVehicleRenting())
+                return false;
+        } else {
+            // make sure a vehicle is currently being rented.  Can't dropoff a vehicle that isn't being
+            // rented
+            if (!this.isVehicleRenting())
+                return false;
+        }
+
+        // If not searching backwards, make sure travel distance in vehicle is greater than minimum
+        // distance
+        if (
+            !options.arriveBy &&
+                this.vehicleRentalDistance < this.stateData.opt.minimumVehicleRentalDistance
+        ) {
+            return false;
+        }
+
+        // if the vehicle is being dropped off at a designated dropoff area, no further state checks are
+        // needed
+        if (droppingOffAtDesignatedDropoffArea)
+            return true;
+
+        // At this point, the vehicle could be dropped off on some kind of StreetEdge unless the StreetEdge forbids it.
+        // First, a sanity check is needed to  make sure we're actually working with an edge here.
+        if (theEdge == null)
+            return false;
+
+        // check if the street edge has some characteristic that would not be suitable for leaving
+        // the vehicle at
+        if (!theEdge.getFloatingVehicleDropoffSuitability())
+            return false;
+
+        if (options.allowVehicleRentalDropoffAnywhere)
+            // User has specified in routing request they intend to keep the vehicle even if dropping off
+            // outside a vehicle rental region.
+            return true;
+
+        // make sure the vehicle networks associated with the edge make a floating dropoff possible.
+        if (options.arriveBy) {
+            // make sure there is at least one possible vehicle network available at this StreetEdge
+            return theEdge.getVehicleNetworks() != null && theEdge.getVehicleNetworks().size() > 0;
+        } else {
+            // if the vehicle is not being dropped off at a designated area for dropping off vehicle rentals
+            // and the user wants to do a dropoff inside the vehicle rental region, make sure that the
+            // vehicle that was rented allows floating dropoffs
+            if (!stateData.rentedVehicleAllowsFloatingDropoffs)
+                return false;
+
+            // Check if the floating vehicle is within a compatible vehicle rental region
+            VehicleRentalStationService vehicleService = getContext().graph.getService(
+                VehicleRentalStationService.class
+            );
+            for (String network : stateData.vehicleRentalNetworks) {
+                boolean hasRegionDefined = vehicleService.getVehicleRentalRegions().get(network) != null;
+                if (!hasRegionDefined || theEdge.containsVehicleNetwork(network)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public boolean isVehicleRenting() { return stateData.usingRentedVehicle; }
+
+    public Set<String> getVehicleRentalNetworks() { return stateData.vehicleRentalNetworks; }
 }

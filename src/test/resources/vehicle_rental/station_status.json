@@ -1,0 +1,15 @@
+{
+  "last_updated": 1558419369,
+  "ttl": 0,
+  "data": {
+    "stations": [{
+      "station_id": "portland",
+      "num_bikes_available": 322,
+      "num_docks_available": 999999,
+      "is_installed": 1,
+      "is_renting": 1,
+      "is_returning": 1,
+      "last_reported": 1558419369
+    }]
+  }
+}

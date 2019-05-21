@@ -1,0 +1,12 @@
+{
+  "last_updated": 1558419235,
+  "ttl": 0,
+  "data": {
+    "stations": [{
+      "station_id": "portland",
+      "name": "Portland",
+      "lat": "45.543855",
+      "lon": "-122.627205"
+    }]
+  }
+}
