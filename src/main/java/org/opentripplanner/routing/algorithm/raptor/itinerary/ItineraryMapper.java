@@ -12,6 +12,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -153,16 +154,12 @@ public class ItineraryMapper {
         leg.endTime = createCalendar(accessPathLeg.toTime());
         leg.mode = "WALK";
         if (request.rctx.fromVertex instanceof TransitVertex) {
-            leg.from = new Place(request.rctx.fromVertex.getLon(), request.rctx.fromVertex.getLat(), request.rctx.fromVertex.getName());
-            leg.from.stopId = ((TransitVertex) request.rctx.fromVertex).getStopId();
-            leg.from.vertexType = VertexType.TRANSIT;
+            leg.from = mapTransitVertexToPlace((TransitVertex) request.rctx.fromVertex);
         }
         else {
-            leg.from = new Place(request.from.lng, request.from.lat, "Coordinate");
+            leg.from = mapLocationToPlace(request.from);
         }
-        leg.to = new Place(accessToStop.getLon(), accessToStop.getLat(), accessToStop.getName());
-        leg.to.stopId = accessToStop.getId();
-        leg.to.vertexType = VertexType.TRANSIT;
+        leg.to = mapStopToPlace(accessToStop);
         leg.legGeometry = PolylineEncoder.createEncodings(accessPath.getCoordinates());
         leg.distance = (double)accessPath.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps test
@@ -187,12 +184,8 @@ public class ItineraryMapper {
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.mode = tripPattern.mode.toString();
         leg.tripId = trip.getId();
-        leg.from = new Place(boardStop.getLon(), boardStop.getLat(), boardStop.getName());
-        leg.from.stopId = boardStop.getId();
-        leg.from.vertexType = VertexType.TRANSIT;
-        leg.to = new Place(alightStop.getLon(), alightStop.getLat(), alightStop.getName());
-        leg.to.stopId = alightStop.getId();
-        leg.to.vertexType = VertexType.TRANSIT;
+        leg.from = mapStopToPlace(boardStop);
+        leg.to = mapStopToPlace(alightStop);
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distance = getDistanceFromCoordinates(transitLegCoordinates);
@@ -223,12 +216,8 @@ public class ItineraryMapper {
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.mode = "WALK";
-        leg.from = new Place(transferFromStop.getLon(), transferFromStop.getLat(), transferFromStop.getName());
-        leg.from.stopId = transferFromStop.getId();
-        leg.from.vertexType = VertexType.TRANSIT;
-        leg.to = new Place(transferToStop.getLon(), transferToStop.getLat(), transferToStop.getName());
-        leg.to.stopId = transferToStop.getId();
-        leg.to.vertexType = VertexType.TRANSIT;
+        leg.from = mapStopToPlace(transferFromStop);
+        leg.to = mapStopToPlace(transferToStop);
         leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
         leg.distance = (double)transfer.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps
@@ -250,21 +239,39 @@ public class ItineraryMapper {
 
         leg.endTime = createCalendar(egressPathLeg.toTime());
         leg.mode = "WALK";
-        leg.from = new Place(egressStop.getLon(), egressStop.getLat(), egressStop.getName());
-        leg.from.stopId = egressStop.getId();
-        leg.from.vertexType = VertexType.TRANSIT;
+        leg.from = mapStopToPlace(egressStop);
         if (request.rctx.toVertex instanceof TransitVertex) {
-            leg.to = new Place(request.rctx.toVertex.getLon(), request.rctx.toVertex.getLat(), request.rctx.toVertex.getName());
-            leg.to.stopId = ((TransitVertex) request.rctx.toVertex).getStopId();
-            leg.to.vertexType = VertexType.TRANSIT;
+            leg.to = mapTransitVertexToPlace((TransitVertex) request.rctx.toVertex);
         }
         else {
-            leg.to = new Place(request.to.lng, request.to.lat, "Coordinate");
+            leg.to = mapLocationToPlace(request.to);
         }
         leg.legGeometry = PolylineEncoder.createEncodings(egressPath.getCoordinates());
         leg.distance = (double)egressPath.getDistanceMeters();
         leg.walkSteps = new ArrayList<>(); //TODO: Add walk steps
         return leg;
+    }
+
+    private Place mapLocationToPlace(GenericLocation location) {
+        if (location.name.isEmpty()) {
+            return new Place(location.lng, location.lat, String.format("%.6f, %.6f", location.lat, location.lng));
+        } else {
+            return new Place(location.lng, location.lat, location.name);
+        }
+    }
+
+    private Place mapTransitVertexToPlace(TransitVertex vertex) {
+        return mapStopToPlace(vertex.getStop());
+    }
+
+    private Place mapStopToPlace(Stop stop) {
+        Place place = new Place(stop.getLon(), stop.getLat(), stop.getName());
+        place.stopId = stop.getId();
+        place.stopCode = stop.getCode();
+        place.platformCode = stop.getPlatformCode();
+        place.zoneId = stop.getZoneId();
+        place.vertexType = VertexType.TRANSIT;
+        return place;
     }
 
     private Calendar createCalendar(int timeInSeconds) {
@@ -285,14 +292,7 @@ public class ItineraryMapper {
             }
             if (boarded) {
                 Stop stop = tripPattern.stopPattern.stops[j];
-                Place place = new Place();
-                place.name = stop.getName();
-                place.lon = stop.getLon();
-                place.lat = stop.getLat();
-                place.stopId = stop.getId();
-                place.stopCode = stop.getCode();
-                place.platformCode = stop.getPlatformCode();
-                place.zoneId = stop.getZoneId();
+                Place place = mapStopToPlace(stop);
                 place.stopIndex = j;
                 // TODO: fill out stopSequence
                 place.arrival = createCalendar(tripSchedule.arrival(j));
