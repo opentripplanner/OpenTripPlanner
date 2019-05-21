@@ -21,18 +21,17 @@ import java.util.stream.Collectors;
  * can typically be used to improve the quality of OSM data for transfer purposes. This can take a long time if the
  * transfer distance is long and/or there are many stops to route between.
  */
-
 public class DirectTransferAnalyzer implements GraphBuilderModule {
+
+    private static final int RADIUS_MULTIPLIER = 5;
+
+    private static final int MIN_RATIO_TO_LOG = 2;
+
+    private static final int MIN_STREET_DISTANCE_TO_LOG = 100;
 
     private static Logger LOG = LoggerFactory.getLogger(DirectTransferAnalyzer.class);
 
-    final double radiusMeters;
-
-    static final int RADIUS_MULTIPLIER = 5;
-
-    static final int MIN_RATIO_TO_LOG = 2;
-
-    static final int MIN_STREET_DISTANCE_TO_LOG = 100;
+    private final double radiusMeters;
 
     public DirectTransferAnalyzer(double radiusMeters) {
         this.radiusMeters = radiusMeters;
@@ -52,7 +51,13 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         NearbyStopFinder nearbyStopFinderStreets =
                 new NearbyStopFinder(graph, radiusMeters * RADIUS_MULTIPLIER, true);
 
+        int stopsAnalyzed = 0;
+
         for (TransitStop originStop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+            if (++stopsAnalyzed % 1000 == 0) {
+                LOG.info("{} stops analyzed", stopsAnalyzed);
+            }
+
             /* Find nearby stops by euclidean distance */
             Map<TransitStop, NearbyStopFinder.StopAtDistance> stopsEuclidean =
                     nearbyStopFinderEuclidian.findNearbyStopsEuclidean(originStop).stream()
@@ -105,7 +110,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         }
 
         /* Sort by street distance to euclidean distance ratio before adding to annotations */
-        directTransfersTooLong.sort(Comparator.comparingDouble(TransferInfo::getRatio).reversed());
+        directTransfersTooLong.sort(Comparator.comparingDouble(t -> t.ratio));
+        Collections.reverse(directTransfersTooLong);
 
         for (TransferInfo transferInfo : directTransfersTooLong) {
             graph.addBuilderAnnotation(new TransferRoutingDistanceTooLong(
@@ -118,7 +124,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         }
 
         /* Sort by direct distance before adding to annotations */
-        directTransfersNotFound.sort(Comparator.comparingDouble(TransferInfo::getDirectDistance));
+        directTransfersNotFound.sort(Comparator.comparingDouble(t -> t.directDistance));
 
         for (TransferInfo transferInfo : directTransfersNotFound) {
             graph.addBuilderAnnotation(new TransferCouldNotBeRouted(
@@ -138,17 +144,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     }
 
     private static class TransferInfo {
-        TransitStop origin;
-        TransitStop destination;
-        double directDistance;
-        double streetDistance;
-        double ratio;
-
-        public double getRatio() {
-            return ratio;
-        }
-
-        public double getDirectDistance() { return directDistance; }
+        final TransitStop origin;
+        final TransitStop destination;
+        final double directDistance;
+        final double streetDistance;
+        final double ratio;
 
         TransferInfo(
                 TransitStop origin,

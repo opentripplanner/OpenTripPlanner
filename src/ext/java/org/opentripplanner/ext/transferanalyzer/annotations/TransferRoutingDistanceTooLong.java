@@ -1,20 +1,25 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+/**
+ * Represents two stops where the routing distance between them (using OSM data) is much longer than the euclidean
+ * distance
+ */
 public class TransferRoutingDistanceTooLong extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Routing distance between stop %s and stop %s is %s times longer than the " +
-            "euclidean distance. Street distance: %s, direct distance: %s.";
+    private static final String FMT = "Routing distance between stop %s and stop %s is %.0f times longer than the " +
+            "euclidean distance. Street distance: %.2f, direct distance: %.2f.";
 
-    public static final String HTMLFMT = "Routing distance between stop " +
+    private static final String HTMLFMT = "Routing distance between stop " +
             "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> and stop " +
-            "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> is %s times longer than " +
-            "the euclidean distance. Street distance: %s, direct distance: %s.";
+            "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> is %.0f times longer than " +
+            "the euclidean distance. Street distance: %.2f, direct distance: %.2f.";
 
     private final TransitStop origin;
     private final TransitStop destination;
@@ -32,27 +37,22 @@ public class TransferRoutingDistanceTooLong extends GraphBuilderAnnotation {
 
     @Override
     public String getMessage() {
-        return String.format(FMT, origin, destination, round(ratio), round2(streetDistance) , round2(directDistance));
+        return String.format(FMT, origin, destination, ratio, streetDistance , directDistance);
     }
 
     @Override
     public String getHTMLMessage() {
-        return String.format(HTMLFMT, origin.getStop().getLat(), origin.getStop().getLon(),
-                origin.getStop().getName(), origin.getStop().getId(), destination.getStop().getLat(),
-                destination.getStop().getLon(), destination.getStop().getName(), destination.getStop().getId(),
-                round(ratio), round2(streetDistance), round2(directDistance));
+        Stop o = origin.getStop();
+        Stop d = destination.getStop();
+
+        return String.format(HTMLFMT, o.getLat(), o.getLon(),
+                o.getName(), o.getId(), d.getLat(),
+                d.getLon(), d.getName(), d.getId(),
+                ratio, streetDistance, directDistance);
     }
 
     @Override
     public Vertex getReferencedVertex() {
         return this.origin;
-    }
-
-    private String round(Double number) {
-        return String.format("%.2f", number);
-    }
-
-    private String round2(Double number) {
-        return String.format("%.0f", number);
     }
 }

@@ -26,6 +26,7 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.S3BucketConfig;
 import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,13 +251,14 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {
-            if (builderParams.analyzeTransfers) {
-                graphBuilder.addModule(new DirectTransferAnalyzer(builderParams.maxTransferDistance));
-            }
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
+            }
+            // Analyze routing between stops to generate report
+            if (OTPFeature.TransferAnalyzer.isOn()) {
+                graphBuilder.addModule(new DirectTransferAnalyzer(builderParams.maxTransferDistance));
             }
         }
         graphBuilder.addModule(new EmbedConfig(config.builderConfig(), config.routerConfig()));

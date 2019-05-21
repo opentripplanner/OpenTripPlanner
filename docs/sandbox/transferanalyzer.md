@@ -10,4 +10,5 @@
 
 ### Documentation
 
-- Javadoc in DirectTransferAnalyzer class
+See javadoc in 
+[DirectTransferAnalyzer](../../src/ext/java/org/opentripplanner/ext/transferanalyzer/DirectTransferAnalyzer.java) class
