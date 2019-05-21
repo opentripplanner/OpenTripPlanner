@@ -203,6 +203,7 @@ public class ItineraryMapper {
         leg.agencyId = route.getAgency().getId();
         leg.routeShortName = route.getShortName();
         leg.routeLongName = route.getLongName();
+        leg.headsign = extractTripHeadsignDirection(pathLeg);
         leg.walkSteps = new ArrayList<>();
         return leg;
     }
@@ -280,6 +281,19 @@ public class ItineraryMapper {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
         c.setTimeInMillis(zdt.toInstant().toEpochMilli());
         return c;
+    }
+
+    private String extractTripHeadsignDirection(TransitPathLeg<TripSchedule> pathLeg) {
+        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
+        TripSchedule tripSchedule = pathLeg.trip();
+        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            if (tripSchedule.departure(j) == pathLeg.fromTime()) {
+                return tripPattern.scheduledTimetable.getTripTimes(tripSchedule.getOriginalTrip())
+                        .getHeadsign(j);
+            }
+        }
+
+        throw new IllegalStateException("Missing stop for departure at " + pathLeg.fromTime() + " for " + tripSchedule);
     }
 
     private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
