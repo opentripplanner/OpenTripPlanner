@@ -125,11 +125,12 @@ public class NearbyStopFinder {
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a TransitStop, the result will include it.
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
+    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean reverse) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
+        routingRequest.arriveBy = reverse;
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
@@ -150,6 +151,10 @@ public class NearbyStopFinder {
         routingRequest.cleanup();
         return stopsFound;
 
+    }
+
+    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
+        return findNearbyStopsViaStreets(originVertex, false);
     }
 
     /**

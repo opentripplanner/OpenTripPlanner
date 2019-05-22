@@ -305,6 +305,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int maxTransfers = 2;
 
     /**
+     * Raptor search window in seconds.
+     */
+    public int raptorSearchWindow = 40 * 60;
+
+    /**
      * Extensions to the trip planner will require additional traversal options beyond the default 
      * set. We provide an extension point for adding arbitrary parameters with an 
      * extension-specific key.
