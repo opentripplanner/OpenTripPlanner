@@ -29,7 +29,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
     private static final int MIN_STREET_DISTANCE_TO_LOG = 100;
 
-    private static Logger LOG = LoggerFactory.getLogger(DirectTransferAnalyzer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DirectTransferAnalyzer.class);
 
     private final double radiusMeters;
 
