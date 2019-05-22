@@ -466,7 +466,12 @@ public class StreetEdge extends Edge implements Cloneable {
                     getPermission().allows(TraverseMode.MICROMOBILITY) &&
                     currMode != TraverseMode.MICROMOBILITY &&
                     options.arriveBy &&
-                    s0.isVehicleRentalDropoffAllowed(this, false)
+                    s0.isVehicleRentalDropoffAllowed(this, false) &&
+                    (s0.isEverBoarded()
+                        // make sure a vehicle hasn't already been rented after transit
+                        ? !s0.stateData.hasRentedVehiclePostTransit()
+                        // make sure a vehicle hasn't already been rented before transit
+                        : !s0.stateData.hasRentedVehiclePreTransit())
             ) {
                 StateEditor editorWithVehicleRental = doTraverse(s0, options, TraverseMode.MICROMOBILITY);
                 if (editorWithVehicleRental != null) {
