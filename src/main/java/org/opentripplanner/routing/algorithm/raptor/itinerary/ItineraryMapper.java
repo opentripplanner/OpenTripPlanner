@@ -37,6 +37,12 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+/**
+ * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
+ * access/egress transfers and transit layer only contains the minimal information needed for routing. Additional
+ * information has to be fetched from the graph index to create complete itineraries that can be shown in a trip
+ * planner.
+ */
 public class ItineraryMapper {
     private final TransitLayer transitLayer;
 
@@ -50,7 +56,21 @@ public class ItineraryMapper {
 
     private static Logger LOG = LoggerFactory.getLogger(ItineraryMapper.class);
 
-    public ItineraryMapper(TransitLayer transitLayer, ZonedDateTime startOfTime, RoutingRequest request, Map<Stop, Transfer> accessTransfers, Map<Stop, Transfer> egressTransfers) {
+    /**
+     * Constructs an itinerary mapper for a request and a set of results
+     *
+     * @param transitLayer the currently active transit layer
+     * @param startOfTime the point in time all times in seconds are counted from
+     * @param request the current routing request
+     * @param accessTransfers the access paths calculated for this request by access stop
+     * @param egressTransfers the egress paths calculated for this request by egress stop
+     */
+    public ItineraryMapper(
+            TransitLayer transitLayer,
+            ZonedDateTime startOfTime,
+            RoutingRequest request,
+            Map<Stop, Transfer> accessTransfers,
+            Map<Stop, Transfer> egressTransfers) {
         this.transitLayer = transitLayer;
         this.startOfTime = startOfTime;
         this.request = request;
