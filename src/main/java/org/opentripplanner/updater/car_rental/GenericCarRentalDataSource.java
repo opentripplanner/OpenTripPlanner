@@ -79,7 +79,7 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
      * Update the allowable dropoff regions for the car rental datasource.
      */
     @Override public boolean updateRegions() {
-        // regions url is optional, so if it's not set, return true
+        // regions url is optional, so if it's not set, return false
         if (regionsUrl == null) return false;
         
         // regions do not change that often, so only check after a certain amount of time has 

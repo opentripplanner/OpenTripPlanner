@@ -64,6 +64,17 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
             return null;
         }
 
+        // make sure only one vehicle is rented pre/post transit
+        if (s0.isEverBoarded()) {
+            if (s0.stateData.hasRentedVehiclePostTransit()) {
+                return null;
+            }
+        } else {
+            if (s0.stateData.hasRentedVehiclePreTransit()) {
+                return null;
+            }
+        }
+
         StateEditor s1e = s0.edit(this);
         if (options.arriveBy) {
             // In an "arrive by" search, a vehicle may have already been dropped off and this potential
@@ -108,17 +119,6 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
             // make sure more than 1 vehicle isn't rented at once
             if (s0.isVehicleRenting())
                 return null;
-
-            // make sure only one vehicle is rented pre/post transit
-            if (s0.isEverBoarded()) {
-                if (s0.stateData.hasRentedVehiclePostTransit()) {
-                    return null;
-                }
-            } else {
-                if (s0.stateData.hasRentedVehiclePreTransit()) {
-                    return null;
-                }
-            }
 
             s1e.beginVehicleRenting(0, station.networks, station.isFloatingVehicle);
         }

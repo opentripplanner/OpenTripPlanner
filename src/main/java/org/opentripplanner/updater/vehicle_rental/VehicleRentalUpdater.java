@@ -6,6 +6,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.edgetype.RentAVehicleOffEdge;
 import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
@@ -206,8 +208,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         public void applyRegions(Graph graph) {
             // Adding vehicle rental regions to all edges of the network.
             LOG.info("Applying {} vehicle rental regions.", regions.size());
-            Collection<StreetEdge> edges = graph.getStreetEdges();
             Map<Coordinate, Set<String>> coordToNetworksMap = new HashMap<>();
+            Collection<StreetEdge> edges = graph.getStreetEdges();
             for (VehicleRentalRegion region : regions) {
                 LOG.info("\t{}", region.network);
                 service.addVehicleRentalRegion(region);
@@ -217,6 +219,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                 coordinates.forEach(c -> coordToNetworksMap.get(c).add(region.network));
 
             }
+            LOG.info("Adding dropoffs to graph");
             addDropOffsToGraph(coordToNetworksMap);
             LOG.info("Added in total {} border dropoffs.", coordToNetworksMap.size());
             LOG.info("Finished applying service regions.");
@@ -231,13 +234,23 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
          */
         private Set<Coordinate> intersectWithGraph(Collection<StreetEdge> edges, VehicleRentalRegion region) {
             Set<Coordinate> coordinates = new HashSet<>();
+
+            // use a prepared geometry to dramatically speed up "covers" operations
+            PreparedGeometry preparedRegionGeometry = PreparedGeometryFactory.prepare(region.geometry);
+
+            // Iterate through StreetEdges
             for (StreetEdge edge : edges) {
                 Point[] edgePoints = getEdgeCoord(edge);
-                boolean coversFrom = region.geometry.covers(edgePoints[0]);
-                boolean coversTo = region.geometry.covers(edgePoints[1]);
+
+                // does this check if all of the edge is covered? What about a really windy road?
+                boolean coversFrom = preparedRegionGeometry.covers(edgePoints[0]);
+                boolean coversTo = preparedRegionGeometry.covers(edgePoints[1]);
+
                 if (coversFrom && coversTo) {
+                    // all of edge is within region
                     edge.addVehicleNetwork(region.network);
                 } else if (coversFrom || coversTo) {
+                    // part of edge is within region
                     coordinates.addAll(intersect(edgePoints, region));
                 }
             }

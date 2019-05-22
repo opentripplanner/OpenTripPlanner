@@ -673,18 +673,10 @@ public class StateEditor {
         child.stateData.nonTransitMode = TraverseMode.MICROMOBILITY;
         child.stateData.vehicleRentalNetworks = networks;
         child.stateData.rentedVehicleAllowsFloatingDropoffs = rentedVehicleAllowsFloatingDropoffs;
-        if (child.getOptions().arriveBy) {
-            if (child.isEverBoarded()) {
-                child.stateData.hasRentedVehiclePreTransit = true;
-            } else {
-                child.stateData.hasRentedVehiclePostTransit = true;
-            }
+        if (child.isEverBoarded()) {
+            child.stateData.hasRentedVehiclePostTransit = true;
         } else {
-            if (child.isEverBoarded()) {
-                child.stateData.hasRentedVehiclePostTransit = true;
-            } else {
-                child.stateData.hasRentedVehiclePreTransit = true;
-            }
+            child.stateData.hasRentedVehiclePreTransit = true;
         }
         child.vehicleRentalDistance = initialEdgeDistance;
     }

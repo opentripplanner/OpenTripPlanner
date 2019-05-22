@@ -430,10 +430,11 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
         } else if (options.allowVehicleRental) {
-            // Possible transition from using rented vehicle to walking.
+            // Irrevocable transition from using rented vehicle to walking.
             // Final Vehicle check needed to prevent infinite recursion.
             if (
                 s0.isVehicleRenting() &&
+                    !getPermission().allows(TraverseMode.MICROMOBILITY) &&
                     currMode == TraverseMode.MICROMOBILITY &&
                     // if in "arrive by" mode, the search is progressing backwards while in a vehicle rental state
                     // before encountering a vehicle rental pickup station.  Therefore, this search cannot proceed.
@@ -468,27 +469,22 @@ public class StreetEdge extends Edge implements Cloneable {
                     s0.isVehicleRentalDropoffAllowed(this, false)
             ) {
                 StateEditor editorWithVehicleRental = doTraverse(s0, options, TraverseMode.MICROMOBILITY);
-                StateEditor editorWithoutVehicleRental = doTraverse(s0, options, currMode);
                 if (editorWithVehicleRental != null) {
                     // begin vehicle rental usage.
                     editorWithVehicleRental.incrementWeight(options.vehicleRentalPickupCost);
                     editorWithVehicleRental.incrementTimeInSeconds(options.vehicleRentalPickupTime);
                     editorWithVehicleRental.beginVehicleRenting(getDistance(), vehicleNetworks, true);
-                    if (editorWithoutVehicleRental != null) {
+                    State editorWithVehicleRentalState = editorWithVehicleRental.makeState();
+                    if (state != null) {
                         // make the forkState be of the non-vehicle-rental mode so it's possible to build walk steps
-                        State forkState = editorWithoutVehicleRental.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(editorWithoutVehicleRental.makeState());
-                            return forkState; // return both rented-vehicle and no-rented-vehicle states
-                        } else {
-                            // if the no-rented vehicle state is non traversable or something, return just the
-                            // rented-vehicle state
-                            return editorWithVehicleRental.makeState();
+                        if (editorWithVehicleRentalState != null) {
+                            state.addToExistingResultChain(editorWithVehicleRentalState);
                         }
+                        return state;
                     } else {
                         // if the no-rented-vehicle state is non traversable or something, return just the
                         // rented-vehicle state
-                        return editorWithVehicleRental.makeState();
+                        return editorWithVehicleRentalState;
                     }
                 }
             }

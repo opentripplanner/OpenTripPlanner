@@ -1,7 +1,17 @@
 package org.opentripplanner.updater.vehicle_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.geojson.Feature;
+import org.geojson.FeatureCollection;
+import org.geojson.GeoJsonObject;
+import org.opentripplanner.analyst.UnsupportedGeometryException;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
@@ -10,7 +20,9 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +43,8 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource, Jso
     private String baseUrl;
 
     private String networkName;
+    private List<VehicleRentalRegion> regions;
+    private boolean regionsLoadedFromConfig;
 
     public GbfsVehicleRentalDataSource(String networkName) {
         stationInformationSource = new GbfsStationDataSource();
@@ -62,6 +76,11 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource, Jso
 
     @Override
     public boolean regionsUpdated() {
+        // return a one-time update if the regions were loaded from config
+        if (regionsLoadedFromConfig) {
+            regionsLoadedFromConfig = false;
+            return true;
+        }
         return stationInformationSource.regionsUpdated() ||
             stationStatusSource.regionsUpdated() ||
             floatingVehicleSource.regionsUpdated();
@@ -103,9 +122,8 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource, Jso
     }
 
     @Override
-    public List<VehicleRentalRegion> getRegions() {
-        // TODO: implement
-        return new ArrayList<>();
+    public synchronized List<VehicleRentalRegion> getRegions() {
+        return regions;
     }
 
     /**
@@ -113,13 +131,73 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource, Jso
      * from the JSON coming in from the update source.
      */
     @Override
-    public void configure (Graph graph, JsonNode jsonNode) {
+    public void configure (Graph graph, JsonNode config) {
         // path() returns MissingNode not null, allowing chained function calls.
-        String url = jsonNode.path("url").asText();
+        String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
         }
         this.setBaseUrl(url);
+        JsonNode regionGeoJson = config.get("regionsGeoJson");
+        if (regionGeoJson == null) {
+            LOG.warn("regionGeoJson not found in configuration for Vehicle Rental Datasource." +
+                "Dropoffs are assumed to be allowed in full extent of graph.");
+            GeometryFactory geometryFactory = new GeometryFactory();
+            VehicleRentalRegion entireEarthRegion = new VehicleRentalRegion();
+            entireEarthRegion.network = networkName;
+            entireEarthRegion.geometry = geometryFactory.toGeometry(new Envelope(-180, 180, -90, 90));
+            regions = Arrays.asList(entireEarthRegion);
+        } else if (regionGeoJson != null) {
+            regions = parseRegionJson(regionGeoJson);
+        }
+        if (regions != null) {
+            regionsLoadedFromConfig = true;
+        }
+    }
+
+    /**
+     * Attempt to parse geojson and set that to be the region.  Currently supported types include
+     * either a single Feature or a FeatureCollection.
+     */
+    private List<VehicleRentalRegion> parseRegionJson(JsonNode regionJson) {
+        ObjectMapper jsonDeserializer = new ObjectMapper();
+        final VehicleRentalRegion region = new VehicleRentalRegion();
+        region.network = networkName;
+
+        // first try to deserialize as a feature
+        try {
+            Feature geoJsonFeature = jsonDeserializer.readValue(
+                regionJson.traverse(),
+                Feature.class
+            );
+            GeoJsonObject geometry = geoJsonFeature.getGeometry();
+            region.geometry = GeometryUtils.convertGeoJsonToJtsGeometry(geometry);
+        } catch (IllegalArgumentException | IOException | UnsupportedGeometryException e) {
+            LOG.debug("Could not parse as a Feature, trying as a FeatureCollection");
+            try {
+                List<Geometry> geometries = new ArrayList<>();
+                FeatureCollection geoJsonFeatureCollection = jsonDeserializer.readValue(
+                    regionJson.traverse(),
+                    FeatureCollection.class
+                );
+
+                // convert all features to geometry
+                for (Feature feature : geoJsonFeatureCollection.getFeatures()) {
+                    geometries.add(GeometryUtils.convertGeoJsonToJtsGeometry(feature.getGeometry()));
+                }
+
+                // union all geometries into a single geometry
+                GeometryFactory geometryFactory = new GeometryFactory();
+                GeometryCollection geometryCollection =
+                    (GeometryCollection) geometryFactory.buildGeometry(geometries);
+                region.geometry = geometryCollection.union();
+            } catch (IllegalArgumentException | IOException | UnsupportedGeometryException e1) {
+                e1.printStackTrace();
+                LOG.error("Could not deserialize GeoJSON for {}", networkName);
+                return new ArrayList<>();
+            }
+        }
+        return Arrays.asList(region);
     }
 
     class GbfsStationDataSource extends GenericJsonVehicleRentalDataSource {
