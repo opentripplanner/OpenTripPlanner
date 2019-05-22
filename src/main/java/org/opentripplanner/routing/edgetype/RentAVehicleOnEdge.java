@@ -91,12 +91,34 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
             if (s0.stateData.rentedVehicleAllowsFloatingDropoffs() && !station.isFloatingVehicle)
                 return null;
 
+            // make sure only one vehicle is rented pre/post transit
+            if (s0.isEverBoarded()) {
+                if (s0.stateData.hasRentedVehiclePreTransit()) {
+                    return null;
+                }
+            } else {
+                if (s0.stateData.hasRentedVehiclePostTransit()) {
+                    return null;
+                }
+            }
+
             // looks like it's ok to have rented a vehicle from this station
             s1e.endVehicleRenting();
         } else {
             // make sure more than 1 vehicle isn't rented at once
             if (s0.isVehicleRenting())
                 return null;
+
+            // make sure only one vehicle is rented pre/post transit
+            if (s0.isEverBoarded()) {
+                if (s0.stateData.hasRentedVehiclePostTransit()) {
+                    return null;
+                }
+            } else {
+                if (s0.stateData.hasRentedVehiclePreTransit()) {
+                    return null;
+                }
+            }
 
             s1e.beginVehicleRenting(0, station.networks, station.isFloatingVehicle);
         }

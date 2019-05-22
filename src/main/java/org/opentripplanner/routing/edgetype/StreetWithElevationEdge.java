@@ -145,6 +145,12 @@ public class StreetWithElevationEdge extends StreetEdge {
             );
         }
 
+        if (time == 0) {
+            // very short edges can cause divide-by-zero errors. Return the max speed a micromobility vehicle could
+            // travel along the road
+            return Math.min(options.maximumMicromobilitySpeed, getCarSpeed());
+        }
+
         return Math.min(
             distance / time,
             // make sure the speed limit is obeyed

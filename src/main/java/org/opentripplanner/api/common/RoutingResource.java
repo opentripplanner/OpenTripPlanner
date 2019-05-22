@@ -746,7 +746,8 @@ public abstract class RoutingResource {
         if (
             companies != null &&
                 this.modes != null &&
-                this.modes.qModes.contains(new QualifiedMode("CAR_RENT"))
+                (this.modes.qModes.contains(new QualifiedMode("CAR_RENT")) ||
+                    this.modes.qModes.contains(new QualifiedMode("MICROMOBILITY_RENT")))
         ) {
             request.companies = companies;
         }

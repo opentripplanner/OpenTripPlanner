@@ -300,6 +300,7 @@ public class State implements Cloneable {
         boolean bikeParkAndRideOk = false;
         boolean carParkAndRideOk = false;
         boolean carRentingOk = false;
+        boolean vehicleRentingOk;
         boolean tncOK = !stateData.opt.useTransportationNetworkCompany || (
             isEverBoarded() &&
             (!isUsingHailedCar() || isTNCStopAllowed())
@@ -308,19 +309,20 @@ public class State implements Cloneable {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
-            // If a car is being rented and the search is progressing backward, the search must
-            // reach a car rental station that this car could have been picked up at
+            // If a car or vehicle is being rented and the search is progressing backward, the search must
+            // reach a car/vehicle rental station that this car/vehicle could have been picked up at
             carRentingOk = !isCarRenting();
+            vehicleRentingOk = !isVehicleRenting();
         } else {
             bikeRentingOk = !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
-            // if still renting a car, check if it is possible to dropoff a rental car at the last
+            // if still renting a car/vehicle, check if it is possible to dropoff a rental car/vehicle at the last
             // seen edge
             carRentingOk = !isCarRenting() || isCarRentalDropoffAllowed(false);
-
+            vehicleRentingOk = !isVehicleRenting() || isVehicleRentalDropoffAllowed(false);
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && tncOK && carRentingOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && tncOK && carRentingOk && vehicleRentingOk;
     }
 
     public Stop getPreviousStop() {
@@ -387,6 +389,13 @@ public class State implements Cloneable {
     public double getCarRentalDistanceDelta() {
         if (backState != null)
             return Math.abs(this.carRentalDriveDistance - backState.carRentalDriveDistance);
+        else
+            return 0;
+    }
+
+    public double getVehicleRentalDistanceDelta() {
+        if (backState != null)
+            return Math.abs(this.vehicleRentalDistance - backState.vehicleRentalDistance);
         else
             return 0;
     }
@@ -765,6 +774,7 @@ public class State implements Cloneable {
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 editor.incrementTransportationNetworkCompanyDistance(orig.getTransportationNetworkCompanyDistanceDelta());
                 editor.incrementCarRentalDistance(orig.getCarRentalDistanceDelta());
+                editor.incrementVehicleRentalDistance(orig.getVehicleRentalDistanceDelta());
 
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());

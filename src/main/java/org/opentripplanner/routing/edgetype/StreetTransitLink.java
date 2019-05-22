@@ -135,6 +135,25 @@ public class StreetTransitLink extends Edge {
                 return null;
             }
         }
+
+        if (req.allowVehicleRental && s0.isVehicleRenting()) {
+            // check to see if transit may be used after transitioning out of a vehicle rental
+            if (req.arriveBy) {
+                // the search backwards has yet to reach a rental vehicle. This implementation does not allow brining a
+                // rented vehicle on transit. Therefore the search must continue so a rental vehicle can be found to
+                // pickup.
+                return null;
+            } else {
+                if (s0.isVehicleRentalDropoffAllowed(false)) {
+                    // floating rental vehicle dropoff allowed.  Exit the vehicle and get onto transit.
+                    s1.endVehicleRenting();
+                    s1.incrementWeight(req.vehicleRentalDropoffCost);
+                    s1.incrementTimeInSeconds(req.vehicleRentalDropoffTime);
+                } else {
+                    return null;
+                }
+            }
+        }
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);

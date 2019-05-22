@@ -104,7 +104,7 @@ public abstract class GraphUpdaterConfigurator {
                 else if (type.equals("car-rental-updater")) {
                     updater = new CarRentalUpdater();
                 }
-                else if (type.equals("micromobility-rental-updater")) {
+                else if (type.equals("vehicle-rental-updater")) {
                     updater = new VehicleRentalUpdater();
                 }
             }

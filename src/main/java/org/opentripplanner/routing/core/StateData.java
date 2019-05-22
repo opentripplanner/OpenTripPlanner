@@ -155,5 +155,9 @@ public class StateData implements Cloneable {
 
     public Set<String> getRentedVehicles() { return rentedVehicles; }
 
+    public boolean hasRentedVehiclePostTransit() { return hasRentedVehiclePostTransit; }
+
+    public boolean hasRentedVehiclePreTransit() { return hasRentedVehiclePreTransit; }
+
     public boolean rentedVehicleAllowsFloatingDropoffs() { return rentedVehicleAllowsFloatingDropoffs; }
 }

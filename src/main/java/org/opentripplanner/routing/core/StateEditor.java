@@ -243,6 +243,11 @@ public class StateEditor {
         child.carRentalDriveDistance += distance;
     }
 
+    public void incrementVehicleRentalDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.vehicleRentalDistance += distance;
+    }
+
     /* Basic Setters */
 
     public void setTripTimes(TripTimes tripTimes) {
