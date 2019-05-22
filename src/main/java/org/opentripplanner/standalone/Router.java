@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone;
 
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -26,21 +26,20 @@ import java.util.EnumMap;
  */
 public class Router {
 
-    private static final Logger LOG = (Logger) LoggerFactory.getLogger(Router.class);
-
-    public static final String ROUTER_CONFIG_FILENAME = "router-config.json";
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
 
     public String id;
     public Graph graph;
     public double[] timeouts = {5, 4, 2};
 
     /**
-     *  Separate logger for incoming requests. This should be handled with a Logback logger rather than something
-     *  simple like a PrintStream because requests come in multi-threaded.
+     *  Separate logger for incoming requests. This should be handled with a Logback logger
+     *  rather than something simple like a PrintStream because requests come in multi-threaded.
      */
     public Logger requestLogger = null;
 
-    /* TODO The fields for "components" are slowly disappearing... maybe at some point a router will be nothing but configuration values tied to a Graph. */
+    /* TODO The fields for "components" are slowly disappearing... maybe at some point a router
+        will be nothing but configuration values tied to a Graph. */
 
     // Inspector/debug services
     public TileRendererManager tileRendererManager;

@@ -1,29 +1,31 @@
 package org.opentripplanner.api.resource;
 
 import org.junit.Test;
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPAppConstruction;
 import org.opentripplanner.standalone.OTPServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RoutersTest {
     @Test
     public void testRouters() {
-        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
+        OTPAppConstruction otpConstruction = new OTPAppConstruction(new CommandLineParameters());
+        OTPServer otpServer = otpConstruction.server();
+
         otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph()));
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph()));
         otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0, 0));
@@ -37,8 +39,7 @@ public class RoutersTest {
         otpServer.getGraphService().getRouter("A").graph.calculateEnvelope();
         otpServer.getGraphService().getRouter("").graph.calculateEnvelope();
 
-        Routers routerApi = new Routers();
-        routerApi.otpServer = otpServer;
+        Routers routerApi = new Routers(otpServer, otpConstruction.configuration());
         RouterList routers = routerApi.getRouterIds();
         assertEquals(2, routers.routerInfo.size());
         RouterInfo router0 = routers.routerInfo.get(0);
@@ -56,7 +57,7 @@ public class RoutersTest {
         assertEquals("A", otherRouter.routerId);
         assertTrue(otherRouter.polygon.getArea() > 0);
     }
-    
+
     @Test
     public void getRouterInfoReturnsFirstAndLastValidDateForGraph() {
 
@@ -74,11 +75,11 @@ public class RoutersTest {
         graph.updateTransitFeedValidity(calendarService);
         graph.expandToInclude(0, 100);
 
-        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
+        OTPAppConstruction otpConstruction = new OTPAppConstruction(new CommandLineParameters());
+        OTPServer otpServer = otpConstruction.server();
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", graph));
 
-        Routers routerApi = new Routers();
-        routerApi.otpServer = otpServer;
+        Routers routerApi = new Routers(otpServer, otpConstruction.configuration());
 
         RouterInfo info = routerApi.getGraphId("A");
 

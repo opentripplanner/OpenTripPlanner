@@ -1,9 +1,5 @@
 package org.opentripplanner.standalone;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.BindException;
-
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -19,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
+import java.io.File;
+import java.io.IOException;
+import java.net.BindException;
 
 public class GrizzlyServer {
 
@@ -35,12 +34,12 @@ public class GrizzlyServer {
 
     /** The command line parameters, including things like port number and content directories. */
     private CommandLineParameters params;
-    private OTPServer server;
+    private Application app;
 
     /** Construct a Grizzly server with the given IoC injector and command line parameters. */
-    public GrizzlyServer (CommandLineParameters params, OTPServer server) {
+    GrizzlyServer (CommandLineParameters params, Application app) {
         this.params = params;
-        this.server = server;
+        this.app = app;
     }
 
     /**
@@ -116,7 +115,6 @@ public class GrizzlyServer {
         /* Add a few handlers (~= servlets) to the Grizzly server. */
 
         /* 1. A Grizzly wrapper around the Jersey Application. */
-        Application app = new OTPApplication(server, !params.insecure);
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 

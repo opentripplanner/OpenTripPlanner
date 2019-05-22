@@ -1,13 +1,21 @@
 package org.opentripplanner.api.resource;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.graph_builder.GraphBuilder;
+import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.OTPConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -26,23 +34,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
+import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 /**
  * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
@@ -89,9 +88,15 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Context OTPServer otpServer;
+    private final OTPServer otpServer;
+    private final OTPConfiguration otpConfiguration;
 
-    /** 
+    public Routers(@Context OTPServer otpServer, @Context OTPConfiguration otpConfiguration) {
+        this.otpServer = otpServer;
+        this.otpConfiguration = otpConfiguration;
+    }
+
+    /**
      * Returns a list of routers and their bounds. 
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
      * on the Accept header in the HTTP request.
@@ -255,8 +260,10 @@ public class Routers {
         CommandLineParameters params = otpServer.params.clone();
         params.build = tempDir;
         params.inMemory = true;
-        
-        GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, tempDir);
+
+        GraphBuilder graphBuilder = GraphBuilder.create(
+                params, otpConfiguration.getGraphConfig(params.build)
+        );
         
         graphBuilder.run();
         

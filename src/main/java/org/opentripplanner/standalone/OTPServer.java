@@ -1,13 +1,12 @@
 package org.opentripplanner.standalone;
 
-import java.io.File;
-import java.util.Collection;
-
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 /**
  * This replaces a Spring application context, which OTP originally used.
@@ -18,13 +17,10 @@ public class OTPServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPServer.class);
 
+    public final CommandLineParameters params;
+
     // Core OTP modules
-    private GraphService graphService;
-
-    /** The directory under which graphs, caches, etc. will be stored. */
-    public File basePath = null;
-
-    public CommandLineParameters params;
+    private final GraphService graphService;
 
     public OTPServer (CommandLineParameters params, GraphService gs) {
         LOG.info("Wiring up and configuring server.");
@@ -64,7 +60,7 @@ public class OTPServer {
      * More on custom injection in Jersey 2:
      * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
      */
-     public AbstractBinder makeBinder() {
+    AbstractBinder makeBinder() {
         return new AbstractBinder() {
             @Override
             protected void configure() {
@@ -72,5 +68,4 @@ public class OTPServer {
             }
         };
     }
-
 }

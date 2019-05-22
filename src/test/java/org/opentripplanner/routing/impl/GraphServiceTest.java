@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -14,11 +15,22 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPAppConstruction;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class GraphServiceTest extends TestCase {
+public class GraphServiceTest {
 
     File basePath;
 
@@ -30,8 +42,8 @@ public class GraphServiceTest extends TestCase {
 
     byte[] smallGraphData;
 
-    @Override
-    protected void setUp() throws IOException {
+    @Before
+    public void setUp() throws IOException {
         // Ensure a dummy disk location exists
         basePath = new File("test_graphs");
         if (!basePath.exists())
@@ -53,22 +65,10 @@ public class GraphServiceTest extends TestCase {
         smallGraphData = baos.toByteArray();
     }
 
-    @Override
-    protected void tearDown() throws FileNotFoundException {
+    @After
+    public void tearDown() throws FileNotFoundException {
         deleteRecursive(basePath);
         basePath = null;
-    }
-
-    public static boolean deleteRecursive(File path) throws FileNotFoundException {
-        if (!path.exists())
-            throw new FileNotFoundException(path.getAbsolutePath());
-        boolean ret = true;
-        if (path.isDirectory()) {
-            for (File f : path.listFiles()) {
-                ret = ret && deleteRecursive(f);
-            }
-        }
-        return ret && path.delete();
     }
 
     @Test
@@ -122,11 +122,14 @@ public class GraphServiceTest extends TestCase {
     }
 
     @Test
-    public final void testGraphServiceFile() throws IOException {
+    public final void testGraphServiceFile() {
 
         // Create a GraphService and a GraphSourceFactory
         GraphService graphService = new GraphService();
-        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(basePath);
+        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(
+                new OTPConfiguration(null),
+                basePath
+        );
 
         graphSourceFactory.save("A", new ByteArrayInputStream(emptyGraphData));
 
@@ -187,22 +190,30 @@ public class GraphServiceTest extends TestCase {
     }
 
     @Test
-    public final void testGraphServiceAutoscan() throws IOException {
+    public final void testGraphServiceAutoscan() {
 
         // Check for no graphs
-        GraphService graphService = new GraphService(false);
-        GraphScanner graphScanner = new GraphScanner(graphService, basePath, true);
+        CommandLineParameters parameters = new CommandLineParameters();
+        OTPAppConstruction construction = new OTPAppConstruction(parameters);
+        OTPConfiguration configuration = construction.configuration();
+
+        GraphService graphService;
+        GraphScanner graphScanner;
+
+        graphService = new GraphService(false, null);
+        graphScanner = new GraphScanner(graphService, configuration, basePath, true);
         graphScanner.startup();
         assertEquals(0, graphService.getRouterIds().size());
 
         System.out.println("------------------------------------------");
         // Add a single default graph
-        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(basePath);
+        InputStreamGraphSource.FileFactory graphSourceFactory =
+                new InputStreamGraphSource.FileFactory(construction.configuration(), basePath);
         graphSourceFactory.save("", new ByteArrayInputStream(smallGraphData));
 
         // Check that the single graph is there
-        graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, basePath, true);
+        graphService = new GraphService(false, null);
+        graphScanner = new GraphScanner(graphService, configuration, basePath, true);
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());
         assertEquals("", graphService.getRouter().graph.routerId);
@@ -211,8 +222,8 @@ public class GraphServiceTest extends TestCase {
         System.out.println("------------------------------------------");
         // Add another graph in a sub-directory
         graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
-        graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, basePath, true);
+        graphService = new GraphService(false, null);
+        graphScanner = new GraphScanner(graphService, configuration, basePath, true);
         graphScanner.startup();
         assertEquals(2, graphService.getRouterIds().size());
         assertEquals("", graphService.getRouter().graph.routerId);
@@ -223,8 +234,8 @@ public class GraphServiceTest extends TestCase {
         new File(basePath, InputStreamGraphSource.GRAPH_FILENAME).delete();
 
         // Check that default is A this time
-        graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, basePath, true);
+        graphService = new GraphService(false, null);
+        graphScanner = new GraphScanner(graphService, configuration, basePath, true);
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());
         assertEquals("A", graphService.getRouter().graph.routerId);
@@ -254,4 +265,17 @@ public class GraphServiceTest extends TestCase {
         assertEquals(graphRouterConfig, routerConfig);
         assertEquals(graphRouterConfig.get("timeout"), routerConfig.get("timeout"));
     }
+
+    private static boolean deleteRecursive(File path) throws FileNotFoundException {
+        if (!path.exists())
+            throw new FileNotFoundException(path.getAbsolutePath());
+        boolean ret = true;
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
+                ret = ret && deleteRecursive(f);
+            }
+        }
+        return ret && path.delete();
+    }
+
 }

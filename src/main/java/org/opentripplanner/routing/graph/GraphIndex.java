@@ -1,30 +1,29 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Calendar;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.locationtech.jts.geom.Envelope;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
-import org.opentripplanner.model.*;
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -39,14 +38,21 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.HttpToGraphQLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**
@@ -398,16 +404,8 @@ public class GraphIndex {
 
     public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
         ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
-        Response.ResponseBuilder res = Response.status(Response.Status.OK);
-        HashMap<String, Object> content = new HashMap<>();
-        if (!executionResult.getErrors().isEmpty()) {
-            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
-            content.put("errors", executionResult.getErrors());
-        }
-        if (executionResult.getData() != null) {
-            content.put("data", executionResult.getData());
-        }
-        return res.entity(content).build();
+
+        return HttpToGraphQLMapper.mapExecutionResultToHttpResponse(executionResult);
     }
 
     /**

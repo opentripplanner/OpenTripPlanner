@@ -22,6 +22,7 @@ New York City and one for Portland, Oregon:
 
 ```
 /var/otp
+├── otp-config.json
 ├── cache
 │   └── ned
 └── graphs
@@ -63,6 +64,23 @@ saving the resulting transportation network description to disk. We call this pr
 *graph building*. They are controlled by `build-config.json`. There are many other details of OTP operation that can be
 modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
 are found in `router-config.json`.
+
+# System wide configuration
+The system wide configuration is used to turn system wide features on off. Some of these might only be relevant in the
+build or routing phase, but for simplicity all features are set here. See the 
+[OTPFeature](../src/main/java/org/opentripplanner/util/OTPFeature.java) 
+Java class for a list of all available features and their default settings. For most use-cases changing the features is 
+not necessary. Some of the [Sandbox Extensions](SandboxExtention.md) is enabled using this.
+
+```JSON
+// otp-config.json
+{
+    featuresEnabled : {
+        APIBikeRental : false,
+        SandboxExampleAPIGraphStatistics : true
+    }
+}
+```
 
 # Graph build configuration
 
