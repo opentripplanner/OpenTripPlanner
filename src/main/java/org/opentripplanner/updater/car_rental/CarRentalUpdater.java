@@ -6,6 +6,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
@@ -231,10 +233,14 @@ public class CarRentalUpdater extends PollingGraphUpdater {
          */
         private Set<Coordinate> intersectWithGraph(Collection<StreetEdge> edges, CarRentalRegion region) {
             Set<Coordinate> coordinates = new HashSet<>();
+
+            // use a prepared geometry to dramatically speed up "covers" operations
+            PreparedGeometry preparedRegionGeometry = PreparedGeometryFactory.prepare(region.geometry);
+
             for (StreetEdge edge : edges) {
                 Point[] edgePoints = getEdgeCoord(edge);
-                boolean coversFrom = region.geometry.covers(edgePoints[0]);
-                boolean coversTo = region.geometry.covers(edgePoints[1]);
+                boolean coversFrom = preparedRegionGeometry.covers(edgePoints[0]);
+                boolean coversTo = preparedRegionGeometry.covers(edgePoints[1]);
                 if (coversFrom && coversTo) {
                     edge.addCarNetwork(region.network);
                 } else if (coversFrom || coversTo) {
