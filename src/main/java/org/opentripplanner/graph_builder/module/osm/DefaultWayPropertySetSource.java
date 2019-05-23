@@ -369,6 +369,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setCarSpeed("highway=service", 6.7f); // ~= 15 mph
         props.setCarSpeed("highway=track", 4.5f); // ~= 10 mph
         props.setCarSpeed("highway=road", 11.2f); // ~= 25 mph
+        props.setCarSpeed("surface=gravel", 4.5f); // ~= 10 mph
+        props.setCarSpeed("surface=dirt", 4.5f); // ~= 10 mph
 
         // default ~= 25 mph
         props.defaultSpeed = 11.2f;

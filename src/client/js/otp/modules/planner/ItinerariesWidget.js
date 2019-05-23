@@ -327,6 +327,7 @@ otp.widgets.ItinerariesWidget =
         if(mode === "BUS") return '#0f0';
         if(mode === "TRAM") return '#f00';
         if(mode === "AIRPLANE") return '#f0f';
+        if(mode === "MICROMOBILITY") return '#FCEF1B';
         return '#aaa';
     },
 
@@ -366,7 +367,7 @@ otp.widgets.ItinerariesWidget =
                 }
             }
 
-            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR" || leg.mode === "MICROMOBILITY") {
                 headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
@@ -721,7 +722,7 @@ otp.widgets.ItinerariesWidget =
 
             return legDiv;
         }
-        else if (leg.steps) { // walk / bike / car
+        else if (leg.steps) { // walk / bike / car / micromobility
             var legDiv = $('<div></div>');
             if (leg && leg.steps) {
                 for(var i=0; i<leg.steps.length; i++) {

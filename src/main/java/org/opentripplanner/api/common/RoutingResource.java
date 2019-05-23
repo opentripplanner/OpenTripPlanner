@@ -397,6 +397,26 @@ public abstract class RoutingResource {
     @QueryParam("onlyTransitTrips")
     private Boolean onlyTransitTrips;
 
+    // the amount of watts a Micromobility vehicle can sustainably output
+    @QueryParam("watts")
+    private Double watts;
+
+    // the weight of the Micromobility vehicle and all things transported by the vehicle including the rider
+    @QueryParam("weight")
+    private Double weight;
+
+    // the minimum speed of a micromobility vehicle. This should only be used to avoid unreasonably slow times on hills.
+    // If it is desired to model effectively impossible travel uphill (ie the vehicle can't reasonably be transported
+    // up a steep enough grade, enter 0. Value in m/s.
+    @QueryParam("minimumMicromobilitySpeed")
+    private Double minimumMicromobilitySpeed;
+
+    // the maximum speed of a micromobility vehicle. This will cap all speeds on declines to this value even if the
+    // physics of the downslope would naturally result in the vehicle traveling faster than this value (ie, the user or
+    // the vehicle itself is assumed to be braking). Value in m/s.
+    @QueryParam("maximumMicromobilitySpeed")
+    private Double maximumMicromobilitySpeed;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -610,6 +630,8 @@ public abstract class RoutingResource {
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
+        request.useCarRentalAvailabilityInformation = (tripPlannedForNow);
+        request.useVehicleRentalAvailabilityInformation = (tripPlannedForNow);
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
@@ -724,7 +746,8 @@ public abstract class RoutingResource {
         if (
             companies != null &&
                 this.modes != null &&
-                this.modes.qModes.contains(new QualifiedMode("CAR_RENT"))
+                (this.modes.qModes.contains(new QualifiedMode("CAR_RENT")) ||
+                    this.modes.qModes.contains(new QualifiedMode("MICROMOBILITY_RENT")))
         ) {
             request.companies = companies;
         }
@@ -734,6 +757,18 @@ public abstract class RoutingResource {
 
         if (onlyTransitTrips != null)
             request.onlyTransitTrips = onlyTransitTrips;
+
+        if (watts != null)
+            request.watts = watts;
+
+        if (weight != null)
+            request.weight = weight;
+
+        if (minimumMicromobilitySpeed != null)
+            request.minimumMicromobilitySpeed = minimumMicromobilitySpeed;
+
+        if (maximumMicromobilitySpeed != null)
+            request.maximumMicromobilitySpeed = maximumMicromobilitySpeed;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

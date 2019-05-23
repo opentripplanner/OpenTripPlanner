@@ -8,6 +8,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.car_rental.CarRentalUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
@@ -102,6 +103,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("car-rental-updater")) {
                     updater = new CarRentalUpdater();
+                }
+                else if (type.equals("vehicle-rental-updater")) {
+                    updater = new VehicleRentalUpdater();
                 }
             }
 

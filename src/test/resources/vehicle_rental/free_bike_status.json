@@ -1,0 +1,29 @@
+{
+  "last_updated": 1558419468,
+  "ttl": 0,
+  "max_page": 0,
+  "data": {
+    "bikes": [{
+      "bike_id": "TEST1",
+      "lat": "45.519958",
+      "lon": "-122.65073",
+      "is_reserved": 0,
+      "is_disabled": 0,
+      "vehicle_type": "bike"
+    }, {
+      "bike_id": "TEST2",
+      "lat": "45.512204",
+      "lon": "-122.646203",
+      "is_reserved": 0,
+      "is_disabled": 0,
+      "vehicle_type": "bike"
+    }, {
+      "bike_id": "TEST3",
+      "lat": "45.506149",
+      "lon": "-122.663295",
+      "is_reserved": 0,
+      "is_disabled": 0,
+      "vehicle_type": "scooter"
+    }]
+  }
+}

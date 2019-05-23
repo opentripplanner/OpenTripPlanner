@@ -243,6 +243,11 @@ public class StateEditor {
         child.carRentalDriveDistance += distance;
     }
 
+    public void incrementVehicleRentalDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.vehicleRentalDistance += distance;
+    }
+
     /* Basic Setters */
 
     public void setTripTimes(TripTimes tripTimes) {
@@ -650,5 +655,44 @@ public class StateEditor {
     public void addRentedCar(String carId) {
         cloneStateDataAsNeeded();
         child.stateData.rentedCars.add(carId);
+    }
+
+    public void endVehicleRenting() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedVehicle = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void beginVehicleRenting(
+        double initialEdgeDistance,
+        Set<String> networks,
+        boolean rentedVehicleAllowsFloatingDropoffs
+    ) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedVehicle = true;
+        child.stateData.nonTransitMode = TraverseMode.MICROMOBILITY;
+        child.stateData.vehicleRentalNetworks = networks;
+        child.stateData.rentedVehicleAllowsFloatingDropoffs = rentedVehicleAllowsFloatingDropoffs;
+        if (child.isEverBoarded()) {
+            child.stateData.hasRentedVehiclePostTransit = true;
+        } else {
+            child.stateData.hasRentedVehiclePreTransit = true;
+        }
+        child.vehicleRentalDistance = initialEdgeDistance;
+    }
+
+    public void setVehicleRenting(boolean vehicleRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedVehicle = vehicleRenting;
+        if (vehicleRenting) {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
+
+    public void addRentedVehicle(String vehicleId) {
+        cloneStateDataAsNeeded();
+        child.stateData.rentedVehicles.add(vehicleId);
     }
 }

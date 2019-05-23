@@ -13,7 +13,7 @@ public enum TraverseMode {
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
     TRANSIT, LEG_SWITCH,
-    AIRPLANE;
+    AIRPLANE, MICROMOBILITY;
 
     private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
             new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
@@ -39,7 +39,7 @@ public enum TraverseMode {
     }
 
     public boolean isOnStreetNonTransit() {
-        return this == WALK || this == BICYCLE || this == CAR;
+        return this == WALK || this == BICYCLE || this == CAR || this == MICROMOBILITY;
     }
     
     public boolean isDriving() {

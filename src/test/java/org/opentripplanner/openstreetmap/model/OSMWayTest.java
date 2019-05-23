@@ -1,13 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.module.osm.OSMFilter;
 import org.opentripplanner.graph_builder.module.osm.WayProperties;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OSMWayTest {
 
@@ -131,6 +132,18 @@ public class OSMWayTest {
         way.addTag("bicycle", "designated");
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allows(StreetTraversalPermission.ALL));
+    }
+
+    /**
+     * Tests if bicycles and micromobility are not allowed to drive on highways classified as limited access roads
+     */
+    @Test public void testMotorWays() {
+        OSMWay way = new OSMWay();
+        way.addTag("highway", "motorway");
+        way.addTag("bicycle", "no");
+
+        P2<StreetTraversalPermission> permissionPair = getWayProperties(way);
+        assertFalse(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
     }
 
     /**

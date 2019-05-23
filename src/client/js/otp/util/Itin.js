@@ -120,6 +120,14 @@ otp.util.Itin = {
         return false;
     },
 
+    includesAnyMicromobility : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(this.getUnqualifiedMode(modeArr[i]) === "MICROMOBILITY") return true;
+        }
+        return false;
+    },
+
     absoluteDirectionStrings : {
         // note: keep these lower case (and uppercase via template / code if needed)
         //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation

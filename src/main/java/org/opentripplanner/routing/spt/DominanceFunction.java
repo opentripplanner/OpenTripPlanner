@@ -111,6 +111,21 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        // Does one state represent using a rented vehicle and the other not currently renting?
+        if (a.isVehicleRenting() != b.isVehicleRenting()) {
+            return false;
+        }
+
+        // Does one state represent using a rented vehicle before transit and the other using a rented vehicle after?
+        if (a.stateData.hasRentedVehiclePreTransit() != b.stateData.hasRentedVehiclePreTransit()) {
+            return false;
+        }
+
+        // Does one state represent using a rented vehicle before transit and the other using a rented car after?
+        if (a.stateData.hasRentedVehiclePostTransit() != b.stateData.hasRentedVehiclePostTransit()) {
+            return false;
+        }
+
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
         if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
             if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {

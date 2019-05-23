@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.car_rental;
+package org.opentripplanner.updater.vehicle_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -9,15 +9,15 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
-import org.opentripplanner.routing.car_rental.CarRentalRegion;
-import org.opentripplanner.routing.car_rental.CarRentalStation;
-import org.opentripplanner.routing.car_rental.CarRentalStationService;
-import org.opentripplanner.routing.edgetype.RentACarOffEdge;
-import org.opentripplanner.routing.edgetype.RentACarOnEdge;
+import org.opentripplanner.routing.edgetype.RentAVehicleOffEdge;
+import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -39,9 +39,9 @@ import java.util.Set;
 
 import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
 
-public class CarRentalUpdater extends PollingGraphUpdater {
+public class VehicleRentalUpdater extends PollingGraphUpdater {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CarRentalUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
 
     private static DecimalFormat format = new DecimalFormat("##.000000");
 
@@ -51,61 +51,61 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
     private String network;
 
-    private CarRentalStationService service;
+    private VehicleRentalStationService service;
 
-    private CarRentalDataSource source;
+    private VehicleRentalDataSource source;
 
     private GraphUpdaterManager updaterManager;
 
-    Map<CarRentalStation, CarRentalStationVertex> verticesByStation = new HashMap<>();
+    Map<VehicleRentalStation, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
 
     @Override
-    protected void runPolling() throws Exception {
-        LOG.debug("Updating car rental stations and regions from " + source);
-        List<CarRentalRegion> regions = new ArrayList<>();
-        List<CarRentalStation> stations = new ArrayList<>();
-        if (source.updateStations()) {
+    protected void runPolling() {
+        LOG.debug("Updating vehicle rental stations and regions from " + source);
+        List<VehicleRentalRegion> regions = new ArrayList<>();
+        List<VehicleRentalStation> stations = new ArrayList<>();
+        source.update();
+        if (source.stationsUpdated()) {
             stations = source.getStations();
         } else {
             LOG.debug("No station updates");
         }
 
-        if (source.updateRegions()) {
+        if (source.regionsUpdated()) {
             regions = source.getRegions();
         } else {
             LOG.debug("No region updates");
         }
 
         // Create graph writer runnable to apply these stations and regions to the graph
-        updaterManager.execute(new CarRentalGraphWriterRunnable(stations, regions));
+        updaterManager.execute(new VehicleRentalGraphWriterRunnable(stations, regions));
     }
 
     @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        network = config.path("sourceType").asText();
-        CarRentalDataSource source = null;
-        if (network != null) {
-            if (network.equals("car2go")) {
-                source = new Car2GoCarRentalDataSource();
-            } else if (network.equals("reachnow")) {
-                source = new ReachNowCarRentalDataSource();
+        network = config.path("network").asText();
+        VehicleRentalDataSource source = null;
+        String sourceType = config.path("sourceType").asText();
+        if (sourceType != null) {
+            if (sourceType.equals("gbfs")) {
+                source = new GbfsVehicleRentalDataSource(network);
             }
         }
 
         if (source == null) {
-            throw new IllegalArgumentException("Unknown car rental source type: " + network);
+            throw new IllegalArgumentException("Unknown vehicle rental source type: " + network);
         } else if (source instanceof JsonConfigurable) {
             ((JsonConfigurable) source).configure(graph, config);
         }
 
         // Configure updater
-        LOG.info("Setting up car rental updater.");
+        LOG.info("Setting up vehicle rental updater.");
         this.graph = graph;
         this.source = source;
         if (pollingPeriodSeconds <= 0) {
-            LOG.info("Creating car rental updater running once only (non-polling): {}", source);
+            LOG.info("Creating vehicle rental updater running once only (non-polling): {}", source);
         } else {
-            LOG.info("Creating car rental updater running every {} seconds : {}", pollingPeriodSeconds, source);
+            LOG.info("Creating vehicle rental updater running every {} seconds : {}", pollingPeriodSeconds, source);
         }
     }
 
@@ -119,19 +119,19 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         // Creation of network linker library will not modify the graph
         splitter = graph.streetIndex.getStreetSplitter();
 
-        service = graph.getService(CarRentalStationService.class, true);
+        service = graph.getService(VehicleRentalStationService.class, true);
     }
 
     @Override
     public void teardown() {}
 
-    private class CarRentalGraphWriterRunnable implements GraphWriterRunnable {
-        private List<CarRentalStation> stations;
-        private List<CarRentalRegion> regions;
+    private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
+        private List<VehicleRentalStation> stations;
+        private List<VehicleRentalRegion> regions;
         private GeometryFactory geometryFactory = new GeometryFactory();
 
 
-        public CarRentalGraphWriterRunnable(List<CarRentalStation> stations, List<CarRentalRegion> regions) {
+        public VehicleRentalGraphWriterRunnable(List<VehicleRentalStation> stations, List<VehicleRentalRegion> regions) {
             this.stations = stations;
             this.regions = regions;
         }
@@ -148,14 +148,14 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
         private void applyStations(Graph graph) {
             // Apply stations to graph
-            Set<CarRentalStation> stationSet = new HashSet<>();
+            Set<VehicleRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
-            LOG.info("Updating {} rental car stations for network {}.", stations.size(), network);
-            /* add any new stations and update car counts for existing stations */
-            for (CarRentalStation station : stations) {
-                service.addCarRentalStation(station);
+            LOG.info("Updating {} vehicle rental stations for network {}.", stations.size(), network);
+            /* add any new stations and update vehicle counts for existing stations */
+            for (VehicleRentalStation station : stations) {
+                service.addVehicleRentalStation(station);
                 stationSet.add(station);
-                CarRentalStationVertex vertex = verticesByStation.get(station);
+                VehicleRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     makeVertex(graph, station);
                 } else if (station.x != vertex.getX() || station.y != vertex.getY()) {
@@ -168,82 +168,89 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
                     makeVertex(graph, station);
                 } else {
-                    vertex.setCarsAvailable(station.carsAvailable);
+                    vertex.setVehiclesAvailable(station.vehiclesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
                 }
             }
             // Remove existing stations that were not present in the update
-            List<CarRentalStation> toRemove = new ArrayList<>();
-            for (Entry<CarRentalStation, CarRentalStationVertex> entry : verticesByStation.entrySet()) {
-                CarRentalStation station = entry.getKey();
+            List<VehicleRentalStation> toRemove = new ArrayList<>();
+            for (Entry<VehicleRentalStation, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
+                VehicleRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                CarRentalStationVertex vertex = entry.getValue();
+                VehicleRentalStationVertex vertex = entry.getValue();
                 if (graph.containsVertex(vertex)) {
                     graph.removeVertexAndEdges(vertex);
                 }
                 toRemove.add(station);
-                service.removeCarRentalStation(station);
+                service.removeVehicleRentalStation(station);
                 // TODO: need to unsplit any streets that were split
             }
-            for (CarRentalStation station : toRemove) {
+            for (VehicleRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
             }
         }
 
-        private void makeVertex(Graph graph, CarRentalStation station) {
-            CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
+        private void makeVertex(Graph graph, VehicleRentalStation station) {
+            VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
             if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
-                // the toString includes the text "Car rental station"
+                // the toString includes the text "Vehicle rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
             verticesByStation.put(station, vertex);
             if (station.allowPickup)
-                new RentACarOnEdge(vertex, station);
+                new RentAVehicleOnEdge(vertex, station);
             if (station.allowDropoff)
-                new RentACarOffEdge(vertex, station);
+                new RentAVehicleOffEdge(vertex, station);
         }
 
         public void applyRegions(Graph graph) {
-            // Adding car service regions to all edges of the network.
-            LOG.info("Applying {} rental car regions.", regions.size());
-            Collection<StreetEdge> edges = graph.getStreetEdges();
+            // Adding vehicle rental regions to all edges of the network.
+            LOG.info("Applying {} vehicle rental regions.", regions.size());
             Map<Coordinate, Set<String>> coordToNetworksMap = new HashMap<>();
-            for (CarRentalRegion region : regions) {
+            Collection<StreetEdge> edges = graph.getStreetEdges();
+            for (VehicleRentalRegion region : regions) {
                 LOG.info("\t{}", region.network);
-                service.addCarRentalRegion(region);
+                service.addVehicleRentalRegion(region);
                 Set<Coordinate> coordinates = intersectWithGraph(edges, region);
 
                 coordinates.forEach(c -> coordToNetworksMap.putIfAbsent(c, new HashSet<>()));
                 coordinates.forEach(c -> coordToNetworksMap.get(c).add(region.network));
 
             }
+            LOG.info("Adding dropoffs to graph");
             addDropOffsToGraph(coordToNetworksMap);
             LOG.info("Added in total {} border dropoffs.", coordToNetworksMap.size());
             LOG.info("Finished applying service regions.");
         }
 
         /**
-         * Labels edges that are inside the region with the car network name. For edges that are partially
+         * Labels edges that are inside the region with the vehicle network name. For edges that are partially
          * inside the region, computes the intersection points and returns them.
          * Skips edges that are outside of the region.
          * @param edges
          * @param region The intersection locations
          */
-        private Set<Coordinate> intersectWithGraph(Collection<StreetEdge> edges, CarRentalRegion region) {
+        private Set<Coordinate> intersectWithGraph(Collection<StreetEdge> edges, VehicleRentalRegion region) {
             Set<Coordinate> coordinates = new HashSet<>();
 
             // use a prepared geometry to dramatically speed up "covers" operations
             PreparedGeometry preparedRegionGeometry = PreparedGeometryFactory.prepare(region.geometry);
 
+            // Iterate through StreetEdges
             for (StreetEdge edge : edges) {
                 Point[] edgePoints = getEdgeCoord(edge);
+
+                // does this check if all of the edge is covered? What about a really windy road?
                 boolean coversFrom = preparedRegionGeometry.covers(edgePoints[0]);
                 boolean coversTo = preparedRegionGeometry.covers(edgePoints[1]);
+
                 if (coversFrom && coversTo) {
-                    edge.addCarNetwork(region.network);
+                    // all of edge is within region
+                    edge.addVehicleNetwork(region.network);
                 } else if (coversFrom || coversTo) {
+                    // part of edge is within region
                     coordinates.addAll(intersect(edgePoints, region));
                 }
             }
@@ -254,10 +261,10 @@ public class CarRentalUpdater extends PollingGraphUpdater {
          * Finds the intersection points of the edge and the region.
          *
          * @param edgePoints an array of two points representing an edge
-         * @param region the car service area
+         * @param region the area inside which vehicle rentals are allowed to be dropped off
          * @return intersection coordinates
          */
-        private Set<Coordinate> intersect(Point[] edgePoints, CarRentalRegion region) {
+        private Set<Coordinate> intersect(Point[] edgePoints, VehicleRentalRegion region) {
             // Intersect the edge with the region's geometry.
             Point from = edgePoints[0];
             Point to = edgePoints[1];
@@ -272,8 +279,8 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                     if (coordinate.equals(equals(from.getCoordinate())) ||
                         coordinate.equals(equals(to.getCoordinate()))){
                         // Skip the 'from' and 'to' nodes of the edge and only return the intersection points.
-                        // The reason is that we will create car drop off stations for those intersection points,
-                        // and not for 'from' and 'to' nodes.
+                        // The reason is that we will create vehicle drop off stations for those
+                        // intersection points, and not for 'from' and 'to' nodes.
                         continue;
                     }
                     intersectionPoints.add(roundLatLng(coordinate));
@@ -287,18 +294,18 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         }
 
         /**
-         * Adds a car dropoff station at each given (location, networks) pairs.
+         * Adds a vehicle dropoff station at each given (location, networks) pairs.
          */
         private void addDropOffsToGraph(Map<Coordinate, Set<String>> coordToNetworksMap) {
             coordToNetworksMap.forEach((coord, networks) -> {
-                CarRentalStation station = makeDropOffStation(coord, networks);
-                CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
+                VehicleRentalStation station = makeDropOffStation(coord, networks);
+                VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
                 if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }
-                service.addCarRentalStation(station);
-                new RentACarOffEdge(vertex, station);
+                service.addVehicleRentalStation(station);
+                new RentAVehicleOffEdge(vertex, station);
             });
         }
 
@@ -313,14 +320,13 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             return new Point[]{fromPoint, toPoint};
         }
 
-        private CarRentalStation makeDropOffStation(Coordinate coord, Set<String> networks) {
-            CarRentalStation station = new CarRentalStation();
+        private VehicleRentalStation makeDropOffStation(Coordinate coord, Set<String> networks) {
+            VehicleRentalStation station = new VehicleRentalStation();
             String id = String.format("border_dropoff_%3.6f_%3.6f", coord.x, coord.y);
 
-            station.address = id;
             station.allowDropoff = true;
             station.allowPickup = false;
-            station.carsAvailable = 0;
+            station.vehiclesAvailable = 0;
             station.id = id;
             station.isBorderDropoff = true;
             station.name = new NonLocalizedString(id);

@@ -744,7 +744,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             return;
         }
 
-        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR);
+        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR, TraverseMode.MICROMOBILITY);
         String exceptModes = relation.getTag("except");
         if (exceptModes != null) {
             for (String m : exceptModes.split(";")) {
@@ -752,6 +752,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
+                    modes.setMicromobility(false);
                     LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));
                 }
             }

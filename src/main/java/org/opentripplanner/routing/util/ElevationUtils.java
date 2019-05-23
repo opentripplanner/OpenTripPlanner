@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ElevationUtils {
     private static Logger log = LoggerFactory.getLogger(ElevationUtils.class);
@@ -20,6 +20,136 @@ public class ElevationUtils {
     private static final double ENERGY_PER_METER_ON_FLAT = 1;
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
+
+    // Coefficient for velocity-dependent dynamic rolling resistance, here approximated with 0.1
+    // See http://www.kreuzotter.de/english/espeed.htm
+    private static final double CrV = 0.1;
+
+    /**
+     * Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(β)
+     *
+     * @param beta Inclination angle, = arctan(grade/100)
+     */
+    public static double getDynamicRollingResistance(double beta) {
+        return CrV * Math.cos(beta);
+    }
+
+    /**
+     * This gravitational constant is actually dependent on latitude and height. However, the amount of variation is not
+     * that much, so we just use the constant at 45 degrees of latitude.
+     * See https://en.wikipedia.org/wiki/Gravitational_acceleration#Gravity_model_for_Earth
+     */
+    public static final double GRAVITATIONAL_ACCELERATION_CONSTANT = 9.80665;
+
+    // the Cd * A * p value at 0 elevation
+    public static final double ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT = getDragResistiveForceComponent(0);
+
+    /**
+     * This is  coefficient of drag and frontal area multiplied together. The equation for drag resistance and the
+     * extracted value is as follows:
+     *
+     * Fdrag = 0.5 * Cd * A * Rho * V^2
+     *               ⎣CdA_⎦
+     *
+     * See See https://www.gribble.org/cycling/power_v_speed.html
+     *
+     * where
+     * Cd = coefficient of drag
+     * A = frontal area in m^2
+     * Rho = air density in kg / m^3
+     *
+     * Apparently you need a wind tunnel to properly measure the coefficient of drag, so for now, assume the following:
+     * Cd = 0.63
+     * A = 0.6
+     */
+    private static final double CdA = 0.63 * 0.6;
+
+    // the air pressure at sea level in Pascals
+    // see https://www.omnicalculator.com/physics/air-pressure-at-altitude
+    private static final int AIR_PRESSURE_AT_SEA_LEVEL = 101325;
+
+    // see https://www.omnicalculator.com/physics/air-pressure-at-altitude
+    private static final double EARTHY_AIR_MOLAR_MASS = 0.0289644;
+
+    private static final double UNIVERSAL_GAS_CONSTANT = 8.31432;
+
+    // 293°K ~= 19.85°C ~= 67.73°F
+    // A slightly higher number than the average earth temperature is assumed since more people live in warmer climates
+    // and may not use transportation exposed to the elements until a reasonably nice outdoor temperature.
+    private static final int A_RANDOM_OUTDOOR_TEMPERATURE_IN_KELVIN = 293;
+
+    // see https://www.omnicalculator.com/physics/air-density
+    private static final double SPECIFIC_GAS_CONSTANT_FOR_DRY_AIR = 287.058;
+
+    /**
+     * Calculates the componens of drag resistance except for the velocity assuming travel through dry earthy air. The
+     * equation for drag resistance and the extracted value is as follows:
+     *
+     * Fdrag = 0.5 * Cd * A * Rho * V^2
+     *         ⎣__dragComponent_⎦
+     *
+     * See https://www.gribble.org/cycling/power_v_speed.html
+     *
+     * The CDA is defined as a constant, but Rho represents air density which is dependent on a lot of things. The full
+     * equation is as follows:
+     *
+     * ρ = (pd / (Rd * T)) + (pv / (Rv * T))
+     *
+     * See https://www.omnicalculator.com/physics/air-density
+     *
+     * where
+     * pd = air pressure in Pascals
+     * Rd = specific gas constant for dry air
+     * T = air temperature in Kelvin
+     * pv = water vapor pressure in Pascals
+     * Rv = specific gas constant for water vapor
+     *
+     * In the second half of the equation (pv / (Rv * T)), this is a calculation given the water vapor pressure. If we
+     * assume travel through dry air, this number effictively becomes 0. Therefore, this calculation is ommitted.
+     *
+     * Therefore, that leave us with:
+     *
+     * ρ = (pd / (Rd * T))
+     *
+     * where:
+     * pd = the pressure of dry air in hPa,
+     * Rd is the specific gas constant for dry air
+     * T is the air temperature in Kelvins
+     *
+     * The pressure of dry air is described with the following formula:
+     *
+     * P = P0 * exp (-g * M * (h-h0) / (R * T))
+     *
+     * See https://www.omnicalculator.com/physics/air-pressure-at-altitude
+     *
+     * where
+     * P0 = is the pressure at the reference level h0 which is assumed to be 0 meters above sea level
+     * g = the gravitational acceleration constant
+     * M = the molar mass of air
+     * h = the altitude in meters at which we want to calculate the pressure
+     * R = the universal gas constant
+     * T = the temperature at altitude h
+     *
+     * P0, g, M and R are all constants. h is provided as an input parameter. And we randomly guess T. Furthermore, the
+     * temperature is assumed to fall 9.8°C per 1,000 meters.
+     *
+     * See https://www.onthesnow.com/news/a/15157/does-elevation-affect-temperature
+     *
+     * @param altitude The altitude in meters
+     */
+    public static double getDragResistiveForceComponent(double altitude) {
+        double randomlyGuessedTemperature = A_RANDOM_OUTDOOR_TEMPERATURE_IN_KELVIN - 9.8 * altitude / 1000;
+        return CdA * (
+            AIR_PRESSURE_AT_SEA_LEVEL *
+            Math.exp(
+                -GRAVITATIONAL_ACCELERATION_CONSTANT *
+                    EARTHY_AIR_MOLAR_MASS *
+                    altitude /
+                    (UNIVERSAL_GAS_CONSTANT * randomlyGuessedTemperature)
+            ) /
+            (SPECIFIC_GAS_CONSTANT_FOR_DRY_AIR * randomlyGuessedTemperature)
+        );
+    }
 
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
@@ -58,9 +188,20 @@ public class ElevationUtils {
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
             log.error("Too small edge, returning neutral slope costs.");
-            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false);
+            return new SlopeCosts(
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                1.0,
+                false,
+                new byte[]{0},
+                new short[]{(short) trueLength},
+                new float[]{(float) getDragResistiveForceComponent(0)}
+            );
         }
         double lengthMultiplier = trueLength / flatLength;
+        List<GradientBin> gradients = new ArrayList<>();
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -68,6 +209,36 @@ public class ElevationUtils {
                 continue;
             }
             double slope = rise / run;
+
+            // store gradients for use in micromobility calculations
+            // Micromobility speed calculations can handle extreme slopes. However, cap them at 100% or -100%.
+            int iGradient = slope < -1
+                ? -100
+                : slope > 1
+                ? 100
+                : (int) Math.round(slope * 100.0);
+
+            // add to existing gradient bin
+            boolean gradientAdded = false;
+            double minCoordinatesAltitude = Math.min(coordinates[i + 1].x, coordinates[i].x);
+            for (GradientBin bin : gradients) {
+                if (bin.gradient == iGradient) {
+                    bin.distance += run;
+                    // always use the minimum altitude for maximum air density to underestimate travel time
+                    bin.minAltitude = Math.min(bin.minAltitude, minCoordinatesAltitude);
+                    gradientAdded = true;
+                    break;
+                }
+            }
+            // or create new bin for new gradient
+            if (!gradientAdded) {
+                GradientBin bin = new GradientBin();
+                bin.gradient = iGradient;
+                bin.distance = run;
+                bin.minAltitude = minCoordinatesAltitude;
+                gradients.add(bin);
+            }
+
             // Baldwin St in Dunedin, NZ, is the steepest street
             // on earth, and has a grade of 35%.  So for streets
             // which allow cars, we set the limit to 35%.  Footpaths
@@ -97,12 +268,33 @@ public class ElevationUtils {
                 slopeSafetyCost += safetyCost;
             }
         }
+
+        // convert gradient info into arrays of primitives
+        byte[] gradientsArr = new byte[gradients.size()];
+        short[] gradientLengthsArr = new short[gradients.size()];
+        float[] gradientCdas = new float[gradients.size()];
+        for (int i = 0; i < gradients.size(); i++) {
+            GradientBin bin = gradients.get(i);
+            gradientsArr[i] = (byte) bin.gradient;
+            gradientLengthsArr[i] = (short) bin.distance;
+            gradientCdas[i] = (float) getDragResistiveForceComponent(bin.minAltitude);
+        }
+
         /*
          * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
          * length of the street edge which is the flat one.
          */
-        return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
-                slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
+        return new SlopeCosts(
+            slopeSpeedEffectiveLength / flatLength,
+            slopeWorkCost / flatLength,
+            slopeSafetyCost,
+            maxSlope,
+            lengthMultiplier,
+            flattened,
+            gradientsArr,
+            gradientLengthsArr,
+            gradientCdas
+        );
     }
 
     /** constants for slope computation */
@@ -361,4 +553,9 @@ public class ElevationUtils {
         }
     }
 
+    private static class GradientBin {
+        public int gradient;
+        public double distance;
+        public double minAltitude;
+    }
 }

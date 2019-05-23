@@ -396,6 +396,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedCar = states[0].isCarRenting() && states[states.length - 1].isCarRenting();
 
+        leg.rentedVehicle = states[0].isVehicleRenting() && states[states.length - 1].isVehicleRenting();
+
         // check at start or end because either could be the very beginning or end of the trip
         // which are temporary edges and stuff
         leg.hailedCar = states[0].isUsingHailedCar() || states[states.length - 1].isUsingHailedCar();
