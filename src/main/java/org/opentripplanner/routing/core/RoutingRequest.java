@@ -588,7 +588,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
         // https://electricbikereview.com/forum/threads/what-are-electric-bike-classes-and-why-do-they-matter.22738/
-        maximumMicromobilitySpeed = 12.5; // 12.5 m/s, ~28 mph, the maximum speed allowed by class 3 electric bicycles
+        // 12.5 m/s, ~28 mph is the maximum speed allowed by class 3 electric bicycles
+        // however, in person experience while riding an eScooter around San Jose, CA, the max speed seemed to hover
+        // around 11mph or 5 m/s. Therefore, set that value as a conservative estimate
+        maximumMicromobilitySpeed = 5;
         // 0.8 m/s, ~1.8mph, an unpleasantly slow speed that assumes walking with a micromobility vehicle that either
         // can't travel up a grade or is out of energy
         minimumMicromobilitySpeed = 0.8;
