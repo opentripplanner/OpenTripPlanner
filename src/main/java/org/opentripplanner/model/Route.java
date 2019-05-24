@@ -11,6 +11,8 @@ public final class Route extends TransitEntity<FeedScopedId> {
 
     private Agency agency;
 
+    private Operator operator;
+
     private String shortName;
 
     private String longName;
@@ -44,12 +46,27 @@ public final class Route extends TransitEntity<FeedScopedId> {
         this.id = id;
     }
 
+    /**
+     * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does NOT map
+     * 1-1 to Authority, it is rather a mix between Authority and Operator.
+     */
     public Agency getAgency() {
         return agency;
     }
 
     public void setAgency(Agency agency) {
         this.agency = agency;
+    }
+
+    /**
+     * NeTEx Operator, not in use when importing GTFS files.
+     */
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
 
     public String getShortName() {

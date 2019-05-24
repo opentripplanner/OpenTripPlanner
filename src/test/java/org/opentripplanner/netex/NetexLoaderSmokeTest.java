@@ -6,6 +6,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
@@ -56,7 +57,9 @@ public class NetexLoaderSmokeTest {
 
         // Then - smoke test model
         OtpTransitService otpModel = transitBuilder.build();
+
         assertAgencies(otpModel.getAllAgencies());
+        assertOperators(otpModel.getAllOperators());
         assertStops(otpModel.getAllStops());
         assertTripPatterns(otpModel.getTripPatterns());
         assertTrips(otpModel.getAllTrips());
@@ -81,6 +84,15 @@ public class NetexLoaderSmokeTest {
         assertNull( a.getFareUrl());
         assertNull( a.getBrandingUrl());
         assertEquals(1, agencies.size());
+    }
+
+    private void assertOperators(Collection<Operator> operators) {
+        Operator o = list(operators).get(0);
+        assertEquals("RUT:Operator:130c", o.getId().getId());
+        assertEquals("Ruter", o.getName());
+        assertNull( o.getUrl());
+        assertNull(o.getPhone());
+        assertEquals(1, operators.size());
     }
 
     private void assertStops(Collection<Stop> stops) {
@@ -111,6 +123,7 @@ public class NetexLoaderSmokeTest {
         assertEquals("RB", p.getFeedId());
         assertEquals("[<Stop RB_NSR:Quay:7203>, <Stop RB_NSR:Quay:8027>]", p.getStops().toString());
         assertEquals("[<Trip RB_RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());
+
         // TODO OTP2 - Why?
         assertNull(p.getServices());
         assertEquals(4, patterns.size());
@@ -123,6 +136,8 @@ public class NetexLoaderSmokeTest {
         assertEquals("Jernbanetorget", t.getTripHeadsign());
         assertNull(t.getTripShortName());
         assertEquals("RUT:DayType:6-101468", t.getServiceId().getId());
+        assertEquals("Ruter", t.getOperator().getName());
+        assertNull(t.getTripOperator());
         assertEquals(0, t.getBikesAllowed());
         assertEquals(0, t.getWheelchairAccessible());
         assertEquals(4, trips.size());

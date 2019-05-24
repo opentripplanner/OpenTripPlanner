@@ -9,6 +9,8 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     private Route route;
 
+    private Operator operator;
+
     private FeedScopedId serviceId;
 
     private String tripShortName;
@@ -41,6 +43,7 @@ public final class Trip extends TransitEntity<FeedScopedId> {
     public Trip(Trip obj) {
         this.id = obj.id;
         this.route = obj.route;
+        this.operator = obj.operator;
         this.serviceId = obj.serviceId;
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
@@ -60,6 +63,22 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     public void setId(FeedScopedId id) {
         this.id = id;
+    }
+
+
+    /**
+     * Operator running the trip. Returns operator of this trip, if it exist, or else the route operator.
+     */
+    public Operator getOperator() {
+        return operator != null ? operator : route.getOperator();
+    }
+
+    public Operator getTripOperator() {
+        return operator;
+    }
+
+    public void setTripOperator(Operator operator) {
+        this.operator = operator;
     }
 
     public Route getRoute() {

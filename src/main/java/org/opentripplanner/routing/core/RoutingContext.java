@@ -307,11 +307,9 @@ public class RoutingContext implements Cloneable {
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
-                        calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(), calendarService, agency.getId()));
                 addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
-                        calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(), calendarService, agency.getId()));
             }
         }
     }

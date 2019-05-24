@@ -10,42 +10,48 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptiona
  * for the establishment of a public transport service." In NeTEx this is not the same as an operator. A default
  * authority can be created if none is present.
  */
-class AgencyMapper {
-
+class AuthorityToAgencyMapper {
     private final String timeZone;
+    private final String dummyAgencyId;
 
-    AgencyMapper(String timeZone) {
+
+    AuthorityToAgencyMapper(String timeZone) {
         this.timeZone = timeZone;
+        this.dummyAgencyId = "Dummy-" + timeZone;
     }
 
     /**
      * Map authority and time zone to OTP agency.
      */
-    Agency mapAgency(Authority authority){
-        Agency agency = new Agency();
+    Agency mapAuthorityToAgency(Authority source){
+        Agency target = new Agency();
 
-        agency.setId(authority.getId());
-        agency.setName(authority.getName().getValue());
-        agency.setTimezone(timeZone);
+        target.setId(source.getId());
+        target.setName(source.getName().getValue());
+        target.setTimezone(timeZone);
 
-        withOptional(authority.getContactDetails(), c -> {
-            agency.setUrl(c.getUrl());
-            agency.setPhone(c.getPhone());
+        withOptional(source.getContactDetails(), c -> {
+            target.setUrl(c.getUrl());
+            target.setPhone(c.getPhone());
         });
-        return agency;
+        return target;
     }
 
     /**
-     * Create a new default agency with time zone set. All other values are set to
-     * "N/A".
+     * Create a new dummy agency with time zone set. All other values are set to
+     * "N/A" and id set to {@code "Dummy-" + timeZone}.
      */
-    Agency createDefaultAgency(){
+    Agency createDummyAgency(){
         Agency agency = new Agency();
-        agency.setId("N/A");
+        agency.setId(dummyAgencyId);
         agency.setName("N/A");
         agency.setTimezone(timeZone);
         agency.setUrl("N/A");
         agency.setPhone("N/A");
         return agency;
+    }
+
+    String dummyAgencyId() {
+       return dummyAgencyId;
     }
 }

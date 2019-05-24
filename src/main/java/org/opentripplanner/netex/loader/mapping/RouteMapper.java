@@ -1,10 +1,13 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.OperatorRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,25 +25,28 @@ class RouteMapper {
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
     private final EntityById<String, Agency> agenciesById;
+    private final EntityById<FeedScopedId, Operator> operatorsById;
     private final NetexImportDataIndexReadOnlyView netexIndex;
-    private final AgencyMapper agencyMapper;
+    private final AuthorityToAgencyMapper authorityMapper;
 
     RouteMapper(
             EntityById<String, Agency> agenciesById,
+            EntityById<FeedScopedId, Operator> operatorsById,
             NetexImportDataIndexReadOnlyView netexIndex,
             String timeZone
     ) {
         this.agenciesById = agenciesById;
+        this.operatorsById = operatorsById;
         this.netexIndex = netexIndex;
-        this.agencyMapper = new AgencyMapper(timeZone);
+        this.authorityMapper = new AuthorityToAgencyMapper(timeZone);
     }
 
     org.opentripplanner.model.Route mapRoute(Line line){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
 
-        otpRoute.setAgency(findOrCreateAgency(line));
-
         otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
+        otpRoute.setAgency(findOrCreateAuthority(line));
+        otpRoute.setOperator(findOperator(line));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
         otpRoute.setType(transportModeMapper.getTransportMode(line.getTransportMode(), line.getTransportSubmode()));
@@ -62,9 +68,10 @@ class RouteMapper {
      * Find an agency by mapping the GroupOfLines/Network Authority. If no authority is found
      * a default agency is created and returned.
      */
-    private Agency findOrCreateAgency(Line line) {
+    private Agency findOrCreateAuthority(Line line) {
         String groupRef = line.getRepresentedByGroupRef().getRef();
 
+        // Find authority, first in *GroupOfLines* and then if not found look in *Network*
         Network network = netexIndex.lookupNetworkForLine(groupRef);
 
         if(network != null) {
@@ -76,10 +83,21 @@ class RouteMapper {
         // No authority found in Network or GroupOfLines.
         // Use the default agency, create if necessary
         LOG.warn("No authority found for " + line.getId());
-        Agency agency = agencyMapper.createDefaultAgency();
-        if (!agenciesById.containsKey(agency.getId())) {
+
+        Agency agency = agenciesById.get(authorityMapper.dummyAgencyId());
+        if (agency == null) {
+            agency = authorityMapper.createDummyAgency();
             agenciesById.add(agency);
         }
         return agency;
+    }
+
+    private Operator findOperator(Line line) {
+        OperatorRefStructure opeRef = line.getOperatorRef();
+
+        if(opeRef == null) {
+            return null;
+        }
+        return operatorsById.get(FeedScopedIdFactory.createFeedScopedId(opeRef.getRef()));
     }
 }

@@ -128,11 +128,14 @@ public class PatternHopFactory {
         }
         fareServiceFactory.processGtfs(transitService);
 
-        // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
+        // TODO OTP2: Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
+        // TODO OTP2 - It should not be the PHFs responsibility to insert anything into the graph, it should build
+        // TODO OTP2 - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
         loadStops(graph);
         loadPathways(graph);
         loadFeedInfo(graph);
         loadAgencies(graph);
+
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
         // Perhaps it is to allow name collisions with previously loaded feeds.
         clearCachedData(); 

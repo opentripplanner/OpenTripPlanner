@@ -22,6 +22,7 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
@@ -70,6 +71,7 @@ public class GraphIndex {
 
     // TODO: consistently key on model object or id string
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
+    public final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
     public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
@@ -107,6 +109,10 @@ public class GraphIndex {
                 this.agenciesForFeedId.put(feedId, agencyForId);
             }
             this.feedInfoForId.put(feedId, graph.getFeedInfo(feedId));
+        }
+
+        for (Operator operator : graph.getOperators()) {
+            this.operatorForId.put(operator.getId(), operator);
         }
 
         Collection<Edge> edges = graph.getEdges();
@@ -435,5 +441,12 @@ public class GraphIndex {
         // Delegate to graph
         Collection<Notice> res = graph.getNoticesByElement().get(entity);
         return res == null ? Collections.emptyList() : res;
+    }
+
+    /**
+     * Get a list of all operators spanning across all feeds.
+     */
+    public Collection<Operator> getAllOperators() {
+        return operatorForId.values();
     }
 }
