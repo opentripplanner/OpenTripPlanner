@@ -12,11 +12,22 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This uses a street search to find paths to all the access/egress stop within range
+ */
 public class AccessEgressRouter {
     private static Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
     private AccessEgressRouter() {}
 
+    /**
+     *
+     * @param rr the current routing request
+     * @param fromTarget whether to route from or towards the point provided in the routing request
+     *                   (access or egress)
+     * @param distanceMeters the maximum street distance to search for access/egress stops
+     * @return Transfer objects by access/egress stop
+     */
     public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget, int distanceMeters) {
         Vertex vertex = fromTarget ? rr.rctx.toVertex : rr.rctx.fromVertex;
 
