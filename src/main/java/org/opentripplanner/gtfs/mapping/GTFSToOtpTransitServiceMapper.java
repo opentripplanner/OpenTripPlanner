@@ -65,6 +65,8 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getStops().addAll(stopMapper.map(data.getAllStops()));
         builder.getStopTimes().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
+        // remove "recommended" transfers as they break the trip plans
+        builder.getTransfers().removeIf(t -> t.getTransferType() == 0);
         builder.getTrips().addAll(tripMapper.map(data.getAllTrips()));
 
         return builder.build();
