@@ -271,6 +271,11 @@ public class GraphQlPlanner {
             //request.setMaxWalkDistance(request.getMaxWalkDistance()*2);
         }
 
+        if (hasArgument(environment, "allowedBikeRentalNetworks")) {
+            ArrayList<String> allowedBikeRentalNetworks = environment.getArgument("allowedBikeRentalNetworks");
+            request.allowedBikeRentalNetworks = new HashSet<>(allowedBikeRentalNetworks);
+        }
+
         if (request.allowBikeRental && !hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;

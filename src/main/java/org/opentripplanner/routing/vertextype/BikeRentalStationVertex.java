@@ -76,4 +76,10 @@ public class BikeRentalStationVertex extends Vertex {
     public BikeRentalStation getStation() {
         return station;
     }
+
+    public void setStation(BikeRentalStation station) {
+        this.station = station;
+        this.bikesAvailable = station.bikesAvailable;
+        this.spacesAvailable = station.spacesAvailable;
+    }
 }

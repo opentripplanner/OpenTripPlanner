@@ -34,13 +34,16 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
     public SmooveBikeRentalDataSource(String networkName) {
         super("result");
-        if (networkName != null && !networkName.isEmpty()) {
-            this.networkName = networkName;
-        } else {
-            this.networkName = "Smoove";
-        }
+        this.networkName = defaultIfEmpty(networkName, "smoove");
     }
-
+    
+    private String defaultIfEmpty(String value, String defaultValue) {
+        if (value == null || value.isEmpty())
+            return defaultValue;
+        
+        return value;
+    }
+    
     /**
      * <pre>
      * {

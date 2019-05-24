@@ -286,7 +286,7 @@ public class IndexAPI {
             return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
         }
 
-        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups);
+        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups, false);
         return Response.status(Status.OK).entity(ret).build();
     }
 

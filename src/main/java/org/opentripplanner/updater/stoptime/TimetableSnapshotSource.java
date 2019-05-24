@@ -870,6 +870,15 @@ public class TimetableSnapshotSource {
         Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
                 "number of stop should match the number of stop time updates");
 
+        final TripPattern pattern = getPatternForTripId(feedId, trip.getId().getId());
+        if (pattern != null) {
+            if (checkNewStopTimeUpdateStopsMatchesPatten(stops, pattern)) {
+                // TripUpdate stop pattern matches existing trip. Handle as scheduled trip
+                LOG.warn("MODIFIED trip {} matches existing SCHEDULED trip. Treating as such.", trip.getId().getId());
+                return handleScheduledTrip(tripUpdate, feedId, serviceDate);
+            }
+        }
+
         // Cancel scheduled trip
 
         final String tripId = tripUpdate.getTrip().getTripId();
@@ -883,6 +892,10 @@ public class TimetableSnapshotSource {
         final boolean success =
                 addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
         return success;
+    }
+
+    private boolean checkNewStopTimeUpdateStopsMatchesPatten(List<Stop> stops, TripPattern pattern) {
+        return stops.equals(pattern.getStops());
     }
 
     private boolean handleCanceledTrip(final TripUpdate tripUpdate, final String feedId, final ServiceDate serviceDate) {

@@ -35,7 +35,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 
-        // Invalid station without coordinates shoulf be ignored, so only 3
+        // Invalid station without coordinates should be ignored, so only 3
         assertEquals(3, rentalStations.size());
         for (BikeRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
@@ -49,7 +49,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals(60.167913, hamn.y);
         assertEquals(11, hamn.spacesAvailable);
         assertEquals(1, hamn.bikesAvailable);
-        assertEquals("[Smoove]", hamn.networks.toString());
+        assertEquals("[smoove]", hamn.networks.toString());
 
         BikeRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
@@ -74,5 +74,54 @@ public class TestBikeRentalStationSource extends TestCase {
         List<BikeRentalStation> rentalStationsWithCustomNetwork = sourceWithCustomNetwork.getStations();
         BikeRentalStation hamnWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
         assertEquals("[Helsinki]", hamnWithCustomNetwork.networks.toString());
+    }
+
+    public void testSamocat() {
+        SamocatScooterRentalDataSource source = new SamocatScooterRentalDataSource(null);
+        source.setUrl("file:src/test/resources/bike/samocat.json");
+        assertTrue(source.update());
+        List<BikeRentalStation> rentalStations = source.getStations();
+
+        // Invalid station without coordinates should be ignored, so only 3
+        assertEquals(3, rentalStations.size());
+        for (BikeRentalStation rentalStation : rentalStations) {
+            System.out.println(rentalStation);
+        }
+
+        BikeRentalStation testikuja = rentalStations.get(0);
+        assertEquals("Testikuja 3", testikuja.name.toString());
+        assertEquals("0451", testikuja.id);
+        // Ignore whitespace in coordinates string
+        assertEquals(24.9355143, testikuja.x);
+        assertEquals(60.1637284, testikuja.y);
+        assertEquals(0, testikuja.spacesAvailable);
+        assertEquals(0, testikuja.bikesAvailable);
+        assertEquals("Station on", testikuja.state);
+        assertEquals("[samocat]", testikuja.networks.toString());
+
+        BikeRentalStation footie = rentalStations.get(1);
+        assertEquals("Footie 3", footie.name.toString());
+        assertEquals("0450", footie.id);
+        assertEquals(3, footie.spacesAvailable);
+        assertEquals(4, footie.bikesAvailable);
+        assertEquals(24.958877, footie.x);
+        assertEquals(60.194449, footie.y);
+
+        BikeRentalStation bartie = rentalStations.get(2);
+        assertEquals("Bartie 10", bartie.name.toString());
+        assertEquals("3451", bartie.id);
+        assertEquals(24.9537278, bartie.x);
+        assertEquals(60.2177349, bartie.y);
+        assertEquals(5, bartie.spacesAvailable);
+        assertEquals(1, bartie.bikesAvailable);
+        // Ignores mismatch with total_slots
+
+        // Test giving network name to data source
+        SamocatScooterRentalDataSource sourceWithCustomNetwork = new SamocatScooterRentalDataSource("vuosaari");
+        sourceWithCustomNetwork.setUrl("file:src/test/resources/bike/samocat.json");
+        assertTrue(sourceWithCustomNetwork.update());
+        List<BikeRentalStation> rentalStationsWithCustomNetwork = sourceWithCustomNetwork.getStations();
+        BikeRentalStation testitieWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
+        assertEquals("[vuosaari]", testitieWithCustomNetwork.networks.toString());
     }
 }
