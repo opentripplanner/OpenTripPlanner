@@ -45,6 +45,8 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
@@ -804,8 +806,13 @@ public class IndexGraphQLSchema {
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("ticketTypes")
-                        .description("A comma-separated list of allowed ticket types.")
+                        .description("**Deprecated:** Use `allowedTicketTypes` instead.  \nA comma-separated list of allowed ticket types.")
                         .type(Scalars.GraphQLString)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("allowedTicketTypes")
+                        .description("List of ticket types that are allowed to be used in itineraries.  \nSee `ticketTypes` query for list of possible ticket types.")
+                        .type(GraphQLList.list(Scalars.GraphQLString))
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("heuristicStepsPerMainStep")
@@ -1310,6 +1317,7 @@ public class IndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("zoneId")
+                        .description("ID of the zone where this stop is located")
                         .type(Scalars.GraphQLString)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2417,7 +2425,7 @@ public class IndexGraphQLSchema {
 
         ticketType = GraphQLObjectType.newObject()
                 .name("TicketType")
-                .description(experimental("Describes ticket type"))
+                .description("Describes ticket type")
                 .withInterface(nodeInterface)
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("id")
@@ -2428,15 +2436,37 @@ public class IndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("fareId")
+                        .description("Ticket type ID in format `FeedId:TicketTypeId`. Ticket type IDs are usually combination of ticket zones where the ticket is valid.")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment -> ((TicketType) environment.getSource()).getId())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("price")
+                        .description("Price of the ticket in currency that is specified in `currency` field")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((TicketType) environment.getSource()).getPrice())
-                        .build()
-                )
+                        .dataFetcher(environment -> {
+                            TicketType ticketType = environment.getSource();
+
+                            int fractionDigits = Currency.getInstance(ticketType.getCurrency()).getDefaultFractionDigits();
+                            if (fractionDigits == -1) {
+                                fractionDigits = 2;
+                            }
+
+                            return BigDecimal.valueOf(ticketType.getPrice()).setScale(fractionDigits, RoundingMode.HALF_UP).doubleValue();
+                        })
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("currency")
+                        .description("ISO 4217 currency code")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(environment -> ((TicketType) environment.getSource()).getCurrency())
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("zones")
+                        .description("List of zones where this ticket is valid.\n  Corresponds to field `zoneId` in **Stop** type.")
+                        .type(GraphQLList.list(GraphQLNonNull.nonNull(Scalars.GraphQLString)))
+                        .dataFetcher(environment -> ((TicketType)environment.getSource()).getZones())
+                        .build())
                 .build();
 
 
@@ -2629,7 +2659,7 @@ public class IndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ticketTypes")
-                        .description(experimental("Return list of available ticket types."))
+                        .description("Return list of available ticket types")
                         .type(new GraphQLList(ticketType))
                         .dataFetcher(environment -> new ArrayList<>(index.getAllTicketTypes()))
                         .build()
@@ -3735,6 +3765,7 @@ public class IndexGraphQLSchema {
                                 .description("Component of the fare (i.e. ticket) for a part of the itinerary")
                                 .field(GraphQLFieldDefinition.newFieldDefinition()
                                         .name("fareId")
+                                        .description("ID of the ticket type. Corresponds to `fareId` in **TicketType**.")
                                         .type(Scalars.GraphQLString)
                                         .dataFetcher(environment -> GtfsLibrary
                                                 .convertIdToString(((FareComponent) environment.getSource()).fareId))

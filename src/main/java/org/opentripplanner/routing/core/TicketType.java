@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import java.util.Set;
+
 public class TicketType {
     FareRuleSet rs;
 
@@ -15,4 +17,9 @@ public class TicketType {
         return rs.getFareAttribute().getPrice();
     }
 
+    public String getCurrency() { return rs.getFareAttribute().getCurrencyType(); }
+
+    public Set<String> getZones() {
+        return rs.getContains();
+    }
 }
