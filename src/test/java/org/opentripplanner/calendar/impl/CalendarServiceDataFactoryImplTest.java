@@ -9,8 +9,8 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.LocalizedServiceId;
@@ -179,7 +179,7 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static Agency agency(OtpTransitServiceBuilder builder) {
-        return first(builder.getAgencies());
+        return first(builder.getAgenciesById().values());
     }
 
     private static FareAttribute createFareAttribute(Agency agency) {

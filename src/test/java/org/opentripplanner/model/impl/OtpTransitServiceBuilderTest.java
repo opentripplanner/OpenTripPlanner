@@ -14,9 +14,12 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +28,8 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.impl.OtpTransitServiceBuilder.generateNoneExistentIds;
 
@@ -54,7 +59,6 @@ public class OtpTransitServiceBuilderTest {
         // An empty list should not cause any trouble (Exception)
         generateNoneExistentIds(Collections.<FeedInfo>emptyList());
 
-
         // Generate id for one value
         list = singletonList(newEntity());
         generateNoneExistentIds(list);
@@ -75,6 +79,16 @@ public class OtpTransitServiceBuilderTest {
         assertEquals(ID_4, id(list, 1));
         // Next to be 6
         assertEquals(ID_6, id(list, 2));
+    }
+
+    @Test
+    public void regenerateIndexes(){
+        FeedScopedId fakeId = new FeedScopedId("fake", "id");
+        testRegenerateIndexForMap(subject.getAgenciesById(), "FakeId");
+        testRegenerateIndexForMap(subject.getTripsById(), fakeId);
+        testRegenerateIndexForMap(subject.getStops(), fakeId);
+        testRegenerateIndexForMap(subject.getRoutes(), fakeId);
+        testReindexForStopTimes(subject.getStopTimesSortedByTrip());
     }
 
     @Test
@@ -125,6 +139,36 @@ public class OtpTransitServiceBuilderTest {
 
     /* private methods */
 
+    private <I extends Serializable, E extends IdentityBean<I>>
+    void testRegenerateIndexForMap(EntityById<I, E> map, I fakeId) {
+        E e = first(map.values());
+        I originalId = e.getId();
+
+        e.setId(fakeId);
+
+        subject.regenerateIndexes();
+        assertNotNull(map.get(fakeId));
+
+        // Cleanup
+        e.setId(originalId);
+    }
+
+    private void testReindexForStopTimes(TripStopTimes map) {
+        Trip trip = first(map.asImmutableMap().keySet());
+        List value = map.get(trip);
+        FeedScopedId originalId = trip.getId();
+        assertEquals(value, map.get(trip));
+
+        trip.setId(new FeedScopedId("fake", "id"));
+        assertTrue(map.get(trip).isEmpty());
+
+        subject.regenerateIndexes();
+        assertEquals(value, map.get(trip));
+
+        // Cleanup
+        trip.setId(originalId);
+    }
+
     private static String id(List<? extends IdentityBean<String>> list, int index) {
         return list.get(index).getId();
     }
@@ -153,7 +197,7 @@ public class OtpTransitServiceBuilderTest {
     }
 
     private static Agency agency(OtpTransitServiceBuilder builder) {
-        return first(builder.getAgencies());
+        return first(builder.getAgenciesById().values());
     }
 
     private static FareAttribute createFareAttribute(Agency agency) {
@@ -171,7 +215,6 @@ public class OtpTransitServiceBuilderTest {
     }
 
     private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().min(comparing(T::toString)).get();
+        return c.stream().min(comparing(T::toString)).orElse(null);
     }
 }

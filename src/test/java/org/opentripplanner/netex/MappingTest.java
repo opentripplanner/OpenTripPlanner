@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
@@ -14,7 +13,6 @@ import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 // TODO - The mapping needs better tests
 public class MappingTest {
@@ -35,10 +33,9 @@ public class MappingTest {
     }
 
     @Test public void testAgencies() {
-        List<Agency> agencies = otpBuilder.getAgencies();
 
         // TODO TGR - fix this test
-        Assert.assertEquals(1, agencies.size());
+        Assert.assertEquals(1, otpBuilder.getAgenciesById().values().size());
     }
 
     @Test public void testNetexRoutes() {

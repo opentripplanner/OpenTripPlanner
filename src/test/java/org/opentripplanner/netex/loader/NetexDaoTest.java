@@ -12,10 +12,8 @@ import org.rutebanken.netex.model.StopPlace;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,36 +40,26 @@ public class NetexDaoTest {
     }
 
     @Test
-    public void lookupStopsById() throws Exception {
+    public void lookupStopsById() {
         StopPlace stopPlaceA = stopPlace(ID, null);
         StopPlace stopPlaceB = stopPlace(ID, "image_1");
 
-        assertEquals(emptyList(), root.lookupStopPlacesById(ID));
-        assertEquals(emptyList(), child.lookupStopPlacesById(ID));
+        root.stopPlaceById.add(stopPlaceA);
+        child.stopPlaceById.add(stopPlaceB);
 
-        root.addStopPlace(stopPlaceA);
-
-        assertEquals(singletonList(stopPlaceA), root.lookupStopPlacesById(ID));
-        assertEquals(singletonList(stopPlaceA), child.lookupStopPlacesById(ID));
-
-        child.addStopPlace(stopPlaceB);
-
-        assertEquals(singletonList(stopPlaceB), child.lookupStopPlacesById(ID));
+        assertEquals(singletonList(stopPlaceA), root.stopPlaceById.lookup(ID));
+        assertEquals(singletonList(stopPlaceB), child.stopPlaceById.lookup(ID));
+        assertTrue(child.stopPlaceById.lookup(ID_2).isEmpty());
     }
 
     @Test
     public void lookupQuayIdByStopPointRef() {
-        assertNull(root.lookupQuayIdByStopPointRef(ID));
-        assertNull(child.lookupQuayIdByStopPointRef(ID));
+        root.quayIdByStopPointRef.add(ID, REF);
+        child.quayIdByStopPointRef.add(ID, REF_2);
 
-        root.addQuayIdByStopPointRef(ID, REF);
-
-        assertEquals(REF, root.lookupQuayIdByStopPointRef(ID));
-        assertEquals(REF, child.lookupQuayIdByStopPointRef(ID));
-
-        child.addQuayIdByStopPointRef(ID, REF_2);
-
-        assertEquals(REF_2, child.lookupQuayIdByStopPointRef(ID));
+        assertEquals(REF, root.quayIdByStopPointRef.lookup(ID));
+        assertEquals(REF_2, child.quayIdByStopPointRef.lookup(ID));
+        assertNull(root.quayIdByStopPointRef.lookup(ID_2));
     }
 
     @Test
@@ -79,108 +67,84 @@ public class NetexDaoTest {
         Quay quayA = quay(ID, null);
         Quay quayB = quay(ID, "image_1");
 
-        assertTrue(root.lookupQuayById(ID).isEmpty());
-        assertTrue(child.lookupQuayById(ID).isEmpty());
+        root.quayById.add(quayA);
+        child.quayById.add(quayB);
 
-        root.addQuay(quayA);
-
-        assertEquals(singletonList(quayA), root.lookupQuayById(ID));
-        assertEquals(singletonList(quayA), child.lookupQuayById(ID));
-
-        child.addQuay(quayB);
-
-        assertEquals(singletonList(quayB), child.lookupQuayById(ID));
+        assertEquals(singletonList(quayA), root.quayById.lookup(ID));
+        assertEquals(singletonList(quayB), child.quayById.lookup(ID));
+        assertTrue(child.quayById.lookup(ID_2).isEmpty());
     }
 
     @Test
-    public void lookupDayTypeAvailable() throws Exception {
-        assertNull(root.lookupDayTypeAvailable(ID));
-        assertNull(child.lookupDayTypeAvailable(ID));
+    public void lookupDayTypeAvailable() {
+        root.dayTypeAvailable.add(ID, TRUE);
+        child.dayTypeAvailable.add(ID, FALSE);
 
-        root.addDayTypeAvailable(ID, TRUE);
-
-        assertEquals(TRUE, root.lookupDayTypeAvailable(ID));
-        assertEquals(TRUE, child.lookupDayTypeAvailable(ID));
-
-        child.addDayTypeAvailable(ID, FALSE);
-
-        assertEquals(FALSE, child.lookupDayTypeAvailable(ID));
+        assertEquals(TRUE, root.dayTypeAvailable.lookup(ID));
+        assertEquals(FALSE, child.dayTypeAvailable.lookup(ID));
+        assertNull(child.dayTypeAvailable.lookup(ID_2));
     }
 
     @Test
-    public void lookupDayTypeAssignment() throws Exception {
-        DayTypeAssignment dta = dayTypeAssignment(ID, REF);
-        DayTypeAssignment dta2 = dayTypeAssignment(ID, REF_2);
+    public void lookupDayTypeAssignment() {
+        DayTypeAssignment dtaA = dayTypeAssignment(ID, REF);
+        DayTypeAssignment dtaB = dayTypeAssignment(ID, REF_2);
 
-        assertEquals(emptyList(), root.lookupDayTypeAssignment(ID));
-        assertEquals(emptyList(), child.lookupDayTypeAssignment(ID));
+        root.dayTypeAssignmentByDayTypeId.add(ID, dtaA);
+        child.dayTypeAssignmentByDayTypeId.add(ID, dtaB);
 
-        root.addDayTypeAssignment(ID, dta);
-
-        assertEquals(singletonList(dta), root.lookupDayTypeAssignment(ID));
-        assertEquals(singletonList(dta), child.lookupDayTypeAssignment(ID));
-
-        child.addDayTypeAssignment(ID, dta2);
-
-        assertEquals(singletonList(dta2), child.lookupDayTypeAssignment(ID));
+        assertEquals(singletonList(dtaA), root.dayTypeAssignmentByDayTypeId.lookup(ID));
+        assertEquals(singletonList(dtaB), child.dayTypeAssignmentByDayTypeId.lookup(ID));
+        assertTrue(child.dayTypeAssignmentByDayTypeId.lookup(ID_2).isEmpty());
     }
 
     @Test
-    public void getTimeZone() throws Exception {
-        assertNull(root.getTimeZone());
-        assertNull(child.getTimeZone());
+    public void getTimeZone() {
+        assertNull(root.timeZone.get());
+        assertNull(child.timeZone.get());
 
-        root.setTimeZone(TIMEZONE_NO);
+        root.timeZone.set(TIMEZONE_NO);
+        child.timeZone.set(TIMEZONE_PST);
 
-        assertEquals(TIMEZONE_NO, root.getTimeZone());
-        assertEquals(TIMEZONE_NO, child.getTimeZone());
-
-        child.setTimeZone(TIMEZONE_PST);
-
-        assertEquals(TIMEZONE_PST, child.getTimeZone());
+        assertEquals(TIMEZONE_NO, root.timeZone.get());
+        assertEquals(TIMEZONE_PST, child.timeZone.get());
     }
 
     @Test
-    public void lookupServiceJourneysById() throws Exception {
-        ServiceJourney value = new ServiceJourney();
-        root.addServiceJourneyById(ID, value);
-        assertEquals(singletonList(value), child.lookupServiceJourneysById(ID));
+    public void lookupServiceJourneysById() {
+        ServiceJourney value = new ServiceJourney().withId(ID_2);
+        root.serviceJourneyByPatternId.add(ID, value);
+        assertEquals(singletonList(value), child.serviceJourneyByPatternId.lookup(ID));
     }
 
     @Test
-    public void lookupJourneyPatternById() throws Exception {
-        JourneyPattern value = new JourneyPattern();
-        value.withId(ID);
-        root.addJourneyPattern(value);
-        assertEquals(value, child.lookupJourneyPatternById(ID));
+    public void lookupJourneyPatternById() {
+        JourneyPattern value = new JourneyPattern().withId(ID);
+        root.journeyPatternsById.add(value);
+        assertEquals(value, child.journeyPatternsById.lookup(ID));
     }
 
     @Test
-    public void lookupRouteById() throws Exception {
-        Route value = new Route();
-        value.withId(ID);
-        root.addRoute(value);
-        assertEquals(value, child.lookupRouteById(ID));
+    public void lookupRouteById() {
+        Route value = new Route().withId(ID);
+        root.routeById.add(value);
+        assertEquals(value, child.routeById.lookup(ID));
     }
 
     @Test
-    public void lookupOperatingPeriodById() throws Exception {
-        OperatingPeriod value = new OperatingPeriod();
-        value.withId(ID);
+    public void lookupOperatingPeriodById() {
+        OperatingPeriod value = new OperatingPeriod().withId(ID);
 
-        assertFalse(child.operatingPeriodExist(ID));
+        root.operatingPeriodById.add(value);
 
-        root.addOperatingPeriod(value);
-
-        assertEquals(value, child.lookupOperatingPeriodById(ID));
-        assertTrue(child.operatingPeriodExist(ID));
+        assertEquals(value, child.operatingPeriodById.lookup(ID));
+        assertTrue(child.operatingPeriodById.containsKey(ID));
     }
 
     @Test
-    public void operatingPeriodExist() throws Exception {
-        Route value = new Route();
-        value.withId(ID);
-        root.addRoute(value);
+    public void operatingPeriodExist() {
+        Route value = new Route().withId(ID);
+        root.routeById.add(value);
     }
 
 

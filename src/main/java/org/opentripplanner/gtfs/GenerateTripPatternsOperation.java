@@ -61,7 +61,7 @@ public class GenerateTripPatternsOperation {
     public void run() {
         collectFrequencyByTrip();
 
-        final Collection<Trip> trips = transitDaoBuilder.getTrips().values();
+        final Collection<Trip> trips = transitDaoBuilder.getTripsById().values();
         final int tripsSize = trips.size();
 
         /* Loop over all trips, handling each one as a frequency-based or scheduled trip. */

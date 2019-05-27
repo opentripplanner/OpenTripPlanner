@@ -26,7 +26,7 @@ public class MultiCalendarServiceImpl extends CalendarServiceImpl {
         CalendarServiceData data = createCalendarSrvDataWithoutDatesForLocalizedSrvId(transitBuilder);
         CalendarServiceData _data = super.getData();
 
-        for (Agency agency : transitBuilder.getAgencies()) {
+        for (Agency agency : transitBuilder.getAgenciesById().values()) {
             String agencyId = agency.getId();
             _data.putTimeZoneForAgencyId(agencyId, data.getTimeZoneForAgencyId(agencyId));
         }

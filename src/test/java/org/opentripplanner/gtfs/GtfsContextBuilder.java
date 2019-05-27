@@ -1,9 +1,9 @@
 package org.opentripplanner.gtfs;
 
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -132,7 +132,7 @@ public class GtfsContextBuilder {
      *     .turnOffRepairStopTimesAndTripPatternsGeneration()
      *     .build();
      *
-     * // Do you changes
+     * // Do your changes
      * applyChanges(context.getDao());
      *
      * // Repair StopTimes and generate TripPatterns
@@ -159,7 +159,7 @@ public class GtfsContextBuilder {
             stop.getId().setAgencyId(this.feedId.getId());
         }
 
-        for (Trip trip : transitBuilder.getTrips().values()) {
+        for (Trip trip : transitBuilder.getTripsById().values()) {
             trip.getId().setAgencyId(this.feedId.getId());
         }
 

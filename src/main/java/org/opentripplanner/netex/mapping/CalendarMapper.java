@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 
 
-// TODO TGR - Add Unit tests
+// TODO OTP2 - Add Unit tests
 public class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
@@ -30,11 +30,12 @@ public class CalendarMapper {
         String[] dayTypeIds = serviceId.getId().split("\\+");
 
         for(String dayTypeId : dayTypeIds) {
-            Collection<DayTypeAssignment> dayTypeAssignmentList = netexDao.lookupDayTypeAssignment(dayTypeId);
+                Collection<DayTypeAssignment> dayTypeAssignmentList =
+                        netexDao.dayTypeAssignmentByDayTypeId.lookup(dayTypeId);
 
 
             for (DayTypeAssignment dayTypeAssignment : dayTypeAssignmentList) {
-                Boolean isAvailable = netexDao.lookupDayTypeAvailable(dayTypeAssignment.getId());
+                Boolean isAvailable = netexDao.dayTypeAvailable.lookup(dayTypeAssignment.getId());
 
                 // Add or remove single days
                 if (dayTypeAssignment.getDate() != null) {
@@ -47,15 +48,16 @@ public class CalendarMapper {
                     }
                 }
                 // Add or remove periods
-                else if (dayTypeAssignment.getOperatingPeriodRef() != null &&
-                        netexDao.operatingPeriodExist(dayTypeAssignment.getOperatingPeriodRef().getRef())) {
+                else if (dayTypeAssignment.getOperatingPeriodRef() != null && netexDao.operatingPeriodById
+                        .containsKey(dayTypeAssignment.getOperatingPeriodRef().getRef())) {
 
-                    OperatingPeriod operatingPeriod = netexDao.lookupOperatingPeriodById(dayTypeAssignment.getOperatingPeriodRef().getRef());
+                    OperatingPeriod operatingPeriod = netexDao.operatingPeriodById
+                            .lookup(dayTypeAssignment.getOperatingPeriodRef().getRef());
                     LocalDateTime fromDate = operatingPeriod.getFromDate();
                     LocalDateTime toDate = operatingPeriod.getToDate();
 
                     List<DayOfWeekEnumeration> daysOfWeek = new ArrayList<>();
-                    DayType dayType = netexDao.getDayTypeById(dayTypeId);
+                    DayType dayType = netexDao.dayTypeById.lookup(dayTypeId);
                     if (dayType.getProperties() != null) {
                         List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
                         for (PropertyOfDay property : propertyOfDays) {

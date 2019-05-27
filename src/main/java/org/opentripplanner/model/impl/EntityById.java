@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import org.opentripplanner.model.IdentityBean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,11 @@ public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
         return map.values();
     }
 
+    /**
+     * @param id the id whose associated value is to be returned
+     * @return the value to which the specified key is mapped, or
+     *         {@code null} if this map contains no mapping for the key
+     */
     public E get(I id) {
         return map.get(id);
     }
@@ -60,8 +66,11 @@ public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
      * So to fix this, this method allows the caller to reindex the internal map.
      */
     void reindex() {
-        HashMap<I, E> temp = new HashMap<>(map);
+        // Copying the values are necessary, since the collection returned by 'map.values()'
+        // is backed by the map and cleared on the next line.
+        Collection<E> temp = new ArrayList<>(map.values());
         map.clear();
-        map.putAll(temp);
+
+        addAll(temp);
     }
 }

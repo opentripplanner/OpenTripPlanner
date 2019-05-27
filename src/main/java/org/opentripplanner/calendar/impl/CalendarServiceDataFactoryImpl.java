@@ -2,6 +2,7 @@
 package org.opentripplanner.calendar.impl;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
@@ -9,7 +10,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.LocalizedServiceId;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class CalendarServiceDataFactoryImpl {
     }
 
     private CalendarServiceDataFactoryImpl(OtpTransitServiceBuilder transitBuilder) {
-        agencies = transitBuilder.getAgencies();
+        agencies = new ArrayList<>(transitBuilder.getAgenciesById().values());
         calendarDatesByServiceId = transitBuilder.getCalendarDates()
                 .stream()
                 .collect(groupingBy(ServiceCalendarDate::getServiceId));
@@ -77,7 +77,7 @@ public class CalendarServiceDataFactoryImpl {
                 .collect(groupingBy(ServiceCalendar::getServiceId));
         serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
 
-        tripAgencyIdsByServiceId = createTripAgencyIdByServiceIdMap(transitBuilder.getTrips().values());
+        tripAgencyIdsByServiceId = createTripAgencyIdByServiceIdMap(transitBuilder.getTripsById().values());
     }
 
     CalendarServiceData createData() {

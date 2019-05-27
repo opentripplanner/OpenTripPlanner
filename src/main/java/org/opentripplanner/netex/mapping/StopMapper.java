@@ -80,7 +80,7 @@ public class StopMapper {
 
 
                         // Continue if this is not newest version of quay
-                        if (netexDao.lookupQuayById(stopQuay.getId().getId()).stream()
+                        if (netexDao.quayById.lookup(stopQuay.getId().getId()).stream()
                                 .anyMatch(q -> Integer.parseInt(q.getVersion()) > Integer.parseInt(quay.getVersion()))) {
                             continue;
                         }

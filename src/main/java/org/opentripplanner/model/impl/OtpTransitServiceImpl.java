@@ -73,7 +73,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
      * Create a read only version of the {@link OtpTransitService}.
      */
     OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
-        this.agencies = immutableList(builder.getAgencies());
+        this.agencies = immutableList(builder.getAgenciesById().values());
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
@@ -84,7 +84,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
-        this.trips = immutableList(builder.getTrips().values());
+        this.trips = immutableList(builder.getTripsById().values());
     }
 
     @Override

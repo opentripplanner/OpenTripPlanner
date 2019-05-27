@@ -34,7 +34,7 @@ import java.util.Set;
  * a {@link OtpTransitService} instance.
  */
 public class OtpTransitServiceBuilder {
-    private final List<Agency> agencies = new ArrayList<>();
+    private final EntityById<String, Agency> agenciesById = new EntityById<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class OtpTransitServiceBuilder {
 
     private final List<Transfer> transfers = new ArrayList<>();
 
-    private final EntityById<FeedScopedId, Trip> trips = new EntityById<>();
+    private final EntityById<FeedScopedId, Trip> tripsById = new EntityById<>();
 
     private final ListMultimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
@@ -73,8 +73,8 @@ public class OtpTransitServiceBuilder {
     /* Accessors */
 
 
-    public List<Agency> getAgencies() {
-        return agencies;
+    public EntityById<String, Agency> getAgenciesById() {
+        return agenciesById;
     }
 
     public List<ServiceCalendarDate> getCalendarDates() {
@@ -125,8 +125,8 @@ public class OtpTransitServiceBuilder {
         return transfers;
     }
 
-    public EntityById<FeedScopedId, Trip> getTrips() {
-        return trips;
+    public EntityById<FeedScopedId, Trip> getTripsById() {
+        return tripsById;
     }
 
     public Multimap<StopPattern, TripPattern> getTripPatterns() {
@@ -154,10 +154,25 @@ public class OtpTransitServiceBuilder {
         return new OtpTransitServiceImpl(this);
     }
 
+    /**
+     * For entities with mutable ids the internal map becomes invalid after the ids are changed.
+     * Calling this method fixes this problem by reindexing the maps.
+     */
+    public void regenerateIndexes() {
+        this.agenciesById.reindex();
+        this.tripsById.reindex();
+        this.stopsById.reindex();
+        this.routesById.reindex();
+        this.stopTimesByTrip.reindex();
+    }
+
     private void createNoneExistentIds() {
         generateNoneExistentIds(feedInfos);
     }
 
+    /**
+     * This method is PRIVATE, it have default access to enable unit testing.
+     */
     static <T extends IdentityBean<String>> void generateNoneExistentIds(List<T> entities) {
         int maxId = 0;
 
@@ -178,12 +193,5 @@ public class OtpTransitServiceBuilder {
             }
             catch (NumberFormatException ignore) { }
         }
-    }
-
-    public void regenerateIndexes() {
-        this.trips.reindex();
-        this.stopsById.reindex();
-        this.routesById.reindex();
-        this.stopTimesByTrip.reindex();
     }
 }

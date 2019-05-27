@@ -33,17 +33,20 @@ public class NetexMapper {
     public void mapNetexToOtp(NetexDao netexDao) {
         FeedScopedIdFactory.setFeedId(agencyId);
 
-        for (Authority authority : netexDao.getAuthorities()) {
-            transitBuilder.getAgencies().add(agencyMapper.mapAgency(authority, netexDao.getTimeZone()));
+        for (Authority authority : netexDao.authoritiesById.localValues()) {
+            transitBuilder.getAgenciesById().add(agencyMapper.mapAgency(authority,
+                    netexDao.timeZone.get()));
         }
 
-        for (Line line : netexDao.getLines()) {
-            Route route = routeMapper.mapRoute(line, transitBuilder, netexDao, netexDao.getTimeZone());
+        for (Line line : netexDao.lineById.localValues()) {
+            Route route = routeMapper.mapRoute(line, transitBuilder, netexDao,
+                    netexDao.timeZone.get());
             transitBuilder.getRoutes().add(route);
         }
 
-        for (String stopPlaceId : netexDao.getStopPlaceIds()) {
-            Collection<StopPlace> stopPlaceAllVersions = netexDao.lookupStopPlacesById(stopPlaceId);
+            for (String stopPlaceId : netexDao.stopPlaceById.localKeys()) {
+                Collection<StopPlace> stopPlaceAllVersions = netexDao.stopPlaceById
+                        .lookup(stopPlaceId);
             if (stopPlaceAllVersions != null) {
                 Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions, netexDao);
                 for (Stop stop : stops) {
@@ -52,7 +55,7 @@ public class NetexMapper {
             }
         }
 
-        for (JourneyPattern journeyPattern : netexDao.getJourneyPatterns()) {
+        for (JourneyPattern journeyPattern : netexDao.journeyPatternsById.localValues()) {
             tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexDao);
         }
 

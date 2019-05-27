@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.netex.loader.NetexDao;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.loader.NetexDao;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -47,11 +47,12 @@ class TripPatternMapper {
         List<Trip> trips = new ArrayList<>();
 
         //find matching journey pattern
-        Collection<ServiceJourney> serviceJourneys = netexDao.lookupServiceJourneysById(journeyPattern.getId());
+            Collection<ServiceJourney> serviceJourneys = netexDao.serviceJourneyByPatternId
+                    .lookup(journeyPattern.getId());
 
         StopPattern stopPattern = null;
 
-        Route route = netexDao.lookupRouteById(journeyPattern.getRouteRef().getRef());
+        Route route = netexDao.routeById.lookup(journeyPattern.getRouteRef().getRef());
         org.opentripplanner.model.Route otpRoute = transitBuilder.getRoutes()
                 .get(FeedScopedIdFactory.createFeedScopedId(route.getLineRef().getValue().getRef()));
 
@@ -110,7 +111,7 @@ class TripPatternMapper {
                 TripTimes tripTimes = new TripTimes(trip,
                         transitBuilder.getStopTimesSortedByTrip().get(trip), deduplicator);
                 tripPattern.add(tripTimes);
-                transitBuilder.getTrips().add(trip);
+                transitBuilder.getTripsById().add(trip);
             }
         }
 
@@ -180,7 +181,8 @@ class TripPatternMapper {
         }
 
         if (stopPoint.getDestinationDisplayRef() != null) {
-            DestinationDisplay value = netexDao.lookUpDestinationDisplayById(stopPoint.getDestinationDisplayRef().getRef());
+            DestinationDisplay value = netexDao.destinationDisplayById
+                    .lookup(stopPoint.getDestinationDisplayRef().getRef());
             if (value != null) {
                 currentHeadsign = value.getFrontText().getValue();
             }
@@ -204,9 +206,8 @@ class TripPatternMapper {
                 if (stop.getId().equals(pointInJourneyPatterRef)) {
                     JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef = ((StopPointInJourneyPattern) point)
                             .getScheduledStopPointRef();
-                    String stopId = netexDao.lookupQuayIdByStopPointRef(
-                            scheduledStopPointRef.getValue().getRef()
-                    );
+                    String stopId = netexDao.quayIdByStopPointRef
+                            .lookup(scheduledStopPointRef.getValue().getRef());
                     if (stopId == null) {
                         LOG.warn("No passengerStopAssignment found for " + scheduledStopPointRef
                                 .getValue().getRef());
