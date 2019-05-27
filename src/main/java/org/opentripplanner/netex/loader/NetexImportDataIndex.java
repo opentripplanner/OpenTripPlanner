@@ -27,25 +27,25 @@ import java.util.Set;
  * This class holds indexes of Netex objects for lookup during the NeTEx import.
  * <p>
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
- * and <em>single files</em>. We create a hierarchy of {@code NetexDao} to avoid keeping everything
+ * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
  * in memory and to be able to override values in a more specific(lower) level.
  * <p/>
  * There is one instance of this class for <em>shard data</em> - the ROOT.
- * For each <em>group of shared data</em> a new {@code NetexDao} is created with the ROOT as a
+ * For each <em>group of shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a
  * parent. When such <em>group of shared data</em> is not needed any more it is discard and become
  * ready for garbage collection.
- * For each <em>single files</em> a new {@code NetexDao} is created with the corresponding
+ * For each <em>single files</em> a new {@code NetexImportDataIndex} is created with the corresponding
  * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
  * the file is loaded.
  * <p/>
- * This hierarchy make it possible to override values in child instances of the {@code NetexDao}
+ * This hierarchy make it possible to override values in child instances of the {@code NetexImportDataIndex}
  * and save memory during the load operation, because data not needed any more can be thrown away.
  * <p/>
  * The hierarchy implementation is delegated to the
  * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
  */
-public class NetexDao {
+public class NetexImportDataIndex {
     public final HierarchicalMapById<Authority> authoritiesById;
     public final HierarchicalMap<String, Authority> authoritiesByGroupOfLinesId;
     public final HierarchicalMap<String, Authority> authoritiesByNetworkId;
@@ -72,7 +72,7 @@ public class NetexDao {
     /**
      * Create a root node.
      */
-    NetexDao() {
+    NetexImportDataIndex() {
         this.authoritiesById = new HierarchicalMapById<>();
         this.authoritiesByGroupOfLinesId = new HierarchicalMap<>();
         this.authoritiesByNetworkId = new HierarchicalMap<>();
@@ -99,7 +99,7 @@ public class NetexDao {
      * Create a child node.
      * @param parent can not be <code>null</code>.
      */
-    NetexDao(NetexDao parent) {
+    NetexImportDataIndex(NetexImportDataIndex parent) {
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
         this.authoritiesByGroupOfLinesId = new HierarchicalMap<>(parent.authoritiesByGroupOfLinesId);
         this.authoritiesByNetworkId = new HierarchicalMap<>(parent.authoritiesByNetworkId);

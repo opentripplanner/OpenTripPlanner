@@ -5,7 +5,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexDao;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -41,18 +41,18 @@ class TripPatternMapper {
 
     private String currentHeadsign;
 
-    void mapTripPattern(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao) {
+    void mapTripPattern(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexImportDataIndex netexIndex) {
         TripMapper tripMapper = new TripMapper();
 
         List<Trip> trips = new ArrayList<>();
 
         //find matching journey pattern
-            Collection<ServiceJourney> serviceJourneys = netexDao.serviceJourneyByPatternId
+            Collection<ServiceJourney> serviceJourneys = netexIndex.serviceJourneyByPatternId
                     .lookup(journeyPattern.getId());
 
         StopPattern stopPattern = null;
 
-        Route route = netexDao.routeById.lookup(journeyPattern.getRouteRef().getRef());
+        Route route = netexIndex.routeById.lookup(journeyPattern.getRouteRef().getRef());
         org.opentripplanner.model.Route otpRoute = transitBuilder.getRoutes()
                 .get(FeedScopedIdFactory.createFeedScopedId(route.getLineRef().getValue().getRef()));
 
@@ -62,14 +62,14 @@ class TripPatternMapper {
         }
 
         for (ServiceJourney serviceJourney : serviceJourneys) {
-            Trip trip = tripMapper.mapServiceJourney(serviceJourney, transitBuilder, netexDao);
+            Trip trip = tripMapper.mapServiceJourney(serviceJourney, transitBuilder, netexIndex);
             trips.add(trip);
 
             TimetabledPassingTimes_RelStructure passingTimes = serviceJourney.getPassingTimes();
             List<TimetabledPassingTime> timetabledPassingTimes = passingTimes.getTimetabledPassingTime();
 
             List<StopTime> stopTimes = mapToStopTimes(
-                    journeyPattern, transitBuilder, netexDao, trip, timetabledPassingTimes
+                    journeyPattern, transitBuilder, netexIndex, trip, timetabledPassingTimes
             );
 
             if (stopTimes != null) {
@@ -118,7 +118,7 @@ class TripPatternMapper {
         transitBuilder.getTripPatterns().put(tripPattern.stopPattern, tripPattern);
     }
 
-    private List<StopTime> mapToStopTimes(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexDao netexDao, Trip trip, List<TimetabledPassingTime> timetabledPassingTimes) {
+    private List<StopTime> mapToStopTimes(JourneyPattern journeyPattern, OtpTransitServiceBuilder transitBuilder, NetexImportDataIndex netexIndex, Trip trip, List<TimetabledPassingTime> timetabledPassingTimes) {
         List<StopTime> stopTimes = new ArrayList<>();
 
         int stopSequence = 0;
@@ -128,11 +128,12 @@ class TripPatternMapper {
                     = passingTime.getPointInJourneyPatternRef();
             String ref = pointInJourneyPatternRef.getValue().getRef();
 
-            Stop quay = findQuay(ref, journeyPattern, netexDao, transitBuilder);
+            Stop quay = findQuay(ref, journeyPattern, netexIndex, transitBuilder);
 
             if (quay != null) {
                 StopPointInJourneyPattern stopPoint = findStopPoint(ref, journeyPattern);
-                StopTime stopTime = mapToStopTime(trip, stopPoint, quay, passingTime, stopSequence, netexDao);
+                StopTime stopTime = mapToStopTime(trip, stopPoint, quay, passingTime, stopSequence,
+                        netexIndex);
                 stopTimes.add(stopTime);
                 ++stopSequence;
             } else {
@@ -144,7 +145,7 @@ class TripPatternMapper {
     }
 
     private StopTime mapToStopTime(Trip trip, StopPointInJourneyPattern stopPoint, Stop quay,
-                                   TimetabledPassingTime passingTime, int stopSequence, NetexDao netexDao) {
+                                   TimetabledPassingTime passingTime, int stopSequence, NetexImportDataIndex netexIndex) {
         StopTime stopTime = new StopTime();
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
@@ -181,7 +182,7 @@ class TripPatternMapper {
         }
 
         if (stopPoint.getDestinationDisplayRef() != null) {
-            DestinationDisplay value = netexDao.destinationDisplayById
+            DestinationDisplay value = netexIndex.destinationDisplayById
                     .lookup(stopPoint.getDestinationDisplayRef().getRef());
             if (value != null) {
                 currentHeadsign = value.getFrontText().getValue();
@@ -196,7 +197,7 @@ class TripPatternMapper {
     }
 
     private Stop findQuay(String pointInJourneyPatterRef, JourneyPattern journeyPattern,
-            NetexDao netexDao, OtpTransitServiceBuilder transitBuilder) {
+            NetexImportDataIndex netexIndex, OtpTransitServiceBuilder transitBuilder) {
         List<PointInLinkSequence_VersionedChildStructure> points = journeyPattern
                 .getPointsInSequence()
                 .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
@@ -206,7 +207,7 @@ class TripPatternMapper {
                 if (stop.getId().equals(pointInJourneyPatterRef)) {
                     JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef = ((StopPointInJourneyPattern) point)
                             .getScheduledStopPointRef();
-                    String stopId = netexDao.quayIdByStopPointRef
+                    String stopId = netexIndex.quayIdByStopPointRef
                             .lookup(scheduledStopPointRef.getValue().getRef());
                     if (stopId == null) {
                         LOG.warn("No passengerStopAssignment found for " + scheduledStopPointRef

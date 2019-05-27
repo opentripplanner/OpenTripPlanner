@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.netex.loader.NetexDao;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.DayOfWeekEnumeration;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -24,18 +24,18 @@ import java.util.List;
 public class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
-    public static Collection<ServiceCalendarDate> mapToCalendarDates(FeedScopedId serviceId, NetexDao netexDao) {
+    public static Collection<ServiceCalendarDate> mapToCalendarDates(FeedScopedId serviceId, NetexImportDataIndex netexIndex) {
         Collection<ServiceCalendarDate> serviceCalendarDates = new ArrayList<>();
         Collection<ServiceCalendarDate> serviceCalendarDatesRemove = new HashSet<>();
         String[] dayTypeIds = serviceId.getId().split("\\+");
 
         for(String dayTypeId : dayTypeIds) {
                 Collection<DayTypeAssignment> dayTypeAssignmentList =
-                        netexDao.dayTypeAssignmentByDayTypeId.lookup(dayTypeId);
+                        netexIndex.dayTypeAssignmentByDayTypeId.lookup(dayTypeId);
 
 
             for (DayTypeAssignment dayTypeAssignment : dayTypeAssignmentList) {
-                Boolean isAvailable = netexDao.dayTypeAvailable.lookup(dayTypeAssignment.getId());
+                Boolean isAvailable = netexIndex.dayTypeAvailable.lookup(dayTypeAssignment.getId());
 
                 // Add or remove single days
                 if (dayTypeAssignment.getDate() != null) {
@@ -48,16 +48,16 @@ public class CalendarMapper {
                     }
                 }
                 // Add or remove periods
-                else if (dayTypeAssignment.getOperatingPeriodRef() != null && netexDao.operatingPeriodById
+                else if (dayTypeAssignment.getOperatingPeriodRef() != null && netexIndex.operatingPeriodById
                         .containsKey(dayTypeAssignment.getOperatingPeriodRef().getRef())) {
 
-                    OperatingPeriod operatingPeriod = netexDao.operatingPeriodById
+                    OperatingPeriod operatingPeriod = netexIndex.operatingPeriodById
                             .lookup(dayTypeAssignment.getOperatingPeriodRef().getRef());
                     LocalDateTime fromDate = operatingPeriod.getFromDate();
                     LocalDateTime toDate = operatingPeriod.getToDate();
 
                     List<DayOfWeekEnumeration> daysOfWeek = new ArrayList<>();
-                    DayType dayType = netexDao.dayTypeById.lookup(dayTypeId);
+                    DayType dayType = netexIndex.dayTypeById.lookup(dayTypeId);
                     if (dayType.getProperties() != null) {
                         List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
                         for (PropertyOfDay property : propertyOfDays) {

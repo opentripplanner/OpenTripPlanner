@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexDao;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -15,7 +15,7 @@ import javax.xml.bind.JAXBElement;
 
 public class TripMapper {
 
-    public Trip mapServiceJourney(ServiceJourney serviceJourney, OtpTransitServiceBuilder gtfsDao, NetexDao netexDao){
+    public Trip mapServiceJourney(ServiceJourney serviceJourney, OtpTransitServiceBuilder gtfsDao, NetexImportDataIndex netexIndex){
 
         JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
 
@@ -23,10 +23,10 @@ public class TripMapper {
         if(lineRefStruct != null){
             lineRef = lineRefStruct.getValue().getRef();
         }else if(serviceJourney.getJourneyPatternRef() != null){
-                JourneyPattern journeyPattern = netexDao.journeyPatternsById
+                JourneyPattern journeyPattern = netexIndex.journeyPatternsById
                         .lookup(serviceJourney.getJourneyPatternRef().getValue().getRef());
             String routeRef = journeyPattern.getRouteRef().getRef();
-            lineRef = netexDao.routeById.lookup(routeRef).getLineRef().getValue().getRef();
+            lineRef = netexIndex.routeById.lookup(routeRef).getLineRef().getValue().getRef();
         }
 
         Trip trip = new Trip();
@@ -37,7 +37,7 @@ public class TripMapper {
         String serviceId = ServiceIdMapper.mapToServiceId(serviceJourney.getDayTypes());
 
         // Add all unique service ids to map. Used when mapping calendars later.
-        netexDao.addCalendarServiceId(serviceId);
+        netexIndex.addCalendarServiceId(serviceId);
 
         trip.setServiceId(FeedScopedIdFactory.createFeedScopedId(serviceId));
 

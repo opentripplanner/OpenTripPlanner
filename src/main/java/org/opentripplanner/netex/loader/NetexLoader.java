@@ -66,7 +66,7 @@ public class NetexLoader {
 
     private NetexMapper otpMapper;
 
-    private Deque<NetexDao> netexDaoStack = new LinkedList<>();
+    private Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
 
     public NetexLoader(NetexBundle netexBundle) {
         this.netexBundle = netexBundle;
@@ -91,41 +91,41 @@ public class NetexLoader {
     private void loadZipFile(ZipFile zipFile, NetexZipFileHierarchy entries) {
 
         // Add a global(this zip file) shared NeTEX DAO  
-        netexDaoStack.addFirst(new NetexDao());
+        netexIndex.addFirst(new NetexImportDataIndex());
         
         // Load global shared files
         loadFiles("shared file", entries.sharedEntries(), zipFile);
-        mapCurrentNetexDaoIntoOtpTransitObjects();
+        mapCurrentNetexObjectsIntoOtpTransitObjects();
 
         for (GroupEntries group : entries.groups()) {
-            newNetexDaoScope(() -> {
+            newNetexImportDataScope(() -> {
                 // Load shared group files
                 loadFiles("shared group file", group.sharedEntries(), zipFile);
-                mapCurrentNetexDaoIntoOtpTransitObjects();
+                mapCurrentNetexObjectsIntoOtpTransitObjects();
 
                 for (ZipEntry entry : group.independentEntries()) {
-                    newNetexDaoScope(() -> {
+                    newNetexImportDataScope(() -> {
                         // Load each independent file in group
                         loadFile("group file", entry, zipFile);
-                        mapCurrentNetexDaoIntoOtpTransitObjects();
+                        mapCurrentNetexObjectsIntoOtpTransitObjects();
                     });
                 }
             });
         }
     }
 
-    private NetexDao currentNetexDao() {
-        return netexDaoStack.peekFirst();
+    private NetexImportDataIndex index() {
+        return netexIndex.peekFirst();
     }
 
-    private void newNetexDaoScope(Runnable task) {
-        netexDaoStack.addFirst(new NetexDao(currentNetexDao()));
+    private void newNetexImportDataScope(Runnable task) {
+        netexIndex.addFirst(new NetexImportDataIndex(index()));
         task.run();
-        netexDaoStack.removeFirst();
+        netexIndex.removeFirst();
     }
 
-    private void mapCurrentNetexDaoIntoOtpTransitObjects() {
-        otpMapper.mapNetexToOtp(currentNetexDao());
+    private void mapCurrentNetexObjectsIntoOtpTransitObjects() {
+        otpMapper.mapNetexToOtp(index());
     }
 
     private Unmarshaller createUnmarshaller() throws Exception {
@@ -167,7 +167,7 @@ public class NetexLoader {
                         timeZone = frameDefaults.getDefaultLocale().getTimeZone();
                     }
 
-                    currentNetexDao().timeZone.set(timeZone);
+                    index().timeZone.set(timeZone);
 
                     List<JAXBElement<? extends Common_VersionFrameStructure>> commonFrames = cf
                             .getFrames().getCommonFrame();
@@ -202,13 +202,13 @@ public class NetexLoader {
             StopPlacesInFrame_RelStructure stopPlaces = sf.getStopPlaces();
             List<StopPlace> stopPlaceList = stopPlaces.getStopPlace();
             for (StopPlace stopPlace : stopPlaceList) {
-                    currentNetexDao().stopPlaceById.add(stopPlace);
+                    index().stopPlaceById.add(stopPlace);
                     if (stopPlace.getQuays() != null) {
                     List<Object> quayRefOrQuay = stopPlace.getQuays().getQuayRefOrQuay();
                     for (Object quayObject : quayRefOrQuay) {
                         if (quayObject instanceof Quay) {
                             Quay quay = (Quay) quayObject;
-                            currentNetexDao().quayById.add(quay);
+                            index().quayById.add(quay);
                         }
                     }
                 }
@@ -230,9 +230,9 @@ public class NetexLoader {
                         PassengerStopAssignment passengerStopAssignment =
                                 (PassengerStopAssignment) assignment.getValue();
                         String quayRef = passengerStopAssignment.getQuayRef().getRef();
-                        Quay quay = currentNetexDao().quayById.lookupLastVersionById(quayRef);
+                        Quay quay = index().quayById.lookupLastVersionById(quayRef);
                         if (quay != null) {
-                            currentNetexDao().quayIdByStopPointRef.add(
+                            index().quayIdByStopPointRef.add(
                                     passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
                                     quay.getId());
                         } else {
@@ -250,7 +250,7 @@ public class NetexLoader {
                 for (JAXBElement element : route_) {
                     if (element.getValue() instanceof Route) {
                         Route route = (Route) element.getValue();
-                        currentNetexDao().routeById.add(route);
+                        index().routeById.add(route);
                     }
                 }
             }
@@ -258,23 +258,23 @@ public class NetexLoader {
             //network
             Network network = sf.getNetwork();
             if(network != null){
-                currentNetexDao().networkById.add(network);
+                index().networkById.add(network);
 
                 String orgRef = network.getTransportOrganisationRef().getValue().getRef();
 
-                Authority authority = currentNetexDao().authoritiesById.lookup(orgRef);
+                Authority authority = index().authoritiesById.lookup(orgRef);
 
                 if (authority != null) {
-                    currentNetexDao().authoritiesByNetworkId.add(network.getId(), authority);
+                    index().authoritiesByNetworkId.add(network.getId(), authority);
                 }
 
                 if (network.getGroupsOfLines() != null) {
                     GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
                     List<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
                     for (GroupOfLines group : groupOfLines) {
-                        currentNetexDao().groupOfLinesById.add(group);
+                        index().groupOfLinesById.add(group);
                         if (authority != null) {
-                            currentNetexDao().authoritiesByGroupOfLinesId.add(group.getId(),
+                            index().authoritiesByGroupOfLinesId.add(group.getId(),
                                     authority);
                         }
                     }
@@ -288,17 +288,17 @@ public class NetexLoader {
                 for (JAXBElement element : line_) {
                     if (element.getValue() instanceof Line) {
                         Line line = (Line) element.getValue();
-                        currentNetexDao().lineById.add(line);
+                        index().lineById.add(line);
                         String groupRef = line.getRepresentedByGroupRef().getRef();
-                        Network network2 = currentNetexDao().networkById.lookup(groupRef);
+                        Network network2 = index().networkById.lookup(groupRef);
                         if (network2 != null) {
-                            currentNetexDao().networkByLineId.add(line.getId(), network2);
+                            index().networkByLineId.add(line.getId(), network2);
                         }
                         else {
-                            GroupOfLines groupOfLines = currentNetexDao().groupOfLinesById
+                            GroupOfLines groupOfLines = index().groupOfLinesById
                                     .lookup(groupRef);
                             if (groupOfLines != null) {
-                                currentNetexDao().groupOfLinesByLineId.add(line.getId(),
+                                index().groupOfLinesByLineId.add(line.getId(),
                                         groupOfLines);
                             }
                         }
@@ -313,7 +313,7 @@ public class NetexLoader {
                         .getJourneyPattern_OrJourneyPatternView();
                 for (JAXBElement pattern : journeyPattern_orJourneyPatternView) {
                     if (pattern.getValue() instanceof JourneyPattern) {
-                        currentNetexDao().journeyPatternsById.add(
+                        index().journeyPatternsById.add(
                                 (JourneyPattern) pattern.getValue());
                     }
                 }
@@ -322,7 +322,7 @@ public class NetexLoader {
             //destinationDisplays
             if (sf.getDestinationDisplays() != null) {
                 for (DestinationDisplay destinationDisplay : sf.getDestinationDisplays().getDestinationDisplay()) {
-                    currentNetexDao().destinationDisplayById.add(destinationDisplay);
+                    index().destinationDisplayById.add(destinationDisplay);
                 }
             }
         }
@@ -342,7 +342,7 @@ public class NetexLoader {
                     ServiceJourney sj = (ServiceJourney) jStructure;
                     String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
 
-                    JourneyPattern journeyPattern = currentNetexDao().journeyPatternsById
+                    JourneyPattern journeyPattern = index().journeyPatternsById
                             .lookup(journeyPatternId);
 
                     if (journeyPattern != null) {
@@ -350,7 +350,7 @@ public class NetexLoader {
                                 getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
                                 .size() == sj.getPassingTimes().getTimetabledPassingTime().size()) {
 
-                            currentNetexDao().serviceJourneyByPatternId.add(journeyPatternId, sj);
+                            index().serviceJourneyByPatternId.add(journeyPatternId, sj);
                         } else {
                             LOG.warn(
                                     "Mismatch between ServiceJourney and JourneyPattern. ServiceJourney will be skipped. - "
@@ -368,7 +368,7 @@ public class NetexLoader {
         DayTypeRefs_RelStructure dayTypes = serviceJourney.getDayTypes();
         String serviceId = ServiceIdMapper.mapToServiceId(dayTypes);
         // Add all unique service ids to map. Used when mapping calendars later.
-        currentNetexDao().addCalendarServiceId(serviceId);
+        index().addCalendarServiceId(serviceId);
     }
 
     // ServiceCalendar
@@ -381,7 +381,7 @@ public class NetexLoader {
                 for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
                     if (dt.getValue() instanceof DayType) {
                         DayType dayType = (DayType) dt.getValue();
-                        currentNetexDao().dayTypeById.add(dayType);
+                        index().dayTypeById.add(dayType);
                     }
                 }
             }
@@ -392,7 +392,7 @@ public class NetexLoader {
                 for (JAXBElement dt : dayTypes) {
                     if (dt.getValue() instanceof DayType) {
                         DayType dayType = (DayType) dt.getValue();
-                        currentNetexDao().dayTypeById.add(dayType);
+                        index().dayTypeById.add(dayType);
                     }
                 }
             }
@@ -401,7 +401,7 @@ public class NetexLoader {
                 for (OperatingPeriod_VersionStructure operatingPeriodStruct : scf
                         .getOperatingPeriods().getOperatingPeriodOrUicOperatingPeriod()) {
                     OperatingPeriod operatingPeriod = (OperatingPeriod) operatingPeriodStruct;
-                    currentNetexDao().operatingPeriodById.add(operatingPeriod);
+                    index().operatingPeriodById.add(operatingPeriod);
                 }
             }
 
@@ -412,9 +412,9 @@ public class NetexLoader {
                 Boolean available = dayTypeAssignment.isIsAvailable() == null ?
                         true :
                         dayTypeAssignment.isIsAvailable();
-                currentNetexDao().dayTypeAvailable.add(dayTypeAssignment.getId(), available);
+                index().dayTypeAvailable.add(dayTypeAssignment.getId(), available);
 
-                currentNetexDao().dayTypeAssignmentByDayTypeId.add(ref, dayTypeAssignment);
+                index().dayTypeAssignmentByDayTypeId.add(ref, dayTypeAssignment);
             }
         }
     }
@@ -428,7 +428,7 @@ public class NetexLoader {
             for (JAXBElement element : organisations) {
                 if(element.getValue() instanceof Authority){
                     Authority authority = (Authority) element.getValue();
-                    currentNetexDao().authoritiesById.add(authority);
+                    index().authoritiesById.add(authority);
                 }
             }
         }

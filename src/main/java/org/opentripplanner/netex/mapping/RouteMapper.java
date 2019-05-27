@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexDao;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.Line;
@@ -25,11 +25,11 @@ public class RouteMapper {
     org.opentripplanner.model.Route mapRoute(
             Line line,
             OtpTransitServiceBuilder transitBuilder,
-            NetexDao netexDao, String timeZone
+            NetexImportDataIndex netexIndex, String timeZone
     ){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
 
-        otpRoute.setAgency(findOrCreateAgency(transitBuilder, netexDao, line, timeZone));
+        otpRoute.setAgency(findOrCreateAgency(transitBuilder, netexIndex, line, timeZone));
 
         otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
         otpRoute.setLongName(line.getName().getValue());
@@ -55,15 +55,15 @@ public class RouteMapper {
      */
     private Agency findOrCreateAgency(
             OtpTransitServiceBuilder transitBuilder,
-            NetexDao netexDao,
+            NetexImportDataIndex netexIndex,
             Line line,
             String timeZone
     ) {
         String lineId = line.getId();
         // Find authority, first in *Network* and then if not found look in *GroupOfLines*
-        Network network = netexDao.networkByLineId.lookup(lineId);
-        GroupOfLines groupOfLines = netexDao.groupOfLinesByLineId.lookup(lineId);
-        Authority authority = netexDao.lookupAuthority(groupOfLines, network);
+        Network network = netexIndex.networkByLineId.lookup(lineId);
+        GroupOfLines groupOfLines = netexIndex.groupOfLinesByLineId.lookup(lineId);
+        Authority authority = netexIndex.lookupAuthority(groupOfLines, network);
 
         if(authority != null) {
             return transitBuilder.getAgenciesById().get(authority.getId());

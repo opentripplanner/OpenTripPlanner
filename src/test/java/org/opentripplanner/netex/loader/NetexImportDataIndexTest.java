@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
  */
-public class NetexDaoTest {
+public class NetexImportDataIndexTest {
 
     private static final String ID = "ID:A";
     private static final String ID_2 = "ID:B";
@@ -30,13 +30,13 @@ public class NetexDaoTest {
     private static final String TIMEZONE_NO = "Oslo/Norway";
     private static final String TIMEZONE_PST = "PST";
 
-    private NetexDao root;
-    private NetexDao child;
+    private NetexImportDataIndex root;
+    private NetexImportDataIndex child;
 
     @Before
     public void setup() {
-        root = new NetexDao();
-        child = new NetexDao(root);
+        root = new NetexImportDataIndex();
+        child = new NetexImportDataIndex(root);
     }
 
     @Test

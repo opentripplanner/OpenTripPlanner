@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.netex.loader.NetexDao;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class StopMapper {
 
     private StopPlaceTypeMapper transportModeMapper  = new StopPlaceTypeMapper();
 
-    public Collection<Stop> mapParentAndChildStops(Collection<StopPlace> stopPlaceAllVersions, NetexDao netexDao){
+    public Collection<Stop> mapParentAndChildStops(Collection<StopPlace> stopPlaceAllVersions, NetexImportDataIndex netexIndex){
         ArrayList<Stop> stops = new ArrayList<>();
 
         Stop stop = new Stop();
@@ -80,7 +80,7 @@ public class StopMapper {
 
 
                         // Continue if this is not newest version of quay
-                        if (netexDao.quayById.lookup(stopQuay.getId().getId()).stream()
+                        if (netexIndex.quayById.lookup(stopQuay.getId().getId()).stream()
                                 .anyMatch(q -> Integer.parseInt(q.getVersion()) > Integer.parseInt(quay.getVersion()))) {
                             continue;
                         }
