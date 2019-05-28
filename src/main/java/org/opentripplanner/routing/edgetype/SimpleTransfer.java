@@ -38,11 +38,8 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public State traverse(State s0) {
-        // Forbid taking shortcuts composed of two transfers in a row
-        if (s0.backEdge instanceof SimpleTransfer) {
-            return null;
-        }
-        if (s0.backEdge instanceof StreetTransitLink) {
+        // only allow to use TransferEdges when already on a transit vehicle and not on a street level
+        if (!(s0.backEdge instanceof PreAlightEdge)) {
             return null;
         }
         if(distance > s0.getOptions().maxTransferWalkDistance) {

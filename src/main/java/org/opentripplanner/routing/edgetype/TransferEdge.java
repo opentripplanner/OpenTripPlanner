@@ -71,10 +71,8 @@ public class TransferEdge extends Edge {
     }
 
     public State traverse(State s0) {
-        /* Disallow chaining of transfer edges. TODO: This should really be guaranteed by the PathParser
-           but the default Pathparser is currently very hard to read because
-           we need a complement operator. */
-        if (s0.getBackEdge() instanceof TransferEdge) return null;
+        // only allow to use TransferEdges when already on a transit vehicle and not on a street level
+        if (!(s0.getBackEdge() instanceof PreAlightEdge)) return null;
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) return null;
         if (this.getDistance() > s0.getOptions().maxTransferWalkDistance) return null;
         StateEditor s1 = s0.edit(this);
