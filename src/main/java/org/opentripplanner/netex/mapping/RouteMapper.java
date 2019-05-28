@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
-public class RouteMapper {
+class RouteMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);
 

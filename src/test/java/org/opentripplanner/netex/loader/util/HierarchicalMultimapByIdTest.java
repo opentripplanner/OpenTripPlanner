@@ -5,12 +5,14 @@ import org.junit.Test;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.REAGAN_2;
+import static org.opentripplanner.netex.loader.util.E.REAGAN_3;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
 import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
@@ -65,5 +67,39 @@ public class HierarchicalMultimapByIdTest {
                 sort(listOf(REAGAN, REAGAN_2)),
                 sort(child.lookup(REAGAN.getId()))
         );
+    }
+
+    @Test public void isLatestVersionWithNoElements() {
+        // Any element is the latest version if the collection is empty
+        assertTrue(root.isNewLatestVersion(REAGAN));
+    }
+
+
+    @Test public void isLatestVersionWithOneRootElement() {
+        // Given one element in the root
+        root.add(REAGAN);
+
+        // Then expect the same element to return false
+        assertFalse(root.isNewLatestVersion(REAGAN));
+        // And expect a later version with the same id to be true
+        assertTrue(root.isNewLatestVersion(REAGAN_2));
+        // And expect an element with none existing id (map key) to return true
+        assertTrue(root.isNewLatestVersion(SCHWARZENEGGER));
+    }
+
+    @Test public void isLatestVersionWithTwoRootElementsAndOneChild() {
+        // Given two versions in root and one in the child
+        root.add(REAGAN);
+        root.add(REAGAN_2);
+        child.add(REAGAN);
+
+        // At root then expect version 3, but not version 2 to return true
+        assertTrue(root.isNewLatestVersion(REAGAN_3));
+        assertFalse(root.isNewLatestVersion(REAGAN_2));
+
+        // At the child on the other hand only version 1 exist, so we
+        // expect version 2, but not version 1 to return true
+        assertTrue(child.isNewLatestVersion(REAGAN_2));
+        assertFalse(child.isNewLatestVersion(REAGAN));
     }
 }

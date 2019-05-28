@@ -15,6 +15,8 @@ class E extends EntityInVersionStructure implements Comparable<E> {
     static final E REAGAN = new E(11, "Reagan", 1);
     /** President and actor, version 2 */
     static final E REAGAN_2 = new E(11, "Reagan", 2);
+    /** President and actor, version 2 */
+    static final E REAGAN_3 = new E(11, "Reagan", 3);
     /** Governor and actor */
     static final E SCHWARZENEGGER = new E(12,"Schwarzenegger", 1);
     /** Mayor and actor */

@@ -7,25 +7,30 @@ import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
  */
 public class ServiceIdMapperTest {
+
+    @SuppressWarnings("unchecked")
     @Test
-    public void mapToServiceId() throws Exception {
+    public void mapToServiceId() {
         Class<DayTypeRefStructure> type = DayTypeRefStructure.class;
         DayTypeRefs_RelStructure value = new DayTypeRefs_RelStructure();
-        createDTRS("REF");
+        createDayTypeRefStructure("REF");
 
-        value.withDayTypeRef(wrap(createDTRS("A"), type), wrap(createDTRS("B"), type));
+        value.withDayTypeRef(
+                wrap(createDayTypeRefStructure("A"), type),
+                wrap(createDayTypeRefStructure("B"), type)
+        );
 
         assertEquals("A+B", ServiceIdMapper.mapToServiceId(value));
 
     }
 
-    private DayTypeRefStructure createDTRS(String ref) {
+    private DayTypeRefStructure createDayTypeRefStructure(String ref) {
         DayTypeRefStructure newObject = new DayTypeRefStructure();
         newObject.withRef(ref);
         return newObject;

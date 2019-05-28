@@ -21,10 +21,10 @@ import java.util.List;
 
 
 // TODO OTP2 - Add Unit tests
-public class CalendarMapper {
+class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
-    public static Collection<ServiceCalendarDate> mapToCalendarDates(FeedScopedId serviceId, NetexImportDataIndex netexIndex) {
+    static Collection<ServiceCalendarDate> mapToCalendarDates(FeedScopedId serviceId, NetexImportDataIndex netexIndex) {
         Collection<ServiceCalendarDate> serviceCalendarDates = new ArrayList<>();
         Collection<ServiceCalendarDate> serviceCalendarDatesRemove = new HashSet<>();
         String[] dayTypeIds = serviceId.getId().split("\\+");

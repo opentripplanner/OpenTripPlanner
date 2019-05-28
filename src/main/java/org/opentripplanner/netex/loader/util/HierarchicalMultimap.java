@@ -6,6 +6,12 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * A concrete multimap implementation of {@link AbstractHierarchicalMap}.
+ *
+ * @param <K> the key type
+ * @param <V> the base value type
+ */
 public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collection<V>> {
     private Multimap<K,V> map  = ArrayListMultimap.create();
 
@@ -19,10 +25,12 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
         super(parent);
     }
 
+    /** Add a new pair of {@code key & value} to the local map value collection. */
     public void add(K key, V value) {
         map.put(key, value);
     }
 
+    /** Add a new pair of {@code key & value} to the local map value collection. */
     public Set<K> localKeys() {
         return map.keySet();
     }

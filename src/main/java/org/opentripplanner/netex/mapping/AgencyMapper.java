@@ -3,8 +3,8 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Agency;
 import org.rutebanken.netex.model.Authority;
 
-public class AgencyMapper {
-    public Agency mapAgency(Authority authority, String timeZone){
+class AgencyMapper {
+    Agency mapAgency(Authority authority, String timeZone){
         Agency agency = new Agency();
 
         agency.setId(authority.getId());
@@ -18,7 +18,7 @@ public class AgencyMapper {
         return agency;
     }
 
-    public Agency getDefaultAgency(String timeZone){
+    Agency getDefaultAgency(String timeZone){
         Agency agency = new Agency();
         agency.setId("N/A");
         agency.setName("N/A");

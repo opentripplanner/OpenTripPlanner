@@ -24,8 +24,8 @@ public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
         map.put(entity.getId(), entity);
     }
 
-    public void addAll(Collection<E> routes) {
-        routes.forEach(this::add);
+    public void addAll(Collection<E> entities) {
+        entities.forEach(this::add);
     }
 
     /** Delegates to {@link java.util.Map#values()} */

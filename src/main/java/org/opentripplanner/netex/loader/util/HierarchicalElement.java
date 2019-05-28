@@ -28,11 +28,12 @@ public class HierarchicalElement<E> {
 
     /**
      * Get element, if not found delegate up to the parent.
-     * NB! elements of this class and its parents are NOT merged, the closest win.
-     * @return an empty collection if no element are found.
+     * @return an {@code null} if no element is found.
      */
     public E get() {
-        return (element != null) || isRoot() ? element : parent.get();
+        if(element != null) return element;
+        if(parent == null) return null;
+        else return parent.get();
     }
 
     /**
@@ -40,12 +41,5 @@ public class HierarchicalElement<E> {
      */
     public void set(E element) {
         this.element = element;
-    }
-
-    /* private methods */
-
-    /** Return true if this instance have a parent. */
-    private boolean isRoot() {
-        return parent == null;
     }
 }
