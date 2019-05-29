@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// TODO OTP2 - JavaDoc
 public class NetexBundle {
 
     private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;

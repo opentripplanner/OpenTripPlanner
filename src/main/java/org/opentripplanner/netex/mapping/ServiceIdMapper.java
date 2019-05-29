@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBElement;
 // TODO OTP2 - any such conventions. It can be fixed by creating a ServiceId type
 // TODO OTP2 - and have different subtypes that clearly reveal the intended
 // TODO OTP2 - workaround.
+// TODO OTP2 - Add Unit tests
 public class ServiceIdMapper {
 
     public static String mapToServiceId(DayTypeRefs_RelStructure dayTypes) {

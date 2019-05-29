@@ -112,11 +112,6 @@ public class PatternHopFactory {
         this.transitService = context.getTransitBuilder().build();
     }
 
-    public PatternHopFactory() {
-        this.feedId = null;
-        this.transitService = null;
-    }
-
     public PatternHopFactory(
             GtfsFeedId feedId, OtpTransitService transitService, FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance, int subwayAccessTime, int maxInterlineDistance

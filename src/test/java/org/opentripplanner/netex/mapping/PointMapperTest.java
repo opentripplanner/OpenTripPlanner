@@ -33,7 +33,7 @@ public class PointMapperTest {
         final Coord c = new Coord();
 
         // When map coordinates
-        assertTrue(PointMapper.handleCoordinates(
+        assertTrue(PointMapper.verifyPointAndProcessCoordinate(
                 point, p -> {
                         c.lat = p.getLatitude().doubleValue();
                         c.lon = p.getLongitude().doubleValue();
@@ -45,12 +45,12 @@ public class PointMapperTest {
     }
 
     @Test public void handleCoordinatesWithMissingPoint() {
-        assertFalse(PointMapper.handleCoordinates(null, this::failTest));
+        assertFalse(PointMapper.verifyPointAndProcessCoordinate(null, this::failTest));
     }
 
     @Test public void handleCoordinatesWithMissingLocation() {
         SimplePoint_VersionStructure p = new SimplePoint_VersionStructure();
-        assertFalse(PointMapper.handleCoordinates(p, this::failTest));
+        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
     }
 
     @Test public void handleCoordinatesWithMissingLatitude() {
@@ -58,7 +58,7 @@ public class PointMapperTest {
         p = new SimplePoint_VersionStructure().withLocation(
             new LocationStructure().withLongitude(LONGITUDE)
         );
-        assertFalse(PointMapper.handleCoordinates(p, this::failTest));
+        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
     }
 
     @Test public void handleCoordinatesWithMissingLongitude() {
@@ -66,7 +66,7 @@ public class PointMapperTest {
         p = new SimplePoint_VersionStructure().withLocation(
                 new LocationStructure().withLatitude(LATITUDE)
         );
-        assertFalse(PointMapper.handleCoordinates(p, this::failTest));
+        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
     }
 
     private void failTest(LocationStructure loc) {

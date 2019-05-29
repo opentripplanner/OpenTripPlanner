@@ -33,6 +33,9 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRI
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 
+// TODO OTP2 - Add Unit tests
+// TODO OTP2 - This code needs cleanup
+// TODO OTP2 - JavaDoc needed
 class TripPatternMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);

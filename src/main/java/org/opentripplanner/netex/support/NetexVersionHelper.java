@@ -1,8 +1,9 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.support;
 
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 import static java.util.Comparator.comparingInt;
 
@@ -11,7 +12,7 @@ import static java.util.Comparator.comparingInt;
  * <p/>
  * This class implements <em>Norwegian profile</em> specific rules.
  */
-class NetexVersionHelper {
+public class NetexVersionHelper {
 
     /**
      * private constructor to prevent instantiation of utility class
@@ -22,7 +23,7 @@ class NetexVersionHelper {
      * According to the <b>Norwegian Netex profile</b> the version number must be a
      * positive increasing integer. A bigger value indicate a later version.
      */
-    static int versionOf(EntityInVersionStructure e) {
+    public static int versionOf(EntityInVersionStructure e) {
         return Integer.parseInt(e.getVersion());
     }
 
@@ -30,7 +31,7 @@ class NetexVersionHelper {
      * Return the latest (maximum) version number for the given {@code list} of elements.
      * If no elements exist in the collection {@code -1} is returned.
      */
-    static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
+    public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
         return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(-1);
     }
 
@@ -38,7 +39,14 @@ class NetexVersionHelper {
      * Return the element with the latest (maximum) version for a given {@code list} of elements.
      * If no elements exist in the collection {@code null} is returned.
      */
-    static <S extends EntityInVersionStructure> S lastestVersionedElementIn(Collection<S> list) {
-        return list.stream().max(comparingInt(NetexVersionHelper::versionOf)).orElse(null);
+    public static <T extends EntityInVersionStructure> T lastestVersionedElementIn(Collection<T> list) {
+        return list.stream().max(comparingVersion()).orElse(null);
+    }
+
+    /**
+     * Return a comparator to compare {@link EntityInVersionStructure} elements by <b>version</b>.
+     */
+    public static <T extends EntityInVersionStructure> Comparator<T> comparingVersion() {
+        return comparingInt(NetexVersionHelper::versionOf);
     }
 }

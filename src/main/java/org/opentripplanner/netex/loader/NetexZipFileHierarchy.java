@@ -16,22 +16,18 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// TODO OTP2 - Doc
 class NetexZipFileHierarchy {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(NetexZipFileHierarchy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetexZipFileHierarchy.class);
 
     private final ZipFile zipFile;
-
     private final NetexParameters config;
-
     private final List<ZipEntry> sharedEntries = new ArrayList<>();
-
     private final Map<String, GroupEntries> groupEntries = new TreeMap<>();
 
     private String currentGroup = null;
 
-    NetexZipFileHierarchy(File filename, NetexParameters netexConfig)
-            throws IOException {
+    NetexZipFileHierarchy(File filename, NetexParameters netexConfig) throws IOException {
         this.zipFile = new ZipFile(filename, ZipFile.OPEN_READ);
         this.config = netexConfig;
         distributeEntries();
@@ -65,7 +61,10 @@ class NetexZipFileHierarchy {
                 groupEntries.get(currentGroup).addIndependentEntries(entry);
             }
             else {
-                LOG.warn("Netex file ignored: {}. The file do not match file patterns.", name);
+                LOG.warn(
+                        "Netex file ignored: {}. The file do not " +
+                        "match any file patterns in the config.", name
+                );
             }
         }
     }

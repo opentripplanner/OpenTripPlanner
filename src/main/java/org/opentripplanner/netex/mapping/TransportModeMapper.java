@@ -10,8 +10,11 @@ import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.TelecabinSubmodeEnumeration;
 import org.rutebanken.netex.model.TramSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
+// TODO OTP2 - Add Unit tests
+// TODO OTP2 - JavaDoc needed
 class TransportModeMapper {
 
     private static final Integer DEFAULT_OTP_VALUE = 3;
@@ -72,6 +75,31 @@ class TransportModeMapper {
                 return 1000;
             default:
                 return DEFAULT_OTP_VALUE;
+        }
+    }
+
+    static int mapVehicleMode(VehicleModeEnumeration mode) {
+        switch (mode) {
+        case AIR:
+            return 1100;
+        case BUS:
+            return 700;
+        case CABLEWAY:
+            return 1700;
+        case COACH:
+            return 200;
+        case FUNICULAR:
+            return 1400;
+        case METRO:
+            return 400;
+        case RAIL:
+            return 100;
+        case TRAM:
+            return 900;
+        case WATER:
+            return 1000;
+        default:
+            return DEFAULT_OTP_VALUE;
         }
     }
 

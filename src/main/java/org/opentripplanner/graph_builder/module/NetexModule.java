@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
-import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.netex.loader.NetexLoader;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.loader.NetexBundle;
+import org.opentripplanner.netex.loader.NetexLoader;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -17,13 +17,16 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 
+// TODO OTP2 - doc
+// TODO OTP2 - logging?
+
 public class NetexModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     private List<NetexBundle> netexBundles;
 
-    private FareServiceFactory _fareServiceFactory = new DefaultFareServiceFactory();
+    private FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
     public NetexModule(List<NetexBundle> netexBundles) {
         this.netexBundles = netexBundles;
@@ -43,10 +46,15 @@ public class NetexModule implements GraphBuilderModule {
                 calendarService.addData(daoBuilder);
 
                 PatternHopFactory hf = new PatternHopFactory(
-                        new GtfsFeedId.Builder().id(netexBundle.netexParameters.netexFeedId)
-                                .build(), daoBuilder.build(), _fareServiceFactory,
-                        netexBundle.getMaxStopToShapeSnapDistance(), netexBundle.subwayAccessTime,
-                        netexBundle.maxInterlineDistance);
+                        new GtfsFeedId.Builder()
+                                .id(netexBundle.netexParameters.netexFeedId)
+                                .build(),
+                        daoBuilder.build(),
+                        fareServiceFactory,
+                        netexBundle.getMaxStopToShapeSnapDistance(),
+                        netexBundle.subwayAccessTime,
+                        netexBundle.maxInterlineDistance
+                );
                 hf.setStopContext(stopContext);
                 hf.run(graph);
 

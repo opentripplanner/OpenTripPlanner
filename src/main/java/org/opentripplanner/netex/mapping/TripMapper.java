@@ -9,13 +9,15 @@ import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
 
+// TODO OTP2 - Add Unit tests
+// TODO OTP2 - This code needs cleanup
+// TODO OTP2 - JavaDoc needed
 /**
  * Agency id must be added when the stop is related to a line
  */
-
 public class TripMapper {
 
-    public Trip mapServiceJourney(ServiceJourney serviceJourney, OtpTransitServiceBuilder gtfsDao, NetexImportDataIndex netexIndex){
+    Trip mapServiceJourney(ServiceJourney serviceJourney, OtpTransitServiceBuilder gtfsDao, NetexImportDataIndex netexIndex){
 
         JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
 

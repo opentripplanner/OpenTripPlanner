@@ -21,6 +21,8 @@ import java.util.List;
 
 
 // TODO OTP2 - Add Unit tests
+// TODO OTP2 - This code needs cleanup
+// TODO OTP2 - JavaDoc needed
 class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 

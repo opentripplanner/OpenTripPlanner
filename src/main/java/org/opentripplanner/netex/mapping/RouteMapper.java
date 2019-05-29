@@ -14,13 +14,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+// TODO OTP2 - Add Unit tests
+// TODO OTP2 - This code needs cleanup
+// TODO OTP2 - JavaDoc needed
 class RouteMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);
 
     private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
-    private final AgencyMapper agencyMapper = new AgencyMapper();
 
     org.opentripplanner.model.Route mapRoute(
             Line line,
@@ -72,7 +74,7 @@ class RouteMapper {
         // No authority found in Network or GroupOfLines.
         // Use the default agency, create if necessary
         LOG.warn("No authority found for " + lineId);
-        Agency agency = agencyMapper.getDefaultAgency(timeZone);
+        Agency agency = AgencyMapper.createDefaultAgency(timeZone);
         EntityById<String, Agency> agenciesById = transitBuilder.getAgenciesById();
         if (!agenciesById.containsKey(agency.getId())) {
             agenciesById.add(agency);

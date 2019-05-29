@@ -107,15 +107,15 @@ public class NetexParameters {
         netexFeedId = text("netexFeedId", NETEX_FEED_ID, config);
     }
 
+    public boolean moduleFileMatches(String name) {
+        return moduleFilePattern.matcher(name).matches();
+    }
+
     private static Pattern pattern(String path, String defaultValue, JsonNode config) {
         return Pattern.compile(text(path, defaultValue, config));
     }
 
     private static String text(String path, String defaultValue, JsonNode config) {
         return config == null ? defaultValue : config.path(path).asText(defaultValue);
-    }
-
-    public boolean moduleFileMatches(String name) {
-        return moduleFilePattern.matcher(name).matches();
     }
 }

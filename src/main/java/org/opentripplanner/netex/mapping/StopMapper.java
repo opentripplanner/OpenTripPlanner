@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
+import org.opentripplanner.netex.support.NetexVersionHelper;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -12,13 +13,15 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static org.opentripplanner.netex.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
+// TODO OTP2 - Add Unit tests
+// TODO OTP2 - JavaDoc needed
 class StopMapper {
     private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
 
@@ -74,7 +77,7 @@ class StopMapper {
      */
     private List<StopPlace> sortStopPlacesOnVersionDesc(Collection<StopPlace> stopPlaces) {
         return stopPlaces.stream()
-                .sorted(Comparator.comparingInt(o -> Integer.parseInt(o.getVersion())))
+                .sorted(NetexVersionHelper.comparingVersion())
                 .collect(toList());
     }
 
@@ -87,17 +90,17 @@ class StopMapper {
         } else {
             station.setName("N/A");
         }
-        boolean locOk = PointMapper.handleCoordinates(
+        boolean locationOk = verifyPointAndProcessCoordinate(
                 stop.getCentroid(),
                 // This kind of awkward callback can be avoided if we add a
                 // Coordinate type the the OTP model, and return that instead.
-                p -> {
-                    station.setLon(p.getLongitude().doubleValue());
-                    station.setLat(p.getLatitude().doubleValue());
+                coordinate -> {
+                    station.setLon(coordinate.getLongitude().doubleValue());
+                    station.setLat(coordinate.getLatitude().doubleValue());
                 }
         );
 
-        if (!locOk) {
+        if (!locationOk) {
             LOG.warn("Station {} does not contain any coordinates.", station.getId());
         }
 
@@ -115,16 +118,16 @@ class StopMapper {
             return;
 
         Stop otpQuay = new Stop();
-        boolean locOk = PointMapper.handleCoordinates(
+        boolean locationOk = verifyPointAndProcessCoordinate(
                 quay.getCentroid(),
                 // This kind of awkward callback can be avoided if we add a
                 // Coordinate type the the OTP model, and return that instead.
-                p -> {
-                    otpQuay.setLon(p.getLongitude().doubleValue());
-                    otpQuay.setLat(p.getLatitude().doubleValue());
+                coordinate -> {
+                    otpQuay.setLon(coordinate.getLongitude().doubleValue());
+                    otpQuay.setLat(coordinate.getLatitude().doubleValue());
                 }
         );
-        if (!locOk) {
+        if (!locationOk) {
             LOG.warn("Quay {} does not contain any coordinates. Quay is ignored.", quay.getId());
             return;
         }

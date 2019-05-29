@@ -14,7 +14,11 @@ import org.opentripplanner.standalone.config.OTPConfiguration;
 import java.io.File;
 import java.util.ArrayList;
 
-// TODO - The mapping needs better tests
+// TODO OTP2 - This tests need to be changed into a compleate integration test an focus on
+// TODO OTP2 - that. It is not a replacement for all the Mapping tests - they test the mapping
+// TODO OTP2 - but this test should focus on that all parts of a netex file is consumed and
+// TODO OTP2 - mapped - verifieying that the mapping is correct is the responsibility of he
+// TODO OTP2 - mapping tests.
 public class MappingTest {
     private static final String NETEX_DIR = "src/test/resources/netex";
     private static final String NETEX_FILENAME = "netex_minimal.zip";
@@ -33,17 +37,18 @@ public class MappingTest {
     }
 
     @Test public void testAgencies() {
-
-        // TODO TGR - fix this test
+        // TODO OTP2 - This is not very robust
         Assert.assertEquals(1, otpBuilder.getAgenciesById().values().size());
     }
 
     @Test public void testNetexRoutes() {
+        // TODO OTP2 - This is not very robust
         ArrayList<Route> routesNetex = new ArrayList<>(otpBuilder.getRoutes().values());
         Assert.assertEquals(2, routesNetex.size());
     }
 
     @Test public void testNetexStopTimes() {
+        // TODO OTP2 - This is not very robust
         Assert.assertEquals(0, otpBuilder.getStopTimesSortedByTrip().valuesAsSet().size());
     }
 

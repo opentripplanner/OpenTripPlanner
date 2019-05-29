@@ -15,7 +15,6 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
     private static final long serialVersionUID = 1L;
 
     public static final int EXCEPTION_TYPE_ADD = 1;
-
     public static final int EXCEPTION_TYPE_REMOVE = 2;
 
     private FeedScopedId serviceId;
@@ -69,6 +68,9 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
                 + this.exceptionType + ">";
     }
 
+    /**
+     * Default sort order is to sort on {@code serviceId} first and then on {@code date}.
+     */
     @Override
     public int compareTo(ServiceCalendarDate other) {
         int c = serviceId.compareTo(other.serviceId);

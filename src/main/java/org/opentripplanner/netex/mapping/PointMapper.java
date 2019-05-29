@@ -22,7 +22,7 @@ class PointMapper {
      * @return true if the handler is successfully invoked with a location, {@code false} if
      *         any of the required data elements are {@code null}.
      */
-    static boolean handleCoordinates(
+    static boolean verifyPointAndProcessCoordinate(
             SimplePoint_VersionStructure point,
             Consumer<LocationStructure> locationHandler
     ) {

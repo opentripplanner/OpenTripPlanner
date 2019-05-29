@@ -135,6 +135,8 @@ public class NetexImportDataIndex {
         return calendarServiceIds;
     }
 
+
+    // TODO OTP2 - Unit test
     /**
      * Search {@code groupOfLines} first, then {@code network} to find an authority. If no
      * authority is found {@code null} is returned.

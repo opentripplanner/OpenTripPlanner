@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
+// TODO OTP2 - JavaDoc
 class GroupEntries {
     private String group;
     private List<ZipEntry> sharedEntries = new ArrayList<>();

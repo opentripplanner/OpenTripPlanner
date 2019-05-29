@@ -2,9 +2,9 @@ package org.opentripplanner.netex.loader.util;
 
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
-import static org.opentripplanner.netex.loader.util.NetexVersionHelper.lastestVersionedElementIn;
-import static org.opentripplanner.netex.loader.util.NetexVersionHelper.latestVersionIn;
-import static org.opentripplanner.netex.loader.util.NetexVersionHelper.versionOf;
+import static org.opentripplanner.netex.support.NetexVersionHelper.lastestVersionedElementIn;
+import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
+import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
 
 /**
  * A hierarchical multimap indexing a collections of {@link EntityInVersionStructure} values by
