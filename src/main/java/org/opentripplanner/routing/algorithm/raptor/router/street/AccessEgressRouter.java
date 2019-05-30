@@ -42,7 +42,8 @@ public class AccessEgressRouter {
                     new Transfer(-1,
                             (int)stopAtDistance.edges.stream().map(Edge::getDistance)
                                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum(),
-                            Arrays.asList(stopAtDistance.geom.getCoordinates())));
+                            Arrays.asList(stopAtDistance.geom.getCoordinates()),
+                            stopAtDistance.edges));
         }
 
         LOG.info("Found {} {} stops", result.size(), fromTarget ? "egress" : "access");
