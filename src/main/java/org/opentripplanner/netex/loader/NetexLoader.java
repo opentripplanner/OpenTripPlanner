@@ -98,7 +98,7 @@ public class NetexLoader {
     }
 
     private void loadDao() {
-        netexBundle.withZipFile(file -> loadZipFile(file, netexBundle.fileHirarcy()));
+        netexBundle.withZipFile(file -> loadZipFile(file, netexBundle.fileHierarchy()));
     }
 
     private void loadZipFile(ZipFile zipFile, NetexZipFileHierarchy entries) {

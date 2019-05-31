@@ -45,7 +45,7 @@ public class NetexBundle {
         return file.getPath();
     }
 
-    NetexZipFileHierarchy fileHirarcy(){
+    NetexZipFileHierarchy fileHierarchy(){
         try {
             return new NetexZipFileHierarchy(file, netexParameters);
         } catch (IOException e) {
