@@ -5,7 +5,11 @@ import org.rutebanken.netex.model.Authority;
 
 import static org.opentripplanner.netex.mapping.MappingUtils.mapOptional;
 
-// TODO OTP2 - JavaDoc needed
+/**
+ * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation which is responsible
+ * for the establishment of a public transport service." In NeTEx this is not the same as an operator. A default
+ * authority can be created if none is present.
+ */
 class AgencyMapper {
     /**
      * Map authority and time zone to OTP agency.
