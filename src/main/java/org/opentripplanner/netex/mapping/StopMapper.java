@@ -21,7 +21,17 @@ import static java.util.stream.Collectors.toList;
 import static org.opentripplanner.netex.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
 // TODO OTP2 - Add Unit tests
-// TODO OTP2 - JavaDoc needed
+// TODO OTP2 - How to choose StopPlace version
+
+/**
+ * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
+ * GroupsOfStopPlaces and these are also mapped to parent stops, because searching from a StopPlace and searching from
+ * a GroupOfStopPlaces both corresponding to searching from all of its underlying quays. Model changes in OTP are
+ * required if we want to preserve the original NeTEx hierarchy.
+ * <p>
+ * A NeTEx StopPlace can contain both a version and a validity period. Since none of these are present in the OTP model
+ * we have to choose which version should be mapped based on both of these parameters.
+ */
 class StopMapper {
     private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
 
