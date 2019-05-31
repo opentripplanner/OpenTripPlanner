@@ -11,7 +11,11 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-// TODO OTP2 - JavaDoc
+/**
+ * This contains the location of the NeTEx zip-file to be imported, information about the naming of the files within,
+ * and config values for how the import process should be done.
+ *
+ */
 public class NetexBundle {
 
     private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
