@@ -877,6 +877,9 @@ public class TimetableSnapshotSource {
                 LOG.warn("MODIFIED trip {} matches existing SCHEDULED trip. Treating as such.", trip.getId().getId());
                 return handleScheduledTrip(tripUpdate, feedId, serviceDate);
             }
+            // Do not modify scheduled trips as it causes canceled trip to appear in indexes and replacement trip not added to indexes
+            LOG.error("MODIFIED trip {} matches existing SCHEDULED trip. Stop patterns do not match SKIPPING", trip.getId().getId());
+            return false;
         }
 
         // Cancel scheduled trip
