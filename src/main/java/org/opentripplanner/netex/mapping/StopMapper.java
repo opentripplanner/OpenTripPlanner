@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
-import org.opentripplanner.netex.support.NetexVersionHelper;
+import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -65,7 +65,7 @@ class StopMapper {
     private Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces) {
 
         // Sort by versions, latest first
-        List<StopPlace> stopPlaceAllVersions = sortStopPlacesOnVersionDesc(stopPlaces);
+        List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
         // Use the last(newest) stop place to create a station
         // TODO OTP2 - Can a station be extracted from the last element in all cases?
@@ -85,9 +85,9 @@ class StopMapper {
     /**
      * Sort stop places on version with latest version first (descending order).
      */
-    private List<StopPlace> sortStopPlacesOnVersionDesc(Collection<StopPlace> stopPlaces) {
+    private List<StopPlace> sortStopPlacesByValidityAndVersionDesc(Collection<StopPlace> stopPlaces) {
         return stopPlaces.stream()
-                .sorted(NetexVersionHelper.comparingVersion())
+                .sorted(new StopPlaceVersionAndValidityComparator())
                 .collect(toList());
     }
 
