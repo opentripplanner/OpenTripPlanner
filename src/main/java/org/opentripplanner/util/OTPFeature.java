@@ -24,7 +24,8 @@ public enum OTPFeature {
     APIUpdaterStatus(true),
 
     // Sandbox extension features - Must be turned OFF by default
-    SandboxExampleAPIGraphStatistics(false);
+    SandboxExampleAPIGraphStatistics(false),
+    TransferAnalyzer(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
