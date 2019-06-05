@@ -20,9 +20,6 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static org.opentripplanner.netex.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
-// TODO OTP2 - Add Unit tests
-// TODO OTP2 - How to choose StopPlace version
-
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
  * GroupsOfStopPlaces and these are also mapped to parent stops, because searching from a StopPlace and searching from
@@ -31,6 +28,9 @@ import static org.opentripplanner.netex.mapping.PointMapper.verifyPointAndProces
  * <p>
  * A NeTEx StopPlace can contain both a version and a validity period. Since none of these are present in the OTP model
  * we have to choose which version should be mapped based on both of these parameters.
+ * <p>
+ * To ensure compatibility with older data sets, we also have to keep quays that are only present in older versions
+ * of the StopPlace.
  */
 class StopMapper {
     private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
@@ -47,7 +47,7 @@ class StopMapper {
     private final HierarchicalMultimapById<Quay> quayIndex;
 
 
-    private StopMapper(HierarchicalMultimapById<Quay> quayIndex) {
+    StopMapper(HierarchicalMultimapById<Quay> quayIndex) {
         this.quayIndex = quayIndex;
     }
 
@@ -62,21 +62,22 @@ class StopMapper {
     /**
      * @param stopPlaces all stop places including multiple versions of each.
      */
-    private Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces) {
+    Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces) {
 
-        // Sort by versions, latest first
+        // Prioritize StopPlace versions. Highest priority first.
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
-        // Use the last(newest) stop place to create a station
-        // TODO OTP2 - Can a station be extracted from the last element in all cases?
-        Stop station = mapToStation(last(stopPlaceAllVersions));
+        // Map the highest priority StopPlace version to station
+        Stop station = mapToStation(first(stopPlaceAllVersions));
 
         resultStops.add(station);
 
+        // Loop through all versions of the StopPlace in order to collect all quays, even if they were deleted in
+        // never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Object quayObject : listOfQuays(stopPlace)) {
                 Quay quay = (Quay) quayObject;
-                addNewStop(quay, station);
+                addNewStopToParentIfNotPresent(quay, station);
             }
         }
         return resultStops;
@@ -120,7 +121,7 @@ class StopMapper {
         return station;
     }
 
-    private void addNewStop(Quay quay, Stop station) {
+    private void addNewStopToParentIfNotPresent(Quay quay, Stop station) {
         // Continue if this is not newest version of quay
         if (!quayIndex.isNewLatestVersion(quay))
             return;
@@ -165,7 +166,7 @@ class StopMapper {
                 .collect(toList());
     }
 
-    private static StopPlace last(List<StopPlace> stops) {
-        return stops.get(stops.size() - 1);
+    private static StopPlace first(List<StopPlace> stops) {
+        return stops.get(0);
     }
 }

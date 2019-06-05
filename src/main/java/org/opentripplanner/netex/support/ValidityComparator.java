@@ -27,8 +27,8 @@ public class ValidityComparator implements Comparator<Collection<ValidBetween>> 
             throw new NotSupportedException("More than one validity period not supported");
         }
 
-        ValidBetween v1 = v1collection.stream().findFirst().orElseGet(null);
-        ValidBetween v2 = v2collection.stream().findFirst().orElseGet(null);
+        ValidBetween v1 = v1collection.stream().findFirst().orElse(null);
+        ValidBetween v2 = v2collection.stream().findFirst().orElse(null);
 
         Boolean validNow1 = ValidityHelper.isValidNow(v1);
         Boolean validNow2 = ValidityHelper.isValidNow(v2);
