@@ -88,7 +88,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         String sourceType = config.path("sourceType").asText();
         if (sourceType != null) {
             if (sourceType.equals("gbfs")) {
-                source = new GbfsVehicleRentalDataSource(network);
+                source = new GenericGbfsService();
             }
         }
 

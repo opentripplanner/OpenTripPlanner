@@ -4,8 +4,8 @@
   "data": {
     "stations": [{
       "station_id": "portland",
-      "num_bikes_available": 322,
-      "num_docks_available": 999999,
+      "num_bikes_available": 5,
+      "num_docks_available": 6,
       "is_installed": 1,
       "is_renting": 1,
       "is_returning": 1,
