@@ -39,9 +39,13 @@ public class SimpleTransfer extends Edge {
     @Override
     public State traverse(State s0) {
         // only allow to use TransferEdges when already on a transit vehicle and not on a street level
-        if (!(s0.backEdge instanceof PreAlightEdge)) {
-            return null;
+        if (s0.getOptions().arriveBy) {
+            if (!(s0.getBackEdge() instanceof PreBoardEdge)) return null;
         }
+        else {
+            if (!(s0.getBackEdge() instanceof PreAlightEdge)) return null;
+        }
+
         if(distance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
