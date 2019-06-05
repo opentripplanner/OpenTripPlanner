@@ -322,7 +322,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         private VehicleRentalStation makeDropOffStation(Coordinate coord, Set<String> networks) {
             VehicleRentalStation station = new VehicleRentalStation();
-            String id = String.format("border_dropoff_%3.6f_%3.6f", coord.x, coord.y);
+            String networkNames = (networks == null || networks.size() == 0) ? "undefined network" : networks.toString();
+            String id = String.format("border_dropoff_%3.6f_%3.6f_%s", coord.x, coord.y, networkNames);
 
             station.allowDropoff = true;
             station.allowPickup = false;

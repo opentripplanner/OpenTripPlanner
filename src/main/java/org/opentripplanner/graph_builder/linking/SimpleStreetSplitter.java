@@ -441,8 +441,14 @@ public class SimpleStreetSplitter implements StreetSplitter {
                 ((TemporarySplitterVertex) v).setWheelchairAccessible(false);
             }
         } else {
-            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
-                edge);
+            StringBuilder splitLabel = new StringBuilder();
+            splitLabel.append("split from ");
+            splitLabel.append(edge.getId());
+            splitLabel.append(" i");
+            while (graph.containsVertexLabel(splitLabel.toString())) {
+                splitLabel.append("i");
+            }
+            v = new SplitterVertex(graph, splitLabel.toString(), splitPoint.x, splitPoint.y, edge);
         }
 
         // make the edges
