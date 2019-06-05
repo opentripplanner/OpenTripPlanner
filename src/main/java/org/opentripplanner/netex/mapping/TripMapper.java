@@ -3,11 +3,14 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
+
+import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 // TODO OTP2 - Add Unit tests
 // TODO OTP2 - This code needs cleanup
@@ -32,16 +35,13 @@ public class TripMapper {
         }
 
         Trip trip = new Trip();
-        trip.setId(FeedScopedIdFactory.createFeedScopedId(serviceJourney.getId()));
+        trip.setId(createFeedScopedId(serviceJourney.getId()));
 
-        trip.setRoute(gtfsDao.getRoutes().get(FeedScopedIdFactory.createFeedScopedId(lineRef)));
+        trip.setRoute(gtfsDao.getRoutes().get(createFeedScopedId(lineRef)));
 
-        String serviceId = ServiceIdMapper.mapToServiceId(serviceJourney.getDayTypes());
+        String serviceId = new DayTypeRefsToServiceIdAdapter(serviceJourney.getDayTypes()).getServiceId();
 
-        // Add all unique service ids to map. Used when mapping calendars later.
-        netexIndex.addCalendarServiceId(serviceId);
-
-        trip.setServiceId(FeedScopedIdFactory.createFeedScopedId(serviceId));
+        trip.setServiceId(createFeedScopedId(serviceId));
 
         return trip;
     }

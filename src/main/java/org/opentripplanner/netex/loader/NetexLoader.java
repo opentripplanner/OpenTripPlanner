@@ -4,14 +4,13 @@ import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.mapping.NetexMapper;
-import org.opentripplanner.netex.mapping.ServiceIdMapper;
+import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
 import org.rutebanken.netex.model.DataManagedObjectStructure;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.GroupOfLines;
@@ -56,7 +55,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 
 // TODO OTP2 - JavaDoc
 // TODO OTP2 - Integration test
@@ -351,8 +349,10 @@ public class NetexLoader {
                     .getDatedServiceJourneyOrDeadRunOrServiceJourney();
             for (Journey_VersionStructure jStructure : datedServiceJourneyOrDeadRunOrServiceJourney) {
                 if (jStructure instanceof ServiceJourney) {
-                    loadServiceIds((ServiceJourney) jStructure);
                     ServiceJourney sj = (ServiceJourney) jStructure;
+
+                    index().dayTypeRefs.add(new DayTypeRefsToServiceIdAdapter(sj.getDayTypes()));
+
                     String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
 
                     JourneyPattern journeyPattern = index().journeyPatternsById
@@ -375,13 +375,6 @@ public class NetexLoader {
                 }
             }
         }
-    }
-
-    private void loadServiceIds(ServiceJourney serviceJourney) {
-        DayTypeRefs_RelStructure dayTypes = serviceJourney.getDayTypes();
-        String serviceId = ServiceIdMapper.mapToServiceId(dayTypes);
-        // Add all unique service ids to map. Used when mapping calendars later.
-        index().addCalendarServiceId(serviceId);
     }
 
     // ServiceCalendar
@@ -411,10 +404,9 @@ public class NetexLoader {
             }
 
             if (scf.getOperatingPeriods() != null) {
-                for (OperatingPeriod_VersionStructure operatingPeriodStruct : scf
+                for (OperatingPeriod_VersionStructure p : scf
                         .getOperatingPeriods().getOperatingPeriodOrUicOperatingPeriod()) {
-                    OperatingPeriod operatingPeriod = (OperatingPeriod) operatingPeriodStruct;
-                    index().operatingPeriodById.add(operatingPeriod);
+                    index().operatingPeriodById.add((OperatingPeriod) p);
                 }
             }
 
@@ -422,11 +414,6 @@ public class NetexLoader {
                     .getDayTypeAssignment();
             for (DayTypeAssignment dayTypeAssignment : dayTypeAssignments) {
                 String ref = dayTypeAssignment.getDayTypeRef().getValue().getRef();
-                Boolean available = dayTypeAssignment.isIsAvailable() == null ?
-                        true :
-                        dayTypeAssignment.isIsAvailable();
-                index().dayTypeAvailable.add(dayTypeAssignment.getId(), available);
-
                 index().dayTypeAssignmentByDayTypeId.add(ref, dayTypeAssignment);
             }
         }

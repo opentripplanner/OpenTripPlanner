@@ -5,6 +5,7 @@ import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
+import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -21,7 +22,6 @@ import org.rutebanken.netex.model.StopPlace;
 
 import java.util.HashSet;
 import java.util.Set;
-
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import.
@@ -50,8 +50,12 @@ public class NetexImportDataIndex {
     public final HierarchicalMap<String, Authority> authoritiesByGroupOfLinesId;
     public final HierarchicalMap<String, Authority> authoritiesByNetworkId;
     public final HierarchicalMapById<DayType> dayTypeById;
-    public final HierarchicalMap<String, Boolean> dayTypeAvailable;
     public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
+    /**
+     * TODO OTP2 - Verify this
+     * DayTypeRefs is only needed in the local scope, no need to lookup values in the parent.
+     * */
+    public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
     public final HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId;
@@ -67,8 +71,6 @@ public class NetexImportDataIndex {
     public final HierarchicalMultimapById<StopPlace> stopPlaceById;
     public final HierarchicalElement<String> timeZone;
 
-    private final Set<String> calendarServiceIds = new HashSet<>();
-
     /**
      * Create a root node.
      */
@@ -77,8 +79,8 @@ public class NetexImportDataIndex {
         this.authoritiesByGroupOfLinesId = new HierarchicalMap<>();
         this.authoritiesByNetworkId = new HierarchicalMap<>();
         this.dayTypeById = new HierarchicalMapById<>();
-        this.dayTypeAvailable = new HierarchicalMap<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
+        this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
         this.groupOfLinesByLineId = new HierarchicalMap<>();
@@ -104,8 +106,8 @@ public class NetexImportDataIndex {
         this.authoritiesByGroupOfLinesId = new HierarchicalMap<>(parent.authoritiesByGroupOfLinesId);
         this.authoritiesByNetworkId = new HierarchicalMap<>(parent.authoritiesByNetworkId);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
-        this.dayTypeAvailable = new HierarchicalMap<>(parent.dayTypeAvailable);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
+        this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
         this.groupOfLinesByLineId = new HierarchicalMap<>(parent.groupOfLinesByLineId);
@@ -121,20 +123,6 @@ public class NetexImportDataIndex {
         this.stopPlaceById = new HierarchicalMultimapById<>(parent.stopPlaceById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
-
-    // TODO OTP2 - Why do calendarServiceIds not need to be in a hierarchy while everything
-    // TODO OTP2 - else is?
-    // TODO OTP2 - If this really should NOT delegate to any parent class, then that also needs
-    // TODO OTP2 - to be mention in the class description of this class - since everything else is.
-    // TODO OTP2 - Add unit tests that enforce the business rules above.
-    public void addCalendarServiceId(String serviceId) {
-        calendarServiceIds.add(serviceId);
-    }
-
-    public Iterable<String> getCalendarServiceIds() {
-        return calendarServiceIds;
-    }
-
 
     // TODO OTP2 - Unit test
     /**

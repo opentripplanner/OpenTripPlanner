@@ -4,6 +4,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
@@ -13,7 +14,6 @@ import java.util.Collection;
 
 import static org.opentripplanner.netex.mapping.AgencyMapper.mapAgency;
 import static org.opentripplanner.netex.mapping.CalendarMapper.mapToCalendarDates;
-import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 import static org.opentripplanner.netex.mapping.StopMapper.mapParentAndChildStops;
 
 // TODO OTP2 - Add Unit tests
@@ -56,9 +56,9 @@ public class NetexMapper {
             tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexIndex);
         }
 
-        for (String serviceId : netexIndex.getCalendarServiceIds()) {
+        for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.dayTypeRefs) {
             transitBuilder.getCalendarDates().addAll(
-                    mapToCalendarDates(createFeedScopedId(serviceId), netexIndex)
+                    mapToCalendarDates(dayTypeRefs, netexIndex)
             );
         }
     }

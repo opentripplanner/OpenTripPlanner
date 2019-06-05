@@ -10,8 +10,6 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPlace;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -73,16 +71,6 @@ public class NetexImportDataIndexTest {
         assertEquals(singletonList(quayA), root.quayById.lookup(ID));
         assertEquals(singletonList(quayB), child.quayById.lookup(ID));
         assertTrue(child.quayById.lookup(ID_2).isEmpty());
-    }
-
-    @Test
-    public void lookupDayTypeAvailable() {
-        root.dayTypeAvailable.add(ID, TRUE);
-        child.dayTypeAvailable.add(ID, FALSE);
-
-        assertEquals(TRUE, root.dayTypeAvailable.lookup(ID));
-        assertEquals(FALSE, child.dayTypeAvailable.lookup(ID));
-        assertNull(child.dayTypeAvailable.lookup(ID_2));
     }
 
     @Test

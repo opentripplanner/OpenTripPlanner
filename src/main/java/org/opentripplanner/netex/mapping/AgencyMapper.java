@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Agency;
 import org.rutebanken.netex.model.Authority;
 
-import static org.opentripplanner.netex.mapping.MappingUtils.mapOptional;
+import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptional;
 
 /**
  * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation which is responsible
@@ -21,7 +21,7 @@ class AgencyMapper {
         agency.setName(authority.getName().getValue());
         agency.setTimezone(timeZone);
 
-        mapOptional(authority.getContactDetails(), c -> {
+        withOptional(authority.getContactDetails(), c -> {
             agency.setUrl(c.getUrl());
             agency.setPhone(c.getPhone());
         });

@@ -2,31 +2,26 @@ package org.opentripplanner.netex.mapping;
 
 import org.junit.Test;
 import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.opentripplanner.netex.mapping.DayTypeRefToServiceIdMapper.generateServiceId;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
  */
-public class ServiceIdMapperTest {
+public class DayTypeRefToServiceIdMapperTest {
 
-    @SuppressWarnings("unchecked")
     @Test
     public void mapToServiceId() {
-        Class<DayTypeRefStructure> type = DayTypeRefStructure.class;
-        DayTypeRefs_RelStructure value = new DayTypeRefs_RelStructure();
-        createDayTypeRefStructure("REF");
-
-        value.withDayTypeRef(
-                wrap(createDayTypeRefStructure("A"), type),
-                wrap(createDayTypeRefStructure("B"), type)
-        );
-
-        assertEquals("A+B", ServiceIdMapper.mapToServiceId(value));
+        assertEquals("A", generateServiceId(Collections.singletonList("A")));
+        assertEquals("A+B", generateServiceId(Arrays.asList("A", "B")));
+        assertNull(generateServiceId(Collections.emptyList()));
 
     }
 
