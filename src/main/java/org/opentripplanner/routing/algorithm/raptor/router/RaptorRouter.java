@@ -2,25 +2,22 @@ package org.opentripplanner.routing.algorithm.raptor.router;
 
 import com.conveyal.r5.otp2.RangeRaptorService;
 import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.request.Optimization;
 import com.conveyal.r5.otp2.api.request.RangeRaptorProfile;
 import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.error.PathNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +45,8 @@ public class RaptorRouter {
 
     private final TransitLayer transitLayer;
 
+    private final RoutingRequest request;
+
     //TODO Naming
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
         double startTime = System.currentTimeMillis();
@@ -57,9 +56,10 @@ public class RaptorRouter {
         );
         LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
         this.transitLayer = transitLayer;
+        this.request = request;
     }
 
-    public TripPlan route(RoutingRequest request) {
+    public Collection<Itinerary> route() {
 
         /* Prepare access/egress transfers */
 
@@ -120,14 +120,9 @@ public class RaptorRouter {
                 .map(itineraryMapper::createItinerary)
                 .collect(Collectors.toList());
 
-        TripPlan tripPlan = itineraryMapper.createTripPlan(itineraries);
+        LOG.info("Creating itineraries took {} ms", itineraries.size(), System.currentTimeMillis() - startItineraries);
 
-        LOG.info("Creating itineraries took {} ms", System.currentTimeMillis() - startItineraries);
-        if (tripPlan.itinerary.isEmpty()) {
-            throw new PathNotFoundException();
-        }
-
-        return tripPlan;
+        return itineraries;
     }
 
     private ZonedDateTime calculateStartOfTime(RoutingRequest request) {
