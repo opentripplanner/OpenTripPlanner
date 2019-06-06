@@ -126,7 +126,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 // parse the region and update the regions
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = mapper.readTree(data);
-                parseRegionJson(rootNode);
+                regions = parseRegionJson(rootNode);
                 data.close();
             } catch (IOException e) {
                 LOG.warn("Error reading vehicle rental regions from " + regionsUrl, e);

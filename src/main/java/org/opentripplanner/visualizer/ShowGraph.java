@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -459,7 +460,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         Envelope env;
         
         // int xminx, xmax, ymin, ymax;
-        for (Vertex v : graph.getVertices()) {
+        // create as a list to avoid concurrent modification exceptions while reading
+        List<Vertex> vertices = Lists.newArrayList(graph.getVertices());
+        for (Vertex v : vertices) {
             Coordinate c = v.getCoordinate();
             env = new Envelope(c);
             vertexIndex.insert(env, v);

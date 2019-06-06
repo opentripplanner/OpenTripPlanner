@@ -1371,11 +1371,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public boolean addVehicleNetwork(String vehicleNetwork) {
         if (vehicleNetworks == null) {
-            synchronized (this) {
-                if (vehicleNetworks == null) {
-                    vehicleNetworks = new HashSet<>();
-                }
-            }
+            vehicleNetworks = new HashSet<>();
         }
         return vehicleNetworks.add(vehicleNetwork);
     }
