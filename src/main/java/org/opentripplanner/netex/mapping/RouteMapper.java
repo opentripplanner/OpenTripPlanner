@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
-// TODO OTP2 - Add Unit tests
-// TODO OTP2 - This code needs cleanup
-// TODO OTP2 - JavaDoc needed
+/**
+ * Maps NeTEx line to OTP Route.
+ */
 class RouteMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);

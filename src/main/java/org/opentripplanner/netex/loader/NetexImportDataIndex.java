@@ -74,7 +74,7 @@ public class NetexImportDataIndex {
     /**
      * Create a root node.
      */
-    NetexImportDataIndex() {
+    public NetexImportDataIndex() {
         this.authoritiesById = new HierarchicalMapById<>();
         this.authoritiesByGroupOfLinesId = new HierarchicalMap<>();
         this.authoritiesByNetworkId = new HierarchicalMap<>();
