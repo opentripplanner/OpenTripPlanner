@@ -11,9 +11,10 @@ import static org.opentripplanner.netex.mapping.TransportModeMapper.mapTramSubmo
 import static org.opentripplanner.netex.mapping.TransportModeMapper.mapVehicleMode;
 import static org.opentripplanner.netex.mapping.TransportModeMapper.mapWaterSubmode;
 
-// TODO OTP2 - Add Unit tests
-// TODO OTP2 - This code needs cleanup
-// TODO OTP2 - JavaDoc needed
+/**
+ * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are identical to the
+ * <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">GTFS extended route types</a>
+ */
 class StopPlaceTypeMapper {
 
     private static final Integer DEFAULT_OTP_VALUE = 3;

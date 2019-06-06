@@ -13,8 +13,10 @@ import org.rutebanken.netex.model.TransportSubmodeStructure;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
-// TODO OTP2 - Add Unit tests
-// TODO OTP2 - JavaDoc needed
+/**
+ * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are identical to the
+ * <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">GTFS extended route types</a>
+ */
 class TransportModeMapper {
 
     private static final Integer DEFAULT_OTP_VALUE = 3;
