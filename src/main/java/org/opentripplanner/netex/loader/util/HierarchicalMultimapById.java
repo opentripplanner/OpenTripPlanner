@@ -57,6 +57,6 @@ public class HierarchicalMultimapById<V extends EntityInVersionStructure>
      * in the first collection found.
      */
     public boolean isNewLatestVersion(V value) {
-        return versionOf(value) > latestVersionIn(lookup(value.getId()));
+        return versionOf(value) >= latestVersionIn(lookup(value.getId()));
     }
 }

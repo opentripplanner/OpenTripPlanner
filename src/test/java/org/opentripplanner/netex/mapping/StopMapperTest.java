@@ -79,6 +79,11 @@ public class StopMapperTest {
         );
 
         HierarchicalMultimapById<Quay> quaysById = new HierarchicalMultimapById<>();
+        quaysById.add(quay1a);
+        quaysById.add(quay1a);
+        quaysById.add(quay2);
+        quaysById.add(quay3);
+
         StopMapper stopMapper = new StopMapper(quaysById);
         Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaces);
 
