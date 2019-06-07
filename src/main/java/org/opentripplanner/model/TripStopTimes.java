@@ -46,6 +46,10 @@ public class TripStopTimes {
         map.replace(key, sort(list));
     }
 
+    public void put(Trip key, Collection<StopTime> list) {
+        map.put(key, sort(list));
+    }
+
     /**
      * Return a copy of the internal map. Changes in the source are not reflected
      * in the destination (returned Map), and visa versa.

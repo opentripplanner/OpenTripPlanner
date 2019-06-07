@@ -76,7 +76,7 @@ class TripPatternMapper {
             );
 
             if (stopTimes != null) {
-                transitBuilder.getStopTimesSortedByTrip().replace(trip, stopTimes);
+                transitBuilder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
                 // Set first headsign as trip headsign
                 if (stopTimes.size() > 0) {
