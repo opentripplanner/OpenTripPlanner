@@ -160,8 +160,8 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals("1003", openTestStation.id);
         assertEquals(25.0424261, openTestStation.x);
         assertEquals(60.2932159, openTestStation.y);
-        assertEquals(3, openTestStation.spacesAvailable);
-        assertEquals(2, openTestStation.bikesAvailable);
+        assertEquals(2, openTestStation.spacesAvailable);
+        assertEquals(3, openTestStation.bikesAvailable);
         assertEquals("Station on", openTestStation.state);
 
         // Test giving network name to data source
