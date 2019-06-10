@@ -1,0 +1,40 @@
+{
+    "message": "",
+    "errcode": 0,
+    "ticks": 0,
+    "data": [
+        {
+            "id": 1001,
+            "name": "Temporarily closed test station",
+            "latitude": 60.2930266,
+            "longitude": 25.0515797,
+            "total_capacity": 0,
+            "available_capacity": 0,
+            "discount": 0,
+            "is_enable": 1,
+            "update_time": "2019-05-22T11:15:02+08:00"
+        },
+        {
+            "id": 1002,
+            "name": "Closed test station",
+            "latitude": 60.2934127,
+            "longitude": 25.0364107,
+            "total_capacity": 0,
+            "available_capacity": 0,
+            "discount": 0,
+            "is_enable": 2,
+            "update_time": "2019-05-22T11:15:02+08:00"
+        },
+        {
+            "id": 1003,
+            "name": "Open test station",
+            "latitude": 60.2932159,
+            "longitude": 25.0424261,
+            "total_capacity": 5,
+            "available_capacity": 2,
+            "discount": 0,
+            "is_enable": 0,
+            "update_time": "2019-05-22T11:15:02+08:00"
+        }
+    ]
+}
