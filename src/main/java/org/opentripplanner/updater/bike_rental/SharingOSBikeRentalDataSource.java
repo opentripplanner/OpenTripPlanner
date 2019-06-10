@@ -42,15 +42,15 @@ public class SharingOSBikeRentalDataSource extends GenericJsonBikeRentalDataSour
             station.y = node.path("latitude").asDouble();
             station.x = node.path("longitude").asDouble();
             if (node.path("is_enable").asInt() == 0) {
-                station.state = "station on";
+                station.state = "Station on";
                 station.bikesAvailable = node.path("available_capacity").asInt();
                 station.spacesAvailable = node.path("total_capacity").asInt() - station.bikesAvailable;
             } else if (node.path("is_enable").asInt() == 1) {
-                station.state = "station off";
+                station.state = "Station off";
                 station.bikesAvailable = 0;
                 station.spacesAvailable = 0;
             } else {
-                station.state = "station closed";
+                station.state = "Station closed";
                 station.bikesAvailable = 0;
                 station.spacesAvailable = 0;
             }

@@ -124,4 +124,52 @@ public class TestBikeRentalStationSource extends TestCase {
         BikeRentalStation testitieWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
         assertEquals("[vuosaari]", testitieWithCustomNetwork.networks.toString());
     }
+
+    public void testSharingos() {
+        SharingOSBikeRentalDataSource source = new SharingOSBikeRentalDataSource(null);
+        source.setUrl("file:src/test/resources/bike/sharingos.json");
+        assertTrue(source.update());
+        List<BikeRentalStation> rentalStations = source.getStations();
+
+        assertEquals(3, rentalStations.size());
+        for (BikeRentalStation rentalStation : rentalStations) {
+            System.out.println(rentalStation);
+        }
+
+        BikeRentalStation tempClosedStation = rentalStations.get(0);
+        assertEquals("Temporarily closed test station", tempClosedStation.name.toString());
+        assertEquals("1001", tempClosedStation.id);
+        assertEquals(25.0515797, tempClosedStation.x);
+        assertEquals(60.2930266, tempClosedStation.y);
+        assertEquals(0, tempClosedStation.spacesAvailable);
+        assertEquals(0, tempClosedStation.bikesAvailable);
+        assertEquals("Station off", tempClosedStation.state);
+        assertEquals("[sharingos]", tempClosedStation.networks.toString());
+
+        BikeRentalStation permClosedStation = rentalStations.get(1);
+        assertEquals("Closed test station", permClosedStation.name.toString());
+        assertEquals("1002", permClosedStation.id);
+        assertEquals(0, permClosedStation.spacesAvailable);
+        assertEquals(0, permClosedStation.bikesAvailable);
+        assertEquals(25.0364107, permClosedStation.x);
+        assertEquals(60.2934127, permClosedStation.y);
+        assertEquals("Station closed", permClosedStation.state);
+
+        BikeRentalStation openTestStation = rentalStations.get(2);
+        assertEquals("Open test station", openTestStation.name.toString());
+        assertEquals("1003", openTestStation.id);
+        assertEquals(25.0424261, openTestStation.x);
+        assertEquals(60.2932159, openTestStation.y);
+        assertEquals(3, openTestStation.spacesAvailable);
+        assertEquals(2, openTestStation.bikesAvailable);
+        assertEquals("Station on", openTestStation.state);
+
+        // Test giving network name to data source
+        SharingOSBikeRentalDataSource sourceWithCustomNetwork = new SharingOSBikeRentalDataSource("vantaa");
+        sourceWithCustomNetwork.setUrl("file:src/test/resources/bike/sharingos.json");
+        assertTrue(sourceWithCustomNetwork.update());
+        List<BikeRentalStation> rentalStationsWithCustomNetwork = sourceWithCustomNetwork.getStations();
+        BikeRentalStation tempClosedStationWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
+        assertEquals("[vantaa]", tempClosedStationWithCustomNetwork.networks.toString());
+    }
 }
