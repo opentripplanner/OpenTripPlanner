@@ -55,6 +55,7 @@
   <!-- for now disable realtime logging, leave only statistics -->
   <logger name="org.opentripplanner.updater.bike_rental.SmooveBikeRentalDataSource" level="warn" />
   <logger name="org.opentripplanner.updater.bike_rental.SamocatScooterRentalDataSource" level="warn" />
+  <logger name="org.opentripplanner.updater.bike_rental.SharingOSBikeRentalDataSource" level="warn" />
   <logger name="org.opentripplanner.updater.bike_rental.BikeRentalUpdater" level="warn" />
   <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource" level="error" />
   <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource$GtfsRealtimeStatistics" level="info" />

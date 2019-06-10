@@ -99,6 +99,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new BicimadBikeRentalDataSource();
             } else if (sourceType.equals("samocat")) {
                 source = new SamocatScooterRentalDataSource(networkName);
+            } else if (sourceType.equals("sharingos")) {
+                source = new SharingOSBikeRentalDataSource(networkName);
             }
         }
 
