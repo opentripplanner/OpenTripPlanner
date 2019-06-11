@@ -3,10 +3,29 @@ package org.opentripplanner.netex.mapping;
 import org.junit.Test;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.rutebanken.netex.model.*;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.RouteRefStructure;
+import org.rutebanken.netex.model.ScheduledStopPoint;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
+import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -14,10 +33,11 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
-import static org.opentripplanner.netex.mapping.TripPatternMapper.*;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.netex.mapping.TripPatternMapper.calculateOtpTime;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
@@ -37,12 +57,14 @@ public class TripPatternMapperTest {
         assertEquals(191700, calculateOtpTime(QUARTER_PAST_FIVE, TWO));
     }
 
-    // TODO - This test needs to be cleaned up
-
     @Test
     public void testMapTripPattern() {
+
+        // Set up NeTEx data structure to map. This includes JourneyPattern and related entities
+
         TripPatternMapper tripPatternMapper = new TripPatternMapper();
         RouteMapper routeMapper = new RouteMapper();
+
         NetexImportDataIndex netexIndex = new NetexImportDataIndex();
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
@@ -58,8 +80,6 @@ public class TripPatternMapperTest {
         netexRoute.setId("RUT:Route:1");
         netexIndex.routeById.add(netexRoute);
 
-        transitBuilder.getRoutes().add(route);
-
         JourneyPattern journeyPattern = new JourneyPattern();
         journeyPattern.setId("RUT:JourneyPattern:1");
 
@@ -67,38 +87,33 @@ public class TripPatternMapperTest {
         journeyPattern.setRouteRef(routeRefStructure);
 
         Collection<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
-
         TimetabledPassingTime timetabledPassingTime1= new TimetabledPassingTime();
         timetabledPassingTime1.setDepartureTime(LocalTime.of(5, 0));
+        timetabledPassingTimes.add(timetabledPassingTime1);
         TimetabledPassingTime timetabledPassingTime2= new TimetabledPassingTime();
         timetabledPassingTime2.setDepartureTime(LocalTime.of(5, 4));
+        timetabledPassingTimes.add(timetabledPassingTime2);
         TimetabledPassingTime timetabledPassingTime3= new TimetabledPassingTime();
         timetabledPassingTime3.setDepartureTime(LocalTime.of(5, 10));
+        timetabledPassingTimes.add(timetabledPassingTime3);
         TimetabledPassingTime timetabledPassingTime4= new TimetabledPassingTime();
         timetabledPassingTime4.setDepartureTime(LocalTime.of(5, 15));
+        timetabledPassingTimes.add(timetabledPassingTime4);
         TimetabledPassingTime timetabledPassingTime5= new TimetabledPassingTime();
         timetabledPassingTime5.setDepartureTime(LocalTime.of(5, 22));
-
-        timetabledPassingTimes.add(timetabledPassingTime1);
-        timetabledPassingTimes.add(timetabledPassingTime2);
-        timetabledPassingTimes.add(timetabledPassingTime3);
-        timetabledPassingTimes.add(timetabledPassingTime4);
         timetabledPassingTimes.add(timetabledPassingTime5);
 
-        ServiceJourney serviceJourney = new ServiceJourney().withPassingTimes(new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(timetabledPassingTimes));
+        ServiceJourney serviceJourney = new ServiceJourney()
+                .withPassingTimes(new TimetabledPassingTimes_RelStructure()
+                        .withTimetabledPassingTime(timetabledPassingTimes));
         serviceJourney.setId("RUT:ServiceJourney:1");
+
         JAXBElement<JourneyPatternRefStructure> journeyPatternRef =
-                new JAXBElement<>(
-                        new QName(""),
-                        JourneyPatternRefStructure.class,
-                        new JourneyPatternRefStructure().withRef(journeyPattern.getId()));
+                getJourneyPatternRef(journeyPattern.getId());
         serviceJourney.setJourneyPatternRef(journeyPatternRef);
 
         JAXBElement<LineRefStructure> lineRef =
-                new JAXBElement<>(
-                        new QName(""),
-                        LineRefStructure.class,
-                        new LineRefStructure().withRef(line.getId()));
+                getLineRef(line.getId());
         serviceJourney.setLineRef(lineRef);
 
         netexRoute.setLineRef(lineRef);
@@ -108,42 +123,31 @@ public class TripPatternMapperTest {
         StopPointInJourneyPattern stopPointInJourneyPattern1 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern1.setId("RUT:StopPointInJourneyPattern:1");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef1 =
-                new JAXBElement<>(
-                        new QName(""),
-                        StopPointInJourneyPatternRefStructure.class,
-                        new StopPointInJourneyPatternRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getStopPointInJourneyPatternRef(stopPointInJourneyPattern1.getId());
         timetabledPassingTime1.setPointInJourneyPatternRef(stopPointInJourneyPatternRef1);
+
         StopPointInJourneyPattern stopPointInJourneyPattern2 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern2.setId("RUT:StopPointInJourneyPattern:2");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef2 =
-                new JAXBElement<>(
-                        new QName(""),
-                        StopPointInJourneyPatternRefStructure.class,
-                        new StopPointInJourneyPatternRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getStopPointInJourneyPatternRef(stopPointInJourneyPattern2.getId());
         timetabledPassingTime2.setPointInJourneyPatternRef(stopPointInJourneyPatternRef2);
+
         StopPointInJourneyPattern stopPointInJourneyPattern3 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern3.setId("RUT:StopPointInJourneyPattern:3");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef3 =
-                new JAXBElement<>(
-                        new QName(""),
-                        StopPointInJourneyPatternRefStructure.class,
-                        new StopPointInJourneyPatternRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getStopPointInJourneyPatternRef(stopPointInJourneyPattern3.getId());
         timetabledPassingTime3.setPointInJourneyPatternRef(stopPointInJourneyPatternRef3);
+
         StopPointInJourneyPattern stopPointInJourneyPattern4 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern4.setId("RUT:StopPointInJourneyPattern:4");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef4 =
-                new JAXBElement<>(
-                        new QName(""),
-                        StopPointInJourneyPatternRefStructure.class,
-                        new StopPointInJourneyPatternRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getStopPointInJourneyPatternRef(stopPointInJourneyPattern4.getId());
         timetabledPassingTime4.setPointInJourneyPatternRef(stopPointInJourneyPatternRef4);
+
         StopPointInJourneyPattern stopPointInJourneyPattern5 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern5.setId("RUT:StopPointInJourneyPattern:5");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef5 =
-                new JAXBElement<>(
-                        new QName(""),
-                        StopPointInJourneyPatternRefStructure.class,
-                        new StopPointInJourneyPatternRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getStopPointInJourneyPatternRef(stopPointInJourneyPattern5.getId());
         timetabledPassingTime5.setPointInJourneyPatternRef(stopPointInJourneyPatternRef5);
 
         Collection<PointInLinkSequence_VersionedChildStructure> pointsInLink = new ArrayList<>();
@@ -153,53 +157,39 @@ public class TripPatternMapperTest {
         pointsInLink.add(stopPointInJourneyPattern4);
         pointsInLink.add(stopPointInJourneyPattern5);
 
-        journeyPattern.setPointsInSequence(new PointsInJourneyPattern_RelStructure().withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(pointsInLink));
+        journeyPattern.setPointsInSequence(new PointsInJourneyPattern_RelStructure()
+                .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(pointsInLink));
 
         ScheduledStopPoint scheduledStopPoint1 = new ScheduledStopPoint();
         scheduledStopPoint1.setId("RUT:ScheduledStopPoint:1");
         ScheduledStopPoint scheduledStopPoint2 = new ScheduledStopPoint();
-        scheduledStopPoint1.setId("RUT:ScheduledStopPoint:2");
+        scheduledStopPoint2.setId("RUT:ScheduledStopPoint:2");
         ScheduledStopPoint scheduledStopPoint3 = new ScheduledStopPoint();
-        scheduledStopPoint1.setId("RUT:ScheduledStopPoint:3");
+        scheduledStopPoint3.setId("RUT:ScheduledStopPoint:3");
         ScheduledStopPoint scheduledStopPoint4 = new ScheduledStopPoint();
-        scheduledStopPoint1.setId("RUT:ScheduledStopPoint:4");
+        scheduledStopPoint4.setId("RUT:ScheduledStopPoint:4");
         ScheduledStopPoint scheduledStopPoint5 = new ScheduledStopPoint();
-        scheduledStopPoint1.setId("RUT:ScheduledStopPoint:5");
+        scheduledStopPoint5.setId("RUT:ScheduledStopPoint:5");
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef1 =
-                new JAXBElement<>(
-                        new QName(""),
-                        ScheduledStopPointRefStructure.class,
-                        new ScheduledStopPointRefStructure().withRef(stopPointInJourneyPattern1.getId()));
+                getScheduledStopPointRef(stopPointInJourneyPattern1.getId());
         stopPointInJourneyPattern1.setScheduledStopPointRef(scheduledStopPointRef1);
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef2 =
-                new JAXBElement<>(
-                        new QName(""),
-                        ScheduledStopPointRefStructure.class,
-                        new ScheduledStopPointRefStructure().withRef(stopPointInJourneyPattern2.getId()));
-        stopPointInJourneyPattern1.setScheduledStopPointRef(scheduledStopPointRef2);
+                getScheduledStopPointRef(stopPointInJourneyPattern2.getId());
+        stopPointInJourneyPattern2.setScheduledStopPointRef(scheduledStopPointRef2);
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef3 =
-                new JAXBElement<>(
-                        new QName(""),
-                        ScheduledStopPointRefStructure.class,
-                        new ScheduledStopPointRefStructure().withRef(stopPointInJourneyPattern3.getId()));
-        stopPointInJourneyPattern1.setScheduledStopPointRef(scheduledStopPointRef3);
+                getScheduledStopPointRef(stopPointInJourneyPattern3.getId());
+        stopPointInJourneyPattern3.setScheduledStopPointRef(scheduledStopPointRef3);
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef4 =
-                new JAXBElement<>(
-                        new QName(""),
-                        ScheduledStopPointRefStructure.class,
-                        new ScheduledStopPointRefStructure().withRef(stopPointInJourneyPattern4.getId()));
-        stopPointInJourneyPattern1.setScheduledStopPointRef(scheduledStopPointRef4);
+                getScheduledStopPointRef(stopPointInJourneyPattern4.getId());
+        stopPointInJourneyPattern4.setScheduledStopPointRef(scheduledStopPointRef4);
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef5 =
-                new JAXBElement<>(
-                        new QName(""),
-                        ScheduledStopPointRefStructure.class,
-                        new ScheduledStopPointRefStructure().withRef(stopPointInJourneyPattern5.getId()));
-        stopPointInJourneyPattern1.setScheduledStopPointRef(scheduledStopPointRef5);
+                getScheduledStopPointRef(stopPointInJourneyPattern5.getId());
+        stopPointInJourneyPattern5.setScheduledStopPointRef(scheduledStopPointRef5);
 
         Quay quay1 = new Quay();
         quay1.setId("NSR:Quay:1");
@@ -239,9 +229,67 @@ public class TripPatternMapperTest {
         serviceJourney.setDayTypes(dayTypeRefs_relStructure);
         netexIndex.serviceJourneyByPatternId.add(journeyPattern.getId(), serviceJourney);
 
+        // Do the actual mapping of NeTEx JourneyPattern to OTP TripPattern
+
         tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexIndex);
 
+        // Assert that the mapping is correct
+
         assertEquals(1, transitBuilder.getTripPatterns().size());
+
+        TripPattern tripPattern = transitBuilder.getTripPatterns().values().stream().findFirst().get();
+
+        assertEquals(5, tripPattern.getStops().size());
+        assertEquals(1, tripPattern.getTrips().size());
+
+        List<Stop> stops = tripPattern.getStops();
+        Trip trip = tripPattern.getTrips().get(0);
+
+        assertEquals("RUT:ServiceJourney:1", trip.getId().getId());
+        assertEquals("NSR:Quay:1", stops.get(0).getId().getId());
+        assertEquals("NSR:Quay:2", stops.get(1).getId().getId());
+        assertEquals("NSR:Quay:3", stops.get(2).getId().getId());
+        assertEquals("NSR:Quay:4", stops.get(3).getId().getId());
+        assertEquals("NSR:Quay:5", stops.get(4).getId().getId());
+
+        assertEquals(1, tripPattern.scheduledTimetable.tripTimes.size());
+
+        TripTimes tripTimes = tripPattern.scheduledTimetable.tripTimes.get(0);
+
+        assertEquals(5, tripTimes.getNumStops());
+
+        assertEquals(18000, tripTimes.getDepartureTime(0));
+        assertEquals(18240, tripTimes.getDepartureTime(1));
+        assertEquals(18600, tripTimes.getDepartureTime(2));
+        assertEquals(18900, tripTimes.getDepartureTime(3));
+        assertEquals(19320, tripTimes.getDepartureTime(4));
     }
 
+    private JAXBElement<ScheduledStopPointRefStructure> getScheduledStopPointRef(String id) {
+        return new JAXBElement<>(
+                new QName(""),
+                ScheduledStopPointRefStructure.class,
+                new ScheduledStopPointRefStructure().withRef(id));
+    }
+
+    private JAXBElement<StopPointInJourneyPatternRefStructure> getStopPointInJourneyPatternRef(String id) {
+        return new JAXBElement<>(
+                new QName(""),
+                StopPointInJourneyPatternRefStructure.class,
+                new StopPointInJourneyPatternRefStructure().withRef(id));
+    }
+
+    private JAXBElement<JourneyPatternRefStructure> getJourneyPatternRef(String id) {
+        return new JAXBElement<>(
+                new QName(""),
+                JourneyPatternRefStructure.class,
+                new JourneyPatternRefStructure().withRef(id));
+    }
+
+    private JAXBElement<LineRefStructure> getLineRef(String id) {
+        return new JAXBElement<>(
+                new QName(""),
+                LineRefStructure.class,
+                new LineRefStructure().withRef(id));
+    }
 }
