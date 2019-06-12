@@ -1,16 +1,12 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.calendar.impl;
+package org.opentripplanner.model.calendar.impl;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.LocalizedServiceId;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +15,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,43 +39,34 @@ public class CalendarServiceDataFactoryImpl {
     private final List<Agency> agencies;
     private final Map<FeedScopedId, List<ServiceCalendarDate>> calendarDatesByServiceId;
     private final Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId;
-    private final Map<FeedScopedId, List<String>> tripAgencyIdsByServiceId;
     private final Set<FeedScopedId> serviceIds;
 
-    public static CalendarService createCalendarService(OtpTransitServiceBuilder transitDaoBuilder) {
-        return new CalendarServiceImpl(createCalendarServiceData(transitDaoBuilder));
-    }
+    public static CalendarServiceData createCalendarServiceData(
+            Collection<Agency> agencies,
+            Collection<ServiceCalendarDate> calendarDates,
+            Collection<ServiceCalendar> serviceCalendars
 
-    public static CalendarServiceData createCalendarServiceData(OtpTransitServiceBuilder transitDaoBuilder) {
-        return new CalendarServiceDataFactoryImpl(transitDaoBuilder).createData();
-    }
-
-    public static CalendarServiceData createCalendarSrvDataWithoutDatesForLocalizedSrvId(
-            OtpTransitServiceBuilder transitDaoBuilder
     ) {
-        return (new CalendarServiceDataFactoryImpl(transitDaoBuilder) {
-            @Override void addDatesForLocalizedServiceId(
-                    FeedScopedId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data
-            ) {
-                // Skip creation of datesForLocalizedServiceId
-            }
-        }).createData();
+        return new CalendarServiceDataFactoryImpl(agencies, calendarDates, serviceCalendars)
+                .createData();
     }
 
-    private CalendarServiceDataFactoryImpl(OtpTransitServiceBuilder transitBuilder) {
-        agencies = new ArrayList<>(transitBuilder.getAgenciesById().values());
-        calendarDatesByServiceId = transitBuilder.getCalendarDates()
+    private CalendarServiceDataFactoryImpl(
+            Collection<Agency> agencies,
+            Collection<ServiceCalendarDate> calendarDates,
+            Collection<ServiceCalendar> serviceCalendars
+    ) {
+        this.agencies = new ArrayList<>(agencies);
+        this.calendarDatesByServiceId = calendarDates
                 .stream()
                 .collect(groupingBy(ServiceCalendarDate::getServiceId));
-        calendarsByServiceId = transitBuilder.getCalendars()
+        this.calendarsByServiceId = serviceCalendars
                 .stream()
                 .collect(groupingBy(ServiceCalendar::getServiceId));
-        serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
-
-        tripAgencyIdsByServiceId = createTripAgencyIdByServiceIdMap(transitBuilder.getTripsById().values());
+        this.serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
     }
 
-    CalendarServiceData createData() {
+    private CalendarServiceData createData() {
 
         CalendarServiceData data = new CalendarServiceData();
 
@@ -106,37 +92,9 @@ public class CalendarServiceDataFactoryImpl {
             Collections.sort(serviceDates);
 
             data.putServiceDatesForServiceId(serviceId, serviceDates);
-
-            addDatesForLocalizedServiceId(serviceId, serviceDates, data);
         }
 
         return data;
-    }
-
-    void addDatesForLocalizedServiceId (
-            FeedScopedId serviceId, List<ServiceDate> serviceDates, CalendarServiceData data) {
-        List<String> tripAgencyIds = tripAgencyIdsByServiceId.get(serviceId);
-
-        if(tripAgencyIds == null) {
-            LOG.warn("There is no trip with service id '{}'. No index for Localized service dates can be created.", serviceId);
-            return;
-        }
-
-        Set<TimeZone> timeZones = new HashSet<>();
-        for (String tripAgencyId : tripAgencyIds) {
-            TimeZone timeZone = data.getTimeZoneForAgencyId(tripAgencyId);
-            timeZones.add(timeZone);
-        }
-
-        for (TimeZone timeZone : timeZones) {
-
-            List<Date> dates = new ArrayList<>(serviceDates.size());
-            for (ServiceDate serviceDate : serviceDates)
-                dates.add(serviceDate.getAsDate(timeZone));
-
-            LocalizedServiceId id = new LocalizedServiceId(serviceId, timeZone);
-            data.putDatesForLocalizedServiceId(id, dates);
-        }
     }
 
     private Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId,
@@ -260,31 +218,7 @@ public class CalendarServiceDataFactoryImpl {
         return c.getTime();
     }
 
-    private static Map<FeedScopedId, List<String>> createTripAgencyIdByServiceIdMap(Collection<Trip> trips) {
-        Map<FeedScopedId, Set<String>> agencyIdsByServiceIds = new HashMap<>();
-
-        for (Trip t : trips) {
-            // In GFTS providing an agency is optional, but we add an empty set
-            // anyway to make sure all trips are represented in the map.
-            Collection<String> agencyIds = agencyIdsByServiceIds
-                    .computeIfAbsent(t.getServiceId(), key -> new HashSet<>());
-
-            if(t.getRoute().getAgency() != null) {
-                agencyIds.add(t.getRoute().getAgency().getId());
-            }
-        }
-
-        Map<FeedScopedId, List<String>> map = new HashMap<>();
-
-        for (Map.Entry<FeedScopedId, Set<String>> entry : agencyIdsByServiceIds.entrySet()) {
-            FeedScopedId tripServiceId = entry.getKey();
-            List<String> agencyIds = new ArrayList<>(entry.getValue());
-            Collections.sort(agencyIds);
-            map.put(tripServiceId, agencyIds);
-        }
-        return map;
-    }
-
+    /** package local to be unit testable */
     static <T> Set<T> merge(Collection<T> set1, Collection<T> set2) {
         Set<T> newSet = new HashSet<>();
         newSet.addAll(set1);

@@ -5,7 +5,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is responsible for generating trip patterns when loading GTFS data. This was
@@ -38,7 +39,7 @@ public class GenerateTripPatternsOperation {
     private final OtpTransitServiceBuilder transitDaoBuilder;
     private final AddBuilderAnnotation builderAnnotation;
     private final Deduplicator deduplicator;
-    private final CalendarService calendarService;
+    private final Set<FeedScopedId> calendarServiceIds;
 
     private final Multimap<StopPattern, TripPattern> tripPatterns;
     private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
@@ -50,11 +51,11 @@ public class GenerateTripPatternsOperation {
 
 
     public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, AddBuilderAnnotation builderAnnotation,
-            Deduplicator deduplicator, CalendarService calendarService) {
+            Deduplicator deduplicator, Set<FeedScopedId> calendarServiceIds) {
         this.transitDaoBuilder = builder;
         this.builderAnnotation = builderAnnotation;
         this.deduplicator = deduplicator;
-        this.calendarService = calendarService;
+        this.calendarServiceIds = calendarServiceIds;
         this.tripPatterns = transitDaoBuilder.getTripPatterns();
     }
 
@@ -99,7 +100,7 @@ public class GenerateTripPatternsOperation {
 
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
-        if (!calendarService.getServiceIds().contains(trip.getServiceId())) {
+        if (!calendarServiceIds.contains(trip.getServiceId())) {
             LOG.warn(builderAnnotation.addBuilderAnnotation(new TripUndefinedService(trip)));
             return; // Invalid trip, skip it, it will break later
         }

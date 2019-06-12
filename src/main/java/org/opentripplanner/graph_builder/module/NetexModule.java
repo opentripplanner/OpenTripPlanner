@@ -1,12 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
-import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.netex.loader.NetexLoader;
-import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -42,26 +40,30 @@ public class NetexModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         graph.clearTimeZone();
-        MultiCalendarServiceImpl calendarService = new MultiCalendarServiceImpl();
-        GtfsStopContext stopContext = new GtfsStopContext();
+        CalendarServiceData calendarServiceData = new CalendarServiceData();
+
+        // TODO OTP2 - Stops set inside the hf.run. The next line appered after merging
+        // TODO OTP2 - dev-2.x and netex_inport, It does not compile due to the deletion of the
+        // TODO OTP2 - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
+        // TODO OTP2 -  this and the "//hf.setStopContext(stopContext);" below (line 67).
+        //GtfsStopContext stopContext = new GtfsStopContext();
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
-                OtpTransitServiceBuilder daoBuilder = new NetexLoader(netexBundle).loadBundle();
-
-                calendarService.addData(daoBuilder);
+                OtpTransitServiceBuilder transitBuilder = new NetexLoader(netexBundle).loadBundle();
+                calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 PatternHopFactory hf = new PatternHopFactory(
                         new GtfsFeedId.Builder()
                                 .id(netexBundle.netexParameters.netexFeedId)
                                 .build(),
-                        daoBuilder.build(),
+                        transitBuilder.build(),
                         fareServiceFactory,
                         netexBundle.getMaxStopToShapeSnapDistance(),
                         netexBundle.subwayAccessTime,
                         netexBundle.maxInterlineDistance
                 );
-                hf.setStopContext(stopContext);
+                //hf.setStopContext(stopContext);
                 hf.run(graph);
 
                 if (netexBundle.linkStopsToParentStations) {
@@ -75,9 +77,8 @@ public class NetexModule implements GraphBuilderModule {
             throw new RuntimeException(e);
         }
 
-        CalendarServiceData data = calendarService.getData();
-        graph.putService(CalendarServiceData.class, data);
-        graph.updateTransitFeedValidity(data);
+        graph.putService(CalendarServiceData.class, calendarServiceData);
+        graph.updateTransitFeedValidity(calendarServiceData);
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();

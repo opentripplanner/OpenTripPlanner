@@ -4,15 +4,15 @@ package org.opentripplanner.model.calendar;
 import org.opentripplanner.model.FeedScopedId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 public class CalendarServiceData implements Serializable {
 
@@ -21,8 +21,6 @@ public class CalendarServiceData implements Serializable {
     private Map<String, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
     private Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
-
-    private Map<LocalizedServiceId, List<Date>> datesByLocalizedServiceId = new HashMap<>();
 
     private Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
@@ -38,12 +36,12 @@ public class CalendarServiceData implements Serializable {
         timeZonesByAgencyId.put(agencyId, timeZone);
     }
 
-    public Set<FeedScopedId> getServiceIds() {
-        return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
+    public Set<String> getAgencyIds() {
+        return Collections.unmodifiableSet(timeZonesByAgencyId.keySet());
     }
 
-    public Set<LocalizedServiceId> getLocalizedServiceIds() {
-        return Collections.unmodifiableSet(datesByLocalizedServiceId.keySet());
+    public Set<FeedScopedId> getServiceIds() {
+        return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
     }
 
     public List<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
@@ -57,11 +55,29 @@ public class CalendarServiceData implements Serializable {
         return serviceIds;
     }
 
-    public void putServiceDatesForServiceId(FeedScopedId serviceId, List<ServiceDate> serviceDates) {
-        serviceDates = new ArrayList<>(serviceDates);
-        Collections.sort(serviceDates);
-        serviceDates = Collections.unmodifiableList(serviceDates);
+    public void putServiceDatesForServiceId(FeedScopedId serviceId, List<ServiceDate> dates) {
+        List<ServiceDate> serviceDates = sortedImmutableList(dates);
         serviceDatesByServiceId.put(serviceId, serviceDates);
+        addDatesToServiceIdsByDate(serviceId, serviceDates);
+    }
+
+    public void add(CalendarServiceData other) {
+        for (String agencyId : other.getAgencyIds()) {
+            putTimeZoneForAgencyId(agencyId, other.getTimeZoneForAgencyId(agencyId));
+        }
+        for (FeedScopedId serviceId : other.serviceDatesByServiceId.keySet()) {
+            putServiceDatesForServiceId(serviceId, other.serviceDatesByServiceId.get(serviceId));
+        }
+    }
+
+
+    /* private methods */
+
+    private static <T> List<T> sortedImmutableList(Collection<T> c) {
+        return Collections.unmodifiableList(c.stream().sorted().collect(Collectors.toList()));
+    }
+
+    private void addDatesToServiceIdsByDate(FeedScopedId serviceId, List<ServiceDate> serviceDates) {
         for (ServiceDate serviceDate : serviceDates) {
             Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(
                     serviceDate,
@@ -70,14 +86,4 @@ public class CalendarServiceData implements Serializable {
             serviceIds.add(serviceId);
         }
     }
-
-    public List<Date> getDatesForLocalizedServiceId(LocalizedServiceId serviceId) {
-        return datesByLocalizedServiceId.get(serviceId);
-    }
-
-    public void putDatesForLocalizedServiceId(LocalizedServiceId serviceId, List<Date> dates) {
-        dates = Collections.unmodifiableList(new ArrayList<>(dates));
-        datesByLocalizedServiceId.put(serviceId, dates);
-    }
-
 }

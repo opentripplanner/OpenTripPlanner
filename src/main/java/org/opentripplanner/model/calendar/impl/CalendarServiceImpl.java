@@ -1,10 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.calendar.impl;
+package org.opentripplanner.model.calendar.impl;
 
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.CalendarService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,10 +34,10 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
         Set<ServiceDate> dates = new HashSet<>();
-        CalendarServiceData allData = getData();
-        List<ServiceDate> serviceDates = allData.getServiceDatesForServiceId(serviceId);
-        if (serviceDates != null)
+        List<ServiceDate> serviceDates = data.getServiceDatesForServiceId(serviceId);
+        if (serviceDates != null) {
             dates.addAll(serviceDates);
+        }
         return dates;
     }
 
@@ -49,12 +49,5 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public TimeZone getTimeZoneForAgencyId(String agencyId) {
         return data.getTimeZoneForAgencyId(agencyId);
-    }
-
-
-  /* Private Methods */
-
-    protected CalendarServiceData getData() {
-        return data;
     }
 }

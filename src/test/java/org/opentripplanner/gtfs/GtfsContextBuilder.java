@@ -5,6 +5,7 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
@@ -12,6 +13,8 @@ import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,7 +23,6 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import java.io.File;
 import java.io.IOException;
 
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarService;
 import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder;
 
 /**
@@ -190,13 +192,16 @@ public class GtfsContextBuilder {
 
     private void generateTripPatterns() {
         new GenerateTripPatternsOperation(
-                transitBuilder, addBuilderAnnotation(), deduplicator(), calendarService()
+                transitBuilder,
+                addBuilderAnnotation(),
+                deduplicator(),
+                calendarService().getServiceIds()
         ).run();
     }
 
     private CalendarService calendarService() {
         if (calendarService == null) {
-            calendarService = createCalendarService(transitBuilder);
+            calendarService = new CalendarServiceImpl(transitBuilder.buildCalendarServiceData());
         }
         return calendarService;
     }
@@ -220,14 +225,14 @@ public class GtfsContextBuilder {
     }
 
     private static class GtfsContextImpl implements GtfsContext {
-
         private final GtfsFeedId feedId;
+        private final OtpTransitService transitService;
+        private final CalendarServiceData calendarServiceData;
 
-        private final OtpTransitServiceBuilder transitBuilder;
-
-        private GtfsContextImpl(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
+        private GtfsContextImpl(GtfsFeedId feedId, OtpTransitServiceBuilder builder) {
             this.feedId = feedId;
-            this.transitBuilder = transitBuilder;
+            this.calendarServiceData = builder.buildCalendarServiceData();
+            this.transitService = builder.build();
         }
 
         @Override
@@ -235,10 +240,12 @@ public class GtfsContextBuilder {
             return feedId;
         }
 
-        @Override
-        public OtpTransitServiceBuilder getTransitBuilder() {
-            return transitBuilder;
+        @Override public OtpTransitService getTransitService() {
+            return transitService;
+        }
+
+        @Override public CalendarServiceData getCalendarServiceData() {
+            return calendarServiceData;
         }
     }
-
 }

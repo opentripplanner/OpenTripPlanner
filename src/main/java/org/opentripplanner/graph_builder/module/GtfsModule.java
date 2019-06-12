@@ -16,15 +16,15 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,7 +32,7 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -91,7 +91,7 @@ public class GtfsModule implements GraphBuilderModule {
         // because the time zone from the first agency is cached
         graph.clearTimeZone();
 
-        MultiCalendarServiceImpl calendarService = new MultiCalendarServiceImpl();
+        CalendarServiceData calendarServiceData = new CalendarServiceData();
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
@@ -106,13 +106,13 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(loadBundle(gtfsBundle));
 
-                calendarService.addData(builder);
+                calendarServiceData.add(builder.buildCalendarServiceData());
 
                 // NB! The calls below have side effects - the builder state is updated!
                 repairStopTimesForEachTrip(graph, builder.getStopTimesSortedByTrip());
 
                 // NB! The calls below have side effects - the builder state is updated!
-                createTripPatterns(graph, builder, calendarService);
+                createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
 
                 PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());
                 hf.run(graph);
@@ -134,9 +134,9 @@ public class GtfsModule implements GraphBuilderModule {
         // We need to save the calendar service data so we can use it later
         graph.putService(
                 org.opentripplanner.model.calendar.CalendarServiceData.class,
-                calendarService.getData()
+                calendarServiceData
         );
-        graph.updateTransitFeedValidity(calendarService.getData());
+        graph.updateTransitFeedValidity(calendarServiceData);
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
@@ -156,9 +156,9 @@ public class GtfsModule implements GraphBuilderModule {
     /**
      * This method have side-effects, the {@code builder} is updated with new TripPatterns.
      */
-    private void createTripPatterns(Graph graph, OtpTransitServiceBuilder builder, CalendarService calendarService) {
+    private void createTripPatterns(Graph graph, OtpTransitServiceBuilder builder, Set<FeedScopedId> calServiceIds) {
         GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
-                builder, graph, graph.deduplicator, calendarService
+                builder, graph, graph.deduplicator, calServiceIds
         );
         buildTPOp.run();
         graph.hasFrequencyService = graph.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();

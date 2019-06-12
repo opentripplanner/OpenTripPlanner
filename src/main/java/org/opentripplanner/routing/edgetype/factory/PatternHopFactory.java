@@ -109,7 +109,7 @@ public class PatternHopFactory {
 
     public PatternHopFactory(GtfsContext context) {
         this.feedId = context.getFeedId();
-        this.transitService = context.getTransitBuilder().build();
+        this.transitService = context.getTransitService();
     }
 
     public PatternHopFactory(

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class GraphStatisticsResourceTest {
@@ -29,8 +28,7 @@ public class GraphStatisticsResourceTest {
         PatternHopFactory hl = new PatternHopFactory(context);
         hl.run(graph);
         graph.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         graph.index(new DefaultStreetVertexIndexFactory());
 

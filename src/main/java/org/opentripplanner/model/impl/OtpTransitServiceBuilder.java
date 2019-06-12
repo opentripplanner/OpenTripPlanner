@@ -21,6 +21,8 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.ArrayList;
@@ -147,6 +149,15 @@ public class OtpTransitServiceBuilder {
         }
         return serviceIds;
     }
+
+    public CalendarServiceData buildCalendarServiceData() {
+        return CalendarServiceDataFactoryImpl.createCalendarServiceData(
+                getAgenciesById().values(),
+                getCalendarDates(),
+                getCalendars()
+        );
+    }
+
 
     public OtpTransitService build() {
         createNoneExistentIds();

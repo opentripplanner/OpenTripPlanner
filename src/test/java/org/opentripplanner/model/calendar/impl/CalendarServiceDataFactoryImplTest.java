@@ -1,4 +1,4 @@
-package org.opentripplanner.calendar.impl;
+package org.opentripplanner.model.calendar.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,15 +13,12 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.LocalizedServiceId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -31,11 +28,9 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarService;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.merge;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
+import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (08.11.2017)
@@ -62,9 +57,9 @@ public class CalendarServiceDataFactoryImplTest {
 
     @BeforeClass
     public static void setup() throws IOException {
-        OtpTransitServiceBuilder transitBuilder = createCtxBuilder().getTransitBuilder();
-        data = createCalendarServiceData(transitBuilder);
-        calendarService = createCalendarService(transitBuilder);
+        // The context builder uses the CalendarServiceDataFactoryImpl to create data
+        data = createCtxBuilder().getCalendarServiceData();
+        calendarService = new CalendarServiceImpl(data);
     }
 
     @Test
@@ -96,25 +91,6 @@ public class CalendarServiceDataFactoryImplTest {
     @Test
     public void testDataGetTimeZoneForAgencyId() throws IOException {
         assertEquals("America/New_York", data.getTimeZoneForAgencyId(AGENCY).getID());
-    }
-
-    @Test
-    public void testDataGetLocalizedServiceIds() throws IOException {
-        LocalizedServiceId locServiceId = getWeekdaysLocalizedServiceId();
-
-        assertEquals("ServiceId(id=F_weekdays timeZone=America/New_York)", locServiceId.toString());
-        assertEquals(2, data.getLocalizedServiceIds().size());
-    }
-
-    @Test
-    public void testDataGetDatesForLocalizedServiceId() throws IOException {
-        LocalizedServiceId locServiceId = getWeekdaysLocalizedServiceId();
-
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.FRENCH);
-
-        assertEquals("[2009-01-01, 2009-01-02, 2009-01-05, 2009-01-06, 2009-01-07]",
-                data.getDatesForLocalizedServiceId(locServiceId).stream().limit(5)
-                        .map(formatDate::format).collect(toList()).toString());
     }
 
     @Test
@@ -156,12 +132,6 @@ public class CalendarServiceDataFactoryImplTest {
         assertTrue(weekdays.contains(A_FRIDAY));
         assertFalse(weekdays.contains(A_SUNDAY));
         assertEquals(10697, weekdays.size());
-    }
-
-    private LocalizedServiceId getWeekdaysLocalizedServiceId() {
-        Set<LocalizedServiceId> localizedServiceIds = data.getLocalizedServiceIds();
-        return localizedServiceIds.stream().filter(it -> it.getId().equals(SERVICE_WEEKDAYS_ID))
-                .findFirst().orElseThrow(IllegalStateException::new);
     }
 
     private static GtfsContext createCtxBuilder() throws IOException {
