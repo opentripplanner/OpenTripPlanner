@@ -16,7 +16,7 @@ public class TransferWithDuration implements TransferLeg {
 
     @Override
     public int stop() {
-        return transfer.stop();
+        return transfer.getToStop();
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.opentripplanner.model.Stop;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class TransitLayer {
     }
 
     public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
-        return tripPatternsForDate.get(date);
+        return tripPatternsForDate.getOrDefault(date, Collections.emptyList());
     }
 
     public List<List<Transfer>> getTransferByStopIndex() {

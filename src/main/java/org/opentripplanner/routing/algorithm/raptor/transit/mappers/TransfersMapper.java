@@ -35,7 +35,8 @@ class TransfersMapper {
 
                     int toStopIndex = indexByStop.get(((TransitStop) edge.getToVertex()).getStop());
                     Transfer transfer = new Transfer(toStopIndex, (int) distance,
-                            Arrays.asList(edge.getGeometry().getCoordinates()));
+                            Arrays.asList(edge.getGeometry().getCoordinates()),
+                            ((SimpleTransfer) edge).getEdges());
 
                     list.add(transfer);
                 }
