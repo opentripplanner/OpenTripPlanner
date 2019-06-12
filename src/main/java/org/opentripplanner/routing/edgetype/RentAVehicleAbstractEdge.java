@@ -59,6 +59,8 @@ public abstract class RentAVehicleAbstractEdge extends Edge {
         return getToVertex().getName(locale);
     }
 
+    public VehicleRentalStation getStation() { return station; }
+
     @Override
     public boolean hasBogusName() {
         return false;

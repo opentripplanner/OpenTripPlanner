@@ -243,27 +243,33 @@ public class Leg {
     @JsonSerialize
     public String alightRule;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean rentedBike;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedBike;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean rentedCar;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedCar;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean rentedVehicle;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedVehicle;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean hailedCar;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean hailedCar;
 
-     @XmlAttribute
-     @JsonSerialize
-     public TransportationNetworkCompanySummary tncData;
+    @XmlAttribute
+    @JsonSerialize
+    public TransportationNetworkCompanySummary tncData;
 
+    @XmlAttribute
+    @JsonSerialize
+    public RentedCarSummary rentedCarData;
 
+    @XmlAttribute
+    @JsonSerialize
+    public RentedVehicleSummary rentedVehicleData;
 
     /**
      * Whether this leg is a transit leg or not.

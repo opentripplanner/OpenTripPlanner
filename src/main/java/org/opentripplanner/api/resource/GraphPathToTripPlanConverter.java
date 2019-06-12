@@ -7,6 +7,8 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.RentedCarSummary;
+import org.opentripplanner.api.model.RentedVehicleSummary;
 import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
@@ -39,6 +41,8 @@ import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.RentACarOnEdge;
+import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -396,7 +400,21 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedCar = states[0].isCarRenting() && states[states.length - 1].isCarRenting();
 
+        if (leg.rentedCar) {
+            RentedCarSummary rentedCarSummary = new RentedCarSummary(
+                ((RentACarOnEdge)states[0].backEdge).getStation().networks
+            );
+            leg.rentedCarData = rentedCarSummary;
+        }
+
         leg.rentedVehicle = states[0].isVehicleRenting() && states[states.length - 1].isVehicleRenting();
+
+        if (leg.rentedVehicle) {
+            RentedVehicleSummary rentedVehicleSummary = new RentedVehicleSummary(
+                ((RentAVehicleOnEdge)states[0].backEdge).getStation().networks
+            );
+            leg.rentedVehicleData = rentedVehicleSummary;
+        }
 
         // check at start or end because either could be the very beginning or end of the trip
         // which are temporary edges and stuff

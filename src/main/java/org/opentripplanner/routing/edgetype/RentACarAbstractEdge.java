@@ -64,6 +64,8 @@ public abstract class RentACarAbstractEdge extends Edge {
         return false;
     }
 
+    public CarRentalStation getStation() { return station; }
+
     /**
      * @param stationNetworks The station where we want to drop the car off.
      * @param rentedNetworks The set of networks of the station we rented the car from.
