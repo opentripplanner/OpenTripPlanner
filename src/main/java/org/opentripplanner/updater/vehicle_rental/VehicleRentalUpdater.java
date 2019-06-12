@@ -207,11 +207,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         public void applyRegions(Graph graph) {
             // Adding vehicle rental regions to all edges of the network.
-            LOG.info("Applying {} vehicle rental regions.", regions.size());
             Map<Coordinate, Set<String>> coordToNetworksMap = new HashMap<>();
             Collection<StreetEdge> edges = graph.getStreetEdges();
             for (VehicleRentalRegion region : regions) {
-                LOG.info("\t{}", region.network);
+                LOG.info("Applying vehicle rental region for: {}", region.network);
                 service.addVehicleRentalRegion(region);
                 Set<Coordinate> coordinates = intersectWithGraph(edges, region);
 
@@ -222,7 +221,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             LOG.info("Adding dropoffs to graph");
             addDropOffsToGraph(coordToNetworksMap);
             LOG.info("Added in total {} border dropoffs.", coordToNetworksMap.size());
-            LOG.info("Finished applying service regions.");
         }
 
         /**
