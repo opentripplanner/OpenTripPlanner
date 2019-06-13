@@ -409,7 +409,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedVehicle = states[0].isVehicleRenting() && states[states.length - 1].isVehicleRenting();
 
-        if (leg.rentedVehicle) {
+        if (leg.rentedVehicle && states[0].backEdge instanceof RentAVehicleOnEdge) {
             RentedVehicleSummary rentedVehicleSummary = new RentedVehicleSummary(
                 ((RentAVehicleOnEdge)states[0].backEdge).getStation().networks
             );
