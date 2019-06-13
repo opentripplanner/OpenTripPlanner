@@ -9,7 +9,6 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.IdentityBean;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -29,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExistentIds;
 
 /**
  * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
@@ -158,10 +159,8 @@ public class OtpTransitServiceBuilder {
         );
     }
 
-
     public OtpTransitService build() {
-        createNoneExistentIds();
-
+        generateNoneExistentIds(feedInfos);
         return new OtpTransitServiceImpl(this);
     }
 
@@ -175,34 +174,5 @@ public class OtpTransitServiceBuilder {
         this.stopsById.reindex();
         this.routesById.reindex();
         this.stopTimesByTrip.reindex();
-    }
-
-    private void createNoneExistentIds() {
-        generateNoneExistentIds(feedInfos);
-    }
-
-    /**
-     * This method is PRIVATE, it have default access to enable unit testing.
-     */
-    static <T extends IdentityBean<String>> void generateNoneExistentIds(List<T> entities) {
-        int maxId = 0;
-
-
-        for (T it : entities) {
-            try {
-                if(it.getId() != null) {
-                    maxId = Math.max(maxId, Integer.parseInt(it.getId()));
-                }
-            } catch (NumberFormatException ignore) {}
-        }
-
-        for (T it : entities) {
-            try {
-                if(it.getId() == null || Integer.parseInt(it.getId()) == 0) {
-                    it.setId(Integer.toString(++maxId));
-                }
-            }
-            catch (NumberFormatException ignore) { }
-        }
     }
 }
