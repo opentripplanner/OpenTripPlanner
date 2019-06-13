@@ -1,6 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
@@ -30,6 +34,7 @@ import java.util.List;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
+import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
@@ -56,10 +61,11 @@ class TripPatternMapper {
     ) {
 
         Collection<ServiceJourney> serviceJourneys = netexIndex.serviceJourneyByPatternId
-            .lookup(journeyPattern.getId());
+                .lookup(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
-            LOG.warn("ServiceJourneyPattern " + journeyPattern.getId() + " does not contain any serviceJourneys.");
+            LOG.warn("ServiceJourneyPattern " + journeyPattern.getId()
+                    + " does not contain any serviceJourneys.");
             return;
         }
 
@@ -87,7 +93,9 @@ class TripPatternMapper {
         }
 
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
-        StopPattern stopPattern = new StopPattern(transitBuilder.getStopTimesSortedByTrip().get(trips.get(0)));
+        StopPattern stopPattern = new StopPattern(
+                transitBuilder.getStopTimesSortedByTrip().get(trips.get(0))
+        );
 
         org.opentripplanner.model.Route otpRoute = lookupRoute(
                 journeyPattern,
@@ -106,10 +114,14 @@ class TripPatternMapper {
             HierarchicalMapById<Route> routeById
     ) {
         Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
-        return otpRouteById.get(FeedScopedIdFactory.createFeedScopedId(route.getLineRef().getValue().getRef()));
+        return otpRouteById.get(createFeedScopedId(route.getLineRef().getValue().getRef()));
     }
 
-    private void createTripTimes(OtpTransitServiceBuilder transitBuilder, List<Trip> trips, TripPattern tripPattern) {
+    private void createTripTimes(
+            OtpTransitServiceBuilder transitBuilder,
+            List<Trip> trips,
+            TripPattern tripPattern
+    ) {
         Deduplicator deduplicator = new Deduplicator();
         for (Trip trip : trips) {
             if (transitBuilder.getStopTimesSortedByTrip().get(trip).size() == 0) {
@@ -218,9 +230,10 @@ class TripPatternMapper {
         return stopTime;
     }
 
-    private Stop lookupStop(StopPointInJourneyPattern stopPointInJourneyPattern,
-                            HierarchicalMap<String, String> quayIdByStopPointRef,
-                            EntityById<FeedScopedId, Stop> stopsById
+    private Stop lookupStop(
+            StopPointInJourneyPattern stopPointInJourneyPattern,
+            HierarchicalMap<String, String> quayIdByStopPointRef,
+            EntityById<FeedScopedId, Stop> stopsById
     ) {
         if (stopPointInJourneyPattern != null) {
             JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef

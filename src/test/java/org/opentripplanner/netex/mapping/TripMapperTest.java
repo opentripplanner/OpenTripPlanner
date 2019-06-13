@@ -5,32 +5,41 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.RouteRefStructure;
+import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
+import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 public class TripMapperTest {
 
-    TripMapper tripMapper = new TripMapper();
+    private static final String ROUTE_ID = "RUT:Route:1";
+    private static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
+    private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
+
+    private static final JAXBElement<LineRefStructure> LINE_REF = createWrappedRef(
+            ROUTE_ID, LineRefStructure.class
+    );
+
+    private TripMapper tripMapper = new TripMapper();
 
     @Test
     public void mapTrip() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
         Route route = new Route();
-        route.setId(FeedScopedIdFactory.createFeedScopedId("RUT:Route:1"));
+        route.setId(createFeedScopedId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
         ServiceJourney serviceJourney = createExampleServiceJourney();
 
-        JAXBElement<LineRefStructure> lineRefStructure =
-                new JAXBElement<>(
-                        new QName(""),
-                        LineRefStructure.class,
-                        new LineRefStructure().withRef("RUT:Route:1"));
-        serviceJourney.setLineRef(lineRefStructure);
+        serviceJourney.setLineRef(LINE_REF);
 
         Trip trip = tripMapper.mapServiceJourney(
                 serviceJourney,
@@ -38,41 +47,27 @@ public class TripMapperTest {
                 null,
                 null);
 
-        assertEquals(trip.getId(), FeedScopedIdFactory.createFeedScopedId("RUT:ServiceJourney:1"));
+        assertEquals(trip.getId(), createFeedScopedId(SERVICE_JOURNEY_ID));
     }
 
     @Test
     public void mapTripWithRouteRefViaJourneyPattern() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
         Route route = new Route();
-        route.setId(FeedScopedIdFactory.createFeedScopedId("RUT:Route:1"));
+        route.setId(createFeedScopedId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
+        JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
+        journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));
+
         ServiceJourney serviceJourney = createExampleServiceJourney();
-
-        JourneyPattern journeyPattern = new JourneyPattern();
-        journeyPattern.setId("RUT:JourneyPattern:1");
-
-        JAXBElement<LineRefStructure> lineRefStructure =
-                new JAXBElement<>(
-                        new QName(""),
-                        LineRefStructure.class,
-                        new LineRefStructure().withRef("RUT:Route:1"));
-
-        RouteRefStructure routeRefStructure = new RouteRefStructure().withRef("RUT:Route:1");
-        journeyPattern.setRouteRef(routeRefStructure);
-
-        JAXBElement<JourneyPatternRefStructure> journeyPatternRefStructure =
-                new JAXBElement<>(
-                        new QName(""),
-                        JourneyPatternRefStructure.class,
-                        new JourneyPatternRefStructure().withRef("RUT:JourneyPattern:1"));
-
-        serviceJourney.setJourneyPatternRef(journeyPatternRefStructure);
+        serviceJourney.setJourneyPatternRef(
+                createWrappedRef(JOURNEY_PATTERN_ID, JourneyPatternRefStructure.class)
+        );
 
         org.rutebanken.netex.model.Route netexRoute = new org.rutebanken.netex.model.Route();
-        netexRoute.setLineRef(lineRefStructure);
-        netexRoute.setId("RUT:Route:1");
+        netexRoute.setLineRef(LINE_REF);
+        netexRoute.setId(ROUTE_ID);
 
         HierarchicalMapById<org.rutebanken.netex.model.Route> routeById = new HierarchicalMapById<>();
         routeById.add(netexRoute);
@@ -85,7 +80,7 @@ public class TripMapperTest {
                 routeById,
                 journeyPatternById);
 
-        assertEquals(trip.getId(), FeedScopedIdFactory.createFeedScopedId("RUT:ServiceJourney:1"));
+        assertEquals(trip.getId(), createFeedScopedId("RUT:ServiceJourney:1"));
     }
 
     private ServiceJourney createExampleServiceJourney() {
