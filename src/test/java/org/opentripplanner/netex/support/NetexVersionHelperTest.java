@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.netex.support.NetexVersionHelper.comparingVersion;
-import static org.opentripplanner.netex.support.NetexVersionHelper.lastestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
+import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
 
 public class NetexVersionHelperTest {
@@ -32,8 +32,8 @@ public class NetexVersionHelperTest {
     }
 
     @Test public void lastestVersionedElementInTest() {
-        assertEquals(E_VER_2, lastestVersionedElementIn(Arrays.asList(E_VER_1, E_VER_2)));
-        assertNull(lastestVersionedElementIn(Collections.emptyList()));
+        assertEquals(E_VER_2, latestVersionedElementIn(Arrays.asList(E_VER_1, E_VER_2)));
+        assertNull(latestVersionedElementIn(Collections.emptyList()));
     }
 
     @Test public void comparingVersionTest() {

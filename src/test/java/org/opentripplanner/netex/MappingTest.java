@@ -49,7 +49,7 @@ public class MappingTest {
 
     @Test public void testNetexStopTimes() {
         // TODO OTP2 - This is not very robust
-        Assert.assertEquals(0, otpBuilder.getStopTimesSortedByTrip().valuesAsSet().size());
+        Assert.assertEquals(8, otpBuilder.getStopTimesSortedByTrip().valuesAsSet().size());
     }
 
     @Test public void testNetexCalendar() {

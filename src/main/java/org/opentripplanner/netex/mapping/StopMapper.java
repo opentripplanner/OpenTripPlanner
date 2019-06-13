@@ -122,8 +122,11 @@ class StopMapper {
     }
 
     private void addNewStopToParentIfNotPresent(Quay quay, Stop station) {
+        // TODO OTP2 - This assumtion is only valid because Norway have a
+        // TODO OTP2 - national stop register, we should add all stops/quays
+        // TODO OTP2 - for version resolution.
         // Continue if this is not newest version of quay
-        if (!quayIndex.isNewLatestVersion(quay))
+        if (!quayIndex.isNewerOrSameVersionComparedWithExistingValues(quay))
             return;
         if (quaysAlreadyProcessed.contains(quay.getId()))
             return;

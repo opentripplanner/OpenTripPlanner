@@ -2,8 +2,8 @@ package org.opentripplanner.netex.loader.util;
 
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
-import static org.opentripplanner.netex.support.NetexVersionHelper.lastestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
+import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
 
 /**
@@ -46,17 +46,18 @@ public class HierarchicalMultimapById<V extends EntityInVersionStructure>
      * {@code null} if not element is found.
      */
     public V lookupLastVersionById(String id) {
-        return lastestVersionedElementIn(lookup(id));
+        return latestVersionedElementIn(lookup(id));
     }
 
     /**
-     * Return {@code true} if the given {@code value.version} is larger than all elements
-     * in the collection of elements returned using the {@link #lookup(Object)} method.
+     * Return {@code true} if the given {@code value.version} is larger or equals to all the
+     * maximum version of all elements in the collection returned using the
+     * {@link #lookup(Object)} method.
      * <p/>
      * Note! This method do not check all values in the hierarchy, only the elements
      * in the first collection found.
      */
-    public boolean isNewLatestVersion(V value) {
+    public boolean isNewerOrSameVersionComparedWithExistingValues(V value) {
         return versionOf(value) >= latestVersionIn(lookup(value.getId()));
     }
 }

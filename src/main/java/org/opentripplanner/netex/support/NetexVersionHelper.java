@@ -39,7 +39,7 @@ public class NetexVersionHelper {
      * Return the element with the latest (maximum) version for a given {@code list} of elements.
      * If no elements exist in the collection {@code null} is returned.
      */
-    public static <T extends EntityInVersionStructure> T lastestVersionedElementIn(Collection<T> list) {
+    public static <T extends EntityInVersionStructure> T latestVersionedElementIn(Collection<T> list) {
         return list.stream().max(comparingVersion()).orElse(null);
     }
 
