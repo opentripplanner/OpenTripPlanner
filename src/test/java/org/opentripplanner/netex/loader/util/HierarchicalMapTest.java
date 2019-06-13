@@ -18,20 +18,21 @@ import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 /**
  * To test the hierarchical map we construct a hierarchy of:
  * <pre>
- *     Country(root) -> State -> County(leaf)
+ *     Country(root) -> State -> City(leaf)
  * </pre>
  * We add <em>president</em> <b>Regan</b> to <b>country</b>, a <em>governor</em>
- * <b>Schwarzenegger</b> to <b>state</b> and <em>mayor</em> <b>Eastwood</b> to <b>county</b>.
+ * <b>Schwarzenegger</b> to <b>state</b> and <em>mayor</em> <b>Eastwood</b> to <b>City</b>.
  * <p/>
  * We also add an <em>actor</em> for each level, but this time <b>Eastwood</b> is added to the
  * <b>country</b> level (clearly the best actor ;-). <b>Schwarzenegger</b> is
- * added to the <b>state</b> level, and <b>Reagan</b> to <b>county</b>.
+ * added to the <b>state</b> level, and <b>Reagan</b> to <b>City</b>.
  * <pre>
- * Level\Role | President | Governor       | Mayor    | Actor
- * -----------|-----------|----------------|----------|----------------
- *    Country | Reagan    |                |          | Eastwood
- *      State |           | Schwarzenegger |          | Schwarzenegger
- *     County |           |                | Eastwood | Reagan
+ *            |                        R o l e                         |
+ * Level      | President | Governor       | Mayor    | Actor          |
+ * -----------|-----------|----------------|----------|----------------|
+ *  Country   | Reagan    |                |          | Eastwood       |
+ *  State     |           | Schwarzenegger |          | Schwarzenegger |
+ *  City      |           |                | Eastwood | Reagan         |
  * </pre>
  * Now we use this test setup to test the {@link HierarchicalMap} and
  * {@link AbstractHierarchicalMap} class.
@@ -44,18 +45,18 @@ public class HierarchicalMapTest {
 
     private final HierarchicalMap<String, E> country = new HierarchicalMap<>();
     private final HierarchicalMap<String, E> state = new HierarchicalMap<>(country);
-    private final HierarchicalMap<String, E> county = new HierarchicalMap<>(state);
+    private final HierarchicalMap<String, E> city = new HierarchicalMap<>(state);
 
 
     @Before
     public void setup() {
         country.add(PRESIDENT, REAGAN);
         state.add(GOVERNOR, SCHWARZENEGGER);
-        county.add(MAYOR, EASTWOOD);
+        city.add(MAYOR, EASTWOOD);
 
         country.add(ACTOR, EASTWOOD);
         state.add(ACTOR, SCHWARZENEGGER);
-        county.add(ACTOR, REAGAN);
+        city.add(ACTOR, REAGAN);
     }
 
 
@@ -65,14 +66,14 @@ public class HierarchicalMapTest {
         // Then expect Reagen to be president at all levels
         assertEquals(REAGAN, country.lookup(PRESIDENT));
         assertEquals(REAGAN, state.lookup(PRESIDENT));
-        assertEquals(REAGAN, county.lookup(PRESIDENT));
+        assertEquals(REAGAN, city.lookup(PRESIDENT));
 
         // And then the right actor for each level
         assertEquals(EASTWOOD, country.lookup(ACTOR));
         assertEquals(SCHWARZENEGGER, state.lookup(ACTOR));
-        assertEquals(REAGAN, county.lookup(ACTOR));
+        assertEquals(REAGAN, city.lookup(ACTOR));
 
-        // And no governor at country level, and
+        // And no governor at country and state level
         assertNull(country.lookup(MAYOR));
         assertNull(state.lookup(MAYOR));
     }
@@ -81,7 +82,7 @@ public class HierarchicalMapTest {
         // Given added elements in the setup method
         assertEqElements(listOf(EASTWOOD, REAGAN),  country.localValues());
         assertEqElements(listOf(SCHWARZENEGGER, SCHWARZENEGGER), state.localValues());
-        assertEqElements(listOf(EASTWOOD, REAGAN), county.localValues());
+        assertEqElements(listOf(EASTWOOD, REAGAN), city.localValues());
     }
 
     @Test public void localGet() {
@@ -91,12 +92,12 @@ public class HierarchicalMapTest {
         assertNull(country.localGet(MAYOR));
         assertNull(state.localGet(MAYOR));
         assertNull(state.localGet(PRESIDENT));
-        assertNull(county.localGet(PRESIDENT));
+        assertNull(city.localGet(PRESIDENT));
 
         // Then expect to get the right object for the given hierarchy level
         assertEquals(EASTWOOD, country.localGet(ACTOR));
         assertEquals(SCHWARZENEGGER, state.localGet(GOVERNOR));
-        assertEquals(REAGAN, county.localGet(ACTOR));
+        assertEquals(REAGAN, city.localGet(ACTOR));
     }
 
     @Test public void containsKey() {
@@ -113,9 +114,9 @@ public class HierarchicalMapTest {
         assertFalse(state.containsKey(MAYOR));
 
         // At country level expect all keys to be present: president, governor and mayor
-        assertTrue(county.containsKey(PRESIDENT));
-        assertTrue(county.containsKey(GOVERNOR));
-        assertTrue(county.containsKey(MAYOR));
+        assertTrue(city.containsKey(PRESIDENT));
+        assertTrue(city.containsKey(GOVERNOR));
+        assertTrue(city.containsKey(MAYOR));
     }
 
     @Test public void localContainsKey() {
@@ -132,9 +133,9 @@ public class HierarchicalMapTest {
         assertFalse(state.localContainsKey(PRESIDENT));
 
         // At country level expect mayor and actor to be present, not governor
-        assertTrue(county.localContainsKey(MAYOR));
-        assertTrue(county.localContainsKey(ACTOR));
-        assertFalse(county.localContainsKey(GOVERNOR));
+        assertTrue(city.localContainsKey(MAYOR));
+        assertTrue(city.localContainsKey(ACTOR));
+        assertFalse(city.localContainsKey(GOVERNOR));
     }
 
     private void assertEqElements(Collection<E> expected, Collection<E> actual) {
