@@ -388,7 +388,9 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 (station.is_returning == null || station.is_returning == 1);
         }
         stations.addAll(stationsByStationId.values());
-        vehiclesUpdated = true;
+        if (stations.size() > 0) {
+            vehiclesUpdated = true;
+        }
     }
 
     private void updateFreeFloatingVehicles(String freeBikeStatusUrl) {
@@ -413,6 +415,9 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
 
                 stations.add(floatingVehicle);
             }
+        }
+        if (stations.size() > 0) {
+            vehiclesUpdated = true;
         }
     }
 
