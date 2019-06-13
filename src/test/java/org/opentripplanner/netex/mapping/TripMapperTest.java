@@ -33,7 +33,8 @@ public class TripMapperTest {
         serviceJourney.setLineRef(lineRefStructure);
 
         Trip trip = tripMapper.mapServiceJourney(
-                serviceJourney, transitBuilder,
+                serviceJourney,
+                transitBuilder.getRoutes(),
                 null,
                 null);
 
@@ -80,7 +81,7 @@ public class TripMapperTest {
 
         Trip trip = tripMapper.mapServiceJourney(
                 serviceJourney,
-                transitBuilder,
+                transitBuilder.getRoutes(),
                 routeById,
                 journeyPatternById);
 

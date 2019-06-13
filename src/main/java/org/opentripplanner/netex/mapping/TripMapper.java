@@ -1,6 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
@@ -19,15 +21,7 @@ public class TripMapper {
 
     Trip mapServiceJourney(
             ServiceJourney serviceJourney,
-            OtpTransitServiceBuilder gtfsDao,
-            NetexImportDataIndex netexIndex
-    ) {
-        return mapServiceJourney(serviceJourney, gtfsDao, netexIndex.routeById, netexIndex.journeyPatternsById);
-    }
-
-    Trip mapServiceJourney(
-            ServiceJourney serviceJourney,
-            OtpTransitServiceBuilder transitBuilder,
+            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
             HierarchicalMapById<Route> routeById,
             HierarchicalMapById<JourneyPattern> journeyPatternsById
     ){
@@ -48,7 +42,7 @@ public class TripMapper {
 
         Trip trip = new Trip();
         trip.setId(createFeedScopedId(serviceJourney.getId()));
-        trip.setRoute(transitBuilder.getRoutes().get(createFeedScopedId(lineRef)));
+        trip.setRoute(otpRouteById.get(createFeedScopedId(lineRef)));
         String serviceId = new DayTypeRefsToServiceIdAdapter(serviceJourney.getDayTypes()).getServiceId();
         trip.setServiceId(createFeedScopedId(serviceId));
 
