@@ -54,14 +54,6 @@ class StopMapper {
     /**
      * @param stopPlaces all stop places including multiple versions of each.
      */
-    static Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces,
-            final NetexImportDataIndex dataIndex) {
-        return new StopMapper(dataIndex.quayById).mapParentAndChildStops(stopPlaces);
-    }
-
-    /**
-     * @param stopPlaces all stop places including multiple versions of each.
-     */
     Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces) {
 
         // Prioritize StopPlace versions. Highest priority first.

@@ -11,10 +11,17 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptiona
  * authority can be created if none is present.
  */
 class AgencyMapper {
+
+    private final String timeZone;
+
+    AgencyMapper(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
     /**
      * Map authority and time zone to OTP agency.
      */
-    static Agency mapAgency(Authority authority, String timeZone){
+    Agency mapAgency(Authority authority){
         Agency agency = new Agency();
 
         agency.setId(authority.getId());
@@ -32,7 +39,7 @@ class AgencyMapper {
      * Create a new default agency with time zone set. All other values are set to
      * "N/A".
      */
-    static Agency createDefaultAgency(String timeZone){
+    Agency createDefaultAgency(){
         Agency agency = new Agency();
         agency.setId("N/A");
         agency.setName("N/A");

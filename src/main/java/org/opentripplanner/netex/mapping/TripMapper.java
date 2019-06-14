@@ -3,8 +3,6 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.*;

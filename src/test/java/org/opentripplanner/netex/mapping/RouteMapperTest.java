@@ -15,8 +15,6 @@ import static org.junit.Assert.*;
 
 public class RouteMapperTest {
 
-    RouteMapper routeMapper = new RouteMapper();
-
     @Test
     public void mapRouteWithDefaultAgency() {
         NetexImportDataIndex netexImportDataIndex = new NetexImportDataIndex();
@@ -25,7 +23,14 @@ public class RouteMapperTest {
         network.setId("RUT:Network:1");
         netexImportDataIndex.networkByLineId.add(line.getId(), network);
 
-        Route route = routeMapper.mapRoute(line, new OtpTransitServiceBuilder(), netexImportDataIndex, TimeZone.getDefault().toString());
+        RouteMapper routeMapper = new RouteMapper(
+                new OtpTransitServiceBuilder(),
+                netexImportDataIndex.networkByLineId,
+                netexImportDataIndex.groupOfLinesByLineId,
+                netexImportDataIndex,
+                TimeZone.getDefault().toString());
+
+        Route route = routeMapper.mapRoute(line);
 
         assertEquals( FeedScopedIdFactory.createFeedScopedId("RUT:Line:1"), route.getId());
         assertEquals("Line 1", route.getLongName());
@@ -44,12 +49,20 @@ public class RouteMapperTest {
         Authority authority = new Authority();
         authority.setId("RUT:Authority:1");
         authority.setName(new MultilingualString().withValue("Ruter"));
-        Agency agency = AgencyMapper.mapAgency(authority, TimeZone.getDefault().toString());
+        AgencyMapper agencyMapper = new AgencyMapper(TimeZone.getDefault().toString());
+        Agency agency = agencyMapper.mapAgency(authority);
         transitBuilder.getAgenciesById().add(agency);
 
         netexIndex.authoritiesByNetworkId.add(network.getId(), authority);
 
-        Route route = routeMapper.mapRoute(line, transitBuilder, netexIndex, TimeZone.getDefault().toString());
+        RouteMapper routeMapper = new RouteMapper(
+                transitBuilder,
+                netexIndex.networkByLineId,
+                netexIndex.groupOfLinesByLineId,
+                netexIndex,
+                TimeZone.getDefault().toString());
+
+        Route route = routeMapper.mapRoute(line);
 
         assertEquals("RUT:Authority:1", route.getAgency().getId());
     }

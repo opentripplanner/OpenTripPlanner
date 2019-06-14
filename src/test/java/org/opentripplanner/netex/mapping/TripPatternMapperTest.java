@@ -62,8 +62,6 @@ public class TripPatternMapperTest {
 
         // Set up NeTEx data structure to map. This includes JourneyPattern and related entities
 
-        RouteMapper routeMapper = new RouteMapper();
-
         NetexImportDataIndex netexIndex = new NetexImportDataIndex();
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
@@ -83,7 +81,15 @@ public class TripPatternMapperTest {
         line.setName(new MultilingualString().withValue("Line 1"));
         line.setTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
-        Route route = routeMapper.mapRoute(line, transitBuilder, netexIndex, TimeZone.getDefault().toString());
+        RouteMapper routeMapper = new RouteMapper(
+            transitBuilder,
+            netexIndex.networkByLineId,
+            netexIndex.groupOfLinesByLineId,
+            netexIndex,
+            TimeZone.getDefault().toString()
+        );
+
+        Route route = routeMapper.mapRoute(line);
         transitBuilder.getRoutes().add(route);
 
         org.rutebanken.netex.model.Route netexRoute = new org.rutebanken.netex.model.Route();

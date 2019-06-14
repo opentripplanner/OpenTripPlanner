@@ -4,6 +4,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.Line;
@@ -24,14 +25,36 @@ class RouteMapper {
     private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
-    org.opentripplanner.model.Route mapRoute(
-            Line line,
+    private final OtpTransitServiceBuilder transitBuilder;
+
+    private final HierarchicalMap<String, Network> networkByLineId;
+
+    private final HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId;
+
+    private final NetexImportDataIndex netexIndex;
+
+    private final AgencyMapper agencyMapper;
+
+    RouteMapper(
             OtpTransitServiceBuilder transitBuilder,
-            NetexImportDataIndex netexIndex, String timeZone
+            HierarchicalMap<String, Network> networkByLineId,
+            HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId,
+            NetexImportDataIndex netexIndex,
+            String timeZone
+    ) {
+        this.transitBuilder = transitBuilder;
+        this.networkByLineId = networkByLineId;
+        this.groupOfLinesByLineId = groupOfLinesByLineId;
+        this.netexIndex = netexIndex;
+        this.agencyMapper = new AgencyMapper(timeZone);
+    }
+
+    org.opentripplanner.model.Route mapRoute(
+            Line line
     ){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
 
-        otpRoute.setAgency(findOrCreateAgency(transitBuilder, netexIndex, line, timeZone));
+        otpRoute.setAgency(findOrCreateAgency(line));
 
         otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
         otpRoute.setLongName(line.getName().getValue());
@@ -56,15 +79,12 @@ class RouteMapper {
      * a default agency is created and returned.
      */
     private Agency findOrCreateAgency(
-            OtpTransitServiceBuilder transitBuilder,
-            NetexImportDataIndex netexIndex,
-            Line line,
-            String timeZone
+            Line line
     ) {
         String lineId = line.getId();
         // Find authority, first in *Network* and then if not found look in *GroupOfLines*
-        Network network = netexIndex.networkByLineId.lookup(lineId);
-        GroupOfLines groupOfLines = netexIndex.groupOfLinesByLineId.lookup(lineId);
+        Network network = networkByLineId.lookup(lineId);
+        GroupOfLines groupOfLines = groupOfLinesByLineId.lookup(lineId);
         Authority authority = netexIndex.lookupAuthority(groupOfLines, network);
 
         if(authority != null) {
@@ -74,7 +94,7 @@ class RouteMapper {
         // No authority found in Network or GroupOfLines.
         // Use the default agency, create if necessary
         LOG.warn("No authority found for " + lineId);
-        Agency agency = AgencyMapper.createDefaultAgency(timeZone);
+        Agency agency = agencyMapper.createDefaultAgency();
         EntityById<String, Agency> agenciesById = transitBuilder.getAgenciesById();
         if (!agenciesById.containsKey(agency.getId())) {
             agenciesById.add(agency);

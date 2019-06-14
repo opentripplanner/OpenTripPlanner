@@ -18,12 +18,14 @@ public class AgencyMapperTest {
     private static final String TIME_ZONE = "CEST";
     private static final String N_A = "N/A";
 
+    AgencyMapper agencyMapper = new AgencyMapper(TIME_ZONE);
+
     @Test public void mapAgency() {
         // Given
         Authority authority = authority(ID, NAME, URL, PHONE);
 
         // When mapped
-        Agency a = AgencyMapper.mapAgency(authority, TIME_ZONE);
+        Agency a = agencyMapper.mapAgency(authority);
 
         // Then expect
         assertEquals(ID, a.getId());
@@ -38,7 +40,7 @@ public class AgencyMapperTest {
         Authority authority = authority(ID, NAME, null, null);
 
         // When mapped
-        Agency a = AgencyMapper.mapAgency(authority, TIME_ZONE);
+        Agency a = agencyMapper.mapAgency(authority);
 
         // Then expect
         assertNull(a.getUrl());
@@ -47,7 +49,7 @@ public class AgencyMapperTest {
 
     @Test public void getDefaultAgency() {
         // When mapped
-        Agency a = AgencyMapper.createDefaultAgency(TIME_ZONE);
+        Agency a = agencyMapper.createDefaultAgency();
 
         // Then expect
         assertEquals(N_A, a.getId());

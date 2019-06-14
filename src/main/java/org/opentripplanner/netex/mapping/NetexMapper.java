@@ -12,15 +12,12 @@ import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Collection;
 
-import static org.opentripplanner.netex.mapping.AgencyMapper.mapAgency;
 import static org.opentripplanner.netex.mapping.CalendarMapper.mapToCalendarDates;
-import static org.opentripplanner.netex.mapping.StopMapper.mapParentAndChildStops;
 
 // TODO OTP2 - Add Unit tests
 // TODO OTP2 - JavaDoc needed
 public class NetexMapper {
 
-    private final RouteMapper routeMapper = new RouteMapper();
     private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
 
@@ -42,25 +39,32 @@ public class NetexMapper {
                 netexIndex.serviceJourneyByPatternId,
                 transitBuilder.getStops()
         );
+        RouteMapper routeMapper = new RouteMapper(
+                transitBuilder,
+                netexIndex.networkByLineId,
+                netexIndex.groupOfLinesByLineId,
+                netexIndex,
+                netexIndex.timeZone.get()
+        );
+        AgencyMapper agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
+        StopMapper stopMapper = new StopMapper(netexIndex.quayById);
 
         FeedScopedIdFactory.setFeedId(agencyId);
 
         for (Authority authority : netexIndex.authoritiesById.localValues()) {
             transitBuilder.getAgenciesById().add(
-                    mapAgency(authority, netexIndex.timeZone.get())
+                    agencyMapper.mapAgency(authority)
             );
         }
 
         for (Line line : netexIndex.lineById.localValues()) {
-            Route route = routeMapper.mapRoute(
-                    line, transitBuilder, netexIndex, netexIndex.timeZone.get()
-            );
+            Route route = routeMapper.mapRoute(line);
             transitBuilder.getRoutes().add(route);
         }
 
         for (String stopPlaceId : netexIndex.stopPlaceById.localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.stopPlaceById.lookup(stopPlaceId);
-            Collection<Stop> stops = mapParentAndChildStops(stopPlaceAllVersions, netexIndex);
+            Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
             transitBuilder.getStops().addAll(stops);
         }
 
