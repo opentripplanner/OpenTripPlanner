@@ -7,33 +7,23 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBElement;
-import java.math.BigInteger;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
-import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 /**
@@ -48,19 +38,40 @@ class TripPatternMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
 
-    private static final int DAY_IN_SECONDS = 3600 * 24;
+    private final OtpTransitServiceBuilder transitBuilder;
 
-    private String currentHeadsign;
+    private final HierarchicalMapById<Route> routeById;
 
-    private TripMapper tripMapper = new TripMapper();
+    private final EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
+
+    private final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
+
+    private final TripMapper tripMapper;
+
+    private final StopTimesMapper stopTimesMapper;
+
+    TripPatternMapper(
+            OtpTransitServiceBuilder transitBuilder,
+            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            HierarchicalMapById<Route> routeById,
+            HierarchicalMapById<JourneyPattern> journeyPatternById,
+            HierarchicalMap<String, String> quayIdByStopPointRef,
+            HierarchicalMapById<DestinationDisplay> destinationDisplayById,
+            HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId,
+            EntityById<FeedScopedId, Stop> stopsById
+    ) {
+        this.routeById = routeById;
+        this.serviceJourneyByPatternId = serviceJourneyByPatternId;
+        this.otpRouteById = otpRouteById;
+        this.transitBuilder = transitBuilder;
+        this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
+        this.stopTimesMapper = new StopTimesMapper(destinationDisplayById, stopsById, quayIdByStopPointRef);
+    }
 
     void mapTripPattern(
-            JourneyPattern journeyPattern,
-            OtpTransitServiceBuilder transitBuilder,
-            NetexImportDataIndex netexIndex
+            JourneyPattern journeyPattern
     ) {
-
-        Collection<ServiceJourney> serviceJourneys = netexIndex.serviceJourneyByPatternId
+        Collection<ServiceJourney> serviceJourneys = serviceJourneyByPatternId
                 .lookup(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
@@ -72,17 +83,11 @@ class TripPatternMapper {
         List<Trip> trips = new ArrayList<>();
         for (ServiceJourney serviceJourney : serviceJourneys) {
             Trip trip = tripMapper.mapServiceJourney(
-                    serviceJourney,
-                    transitBuilder.getRoutes(),
-                    netexIndex.routeById,
-                    netexIndex.journeyPatternsById
+                    serviceJourney
             );
 
-            List<StopTime> stopTimes = mapToStopTimes(
+            List<StopTime> stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
-                    transitBuilder.getStops(),
-                    netexIndex.quayIdByStopPointRef,
-                    netexIndex.destinationDisplayById,
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime()
             );
@@ -97,28 +102,23 @@ class TripPatternMapper {
                 transitBuilder.getStopTimesSortedByTrip().get(trips.get(0))
         );
 
-        org.opentripplanner.model.Route otpRoute = lookupRoute(
-                journeyPattern,
-                transitBuilder.getRoutes(),
-                netexIndex.routeById);
-        TripPattern tripPattern = new TripPattern(otpRoute, stopPattern);
+        TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
         tripPattern.code = journeyPattern.getId();
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
+
+        createTripTimes(trips, tripPattern);
+
         transitBuilder.getTripPatterns().put(tripPattern.stopPattern, tripPattern);
-        createTripTimes(transitBuilder, trips, tripPattern);
     }
 
     private org.opentripplanner.model.Route lookupRoute(
-            JourneyPattern journeyPattern,
-            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
-            HierarchicalMapById<Route> routeById
+            JourneyPattern journeyPattern
     ) {
         Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
         return otpRouteById.get(createFeedScopedId(route.getLineRef().getValue().getRef()));
     }
 
     private void createTripTimes(
-            OtpTransitServiceBuilder transitBuilder,
             List<Trip> trips,
             TripPattern tripPattern
     ) {
@@ -141,151 +141,5 @@ class TripPatternMapper {
         } else {
             return "";
         }
-    }
-
-    private List<StopTime> mapToStopTimes(
-            JourneyPattern journeyPattern,
-            EntityById<FeedScopedId, Stop> stopsById,
-            HierarchicalMap<String, String> quayIdByStopPointRef,
-            HierarchicalMapById<DestinationDisplay> destinationDisplayById,
-            Trip trip,
-            List<TimetabledPassingTime> timetabledPassingTimes
-    ) {
-        List<StopTime> stopTimes = new ArrayList<>();
-
-        for (int i = 0; i < timetabledPassingTimes.size(); i++) {
-
-            String pointInJourneyPattern =
-                    timetabledPassingTimes.get(i).getPointInJourneyPatternRef().getValue().getRef();
-
-            StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
-            Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
-
-            StopTime stopTime = mapToStopTime(
-                    trip,
-                    stopPoint,
-                    stop,
-                    timetabledPassingTimes.get(i),
-                    i,
-                    destinationDisplayById);
-
-            stopTimes.add(stopTime);
-        }
-        return stopTimes;
-    }
-
-    private StopTime mapToStopTime(
-            Trip trip,
-            StopPointInJourneyPattern stopPoint,
-            Stop stop,
-            TimetabledPassingTime passingTime,
-            int stopSequence,
-            HierarchicalMapById<DestinationDisplay> destinationDisplayById
-    ) {
-        StopTime stopTime = new StopTime();
-        stopTime.setTrip(trip);
-        stopTime.setStopSequence(stopSequence);
-        stopTime.setStop(stop);
-        stopTime.setArrivalTime(
-                calculateOtpTime(passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
-                        passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()));
-        stopTime.setDepartureTime(calculateOtpTime(passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset(), passingTime.getArrivalTime(),
-                passingTime.getArrivalDayOffset()));
-
-        if (stopPoint != null) {
-            if (isFalse(stopPoint.isForAlighting())) {
-                stopTime.setDropOffType(PICKDROP_NONE);
-            } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
-                stopTime.setDropOffType(PICKDROP_COORDINATE_WITH_DRIVER);
-            } else {
-                stopTime.setDropOffType(PICKDROP_SCHEDULED);
-            }
-
-            if (isFalse(stopPoint.isForBoarding())) {
-                stopTime.setPickupType(PICKDROP_NONE);
-            } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
-                stopTime.setPickupType(PICKDROP_COORDINATE_WITH_DRIVER);
-            } else {
-                stopTime.setPickupType(PICKDROP_SCHEDULED);
-            }
-
-            if (stopPoint.getDestinationDisplayRef() != null) {
-                DestinationDisplay destinationDisplay =
-                        destinationDisplayById.lookup(stopPoint.getDestinationDisplayRef().getRef());
-                if (destinationDisplay != null) {
-                    currentHeadsign = destinationDisplay.getFrontText().getValue();
-                }
-            }
-        }
-
-        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
-            LOG.warn("Time missing for trip " + trip.getId());
-        }
-
-        if (currentHeadsign != null) {
-            stopTime.setStopHeadsign(currentHeadsign);
-        }
-
-        return stopTime;
-    }
-
-    private Stop lookupStop(
-            StopPointInJourneyPattern stopPointInJourneyPattern,
-            HierarchicalMap<String, String> quayIdByStopPointRef,
-            EntityById<FeedScopedId, Stop> stopsById
-    ) {
-        if (stopPointInJourneyPattern != null) {
-            JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef
-                    = stopPointInJourneyPattern.getScheduledStopPointRef();
-            String stopId = quayIdByStopPointRef.lookup(scheduledStopPointRef.getValue().getRef());
-            if (stopId == null) {
-                LOG.warn("No passengerStopAssignment found for " + scheduledStopPointRef
-                        .getValue().getRef());
-            } else {
-                Stop stop = stopsById.get(FeedScopedIdFactory.createFeedScopedId(stopId));
-                if (stop == null) {
-                    LOG.warn("Quay not found for " + scheduledStopPointRef.getValue()
-                            .getRef());
-                }
-                return stop;
-            }
-        }
-        return null;
-    }
-
-    private StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
-            JourneyPattern journeyPattern) {
-        List<PointInLinkSequence_VersionedChildStructure> points = journeyPattern
-                .getPointsInSequence()
-                .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
-        for (PointInLinkSequence_VersionedChildStructure point : points) {
-            if (point instanceof StopPointInJourneyPattern) {
-                StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
-                if (stopPoint.getId().equals(pointInJourneyPatterRef)) {
-                    return stopPoint;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static int calculateOtpTime(LocalTime time, BigInteger dayOffset,
-            LocalTime fallbackTime, BigInteger fallbackDayOffset) {
-        return time != null ?
-                calculateOtpTime(time, dayOffset) :
-                calculateOtpTime(fallbackTime, fallbackDayOffset);
-    }
-
-    static int calculateOtpTime(LocalTime time, BigInteger dayOffset) {
-        int otpTime = time.toSecondOfDay();
-        if (dayOffset != null) {
-            otpTime += DAY_IN_SECONDS * dayOffset.intValue();
-        }
-        return otpTime;
-    }
-
-    private boolean isFalse(Boolean value) {
-        return value != null && !value;
     }
 }

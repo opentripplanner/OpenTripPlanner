@@ -19,11 +19,22 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
  */
 public class TripMapper {
 
-    Trip mapServiceJourney(
-            ServiceJourney serviceJourney,
+    private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
+    private HierarchicalMapById<Route> routeById;
+    private HierarchicalMapById<JourneyPattern> journeyPatternsById;
+
+    TripMapper(
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
             HierarchicalMapById<Route> routeById,
             HierarchicalMapById<JourneyPattern> journeyPatternsById
+    ) {
+        this.otpRouteById = otpRouteById;
+        this.routeById = routeById;
+        this.journeyPatternsById = journeyPatternsById;
+    }
+
+    Trip mapServiceJourney(
+            ServiceJourney serviceJourney
     ){
         // Check for direct connection to Line
         JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();

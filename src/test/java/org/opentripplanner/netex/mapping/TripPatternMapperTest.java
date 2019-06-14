@@ -37,7 +37,7 @@ import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
-import static org.opentripplanner.netex.mapping.TripPatternMapper.calculateOtpTime;
+import static org.opentripplanner.netex.mapping.StopTimesMapper.calculateOtpTime;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
@@ -62,11 +62,21 @@ public class TripPatternMapperTest {
 
         // Set up NeTEx data structure to map. This includes JourneyPattern and related entities
 
-        TripPatternMapper tripPatternMapper = new TripPatternMapper();
         RouteMapper routeMapper = new RouteMapper();
 
         NetexImportDataIndex netexIndex = new NetexImportDataIndex();
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+
+        TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                transitBuilder,
+                transitBuilder.getRoutes(),
+                netexIndex.routeById,
+                netexIndex.journeyPatternsById,
+                netexIndex.quayIdByStopPointRef,
+                netexIndex.destinationDisplayById,
+                netexIndex.serviceJourneyByPatternId,
+                transitBuilder.getStops()
+        );
 
         Line line = new Line();
         line.setId("RUT:Line:1");
@@ -231,7 +241,7 @@ public class TripPatternMapperTest {
 
         // Do the actual mapping of NeTEx JourneyPattern to OTP TripPattern
 
-        tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexIndex);
+        tripPatternMapper.mapTripPattern(journeyPattern);
 
         // Assert that the mapping is correct
 

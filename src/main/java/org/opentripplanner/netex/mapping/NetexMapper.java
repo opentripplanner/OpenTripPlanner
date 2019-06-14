@@ -21,16 +21,28 @@ import static org.opentripplanner.netex.mapping.StopMapper.mapParentAndChildStop
 public class NetexMapper {
 
     private final RouteMapper routeMapper = new RouteMapper();
-    private final TripPatternMapper tripPatternMapper = new TripPatternMapper();
     private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
 
     public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;
+
     }
 
     public void mapNetexToOtp(NetexImportDataIndex netexIndex) {
+        //TODO Consider moving this to constructor
+        TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                transitBuilder,
+                transitBuilder.getRoutes(),
+                netexIndex.routeById,
+                netexIndex.journeyPatternsById,
+                netexIndex.quayIdByStopPointRef,
+                netexIndex.destinationDisplayById,
+                netexIndex.serviceJourneyByPatternId,
+                transitBuilder.getStops()
+        );
+
         FeedScopedIdFactory.setFeedId(agencyId);
 
         for (Authority authority : netexIndex.authoritiesById.localValues()) {
@@ -53,7 +65,7 @@ public class NetexMapper {
         }
 
         for (JourneyPattern journeyPattern : netexIndex.journeyPatternsById.localValues()) {
-            tripPatternMapper.mapTripPattern(journeyPattern, transitBuilder, netexIndex);
+            tripPatternMapper.mapTripPattern(journeyPattern);
         }
 
         for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.dayTypeRefs) {

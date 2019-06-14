@@ -28,8 +28,6 @@ public class TripMapperTest {
             ROUTE_ID, LineRefStructure.class
     );
 
-    private TripMapper tripMapper = new TripMapper();
-
     @Test
     public void mapTrip() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
@@ -37,15 +35,16 @@ public class TripMapperTest {
         route.setId(createFeedScopedId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
+        TripMapper tripMapper = new TripMapper(transitBuilder.getRoutes(),
+                new HierarchicalMapById<>(),
+                new HierarchicalMapById<>());
+
         ServiceJourney serviceJourney = createExampleServiceJourney();
 
         serviceJourney.setLineRef(LINE_REF);
 
         Trip trip = tripMapper.mapServiceJourney(
-                serviceJourney,
-                transitBuilder.getRoutes(),
-                null,
-                null);
+                serviceJourney);
 
         assertEquals(trip.getId(), createFeedScopedId(SERVICE_JOURNEY_ID));
     }
@@ -56,6 +55,8 @@ public class TripMapperTest {
         Route route = new Route();
         route.setId(createFeedScopedId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
+
+
 
         JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
         journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));
@@ -74,11 +75,14 @@ public class TripMapperTest {
         HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
         journeyPatternById.add(journeyPattern);
 
-        Trip trip = tripMapper.mapServiceJourney(
-                serviceJourney,
+        TripMapper tripMapper = new TripMapper(
                 transitBuilder.getRoutes(),
                 routeById,
-                journeyPatternById);
+                journeyPatternById
+        );
+
+        Trip trip = tripMapper.mapServiceJourney(
+                serviceJourney);
 
         assertEquals(trip.getId(), createFeedScopedId("RUT:ServiceJourney:1"));
     }
