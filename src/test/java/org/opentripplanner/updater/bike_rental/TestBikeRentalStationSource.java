@@ -131,7 +131,7 @@ public class TestBikeRentalStationSource extends TestCase {
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 
-        assertEquals(3, rentalStations.size());
+        assertEquals(4, rentalStations.size());
         for (BikeRentalStation rentalStation : rentalStations) {
             System.out.println(rentalStation);
         }
@@ -160,9 +160,18 @@ public class TestBikeRentalStationSource extends TestCase {
         assertEquals("1003", openTestStation.id);
         assertEquals(25.0424261, openTestStation.x);
         assertEquals(60.2932159, openTestStation.y);
-        assertEquals(2, openTestStation.spacesAvailable);
-        assertEquals(3, openTestStation.bikesAvailable);
+        assertEquals(3, openTestStation.spacesAvailable);
+        assertEquals(2, openTestStation.bikesAvailable);
         assertEquals("Station on", openTestStation.state);
+
+        BikeRentalStation overflowTestStation = rentalStations.get(3);
+        assertEquals("Overflow test station", overflowTestStation.name.toString());
+        assertEquals("1004", overflowTestStation.id);
+        assertEquals(25.0434261, overflowTestStation.x);
+        assertEquals(60.2931159, overflowTestStation.y);
+        assertEquals(0, overflowTestStation.spacesAvailable);
+        assertEquals(7, overflowTestStation.bikesAvailable);
+        assertEquals("Station on", overflowTestStation.state);
 
         // Test giving network name to data source
         SharingOSBikeRentalDataSource sourceWithCustomNetwork = new SharingOSBikeRentalDataSource("vantaa");
