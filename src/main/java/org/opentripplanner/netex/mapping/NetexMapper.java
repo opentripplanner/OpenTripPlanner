@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
@@ -20,16 +19,15 @@ public class NetexMapper {
 
     private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
+    private final TripPatternMapper tripPatternMapper;
+    private final RouteMapper routeMapper;
+    private final AgencyMapper agencyMapper;
+    private final StopMapper stopMapper;
 
-    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
+    public NetexMapper(OtpTransitServiceBuilder transitBuilder, NetexImportDataIndex netexIndex, String agencyId) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;
-
-    }
-
-    public void mapNetexToOtp(NetexImportDataIndex netexIndex) {
-        //TODO Consider moving this to constructor
-        TripPatternMapper tripPatternMapper = new TripPatternMapper(
+        tripPatternMapper = new TripPatternMapper(
                 transitBuilder,
                 transitBuilder.getRoutes(),
                 netexIndex.routeById,
@@ -39,16 +37,18 @@ public class NetexMapper {
                 netexIndex.serviceJourneyByPatternId,
                 transitBuilder.getStops()
         );
-        RouteMapper routeMapper = new RouteMapper(
+        routeMapper = new RouteMapper(
                 transitBuilder,
                 netexIndex.networkByLineId,
                 netexIndex.groupOfLinesByLineId,
                 netexIndex,
                 netexIndex.timeZone.get()
         );
-        AgencyMapper agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
-        StopMapper stopMapper = new StopMapper(netexIndex.quayById);
+        agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
+        stopMapper = new StopMapper(netexIndex.quayById);
+    }
 
+    public void mapNetexToOtp(NetexImportDataIndex netexIndex) {
         FeedScopedIdFactory.setFeedId(agencyId);
 
         for (Authority authority : netexIndex.authoritiesById.localValues()) {
@@ -58,8 +58,9 @@ public class NetexMapper {
         }
 
         for (Line line : netexIndex.lineById.localValues()) {
-            Route route = routeMapper.mapRoute(line);
-            transitBuilder.getRoutes().add(route);
+            transitBuilder.getRoutes().add(
+                    routeMapper.mapRoute(line)
+            );
         }
 
         for (String stopPlaceId : netexIndex.stopPlaceById.localKeys()) {
