@@ -39,20 +39,18 @@ public class GraphPath {
      * final itinerary presented to the user. When planning with departure time, the edges will then
      * be re-traversed once more in order to move the waiting time forward in time, towards the end.
      * 
-     * @param s
-     *            - the state for which a path is requested
+     * @param finalState
+     *            - the final state of the requested shortest path search
      * @param optimize
      *            - whether excess waiting time should be removed
-     * @param options
-     *            - the traverse options used to reach this state
      */
-    public GraphPath(State s, boolean optimize) {
+    public GraphPath(State finalState, boolean optimize) {
         // Only optimize transit trips
-        optimize &= s.getOptions().modes.isTransit();
-        this.rctx = s.getContext();
-        this.back = s.getOptions().arriveBy;
+        optimize &= finalState.getOptions().modes.isTransit();
+        this.rctx = finalState.getContext();
+        this.back = finalState.getOptions().arriveBy;
         // optimize = false; // DEBUG
-        if (s.getOptions().startingTransitTripId != null) {
+        if (finalState.getOptions().startingTransitTripId != null) {
             LOG.debug("Disable reverse-optimize for on-board depart");
             optimize = false;
         }
@@ -64,11 +62,11 @@ public class GraphPath {
 
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
-        walkDistance = s.getWalkDistance();
+        walkDistance = finalState.getWalkDistance();
         if (back) {
-            lastState = optimize ? s.optimize() : s.reverse();
+            lastState = optimize ? finalState.optimize() : finalState.reverse();
         } else {
-            lastState = optimize ? s.optimize().optimize() : s;
+            lastState = optimize ? finalState.optimize().optimize() : finalState;
         }
         // DEBUG
         // lastState = s;

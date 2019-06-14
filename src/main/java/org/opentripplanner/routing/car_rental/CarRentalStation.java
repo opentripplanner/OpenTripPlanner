@@ -121,7 +121,8 @@ public class CarRentalStation implements Serializable, Cloneable {
     }
 
     public String toString () {
-        return String.format(Locale.US, "Car rental station %s at %.6f, %.6f", name, y, x);
+        String networkNames = networks == null ? "undefined network" : networks.toString();
+        return String.format(Locale.US, "Car rental station %s (%s) at %.6f, %.6f", name, networkNames, y, x);
     }
 
     @Override

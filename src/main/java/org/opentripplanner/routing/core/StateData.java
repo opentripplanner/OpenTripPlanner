@@ -99,9 +99,12 @@ public class StateData implements Cloneable {
 
     public Set<String> bikeRentalNetworks;
 
-    protected Set<String> carRentalNetworks;
+    public Set<String> carRentalNetworks;
 
-    protected Set<String> vehicleRentalNetworks;
+    // A list of possible vehicle rental networks that the state can be associated with. This data structure is a set
+    // because in an arrive-by search, the search progresses backwards from a street edge where potentially multiple
+    // vehicle rental providers allow floating drop-offs at the edge.
+    public Set<String> vehicleRentalNetworks;
 
     // The ids of cars that have been rented so far
     protected Set<String> rentedCars = new HashSet<>();
