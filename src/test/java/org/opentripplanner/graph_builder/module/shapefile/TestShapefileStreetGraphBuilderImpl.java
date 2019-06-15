@@ -75,7 +75,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         
         /* street directions */
         CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
-                "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
 
         perms.addPermission("W", StreetTraversalPermission.ALL,
                 StreetTraversalPermission.PEDESTRIAN);

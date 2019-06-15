@@ -137,6 +137,7 @@ public class StreetUtils {
                     StreetTraversalPermission permission = pse.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
+                    permission = permission.remove(StreetTraversalPermission.MICROMOBILITY);
                     if (permission == StreetTraversalPermission.NONE) {
                         graph.removeEdge(pse);
                     } else {

@@ -1,11 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -37,13 +41,19 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.util.GeoJsonUtils.parsePolygonOrMultiPolygonFromJsonNode;
+import static org.opentripplanner.util.HttpUtils.getDataFromUrlOrFile;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -113,6 +123,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     public boolean includeOsmTags = false;
 
+    // Areas where travel with the Micromobility mode is forbidden.
+    private PreparedGeometry restrictedMicromobilityTravelGeometry;
+
+    // Areas where dropping off a Micromobility rental vehicle is forbidden
+    private PreparedGeometry restrictedMicromobilityDropoffGeometry;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -192,6 +207,37 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         return (T) value;
     }
 
+    public void loadMicromobilityTravelRestrictions(GraphBuilderParameters params) {
+        restrictedMicromobilityTravelGeometry = parseGeometry(params.micromobilityTravelRestrictionsUrlOrFile);
+        if (restrictedMicromobilityTravelGeometry == null) {
+            LOG.info("No Micromobility travel restrictions found. Micromobility travel will be allowed wherever bicycling is allowed");
+        }
+        restrictedMicromobilityDropoffGeometry = parseGeometry(params.micromobilityDropoffRestrictionsUrlOrFile);
+        if (restrictedMicromobilityDropoffGeometry == null) {
+            LOG.info("No special micromobility dropoff restrictions found.");
+        }
+    }
+
+    private PreparedGeometry parseGeometry(String areaUrlOrFile) {
+        if (areaUrlOrFile == null) {
+            return null;
+        }
+        InputStream data = null;
+        try {
+            data = getDataFromUrlOrFile(areaUrlOrFile);
+        } catch (IOException e) {
+            LOG.warn("Failed to fetch/load from url or file: {}. Error: {}", areaUrlOrFile, e);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode geojson = mapper.readTree(data);
+            return PreparedGeometryFactory.prepare(parsePolygonOrMultiPolygonFromJsonNode(geojson));
+        } catch (IOException | UnsupportedGeometryException e) {
+            LOG.error("Failed to parse GeoJson for urlOrFile: {}", areaUrlOrFile);
+            return null;
+        }
+    }
+
     protected class Handler {
 
         private static final String nodeLabelFormat = "osm:node:%d";
@@ -268,6 +314,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             extra.put(ElevationPoint.class, elevationData);
 
             applyBikeSafetyFactor(graph);
+
+            // this extra iteration is needed to ensure that StreetEdges created from areas and other items are properly
+            // accounted for with micromobility restrictions
+            applyMircomobilityRestrictions(graph);
         } // END buildGraph()
 
         private void processBikeRentalNodes() {
@@ -676,8 +726,37 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
+
+                    applyMircomobilityRestrictions(street);
+                    applyMircomobilityRestrictions(backStreet);
                 }
             } // END loop over OSM ways
+        }
+
+        // forbid travel with micromobility on edges that intersects with a restricted area
+        private void applyMircomobilityRestrictions(Graph graph) {
+            for (StreetEdge streetEdge : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
+                applyMircomobilityRestrictions(streetEdge);
+            }
+        }
+
+        // forbid travel with micromobility on edges that intersects with a restricted area
+        private void applyMircomobilityRestrictions(StreetEdge streetEdge) {
+            if (streetEdge != null) {
+                Geometry streetEdgeGeometry = streetEdge.getGeometry();
+                if (
+                    restrictedMicromobilityTravelGeometry != null &&
+                        restrictedMicromobilityTravelGeometry.intersects(streetEdgeGeometry)
+                ) {
+                    streetEdge.setPermission(streetEdge.getPermission().remove(StreetTraversalPermission.MICROMOBILITY));
+                }
+                if (
+                    restrictedMicromobilityDropoffGeometry != null &&
+                        restrictedMicromobilityDropoffGeometry.intersects(streetEdgeGeometry)
+                ) {
+                    streetEdge.setFloatingVehicleDropoffSuitability(false);
+                }
+            }
         }
 
         // TODO Set this to private once WalkableAreaBuilder is gone
@@ -800,7 +879,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                     // default permissions: pedestrian, wheelchair, and bicycle
                     boolean wheelchairAccessible = true;
-                    StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+                    StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY;
                     // check for bicycle=no, otherwise assume it's OK to take a bike
                     if (node.isTagFalse("bicycle")) {
                         permission = StreetTraversalPermission.PEDESTRIAN;

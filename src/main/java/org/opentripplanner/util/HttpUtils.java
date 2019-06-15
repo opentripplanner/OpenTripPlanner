@@ -3,6 +3,9 @@ package org.opentripplanner.util;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
@@ -64,5 +67,27 @@ public class HttpUtils {
                 .build();
 
         return httpClient;
+    }
+
+    public static InputStream getDataFromUrlOrFile (String urlOrFile) throws IOException {
+        return getDataFromUrlOrFile(urlOrFile, null, null);
+    }
+
+    public static InputStream getDataFromUrlOrFile(
+        String urlOrFile,
+        String requestHeaderName,
+        String requestHeaderValue
+    ) throws IOException {
+        InputStream data;
+        URL url2 = new URL(urlOrFile);
+
+        String proto = url2.getProtocol();
+        if (proto.equals("http") || proto.equals("https")) {
+            data = getData(urlOrFile, requestHeaderName, requestHeaderValue);
+        } else {
+            // Local file probably, try standard java
+            data = url2.openStream();
+        }
+        return data;
     }
 }

@@ -33,6 +33,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.*;
 
+import static org.opentripplanner.util.GeoJsonUtils.parsePolygonOrMultiPolygonFromJsonNode;
+import static org.opentripplanner.util.HttpUtils.getDataFromUrlOrFile;
+
 /**
  * A standalone service for consuming a GBFS
  */
@@ -430,43 +433,15 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
      * either a single Feature or a FeatureCollection.
      */
     private List<VehicleRentalRegion> parseRegionJson(JsonNode regionJson) {
-        ObjectMapper jsonDeserializer = new ObjectMapper();
         final VehicleRentalRegion region = new VehicleRentalRegion();
         region.network = networkName;
-
-        // first try to deserialize as a feature
         try {
-            Feature geoJsonFeature = jsonDeserializer.readValue(
-                regionJson.traverse(),
-                Feature.class
-            );
-            GeoJsonObject geometry = geoJsonFeature.getGeometry();
-            region.geometry = GeometryUtils.convertGeoJsonToJtsGeometry(geometry);
-        } catch (IllegalArgumentException | IOException | UnsupportedGeometryException e) {
-            LOG.debug("Could not parse as a Feature, trying as a FeatureCollection");
-            try {
-                List<Geometry> geometries = new ArrayList<>();
-                FeatureCollection geoJsonFeatureCollection = jsonDeserializer.readValue(
-                    regionJson.traverse(),
-                    FeatureCollection.class
-                );
-
-                // convert all features to geometry
-                for (Feature feature : geoJsonFeatureCollection.getFeatures()) {
-                    geometries.add(GeometryUtils.convertGeoJsonToJtsGeometry(feature.getGeometry()));
-                }
-
-                // union all geometries into a single geometry
-                GeometryFactory geometryFactory = new GeometryFactory();
-                GeometryCollection geometryCollection =
-                    (GeometryCollection) geometryFactory.buildGeometry(geometries);
-                region.geometry = geometryCollection.union();
-            } catch (IllegalArgumentException | IOException | UnsupportedGeometryException e1) {
-                e1.printStackTrace();
-                LOG.error("Could not deserialize GeoJSON for {}", networkName);
-                return new ArrayList<>();
-            }
+            region.geometry = parsePolygonOrMultiPolygonFromJsonNode(regionJson);
+        } catch (UnsupportedGeometryException | IOException e) {
+            LOG.error("Could not deserialize GeoJSON for {}", networkName);
+            return new ArrayList<>();
         }
+
         return Arrays.asList(region);
     }
 
@@ -544,19 +519,9 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     private InputStream fetchFromUrl(String url, boolean fetchRequired) {
         InputStream data = null;
         try {
-        	URL url2 = new URL(url);
-
-            String proto = url2.getProtocol();
-            if (proto.equals("http") || proto.equals("https")) {
-            	data = HttpUtils.getData(url, headerName, headerValue);
-            } else {
-                // Local file probably, try standard java
-                data = url2.openStream();
-            }
-        } catch (SocketTimeoutException e) {
-            LOG.warn("timeout encountered while trying to fetch from URL: {}", url);
+            data = getDataFromUrlOrFile(url, headerName, headerValue);
         } catch (IOException e) {
-            LOG.warn("Error reading data from " + url, e);
+            LOG.warn("Failed to fetch from url: {}. Error: {}", url, e);
         }
         if (data == null && fetchRequired) {
             LOG.error("Received no data from URL fetch from: {}", url);

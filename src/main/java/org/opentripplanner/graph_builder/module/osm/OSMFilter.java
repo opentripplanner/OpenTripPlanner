@@ -83,7 +83,7 @@ public class OSMFilter {
                 permission = permission.add(StreetTraversalPermission.CAR);
             }
             if (entity.isBicycleExplicitlyAllowed()) {
-                permission = permission.add(StreetTraversalPermission.BICYCLE);
+                permission = permission.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
             }
             if (entity.isPedestrianExplicitlyAllowed()) {
                 permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
@@ -99,9 +99,9 @@ public class OSMFilter {
         }
 
         if (entity.isBicycleExplicitlyDenied()) {
-            permission = permission.remove(StreetTraversalPermission.BICYCLE);
+            permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         } else if (entity.isBicycleExplicitlyAllowed()) {
-            permission = permission.add(StreetTraversalPermission.BICYCLE);
+            permission = permission.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
 
         if (entity.isPedestrianExplicitlyDenied()) {
@@ -164,13 +164,13 @@ public class OSMFilter {
         // Compute bike permissions, check consistency.
         boolean forceBikes = false;
         if (way.isBicycleExplicitlyAllowed()) {
-            permissions = permissions.add(StreetTraversalPermission.BICYCLE);
+            permissions = permissions.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
             forceBikes = true;
         }
 
         if (way.isBicycleDismountForced() ||
                 (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))) {
-            permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
+            permissions = permissions.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
             if (forceBikes) {
                 LOG.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
             }
@@ -196,26 +196,26 @@ public class OSMFilter {
 
         // Check driving direction restrictions.
         if (way.isOneWayForwardDriving() || way.isRoundabout()) {
-            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR_AND_MICROMOBILITY);
         }
         if (way.isOneWayReverseDriving()) {
-            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR_AND_MICROMOBILITY);
         }
 
         // Check bike direction restrictions.
         if (way.isOneWayForwardBicycle()) {
-            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
         if (way.isOneWayReverseBicycle()) {
-            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
 
         // TODO(flamholz): figure out what this is for.
         String oneWayBicycle = way.getTag("oneway:bicycle");
         if (OSMWithTags.isFalse(oneWayBicycle) || way.isTagTrue("bicycle:backwards")) {
             if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
-                permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
-                permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+                permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
+                permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
             }
         }
 
@@ -223,16 +223,16 @@ public class OSMFilter {
         //removes bicycle permission when bicycles need to use sidepath
         //TAG: bicycle:forward=use_sidepath
         if (way.isForwardDirectionSidepath()) {
-            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
 
         //TAG bicycle:backward=use_sidepath
         if (way.isReverseDirectionSidepath()) {
-            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
 
         if (way.isOpposableCycleway()) {
-            permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+            permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
         }
         return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
     }
