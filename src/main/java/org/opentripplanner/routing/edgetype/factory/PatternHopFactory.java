@@ -893,6 +893,7 @@ public class PatternHopFactory {
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
+            if (pathway.getTraversalTime() == Pathway.MISSING_VALUE) continue;
             Vertex fromVertex = context.stationStopNodes.get(pathway.getFromStop());
             Vertex toVertex = context.stationStopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
