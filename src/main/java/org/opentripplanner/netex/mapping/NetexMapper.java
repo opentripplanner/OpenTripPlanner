@@ -47,7 +47,6 @@ public class NetexMapper {
                 netexIndex.timeZone.get()
         );
         AgencyMapper agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
-        StopMapper stopMapper = new StopMapper(netexIndex.quayById);
 
         FeedScopedIdFactory.setFeedId(agencyId);
 
@@ -64,6 +63,7 @@ public class NetexMapper {
 
         for (String stopPlaceId : netexIndex.stopPlaceById.localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.stopPlaceById.lookup(stopPlaceId);
+            StopMapper stopMapper = new StopMapper(netexIndex.quayById);
             Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
             transitBuilder.getStops().addAll(stops);
         }
