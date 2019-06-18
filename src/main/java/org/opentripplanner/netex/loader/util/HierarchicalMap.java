@@ -3,6 +3,7 @@ package org.opentripplanner.netex.loader.util;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A concrete implementation of {@link AbstractHierarchicalMap}.
@@ -28,6 +29,16 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
      */
     public void add(K key, V value) {
         map.put(key, value);
+    }
+
+    public void addAll(HierarchicalMap<K,V> other) {
+        for (K key : other.localKeys()) {
+            add(key, other.localGet(key));
+        }
+    }
+
+    public Set<K> localKeys() {
+        return map.keySet();
     }
 
     /**

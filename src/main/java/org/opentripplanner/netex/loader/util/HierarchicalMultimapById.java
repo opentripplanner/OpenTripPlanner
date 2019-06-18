@@ -31,6 +31,14 @@ public class HierarchicalMultimapById<V extends EntityInVersionStructure>
         super.add(entity.getId(), entity);
     }
 
+    public void addAll(HierarchicalMultimapById<V> other) {
+        for (String key : other.localKeys()) {
+            for (V entity : other.localGet(key)) {
+                add(entity);
+            }
+        }
+    }
+
     /**
      * Use the {@link #add(EntityInVersionStructure)} method!
      * @throws IllegalArgumentException This method throws an exception to prevent adding elements

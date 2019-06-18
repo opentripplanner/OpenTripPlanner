@@ -26,6 +26,12 @@ public class HierarchicalMapById<V extends EntityStructure> extends Hierarchical
         super.add(entity.getId(), entity);
     }
 
+    public void addAll(HierarchicalMapById<V> other) {
+        for (String key : other.localKeys()) {
+            add(other.localGet(key));
+        }
+    }
+
     /**
      * Use the {@link #add(EntityStructure)} method!
      * @throws  IllegalArgumentException This method throws an exception

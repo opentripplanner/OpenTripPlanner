@@ -30,6 +30,14 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
         map.put(key, value);
     }
 
+    public void addAll(HierarchicalMultimap<K,V> other) {
+        for (K key : other.localKeys()) {
+            for (V entity : other.localGet(key)) {
+                add(key, entity);
+            }
+        }
+    }
+
     /** Add a new pair of {@code key & value} to the local map value collection. */
     public Set<K> localKeys() {
         return map.keySet();
