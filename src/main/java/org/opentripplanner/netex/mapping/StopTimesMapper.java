@@ -22,8 +22,14 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRI
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
 
-// TODO Javadoc
 // TODO Test
+
+/**
+ * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
+ * to the correct stop. DestinationDisplay is mapped to HeadSign. There is logic to take care of the the fact that
+ * DestinationsDisplay is also valid for each subsequent TimeTabledPassingTime, while HeadSign has to be explicitly
+ * defined for each StopTime.
+ */
 class StopTimesMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
