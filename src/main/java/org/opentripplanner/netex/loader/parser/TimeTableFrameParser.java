@@ -7,11 +7,11 @@ import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-public class TimeTableFrameParser {
+class TimeTableFrameParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimeTableFrameParser.class);
 
@@ -21,13 +21,13 @@ public class TimeTableFrameParser {
 
     private final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId = new HierarchicalMultimap<>();
 
-    public TimeTableFrameParser(HierarchicalMapById<JourneyPattern> journeyPatternById) {
+    TimeTableFrameParser(HierarchicalMapById<JourneyPattern> journeyPatternById) {
         this.journeyPatternById = journeyPatternById;
     }
 
-    public void parse(TimetableFrame timetableFrame) {
+    void parse(TimetableFrame timetableFrame) {
         JourneysInFrame_RelStructure vehicleJourneys = timetableFrame.getVehicleJourneys();
-        List<Journey_VersionStructure> datedServiceJourneyOrDeadRunOrServiceJourney = vehicleJourneys
+        Collection<Journey_VersionStructure> datedServiceJourneyOrDeadRunOrServiceJourney = vehicleJourneys
                 .getDatedServiceJourneyOrDeadRunOrServiceJourney();
         for (Journey_VersionStructure jStructure : datedServiceJourneyOrDeadRunOrServiceJourney) {
             if (jStructure instanceof ServiceJourney) {
@@ -58,11 +58,11 @@ public class TimeTableFrameParser {
         }
     }
 
-    public Set<DayTypeRefsToServiceIdAdapter> getDayTypeRefs() {
+    Set<DayTypeRefsToServiceIdAdapter> getDayTypeRefs() {
         return dayTypeRefs;
     }
 
-    public HierarchicalMultimap<String, ServiceJourney> getServiceJourneyByPatternId() {
+    HierarchicalMultimap<String, ServiceJourney> getServiceJourneyByPatternId() {
         return serviceJourneyByPatternId;
     }
 }

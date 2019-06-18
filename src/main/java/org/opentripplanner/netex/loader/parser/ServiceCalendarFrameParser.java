@@ -5,9 +5,9 @@ import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
-import java.util.List;
+import java.util.Collection;
 
-public class ServiceCalendarFrameParser {
+class ServiceCalendarFrameParser {
 
     private final HierarchicalMapById<DayType> dayTypeById =
             new HierarchicalMapById<>();
@@ -18,7 +18,7 @@ public class ServiceCalendarFrameParser {
     private final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId =
             new HierarchicalMultimap<>();
 
-    public void parse(ServiceCalendarFrame scf) {
+    void parse(ServiceCalendarFrame scf) {
         if (scf.getServiceCalendar() != null) {
             DayTypes_RelStructure dayTypes = scf.getServiceCalendar().getDayTypes();
             for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
@@ -30,7 +30,7 @@ public class ServiceCalendarFrameParser {
         }
 
         if (scf.getDayTypes() != null) {
-            List<JAXBElement<? extends DataManagedObjectStructure>> dayTypes = scf.getDayTypes()
+            Collection<JAXBElement<? extends DataManagedObjectStructure>> dayTypes = scf.getDayTypes()
                     .getDayType_();
             for (JAXBElement dt : dayTypes) {
                 if (dt.getValue() instanceof DayType) {
@@ -47,7 +47,7 @@ public class ServiceCalendarFrameParser {
             }
         }
 
-        List<DayTypeAssignment> dayTypeAssignments = scf.getDayTypeAssignments()
+        Collection<DayTypeAssignment> dayTypeAssignments = scf.getDayTypeAssignments()
                 .getDayTypeAssignment();
         for (DayTypeAssignment dayTypeAssignment : dayTypeAssignments) {
             String ref = dayTypeAssignment.getDayTypeRef().getValue().getRef();
@@ -55,15 +55,15 @@ public class ServiceCalendarFrameParser {
         }
     }
 
-    public HierarchicalMapById<DayType> getDayTypeById() {
+    HierarchicalMapById<DayType> getDayTypeById() {
         return dayTypeById;
     }
 
-    public HierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
+    HierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
         return operatingPeriodById;
     }
 
-    public HierarchicalMultimap<String, DayTypeAssignment> getDayTypeAssignmentByDayTypeId() {
+    HierarchicalMultimap<String, DayTypeAssignment> getDayTypeAssignmentByDayTypeId() {
         return dayTypeAssignmentByDayTypeId;
     }
 }

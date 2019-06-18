@@ -4,7 +4,7 @@ import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
-import java.util.List;
+import java.util.Collection;
 
 public class CompositeOrCommonFrameParser {
 
@@ -26,7 +26,7 @@ public class CompositeOrCommonFrameParser {
 
             netexIndex.timeZone.set(timeZone);
 
-            List<JAXBElement<? extends Common_VersionFrameStructure>> commonFrames = cf
+            Collection<JAXBElement<? extends Common_VersionFrameStructure>> commonFrames = cf
                     .getFrames().getCommonFrame();
             for (JAXBElement commonFrame : commonFrames) {
                 loadResourceFrames(commonFrame);
@@ -66,7 +66,7 @@ public class CompositeOrCommonFrameParser {
             netexIndex.destinationDisplayById.addAll(serviceFrameParser.getDestinationDisplayById());
             netexIndex.authoritiesByGroupOfLinesId.addAll(serviceFrameParser.getAuthorityByGroupOfLinesId());
             netexIndex.quayIdByStopPointRef.addAll((serviceFrameParser.getQuayIdByStopPointRef()));
-            netexIndex.groupOfLinesByLineId.addAll(serviceFrameParser.getGroupOfLinesByLineId());
+            netexIndex.groupOfLinesById.addAll(serviceFrameParser.getGroupOfLinesById());
         }
     }
 

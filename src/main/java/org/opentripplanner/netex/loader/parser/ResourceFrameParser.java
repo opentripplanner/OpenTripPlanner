@@ -6,14 +6,14 @@ import org.rutebanken.netex.model.DataManagedObjectStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 
 import javax.xml.bind.JAXBElement;
-import java.util.List;
+import java.util.Collection;
 
-public class ResourceFrameParser {
+class ResourceFrameParser {
 
     private final HierarchicalMapById<Authority> authorityById = new HierarchicalMapById<>();
 
-    public void parse(ResourceFrame resourceFrame) {
-        List<JAXBElement<? extends DataManagedObjectStructure>> organisations = resourceFrame
+    void parse(ResourceFrame resourceFrame) {
+        Collection<JAXBElement<? extends DataManagedObjectStructure>> organisations = resourceFrame
                 .getOrganisations().getOrganisation_();
         for (JAXBElement element : organisations) {
             if(element.getValue() instanceof Authority){
@@ -23,7 +23,7 @@ public class ResourceFrameParser {
         }
     }
 
-    public HierarchicalMapById<Authority> getAuthorityById() {
+    HierarchicalMapById<Authority> getAuthorityById() {
         return authorityById;
     }
 }

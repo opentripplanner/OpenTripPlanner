@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBElement;
-import java.util.List;
+import java.util.Collection;
 
-public class ServiceFrameParser {
+class ServiceFrameParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
 
@@ -40,7 +40,7 @@ public class ServiceFrameParser {
 
     private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
 
-    public ServiceFrameParser(
+    ServiceFrameParser(
             HierarchicalMultimapById<Quay> quayById,
             HierarchicalMapById<Authority> authorityById,
             HierarchicalMapById<Network> networkById,
@@ -52,11 +52,11 @@ public class ServiceFrameParser {
         this.groupOfLinesById = groupOfLinesById;
     }
 
-    public void parse(ServiceFrame sf) {
+    void parse(ServiceFrame sf) {
             //stop assignments
             StopAssignmentsInFrame_RelStructure stopAssignments = sf.getStopAssignments();
             if (stopAssignments != null) {
-                List<JAXBElement<? extends StopAssignment_VersionStructure>> assignments = stopAssignments
+                Collection<JAXBElement<? extends StopAssignment_VersionStructure>> assignments = stopAssignments
                         .getStopAssignment();
                 for (JAXBElement assignment : assignments) {
                     if (assignment.getValue() instanceof PassengerStopAssignment) {
@@ -78,7 +78,7 @@ public class ServiceFrameParser {
             //routes
             RoutesInFrame_RelStructure routes = sf.getRoutes();
             if (routes != null) {
-                List<JAXBElement<? extends LinkSequence_VersionStructure>> route_ = routes
+                Collection<JAXBElement<? extends LinkSequence_VersionStructure>> route_ = routes
                         .getRoute_();
                 for (JAXBElement element : route_) {
                     if (element.getValue() instanceof Route) {
@@ -103,7 +103,7 @@ public class ServiceFrameParser {
 
                 if (network.getGroupsOfLines() != null) {
                     GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
-                    List<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
+                    Collection<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
                     for (GroupOfLines group : groupOfLines) {
                         groupOfLinesById.add(group);
                         if (authority != null) {
@@ -117,7 +117,7 @@ public class ServiceFrameParser {
             //lines
             LinesInFrame_RelStructure lines = sf.getLines();
             if(lines != null){
-                List<JAXBElement<? extends DataManagedObjectStructure>> line_ = lines.getLine_();
+                Collection<JAXBElement<? extends DataManagedObjectStructure>> line_ = lines.getLine_();
                 for (JAXBElement element : line_) {
                     if (element.getValue() instanceof Line) {
                         Line line = (Line) element.getValue();
@@ -142,7 +142,7 @@ public class ServiceFrameParser {
             //journeyPatterns
             JourneyPatternsInFrame_RelStructure journeyPatterns = sf.getJourneyPatterns();
             if (journeyPatterns != null) {
-                List<JAXBElement<?>> journeyPattern_orJourneyPatternView = journeyPatterns
+                Collection<JAXBElement<?>> journeyPattern_orJourneyPatternView = journeyPatterns
                         .getJourneyPattern_OrJourneyPatternView();
                 for (JAXBElement pattern : journeyPattern_orJourneyPatternView) {
                     if (pattern.getValue() instanceof JourneyPattern) {
@@ -160,43 +160,41 @@ public class ServiceFrameParser {
             }
     }
 
-    public HierarchicalMapById<Route> getRouteById() {
+    HierarchicalMapById<Route> getRouteById() {
         return routeById;
     }
 
-    public HierarchicalMap<String, Authority> getAuthorityByNetworkId() {
+    HierarchicalMap<String, Authority> getAuthorityByNetworkId() {
         return authorityByNetworkId;
     }
 
-    public HierarchicalMapById<Line> getLineById() {
+    HierarchicalMapById<Line> getLineById() {
         return lineById;
     }
 
-    public HierarchicalMap<String, Network> getNetworkByLineId() {
+    HierarchicalMap<String, Network> getNetworkByLineId() {
         return networkByLineId;
     }
 
-    public HierarchicalMap<String, GroupOfLines> getGroupOfLinesByLineId() {
+    HierarchicalMap<String, GroupOfLines> getGroupOfLinesByLineId() {
         return groupOfLinesByLineId;
     }
 
-    public HierarchicalMapById<JourneyPattern> getJourneyPatternById() {
+    HierarchicalMapById<JourneyPattern> getJourneyPatternById() {
         return journeyPatternById;
     }
 
-    public HierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
+    HierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
         return destinationDisplayById;
     }
 
-    public HierarchicalMap<String, Authority> getAuthorityByGroupOfLinesId() {
+    HierarchicalMap<String, Authority> getAuthorityByGroupOfLinesId() {
         return authorityByGroupOfLinesId;
     }
 
-    public HierarchicalMap<String, String> getQuayIdByStopPointRef() {
+    HierarchicalMap<String, String> getQuayIdByStopPointRef() {
         return quayIdByStopPointRef;
     }
 
-    public HierarchicalMapById<GroupOfLines> getGroupOfLinesById() {
-        return groupOfLinesById;
-    }
+    HierarchicalMapById<GroupOfLines> getGroupOfLinesById() { return groupOfLinesById; }
 }
