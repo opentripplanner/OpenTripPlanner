@@ -688,7 +688,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
         if (OSMFilter.isOsmEntityRoutable(area.parent)
                 && permissions != StreetTraversalPermission.NONE) {
             walkableAreas.add(area);

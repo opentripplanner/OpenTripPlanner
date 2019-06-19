@@ -1296,6 +1296,10 @@ public class StreetEdge extends Edge implements Cloneable {
                 e.setStairs(isStairs());
                 e.setWheelchairAccessible(isWheelchairAccessible());
                 e.setBack(isBack());
+                e.setCarNetworks(getCarNetworks());
+                e.setFloatingCarDropoffSuitability(getFloatingCarDropoffSuitability());
+                e.setVehicleNetworks(getVehicleNetworks());
+                e.setFloatingVehicleDropoffSuitability(getFloatingVehicleDropoffSuitability());
             }
         } else {
             if (((TemporarySplitterVertex) v).isEndVertex()) {

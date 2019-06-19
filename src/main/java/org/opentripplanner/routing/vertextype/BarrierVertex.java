@@ -21,7 +21,7 @@ public class BarrierVertex extends OsmVertex {
     private StreetTraversalPermission barrierPermissions;
 
     //According to OSM default permissions are access=no, foot=yes, bicycle=yes
-    public static final StreetTraversalPermission defaultBarrierPermissions = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+    public static final StreetTraversalPermission defaultBarrierPermissions = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY;
 
     public BarrierVertex(Graph g, String label, double x, double y, long nodeId) {
         super(g, label, x, y, nodeId);

@@ -15,10 +15,17 @@ public enum StreetTraversalPermission {
     PEDESTRIAN(1),
     BICYCLE(2),
     PEDESTRIAN_AND_BICYCLE(2 | 1),
+    PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY(8 | 2 | 1),
     CAR(4),
+    MICROMOBILITY(8),
+    PEDESTRIAN_AND_MICROMOBILITY(8 | 1),
     PEDESTRIAN_AND_CAR(4 | 1),
+    PEDESTRIAN_AND_BICYCLE_AND_CAR(4 | 2 | 1),
     BICYCLE_AND_CAR(4 | 2),
-    ALL(4 | 2 | 1);
+    BICYCLE_AND_MICROMOBILITY(8 | 2),
+    BICYCLE_AND_CAR_AND_MICROMOBILITY(8 | 4 | 2),
+    CAR_AND_MICROMOBILITY(8 | 4),
+    ALL(8 | 4 | 2 | 1);
 
     private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();
 
@@ -69,7 +76,9 @@ public enum StreetTraversalPermission {
     public boolean allows(TraverseModeSet modes) {
         if (modes.getWalk() && allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
-        } else if ((modes.getBicycle() || modes.getMicromobility()) && allows(StreetTraversalPermission.BICYCLE)) {
+        } else if ((modes.getBicycle()) && allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        } else if ((modes.getMicromobility()) && allows(StreetTraversalPermission.MICROMOBILITY)) {
             return true;
         } else if (modes.getCar() && allows(StreetTraversalPermission.CAR)) {
             return true;
@@ -83,10 +92,9 @@ public enum StreetTraversalPermission {
     public boolean allows(TraverseMode mode) {
         if (mode == TraverseMode.WALK && allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
-        } else if (
-            (mode == TraverseMode.BICYCLE || mode == TraverseMode.MICROMOBILITY) &&
-                allows(StreetTraversalPermission.BICYCLE)
-        ) {
+        } else if (mode == TraverseMode.BICYCLE && allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        } else if (mode == TraverseMode.MICROMOBILITY && allows(StreetTraversalPermission.MICROMOBILITY)) {
             return true;
         } else if (mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR)) {
             return true;

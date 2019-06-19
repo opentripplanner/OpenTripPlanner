@@ -131,7 +131,7 @@ public class PlatformLinker {
                 to.getCoordinate());
 
         StreetTraversalPermission areaPermissions = OSMFilter.getPermissionsForEntity(
-                area.parent, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                area.parent, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
 
         String labelFromTo = "way (area) " + area.parent.getId() + " from " + from.getLabel()
                 + " to " + to.getLabel();

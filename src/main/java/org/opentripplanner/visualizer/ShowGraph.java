@@ -544,7 +544,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                     stroke(000, 000, 200);
                     strokeWeight(6);
                     drawEdge(e);
-                } else if (stp == StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE) {
+                } else if (stp == StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY) {
                     stroke(000, 200, 200);
                     strokeWeight(6);
                     drawEdge(e);

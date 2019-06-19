@@ -43,8 +43,13 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
             return null;
         }
 
-        if (mode == TraverseMode.BICYCLE && 
+        if (mode == TraverseMode.BICYCLE &&
             !permission.allows(StreetTraversalPermission.BICYCLE)) {
+            return null;
+        }
+
+        if (mode == TraverseMode.MICROMOBILITY &&
+            !permission.allows(StreetTraversalPermission.MICROMOBILITY)) {
             return null;
         }
         // there are elevators which allow cars

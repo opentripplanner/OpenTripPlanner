@@ -30,25 +30,25 @@ public class BarrierVertexTest {
         BarrierVertex bv = new BarrierVertex(graph, label, simpleBarier.lon, simpleBarier.lat, 0);
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
-        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, bv.getBarrierPermissions());
 
         simpleBarier.addTag("foot", "yes");
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
-        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, bv.getBarrierPermissions());
         simpleBarier.addTag("bicycle", "yes");
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
-        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, bv.getBarrierPermissions());
         simpleBarier.addTag("access", "no");
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
-        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, bv.getBarrierPermissions());
 
         simpleBarier.addTag("motor_vehicle", "no");
         bv.setBarrierPermissions(OSMFilter
             .getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions));
-        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+        assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, bv.getBarrierPermissions());
 
         simpleBarier.addTag("bicycle", "no");
         bv.setBarrierPermissions(OSMFilter
