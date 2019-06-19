@@ -44,9 +44,4 @@ public class PdxFareServiceImpl extends DefaultFareServiceImpl {
         return cost > 0 && cost < Float.POSITIVE_INFINITY;
     }
 
-//    @Override
-//    protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
-//        return Math.max(cost0, cost1);
-//    }
-
 }
