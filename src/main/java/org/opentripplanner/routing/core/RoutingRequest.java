@@ -40,6 +40,9 @@ import java.util.TimeZone;
  * All defaults should be specified here in the RoutingRequest, NOT as annotations on query parameters in web services
  * that create RoutingRequests. This establishes a priority chain for default values:
  * RoutingRequest field initializers, then JSON router config, then query parameters.
+ *
+ * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor router or other
+ * non-transit routing (walk, bike, car etc.)
  */
 public class RoutingRequest implements Cloneable, Serializable {
 
@@ -67,56 +70,95 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The end location */
     public GenericLocation to;
 
-    /** If true, the tree will be allowed to grow in all directions, rather than being directed toward a single target. */
+    /** If true, the tree will be allowed to grow in all directions, rather than being directed toward a single target.
+     * @Deprecated - Will not be supported in Raptor
+     * */
+    @Deprecated
     public boolean oneToMany = false;
 
-    /** An ordered list of intermediate locations to be visited. */
+    /** An ordered list of intermediate locations to be visited.
+     * @Deprecated - Not currently supported in Raptor, but planned in the future
+     * */
+    @Deprecated
     public List<GenericLocation> intermediatePlaces;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for access/egress legs.
      * Defaults to unlimited.
+     *
+     * @Deprecated - TODO: This should be supported
      */
+    @Deprecated
     public double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.
      * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.
+     *
+     * @Deprecated - TODO: This should be supported
      */
+    @Deprecated
     public double maxTransferWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
      * large graphs the search becomes very slow.
+     *
+     * @Deprecated - Not currently supported in Raptor, but planned in the future
      */
+    @Deprecated
     public int maxPreTransitTime = 30 * 60;
 
-    /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
+    /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept
+     *
+     * @Deprecated - Not currently supported in Raptor, but planned in the future
+     * */
+    @Deprecated
     public long worstTime = Long.MAX_VALUE;
 
-    /** The worst possible weight that we will accept when planning a trip. */
+    /** The worst possible weight that we will accept when planning a trip.
+     *
+     * @Deprecated - Not supported in Raptor
+     * */
+    @Deprecated
     public double maxWeight = Double.MAX_VALUE;
 
-    /** The maximum duration of a returned itinerary, in hours. */
+    /** The maximum duration of a returned itinerary, in hours.
+     *
+     * @Deprecated - Not supported in Raptor
+     * */
+    @Deprecated
     public double maxHours = Double.MAX_VALUE;
 
-    /** Whether maxHours limit should consider wait/idle time between the itinerary and the requested arrive/depart time. */
+    /** Whether maxHours limit should consider wait/idle time between the itinerary and the requested arrive/depart time.
+     *
+     * @Deprecated - Not supported in Raptor
+     * */
+    @Deprecated
     public boolean useRequestedDateTimeInMaxHours = false;
 
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
-    /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    public OptimizeType optimize = OptimizeType.QUICK;
     // TODO this should be completely removed and done only with individual cost parameters
+    /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time.
+     *
+     * @Deprecated - Not supported in Raptor
+     * */
+    @Deprecated
+    public OptimizeType optimize = OptimizeType.QUICK;
     // Also: apparently OptimizeType only affects BICYCLE mode traversal of street segments.
     // If this is the case it should be very well documented and carried over into the Enum name.
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
 
-    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
+    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
+     *
+     * TODO: Needs to  be implemented
+     * */
+    @Deprecated
     public boolean arriveBy = false;
 
     /** Whether the trip must be wheelchair accessible. */
@@ -244,57 +286,96 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Do not use certain named routes.
      * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
      * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
+     *
+     * TODO: Needs to be implemented
      */
+    @Deprecated
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
-    /** Only use certain named routes */
+    /** Only use certain named routes
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
-    /** Do not use certain named agencies */
+    /** Do not use certain named agencies
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
-    /** Only use certain named agencies */
+    /** Only use certain named agencies
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     public HashSet<String> whiteListedAgencies = new HashSet<String>();
 
-    /** Do not use certain trips */
+    /** Do not use certain trips
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
+    /** Set of preferred routes by user.
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
-    /** Set of preferred agencies by user. */
+    /** Set of preferred agencies by user.
+     *
+     * TODO: Needs to be implemented
+     * */
+    @Deprecated
     public HashSet<String> preferredAgencies = new HashSet<String>();
 
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
+     *
+     * TODO Needs to be implemented
      */
+    @Deprecated
     public int otherThanPreferredRoutesPenalty = 300;
 
     /** Set of unpreferred routes for given user. */
+    @Deprecated
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
     
     /** Set of unpreferred agencies for given user. */
+    @Deprecated
     public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
     /**
      * Penalty added for using every unpreferred route. We return number of seconds that we are willing to wait for preferred route.
      */
+    @Deprecated
     public int useUnpreferredRoutesPenalty = 300;
 
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and
      * boarding another. This time is in addition to time it might take to walk between transit stops. This time should also be overridden by specific
      * transfer timing information in transfers.txt
+     *
+     * TODO: Needs to be implemented
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
+    @Deprecated
     public int transferSlack = 0;
 
     /** Invariant: boardSlack + alightSlack ≤ transferSlack. */
     public int boardSlack = 0;
 
+    @Deprecated
     public int alightSlack = 0;
 
+    @Deprecated
     public int maxTransfers = 2;
 
     /**
@@ -310,6 +391,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
+    @Deprecated
     public int nonpreferredTransferPenalty = 180;
 
     /**
@@ -327,7 +409,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Options specifically for the case that you are walking a bicycle. */
     public RoutingRequest bikeWalkingOptions;
 
-    /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
+    /** This is true when a GraphPath is being traversed in reverse for optimization purposes.
+     *
+     * @Deprecated - Not needed in Raptor
+     * */
+    @Deprecated
     public boolean reverseOptimizing = false;
 
     /**
@@ -337,17 +423,26 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
+     *
+     * @Deprecated - Analyst will be removed
      */
+    @Deprecated
     public long clampInitialWait = -1;
 
     /**
      * When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.
+     *
+     * @Deprecated - Not needed in Raptor
      */
+    @Deprecated
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
      * When true, do a full reversed search to compact the legs of the GraphPath.
+     *
+     * @Deprecated - Not needed in Raptor
      */
+    @Deprecated
     public boolean compactLegsByReversedSearch = false;
 
     /**
@@ -370,13 +465,19 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     /**
      * When true, realtime updates are ignored during this search.
+     *
+     * TODO Needs to be implemented
      */
+    @Deprecated
     public boolean ignoreRealtimeUpdates = false;
 
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
+     *
+     * @Deprecated - Not needed in Raptor
      */
+    @Deprecated
     public boolean disableRemainingWeightHeuristic = false;
 
     /**
@@ -427,7 +528,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
-    /** Accept only paths that use transit (no street-only paths). */
+    /** Accept only paths that use transit (no street-only paths).
+     *
+     * @Deprecated - This will probably be reimplemented
+     * */
+    @Deprecated
     public boolean onlyTransitTrips = false;
 
     /** Option to disable the default filtering of GTFS-RT alerts by time. */
@@ -436,7 +541,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
-    /** Which path comparator to use */
+    /** Which path comparator to use
+     *
+     * @Deprecated - A variant of this will probably be implemented in the future
+     * */
+    @Deprecated
     public String pathComparator = null;
 
     /** Saves split edge which can be split on origin/destination search
