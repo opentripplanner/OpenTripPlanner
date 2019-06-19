@@ -162,6 +162,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         case "dutch":
             retval = new DutchFareServiceFactory();
             break;
+        case "pdx":
+            retval = new PdxFareServiceFactory();
+            break;
         case "san-francisco":
             retval = new SFBayFareServiceFactory();
             break;
