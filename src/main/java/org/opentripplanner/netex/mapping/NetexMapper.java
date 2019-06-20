@@ -41,11 +41,10 @@ public class NetexMapper {
         );
         RouteMapper routeMapper = new RouteMapper(
                 transitBuilder,
-                netexIndex.networkByLineId,
-                netexIndex.groupOfLinesByLineId,
                 netexIndex,
                 netexIndex.timeZone.get()
         );
+
         AgencyMapper agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
 
         FeedScopedIdFactory.setFeedId(agencyId);

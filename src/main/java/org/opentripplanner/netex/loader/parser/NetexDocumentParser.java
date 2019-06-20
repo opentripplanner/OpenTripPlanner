@@ -109,12 +109,7 @@ public class NetexDocumentParser {
     }
 
     private void parseServiceFrames(ServiceFrame serviceFrame) {
-        ServiceFrameParser parser = new ServiceFrameParser(
-                netexIndex.quayById,
-                netexIndex.authoritiesById,
-                netexIndex.networkById,
-                netexIndex.groupOfLinesById
-        );
+        ServiceFrameParser parser = new ServiceFrameParser(netexIndex.quayById);
         parser.parse(serviceFrame);
         parser.setResultOnIndex(netexIndex);
     }

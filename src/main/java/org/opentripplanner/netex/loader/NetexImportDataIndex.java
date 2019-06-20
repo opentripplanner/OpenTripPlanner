@@ -46,8 +46,9 @@ import java.util.Set;
  * {@link HierarchicalElement} classes.
  */
 public class NetexImportDataIndex {
+
+    // Indexes to entities
     public final HierarchicalMapById<Authority> authoritiesById;
-    public final HierarchicalMap<String, Authority> authoritiesByGroupOfLinesId;
     public final HierarchicalMapById<DayType> dayTypeById;
     public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
     /**
@@ -57,17 +58,24 @@ public class NetexImportDataIndex {
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
-    public final HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId;
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
     public final HierarchicalMapById<Line> lineById;
     public final HierarchicalMapById<Network> networkById;
-    public final HierarchicalMap<String, Network> networkByLineId;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
     public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
+
+
+    // Relations between entities - The Netex XML sometimes rely on the the
+    // nested structure of the XML document, rater than explicit references.
+    // Since we throw away the document we need to keep track of these.
+
+    public final HierarchicalMap<String, String> networkIdByGroupOfLineId;
+
+    // Shared data
     public final HierarchicalElement<String> timeZone;
 
     /**
@@ -75,17 +83,15 @@ public class NetexImportDataIndex {
      */
     public NetexImportDataIndex() {
         this.authoritiesById = new HierarchicalMapById<>();
-        this.authoritiesByGroupOfLinesId = new HierarchicalMap<>();
         this.dayTypeById = new HierarchicalMapById<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
-        this.groupOfLinesByLineId = new HierarchicalMap<>();
         this.journeyPatternsById = new HierarchicalMapById<>();
         this.lineById = new HierarchicalMapById<>();
         this.networkById = new HierarchicalMapById<>();
-        this.networkByLineId = new HierarchicalMap<>();
+        this.networkIdByGroupOfLineId = new HierarchicalMap<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
@@ -101,17 +107,15 @@ public class NetexImportDataIndex {
      */
     NetexImportDataIndex(NetexImportDataIndex parent) {
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
-        this.authoritiesByGroupOfLinesId = new HierarchicalMap<>(parent.authoritiesByGroupOfLinesId);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
-        this.groupOfLinesByLineId = new HierarchicalMap<>(parent.groupOfLinesByLineId);
         this.journeyPatternsById = new HierarchicalMapById<>(parent.journeyPatternsById);
         this.lineById = new HierarchicalMapById<>(parent.lineById);
         this.networkById = new HierarchicalMapById<>(parent.networkById);
-        this.networkByLineId = new HierarchicalMap<>(parent.networkByLineId);
+        this.networkIdByGroupOfLineId = new HierarchicalMap<>(parent.networkIdByGroupOfLineId);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
@@ -121,21 +125,21 @@ public class NetexImportDataIndex {
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
-    // TODO OTP2 - Unit test
     /**
-     * Search {@code groupOfLines} first, then {@code network} to find an authority. If no
-     * authority is found {@code null} is returned.
+     * Lookup a Network given a GroupOfLine id or an Network id. If the given
+     * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
+     * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
+     * can lookup the Network directly.
+     * <p/>
+     * If no Network is found {@code null} is returned.
      */
-    public Authority lookupAuthority(GroupOfLines groupOfLines, Network network) {
-        if(groupOfLines != null) {
-            Authority a = authoritiesByGroupOfLinesId.lookup(groupOfLines.getId());
-            if(a != null) return a;
-        }
+    public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
+        GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
 
-        if(network != null) {
-            String orgRef = network.getTransportOrganisationRef().getValue().getRef();
-            return authoritiesById.lookup(orgRef);
-        }
-        return null;
+        String networkId = groupOfLines == null
+                ? groupOfLineOrNetworkId
+                : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
+
+        return networkById.lookup(networkId);
     }
 }

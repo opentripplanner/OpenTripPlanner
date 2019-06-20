@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,6 +15,7 @@ import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
 import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
+import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 /**
@@ -76,6 +79,23 @@ public class HierarchicalMapTest {
         // And no governor at country and state level
         assertNull(country.lookup(MAYOR));
         assertNull(state.lookup(MAYOR));
+    }
+
+    @Test public void testAddAllAndLocalMethods() {
+        // Given
+        Map<String, E> map = new HashMap<>();
+        map.put("A", EASTWOOD);
+        map.put("B", SCHWARZENEGGER);
+
+        // When
+        HierarchicalMap<String, E> hmap = new HierarchicalMap<>();
+        hmap.addAll(map);
+
+        // Then
+        assertEquals(setOf("A", "B"),  hmap.localKeys());
+        assertEquals(EASTWOOD,  hmap.localGet("A"));
+        assertEquals(sort(listOf(EASTWOOD, SCHWARZENEGGER)),  sort(hmap.localValues()));
+        assertTrue(hmap.localContainsKey("B"));
     }
 
     @Test public void localValues() {

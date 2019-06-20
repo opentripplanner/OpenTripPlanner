@@ -1,9 +1,7 @@
 package org.opentripplanner.netex.loader.parser;
 
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
-import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
 import org.rutebanken.netex.model.GroupOfLines;
@@ -34,38 +32,24 @@ class ServiceFrameParser {
 
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayById;
 
-    private final HierarchicalMapById<Network> networkById;
+    private final Collection<Network> networks = new ArrayList<>();
 
-    private final HierarchicalMapById<GroupOfLines> groupOfLinesById;
-
-    private final HierarchicalMapById<Authority> authorityById;
+    private final Collection<GroupOfLines> groupOfLines = new ArrayList<>();
 
     private final Collection<Route> routes = new ArrayList<>();
 
     private final Collection<Line> lines = new ArrayList<>();
 
-    private final Map<String, Network> networkByLineId = new HashMap<>();
-
-    private final Map<String, GroupOfLines> groupOfLinesByLineId = new HashMap<>();
+    private final Map<String, String> networkIdByGroupOfLineId = new HashMap<>();
 
     private final Collection<JourneyPattern> journeyPatterns = new ArrayList<>();
 
     private final Collection<DestinationDisplay> destinationDisplays = new ArrayList<>();
 
-    private final Map<String, Authority> authorityByGroupOfLinesId = new HashMap<>();
-
     private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
-    ServiceFrameParser(
-            ReadOnlyHierarchicalVersionMapById<Quay> quayById,
-            HierarchicalMapById<Authority> authorityById,
-            HierarchicalMapById<Network> networkById,
-            HierarchicalMapById<GroupOfLines> groupOfLinesById
-    ) {
+    ServiceFrameParser(ReadOnlyHierarchicalVersionMapById<Quay> quayById) {
         this.quayById = quayById;
-        this.authorityById = authorityById;
-        this.networkById = networkById;
-        this.groupOfLinesById = groupOfLinesById;
     }
 
     void parse(ServiceFrame sf) {
@@ -78,14 +62,17 @@ class ServiceFrameParser {
     }
 
     void setResultOnIndex(NetexImportDataIndex index) {
-        index.routeById.addAll(routes);
-        index.lineById.addAll(lines);
-        index.networkByLineId.addAll(networkByLineId);
-        index.groupOfLinesByLineId.addAll(groupOfLinesByLineId);
-        index.journeyPatternsById.addAll(journeyPatterns);
+        // update entities
         index.destinationDisplayById.addAll(destinationDisplays);
-        index.authoritiesByGroupOfLinesId.addAll(authorityByGroupOfLinesId);
+        index.groupOfLinesById.addAll(groupOfLines);
+        index.journeyPatternsById.addAll(journeyPatterns);
+        index.lineById.addAll(lines);
+        index.networkById.addAll(networks);
         index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
+        index.routeById.addAll(routes);
+
+        // update references
+        index.networkIdByGroupOfLineId.addAll(networkIdByGroupOfLineId);
     }
 
     private void parseStopAssignments(StopAssignmentsInFrame_RelStructure stopAssignments) {
@@ -122,24 +109,19 @@ class ServiceFrameParser {
     private void parseNetwork(Network network) {
         if (network == null) return;
 
-        networkById.add(network);
-
-        // TODO OTP2 - Add this responsibility to Index
-
-        String orgRef = network.getTransportOrganisationRef().getValue().getRef();
-        Authority authority = authorityById.lookup(orgRef);
-
+        networks.add(network);
 
         GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
 
         if (groupsOfLines != null) {
-            Collection<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
-            for (GroupOfLines group : groupOfLines) {
-                groupOfLinesById.add(group);
-                if (authority != null) {
-                    authorityByGroupOfLinesId.put(group.getId(), authority);
-                }
-            }
+            parseGroupOfLines(groupsOfLines.getGroupOfLines(), network);
+        }
+    }
+
+    private void parseGroupOfLines(Collection<GroupOfLines> groupOfLines, Network network) {
+        for (GroupOfLines group : groupOfLines) {
+            groupOfLines.add(group);
+            networkIdByGroupOfLineId.put(network.getId(), group.getId());
         }
     }
 
@@ -148,20 +130,7 @@ class ServiceFrameParser {
 
         for (JAXBElement element : lines.getLine_()) {
             if (element.getValue() instanceof Line) {
-                Line line = (Line) element.getValue();
-                this.lines.add(line);
-
-                String groupRef = line.getRepresentedByGroupRef().getRef();
-                Network network = networkById.lookup(groupRef);
-
-                if (network != null) {
-                    networkByLineId.put(line.getId(), network);
-                } else {
-                    GroupOfLines groupOfLines = groupOfLinesById.lookup(groupRef);
-                    if (groupOfLines != null) {
-                        groupOfLinesByLineId.put(line.getId(), groupOfLines);
-                    }
-                }
+                this.lines.add((Line) element.getValue());
             }
         }
     }
@@ -178,6 +147,7 @@ class ServiceFrameParser {
 
     private void parseDestinationDisplays(DestinationDisplaysInFrame_RelStructure destDisplays) {
         if (destDisplays == null) return;
+
         this.destinationDisplays.addAll(destDisplays.getDestinationDisplay());
     }
 }

@@ -1,17 +1,22 @@
 package org.opentripplanner.netex.loader.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
+import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
+import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 /**
  * We uses a simplified version of the data structure used in the {@link HierarchicalMapTest}:
@@ -44,6 +49,25 @@ public class HierarchicalMultimapTest {
 
         country.add(ACTOR, EASTWOOD);
         state.add(ACTOR, SCHWARZENEGGER);
+    }
+
+    @Test public void testAddAllAndLocalMethods() {
+        // Given
+        HierarchicalMultimap<String, E> subject = new HierarchicalMultimap<>();
+        Multimap<String, E> input = ArrayListMultimap.create();
+
+        input.put("A", EASTWOOD);
+        input.put("A", SCHWARZENEGGER);
+        input.put("B", REAGAN);
+
+        // When
+        subject.addAll(input);
+
+        // Then
+        assertEquals(setOf("A", "B"),  subject.localKeys());
+        assertEquals(sort(listOf(EASTWOOD, SCHWARZENEGGER)), sort(subject.localGet("A")));
+        assertEquals(sort(singleton(REAGAN)),  sort(subject.localGet("B")));
+        assertTrue(subject.localContainsKey("A"));
     }
 
     @Test public void addAndLookup() {

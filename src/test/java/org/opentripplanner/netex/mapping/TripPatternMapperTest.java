@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;

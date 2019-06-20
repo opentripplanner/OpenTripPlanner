@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.loader.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -15,11 +17,30 @@ import static org.opentripplanner.netex.loader.util.E.REAGAN_2;
 import static org.opentripplanner.netex.loader.util.E.REAGAN_3;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
 import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
+import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
-public class HierarchicalMultimapByIdTest {
+public class HierarchicalVersionMapByIdTest {
     private final HierarchicalVersionMapById<E> root = new HierarchicalVersionMapById<>();
     private final HierarchicalVersionMapById<E> child = new HierarchicalVersionMapById<>(root);
+
+    @Test public void testAddAllAndLocalMethods() {
+        // Given
+        HierarchicalVersionMapById<E> subject = new HierarchicalVersionMapById<>();
+
+        String eId = EASTWOOD.getId();
+        String sId = SCHWARZENEGGER.getId();
+        String rId = REAGAN.getId();
+
+        // When
+        subject.addAll(listOf(REAGAN, REAGAN_2, REAGAN_3, EASTWOOD, SCHWARZENEGGER));
+
+        // Then
+        assertEquals(setOf(eId, sId, rId),  subject.localKeys());
+        assertEquals(listOf(EASTWOOD), subject.localGet(eId));
+        assertEquals(sort(listOf(REAGAN, REAGAN_2, REAGAN_3)),  sort(subject.localGet(rId)));
+        assertTrue(subject.localContainsKey(eId));
+    }
 
     /**
      * Add entity using the one argument add method verify that it can be retrieved
@@ -40,6 +61,16 @@ public class HierarchicalMultimapByIdTest {
     public void addEntityWithIllegalKeyArgument() {
         // Prevent using add method with (key, value) -> the key is given: the ID.
         child.add("Illegal key", EASTWOOD);
+        fail("Expected an exception, but did not get one.");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addEntitiesWithIllegalKeyArgument() {
+        Multimap<String, E> input = ArrayListMultimap.create();
+        input.put("Illegal key", EASTWOOD);
+
+        // Prevent using add method with (key, value) -> the key is given: the ID.
+        child.addAll(input);
         fail("Expected an exception, but did not get one.");
     }
 

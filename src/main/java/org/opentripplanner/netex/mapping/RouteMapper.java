@@ -4,9 +4,6 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.PresentationStructure;
@@ -27,24 +24,16 @@ class RouteMapper {
 
     private final OtpTransitServiceBuilder transitBuilder;
 
-    private final HierarchicalMap<String, Network> networkByLineId;
-
-    private final HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId;
-
     private final NetexImportDataIndex netexIndex;
 
     private final AgencyMapper agencyMapper;
 
     RouteMapper(
             OtpTransitServiceBuilder transitBuilder,
-            HierarchicalMap<String, Network> networkByLineId,
-            HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId,
             NetexImportDataIndex netexIndex,
             String timeZone
     ) {
         this.transitBuilder = transitBuilder;
-        this.networkByLineId = networkByLineId;
-        this.groupOfLinesByLineId = groupOfLinesByLineId;
         this.netexIndex = netexIndex;
         this.agencyMapper = new AgencyMapper(timeZone);
     }
@@ -78,22 +67,20 @@ class RouteMapper {
      * Find an agency by mapping the GroupOfLines/Network Authority. If no authority is found
      * a default agency is created and returned.
      */
-    private Agency findOrCreateAgency(
-            Line line
-    ) {
-        String lineId = line.getId();
-        // Find authority, first in *Network* and then if not found look in *GroupOfLines*
-        Network network = networkByLineId.lookup(lineId);
-        GroupOfLines groupOfLines = groupOfLinesByLineId.lookup(lineId);
-        Authority authority = netexIndex.lookupAuthority(groupOfLines, network);
+    private Agency findOrCreateAgency(Line line) {
+        String groupRef = line.getRepresentedByGroupRef().getRef();
 
-        if(authority != null) {
-            return transitBuilder.getAgenciesById().get(authority.getId());
+        Network network = netexIndex.lookupNetworkForLine(groupRef);
+
+        if(network != null) {
+            String orgRef = network.getTransportOrganisationRef().getValue().getRef();
+            Agency agency = transitBuilder.getAgenciesById().get(orgRef);
+            if(agency != null) return agency;
         }
 
         // No authority found in Network or GroupOfLines.
         // Use the default agency, create if necessary
-        LOG.warn("No authority found for " + lineId);
+        LOG.warn("No authority found for " + line.getId());
         Agency agency = agencyMapper.createDefaultAgency();
         EntityById<String, Agency> agenciesById = transitBuilder.getAgenciesById();
         if (!agenciesById.containsKey(agency.getId())) {
