@@ -1,20 +1,38 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
-import org.rutebanken.netex.model.*;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
+import org.rutebanken.netex.model.GroupOfLines;
+import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
+import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.LinesInFrame_RelStructure;
+import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.PassengerStopAssignment;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.RoutesInFrame_RelStructure;
+import org.rutebanken.netex.model.ServiceFrame;
+import org.rutebanken.netex.model.StopAssignmentsInFrame_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 class ServiceFrameParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
 
-    private final HierarchicalMultimapById<Quay> quayById;
+    private final ReadOnlyHierarchicalVersionMapById<Quay> quayById;
 
     private final HierarchicalMapById<Network> networkById;
 
@@ -22,30 +40,28 @@ class ServiceFrameParser {
 
     private final HierarchicalMapById<Authority> authorityById;
 
-    private final HierarchicalMapById<Route> routeById = new HierarchicalMapById<>();
+    private final Collection<Route> routes = new ArrayList<>();
 
-    private final HierarchicalMap<String, Authority> authorityByNetworkId = new HierarchicalMap<>();
+    private final Collection<Line> lines = new ArrayList<>();
 
-    private final HierarchicalMapById<Line> lineById = new HierarchicalMapById<>();
+    private final Map<String, Network> networkByLineId = new HashMap<>();
 
-    private final HierarchicalMap<String, Network> networkByLineId = new HierarchicalMap<>();
+    private final Map<String, GroupOfLines> groupOfLinesByLineId = new HashMap<>();
 
-    private final HierarchicalMap<String, GroupOfLines> groupOfLinesByLineId = new HierarchicalMap<>();
+    private final Collection<JourneyPattern> journeyPatterns = new ArrayList<>();
 
-    private final HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
+    private final Collection<DestinationDisplay> destinationDisplays = new ArrayList<>();
 
-    private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
+    private final Map<String, Authority> authorityByGroupOfLinesId = new HashMap<>();
 
-    private final HierarchicalMap<String, Authority> authorityByGroupOfLinesId = new HierarchicalMap<>();
-
-    private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
+    private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
     ServiceFrameParser(
-            HierarchicalMultimapById<Quay> quayById,
+            ReadOnlyHierarchicalVersionMapById<Quay> quayById,
             HierarchicalMapById<Authority> authorityById,
             HierarchicalMapById<Network> networkById,
             HierarchicalMapById<GroupOfLines> groupOfLinesById
-    )  {
+    ) {
         this.quayById = quayById;
         this.authorityById = authorityById;
         this.networkById = networkById;
@@ -53,148 +69,115 @@ class ServiceFrameParser {
     }
 
     void parse(ServiceFrame sf) {
-            //stop assignments
-            StopAssignmentsInFrame_RelStructure stopAssignments = sf.getStopAssignments();
-            if (stopAssignments != null) {
-                Collection<JAXBElement<? extends StopAssignment_VersionStructure>> assignments = stopAssignments
-                        .getStopAssignment();
-                for (JAXBElement assignment : assignments) {
-                    if (assignment.getValue() instanceof PassengerStopAssignment) {
-                        PassengerStopAssignment passengerStopAssignment =
-                                (PassengerStopAssignment) assignment.getValue();
-                        String quayRef = passengerStopAssignment.getQuayRef().getRef();
-                        Quay quay = quayById.lookupLastVersionById(quayRef);
-                        if (quay != null) {
-                            quayIdByStopPointRef.add(
-                                    passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
-                                    quay.getId());
-                        } else {
-                            LOG.warn("Quay " + quayRef + " not found in stop place file.");
-                        }
-                    }
+        parseStopAssignments(sf.getStopAssignments());
+        parseRoutes(sf.getRoutes());
+        parseNetwork(sf.getNetwork());
+        parseLines(sf.getLines());
+        parseJourneyPatterns(sf.getJourneyPatterns());
+        parseDestinationDisplays(sf.getDestinationDisplays());
+    }
+
+    void setResultOnIndex(NetexImportDataIndex index) {
+        index.routeById.addAll(routes);
+        index.lineById.addAll(lines);
+        index.networkByLineId.addAll(networkByLineId);
+        index.groupOfLinesByLineId.addAll(groupOfLinesByLineId);
+        index.journeyPatternsById.addAll(journeyPatterns);
+        index.destinationDisplayById.addAll(destinationDisplays);
+        index.authoritiesByGroupOfLinesId.addAll(authorityByGroupOfLinesId);
+        index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
+    }
+
+    private void parseStopAssignments(StopAssignmentsInFrame_RelStructure stopAssignments) {
+        if (stopAssignments == null) return;
+
+        for (JAXBElement stopAssignment : stopAssignments.getStopAssignment()) {
+            if (stopAssignment.getValue() instanceof PassengerStopAssignment) {
+                PassengerStopAssignment assignment = (PassengerStopAssignment) stopAssignment
+                        .getValue();
+                String quayRef = assignment.getQuayRef().getRef();
+                Quay quay = quayById.lookupLastVersionById(quayRef);
+                if (quay != null) {
+                    quayIdByStopPointRef
+                            .put(assignment.getScheduledStopPointRef().getValue()
+                                    .getRef(), quay.getId());
+                } else {
+                    LOG.warn("Quay " + quayRef + " not found in stop place file.");
                 }
             }
+        }
+    }
 
-            //routes
-            RoutesInFrame_RelStructure routes = sf.getRoutes();
-            if (routes != null) {
-                Collection<JAXBElement<? extends LinkSequence_VersionStructure>> route_ = routes
-                        .getRoute_();
-                for (JAXBElement element : route_) {
-                    if (element.getValue() instanceof Route) {
-                        Route route = (Route) element.getValue();
-                        routeById.add(route);
-                    }
-                }
+    private void parseRoutes(RoutesInFrame_RelStructure routes) {
+        if (routes == null) return;
+
+        for (JAXBElement element : routes.getRoute_()) {
+            if (element.getValue() instanceof Route) {
+                Route route = (Route) element.getValue();
+                this.routes.add(route);
             }
+        }
+    }
 
-            //network
-            Network network = sf.getNetwork();
-            if(network != null){
-                networkById.add(network);
+    private void parseNetwork(Network network) {
+        if (network == null) return;
 
-                String orgRef = network.getTransportOrganisationRef().getValue().getRef();
+        networkById.add(network);
 
-                Authority authority = authorityById.lookup(orgRef);
+        // TODO OTP2 - Add this responsibility to Index
 
+        String orgRef = network.getTransportOrganisationRef().getValue().getRef();
+        Authority authority = authorityById.lookup(orgRef);
+
+
+        GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
+
+        if (groupsOfLines != null) {
+            Collection<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
+            for (GroupOfLines group : groupOfLines) {
+                groupOfLinesById.add(group);
                 if (authority != null) {
-                    authorityByNetworkId.add(network.getId(), authority);
+                    authorityByGroupOfLinesId.put(group.getId(), authority);
                 }
+            }
+        }
+    }
 
-                if (network.getGroupsOfLines() != null) {
-                    GroupsOfLinesInFrame_RelStructure groupsOfLines = network.getGroupsOfLines();
-                    Collection<GroupOfLines> groupOfLines = groupsOfLines.getGroupOfLines();
-                    for (GroupOfLines group : groupOfLines) {
-                        groupOfLinesById.add(group);
-                        if (authority != null) {
-                            authorityByGroupOfLinesId.add(group.getId(),
-                                    authority);
-                        }
+    private void parseLines(LinesInFrame_RelStructure lines) {
+        if (lines == null) return;
+
+        for (JAXBElement element : lines.getLine_()) {
+            if (element.getValue() instanceof Line) {
+                Line line = (Line) element.getValue();
+                this.lines.add(line);
+
+                String groupRef = line.getRepresentedByGroupRef().getRef();
+                Network network = networkById.lookup(groupRef);
+
+                if (network != null) {
+                    networkByLineId.put(line.getId(), network);
+                } else {
+                    GroupOfLines groupOfLines = groupOfLinesById.lookup(groupRef);
+                    if (groupOfLines != null) {
+                        groupOfLinesByLineId.put(line.getId(), groupOfLines);
                     }
                 }
             }
+        }
+    }
 
-            //lines
-            LinesInFrame_RelStructure lines = sf.getLines();
-            if(lines != null){
-                Collection<JAXBElement<? extends DataManagedObjectStructure>> line_ = lines.getLine_();
-                for (JAXBElement element : line_) {
-                    if (element.getValue() instanceof Line) {
-                        Line line = (Line) element.getValue();
-                        lineById.add(line);
-                        String groupRef = line.getRepresentedByGroupRef().getRef();
-                        Network network2 = networkById.lookup(groupRef);
-                        if (network2 != null) {
-                            networkByLineId.add(line.getId(), network2);
-                        }
-                        else {
-                            GroupOfLines groupOfLines = groupOfLinesById
-                                    .lookup(groupRef);
-                            if (groupOfLines != null) {
-                                groupOfLinesByLineId.add(line.getId(),
-                                        groupOfLines);
-                            }
-                        }
-                    }
-                }
+    private void parseJourneyPatterns(JourneyPatternsInFrame_RelStructure journeyPatterns) {
+        if (journeyPatterns == null) return;
+
+        for (JAXBElement pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
+            if (pattern.getValue() instanceof JourneyPattern) {
+                this.journeyPatterns.add((JourneyPattern) pattern.getValue());
             }
-
-            //journeyPatterns
-            JourneyPatternsInFrame_RelStructure journeyPatterns = sf.getJourneyPatterns();
-            if (journeyPatterns != null) {
-                Collection<JAXBElement<?>> journeyPattern_orJourneyPatternView = journeyPatterns
-                        .getJourneyPattern_OrJourneyPatternView();
-                for (JAXBElement pattern : journeyPattern_orJourneyPatternView) {
-                    if (pattern.getValue() instanceof JourneyPattern) {
-                        journeyPatternById.add(
-                                (JourneyPattern) pattern.getValue());
-                    }
-                }
-            }
-
-            //destinationDisplays
-            if (sf.getDestinationDisplays() != null) {
-                for (DestinationDisplay destinationDisplay : sf.getDestinationDisplays().getDestinationDisplay()) {
-                    destinationDisplayById.add(destinationDisplay);
-                }
-            }
+        }
     }
 
-    HierarchicalMapById<Route> getRouteById() {
-        return routeById;
+    private void parseDestinationDisplays(DestinationDisplaysInFrame_RelStructure destDisplays) {
+        if (destDisplays == null) return;
+        this.destinationDisplays.addAll(destDisplays.getDestinationDisplay());
     }
-
-    HierarchicalMap<String, Authority> getAuthorityByNetworkId() {
-        return authorityByNetworkId;
-    }
-
-    HierarchicalMapById<Line> getLineById() {
-        return lineById;
-    }
-
-    HierarchicalMap<String, Network> getNetworkByLineId() {
-        return networkByLineId;
-    }
-
-    HierarchicalMap<String, GroupOfLines> getGroupOfLinesByLineId() {
-        return groupOfLinesByLineId;
-    }
-
-    HierarchicalMapById<JourneyPattern> getJourneyPatternById() {
-        return journeyPatternById;
-    }
-
-    HierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
-        return destinationDisplayById;
-    }
-
-    HierarchicalMap<String, Authority> getAuthorityByGroupOfLinesId() {
-        return authorityByGroupOfLinesId;
-    }
-
-    HierarchicalMap<String, String> getQuayIdByStopPointRef() {
-        return quayIdByStopPointRef;
-    }
-
-    HierarchicalMapById<GroupOfLines> getGroupOfLinesById() { return groupOfLinesById; }
 }

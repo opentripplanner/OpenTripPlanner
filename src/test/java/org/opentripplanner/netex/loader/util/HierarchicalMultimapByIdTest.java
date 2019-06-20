@@ -18,8 +18,8 @@ import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 public class HierarchicalMultimapByIdTest {
-    private final HierarchicalMultimapById<E> root = new HierarchicalMultimapById<>();
-    private final HierarchicalMultimapById<E> child = new HierarchicalMultimapById<>(root);
+    private final HierarchicalVersionMapById<E> root = new HierarchicalVersionMapById<>();
+    private final HierarchicalVersionMapById<E> child = new HierarchicalVersionMapById<>(root);
 
     /**
      * Add entity using the one argument add method verify that it can be retrieved

@@ -1,29 +1,27 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.DataManagedObjectStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 
 import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
 import java.util.Collection;
 
 class ResourceFrameParser {
 
-    private final HierarchicalMapById<Authority> authorityById = new HierarchicalMapById<>();
+    private final Collection<Authority> authorityById = new ArrayList<>();
 
     void parse(ResourceFrame resourceFrame) {
-        Collection<JAXBElement<? extends DataManagedObjectStructure>> organisations = resourceFrame
-                .getOrganisations().getOrganisation_();
-        for (JAXBElement element : organisations) {
-            if(element.getValue() instanceof Authority){
-                Authority authority = (Authority) element.getValue();
+        for (JAXBElement e : resourceFrame.getOrganisations().getOrganisation_()) {
+            if(e.getValue() instanceof Authority){
+                Authority authority = (Authority) e.getValue();
                 authorityById.add(authority);
             }
         }
     }
 
-    HierarchicalMapById<Authority> getAuthorityById() {
-        return authorityById;
+    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+        netexIndex.authoritiesById.addAll(authorityById);
     }
 }

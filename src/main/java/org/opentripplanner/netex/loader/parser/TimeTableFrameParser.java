@@ -1,9 +1,15 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.Journey_VersionStructure;
+import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
+import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.TimetableFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,54 +21,56 @@ class TimeTableFrameParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimeTableFrameParser.class);
 
-    private final HierarchicalMapById<JourneyPattern> journeyPatternById;
+    private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById;
 
     private final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs = new HashSet<>();
 
-    private final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId = new HierarchicalMultimap<>();
+    private final Multimap<String, ServiceJourney> serviceJourneyByPatternId = ArrayListMultimap.create();
 
-    TimeTableFrameParser(HierarchicalMapById<JourneyPattern> journeyPatternById) {
+    TimeTableFrameParser(ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById) {
         this.journeyPatternById = journeyPatternById;
     }
 
     void parse(TimetableFrame timetableFrame) {
-        JourneysInFrame_RelStructure vehicleJourneys = timetableFrame.getVehicleJourneys();
-        Collection<Journey_VersionStructure> datedServiceJourneyOrDeadRunOrServiceJourney = vehicleJourneys
-                .getDatedServiceJourneyOrDeadRunOrServiceJourney();
-        for (Journey_VersionStructure jStructure : datedServiceJourneyOrDeadRunOrServiceJourney) {
-            if (jStructure instanceof ServiceJourney) {
-                ServiceJourney sj = (ServiceJourney) jStructure;
+        JourneysInFrame_RelStructure vehicleJourneys;
+        Collection<Journey_VersionStructure> journeys;
 
-                dayTypeRefs.add(new DayTypeRefsToServiceIdAdapter(sj.getDayTypes()));
+        vehicleJourneys = timetableFrame.getVehicleJourneys();
+        journeys = vehicleJourneys.getDatedServiceJourneyOrDeadRunOrServiceJourney();
 
-                String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
-
-                JourneyPattern journeyPattern = journeyPatternById
-                        .lookup(journeyPatternId);
-
-                if (journeyPattern != null) {
-                    if (journeyPattern.getPointsInSequence().
-                            getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-                            .size() == sj.getPassingTimes().getTimetabledPassingTime().size()) {
-
-                        serviceJourneyByPatternId.add(journeyPatternId, sj);
-                    } else {
-                        LOG.warn(
-                                "Mismatch between ServiceJourney and JourneyPattern. ServiceJourney will be skipped. - "
-                                        + sj.getId());
-                    }
-                } else {
-                    LOG.warn("JourneyPattern not found. " + journeyPatternId);
-                }
+        for (Journey_VersionStructure it : journeys) {
+            if (it instanceof ServiceJourney) {
+                parseServiceJourney((ServiceJourney)it);
             }
         }
     }
 
-    Set<DayTypeRefsToServiceIdAdapter> getDayTypeRefs() {
-        return dayTypeRefs;
+    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+        netexIndex.serviceJourneyByPatternId.addAll(serviceJourneyByPatternId);
+        netexIndex.dayTypeRefs.addAll(dayTypeRefs);
     }
 
-    HierarchicalMultimap<String, ServiceJourney> getServiceJourneyByPatternId() {
-        return serviceJourneyByPatternId;
+    private void parseServiceJourney(ServiceJourney sj) {
+        dayTypeRefs.add(new DayTypeRefsToServiceIdAdapter(sj.getDayTypes()));
+
+        String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
+
+        JourneyPattern journeyPattern = journeyPatternById.lookup(journeyPatternId);
+
+        if (journeyPattern != null) {
+            if (journeyPattern.getPointsInSequence().
+                    getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+                    .size() == sj.getPassingTimes().getTimetabledPassingTime().size()) {
+
+                serviceJourneyByPatternId.put(journeyPatternId, sj);
+            } else {
+                LOG.warn(
+                        "Mismatch between ServiceJourney and JourneyPattern. " +
+                        "ServiceJourney will be skipped. - " + sj.getId()
+                );
+            }
+        } else {
+            LOG.warn("JourneyPattern not found. " + journeyPatternId);
+        }
     }
 }

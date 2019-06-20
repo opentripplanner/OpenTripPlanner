@@ -13,7 +13,7 @@ package org.opentripplanner.netex.loader.util;
  * @param <K> The key type
  * @param <V> Thr value type
  */
-public abstract class AbstractHierarchicalMap<K,V> {
+public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchicalMap<K,V> {
 
     private final AbstractHierarchicalMap<K,V> parent;
 

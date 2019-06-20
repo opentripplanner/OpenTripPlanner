@@ -1,41 +1,43 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.SiteFrame;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.StopPlacesInFrame_RelStructure;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 class SiteFrameParser {
 
-    private final HierarchicalMultimapById<StopPlace> stopPlaceById = new HierarchicalMultimapById<>();
+    private final Collection<StopPlace> stopPlaces = new ArrayList<>();
 
-    private final HierarchicalMultimapById<Quay> quayById = new HierarchicalMultimapById<>();
+    private final Collection<Quay> quays = new ArrayList<>();
 
     public void parse(SiteFrame sf) {
-        StopPlacesInFrame_RelStructure stopPlaces = sf.getStopPlaces();
-        Collection<StopPlace> stopPlaceList = stopPlaces.getStopPlace();
+        parseStopPlaces(sf.getStopPlaces().getStopPlace());
+    }
+
+    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+        netexIndex.stopPlaceById.addAll(stopPlaces);
+        netexIndex.quayById.addAll(quays);
+    }
+
+    private void parseStopPlaces(Collection<StopPlace> stopPlaceList) {
         for (StopPlace stopPlace : stopPlaceList) {
-            stopPlaceById.add(stopPlace);
-            if (stopPlace.getQuays() != null) {
-                Collection<Object> quayRefOrQuay = stopPlace.getQuays().getQuayRefOrQuay();
-                for (Object quayObject : quayRefOrQuay) {
-                    if (quayObject instanceof Quay) {
-                        Quay quay = (Quay) quayObject;
-                        quayById.add(quay);
-                    }
-                }
-            }
+            stopPlaces.add(stopPlace);
+            parseQuays(stopPlace.getQuays());
         }
     }
 
-    HierarchicalMultimapById<StopPlace> getStopPlaceById() {
-        return stopPlaceById;
-    }
+    private void parseQuays(Quays_RelStructure quayRefOrQuay) {
+        if(quayRefOrQuay == null) return;
 
-    HierarchicalMultimapById<Quay> getQuayById() {
-        return quayById;
+        for (Object quayObject : quayRefOrQuay.getQuayRefOrQuay()) {
+            if (quayObject instanceof Quay) {
+                quays.add((Quay) quayObject);
+            }
+        }
     }
 }

@@ -1,8 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimapById;
+import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
@@ -44,10 +43,10 @@ class StopMapper {
 
     private final ArrayList<Stop> resultStops = new ArrayList<>();
 
-    private final HierarchicalMultimapById<Quay> quayIndex;
+    private final HierarchicalVersionMapById<Quay> quayIndex;
 
 
-    StopMapper(HierarchicalMultimapById<Quay> quayIndex) {
+    StopMapper(HierarchicalVersionMapById<Quay> quayIndex) {
         this.quayIndex = quayIndex;
     }
 

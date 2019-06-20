@@ -1,69 +1,90 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
-import org.rutebanken.netex.model.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.rutebanken.netex.model.DataManagedObjectStructure;
+import org.rutebanken.netex.model.DayType;
+import org.rutebanken.netex.model.DayTypeAssignment;
+import org.rutebanken.netex.model.DayTypes_RelStructure;
+import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
+import org.rutebanken.netex.model.ServiceCalendar;
+import org.rutebanken.netex.model.ServiceCalendarFrame;
 
 import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class ServiceCalendarFrameParser {
 
-    private final HierarchicalMapById<DayType> dayTypeById =
-            new HierarchicalMapById<>();
+    private final Collection<DayType> dayTypes = new ArrayList<>();
 
-    private final HierarchicalMapById<OperatingPeriod> operatingPeriodById =
-            new HierarchicalMapById<>();
+    private final Collection<OperatingPeriod> operatingPeriods = new ArrayList<>();
 
-    private final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId =
-            new HierarchicalMultimap<>();
+    private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId =
+            ArrayListMultimap.create();
+
 
     void parse(ServiceCalendarFrame scf) {
         if (scf.getServiceCalendar() != null) {
-            DayTypes_RelStructure dayTypes = scf.getServiceCalendar().getDayTypes();
-            for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
-                if (dt.getValue() instanceof DayType) {
-                    DayType dayType = (DayType) dt.getValue();
-                    dayTypeById.add(dayType);
-                }
-            }
+            parseServiceCalendar(scf.getServiceCalendar());
         }
 
         if (scf.getDayTypes() != null) {
-            Collection<JAXBElement<? extends DataManagedObjectStructure>> dayTypes = scf.getDayTypes()
-                    .getDayType_();
-            for (JAXBElement dt : dayTypes) {
-                if (dt.getValue() instanceof DayType) {
-                    DayType dayType = (DayType) dt.getValue();
-                    dayTypeById.add(dayType);
-                }
-            }
+            parseDayTypes(scf.getDayTypes().getDayType_());
         }
 
         if (scf.getOperatingPeriods() != null) {
-            for (OperatingPeriod_VersionStructure p : scf
-                    .getOperatingPeriods().getOperatingPeriodOrUicOperatingPeriod()) {
-                operatingPeriodById.add((OperatingPeriod) p);
-            }
+            parseOperatingPeriods(
+                    scf.getOperatingPeriods().getOperatingPeriodOrUicOperatingPeriod()
+            );
         }
+        parseDayTypeAssignments(scf.getDayTypeAssignments().getDayTypeAssignment());
+    }
 
-        Collection<DayTypeAssignment> dayTypeAssignments = scf.getDayTypeAssignments()
-                .getDayTypeAssignment();
+    private void parseServiceCalendar(ServiceCalendar serviceCalendar) {
+        parseDayTypes(serviceCalendar.getDayTypes());
+        // TODO OTP2 - What about OperatingPeriods here?
+        parseDayTypeAssignments(serviceCalendar.getDayTypeAssignments().getDayTypeAssignment());
+    }
+
+    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+        netexIndex.dayTypeById.addAll(dayTypes);
+        netexIndex.operatingPeriodById.addAll(operatingPeriods);
+        netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);
+    }
+
+    //List<JAXBElement<? extends DataManagedObjectStructure>>
+    private void parseDayTypes(List<JAXBElement<? extends DataManagedObjectStructure>> elements) {
+        for (JAXBElement dt : elements) {
+            parseDayType(dt);
+        }
+    }
+
+    private void parseDayTypes(DayTypes_RelStructure dayTypes) {
+        for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
+            parseDayType(dt);
+        }
+    }
+
+    private void parseDayType(JAXBElement dt) {
+        if (dt.getValue() instanceof DayType) {
+            dayTypes.add((DayType) dt.getValue());
+        }
+    }
+
+    private void parseOperatingPeriods(List<OperatingPeriod_VersionStructure> periods) {
+        for (OperatingPeriod_VersionStructure p : periods) {
+            operatingPeriods.add((OperatingPeriod) p);
+        }
+    }
+
+    private void parseDayTypeAssignments(Collection<DayTypeAssignment> dayTypeAssignments) {
         for (DayTypeAssignment dayTypeAssignment : dayTypeAssignments) {
             String ref = dayTypeAssignment.getDayTypeRef().getValue().getRef();
-            dayTypeAssignmentByDayTypeId.add(ref, dayTypeAssignment);
+            dayTypeAssignmentByDayTypeId.put(ref, dayTypeAssignment);
         }
-    }
-
-    HierarchicalMapById<DayType> getDayTypeById() {
-        return dayTypeById;
-    }
-
-    HierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
-        return operatingPeriodById;
-    }
-
-    HierarchicalMultimap<String, DayTypeAssignment> getDayTypeAssignmentByDayTypeId() {
-        return dayTypeAssignmentByDayTypeId;
     }
 }

@@ -3,9 +3,8 @@ package org.opentripplanner.netex.loader;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.parser.*;
+import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
-import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -105,7 +103,7 @@ public class NetexLoader {
         otpMapper.mapNetexToOtp(index());
     }
 
-    private Unmarshaller createUnmarshaller() throws Exception {
+    private Unmarshaller createUnmarshaller() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(PublicationDeliveryStructure.class);
         return jaxbContext.createUnmarshaller();
     }
@@ -129,14 +127,8 @@ public class NetexLoader {
             LOG.info("Loading {}: {}", fileDescription, entry.getName());
             byte[] bytesArray = entryAsBytes(zipFile, entry);
 
-            CompositeOrCommonFrameParser compositeOrCommonFrameParser = new CompositeOrCommonFrameParser(index());
+            NetexDocumentParser.parseAndPopulateIndex(index(), parseXmlDoc(bytesArray));
 
-            PublicationDeliveryStructure value = parseXmlDoc(bytesArray);
-            List<JAXBElement<? extends Common_VersionFrameStructure>> compositeFrameOrCommonFrames = value
-                    .getDataObjects().getCompositeFrameOrCommonFrame();
-            for (JAXBElement<? extends Common_VersionFrameStructure> frame : compositeFrameOrCommonFrames) {
-                compositeOrCommonFrameParser.parse(frame);
-            }
         } catch (JAXBException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -150,7 +142,6 @@ public class NetexLoader {
 
         return root.getValue();
     }
-
 
 }
 

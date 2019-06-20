@@ -25,19 +25,23 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     }
 
     /**
-     * Add a new pair of {@code key & value} to the map instance.
+     * Add a new pair of {@code key & value} to the local map instance.
      */
     public void add(K key, V value) {
         map.put(key, value);
     }
 
-    public void addAll(HierarchicalMap<K,V> other) {
-        for (K key : other.localKeys()) {
-            add(key, other.localGet(key));
+    /**
+     * Add a set of {@code keys & values} to the local map instance.
+     */
+    public void addAll(Map<K,V> other) {
+        for (Map.Entry<K, V> e : other.entrySet()) {
+            add(e.getKey(), e.getValue());
         }
     }
 
-    public Set<K> localKeys() {
+    /** @return return all keys in the local map */
+    Set<K> localKeys() {
         return map.keySet();
     }
 

@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,15 +31,13 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
         map.put(key, value);
     }
 
-    public void addAll(HierarchicalMultimap<K,V> other) {
-        for (K key : other.localKeys()) {
-            for (V entity : other.localGet(key)) {
-                add(key, entity);
-            }
+    /** Add a multimap to the local map */
+    public void addAll(Multimap<K, V> other) {
+        for (Map.Entry<K, V> it : other.entries()) {
+            add(it.getKey(), it.getValue());
         }
     }
 
-    /** Add a new pair of {@code key & value} to the local map value collection. */
     public Set<K> localKeys() {
         return map.keySet();
     }

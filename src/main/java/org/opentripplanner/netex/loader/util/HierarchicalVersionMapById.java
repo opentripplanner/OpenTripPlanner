@@ -1,6 +1,9 @@
 package org.opentripplanner.netex.loader.util;
 
+import com.google.common.collect.Multimap;
 import org.rutebanken.netex.model.EntityInVersionStructure;
+
+import java.util.Collection;
 
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
@@ -13,14 +16,15 @@ import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
  *
  * @param <V> the value type
  */
-public class HierarchicalMultimapById<V extends EntityInVersionStructure>
-        extends HierarchicalMultimap<String, V> {
+public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
+        extends HierarchicalMultimap<String, V>
+        implements ReadOnlyHierarchicalVersionMapById<V> {
 
     /** Create a root for the hierarchy */
-    public HierarchicalMultimapById() { }
+    public HierarchicalVersionMapById() { }
 
     /** Create a child of the given {@code parent}. */
-    public HierarchicalMultimapById(HierarchicalMultimapById<V> parent) {
+    public HierarchicalVersionMapById(HierarchicalVersionMapById<V> parent) {
         super(parent);
     }
 
@@ -31,28 +35,32 @@ public class HierarchicalMultimapById<V extends EntityInVersionStructure>
         super.add(entity.getId(), entity);
     }
 
-    public void addAll(HierarchicalMultimapById<V> other) {
-        for (String key : other.localKeys()) {
-            for (V entity : other.localGet(key)) {
-                add(entity);
-            }
+    /** Add all given entities to local map */
+    public void addAll(Collection<V> entities) {
+        for (V it : entities) {
+            add(it);
         }
     }
 
     /**
      * Use the {@link #add(EntityInVersionStructure)} method!
-     * @throws IllegalArgumentException This method throws an exception to prevent adding elements
-     *                                  with a key different than the element id.
+     * @throws IllegalArgumentException This method throws an exception to prevent adding
+     *                                  elements with a key different than the element id.
      */
     @Override
     public void add(String key, V value) {
         throw new IllegalArgumentException("Use the add method with just one argument instead.");
     }
 
-    /**
-     * Return the element with the latest version with the given {@code id}. Returns
-     * {@code null} if not element is found.
-     */
+
+    @Override
+    // We need to override this method because the super method uses the the #add(Strinng, V)
+    // method - which throws an exception.
+    public void addAll(Multimap<String, V> other) {
+        throw new IllegalArgumentException("Use the add method with just one argument instead.");
+    }
+
+    @Override
     public V lookupLastVersionById(String id) {
         return latestVersionedElementIn(lookup(id));
     }
