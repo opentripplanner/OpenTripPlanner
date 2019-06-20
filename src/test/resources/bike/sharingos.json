@@ -35,6 +35,17 @@
             "discount": 0,
             "is_enable": 0,
             "update_time": "2019-05-22T11:15:02+08:00"
+        },
+        {
+            "id": 1004,
+            "name": "Overflow test station",
+            "latitude": 60.2931159,
+            "longitude": 25.0434261,
+            "total_capacity": 5,
+            "available_capacity": 7,
+            "discount": 0,
+            "is_enable": 0,
+            "update_time": "2019-05-22T11:15:02+08:00"
         }
     ]
 }
