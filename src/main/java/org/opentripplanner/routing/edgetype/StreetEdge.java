@@ -435,37 +435,85 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
         } else if (options.allowVehicleRental) {
-            // Irrevocable transition from using rented vehicle to walking.
-            // Final Vehicle check needed to prevent infinite recursion.
+            // possible transitions out of renting a Micromobility vehicle during "depart at" searches
             if (
-                s0.isVehicleRenting() &&
-                    !getPermission().allows(TraverseMode.MICROMOBILITY) &&
-                    currMode == TraverseMode.MICROMOBILITY &&
-                    // if in "arrive by" mode, the search is progressing backwards while in a vehicle rental state
-                    // before encountering a vehicle rental pickup station.  Therefore, this search cannot proceed.
-                    !options.arriveBy &&
-                    s0.isVehicleRentalDropoffAllowed(this, false)
+                !options.arriveBy &&
+                    s0.isVehicleRenting() &&
+                    currMode == TraverseMode.MICROMOBILITY
             ) {
-                StateEditor editorEndedVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
-                if (editorEndedVehicleRental != null) {
-                    editorEndedVehicleRental.endVehicleRenting(); // done with vehicle rental use for now
-                    editorEndedVehicleRental.incrementWeight(options.vehicleRentalDropoffCost);
-                    editorEndedVehicleRental.incrementTimeInSeconds(options.vehicleRentalDropoffTime);
-                    State endedVehicleRentalState = editorEndedVehicleRental.makeState();
-                    if (state != null) {
-                        if (endedVehicleRentalState != null) {
-                            // make the forkState be of the non-vehicle-rental mode so it's possible to build walk steps
-                            endedVehicleRentalState.addToExistingResultChain(state);
-                            return endedVehicleRentalState; // return both rented-vehicle and no-rented-vehicle states
-                        }
-                    } else {
-                        // if the rented-vehicle state is non traversable or something, return just the
-                        // ended-rented-vehicle state
-                        return endedVehicleRentalState;
+                // A StreetEdge has been encountered that
+                // 1. Does not allow Micromobility travel
+                // 2. Allows a floating vehicle dropoff under the following cirucmstances:
+                //    a. on the current edge
+                //    b. on the edge of the previous state (NOTE: the previous StreetEdge is considered because it can
+                //        be reasoned that the very last point of the previous StreetEdge consitutes a part of this
+                //        current StreetEdge. Since walking would begin on this StreetEdge, the floating rental vehicle
+                //        is assumed to be left at the very beginning of the StreetEdge.)
+                //
+                // In this case fork the state into 2 options:
+                // 1. End the vehicle rental and begin walking
+                // 2. Keep renting the vehicle, but transition to WALK mode
+                if (
+                    !getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                        (
+                            s0.isVehicleRentalDropoffAllowed(this, false) ||
+                                (
+                                    s0.backEdge instanceof StreetEdge &&
+                                        s0.isVehicleRentalDropoffAllowed(
+                                            (StreetEdge) s0.backEdge,
+                                            false
+                                        )
+                                )
+                        )
+                ) {
+                    StateEditor editorEndedVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    StateEditor editorKeepVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    State keepVehicleRentalState = null;
+                    if (editorKeepVehicleRental != null) {
+                        editorKeepVehicleRental.setBackMode(TraverseMode.WALK);
+                        keepVehicleRentalState = editorKeepVehicleRental.makeState();
                     }
+                    if (editorEndedVehicleRental != null) {
+                        editorEndedVehicleRental.endVehicleRenting(); // done with vehicle rental use for now
+                        editorEndedVehicleRental.incrementWeight(options.vehicleRentalDropoffCost);
+                        editorEndedVehicleRental.incrementTimeInSeconds(options.vehicleRentalDropoffTime);
+                        State endedVehicleRentalState = editorEndedVehicleRental.makeState();
+                        if (endedVehicleRentalState != null) {
+                            endedVehicleRentalState.addToExistingResultChain(keepVehicleRentalState);
+                            return endedVehicleRentalState;
+                        }
+                    }
+                    return keepVehicleRentalState;
+                }
+                // A StreetEdge has been ecountered where:
+                // 1. Micromobility vehicles are allowed to be ridden
+                // 2. Micromobility vehicles are not allowed to be dropped off at
+                // 3. The previous edge was a StreetEdge that did allow a floating vehicle dropoff
+                //
+                // In this case, return 2 states:
+                // 1. Still renting and riding the vehicle
+                // 2. Vehicle rental ended and walking on foot
+                else if (
+                    getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                        !getFloatingVehicleDropoffSuitability() &&
+                        s0.backEdge instanceof StreetEdge &&
+                        s0.isVehicleRentalDropoffAllowed((StreetEdge) s0.backEdge, false)
+                ) {
+                    StateEditor editorEndedVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    if (editorEndedVehicleRental != null) {
+                        editorEndedVehicleRental.endVehicleRenting(); // done with vehicle rental use for now
+                        editorEndedVehicleRental.incrementWeight(options.vehicleRentalDropoffCost);
+                        editorEndedVehicleRental.incrementTimeInSeconds(options.vehicleRentalDropoffTime);
+                        State endedVehicleRentalState = editorEndedVehicleRental.makeState();
+                        if (endedVehicleRentalState != null) {
+                            endedVehicleRentalState.addToExistingResultChain(state);
+                            return endedVehicleRentalState;
+                        }
+                    }
+                    return state;
                 }
             }
-            // possible transition to dropping off a floating vehicle when in "arrive by" mode
+            // possible backward transition of completing a dropping off of a floating vehicle when in "arrive by" mode
             else if (
                 !s0.isVehicleRenting() &&
                     getPermission().allows(TraverseMode.MICROMOBILITY) &&
