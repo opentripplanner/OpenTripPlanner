@@ -231,22 +231,22 @@ class TripPatternStructure {
 
     EntityById<FeedScopedId, org.opentripplanner.model.Route> getOtpRouteByid() { return otpRouteByid; }
 
-    static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(String id) {
+    private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(String id) {
         return createWrappedRef(id, ScheduledStopPointRefStructure.class);
     }
 
-    static JAXBElement<StopPointInJourneyPatternRefStructure> createStopPointInJourneyPatternRef(String id) {
+    private static JAXBElement<StopPointInJourneyPatternRefStructure> createStopPointInJourneyPatternRef(String id) {
         return createWrappedRef(id, StopPointInJourneyPatternRefStructure.class);
     }
 
-    static JAXBElement<JourneyPatternRefStructure> createJourneyPatternRef(String id) {
+    private static JAXBElement<JourneyPatternRefStructure> createJourneyPatternRef(String id) {
         return createWrappedRef(id, JourneyPatternRefStructure.class);
     }
 
-    static JAXBElement<LineRefStructure> createLineRef(String id) {
+    private static JAXBElement<LineRefStructure> createLineRef(String id) {
         return createWrappedRef(id, LineRefStructure.class);
     }
-    static JAXBElement<DestinationDisplayRefStructure> createDestinationDisplayRef(String id) {
+    private static JAXBElement<DestinationDisplayRefStructure> createDestinationDisplayRef(String id) {
         return createWrappedRef(id, DestinationDisplayRefStructure.class);
     }
 }
