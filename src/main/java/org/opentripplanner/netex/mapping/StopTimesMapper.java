@@ -21,9 +21,6 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
-
-// TODO Test
-
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
  * to the correct stop. DestinationDisplay is mapped to HeadSign. There is logic to take care of the the fact that

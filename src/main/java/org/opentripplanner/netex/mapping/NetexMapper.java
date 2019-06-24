@@ -28,7 +28,6 @@ public class NetexMapper {
     }
 
     public void mapNetexToOtp(NetexImportDataIndex netexIndex) {
-        //TODO Consider moving this to constructor
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 transitBuilder,
                 transitBuilder.getRoutes(),
