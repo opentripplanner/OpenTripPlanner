@@ -15,7 +15,14 @@ import java.util.Collection;
 import static org.opentripplanner.netex.mapping.CalendarMapper.mapToCalendarDates;
 
 // TODO OTP2 - Add Unit tests
-// TODO OTP2 - JavaDoc needed
+
+/**
+ * This maps a NetexImportDataIndex into an OtpTransitServiceBuilder. This is where the main mapping from NeTEx
+ * objects to OTP objects happens. It loops through all the relevant NeTEx objects and calls the appropriate mapper.
+ * In some cases the result is returned and added to the transit builder, while in other cases a more complex structure
+ * has to be added, so the transit builder is passed into the mapper and objects are added there.
+ */
+
 public class NetexMapper {
 
     private final OtpTransitServiceBuilder transitBuilder;
