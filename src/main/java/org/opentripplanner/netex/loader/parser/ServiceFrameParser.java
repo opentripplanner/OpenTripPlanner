@@ -120,7 +120,6 @@ class ServiceFrameParser {
 
     private void parseGroupOfLines(Collection<GroupOfLines> groupOfLines, Network network) {
         for (GroupOfLines group : groupOfLines) {
-            groupOfLines.add(group);
             networkIdByGroupOfLineId.put(network.getId(), group.getId());
         }
     }
