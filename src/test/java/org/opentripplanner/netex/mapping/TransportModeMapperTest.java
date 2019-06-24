@@ -1,23 +1,38 @@
 package org.opentripplanner.netex.mapping;
 
 import org.junit.Test;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.TransportSubmodeStructure;
+import org.rutebanken.netex.model.*;
 
 import static org.junit.Assert.*;
-
-// TODO OTP2 - Verify functionality of mapper and fill out test cases
 
 public class TransportModeMapperTest {
     TransportModeMapper transportModeMapper = new TransportModeMapper();
 
     @Test
-    public void mapTransportModes() {
+    public void mapWithTransportModeOnly() {
         assertEquals(
-                702,
+                700,
                 transportModeMapper.getTransportMode(
                         AllVehicleModesOfTransportEnumeration.BUS,
-                        new TransportSubmodeStructure().withBusSubmode(BusSubmodeEnumeration.EXPRESS_BUS)));
+                        null));
+    }
+
+    @Test
+    public void mapWithSubMode() {
+        assertEquals(
+                102,
+                transportModeMapper.getTransportMode(
+                        AllVehicleModesOfTransportEnumeration.RAIL,
+                        new TransportSubmodeStructure().withRailSubmode(RailSubmodeEnumeration.LONG_DISTANCE)));
+    }
+
+    @Test
+    public void checkSubModePrecedensOverMainMode() {
+        assertEquals(
+                1005,
+                transportModeMapper.getTransportMode(
+                        AllVehicleModesOfTransportEnumeration.BUS,
+                        new TransportSubmodeStructure()
+                                .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)));
     }
 }
