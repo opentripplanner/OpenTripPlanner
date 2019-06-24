@@ -20,9 +20,6 @@ class StopPlaceTypeMapper {
     private static final Integer DEFAULT_OTP_VALUE = 3;
 
     int getTransportMode(StopPlace stopPlace) {
-        if (stopPlace.getTransportMode() != null) {
-            return mapVehicleMode(stopPlace.getTransportMode());
-        }
         if (stopPlace.getAirSubmode() != null) {
             return mapAirSubmode (stopPlace.getAirSubmode());
         }
@@ -49,6 +46,9 @@ class StopPlaceTypeMapper {
         }
         if (stopPlace.getWaterSubmode() != null) {
             return mapWaterSubmode(stopPlace.getWaterSubmode());
+        }
+        if (stopPlace.getTransportMode() != null) {
+            return mapVehicleMode(stopPlace.getTransportMode());
         }
         return DEFAULT_OTP_VALUE;
     }
