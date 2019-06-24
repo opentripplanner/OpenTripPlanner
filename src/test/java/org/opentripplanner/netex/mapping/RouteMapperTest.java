@@ -12,8 +12,6 @@ import java.util.TimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
-// TODO OTP2 - Test route color
-
 public class RouteMapperTest {
 
     private static final String NETWORK_ID = "RUT:Network:1";
