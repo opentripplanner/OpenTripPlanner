@@ -5,12 +5,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.GroupOfLinesRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OrganisationRefStructure;
+import org.rutebanken.netex.model.*;
 
 import java.util.TimeZone;
 
@@ -66,6 +61,29 @@ public class RouteMapperTest {
         Route route = routeMapper.mapRoute(line);
 
         assertEquals(AUTHORITY_ID, route.getAgency().getId());
+    }
+
+    @Test
+    public void mapRouteWithColor() {
+        NetexImportDataIndex netexImportDataIndex = new NetexImportDataIndex();
+        Line line = createExampleLine();
+        byte[] color = new byte[] {127, 0, 0};
+        byte[] textColor = new byte[] {0, 127, 0};
+        line.setPresentation(
+                new PresentationStructure()
+                        .withColour(color)
+                        .withTextColour(textColor));
+
+        RouteMapper routeMapper = new RouteMapper(
+                new OtpTransitServiceBuilder(),
+                netexImportDataIndex,
+                TimeZone.getDefault().toString()
+        );
+
+        Route route = routeMapper.mapRoute(line);
+
+        assertEquals( route.getColor(), "7F0000");
+        assertEquals(route.getTextColor(), "007F00");
     }
 
     private Line createExampleLine() {
