@@ -36,9 +36,18 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
 
-    StreetVertexIndexServiceImpl index;
     private double searchRadiusM = 250;
     private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+    StreetVertexIndexServiceImpl index;
+    private String vertexConnector;
+
+    public TransitToTaggedStopsModule(String vertexConnector) {
+        this.vertexConnector = vertexConnector;
+    }
+
+    public TransitToTaggedStopsModule() {
+        this.vertexConnector = "";
+    }
 
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");
@@ -51,13 +60,14 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to tagged bus stops...");
-
         index = new StreetVertexIndexServiceImpl(graph);
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();
         vertices.addAll(graph.getVertices());
-
+        VertexConnectorFactory factory = new VertexConnectorFactory();
+        VertexConnector connector = factory.getVertexConnector(this.vertexConnector);
+        LOG.info("CONNECTORI: " + connector.getClass());
         for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
@@ -73,40 +83,21 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!connectVertexToStop(ts, wheelchairAccessible)) {
+
+                boolean vectorConnected = false;
+                if(ts.getStopCode() != null) {
+                    Envelope envelope = new Envelope(ts.getCoordinate());
+                    double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
+                    envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
+                    Collection<Vertex> tsVertices = index.getVerticesForEnvelope(envelope);
+                    vectorConnected = connector.connectVertex(ts, wheelchairAccessible, tsVertices);
+                }
+                if (!vectorConnected) {
                     LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
         }
-    }
-
-    private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
-        String stopCode = ts.getStopCode();
-        if (stopCode == null){
-            return false;
-        }
-        Envelope envelope = new Envelope(ts.getCoordinate());
-        double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
-        envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
-        Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
-        // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
-        // in their ref= tag that matches the GTFS stop code of this TransitStop.
-        for (Vertex v : vertices){
-            if (!(v instanceof TransitStopStreetVertex)){
-                continue;
-            }
-            TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
-
-            // Only use stop codes for linking TODO: find better method to connect stops without stop code
-            if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                new StreetTransitLink(tsv, ts, wheelchairAccessible);
-                LOG.debug("Connected " + ts.toString() + " (" + ts.getStopCode() + ") to " + tsv.getLabel() + " at " + tsv.getCoordinate().toString());
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
