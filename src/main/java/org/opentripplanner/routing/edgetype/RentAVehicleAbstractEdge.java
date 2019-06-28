@@ -72,12 +72,9 @@ public abstract class RentAVehicleAbstractEdge extends Edge {
      * @return true if the vehicle can be dropped off here, false if not.
      */
     protected boolean hasCompatibleNetworks(Set<String> stationNetworks, Set<String> rentedNetworks) {
-        /*
-         * Two stations are compatible if they share at least one network. Special case for "null"
-         * networks ("catch-all" network defined).
-         */
-        if (stationNetworks == null || rentedNetworks == null)
-            return true; // Always a match
+        // Two stations are compatible if they share at least one network. Special case for "null"
+        // networks ("catch-all" network defined).
+        if (stationNetworks == null || rentedNetworks == null) return true; // Always a match
         return !Sets.intersection(stationNetworks, rentedNetworks).isEmpty();
     }
 }

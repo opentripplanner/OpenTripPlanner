@@ -207,6 +207,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         return (T) value;
     }
 
+    /**
+     * Load in data about restricted areas of Micromobility travel and rental parking. For more info on these files
+     * see the docs about configuration.
+     */
     public void loadMicromobilityTravelRestrictions(GraphBuilderParameters params) {
         restrictedMicromobilityTravelGeometry = parseGeometry(params.micromobilityTravelRestrictionsUrlOrFile);
         if (restrictedMicromobilityTravelGeometry == null) {
@@ -218,6 +222,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
     }
 
+    /**
+     * Attempt to deserialize GeoJson data that is potentially in a file or url into a PreparedGeometry object. A null
+     * value is returned if that operation was unsuccessful in any way.
+     */
     private PreparedGeometry parseGeometry(String areaUrlOrFile) {
         if (areaUrlOrFile == null) {
             return null;
@@ -315,9 +323,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             applyBikeSafetyFactor(graph);
 
-            // this extra iteration is needed to ensure that StreetEdges created from areas and other items are properly
-            // accounted for with micromobility restrictions
-            applyMircomobilityRestrictions(graph);
+            // Micromobility restrictions are already mostly applied to most StreetEdges during a basic graph build that
+            // iterates over each OSM way. This extra iteration is needed to ensure that StreetEdges created from areas
+            // and other items are properly accounted for with micromobility restrictions.
+            applyMicromobilityRestrictions(graph);
         } // END buildGraph()
 
         private void processBikeRentalNodes() {
@@ -727,21 +736,29 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
 
-                    applyMircomobilityRestrictions(street);
-                    applyMircomobilityRestrictions(backStreet);
+                    applyMicromobilityRestrictions(street);
+                    applyMicromobilityRestrictions(backStreet);
                 }
             } // END loop over OSM ways
         }
 
-        // forbid travel with micromobility on edges that intersects with a restricted area
-        private void applyMircomobilityRestrictions(Graph graph) {
+        /**
+         * Iterate through all StreetEdges of a graph and forbid travel or rental dropoffs with micromobility as needed
+         * on edges that intersects with a restricted area.
+         */
+        private void applyMicromobilityRestrictions(Graph graph) {
+            // don't bother iterating through all edges of the graph if there aren't any restrictions in this graph
+            if (restrictedMicromobilityTravelGeometry == null && restrictedMicromobilityDropoffGeometry == null) return;
             for (StreetEdge streetEdge : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-                applyMircomobilityRestrictions(streetEdge);
+                applyMicromobilityRestrictions(streetEdge);
             }
         }
 
-        // forbid travel with micromobility on edges that intersects with a restricted area
-        private void applyMircomobilityRestrictions(StreetEdge streetEdge) {
+        /**
+         * Forbid travel or rental dropoffs as needed with micromobility on a specific StreetEdge that intersects with a
+         * restricted area.
+         */
+        private void applyMicromobilityRestrictions(StreetEdge streetEdge) {
             if (streetEdge != null) {
                 Geometry streetEdgeGeometry = streetEdge.getGeometry();
                 if (

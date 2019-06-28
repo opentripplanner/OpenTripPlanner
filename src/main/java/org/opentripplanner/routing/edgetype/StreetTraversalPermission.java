@@ -8,23 +8,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Who can traverse a street in a single direction.
+ * Modes of travel that can traverse a street in a single direction.
+ *
+ * There are 4 types of Street Travel that are assumed here:
+ * - PEDESTRIAN: this involves a person walking along a street. This mode is also used to model walking a bicycle or
+ *  walking with a micromobility vehicle
+ * - BICYCLE: this involves riding a bicycle and generally travelling at a faster speed than walking.
+ * - CAR: driving a car at the fastest possible speed along a roadway
+ * - MICROMOBILITY: riding a vehicle that weighs less than 500kg and has a motor. The distinction between this mode and
+ *  bicycling is needed because some roads that do allow bicycling do not allow eScooters.
+ *
+ * Each StreetEdge is assigned a StreetTravelPermission that is used when traversing the edge to determine if the
+ * current mode of travel in the shortest path search can be used to traverse the street. The above 4 modes can be
+ * combined together to represent a composite set of permissions for a StreetEdge.
  */
 public enum StreetTraversalPermission {
     NONE(0),
     PEDESTRIAN(1),
     BICYCLE(2),
-    PEDESTRIAN_AND_BICYCLE(2 | 1),
-    PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY(8 | 2 | 1),
     CAR(4),
     MICROMOBILITY(8),
-    PEDESTRIAN_AND_MICROMOBILITY(8 | 1),
+    PEDESTRIAN_AND_BICYCLE(2 | 1),
     PEDESTRIAN_AND_CAR(4 | 1),
-    PEDESTRIAN_AND_BICYCLE_AND_CAR(4 | 2 | 1),
     BICYCLE_AND_CAR(4 | 2),
+    PEDESTRIAN_AND_BICYCLE_AND_CAR(4 | 2 | 1),
+    PEDESTRIAN_AND_MICROMOBILITY(8 | 1),
     BICYCLE_AND_MICROMOBILITY(8 | 2),
-    BICYCLE_AND_CAR_AND_MICROMOBILITY(8 | 4 | 2),
+    PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY(8 | 2 | 1),
     CAR_AND_MICROMOBILITY(8 | 4),
+    BICYCLE_AND_CAR_AND_MICROMOBILITY(8 | 4 | 2),
     ALL(8 | 4 | 2 | 1);
 
     private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();

@@ -35,6 +35,11 @@ import java.util.Locale;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
+/**
+ * An endpoint for retrieving vehicle rental data. This currently only fetches data that has been added by a
+ * "vehicle-rental" updater.
+ * TODO: refactor and combine with car and bike rental endpoints.
+ */
 @Path("/routers/{routerId}/vehicle_rental")
 @XmlRootElement
 public class VehicleRental {

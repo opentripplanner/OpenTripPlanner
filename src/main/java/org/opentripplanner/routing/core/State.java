@@ -123,6 +123,8 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
+        // set the current time of the state here as it could be pushed back further in certain queries with
+        // Transportation Network Companies enabled.
         this.time = timeSeconds * 1000;
         this.stateData.usingRentedBike = false;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -130,13 +131,19 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
 
-    /** max modal speed along streets, in meters per second */
+    /** max walking speed along streets, in meters per second */
     public double walkSpeed;
 
+    /** max bicycling speed along streets, in meters per second */
     public double bikeSpeed;
 
+    /** max micromobility speed along streets, in meters per second */
     public double maximumMicromobilitySpeed;
 
+    /**
+     * minimum micromobility speed along streets, in meters per second. See more discussion about this in
+     * {@link RoutingResource#minimumMicromobilitySpeed}.
+     */
     public double minimumMicromobilitySpeed;
 
     public double carSpeed;
@@ -508,19 +515,19 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double driveDistanceReluctance = -1.0;
 
     /**
-     * A mimum travel distance for a ride in a transportation network company.
+     * A minimum travel distance for a ride in a transportation network company.
      * Units in meters, default is 0.5 miles.
      */
     public double minimumTransportationNetworkCompanyDistance = 804.672;
 
     /**
-     * A mimum travel distance for a ride in a car rental.
+     * A minimum travel distance for a ride in a car rental.
      * Units in meters, default is 0.5 miles.
      */
     public double minimumCarRentalDistance = 804.672;
 
     /**
-     * A mimum travel distance to travel using a vehicle rental.
+     * A minimum travel distance to travel using a vehicle rental.
      * Units in meters, default is 100 meters.
      */
     public double minimumVehicleRentalDistance = 100.0;
@@ -560,10 +567,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String pathComparator = null;
 
     /**
-     * the maximum sustained power output of a micromobility vehicle in watts
-     * Theoretically, this could also model human power.
-     * The default is set to 250 watts.
-     **/
+     * The maximum sustained power output of a micromobility vehicle in watts. Theoretically, this could also model
+     * human power. The default is set to 250 watts.
+     *
+     * Here are some examples of power output assumptions from various micromobility vehicles:
+     *
+     * 125 watts: Swagtron Turbo 5 hoverboard: (https://swagtron.com/product/recertified-swagtron-turbo-five-hoverboard-classic/)
+     * 250 watts: Xiaomi M365 (https://www.gearbest.com/skateboard/pp_596618.html)
+     * 500 watts: Razor EcoSmart Metro (https://www.amazon.com/Razor-EcoSmart-Metro-Electric-Scooter/dp/B002ZDAEIS?SubscriptionId=AKIAJMXJ2YFJTEDLQMUQ&tag=digitren08-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B002ZDAEIS&ascsubtag=15599460143449ocb)
+     * 1000 watts: Boosted Rev (https://boostedboards.com/vehicles/scooters/boosted-rev)
+     */
     public double watts = 250;
 
     /**

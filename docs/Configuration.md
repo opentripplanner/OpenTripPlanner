@@ -276,6 +276,21 @@ such as:
 
 There is currently only one custom naming module called `portland` (which has no parameters).
 
+### Micromobility Restrictions
+
+It is possible to load in restricted micromobility travel and rental parking areas that will be applied throughout the graph.
+There are two separate keys that can be added to describe either areas where travel is forbidden or where parking floating 
+rental vehicles is forbidden. Each file must contain GeoJson with a Feature or FeatureCollection that contains only Polygons 
+or MultiPolygons. The values of these keys can be either a url or a file path. For example: 
+
+```JSON
+// build-config.json
+{
+  "micromobilityTravelRestrictionsUrlOrFile": "file:/some/path/no_riding_zones.geojson",
+  "micromobilityDropoffRestrictionsUrlOrFile": "http://example.com/no_parking_zones.geojson"
+}
+```
+
 
 # Runtime router configuration
 

@@ -83,6 +83,7 @@ public class OSMFilter {
                 permission = permission.add(StreetTraversalPermission.CAR);
             }
             if (entity.isBicycleExplicitlyAllowed()) {
+                // Micromobility is assumed to be allowed wherever bicycling is allowed for now
                 permission = permission.add(StreetTraversalPermission.BICYCLE_AND_MICROMOBILITY);
             }
             if (entity.isPedestrianExplicitlyAllowed()) {

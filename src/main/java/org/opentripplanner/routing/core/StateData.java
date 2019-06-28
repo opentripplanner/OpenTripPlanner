@@ -109,7 +109,7 @@ public class StateData implements Cloneable {
     // The ids of cars that have been rented so far
     protected Set<String> rentedCars = new HashSet<>();
 
-    // The ids of cars that have been rented so far
+    // The ids of vehicles that have been rented so far
     protected Set<String> rentedVehicles = new HashSet<>();
 
     // whether the currently rented car can be dropped off anywhere inside a car rental region
