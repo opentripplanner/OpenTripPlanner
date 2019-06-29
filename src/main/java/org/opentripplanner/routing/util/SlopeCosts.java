@@ -9,11 +9,11 @@ public class SlopeCosts {
     public final double lengthMultiplier; // Multiplier to get true length based on flat (projected) length
     public final byte[] gradients; // array of gradients as percents
     public final short[] gradientLengths; // array of the length of each gradient in meters
-    public final float[] gradientCdas; // array of the resistive drag force component at the corresonding gradient
+    public final double maximumDragResistiveForceComponent; // the maximum resistive drag force component along an edge
 
     public SlopeCosts(double slopeSpeedFactor, double slopeWorkFactor, double slopeSafetyCost,
                       double maxSlope, double lengthMultiplier, boolean flattened, byte[] gradients,
-                      short[] gradientLengths, float[] gradientCdas) {
+                      short[] gradientLengths, double maximumDragResistiveForceComponent) {
         this.slopeSpeedFactor = slopeSpeedFactor;
         this.slopeWorkFactor = slopeWorkFactor;
         this.slopeSafetyCost = slopeSafetyCost;
@@ -22,6 +22,6 @@ public class SlopeCosts {
         this.flattened = flattened;
         this.gradients = gradients;
         this.gradientLengths = gradientLengths;
-        this.gradientCdas = gradientCdas;
+        this.maximumDragResistiveForceComponent = maximumDragResistiveForceComponent;
     }
 }

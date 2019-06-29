@@ -21,17 +21,19 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
-    // Coefficient for velocity-dependent dynamic rolling resistance, here approximated with 0.1
-    // See http://www.kreuzotter.de/english/espeed.htm
-    private static final double CrV = 0.1;
+    /**
+     * Coefficient for velocity-dependent dynamic rolling resistance, here approximated with 0.1
+     * See http://www.kreuzotter.de/english/espeed.htm
+     */
+    private static final double COEFFICIENT_OF_VELOCITY_DEPENDENT_DYNAMIC_ROLLING_RESISTANCE = 0.1;
 
     /**
      * Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(β)
      *
-     * @param beta Inclination angle, = arctan(grade/100)
+     * @param beta Inclination angle = arctan(grade/100)
      */
     public static double getDynamicRollingResistance(double beta) {
-        return CrV * Math.cos(beta);
+        return COEFFICIENT_OF_VELOCITY_DEPENDENT_DYNAMIC_ROLLING_RESISTANCE * Math.cos(beta);
     }
 
     /**
@@ -51,7 +53,7 @@ public class ElevationUtils {
      * Fdrag = 0.5 * Cd * A * Rho * V^2
      *               ⎣CdA_⎦
      *
-     * See See https://www.gribble.org/cycling/power_v_speed.html
+     * See https://www.gribble.org/cycling/power_v_speed.html
      *
      * where
      * Cd = coefficient of drag
@@ -62,7 +64,7 @@ public class ElevationUtils {
      * Cd = 0.63
      * A = 0.6
      */
-    private static final double CdA = 0.63 * 0.6;
+    private static final double FRONTAL_AREA_DRAG_COMPONENT = 0.63 * 0.6;
 
     // the air pressure at sea level in Pascals
     // see https://www.omnicalculator.com/physics/air-pressure-at-altitude
@@ -82,11 +84,20 @@ public class ElevationUtils {
     private static final double SPECIFIC_GAS_CONSTANT_FOR_DRY_AIR = 287.058;
 
     /**
-     * Calculates the componens of drag resistance except for the velocity assuming travel through dry earthy air. The
+     * The temperature decline in C or K per 1,000 meters of elevation gain.
+     * Temperature is assumed to fall 9.8°C per 1,000 meters in elevation gain.
+     * See https://www.onthesnow.com/news/a/15157/does-elevation-affect-temperature
+     */
+    private static final double TEMPERATURE_DECLINE_PER_METER_OF_ELEVATION_GAIN = -9.8 / 1000;
+
+    /**
+     * Calculates the components of drag resistance except for the velocity assuming travel through dry earthy air. The
      * equation for drag resistance and the extracted value is as follows:
      *
      * Fdrag = 0.5 * Cd * A * Rho * V^2
-     *         ⎣__dragComponent_⎦
+     *             ⎣dragComponent⎦
+     *
+     * Note that the 0.5 is accounted for as a part of the final micromobility speed calcuations.
      *
      * See https://www.gribble.org/cycling/power_v_speed.html
      *
@@ -98,6 +109,7 @@ public class ElevationUtils {
      * See https://www.omnicalculator.com/physics/air-density
      *
      * where
+     * ρ = air density in kg/m^3
      * pd = air pressure in Pascals
      * Rd = specific gas constant for dry air
      * T = air temperature in Kelvin
@@ -112,9 +124,10 @@ public class ElevationUtils {
      * ρ = (pd / (Rd * T))
      *
      * where:
+     * ρ = air density in kg/m^3
      * pd = the pressure of dry air in hPa,
-     * Rd is the specific gas constant for dry air
-     * T is the air temperature in Kelvins
+     * Rd = the specific gas constant for dry air
+     * T = the air temperature in Kelvins
      *
      * The pressure of dry air is described with the following formula:
      *
@@ -123,6 +136,7 @@ public class ElevationUtils {
      * See https://www.omnicalculator.com/physics/air-pressure-at-altitude
      *
      * where
+     * P = the air pressure in hPa
      * P0 = is the pressure at the reference level h0 which is assumed to be 0 meters above sea level
      * g = the gravitational acceleration constant
      * M = the molar mass of air
@@ -130,16 +144,18 @@ public class ElevationUtils {
      * R = the universal gas constant
      * T = the temperature at altitude h
      *
-     * P0, g, M and R are all constants. h is provided as an input parameter. And we randomly guess T. Furthermore, the
-     * temperature is assumed to fall 9.8°C per 1,000 meters.
+     * P0, g, M and R are all constants. h is provided as an input parameter. And we randomly guess T by starting with a
+     * randomly guesssed temperature at sea level that is then assumed to fall 9.8°C per 1,000 meters of elevation gain.
      *
      * See https://www.onthesnow.com/news/a/15157/does-elevation-affect-temperature
      *
      * @param altitude The altitude in meters
      */
     public static double getDragResistiveForceComponent(double altitude) {
-        double randomlyGuessedTemperature = A_RANDOM_OUTDOOR_TEMPERATURE_IN_KELVIN - 9.8 * altitude / 1000;
-        return CdA * (
+        double randomlyGuessedTemperature = A_RANDOM_OUTDOOR_TEMPERATURE_IN_KELVIN + (
+            altitude * TEMPERATURE_DECLINE_PER_METER_OF_ELEVATION_GAIN
+        );
+        return FRONTAL_AREA_DRAG_COMPONENT * (
             AIR_PRESSURE_AT_SEA_LEVEL *
             Math.exp(
                 -GRAVITATIONAL_ACCELERATION_CONSTANT *
@@ -197,7 +213,7 @@ public class ElevationUtils {
                 false,
                 new byte[]{0},
                 new short[]{(short) trueLength},
-                new float[]{(float) getDragResistiveForceComponent(0)}
+                getDragResistiveForceComponent(0)
             );
         }
         double lengthMultiplier = trueLength / flatLength;
@@ -272,12 +288,15 @@ public class ElevationUtils {
         // convert gradient info into arrays of primitives
         byte[] gradientsArr = new byte[gradients.size()];
         short[] gradientLengthsArr = new short[gradients.size()];
-        float[] gradientCdas = new float[gradients.size()];
+        double maximumDragResistiveForceComponent = Double.MIN_VALUE;
         for (int i = 0; i < gradients.size(); i++) {
             GradientBin bin = gradients.get(i);
             gradientsArr[i] = (byte) bin.gradient;
             gradientLengthsArr[i] = (short) bin.distance;
-            gradientCdas[i] = (float) getDragResistiveForceComponent(bin.minAltitude);
+            double dragReistiveForceComponent = getDragResistiveForceComponent(bin.minAltitude);
+            if (dragReistiveForceComponent > maximumDragResistiveForceComponent) {
+                maximumDragResistiveForceComponent = dragReistiveForceComponent;
+            }
         }
 
         /*
@@ -293,7 +312,7 @@ public class ElevationUtils {
             flattened,
             gradientsArr,
             gradientLengthsArr,
-            gradientCdas
+            maximumDragResistiveForceComponent
         );
     }
 

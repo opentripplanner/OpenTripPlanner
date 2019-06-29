@@ -37,12 +37,12 @@ public class StreetWithElevationEdge extends StreetEdge {
     // an array of the length in meters of the corresponding gradient at the same index
     private short[] gradientLengths;
 
-    // an array of the approximate resistive drag force component of the corresponding gradient at the same index. Since
-    // there can be numerous elevation differences of gradients within an edge, these are approximations based off of
-    // the minimum altitude seen for the corresonding gradient on this edge. This is an overestimate of aerodynamic
-    // drag.
-    // TODO just use one Cda for the minimum altitude, this is overkill
-    private float[] gradientCdas;
+    // The maximum resistive drag force component along this StreetWithElevationEdge. The difference of this resistive
+    // drag force component is likely extremely small along the vast majority of edges in the graph. Therefore, don't
+    // store all values in an array like the gradients and gradient lengths. Instead, use the maximum resistive drag
+    // component which would correspond to drag resistive force at the minimum altitude seen on this edge. This is an
+    // overestimate of aerodynamic drag.
+    private double maximumDragResistiveForceComponent;
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
@@ -80,7 +80,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
         gradients = costs.gradients;
         gradientLengths = costs.gradientLengths;
-        gradientCdas = costs.gradientCdas;
+        maximumDragResistiveForceComponent = costs.maximumDragResistiveForceComponent;
 
         return costs.flattened;
     }
@@ -111,23 +111,30 @@ public class StreetWithElevationEdge extends StreetEdge {
     }
 
     /**
-     * Override the calculateSpeed method, but only do special calculations for Micromobility. The elevation-dependent
-     * micromobility speed will differ according to calculated gradients. In order to save computing time, the gradients
-     * along a road are pre-calculated and allocated into bins of 1% grade. Two different arrays are analyzed. One array
-     * has information about the gradient and the other has information about the length in meters of this gradient. All
-     * of the resulting travel times and meters of each gradient segment are added up and then used to calculate an
-     * average speed for the entire road.
+     * Override the calculateSpeed method, but only do special calculations for Micromobility. There are separate
+     * methods that are used to calculate speed for walking and bicycling. However, the calculations for bicycling are
+     * questionable and this method could theoretically be used to calculate bicycling speeds.
+     *
+     * The elevation-dependent micromobility speed will differ according to calculated gradients. In order to save
+     * computing time, the gradients along a road are pre-calculated and allocated into bins of 1% grade. Two different
+     * arrays are analyzed. One array has information about the gradient and the other has information about the length
+     * in meters of this gradient. All of the resulting travel times and meters of each gradient segment are added up
+     * and then used to calculate an average speed for the entire road.
      */
     @Override
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
+        // use default StreetEdge method to calculate speed if the traverseMode is not micromobility
         if (traverseMode != TraverseMode.MICROMOBILITY) return super.calculateSpeed(options, traverseMode, timeMillis);
-        // calculate the travel time it would tak to traverse each gradient
-        double distance = 0;
-        double time = 0;
 
         // TODO: figure out why this is null sometimes
         if (gradients == null) return super.calculateSpeed(options, traverseMode, timeMillis);
 
+        // calculate and accumulate the total travel time and distance it would take to traverse each gradient
+        // these values will eventually be used to calculate an overall average speed.
+        double distance = 0;
+        double time = 0;
+
+        // iterate over each gradient/distance entry and determine the travel time
         for (int i = 0; i < gradients.length; i++) {
             distance += gradientLengths[i];
             time += gradientLengths[i] / Math.min(
@@ -136,7 +143,7 @@ public class StreetWithElevationEdge extends StreetEdge {
                     options.weight,
                     Math.atan(gradients[i] / 100.0),
                     this.getRollingResistanceCoefficient(),
-                    gradientCdas[i],
+                    maximumDragResistiveForceComponent,
                     options.minimumMicromobilitySpeed,
                     options.maximumMicromobilitySpeed
                 ),
@@ -151,11 +158,8 @@ public class StreetWithElevationEdge extends StreetEdge {
             return Math.min(options.maximumMicromobilitySpeed, getCarSpeed());
         }
 
-        return Math.min(
-            distance / time,
-            // make sure the speed limit is obeyed
-            getCarSpeed()
-        );
+        // return the overall average speed by dividing the accumulated distance and time
+        return distance / time;
     }
 
     @Override

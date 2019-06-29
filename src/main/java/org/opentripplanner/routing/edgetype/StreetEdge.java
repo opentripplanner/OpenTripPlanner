@@ -145,7 +145,7 @@ public class StreetEdge extends Edge implements Cloneable {
     // whether or not this street is a good place to dropoff a floating car rental
     private boolean suitableForFloatingCarRentalDropoff = true;
 
-    // whether or not this street is a good place to dropoff a floating car rental
+    // whether or not this street is a good place to dropoff a floating vehicle rental
     private boolean suitableForFloatingVehicleRentalDropoff = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -441,7 +441,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 // 2. Allows a floating vehicle dropoff under the following cirucmstances:
                 //    a. on the current edge
                 //    b. on the edge of the previous state (NOTE: the previous StreetEdge is considered because it can
-                //        be reasoned that the very last point of the previous StreetEdge consitutes a part of this
+                //        be reasoned that the very last point of the previous StreetEdge constitutes a part of this
                 //        current StreetEdge. Since walking would begin on this StreetEdge, the floating rental vehicle
                 //        is assumed to be left at the very beginning of the StreetEdge.)
                 //
@@ -893,8 +893,8 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /**
-     * Calculate the approximate travel time for a given distance with a given slope, available sustained power output,
-     * weight, rolling resistance, aerodynamic drag and bounds on min/max speeds.
+     * Calculate the approximate speed for a vehicle given slope data, available sustained power output, weight, rolling
+     * resistance, aerodynamic drag and bounds on min/max speeds.
      *
      * This calculation is made using a formula derived from the equations relating to determing total resistive force
      * that is needed to be overcome to maintain a certain velocity. The website at
@@ -942,26 +942,29 @@ public class StreetEdge extends Edge implements Cloneable {
      * If a^2 + b^3 < 0:
      * V = 2 * sqrt(-b) * cos((1 / 3) * arccos(a / sqrt(-b^3)) - (2 / 3) * (Crvn / (Cd * A * ρ))
      *
-     * @param watts The sustained power ouptut in watts
+     * @param watts The sustained power output in watts. This represents the value of `P` in the above equations.
      * @param weight The total weight required to be moved that includes the rider(s), their belongings and the vehicle
      *               weight.
      * @param beta ("beta") Inclination angle, = arctan(grade/100). It's probably not a huge time savings and would use
-     *             more memory, but additional precalculations from this value could be made.
-     * @param Cr The coefficient of rolling resistance. This can also be used to model the difficulty of traveling over
-     *           bumpy roadways. See this wikipedia page for a list of coefficients by various surface types:
-     *           https://en.wikipedia.org/wiki/Rolling_resistance#Rolling_resistance_coefficient_examples
-     * @param Cdap The product of the coefficient of aerodynamic drag, frontal area and air density
-     * @param minSpeed The minimum speed that the micromobility should travel at in cases where the slope is too steep
-     *                 or the vehicle has ran out of energy.
-     * @param maxSpeed The maximum speed the vehicle can travel at on steep downhills.
-     * @return the travel time in seconds
+     *              more memory, but additional precalculations from this value could be made. This value is used to
+     *              calculate the values of `Crvn` and `Frg` as noted in the above equations.
+     * @param coefficientOfRollingResistance The coefficient of rolling resistance. This can also be used to model the
+     *              difficulty of traveling over bumpy roadways. This value is used to calculate the value of `Frg` as
+     *              noted in the above equations.See this wikipedia page for a list of coefficients by various surface
+     *              types: https://en.wikipedia.org/wiki/Rolling_resistance#Rolling_resistance_coefficient_examples
+     * @param aerodynamicDragComponent The product of the coefficient of aerodynamic drag, frontal area and air density.
+     *              This value is product of (Cd * A * ρ) as noted in the above mathematical equations.
+     * @param minSpeed The minimum speed that the micromobility should travel at in cases where the slope is so steep
+     *              that it would be faster to walk with the vehicle.
+     * @param maxSpeed The maximum speed the vehicle can travel at.
+     * @return The speed in m/s. This represents the value of `V` in the above mathematical equations.
      */
     public static double calculateMicromobilitySpeed(
         double watts,
         double weight,
         double beta,
-        double Cr,
-        double Cdap,
+        double coefficientOfRollingResistance,
+        double aerodynamicDragComponent,
         double minSpeed,
         double maxSpeed
     ) {
@@ -969,37 +972,48 @@ public class StreetEdge extends Edge implements Cloneable {
         // the vehicle. This adjusts the power downward  to account for drivetrain inefficencies. An assumption is also
         // made that due to use in an urban environment the user may not always be traveling with the maximum available
         // sustained power due to traffic, personal perference, etc
+        //
+        // FIXME: this current implementation assumes that the maximum sustained power is always used. In reality, the
+        //  actual wattage outputted likely depends on the desired speed the user wants to travel at and whether the
+        //  vehicle (and person if human-power assist is possible) can output enough power to overcome the resistive
+        //  forces needed to travel at that desired speed. For example, on steep downhills, the power output could
+        //  actually be negative (ie the user is braking the vehicle). And on the flats, the maximum power output of
+        //  some vehicles likely isn't necessary to maintain the desired speed. For now this maxSpeed acts as a good cap
+        //  on speeds, but perhaps some more advanced calculation of the actual power could be done. And in turn the
+        //  actual power could be used to determine how much fuel has been burned in the vehicle.
         watts = watts * 0.8;
 
         // The coefficient for the dynamic rolling resistance, normalized to road inclination.
-        // This value could be precalculated during graph build
-        double Crvn = ElevationUtils.getDynamicRollingResistance(beta);
+        // In the above mathematical equations, this is the value of `Crvn`.
+        // This value could be precalculated during graph build.
+        double dynamicRollingResistance = ElevationUtils.getDynamicRollingResistance(beta);
 
         // Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
-        double Frg = ElevationUtils.GRAVITATIONAL_ACCELERATION_CONSTANT *
+        // In the above mathematical equations, this is the value of `Frg`.
+        double normalizedRollingFriction = ElevationUtils.GRAVITATIONAL_ACCELERATION_CONSTANT *
             weight *
             // These cosine and sine calculations could be precalculated during graph build
-            (Cr * Math.cos(beta) + Math.sin(beta));
+            (coefficientOfRollingResistance * Math.cos(beta) + Math.sin(beta));
 
         double a = (
-            -Math.pow(Crvn, 3) / 27.0
+            -Math.pow(dynamicRollingResistance, 3) / 27.0
         ) + (
-            (2.0 * Frg * Crvn) /
-                (3.0 * Math.pow(Cdap, 2))
+            (2.0 * normalizedRollingFriction * dynamicRollingResistance) /
+                (3.0 * Math.pow(aerodynamicDragComponent, 2))
         ) + (
-            watts / Cdap
+            watts / aerodynamicDragComponent
         );
         double b = (
-            2.0 / (9.0 * Cdap)
+            2.0 / (9.0 * aerodynamicDragComponent)
         ) * (
-            3.0 * Frg -
+            3.0 * normalizedRollingFriction -
                 (
-                    (2.0 * Crvn) / Cdap
+                    (2.0 * dynamicRollingResistance) / aerodynamicDragComponent
                 )
         );
 
         double cardanicCheck = Math.pow(a, 2) + Math.pow(b, 3);
-        double rollingDragComponent = 2.0 / 3.0 * Crvn / Cdap;
+        double rollingDragComponent = 2.0 / 3.0 * dynamicRollingResistance / aerodynamicDragComponent;
         double speed;
         if (cardanicCheck >= 0) {
             double cardanicCheckSqrt = Math.sqrt(cardanicCheck);
