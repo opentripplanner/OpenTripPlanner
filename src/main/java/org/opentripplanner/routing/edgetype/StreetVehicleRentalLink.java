@@ -68,7 +68,7 @@ public class StreetVehicleRentalLink extends Edge {
 
     public State traverse(State s0) {
         // Do not even consider vehicle rental vertices unless vehicle rental is enabled.
-        if ( ! s0.getOptions().allowVehicleRental) {
+        if (!s0.getOptions().allowVehicleRental) {
             return null;
         }
         // Disallow traversing two StreetVehicleRentalLinks in a row.
@@ -85,7 +85,7 @@ public class StreetVehicleRentalLink extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        return options.modes.contains(TraverseMode.CAR) ? 0 : Double.POSITIVE_INFINITY;
+        return options.modes.contains(TraverseMode.MICROMOBILITY) ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {
