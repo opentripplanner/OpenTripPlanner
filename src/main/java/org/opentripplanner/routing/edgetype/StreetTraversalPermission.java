@@ -88,9 +88,9 @@ public enum StreetTraversalPermission {
     public boolean allows(TraverseModeSet modes) {
         if (modes.getWalk() && allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
-        } else if ((modes.getBicycle()) && allows(StreetTraversalPermission.BICYCLE)) {
+        } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
             return true;
-        } else if ((modes.getMicromobility()) && allows(StreetTraversalPermission.MICROMOBILITY)) {
+        } else if (modes.getMicromobility() && allows(StreetTraversalPermission.MICROMOBILITY)) {
             return true;
         } else if (modes.getCar() && allows(StreetTraversalPermission.CAR)) {
             return true;

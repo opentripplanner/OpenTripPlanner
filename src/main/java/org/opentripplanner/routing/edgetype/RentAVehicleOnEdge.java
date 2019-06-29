@@ -41,16 +41,22 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
         RoutingRequest options = s0.getOptions();
 
         // To rent a vehicle, we need to have vehicle rental allowed in request.
-        if (!options.allowVehicleRental)
+        if (!options.allowVehicleRental) {
+            // request settings forbids vehicle renting. Don't rent a vehicle.
             return null;
+        }
 
         // make sure there is at least one vehicle available to rent at this station
-        if (options.useVehicleRentalAvailabilityInformation && station.vehiclesAvailable == 0)
+        if (options.useVehicleRentalAvailabilityInformation && station.vehiclesAvailable == 0) {
+            // no vehicle available at the station, rental not possible from here.
             return null;
+        }
 
         // don't use the same pickup station twice
-        if (s0.stateData.getRentedVehicles().contains(station.id))
+        if (s0.stateData.getRentedVehicles().contains(station.id)) {
+            // this station has already been used in the search. Don't use it again.
             return null;
+        }
 
         // make sure the vehicle being rented is within a network compatible with the request
         if (
@@ -70,8 +76,10 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
             // pickup location has been encountered.
 
             // First make sure the current state has a vehicle rented.
-            if (!s0.isVehicleRenting())
+            if (!s0.isVehicleRenting()) {
+                // not in a state where a vehicle is being rented, therefore a rental can't begin at this time
                 return null;
+            }
 
             // Check if the vehicle network at this edge is compatible with the allowable vehicle networks
             // where the vehicle was dropped off.  Dropoff points could be either a dropoff station or a
@@ -83,36 +91,51 @@ public class RentAVehicleOnEdge extends RentAVehicleAbstractEdge {
             }
 
             // make sure the minimum vehicle rental distance has been traveled
-            if (s0.vehicleRentalDistance < options.minimumVehicleRentalDistance)
+            if (s0.vehicleRentalDistance < options.minimumVehicleRentalDistance) {
+                // not enough distance has been traveled in order to do the rental, return null
                 return null;
+            }
 
-            // make sure the vehicle that is about to be rented has floating dropoff capabilities if it
-            // was dropped off in a floating state
-            if (s0.stateData.rentedVehicleAllowsFloatingDropoffs() && !station.isFloatingVehicle)
-                return null;
+            // TODO: make sure the vehicle that is about to be rented has floating dropoff capabilities if it
+            //  was dropped off in a floating state. This depends on future changes where rental stations have
+            //  information about whether vehicles that are rented from the station would allow a floating dropoff.
+//            if (s0.stateData.rentedVehicleAllowsFloatingDropoffs() && !station.vehicleRentalsAllowFloatingDropoffs) {
+//                return null;
+//            }
 
-            // looks like it's ok to have rented a vehicle from this station
+            // looks like it's ok to have rented a vehicle from this station. Transition out of the vehicle rental state.
             s1e.endVehicleRenting();
         } else {
             // make sure more than 1 vehicle isn't rented at once
-            if (s0.isVehicleRenting())
+            if (s0.isVehicleRenting()) {
+                // already renting a vehicle, don't allow 2 rentals
                 return null;
+            }
 
-            // make sure only one vehicle is rented pre/post transit
+            // make sure a vehicle is rented only once during pre/post transit parts of the trip
             if (s0.isEverBoarded()) {
                 if (s0.stateData.hasRentedVehiclePostTransit()) {
+                    // a vehicle has already been rented after taking transit, don't rent another after taking transit
                     return null;
                 }
             } else {
                 if (s0.stateData.hasRentedVehiclePreTransit()) {
+                    // a vehicle has already been rented after taking transit, don't rent another before taking transit
                     return null;
                 }
             }
 
+            // looks like it's ok to have begun renting a vehicle from this station
             s1e.beginVehicleRenting(0, station.networks, station.isFloatingVehicle);
         }
+
+        // if this point is reached, it is possible to proceed with a vehicle rental pickup from this station
+
+        // increment costs and time associated with picking up a rented vehicle
         s1e.incrementWeight(options.vehicleRentalPickupCost);
         s1e.incrementTimeInSeconds(options.vehicleRentalPickupTime);
+
+        // add this vehicle rental station id to a list of ids of stations that have already been rented from
         s1e.addRentedVehicle(station.id);
         State s1 = s1e.makeState();
         return s1;
