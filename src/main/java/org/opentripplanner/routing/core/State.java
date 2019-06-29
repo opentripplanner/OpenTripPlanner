@@ -1099,55 +1099,84 @@ public class State implements Cloneable {
             return false;
 
         if (options.arriveBy) {
+            // the search is progressing backwards, so this is the point where a car rental would "begin" by entering
+            // into a car rental state.
+
             // make sure a car is not currently being rented.  Why drive 2 cars at once?
-            if (this.isCarRenting())
+            if (this.isCarRenting()) {
+                // already renting a car, don't allow 2 car rentals at once.
                 return false;
+            }
+
+            if (isEverBoarded()) {
+                // make sure a car hasn't already been rented after transit
+                if (stateData.hasRentedCarPostTransit()) {
+                    // a car has already been rented after taking transit, car rental not possible anymore
+                    return false;
+                }
+            } else {
+                // make sure a car hasn't already been rented before transit
+                if (stateData.hasRentedCarPreTransit()) {
+                    // a car has already been rented before transit, don't begin renting another one until we take
+                    // transit
+                    return false;
+                }
+            }
         } else {
-            // make sure a car is currently being rented.  Can't dropoff a car that isn't being
-            // rented
-            if (!this.isCarRenting())
+            // make sure a car is currently being rented.
+            if (!this.isCarRenting()) {
+                // Can't dropoff a car that isn't being rented
                 return false;
+            }
         }
 
-        // If not searching backwards, make sure travel distance in car is greater than minimum
-        // distance
+        // If not searching backwards, make sure travel distance in car is greater than minimum distance
         if (
             !options.arriveBy &&
                 this.carRentalDriveDistance < this.stateData.opt.minimumCarRentalDistance
         ) {
+            // haven't traveled far enough, dropoff not possible
             return false;
         }
 
-        // if the car is being dropped off at a designated dropoff area, no further state checks are
-        // needed
-        if (droppingOffAtDesignatedDropoffArea)
+        // if the car is being dropped off at a designated dropoff area such as a car rental station that might have
+        // parking spaces. No further state checks are needed, so return true.
+        if (droppingOffAtDesignatedDropoffArea) {
             return true;
+        }
 
-        // At this point, the car is going to be dropped off on some kind of StreetEdge.  But first,
-        // a sanity check is needed to  make sure we're actually working with an edge here.
-        if (theEdge == null)
+        // At this point, the car is going to be dropped off on some kind of StreetEdge.  But first, a sanity check is
+        // needed to  make sure we're actually working with an edge here.
+        if (theEdge == null) {
             return false;
+        }
 
-        // check if the street edge has some characteristic that would not be suitable for leaving
-        // the car at
-        if (!theEdge.getFloatingCarDropoffSuitability())
+        // check if the street edge has some characteristic that would not be suitable for leaving the car at
+        if (!theEdge.getFloatingCarDropoffSuitability()) {
+            // Dropping off not allowed at the StreetEdge, return false.
             return false;
+        }
 
-        if (options.allowCarRentalDropoffAnywhere)
-            // User has specified in routing request they intend to keep car even if dropping off
-            // outside a car rental region.
+        if (options.allowCarRentalDropoffAnywhere) {
+            // User has specified in routing request they intend to keep car even if dropping off outside a car rental
+            // region.
             return true;
+        }
 
         // make sure the car networks associated with the edge make a floating dropoff possible.
         if (options.arriveBy) {
-            // make sure there is at least one possible car network available at this StreetEdge
+            // the search is progressing backwards to the origin an a floating car dropoff might have occurred at this
+            // StreetEdge. Make sure there is at least one possible car network that allows floating dropoffs at this
+            // StreetEdge.
             return theEdge.getCarNetworks() != null && theEdge.getCarNetworks().size() > 0;
         } else {
-            // if the car is not being dropped off at a designated area for dropping off car rentals
-            // and the user wants to do a dropoff inside the car rental region, make sure that the
-            // car that was rented allows floating dropoffs
-            if (!stateData.rentedCarAllowsFloatingDropoffs)
+            // if the car is not being dropped off at a designated area for dropping off car rentals and the user wants
+            // to do a dropoff inside the car rental region, make sure that the car that was rented allows floating
+            // dropoffs
+            if (!stateData.rentedCarAllowsFloatingDropoffs) {
+                // the car must be returned at a car rental station, return false.
                 return false;
+            }
 
             // Check if the floating car is within a compatible car rental region
             CarRentalStationService carService = getContext().graph.getService(
@@ -1159,6 +1188,8 @@ public class State implements Cloneable {
                     return true;
                 }
             }
+            // The rented car and StreetEdge do not share any common car rental networks, therefore a dropoff is not
+            // allowed
             return false;
         }
     }
@@ -1225,55 +1256,84 @@ public class State implements Cloneable {
             return false;
 
         if (options.arriveBy) {
+            // the search is progressing backwards, so this is the point where a vehicle rental would "begin" by
+            // entering into a vehicle rental state.
+
             // make sure a vehicle is not currently being rented.
-            if (this.isVehicleRenting())
+            if (this.isVehicleRenting()) {
+                // Forbid using more than 1 rental vehicle at once.
                 return false;
+            }
+
+            if (isEverBoarded()) {
+                // make sure a vehicle hasn't already been rented after transit
+                if (stateData.hasRentedVehiclePostTransit()) {
+                    // a vehicle has already been rented after taking transit, vehicle rental not possible anymore
+                    return false;
+                }
+            } else {
+                // make sure a vehicle hasn't already been rented before transit
+                if (stateData.hasRentedCarPreTransit()) {
+                    // a vehicle has already been rented before transit, don't begin renting another one until we take
+                    // transit
+                    return false;
+                }
+            }
         } else {
-            // make sure a vehicle is currently being rented.  Can't dropoff a vehicle that isn't being
-            // rented
-            if (!this.isVehicleRenting())
+            // make sure a vehicle is currently being rented.
+            if (!this.isVehicleRenting()) {
+                // Can't dropoff a vehicle that isn't being rented
                 return false;
+            }
         }
 
-        // If not searching backwards, make sure travel distance in vehicle is greater than minimum
-        // distance
+        // If not searching backwards, make sure travel distance in vehicle is greater than minimum distance
         if (
             !options.arriveBy &&
                 this.vehicleRentalDistance < this.stateData.opt.minimumVehicleRentalDistance
         ) {
+            // vehicle hasn't been ridden far enough
             return false;
         }
 
-        // if the vehicle is being dropped off at a designated dropoff area, no further state checks are
-        // needed
-        if (droppingOffAtDesignatedDropoffArea)
+        // if the vehicle is being dropped off at a designated dropoff area such as a docking station that might have
+        //  parking spaces. No further state checks are needed, so return true.
+        if (droppingOffAtDesignatedDropoffArea) {
             return true;
+        }
 
         // At this point, the vehicle could be dropped off on some kind of StreetEdge unless the StreetEdge forbids it.
         // First, a sanity check is needed to  make sure we're actually working with an edge here.
-        if (theEdge == null)
+        if (theEdge == null) {
             return false;
+        }
 
-        // check if the street edge has some characteristic that would not be suitable for leaving
-        // the vehicle at
-        if (!theEdge.getFloatingVehicleDropoffSuitability())
+        // check if the street edge has some characteristic that would not be suitable for leaving the vehicle at
+        if (!theEdge.getFloatingVehicleDropoffSuitability()) {
+            // Floating vehicles cannot be dropped off at the edge.
             return false;
+        }
 
-        if (options.allowVehicleRentalDropoffAnywhere)
-            // User has specified in routing request they intend to keep the vehicle even if dropping off
-            // outside a vehicle rental region.
+        if (options.allowVehicleRentalDropoffAnywhere) {
+            // User has specified in routing request they intend to keep the vehicle even if dropping off outside a
+            // vehicle rental region.
             return true;
+        }
 
         // make sure the vehicle networks associated with the edge make a floating dropoff possible.
         if (options.arriveBy) {
-            // make sure there is at least one possible vehicle network available at this StreetEdge
+            // the search is progressing backwards to the origin an a floating vehicle dropoff might have occurred at
+            // this StreetEdge. Make sure there is at least one possible vehicle network that allows floating dropoffs
+            // at this StreetEdge.
             return theEdge.getVehicleNetworks() != null && theEdge.getVehicleNetworks().size() > 0;
         } else {
             // if the vehicle is not being dropped off at a designated area for dropping off vehicle rentals
             // and the user wants to do a dropoff inside the vehicle rental region, make sure that the
             // vehicle that was rented allows floating dropoffs
-            if (!stateData.rentedVehicleAllowsFloatingDropoffs)
+            if (!stateData.rentedVehicleAllowsFloatingDropoffs) {
+                // rented vehicle must be dropped off at a vehicle rental station
                 return false;
+            }
 
             // Check if the floating vehicle is within a compatible vehicle rental region
             VehicleRentalStationService vehicleService = getContext().graph.getService(
@@ -1285,6 +1345,9 @@ public class State implements Cloneable {
                     return true;
                 }
             }
+
+            // The rented vehicle's networks and the edge's networks don't have any compatibility, so a dropoff is not
+            // possible here.
             return false;
         }
     }
