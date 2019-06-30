@@ -1,17 +1,15 @@
 package org.opentripplanner.updater.vehicle_rental.GBFSMappings;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Response class for the station_status.json file.
  * See https://github.com/NABSA/gbfs/blob/master/gbfs.md#station_statusjson
  */
 public class StationStatus extends BaseGtfsResponse {
-    public StatusInfromation data;
+    public StationStatusData data;
 
-    public static class StatusInfromation {
+    public static class StationStatusData {
         public List<DockingStationStatusInformation> stations;
     }
 

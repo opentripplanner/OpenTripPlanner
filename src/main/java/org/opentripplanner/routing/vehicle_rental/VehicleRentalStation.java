@@ -24,6 +24,19 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * This class models a place where a rental vehicle can be returned or picked up.
+ * This class is typically used in one of 3 ways:
+ *
+ * 1. To model a docking station that may have multiple vehicles that can be rented and also parking spaces to return
+ *  a rented vehicle.
+ * 2. To model a single floating vehicle that can only be picked up.
+ * 3. To model a border dropoff where the extent of vehicle rental region ends. At this point, the StreetEdge is split
+ *  and a vehicle rental station is created to facilitate the dropoff of vehicles no further than the allowable dropoff
+ *  area.
+ * FIXME: border dropoff stations, vertices and edges are probably not needed anymore with updated StreetEdge dropoff
+ *  checks.
+ */
 public class VehicleRentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;
 
@@ -55,6 +68,10 @@ public class VehicleRentalStation implements Serializable, Cloneable {
     @JsonSerialize
     public boolean allowPickup = true;
 
+    /**
+     * Whether or not this rental station models a floating vehicle that is parked outside of a docking station on some
+     * StreetEdge.
+     */
     @XmlAttribute
     @JsonSerialize
     public boolean isFloatingVehicle = false;

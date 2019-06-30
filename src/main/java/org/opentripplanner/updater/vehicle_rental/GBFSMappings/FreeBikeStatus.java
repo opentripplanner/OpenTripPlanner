@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.GBFSMappings;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.List;
 
 /**
@@ -9,9 +7,9 @@ import java.util.List;
  * See https://github.com/NABSA/gbfs/blob/master/gbfs.md#free_bike_statusjson
  */
 public class FreeBikeStatus extends BaseGtfsResponse {
-    public FreeBikeStatusInfromation data;
+    public FreeBikeStatusData data;
 
-    public static class FreeBikeStatusInfromation {
+    public static class FreeBikeStatusData {
         public List<FreeBike> bikes;
     }
 

@@ -5,32 +5,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geojson.Feature;
-import org.geojson.FeatureCollection;
-import org.geojson.GeoJsonObject;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
-import org.opentripplanner.api.resource.VehicleRental;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.FreeBikeStatus;
-import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsRespone;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsResponse;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationInformation;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationStatus;
-import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.*;
 
 import static org.opentripplanner.util.GeoJsonUtils.parsePolygonOrMultiPolygonFromJsonNode;
@@ -42,7 +32,7 @@ import static org.opentripplanner.util.HttpUtils.getDataFromUrlOrFile;
 public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigurable {
     private static final Logger LOG = LoggerFactory.getLogger(GenericGbfsService.class);
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     // config items
     private String rootUrl;
@@ -103,19 +93,20 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     }
 
     /**
-     * the following is ideally a bit of temporary code that reads in the contents from a URL (or file) that describes
+     * The following is ideally a bit of temporary code that reads in the contents from a URL (or file) that describes
      * the allowable dropoff areas for this vehicle rental company
      *
-     * ideally in the future, the url will be built into the GBFS
+     * TODO: It is quite likely that in the near future, there will be a way to fetch information about vehicle rental
+     *  regions from an updated version of the GBFS. Once that happens, this will probably need to be refactored.
      */
     private void setRegionsFromConfig(JsonNode config) {
         JsonNode regionsUrlNode = config.get("regionsUrl");
         if (regionsUrlNode != null) {
             regionsUrl = regionsUrlNode.asText();
         }
-        JsonNode regionGeoJson = config.get("regionsGeoJson");
-        if (regionGeoJson != null) {
-            regions = parseRegionJson(regionGeoJson);
+        JsonNode regionsGeoJson = config.get("regionsGeoJson");
+        if (regionsGeoJson != null) {
+            regions = parseRegionJson(regionsGeoJson);
         } else if (regionsUrl != null) {
             try {
                 // fetch regions
@@ -127,7 +118,6 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 }
 
                 // parse the region and update the regions
-                ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = mapper.readTree(data);
                 regions = parseRegionJson(rootNode);
                 data.close();
@@ -177,9 +167,6 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         regionsUpdated = false;
         stations = new ArrayList<>();
 
-        // fetch data from root URL
-        InputStream rootData = fetchFromUrl(makeUrl("gbfs.json"));
-
         String systemInformationUrl = null;
         String stationInformationUrl = null;
         String stationStatusUrl = null;
@@ -190,21 +177,28 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         String systemPricingPlansUrl = null;
         String systemAlertsUrl = null;
 
+        // fetch data from root URL. This file/endpoint is actually not required per the GBFS spec
+        // See https://github.com/NABSA/gbfs/blob/master/gbfs.md#files
+        InputStream rootData = fetchFromUrl(makeGbfsEndpointUrl("gbfs.json"));
+
+        // Check to see if data from the root url was able to be fetched. The GBFS.json file is not required.
         if (rootData == null) {
-            // populate URLs with default values
-            systemInformationUrl = makeUrl("system_information.json");
-            stationInformationUrl = makeUrl("station_information.json");
-            stationStatusUrl = makeUrl("station_status.json");
-            freeBikeStatusUrl = makeUrl("free_bike_status.json");
-            systemHoursUrl = makeUrl("system_hours.json");
-            systemCalendarUrl = makeUrl("system_calendar.json");
-            systemRegionsUrl = makeUrl("system_regions.json");
-            systemPricingPlansUrl = makeUrl("system_pricing_plans.json");
-            systemAlertsUrl = makeUrl("system_alerts.json");
+            // Root GBFS.json file not able to be fetched, set default endpoints.
+            systemInformationUrl = makeGbfsEndpointUrl("system_information.json");
+            stationInformationUrl = makeGbfsEndpointUrl("station_information.json");
+            stationStatusUrl = makeGbfsEndpointUrl("station_status.json");
+            freeBikeStatusUrl = makeGbfsEndpointUrl("free_bike_status.json");
+            systemHoursUrl = makeGbfsEndpointUrl("system_hours.json");
+            systemCalendarUrl = makeGbfsEndpointUrl("system_calendar.json");
+            systemRegionsUrl = makeGbfsEndpointUrl("system_regions.json");
+            systemPricingPlansUrl = makeGbfsEndpointUrl("system_pricing_plans.json");
+            systemAlertsUrl = makeGbfsEndpointUrl("system_alerts.json");
         } else {
-            GbfsRespone gbfsRespone = null;
+            // GBFS.json file is found. Parse data from response and set all of the corresponding URLs as they are
+            // available in the response data.
+            GbfsResponse gbfsResponse = null;
             try {
-                gbfsRespone = mapper.readValue(rootData, GbfsRespone.class);
+                gbfsResponse = mapper.readValue(rootData, GbfsResponse.class);
             } catch (IOException e) {
                 LOG.error("failed to deserialize gbfs.json response: {}", e);
                 return;
@@ -215,16 +209,21 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                     e.printStackTrace();
                 }
             }
-            if (gbfsRespone.data == null) {
+            if (gbfsResponse.data == null) {
                 LOG.error("failed to read gbfs.json, no data found");
                 return;
             }
-            GbfsRespone.GbfsFeeds feeds = gbfsRespone.data.get(language);
+
+            // Get the GBFS feeds for the configured language.
+            // FIXME: the configured language always defaults to "en" in this current implementation.
+            GbfsResponse.GbfsFeeds feeds = gbfsResponse.data.get(language);
             if (feeds == null) {
                 LOG.error("requested language ({}) not available in GBFS: {}", language, rootUrl);
                 return;
             }
-            for (GbfsRespone.GbfsFeed feed : feeds.feeds) {
+
+            // iterate through all feed endpoints and update as needed
+            for (GbfsResponse.GbfsFeed feed : feeds.feeds) {
                 switch (feed.name) {
                     case "system_information":
                         systemInformationUrl = feed.url;
@@ -277,7 +276,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     /**
      * Construct a url based on the root url and the desired file
      */
-    private String makeUrl(String file) {
+    private String makeGbfsEndpointUrl(String file) {
         String baseUrl = rootUrl;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
         return String.format("%s%s", baseUrl, file);
@@ -424,8 +423,12 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         }
     }
 
+    /**
+     * Parse any updates to the vehicle rental regions as received from the GBFS.
+     */
     private void updateRegions() {
-        // TODO implement
+        // FIXME currently the vehicle rental regions are only loaded upon the startup of OTP and have no way of being
+        //   updated while the application is running.
     }
 
     /**

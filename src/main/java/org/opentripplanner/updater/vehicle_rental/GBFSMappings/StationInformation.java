@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.GBFSMappings;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -9,9 +8,9 @@ import java.util.Set;
  * See https://github.com/NABSA/gbfs/blob/master/gbfs.md#station_informationjson
  */
 public class StationInformation extends BaseGtfsResponse {
-    public StationInfromation data;
+    public StationInformationData data;
 
-    public static class StationInfromation {
+    public static class StationInformationData {
         public List<DockingStationInformation> stations;
     }
 

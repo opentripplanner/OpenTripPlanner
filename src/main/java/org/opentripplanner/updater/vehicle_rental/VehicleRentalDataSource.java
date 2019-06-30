@@ -18,6 +18,10 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 import java.util.List;
 
+/**
+ * An interface for modeling a vehicle rental data source. All vehicle rental updaters are assumed to have stations and
+ * regions that can be updated over time.
+ */
 public interface VehicleRentalDataSource {
 
     /** Returns true if there might have been changes to the regions */

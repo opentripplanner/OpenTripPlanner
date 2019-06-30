@@ -9,7 +9,7 @@ import java.util.Map;
  * Response class for the gbfs.json file.
  * See https://github.com/NABSA/gbfs/blob/master/gbfs.md#gbfsjson
  */
-public class GbfsRespone extends BaseGtfsResponse {
+public class GbfsResponse extends BaseGtfsResponse {
     public Map<String, GbfsFeeds> data;
 
     public static class GbfsFeeds {

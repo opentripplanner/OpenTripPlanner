@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A service to help link between the vehicle rental updaters and API requests and graph searches. This class holds
+ * information about vehicle rental stations and vehicle rental regions from all vehicle updaters.
+ */
 public class VehicleRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 

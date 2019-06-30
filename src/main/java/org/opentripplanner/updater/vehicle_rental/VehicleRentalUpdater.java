@@ -39,11 +39,17 @@ import java.util.Set;
 
 import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
 
+/**
+ * An updater for vehicle rentals. This runs as a PollingGraphUpdater and fetches the latest data from a datasource that
+ * is able to return data about vehicle rental stations and vehicle rental regions.
+ */
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
 
-    private static DecimalFormat format = new DecimalFormat("##.000000");
+    private static final String DECIMAL_PRECISION = "##.000000";
+
+    private static DecimalFormat format = new DecimalFormat(DECIMAL_PRECISION);
 
     private Graph graph;
 
