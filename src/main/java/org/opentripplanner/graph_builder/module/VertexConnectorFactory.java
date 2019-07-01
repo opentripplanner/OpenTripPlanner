@@ -12,6 +12,5 @@ public class VertexConnectorFactory {
 			default:
 				return new DefaultVertexConnector();
 		}
-
 	}
 }

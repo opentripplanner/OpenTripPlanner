@@ -67,7 +67,6 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         vertices.addAll(graph.getVertices());
         VertexConnectorFactory factory = new VertexConnectorFactory();
         VertexConnector connector = factory.getVertexConnector(this.vertexConnector);
-        LOG.info("CONNECTORI: " + connector.getClass());
         for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
@@ -78,12 +77,12 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
                     break;
                 }
             }
+
             if(alreadyLinked) continue;
             // only connect transit stops that (a) are entrances, or (b) have no associated
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-
                 boolean vectorConnected = false;
                 if(ts.getStopCode() != null) {
                     Envelope envelope = new Envelope(ts.getCoordinate());

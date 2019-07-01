@@ -21,6 +21,7 @@ public class HSLVertexConnector  implements VertexConnector  {
 		new StreetTransitLink(tsv, ts, wheelchairAccessible);
 		LOG.debug("Connected " + ts.toString() + " (" + ts.getStopCode() + ") to " + tsv.getLabel() + " at " + tsv.getCoordinate().toString());
 	}
+
 	@Override
 	public boolean connectVertex(TransitStop ts, boolean wheelchairAccessible, Collection<Vertex> vertices) {
 		// Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
@@ -29,6 +30,7 @@ public class HSLVertexConnector  implements VertexConnector  {
 			if (!(v instanceof TransitStopStreetVertex)) {
 				continue;
 			}
+
 			TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
 			// Only use stop codes for linking TODO: find better method to connect stops without stop code
 			if (tsv.stopCode != null) {
@@ -36,8 +38,9 @@ public class HSLVertexConnector  implements VertexConnector  {
 					makeStreetTransitLink(ts, wheelchairAccessible, tsv);
 					return true;
 				}
+
 				// Special check for HSL: Try matching without H prefix also
-				boolean hasHprefix = "H".equals(tsv.stopCode.charAt(0));
+				boolean hasHprefix = 'H' == (tsv.stopCode.charAt(0));
 				if (hasHprefix) {
 					String woPrefix = tsv.stopCode.substring(1);
 					if (woPrefix.equals(ts.getStopCode())) {
