@@ -397,6 +397,40 @@ public abstract class RoutingResource {
     @QueryParam("onlyTransitTrips")
     private Boolean onlyTransitTrips;
 
+    /**
+     * The amount of watts a Micromobility vehicle can sustainably output
+     */
+    @QueryParam("watts")
+    private Double watts;
+
+    /**
+     * The weight of the Micromobility vehicle and all things transported by the vehicle including the rider
+     */
+    @QueryParam("weight")
+    private Double weight;
+
+    /**
+     * The minimum speed of a personal micromobility vehicle. This should only be used to avoid unreasonably slow times
+     * on hills. If it is desired to model effectively impossible travel uphill (ie the vehicle can't reasonably be
+     * transported up a steep enough grade) enter 0. Value in m/s. If this parameter is not provided, a default of
+     * 0.8 m/s is set in the RoutingRequest class.
+     * TODO: A future refactor of the code will update StateData data with this value if using a personal micromobility
+     *   vehicle or with data describing the rental vehicle characteristics.
+     */
+    @QueryParam("minimumMicromobilitySpeed")
+    private Double minimumMicromobilitySpeed;
+
+    /**
+     * The maximum speed of a personal micromobility vehicle. This will cap all speeds on declines to this value even if
+     * the physics of the downslope would naturally result in the vehicle traveling faster than this value (ie, the user
+     * or the vehicle itself is assumed to be braking). Value in m/s. If this parameter is not provided, a default of
+     * 5 m/s is set in the RoutingRequest class.
+     * TODO: A future refactor of the code will update StateData data with this value if using a personal micromobility
+     *   vehicle or with data describing the rental vehicle characteristics.
+     */
+    @QueryParam("maximumMicromobilitySpeed")
+    private Double maximumMicromobilitySpeed;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -610,6 +644,8 @@ public abstract class RoutingResource {
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
+        request.useCarRentalAvailabilityInformation = (tripPlannedForNow);
+        request.useVehicleRentalAvailabilityInformation = (tripPlannedForNow);
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
@@ -724,7 +760,8 @@ public abstract class RoutingResource {
         if (
             companies != null &&
                 this.modes != null &&
-                this.modes.qModes.contains(new QualifiedMode("CAR_RENT"))
+                (this.modes.qModes.contains(new QualifiedMode("CAR_RENT")) ||
+                    this.modes.qModes.contains(new QualifiedMode("MICROMOBILITY_RENT")))
         ) {
             request.companies = companies;
         }
@@ -734,6 +771,18 @@ public abstract class RoutingResource {
 
         if (onlyTransitTrips != null)
             request.onlyTransitTrips = onlyTransitTrips;
+
+        if (watts != null)
+            request.watts = watts;
+
+        if (weight != null)
+            request.weight = weight;
+
+        if (minimumMicromobilitySpeed != null)
+            request.minimumMicromobilitySpeed = minimumMicromobilitySpeed;
+
+        if (maximumMicromobilitySpeed != null)
+            request.maximumMicromobilitySpeed = maximumMicromobilitySpeed;
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

@@ -128,7 +128,7 @@ public class PlainStreetEdgeTest {
     @Test
     public void testTraverseModeSwitchBike() {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
-        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
 
         v1.trafficLight = (true);
 
@@ -164,7 +164,7 @@ public class PlainStreetEdgeTest {
      */
     @Test
     public void testTraverseModeSwitchWalk() {
-        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
         v1.trafficLight = (true);
@@ -197,7 +197,7 @@ public class PlainStreetEdgeTest {
     public void testBikeSwitch() {
         StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
         StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
-        StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
 
         RoutingRequest noPenalty = proto.clone();
         noPenalty.setMode(TraverseMode.BICYCLE);

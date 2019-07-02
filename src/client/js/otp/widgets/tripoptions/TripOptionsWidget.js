@@ -682,6 +682,29 @@ otp.widgets.tripoptions.MaxBikeSelector =
 
 });
 
+otp.widgets.tripoptions.MaxMicromobilitySelector =
+    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
+
+    // miles (0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30)
+    imperialPresets: [160.934, 402.335, 804.67, 1207.0049999999999, 1609.34, 3218.68, 4828.0199999999995, 6437.36, 8046.7, 16093.4, 24140.1, 32186.8, 48280.2],
+
+    // meters
+    metricPresets      : [100, 300, 750, 1000, 1500, 2500, 5000, 7500, 10000],
+
+    //TRANSLATORS: label for choosing how much should person's trip on bicycle be
+    label       : _tr("Maximum micromobility")+":",
+
+    initialize : function(tripWidget) {
+        this.id = tripWidget.id+"-maxMicromobilitySelector";
+        otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
+    },
+
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesAnyMicromobility(mode);
+    },
+
+});
+
 //** PreferredRoutes **//
 
 otp.widgets.tripoptions.PreferredRoutes =
@@ -990,6 +1013,77 @@ otp.widgets.tripoptions.BikeType =
 
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesBicycle(mode) && otp.util.Itin.includesWalk(mode);
+    }
+
+});
+
+//** Micromobility **//
+
+otp.widgets.tripoptions.Micromobility =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+
+    initialize : function(tripWidget) {
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-micromobility";
+        this.$().addClass('notDraggable');
+
+        var html = '<div class="notDraggable">Watts: <input id="'+this.id+'-watts-value" type="text" style="width:30px;" value="250" />';
+        html += '<div class="notDraggable">Weight (kg): <input id="'+this.id+'-weight-value" type="text" style="width:30px;" value="105" />';
+        html += '<div class="notDraggable">Min Speed (m/s): <input id="'+this.id+'-minspeed-value" type="text" style="width:30px;" value="0.8" />';
+        html += '<div class="notDraggable">Max Speed (m/s): <input id="'+this.id+'-maxspeed-value" type="text" style="width:30px;" value="12.5" />';
+        html += "</div>"
+
+        this.setContent(html);
+    },
+
+    doAfterLayout : function() {
+        //var module = this.tripWidget.module;
+        var this_ = this;
+        $('#'+this.id+'-watts-value').change(function() {
+            this_.tripWidget.inputChanged({
+                watts : parseFloat($('#'+this_.id+'-watts-value').val()),
+            });
+        });
+        $('#'+this.id+'-weight-value').change(function() {
+            this_.tripWidget.inputChanged({
+                watts : parseFloat($('#'+this_.id+'-weight-value').val()),
+            });
+        });
+        $('#'+this.id+'-minspeed-value').change(function() {
+            this_.tripWidget.inputChanged({
+                minimumMicromobilitySpeed : parseFloat($('#'+this_.id+'-minspeed-value').val()),
+            });
+        });
+        $('#'+this.id+'-maxspeed-value').change(function() {
+            this_.tripWidget.inputChanged({
+                maximumMicromobilitySpeed : parseFloat($('#'+this_.id+'-maxspeed-value').val()),
+            });
+        });
+    },
+
+    restorePlan : function(planData) {
+        var wattsVal = parseFloat(planData.queryParams.watts)
+        if(!isNaN(wattsVal)) {
+            $('#'+this.id+'-watts-value').val(wattsVal);
+        }
+        var weightVal = parseFloat(planData.queryParams.weight)
+        if(!isNaN(weightVal)) {
+            $('#'+this.id+'-weight-value').val(weightVal);
+        }
+        var minSpeedVal = parseFloat(planData.queryParams.minimumMicromobilitySpeed)
+        if(!isNaN(minSpeedVal)) {
+            $('#'+this.id+'-minSpeed-value').val(minSpeedVal);
+        }
+        var maxSpeedVal = parseFloat(planData.queryParams.maximumMicromobilitySpeed)
+        if(!isNaN(maxSpeedVal)) {
+            $('#'+this.id+'-maxSpeed-value').val(maxSpeedVal);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesAnyMicromobility(mode);
     }
 
 });

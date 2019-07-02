@@ -342,4 +342,8 @@ otp.config.modes = {
     "CAR_HAIL,WALK,TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"     : _tr('TNC &amp; Rail'),
     "CAR_RENT,WALK,TRANSIT"     : _tr('Car Rental &amp; Transit'),
     "CAR_RENT,WALK,TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"     : _tr('Car Rental &amp; Rail'),
+    "MICROMOBILITY": _tr('Micromobility'),
+    "MICROMOBILITY,TRANSIT": _tr('Micromobility & Transit'),
+    // Micromobility rentals will automatically have the walk mode added in the backend.
+    "MICROMOBILITY_RENT,TRANSIT": _tr('Rented Micromobility & Transit'),
     };

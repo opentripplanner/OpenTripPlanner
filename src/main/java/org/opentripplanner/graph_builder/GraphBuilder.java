@@ -234,6 +234,7 @@ public class GraphBuilder implements Runnable {
             osmModule.banDiscouragedBiking = builderParams.banDiscouragedBiking;
             osmModule.walkConfig = OTPMain.loadJson(new File(dir, WalkComfortCalculator.WALK_CONFIG_FILENAME));
             osmModule.includeOsmTags = builderParams.includeOsmTags;
+            osmModule.loadMicromobilityTravelRestrictions(builderParams);
             graphBuilder.addModule(osmModule);
             PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
             pruneFloatingIslands.setPruningThresholdIslandWithoutStops(builderParams.pruningThresholdIslandWithoutStops);

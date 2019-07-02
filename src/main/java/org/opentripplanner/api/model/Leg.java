@@ -243,23 +243,33 @@ public class Leg {
     @JsonSerialize
     public String alightRule;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean rentedBike;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedBike;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean rentedCar;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedCar;
 
-     @XmlAttribute
-     @JsonSerialize
-     public Boolean hailedCar;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean rentedVehicle;
 
-     @XmlAttribute
-     @JsonSerialize
-     public TransportationNetworkCompanySummary tncData;
+    @XmlAttribute
+    @JsonSerialize
+    public Boolean hailedCar;
 
+    @XmlAttribute
+    @JsonSerialize
+    public TransportationNetworkCompanySummary tncData;
 
+    @XmlAttribute
+    @JsonSerialize
+    public RentedCarSummary rentedCarData;
+
+    @XmlAttribute
+    @JsonSerialize
+    public RentedVehicleSummary rentedVehicleData;
 
     /**
      * Whether this leg is a transit leg or not.
@@ -270,6 +280,7 @@ public class Leg {
         else if (mode.equals(TraverseMode.WALK.toString())) return false;
         else if (mode.equals(TraverseMode.CAR.toString())) return false;
         else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
+        else if (mode.equals(TraverseMode.MICROMOBILITY.toString())) return false;
         else return true;
     }
     

@@ -346,17 +346,20 @@ public class AStar {
         this.traverseVisitor = traverseVisitor;
     }
 
+    /**
+     * Get a list of final shortest path states that satisfy all criteria for the path search.
+     */
     public List<GraphPath> getPathsToTarget() {
         if (runState == null) {
             return Collections.emptyList();
         }
 
-        List<GraphPath> ret = new LinkedList<>();
-        for (State s : runState.targetAcceptedStates) {
-            if (s.isFinal()) {
-                ret.add(new GraphPath(s, true));
+        List<GraphPath> acceptedPaths = new LinkedList<>();
+        for (State targetAcceptedState : runState.targetAcceptedStates) {
+            if (targetAcceptedState.isFinal()) {
+                acceptedPaths.add(new GraphPath(targetAcceptedState, true));
             }
         }
-        return ret;
+        return acceptedPaths;
     }
 }

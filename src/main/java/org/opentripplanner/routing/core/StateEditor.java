@@ -243,6 +243,11 @@ public class StateEditor {
         child.carRentalDriveDistance += distance;
     }
 
+    public void incrementVehicleRentalDistance(double distance) {
+        cloneStateDataAsNeeded();
+        child.vehicleRentalDistance += distance;
+    }
+
     /* Basic Setters */
 
     public void setTripTimes(TripTimes tripTimes) {
@@ -416,6 +421,8 @@ public class StateEditor {
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.usingRentedCar = state.stateData.usingRentedCar;
+        child.stateData.usingRentedVehicle = state.stateData.usingRentedVehicle;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
@@ -426,6 +433,8 @@ public class StateEditor {
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
+        child.stateData.usingRentedCar = state.isCarRenting();
+        child.stateData.usingRentedVehicle = state.isVehicleRenting();
     }
 
     /* PUBLIC GETTER METHODS */
@@ -552,44 +561,7 @@ public class StateEditor {
      */
     public void boardHailedCar(double initialEdgeDistance) {
         cloneStateDataAsNeeded();
-        child.stateData.usingHailedCar = true;
-        child.stateData.nonTransitMode = TraverseMode.CAR;
-        RoutingRequest options = child.getOptions();
-        if (child.isEverBoarded()) {
-            if (options.arriveBy) {
-                child.stateData.hasHailedCarPreTransit = true;
-            } else {
-                child.stateData.hasHailedCarPostTransit = true;
-            }
-        } else {
-            if (options.arriveBy) {
-                child.stateData.hasHailedCarPostTransit = true;
-            } else {
-                child.stateData.hasHailedCarPreTransit = true;
-
-                // add the earliest ETA of a TNC vehicle if using "departing at" mode and if before transit.
-                // This uses the ETA of a TNC vehicle at the origin, so this code is making the assumption that the ETA
-                // estimate obtained for the origin is applicable at other places and times so long as transit has not been
-                // boarded yet.  The way to obtain ETA estimates for every possible street and vertex would involve making
-                // potentially hundreds of thousands of http requests to existing TNC API endpoints.  It sure would be nice
-                // if there were a way to download network-wide ETA estimates in a single request, but that option currently
-                // does not exist.
-                //
-                // FIXME: If a non-transit mode travels a significant distance from the origin prior to boarding a TNC, the
-                // ETA will still be added when it probably shouldn't be.
-                if (
-                    options.transportationNetworkCompanyEtaAtOrigin > -1 &&
-                        !child.stateData.everBoarded
-                ) {
-                    // increment the time by the ETA at the origin.
-                    incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
-                }
-            }
-        }
-
-        // Add the initial TNC distance as the first StreetEdge traversed is done so while the usingHailedCar flag is
-        // still set to false
-        child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
+        child.boardHailedCar(initialEdgeDistance);
     }
 
     public void endCarRenting() {
@@ -604,24 +576,7 @@ public class StateEditor {
         boolean rentedCarAllowsFloatingDropoffs
     ) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedCar = true;
-        child.stateData.nonTransitMode = TraverseMode.CAR;
-        child.stateData.carRentalNetworks = networks;
-        child.stateData.rentedCarAllowsFloatingDropoffs = rentedCarAllowsFloatingDropoffs;
-        if (child.getOptions().arriveBy) {
-            if (child.isEverBoarded()) {
-                child.stateData.hasRentedCarPreTransit = true;
-            } else {
-                child.stateData.hasRentedCarPostTransit = true;
-            }
-        } else {
-            if (child.isEverBoarded()) {
-                child.stateData.hasRentedCarPostTransit = true;
-            } else {
-                child.stateData.hasRentedCarPreTransit = true;
-            }
-        }
-        child.carRentalDriveDistance = initialEdgeDistance;
+        child.beginCarRenting(initialEdgeDistance, networks, rentedCarAllowsFloatingDropoffs);
     }
 
     /**
@@ -650,5 +605,35 @@ public class StateEditor {
     public void addRentedCar(String carId) {
         cloneStateDataAsNeeded();
         child.stateData.rentedCars.add(carId);
+    }
+
+    public void endVehicleRenting() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedVehicle = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void beginVehicleRenting(
+        double initialEdgeDistance,
+        Set<String> networks,
+        boolean rentedVehicleAllowsFloatingDropoffs
+    ) {
+        cloneStateDataAsNeeded();
+        child.beginVehicleRenting(initialEdgeDistance, networks, rentedVehicleAllowsFloatingDropoffs);
+    }
+
+    public void setVehicleRenting(boolean vehicleRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedVehicle = vehicleRenting;
+        if (vehicleRenting) {
+            child.stateData.nonTransitMode = TraverseMode.MICROMOBILITY;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
+
+    public void addRentedVehicle(String vehicleId) {
+        cloneStateDataAsNeeded();
+        child.stateData.rentedVehicles.add(vehicleId);
     }
 }

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -130,10 +131,20 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
 
-    /** max walk/bike speed along streets, in meters per second */
+    /** max walking speed along streets, in meters per second */
     public double walkSpeed;
 
+    /** max bicycling speed along streets, in meters per second */
     public double bikeSpeed;
+
+    /** max micromobility speed along streets, in meters per second */
+    public double maximumMicromobilitySpeed;
+
+    /**
+     * minimum micromobility speed along streets, in meters per second. See more discussion about this in
+     * {@link RoutingResource#minimumMicromobilitySpeed}.
+     */
+    public double minimumMicromobilitySpeed;
 
     public double carSpeed;
 
@@ -211,12 +222,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
 
-    /** Time to get on and off your own car */
-    public int carSwitchTime;
-
-    /** Cost of getting on and off your own car */
-    public int carSwitchCost;
-
     /** Time to rent a car */
     public int carRentalPickupTime = 120;
 
@@ -230,6 +235,20 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Cost of dropping-off a rented car */
     public int carRentalDropoffCost = 30;
+
+    /** Time to rent a vehicle */
+    public int vehicleRentalPickupTime = 60;
+
+    /**
+     * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost and trouble.
+     */
+    public int vehicleRentalPickupCost = 120;
+
+    /** Time to drop-off a rented vehicle */
+    public int vehicleRentalDropoffTime = 30;
+
+    /** Cost of dropping-off a rented vehicle */
+    public int vehicleRentalDropoffCost = 30;
 
     /** Time to park a car */
     public int carParkTime = 120;
@@ -365,9 +384,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
-     * Whether or not car rental availability information will be used to plan bike rental trips
+     * Whether or not car rental availability information will be used to plan car rental trips
      */
     public boolean useCarRentalAvailabilityInformation = false;
+
+    /**
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
+     */
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
@@ -451,6 +475,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     */
     public boolean allowBikeRental = false;
     public boolean allowCarRental = false;
+
+    // currently used exclusively for micromobility, may refactor bike and car rentals into here later
+    public boolean allowVehicleRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
@@ -488,16 +515,22 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double driveDistanceReluctance = -1.0;
 
     /**
-     * A mimum travel distance for a ride in a transportation network company.
+     * A minimum travel distance for a ride in a transportation network company.
      * Units in meters, default is 0.5 miles.
      */
     public double minimumTransportationNetworkCompanyDistance = 804.672;
 
     /**
-     * A mimum travel distance for a ride in a car rental.
+     * A minimum travel distance for a ride in a car rental.
      * Units in meters, default is 0.5 miles.
      */
     public double minimumCarRentalDistance = 804.672;
+
+    /**
+     * A minimum travel distance to travel using a vehicle rental.
+     * Units in meters, default is 100 meters.
+     */
+    public double minimumVehicleRentalDistance = 100.0;
 
     // The earliest time in seconds that a TNC vehicle can pick up at the origin.  The earliest
     // pickup time is stored here and added to the time it upon the first boarding.  This way, a
@@ -519,6 +552,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     // to keep the car and drive it back to an allowable dropoff point in a later trip.
     public boolean allowCarRentalDropoffAnywhere = false;
 
+    // setting of allowing a dropoff anywhere regardless of whether the dropoff point is a designated dropoff area or if
+    // traveling with a vehicle with floating dropoff capabilities outside the vehicle rental region.  This means the
+    // user is planning a trip with a rental vehicle with the intent to keep the vehicle and bring it back to an
+    // allowable dropoff point in a later trip. This does not override edge-specific restrictions.
+    public boolean allowVehicleRentalDropoffAnywhere = false;
+
     // allow custom shortest path search timeouts
     // set to -1 by default which means don't use a custom timeout
     // units are in milliseconds
@@ -526,6 +565,27 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Which path comparator to use */
     public String pathComparator = null;
+
+    /**
+     * The maximum sustained power output of a micromobility vehicle in watts. Theoretically, this could also model
+     * human power. The default is set to 250 watts.
+     *
+     * Here are some examples of power output assumptions from various micromobility vehicles:
+     *
+     * 125 watts: Swagtron Turbo 5 hoverboard: (https://swagtron.com/product/recertified-swagtron-turbo-five-hoverboard-classic/)
+     * 250 watts: Xiaomi M365 (https://www.gearbest.com/skateboard/pp_596618.html)
+     * 500 watts: Razor EcoSmart Metro (https://www.amazon.com/Razor-EcoSmart-Metro-Electric-Scooter/dp/B002ZDAEIS?SubscriptionId=AKIAJMXJ2YFJTEDLQMUQ&tag=digitren08-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B002ZDAEIS&ascsubtag=15599460143449ocb)
+     * 1000 watts: Boosted Rev (https://boostedboards.com/vehicles/scooters/boosted-rev)
+     */
+    public double watts = 250;
+
+    /**
+     * The total weight of the micromobility vehicle + rider in kilograms.
+     * The default is set to 105 kilograms. This assumes a North-American average weight of 80kgs and then 25kgs for
+     * vehicle weight.
+     * https://en.wikipedia.org/wiki/Human_body_weight#Average_weight_around_the_world
+     */
+    public double weight = 105;
 
     /** Saves split edge which can be split on origin/destination search
      *
@@ -540,6 +600,14 @@ public class RoutingRequest implements Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
+        // https://electricbikereview.com/forum/threads/what-are-electric-bike-classes-and-why-do-they-matter.22738/
+        // 12.5 m/s, ~28 mph is the maximum speed allowed by class 3 electric bicycles
+        // however, in person experience while riding an eScooter around San Jose, CA, the max speed seemed to hover
+        // around 11mph or 5 m/s. Therefore, set that value as a conservative estimate
+        maximumMicromobilitySpeed = 5;
+        // 0.8 m/s, ~1.8mph, an unpleasantly slow speed that assumes walking with a micromobility vehicle that either
+        // can't travel up a grade or is out of energy
+        minimumMicromobilitySpeed = 0.8;
         // http://en.wikipedia.org/wiki/Speed_limit
         carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
         setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
@@ -603,7 +671,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
-        if (modes.getBicycle()) {
+        if (modes.getBicycle() || modes.getMicromobility()) {
             // This alternate routing request is used when we get off a bike to take a shortcut and are
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
@@ -615,6 +683,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
+            bikeWalkingOptions.modes.setMicromobility(false);
             bikeWalkingOptions.modes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
             bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
@@ -1179,6 +1248,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             return bikeSpeed;
         case CAR:
             return carSpeed;
+        case MICROMOBILITY:
+            return maximumMicromobilitySpeed;
         default:
             break;
         }
@@ -1190,6 +1261,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         // Assume carSpeed > bikeSpeed > walkSpeed
         if (modes.getCar())
             return carSpeed;
+        if (modes.getMicromobility())
+            return maximumMicromobilitySpeed;
         if (modes.getBicycle())
             return bikeSpeed;
         return walkSpeed;

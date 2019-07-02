@@ -93,7 +93,7 @@ public class LinkStopToPlatformTest {
                 v2.getCoordinate());
         I18NString name = new LocalizedString(nameString, new OSMWithTags());
 
-        AreaEdge areaEdge = new AreaEdge(v1, v2, line, name, line.getLength(), StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area );
+        AreaEdge areaEdge = new AreaEdge(v1, v2, line, name, line.getLength(), StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, false, area );
 
         return areaEdge;
     }

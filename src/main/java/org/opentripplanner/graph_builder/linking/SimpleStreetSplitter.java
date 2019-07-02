@@ -34,6 +34,7 @@ import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -48,6 +49,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -339,8 +341,8 @@ public class SimpleStreetSplitter implements StreetSplitter {
                         vertex.getCoordinate());
                 I18NString name = new LocalizedString("", new OSMWithTags());
 
-                edgeFactory.createAreaEdge((IntersectionVertex) splitterVertex, (IntersectionVertex) vertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area);
-                edgeFactory.createAreaEdge((IntersectionVertex) vertex, (IntersectionVertex) splitterVertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area);
+                edgeFactory.createAreaEdge((IntersectionVertex) splitterVertex, (IntersectionVertex) vertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, false, area);
+                edgeFactory.createAreaEdge((IntersectionVertex) vertex, (IntersectionVertex) splitterVertex, line, name, length,StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY, false, area);
             }
         }
     }
@@ -439,8 +441,14 @@ public class SimpleStreetSplitter implements StreetSplitter {
                 ((TemporarySplitterVertex) v).setWheelchairAccessible(false);
             }
         } else {
-            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y,
-                edge);
+            StringBuilder splitLabel = new StringBuilder();
+            splitLabel.append("split from ");
+            splitLabel.append(edge.getId());
+            splitLabel.append(" i");
+            while (graph.containsVertexLabel(splitLabel.toString())) {
+                splitLabel.append("i");
+            }
+            v = new SplitterVertex(graph, splitLabel.toString(), splitPoint.x, splitPoint.y, edge);
         }
 
         // make the edges
@@ -477,6 +485,8 @@ public class SimpleStreetSplitter implements StreetSplitter {
             makeBikeParkEdges((BikeParkVertex) from, to, destructiveSplitting);
         } else if (from instanceof CarRentalStationVertex) {
             makeCarRentalLinkEdges((CarRentalStationVertex) from, to, destructiveSplitting);
+        } else if (from instanceof VehicleRentalStationVertex) {
+            makeVehicleRentalLinkEdges((VehicleRentalStationVertex) from, to, destructiveSplitting);
         }
     }
 
@@ -542,6 +552,21 @@ public class SimpleStreetSplitter implements StreetSplitter {
 
         new StreetCarRentalLink(from, to);
         new StreetCarRentalLink(to, from);
+    }
+
+    /** Make link edges for vehicle rental */
+    private void makeVehicleRentalLinkEdges (VehicleRentalStationVertex from, StreetVertex to,
+                                         final boolean destructiveSplitting) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Vehicle rental edges are created with non destructive splitting!");
+        }
+        for (StreetVehicleRentalLink scrl : Iterables.filter(from.getOutgoing(), StreetVehicleRentalLink.class)) {
+            if (scrl.getToVertex() == to)
+                return;
+        }
+
+        new StreetVehicleRentalLink(from, to);
+        new StreetVehicleRentalLink(to, from);
     }
 
     /** Make link edges for bike rental */

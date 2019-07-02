@@ -281,6 +281,10 @@ public class Graph implements Serializable {
         return vertices.get(label);
     }
 
+    public boolean containsVertexLabel(String label) {
+        return vertices.containsKey(label);
+    }
+
     /**
      * Returns the vertex with the given ID or null if none is present.
      *

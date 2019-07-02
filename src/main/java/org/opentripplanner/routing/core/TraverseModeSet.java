@@ -40,10 +40,12 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_AIRPLANE = 4096;
 
+    private static final int MODE_MICROMOBILITY = 8192;
+
     private static final int MODE_TRANSIT = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR
             | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE;
  
-    private static final int MODE_ALL = MODE_TRANSIT | MODE_WALK | MODE_BICYCLE;
+    private static final int MODE_ALL = MODE_TRANSIT | MODE_WALK | MODE_BICYCLE | MODE_MICROMOBILITY;
 
     private int modes = 0;
 
@@ -103,6 +105,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_AIRPLANE;
         case TRANSIT:
             return MODE_TRANSIT;
+        case MICROMOBILITY:
+            return MODE_MICROMOBILITY;
         }
         return 0;
     }
@@ -171,6 +175,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public boolean getAirplane() {
         return (modes & MODE_AIRPLANE) != 0;
     }
+
+    public boolean getMicromobility() { return (modes & MODE_MICROMOBILITY) != 0; }
 
     public void setBicycle(boolean bicycle) {
         if (bicycle) {
@@ -267,7 +273,14 @@ public class TraverseModeSet implements Cloneable, Serializable {
         } else {
             modes &= ~MODE_AIRPLANE;
         }
+    }
 
+    public void setMicromobility(boolean micromobility) {
+        if (micromobility) {
+            modes |= MODE_MICROMOBILITY;
+        } else {
+            modes &= ~MODE_MICROMOBILITY;
+        }
     }
 
     /** Returns true if the trip may use some transit mode */
@@ -367,5 +380,4 @@ public class TraverseModeSet implements Cloneable, Serializable {
         }
         return false;
     }
-
 }

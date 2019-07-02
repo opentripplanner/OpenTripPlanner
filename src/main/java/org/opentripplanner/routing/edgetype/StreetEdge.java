@@ -49,7 +49,6 @@ import java.util.Set;
  * 
  */
 public class StreetEdge extends Edge implements Cloneable {
-
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private static final long serialVersionUID = 2L;
@@ -135,12 +134,19 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private Set<String> carNetworks;
 
+    /**
+     * A set of vehicle networks where this edge is located inside their service regions.
+     */
+    private Set<String> vehicleNetworks;
+
     // whether or not this street is a good place to board or alight a TNC vehicle
     private boolean suitableForTNCStop = true;
 
     // whether or not this street is a good place to dropoff a floating car rental
     private boolean suitableForFloatingCarRentalDropoff = true;
 
+    // whether or not this street is a good place to dropoff a floating vehicle rental
+    private boolean suitableForFloatingVehicleRentalDropoff = true;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -394,6 +400,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 editor = doTraverse(s0, options, TraverseMode.WALK);
                 if (editor != null) {
                     editor.endCarRenting(); // done with car rental use for now
+                    editor.incrementWeight(options.carRentalDropoffCost);
+                    editor.incrementTimeInSeconds(options.carRentalDropoffTime);
                     return editor.makeState(); // return only the state with updated rental car usage
                 }
             }
@@ -406,25 +414,125 @@ public class StreetEdge extends Edge implements Cloneable {
                     s0.isCarRentalDropoffAllowed(this, false)
             ) {
                 StateEditor editorCar = doTraverse(s0, options, TraverseMode.CAR);
-                StateEditor editorNonCar = doTraverse(s0, options, currMode);
                 if (editorCar != null) {
                     // begin car rental usage.
-                    editorCar.incrementWeight(options.carRentalDropoffCost);
-                    editorCar.incrementTimeInSeconds(options.carRentalDropoffTime);
+                    editorCar.incrementWeight(options.carRentalPickupCost);
+                    editorCar.incrementTimeInSeconds(options.carRentalPickupTime);
                     editorCar.beginCarRenting(getDistance(), carNetworks, true);
-                    if (editorNonCar != null) {
+                    if (state != null) {
                         // make the forkState be of the non-car mode so it's possible to build walk steps
-                        State forkState = editorNonCar.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(editorCar.makeState());
-                            return forkState; // return both in-car and out-of-car states
-                        } else {
-                            // if the non-car state is non traversable or something, return just the car state
-                            return editorCar.makeState();
-                        }
+                        state.addToExistingResultChain(editorCar.makeState());
+                        return state; // return both in-car and out-of-car states
                     } else {
                         // if the non-car state is non traversable or something, return just the car state
                         return editorCar.makeState();
+                    }
+                }
+            }
+        } else if (options.allowVehicleRental) {
+            // possible transitions out of renting a Micromobility vehicle during "depart at" searches
+            if (
+                !options.arriveBy &&
+                    s0.isVehicleRenting() &&
+                    currMode == TraverseMode.MICROMOBILITY
+            ) {
+                // A StreetEdge has been encountered that
+                // 1. Does not allow Micromobility travel
+                // 2. Allows a floating vehicle dropoff under the following cirucmstances:
+                //    a. on the current edge
+                //    b. on the edge of the previous state (NOTE: the previous StreetEdge is considered because it can
+                //        be reasoned that the very last point of the previous StreetEdge constitutes a part of this
+                //        current StreetEdge. Since walking would begin on this StreetEdge, the floating rental vehicle
+                //        is assumed to be left at the very beginning of the StreetEdge.)
+                //
+                // In this case fork the state into 2 options:
+                // 1. End the vehicle rental and begin walking
+                // 2. Keep renting the vehicle, but transition to WALK mode
+                if (
+                    !getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                        (
+                            s0.isVehicleRentalDropoffAllowed(this, false) ||
+                                (
+                                    s0.backEdge instanceof StreetEdge &&
+                                        s0.isVehicleRentalDropoffAllowed(
+                                            (StreetEdge) s0.backEdge,
+                                            false
+                                        )
+                                )
+                        )
+                ) {
+                    StateEditor editorEndedVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    StateEditor editorKeepVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    State keepVehicleRentalState = null;
+                    if (editorKeepVehicleRental != null) {
+                        editorKeepVehicleRental.setBackMode(TraverseMode.WALK);
+                        keepVehicleRentalState = editorKeepVehicleRental.makeState();
+                    }
+                    if (editorEndedVehicleRental != null) {
+                        editorEndedVehicleRental.endVehicleRenting(); // done with vehicle rental use for now
+                        editorEndedVehicleRental.incrementWeight(options.vehicleRentalDropoffCost);
+                        editorEndedVehicleRental.incrementTimeInSeconds(options.vehicleRentalDropoffTime);
+                        State endedVehicleRentalState = editorEndedVehicleRental.makeState();
+                        if (endedVehicleRentalState != null) {
+                            endedVehicleRentalState.addToExistingResultChain(keepVehicleRentalState);
+                            return endedVehicleRentalState;
+                        }
+                    }
+                    return keepVehicleRentalState;
+                }
+                // A StreetEdge has been ecountered where:
+                // 1. Micromobility vehicles are allowed to be ridden
+                // 2. Micromobility vehicles are not allowed to be dropped off at
+                // 3. The previous edge was a StreetEdge that did allow a floating vehicle dropoff
+                //
+                // In this case, return 2 states:
+                // 1. Still renting and riding the vehicle
+                // 2. Vehicle rental ended and walking on foot
+                else if (
+                    getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                        !getFloatingVehicleDropoffSuitability() &&
+                        s0.backEdge instanceof StreetEdge &&
+                        s0.isVehicleRentalDropoffAllowed((StreetEdge) s0.backEdge, false)
+                ) {
+                    StateEditor editorEndedVehicleRental = doTraverse(s0, options, TraverseMode.WALK);
+                    if (editorEndedVehicleRental != null) {
+                        editorEndedVehicleRental.endVehicleRenting(); // done with vehicle rental use for now
+                        editorEndedVehicleRental.incrementWeight(options.vehicleRentalDropoffCost);
+                        editorEndedVehicleRental.incrementTimeInSeconds(options.vehicleRentalDropoffTime);
+                        State endedVehicleRentalState = editorEndedVehicleRental.makeState();
+                        if (endedVehicleRentalState != null) {
+                            endedVehicleRentalState.addToExistingResultChain(state);
+                            return endedVehicleRentalState;
+                        }
+                    }
+                    return state;
+                }
+            }
+            // possible backward transition of completing a dropping off of a floating vehicle when in "arrive by" mode
+            else if (
+                !s0.isVehicleRenting() &&
+                    getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                    currMode != TraverseMode.MICROMOBILITY &&
+                    options.arriveBy &&
+                    s0.isVehicleRentalDropoffAllowed(this, false)
+            ) {
+                StateEditor editorWithVehicleRental = doTraverse(s0, options, TraverseMode.MICROMOBILITY);
+                if (editorWithVehicleRental != null) {
+                    // begin vehicle rental usage.
+                    editorWithVehicleRental.incrementWeight(options.vehicleRentalPickupCost);
+                    editorWithVehicleRental.incrementTimeInSeconds(options.vehicleRentalPickupTime);
+                    editorWithVehicleRental.beginVehicleRenting(getDistance(), vehicleNetworks, true);
+                    State editorWithVehicleRentalState = editorWithVehicleRental.makeState();
+                    if (state != null) {
+                        // make the forkState be of the non-vehicle-rental mode so it's possible to build walk steps
+                        if (editorWithVehicleRentalState != null) {
+                            state.addToExistingResultChain(editorWithVehicleRentalState);
+                        }
+                        return state;
+                    } else {
+                        // if the no-rented-vehicle state is non traversable or something, return just the
+                        // rented-vehicle state
+                        return editorWithVehicleRentalState;
                     }
                 }
             }
@@ -456,7 +564,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
         if (!canTraverse(options, traverseMode)) {
-            if (traverseMode == TraverseMode.BICYCLE) {
+            if (traverseMode == TraverseMode.BICYCLE || traverseMode == TraverseMode.MICROMOBILITY) {
                 return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
             }
             return null;
@@ -614,8 +722,9 @@ public class StreetEdge extends Edge implements Cloneable {
         }
         
 
-        if (walkingBike || TraverseMode.BICYCLE.equals(traverseMode)) {
-            if (!(backWalkingBike || TraverseMode.BICYCLE.equals(backMode))) {
+        // add a cost for switching modes. This assumes that it's not possible to make Bicycle <> Micromobility switches
+        if (walkingBike || TraverseMode.BICYCLE.equals(traverseMode) || TraverseMode.MICROMOBILITY.equals(traverseMode)) {
+            if (!(backWalkingBike || TraverseMode.BICYCLE.equals(backMode) || TraverseMode.MICROMOBILITY.equals(backMode))) {
                 s1.incrementTimeInSeconds(options.bikeSwitchTime);
                 s1.incrementWeight(options.bikeSwitchCost);
             }
@@ -623,6 +732,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getDistance());
+            if (s0.isVehicleRenting()) {
+                s1.incrementVehicleRentalDistance(getDistance());
+            }
         } else {
             // check if driveTimeReluctance is defined (ie it is greater than 0)
             if (options.driveTimeReluctance > 0) {
@@ -747,8 +859,27 @@ public class StreetEdge extends Edge implements Cloneable {
             }
 
             return calculateCarSpeed(options);
+        } else if (traverseMode == TraverseMode.MICROMOBILITY) {
+            return Math.min(
+                calculateMicromobilitySpeed(
+                    options.watts,
+                    options.weight,
+                    Math.atan(0), // 0 slope beta
+                    getRollingResistanceCoefficient(),
+                    ElevationUtils.ZERO_ELEVATION_DRAG_RESISTIVE_FORCE_COMPONENT,
+                    options.minimumMicromobilitySpeed,
+                    options.maximumMicromobilitySpeed
+                ),
+                // Micromobility vehicles must also obey the car speed limit
+                carSpeed
+            );
         }
         return options.getSpeed(traverseMode);
+    }
+
+    // TODO: use some kind of lookup of roadway type to get this number (ie if gravel increase value)
+    public double getRollingResistanceCoefficient() {
+        return 0.005;
     }
 
     @Override
@@ -759,6 +890,156 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public double timeLowerBound(RoutingRequest options) {
         return this.getDistance() / options.getStreetSpeedUpperBound();
+    }
+
+    /**
+     * Calculate the approximate speed for a vehicle given slope data, available sustained power output, weight, rolling
+     * resistance, aerodynamic drag and bounds on min/max speeds.
+     *
+     * This calculation is made using a formula derived from the equations relating to determing total resistive force
+     * that is needed to be overcome to maintain a certain velocity. The website at
+     * http://www.kreuzotter.de/english/espeed.htm goes into great detail regarding this and presents the following
+     * equation which also appears on other websites such as https://www.gribble.org/cycling/power_v_speed.html.
+     *
+     * P = Cm * V * (Cd * A * ρ/2 * (V + W) ^ 2 + Frg + V * Crvn)
+     *
+     * where:
+     * P = power in watts
+     * Cm = Coefficient for power transmission losses and losses due to tire slippage
+     * V = velocity in m/s
+     * Cd = Coefficient of aerodynamic drag
+     * A = frontal area in m^2
+     * ρ = air density in kg/m^3
+     * W = wind speed in m/s (if positive this is a headwind, if negative this is a tailwind)
+     * Frg = Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
+     * Crvn = The coefficient for the dynamic rolling resistance, normalized to road inclination.
+     *
+     * This equation is then rearranged in an attempt to solve for V on their website as the following:
+     *
+     * V^3 + V^2 * 2 * (W + Crvn / (Cd * A * ρ)) + V * (W^2 + (2 * Frg) / (Cd * A * ρ)) - (2 * P) / (Cm * Cd * A * ρ) = 0
+     *
+     * Then, using the cardanic formulae, the following solutions are found:
+     *
+     * a = (W^3 - Crvn^3) / 27 - (W * (5 * W * Crvn + (8 * Crvn^2) / (Cd * A * ρ) - 6 * Frg)) / (9 * Cd * A * ρ) + (2 * Frg * Crvn) / (3 * (Cd * A * ρ)^2) + P / (Cm * Cd * A * ρ)
+     * b = (2 / (9 * Cd * A * ρ)) * (3 * Frg - 4 * W * Crvn - (W^2) * Cd * A * ρ/2 - (2 * Crvn) / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 ≥ 0:
+     * V = cbrt(a + sqrt(a^2 + b^3)) + cbrt(a - sqrt(a^2 + b^3)) - (2 / 3) * (W + Crvn / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 < 0:
+     * V = 2 * sqrt(-b) * cos((1 / 3) * arccos(a / sqrt(-b^3)) - (2 / 3) * (W + Crvn / (Cd * A * ρ))
+     *
+     * Although it could be possible to try to estimate wind speed using weather data, for now wind speed is assumed to
+     * be 0. Therefore, the above equations can be changed to exlude the parts where the wind speed being 0 would cause
+     * various components to no longer be needed. Thus these solutions are used:
+     *
+     * a = (- Crvn^3) / 27 + (2 * Frg * Crvn) / (3 * (Cd * A * ρ)^2) + P / (Cm * Cd * A * ρ)
+     * b = (2 / (9 * Cd * A * ρ)) * (3 * Frg - (2 * Crvn) / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 ≥ 0:
+     * V = cbrt(a + sqrt(a^2 + b^3)) + cbrt(a - sqrt(a^2 + b^3)) - (2 / 3) * (Crvn / (Cd * A * ρ))
+     *
+     * If a^2 + b^3 < 0:
+     * V = 2 * sqrt(-b) * cos((1 / 3) * arccos(a / sqrt(-b^3)) - (2 / 3) * (Crvn / (Cd * A * ρ))
+     *
+     * @param watts The sustained power output in watts. This represents the value of `P` in the above equations.
+     * @param weight The total weight required to be moved that includes the rider(s), their belongings and the vehicle
+     *               weight.
+     * @param beta ("beta") Inclination angle, = arctan(grade/100). It's probably not a huge time savings and would use
+     *              more memory, but additional precalculations from this value could be made. This value is used to
+     *              calculate the values of `Crvn` and `Frg` as noted in the above equations.
+     * @param coefficientOfRollingResistance The coefficient of rolling resistance. This can also be used to model the
+     *              difficulty of traveling over bumpy roadways. This value is used to calculate the value of `Frg` as
+     *              noted in the above equations.See this wikipedia page for a list of coefficients by various surface
+     *              types: https://en.wikipedia.org/wiki/Rolling_resistance#Rolling_resistance_coefficient_examples
+     * @param aerodynamicDragComponent The product of the coefficient of aerodynamic drag, frontal area and air density.
+     *              This value is product of (Cd * A * ρ) as noted in the above mathematical equations.
+     * @param minSpeed The minimum speed that the micromobility should travel at in cases where the slope is so steep
+     *              that it would be faster to walk with the vehicle.
+     * @param maxSpeed The maximum speed the vehicle can travel at.
+     * @return The speed in m/s. This represents the value of `V` in the above mathematical equations.
+     */
+    public static double calculateMicromobilitySpeed(
+        double watts,
+        double weight,
+        double beta,
+        double coefficientOfRollingResistance,
+        double aerodynamicDragComponent,
+        double minSpeed,
+        double maxSpeed
+    ) {
+        // assume that end-users will not account for drivetrain inefficencies and will use the default power rating of
+        // the vehicle. This adjusts the power downward  to account for drivetrain inefficencies. An assumption is also
+        // made that due to use in an urban environment the user may not always be traveling with the maximum available
+        // sustained power due to traffic, personal perference, etc
+        //
+        // FIXME: this current implementation assumes that the maximum sustained power is always used. In reality, the
+        //  actual wattage outputted likely depends on the desired speed the user wants to travel at and whether the
+        //  vehicle (and person if human-power assist is possible) can output enough power to overcome the resistive
+        //  forces needed to travel at that desired speed. For example, on steep downhills, the power output could
+        //  actually be negative (ie the user is braking the vehicle). And on the flats, the maximum power output of
+        //  some vehicles likely isn't necessary to maintain the desired speed. For now this maxSpeed acts as a good cap
+        //  on speeds, but perhaps some more advanced calculation of the actual power could be done. And in turn the
+        //  actual power could be used to determine how much fuel has been burned in the vehicle.
+        watts = watts * 0.8;
+
+        // The coefficient for the dynamic rolling resistance, normalized to road inclination.
+        // In the above mathematical equations, this is the value of `Crvn`.
+        // This value could be precalculated during graph build.
+        double dynamicRollingResistance = ElevationUtils.getDynamicRollingResistance(beta);
+
+        // Rolling friction (normalized on inclined plane) plus slope pulling force on inclined plane
+        // In the above mathematical equations, this is the value of `Frg`.
+        double normalizedRollingFriction = ElevationUtils.GRAVITATIONAL_ACCELERATION_CONSTANT *
+            weight *
+            // These cosine and sine calculations could be precalculated during graph build
+            (coefficientOfRollingResistance * Math.cos(beta) + Math.sin(beta));
+
+        double a = (
+            -Math.pow(dynamicRollingResistance, 3) / 27.0
+        ) + (
+            (2.0 * normalizedRollingFriction * dynamicRollingResistance) /
+                (3.0 * Math.pow(aerodynamicDragComponent, 2))
+        ) + (
+            watts / aerodynamicDragComponent
+        );
+        double b = (
+            2.0 / (9.0 * aerodynamicDragComponent)
+        ) * (
+            3.0 * normalizedRollingFriction -
+                (
+                    (2.0 * dynamicRollingResistance) / aerodynamicDragComponent
+                )
+        );
+
+        double cardanicCheck = Math.pow(a, 2) + Math.pow(b, 3);
+        double rollingDragComponent = 2.0 / 3.0 * dynamicRollingResistance / aerodynamicDragComponent;
+        double speed;
+        if (cardanicCheck >= 0) {
+            double cardanicCheckSqrt = Math.sqrt(cardanicCheck);
+            speed = Math.cbrt(a + cardanicCheckSqrt) +
+                Math.cbrt(a - cardanicCheckSqrt) -
+                rollingDragComponent;
+        } else {
+            speed = 2.0 *
+                Math.sqrt(-b) *
+                Math.cos(1.0 / 3.0 * Math.acos(a / Math.sqrt(Math.pow(-b, 3)))) -
+                rollingDragComponent;
+        }
+
+        // on steep uphills, the calculated velocity could be slower than the minimum speed. Use the minimum speed in
+        // that case.
+        speed = Math.max(
+            // on steep downhills, the calculated velocity can easily be faster than the max vehicle speed, so cap the
+            // speed at the given maximum speed
+            Math.min(
+                speed,
+                maxSpeed
+            ),
+            minSpeed
+        );
+
+        return speed;
     }
 
     public double getSlopeSpeedEffectiveLength() {
@@ -942,9 +1223,13 @@ public class StreetEdge extends Edge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
+    public void setCarNetworks(Set<String> networks) { carNetworks = networks; }
 
-	public Set<String> getCarNetworks() { return carNetworks; }
+    public Set<String> getCarNetworks() { return carNetworks; }
+
+    public void setVehicleNetworks(Set<String> networks) { vehicleNetworks = networks; }
+
+    public Set<String> getVehicleNetworks() { return vehicleNetworks; }
 
     public void setTNCStopSuitability(boolean isSuitable) {
         this.suitableForTNCStop = isSuitable;
@@ -958,7 +1243,13 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public boolean getFloatingCarDropoffSuitability() { return suitableForFloatingCarRentalDropoff; }
 
-	public boolean isSlopeOverride() {
+    public void setFloatingVehicleDropoffSuitability(boolean isSuitable) {
+        this.suitableForFloatingVehicleRentalDropoff = isSuitable;
+    }
+
+    public boolean getFloatingVehicleDropoffSuitability() { return suitableForFloatingVehicleRentalDropoff; }
+
+    public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 
@@ -1057,6 +1348,10 @@ public class StreetEdge extends Edge implements Cloneable {
                 e.setStairs(isStairs());
                 e.setWheelchairAccessible(isWheelchairAccessible());
                 e.setBack(isBack());
+                e.setCarNetworks(getCarNetworks());
+                e.setFloatingCarDropoffSuitability(getFloatingCarDropoffSuitability());
+                e.setVehicleNetworks(getVehicleNetworks());
+                e.setFloatingVehicleDropoffSuitability(getFloatingVehicleDropoffSuitability());
             }
         } else {
             if (((TemporarySplitterVertex) v).isEndVertex()) {
@@ -1133,5 +1428,19 @@ public class StreetEdge extends Edge implements Cloneable {
             return false;
         }
         return carNetworks.contains(carNetwork);
+    }
+
+    public boolean addVehicleNetwork(String vehicleNetwork) {
+        if (vehicleNetworks == null) {
+            vehicleNetworks = new HashSet<>();
+        }
+        return vehicleNetworks.add(vehicleNetwork);
+    }
+
+    public boolean containsVehicleNetwork(String vehicleNetwork) {
+        if (vehicleNetworks == null){
+            return false;
+        }
+        return vehicleNetworks.contains(vehicleNetwork);
     }
 }

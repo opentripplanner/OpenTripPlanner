@@ -44,6 +44,13 @@ public class StateData implements Cloneable {
     protected boolean hasRentedCarPostTransit = false;
     protected boolean hasRentedCarPreTransit = false;
 
+    protected boolean usingRentedVehicle;
+
+    protected boolean hasRentedVehiclePostTransit = false;
+    protected boolean hasRentedVehiclePreTransit = false;
+
+    public boolean rentedVehicleAllowsFloatingDropoffs;
+
     protected boolean usingHailedCar;
 
     protected boolean hasHailedCarPostTransit = false;
@@ -92,10 +99,18 @@ public class StateData implements Cloneable {
 
     public Set<String> bikeRentalNetworks;
 
-    protected Set<String> carRentalNetworks;
+    public Set<String> carRentalNetworks;
+
+    // A list of possible vehicle rental networks that the state can be associated with. This data structure is a set
+    // because in an arrive-by search, the search progresses backwards from a street edge where potentially multiple
+    // vehicle rental providers allow floating drop-offs at the edge.
+    public Set<String> vehicleRentalNetworks;
 
     // The ids of cars that have been rented so far
     protected Set<String> rentedCars = new HashSet<>();
+
+    // The ids of vehicles that have been rented so far
+    protected Set<String> rentedVehicles = new HashSet<>();
 
     // whether the currently rented car can be dropped off anywhere inside a car rental region
     protected boolean rentedCarAllowsFloatingDropoffs;
@@ -111,6 +126,8 @@ public class StateData implements Cloneable {
             nonTransitMode = TraverseMode.WALK;
         else if (modes.getBicycle())
             nonTransitMode = TraverseMode.BICYCLE;
+        else if (modes.getMicromobility())
+            nonTransitMode = TraverseMode.MICROMOBILITY;
         else
             nonTransitMode = null;
     }
@@ -138,4 +155,12 @@ public class StateData implements Cloneable {
     public boolean rentedCarAllowsFloatingDropoffs() { return rentedCarAllowsFloatingDropoffs; }
 
     public Set<String> getRentedCars() { return rentedCars; }
+
+    public Set<String> getRentedVehicles() { return rentedVehicles; }
+
+    public boolean hasRentedVehiclePostTransit() { return hasRentedVehiclePostTransit; }
+
+    public boolean hasRentedVehiclePreTransit() { return hasRentedVehiclePreTransit; }
+
+    public boolean rentedVehicleAllowsFloatingDropoffs() { return rentedVehicleAllowsFloatingDropoffs; }
 }

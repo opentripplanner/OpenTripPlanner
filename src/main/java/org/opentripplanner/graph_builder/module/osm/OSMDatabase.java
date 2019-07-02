@@ -688,7 +688,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_AND_MICROMOBILITY);
         if (OSMFilter.isOsmEntityRoutable(area.parent)
                 && permissions != StreetTraversalPermission.NONE) {
             walkableAreas.add(area);
@@ -744,7 +744,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             return;
         }
 
-        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR);
+        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR, TraverseMode.MICROMOBILITY);
         String exceptModes = relation.getTag("except");
         if (exceptModes != null) {
             for (String m : exceptModes.split(";")) {
@@ -752,6 +752,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
+                    modes.setMicromobility(false);
                     LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));
                 }
             }
