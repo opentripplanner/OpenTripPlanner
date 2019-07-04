@@ -1,6 +1,5 @@
 package org.opentripplanner.model.json_serialization;
 
-import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import org.opentripplanner.common.geometry.GeometrySerializer;
 
 public class SerializerUtils {
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap.services;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 
 /**
  * A RegionSource represents a set of rectangular regions. It's used by

@@ -31,6 +31,10 @@ public class TripTimeShort {
     public FeedScopedId tripId;
     public String blockId;
     public String headsign;
+    public int continuousPickup;
+    public int continuousDropOff;
+    public double serviceAreaRadius;
+    public String serviceArea;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -50,6 +54,10 @@ public class TripTimeShort {
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);
+        continuousPickup   = tt.getContinuousPickup(i);
+        continuousDropOff  = tt.getContinuousDropOff(i);
+        serviceAreaRadius  = tt.getServiceAreaRadius(i);
+        serviceArea        = tt.getServiceArea(i);
     }
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {

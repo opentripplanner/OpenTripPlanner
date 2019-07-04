@@ -1,7 +1,7 @@
 package org.opentripplanner.analyst.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
 

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,15 @@ public class Fare {
 
     /**
      * A mapping from {@link FareType} to a list of {@link FareComponent}.
+     * The FareComponents are stored in an array instead of a list because JAXB doesn't know how to deal with
+     * interfaces when serializing a trip planning response, and List is an interface.
+     * See https://stackoverflow.com/a/1119241/778449
      */
-    public HashMap<FareType, List<FareComponent>> details;
+    public HashMap<FareType, FareComponent[]> details;
 
     public Fare() {
-        fare = new HashMap<FareType, Money>();
-        details = new HashMap<FareType, List<FareComponent>>();
+        fare = new HashMap<>();
+        details = new HashMap<>();
     }
 
     public Fare(Fare aFare) {
@@ -51,7 +55,7 @@ public class Fare {
     }
 
     public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
-        details.put(fareType, newDetails);
+        details.put(fareType, newDetails.toArray(new FareComponent[newDetails.size()]));
     }
 
     public Money getFare(FareType type) {
@@ -59,7 +63,7 @@ public class Fare {
     }
 
     public List<FareComponent> getDetails(FareType type) {
-        return details.get(type);
+        return Arrays.asList(details.get(type));
     }
 
     public void addCost(int surcharge) {
