@@ -130,7 +130,11 @@ public class NearbyStopFinder {
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean reverseDirection) {
+    public List<StopAtDistance> findNearbyStopsViaStreets (
+            Vertex originVertex,
+            boolean reverseDirection,
+            boolean retainEdges
+    ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
@@ -157,13 +161,15 @@ public class NearbyStopFinder {
         if (originVertex instanceof TransitStopVertex) {
             stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
         }
-        routingRequest.cleanup();
+        if (!retainEdges) {
+            routingRequest.cleanup();
+        }
         return stopsFound;
 
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
-        return findNearbyStopsViaStreets(originVertex, false);
+        return findNearbyStopsViaStreets(originVertex, false, false);
     }
 
     /**

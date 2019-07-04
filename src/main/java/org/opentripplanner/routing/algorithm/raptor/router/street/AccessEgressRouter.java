@@ -35,7 +35,7 @@ public class AccessEgressRouter {
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
         List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
-                nearbyStopFinder.findNearbyStopsViaStreets(vertex, fromTarget);
+                nearbyStopFinder.findNearbyStopsViaStreets(vertex, fromTarget, true);
 
         Map<Stop, Transfer> result = new HashMap<>();
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
