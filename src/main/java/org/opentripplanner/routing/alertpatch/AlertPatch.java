@@ -127,8 +127,7 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            graph.addAlertPatch(tripPattern.boardEdges[i], this);
-                            graph.addAlertPatch(tripPattern.alightEdges[i], this);
+                            throw new UnsupportedOperationException("Cannot add Alert patch to Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }
@@ -188,8 +187,7 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            graph.removeAlertPatch(tripPattern.boardEdges[i], this);
-                            graph.removeAlertPatch(tripPattern.alightEdges[i], this);
+                            throw new UnsupportedOperationException("Cannot remove Alert patch from Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }

@@ -100,17 +100,12 @@ public class TripPattern implements Cloneable, Serializable {
      */
     public String code;
 
-    /* The vertices in the Graph that correspond to each Stop in this pattern. */
-    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. FIXME they appear to be all null. are they even used?
-
-    // REMOVE THESE
-    public final PatternDepartVertex[] departVertices;
-    public final PatternArriveVertex[] arriveVertices;
-    /* The Edges in the graph that correspond to each Stop in this pattern. */
-    public final TransitBoardAlight[]  boardEdges;
-    public final TransitBoardAlight[]  alightEdges;
-    public final PatternHop[]          hopEdges;
-    public final PatternDwell[]        dwellEdges;
+    /**
+     * The vertices in the Graph that correspond to each Stop in this pattern.
+     * Note: these are not unique to this pattern, and could be shared in the stop.
+     * FIXME they appear to be all null. are they even used?
+     */
+    public final TransitStop[] stopVertices;
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
@@ -161,18 +156,8 @@ public class TripPattern implements Cloneable, Serializable {
         this.route = route;
         this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
-        int size = stopPattern.size;
+        this.stopVertices = new TransitStop[stopPattern.size];
         setStopsFromStopPattern(stopPattern);
-
-        /* Create properly dimensioned arrays for all the vertices/edges associated with this pattern. */
-        stopVertices   = new TransitStop[size];
-        departVertices = new PatternDepartVertex[size];
-        arriveVertices = new PatternArriveVertex[size];
-        boardEdges     = new TransitBoardAlight[size];
-        alightEdges    = new TransitBoardAlight[size];
-        // one less hop than stops
-        hopEdges       = new PatternHop[size - 1];
-        dwellEdges     = new PatternDwell[size];
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -201,12 +186,6 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public Stop getStop(int stopIndex) {
-// Crazy, this was inspecting the edges to get the stop instead of just looking it up in an array.
-//        if (stopIndex == patternHops.length) {
-//            return patternHops[stopIndex - 1].getEndStop();
-//        } else {
-//            return patternHops[stopIndex].getBeginStop();
-//        }
         return stopPattern.stops[stopIndex];
     }
 
@@ -490,70 +469,6 @@ public class TripPattern implements Cloneable, Serializable {
             }
         }
 
-    }
-
-    /**
-     * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
-     * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
-     * needed for shape distances (actually, stop sequence numbers?).
-     *
-     * @param graph graph to create vertices and edges in
-     * @param transitStops map of transit stops given the stop; it is assumed all stops of this trip
-     *        pattern are included in this map and refer to TransitStops
-     */
-    public void makePatternVerticesAndEdges(Graph graph, Map<Stop, ? extends TransitStationStop> transitStops) {
-
-        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */
-        PatternArriveVertex pav0, pav1 = null;
-        PatternDepartVertex pdv0;
-        int nStops = stopPattern.size;
-        for (int stop = 0; stop < nStops - 1; stop++) {
-            Stop s0 = stopPattern.stops[stop];
-            Stop s1 = stopPattern.stops[stop + 1];
-            pdv0 = new PatternDepartVertex(graph, this, stop);
-            departVertices[stop] = pdv0;
-            if (stop > 0) {
-                pav0 = pav1;
-                dwellEdges[stop] = new PatternDwell(pav0, pdv0, stop, this);
-            }
-            pav1 = new PatternArriveVertex(graph, this, stop + 1);
-            arriveVertices[stop + 1] = pav1;
-            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
-
-            /* Get the arrive and depart vertices for the current stop (not pattern stop). */
-            TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;
-            TransitStopArrive stopArrive = ((TransitStop) transitStops.get(s1)).arriveVertex;
-
-            /* Record the transit stop vertices visited on this pattern. */
-            stopVertices[stop] = stopDepart.getStopVertex();
-            stopVertices[stop + 1] = stopArrive.getStopVertex(); // this will only have an effect on the last stop
-
-            /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
-            if (this.canBoard(stop)) {
-                boardEdges[stop] = new TransitBoardAlight(stopDepart, pdv0, stop, mode);
-            }
-            if (this.canAlight(stop + 1)) {
-                alightEdges[stop + 1] = new TransitBoardAlight(pav1, stopArrive, stop + 1, mode);
-            }
-        }
-    }
-
-    public void dumpServices() {
-        Set<FeedScopedId> services = Sets.newHashSet();
-        for (Trip trip : this.trips) {
-            services.add(trip.getServiceId());
-        }
-        LOG.info("route {} : {}", route, services);
-    }
-
-    public void dumpVertices() {
-        for (int i = 0; i < this.stopPattern.size; ++i) {
-            Vertex arrive = arriveVertices[i];
-            Vertex depart = departVertices[i];
-            System.out.format("%s %02d %s %s\n", this.code, i,
-                    arrive == null ? "NULL" : arrive.getLabel(),
-                    depart == null ? "NULL" : depart.getLabel());
-        }
     }
 
     /**
