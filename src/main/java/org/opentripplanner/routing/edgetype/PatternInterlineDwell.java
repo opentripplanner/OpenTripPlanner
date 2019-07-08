@@ -63,15 +63,13 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    /* Interlining relationships between trips. This could actually be a single Graph-wide BiMap. */
-    final BiMap<Trip,Trip> trips = HashBiMap.create();
 
     public PatternInterlineDwell(TripPattern p0, TripPattern p1) {
         // The dwell actually connects the _arrival_ at the last stop of the first pattern
         // to the _departure_ of the first stop of the second pattern.
         // The last stop of the first pattern does not even have a _depart_ vertex, and
         // The first stop of the second pattern does not even have an _arrive_ vertex.
-        super(p0.arriveVertices[p0.stopPattern.size - 1], p1.departVertices[0]);
+        super(null, null);
     }
 
     @VisibleForTesting
@@ -86,7 +84,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
      * to.
      */
     public void add(Trip t1, Trip t2) {
-        trips.put(t1, t2);
+        //
     }
 
     @Override
@@ -121,7 +119,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
         RoutingRequest options = state0.getOptions();
         Trip oldTrip = state0.getBackTrip();
-        Trip newTrip = options.arriveBy ? trips.inverse().get(oldTrip) : trips.get(oldTrip);
+        Trip newTrip = null;
         if (newTrip == null) return null;
 
         TripPattern newPattern;

@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -41,6 +42,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -217,6 +219,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     // TripPatterns used to be reached through hop edges, but we're not creating on-board transit vertices/edges anymore.
     public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+
+    /** Interlining relationships between trips. */
+    public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
 
     /** Data model for Raptor routing */
     public transient TransitLayer transitLayer;

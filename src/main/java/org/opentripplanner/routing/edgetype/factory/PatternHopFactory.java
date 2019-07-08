@@ -187,7 +187,7 @@ public class PatternHopFactory {
         /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns);
 
-        /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
+        /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
             // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
             for (int s = 0; s < tripPattern.stopVertices.length; s++) {
@@ -217,9 +217,7 @@ public class PatternHopFactory {
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        // This appears to store all interline information in edges, which we won't be using anymore...
-        // FIXME store interline information in another table, or in trip patterns.
-        // interline(tripPatterns);
+        interline(tripPatterns, graph);
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
@@ -247,10 +245,9 @@ public class PatternHopFactory {
 
     /**
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
-     * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices
-     * are already created, because it creates interline dwell edges between existing pattern arrive/depart vertices.
+     * and update the TripPatterns accordingly.
      */
-    private void interline(Collection<TripPattern> tripPatterns) {
+    private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
         Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();
@@ -315,18 +312,14 @@ public class PatternHopFactory {
             }
         }
 
-        // Create the PatternInterlineDwell edges linking together TripPatterns.
-        // All the pattern vertices and edges must already have been created.
+        // Copy all interline relationships into the field holding them in the graph.
+        // TODO: verify whether we need to be keeping track of patterns at all here, or could just accumulate trip-trip relationships.
         for (P2<TripPattern> patterns : interlines.keySet()) {
-            TripPattern prevPattern = patterns.first;
-            TripPattern nextPattern = patterns.second;
-            // This is a single (uni-directional) edge which may be traversed forward and backward.
-            PatternInterlineDwell edge = new PatternInterlineDwell(prevPattern, nextPattern);
             for (P2<Trip> trips : interlines.get(patterns)) {
-                edge.add(trips.first, trips.second);
+                graph.interlinedTrips.put(trips.first, trips.second);
             }
         }
-        LOG.info("Done finding interlining trips and creating the corresponding edges.");
+        LOG.info("Done finding interlining trips.");
     }
 
     /**
