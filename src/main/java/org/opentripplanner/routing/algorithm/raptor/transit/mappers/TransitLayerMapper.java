@@ -78,6 +78,6 @@ public class TransitLayerMapper {
     }
 
     private Collection<org.opentripplanner.routing.edgetype.TripPattern> originalTripPatterns() {
-        return graph.index.patternForId.values();
+        return graph.tripPatternForId.values();
     }
 }

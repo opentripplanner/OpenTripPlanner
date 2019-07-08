@@ -215,6 +215,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
+    // TripPatterns used to be reached through hop edges, but we're not creating on-board transit vertices/edges anymore.
+    public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+
     /** Data model for Raptor routing */
     public transient TransitLayer transitLayer;
 

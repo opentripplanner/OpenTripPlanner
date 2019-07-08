@@ -333,7 +333,7 @@ public class ItineraryMapper {
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
             if (boarded) {
-                transitLegCoordinates.addAll(Arrays.asList(tripPattern.hopEdges[j - 1].getGeometry().getCoordinates()));
+                transitLegCoordinates.addAll(Arrays.asList(tripPattern.hopGeometries[j - 1].getCoordinates()));
             }
             if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
                 boarded = true;

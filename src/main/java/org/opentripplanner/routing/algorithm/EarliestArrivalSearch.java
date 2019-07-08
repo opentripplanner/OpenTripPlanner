@@ -20,6 +20,8 @@ import java.util.Collection;
  * Note that walk limiting must be turned off -- resource limiting is not algorithmically correct.
  *
  * TODO this implements the deprecated SPTService interface. It should become a different SPT and dominance function implementation, rather than a "service"
+ *
+ * FIXME this is used only by NearbyStopFinder, which is only used to find DirectTransfers. Why would we define a completely different search method for only that case?
  */
 public class EarliestArrivalSearch {
 

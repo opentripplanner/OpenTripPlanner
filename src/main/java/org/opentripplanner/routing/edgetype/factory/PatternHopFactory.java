@@ -3,6 +3,8 @@ package org.opentripplanner.routing.edgetype.factory;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.math3.util.FastMath;
@@ -187,17 +189,17 @@ public class PatternHopFactory {
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
-            tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
-            // Add the geometries to the hop edges.
-            LineString[] geom = geometriesByTripPattern.get(tripPattern);
-            if (geom != null) {
-                for (int i = 0; i < tripPattern.hopEdges.length; i++) {
-                    tripPattern.hopEdges[i].setGeometry(geom[i]);
-                }
-                // Make a geometry for the whole TripPattern from all its constituent hops.
-                // This happens only if geometry is found in geometriesByTripPattern,
-                // because that means that geometry was created from shapes instead "as crow flies"
-                tripPattern.makeGeometry();
+            // Do not make edges, we will use only Raptor now.
+            // tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
+            for (int s = 0; s < tripPattern.stopVertices.length; s++) {
+                Stop stop = tripPattern.stopPattern.stops[s];
+                tripPattern.stopVertices[s] = ((TransitStop)context.stationStopNodes.get(stop));
+            }
+            LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
+            if (hopGeometries != null) {
+                // Make a single unified geometry, and also store the per-hop split geometries.
+                tripPattern.makeGeometry(hopGeometries);
+                tripPattern.hopGeometries = hopGeometries;
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
 
@@ -211,10 +213,14 @@ public class PatternHopFactory {
                 graph.addTransitMode(mode);
             }
 
+            // Store the tripPattern in the Graph so it will be serialized and usable in routing.
+            graph.tripPatternForId.put(tripPattern.code, tripPattern);
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        interline(tripPatterns, graph);
+        // This appears to store all interline information in edges, which we won't be using anymore...
+        // FIXME store interline information in another table, or in trip patterns.
+        // interline(tripPatterns);
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
@@ -232,8 +238,10 @@ public class PatternHopFactory {
         for (TripPattern tableTripPattern : tripPatterns) {
             tableTripPattern.scheduledTimetable.finish();
         }
-        
-        clearCachedData(); // eh?
+
+        // FIXME again, what is the goal here? Why is there cached "data", and why are we clearing it?
+        clearCachedData();
+
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
@@ -243,7 +251,7 @@ public class PatternHopFactory {
      * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices
      * are already created, because it creates interline dwell edges between existing pattern arrive/depart vertices.
      */
-    private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
+    private void interline(Collection<TripPattern> tripPatterns) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
         Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();

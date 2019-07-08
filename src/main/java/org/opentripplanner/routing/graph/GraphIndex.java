@@ -63,10 +63,6 @@ import java.util.concurrent.Executors;
 public class GraphIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
-    private static final int CLUSTER_RADIUS = 400; // meters
-
-    /** maximum distance to walk after leaving transit in Analyst */
-    public static final int MAX_WALK_METERS = 1000;
 
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
@@ -76,7 +72,6 @@ public class GraphIndex {
     public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
     public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
-    public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
@@ -116,11 +111,6 @@ public class GraphIndex {
         for (Edge edge : edges) {
             vertices.add(edge.getFromVertex());
             vertices.add(edge.getToVertex());
-            if (edge instanceof TablePatternEdge) {
-                TablePatternEdge patternEdge = (TablePatternEdge) edge;
-                TripPattern pattern = patternEdge.getPattern();
-                patternForId.put(pattern.code, pattern);
-            }
         }
         for (Vertex vertex : vertices) {
             vertexForId.put(vertex.getLabel(), vertex);
@@ -136,10 +126,9 @@ public class GraphIndex {
             Envelope envelope = new Envelope(stopVertex.getCoordinate());
             stopSpatialIndex.insert(envelope, stopVertex);
         }
-        for (TripPattern pattern : patternForId.values()) {
+        for (TripPattern pattern : graph.tripPatternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.route, pattern);
-
             for (Trip trip : pattern.getTrips()) {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);

@@ -102,9 +102,10 @@ public class TripPattern implements Cloneable, Serializable {
 
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
     public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. FIXME they appear to be all null. are they even used?
+
+    // REMOVE THESE
     public final PatternDepartVertex[] departVertices;
     public final PatternArriveVertex[] arriveVertices;
-
     /* The Edges in the graph that correspond to each Stop in this pattern. */
     public final TransitBoardAlight[]  boardEdges;
     public final TransitBoardAlight[]  alightEdges;
@@ -126,6 +127,13 @@ public class TripPattern implements Cloneable, Serializable {
 
     /** Used by the MapBuilder (and should be exposed by the Index API). */
     public LineString geometry = null;
+
+    /**
+     * Geometries of each inter-stop segment of the tripPattern. This is redundant information but should just reuse
+     * references to the same coordinates referenced by the single geometry field. These probably could be raw coordinate
+     * arrays (or some kind of packed coordinate sequences) since we just use the coordinate arrays out of them.
+     */
+    public LineString[] hopGeometries = null;
 
     /**
      * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
@@ -193,11 +201,13 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public Stop getStop(int stopIndex) {
-        if (stopIndex == patternHops.length) {
-            return patternHops[stopIndex - 1].getEndStop();
-        } else {
-            return patternHops[stopIndex].getBeginStop();
-        }
+// Crazy, this was inspecting the edges to get the stop instead of just looking it up in an array.
+//        if (stopIndex == patternHops.length) {
+//            return patternHops[stopIndex - 1].getEndStop();
+//        } else {
+//            return patternHops[stopIndex].getBeginStop();
+//        }
+        return stopPattern.stops[stopIndex];
     }
 
     public List<Stop> getStops() {
@@ -605,26 +615,24 @@ public class TripPattern implements Cloneable, Serializable {
      * It could probably just come from the full shapes.txt entry for the trips in the route, but given all the details
      * in how the individual hop geometries are constructed we just recombine them here.
      */
-    public void makeGeometry() {
+    public void makeGeometry(LineString[] hopGeoms) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-        if (patternHops != null && patternHops.length > 0) {
-            for (int i = 0; i < patternHops.length; i++) {
-                LineString geometry = patternHops[i].getGeometry();
-                if (geometry != null) {
-                    if (coordinates.size() == 0) {
-                        coordinates.extend(geometry.getCoordinates());
-                    } else {
-                        coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplicate coords at stops
-                    }
+        for (int i = 0; i < hopGeoms.length; i++) {
+            LineString geometry = hopGeoms[i];
+            if (geometry != null) {
+                if (coordinates.size() == 0) {
+                    coordinates.extend(geometry.getCoordinates());
+                } else {
+                    coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplicate coords at stops
                 }
             }
-            // The CoordinateArrayListSequence is easy to append to, but is not serializable.
-            // It might be possible to just mark it serializable, but it is not particularly compact either.
-            // So we convert it to a packed coordinate sequence, since that is serializable and smaller.
-            // FIXME It seems like we could simply accumulate the coordinates into an array instead of using the CoordinateArrayListSequence.
-            PackedCoordinateSequence packedCoords = new PackedCoordinateSequence.Double(coordinates.toCoordinateArray(), 2);
-            this.geometry = GeometryUtils.getGeometryFactory().createLineString(packedCoords);
         }
+        // The CoordinateArrayListSequence is easy to append to, but is not serializable.
+        // It might be possible to just mark it serializable, but it is not particularly compact either.
+        // So we convert it to a packed coordinate sequence, since that is serializable and smaller.
+        // FIXME It seems like we could simply accumulate the coordinates into an array instead of using the CoordinateArrayListSequence.
+        PackedCoordinateSequence packedCoords = new PackedCoordinateSequence.Double(coordinates.toCoordinateArray(), 2);
+        this.geometry = GeometryUtils.getGeometryFactory().createLineString(packedCoords);
     }
 
 
