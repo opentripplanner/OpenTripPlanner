@@ -105,8 +105,8 @@ public class StopMapperTest {
         assertNull(result.getCode());
         assertNull(result.getDesc());
         assertNull(result.getDirection());
-        assertEquals(0d, result.getLat(), 0.0001);
-        assertEquals(0d, result.getLon(), 0.0001);
+        assertEquals(org.opentripplanner.model.Stop.MISSING_VALUE, result.getLat(), 0.0001);
+        assertEquals(org.opentripplanner.model.Stop.MISSING_VALUE, result.getLon(), 0.0001);
         assertEquals(0, result.getLocationType());
         assertNull(result.getName());
         assertNull(result.getParentStation());

@@ -1,3 +1,0 @@
-agency_id,route_id,route_short_name,route_long_name,route_type
-MMRI,3f|1,,Intercity 1,2
-MMRI,3f|2,,Intercity 2,2

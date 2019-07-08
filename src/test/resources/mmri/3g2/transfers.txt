@@ -1,2 +1,0 @@
-from_stop_id,to_stop_id,transfer_type
-3g24,3g24,3

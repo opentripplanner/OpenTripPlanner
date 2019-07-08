@@ -1,3 +1,0 @@
-agency_id,route_id,route_short_name,route_long_name,route_type
-MMRI,2a1|short,short,,3
-MMRI,2a1|long,long,,3

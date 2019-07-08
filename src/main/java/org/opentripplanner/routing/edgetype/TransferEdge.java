@@ -99,4 +99,10 @@ public class TransferEdge extends Edge {
         return wheelchairAccessible;
     }
 
+    @Override
+    public String toString() {
+        return "TransferEdge(" +
+                getFromVertex() + " to " + getToVertex() + ")";
+    }
+
 }

@@ -74,7 +74,7 @@ public class PathwayMapperTest {
         assertNull(result.getFromStop());
         assertNull(result.getToStop());
         assertEquals(0, result.getPathwayMode());
-        assertEquals(0, result.getTraversalTime());
+        assertEquals(org.opentripplanner.model.Pathway.MISSING_VALUE, result.getTraversalTime());
         assertFalse(result.isWheelchairTraversalTimeSet());
     }
 

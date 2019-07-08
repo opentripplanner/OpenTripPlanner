@@ -1,3 +1,0 @@
-route_id,service_id,trip_id
-3b,ignore,3b|1
-3b,ignore,3b|2

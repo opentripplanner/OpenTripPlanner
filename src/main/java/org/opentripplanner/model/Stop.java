@@ -5,7 +5,7 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final int MISSING_VALUE = -999;
+    public static final int MISSING_VALUE = -999;
 
     private FeedScopedId id;
 

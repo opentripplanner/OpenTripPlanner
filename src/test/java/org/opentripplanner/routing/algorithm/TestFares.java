@@ -55,55 +55,6 @@ public class TestFares extends TestCase {
         Fare cost = fareService.getCost(path);
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
-
-    public void testPortland() throws Exception {
-
-        Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
-        String feedId = gg.getFeedIds().iterator().next();
-        RoutingRequest options = new RoutingRequest();
-        ShortestPathTree spt;
-        GraphPath path = null;
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":10579", feedId + ":8371");
-        // from zone 3 to zone 2
-        spt = aStar.getShortestPathTree(options);
-
-        path = spt.getPath(gg.getVertex(feedId + ":8371"), true);
-        assertNotNull(path);
-
-        FareService fareService = gg.getService(FareService.class);
-        Fare cost = fareService.getCost(path);
-        assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
-
-        // long trip
-
-        startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":8389", feedId + ":1252");
-        spt = aStar.getShortestPathTree(options);
-
-        path = spt.getPath(gg.getVertex(feedId + ":1252"), true);
-        assertNotNull(path);
-        cost = fareService.getCost(path);
-        
-        //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
-        
-        // complex trip
-        options.maxTransfers = 5;
-        startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":10428", feedId + ":4231");
-        spt = aStar.getShortestPathTree(options);
-
-        path = spt.getPath(gg.getVertex(feedId + ":4231"), true);
-        assertNotNull(path);
-        cost = fareService.getCost(path);
-        //
-        // this is commented out because portland's fares are, I think, broken in the gtfs. see
-        // thread on gtfs-changes.
-        // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
-    }
     
     
     public void testKCM() throws Exception {
