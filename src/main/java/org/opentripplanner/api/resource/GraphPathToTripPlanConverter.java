@@ -315,6 +315,10 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
 
+        // Interlining information is now in a separate field in Graph, not in edges.
+        // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
+        leg.interlineWithPreviousLeg = false;
+
         addFrequencyFields(states, leg);
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
