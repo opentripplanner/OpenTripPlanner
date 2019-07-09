@@ -30,7 +30,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -65,7 +64,6 @@ public class GraphIndex {
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
 
     // TODO: consistently key on model object or id string
-    public final Map<String, Vertex> vertexForId = Maps.newHashMap();
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
@@ -105,15 +103,10 @@ public class GraphIndex {
         }
 
         Collection<Edge> edges = graph.getEdges();
-        /* We will keep a separate set of all vertices in case some have the same label. 
+
+        /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
-        Set<Vertex> vertices = Sets.newHashSet();
-        for (Edge edge : edges) {
-            vertices.add(edge.getFromVertex());
-            vertices.add(edge.getToVertex());
-        }
-        for (Vertex vertex : vertices) {
-            vertexForId.put(vertex.getLabel(), vertex);
+        for (Vertex vertex : graph.getVertices()) {
             if (vertex instanceof TransitStop) {
                 TransitStop transitStop = (TransitStop) vertex;
                 Stop stop = transitStop.getStop();

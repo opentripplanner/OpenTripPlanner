@@ -33,7 +33,7 @@ public class GraphIndexTest extends GtfsTest {
     public void testIdLookup() {
 
         /* Graph vertices */
-        for (Vertex vertex : graph.index.vertexForId.values()) {
+        for (Vertex vertex : graph.getVertices()) {
             if (vertex instanceof TransitStop) {
                 Stop stop = ((TransitStop)vertex).getStop();
                 Vertex index_vertex = graph.index.stopVertexForStop.get(stop);

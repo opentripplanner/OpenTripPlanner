@@ -130,17 +130,6 @@ public class TripPattern implements Cloneable, Serializable {
      */
     public LineString[] hopGeometries = null;
 
-    /**
-     * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
-     * the same stops and a PatternHop apply to all those trips, so this array apply to every trip
-     * in every timetable in this pattern. Please note that the array size is the number of stops
-     * minus 1. This also allow to access the ordered list of stops.
-     *
-     * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
-     * stopPattern.
-     */
-    private PatternHop[] patternHops; // TODO rename/merge with hopEdges
-
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
     @XmlElement int[] perStopFlags;
@@ -171,7 +160,6 @@ public class TripPattern implements Cloneable, Serializable {
     // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
     // TODO get rid of the per stop flags and just use the values in StopPattern, or an Enum
     private void setStopsFromStopPattern(StopPattern stopPattern) {
-        patternHops = new PatternHop[stopPattern.size - 1];
         perStopFlags = new int[stopPattern.size];
         int i = 0;
         for (Stop stop : stopPattern.stops) {
@@ -191,15 +179,6 @@ public class TripPattern implements Cloneable, Serializable {
 
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
-    }
-
-    public List<PatternHop> getPatternHops() {
-        return Arrays.asList(patternHops);
-    }
-
-    /* package private */
-    void setPatternHop(int stopIndex, PatternHop patternHop) {
-        patternHops[stopIndex] = patternHop;
     }
 
     public Trip getTrip(int tripIndex) {

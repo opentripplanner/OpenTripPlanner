@@ -27,7 +27,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
@@ -35,7 +34,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -274,10 +272,9 @@ public class TimetableSnapshotSourceTest {
         // THEN
         // Find new pattern in graph starting from stop A
         Stop stopA = graph.index.stopForId.get(new FeedScopedId(feedId, "A"));
-        TransitStopDepart transitStopDepartA = graph.index.stopVertexForStop.get(stopA).departVertex;
         // Get trip pattern of last (most recently added) outgoing edge
-        final List<Edge> outgoingEdges = (List<Edge>) transitStopDepartA.getOutgoing();
-        final TripPattern tripPattern = ((TransitBoardAlight) outgoingEdges.get(outgoingEdges.size() - 1)).getPattern();
+        // FIXME create a new test to see that add-trip realtime updates work
+        TripPattern tripPattern = null;
         assertNotNull("Added trip pattern should be found", tripPattern);
 
         final TimetableSnapshot snapshot = updater.getTimetableSnapshot();

@@ -242,11 +242,6 @@ public class RoutingContext implements Cloneable {
             }
         }
 
-        if (opt.startingTransitStopId != null) {
-            Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
-            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            startingStop = tstop.departVertex;
-        }
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;

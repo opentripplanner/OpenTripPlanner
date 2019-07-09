@@ -5,16 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import com.google.common.collect.Iterables;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -55,9 +53,7 @@ public class GraphStats {
 
     private CommandEndpoints commandEndpoints = new CommandEndpoints(); 
     
-    private CommandSpeedStats commandSpeedStats = new CommandSpeedStats();  
-
-    private CommandPatternStats commandPatternStats = new CommandPatternStats();  
+    private CommandPatternStats commandPatternStats = new CommandPatternStats();
 
     private JCommander jc;
     
@@ -73,7 +69,6 @@ public class GraphStats {
     private GraphStats(String[] args) {
         jc = new JCommander(this);
         jc.addCommand(commandEndpoints);
-        jc.addCommand(commandSpeedStats);
         jc.addCommand(commandPatternStats);
         
         try {
@@ -117,8 +112,6 @@ public class GraphStats {
         String command = jc.getParsedCommand();
         if (command.equals("endpoints")) {
             commandEndpoints.run();
-        } else if (command.equals("speedstats")) {
-            commandSpeedStats.run();
         } else if (command.equals("patternstats")) {
             commandPatternStats.run();
         }
@@ -157,12 +150,12 @@ public class GraphStats {
             Collections.shuffle(vertices, random);
             vertices = vertices.subList(0, n);
             try {
-                writer.writeRecord( new String[] {"n", "name", "lon", "lat"} );
+                writer.writeRecord(new String[]{"n", "name", "lon", "lat"});
                 int i = 0;
                 for (Vertex v : vertices) {
                     Coordinate c;
                     if (v instanceof StreetVertex) {
-                        LineString ls = ((StreetVertex)v).getOutgoing().iterator().next().getGeometry();
+                        LineString ls = ((StreetVertex) v).getOutgoing().iterator().next().getGeometry();
                         int numPoints = ls.getNumPoints();
                         LocationIndexedLine lil = new LocationIndexedLine(ls);
                         int seg = random.nextInt(numPoints);
@@ -181,8 +174,8 @@ public class GraphStats {
                     gc.setDirection(azimuth, distance);
                     Point2D dest = gc.getDestinationGeographicPoint();
                     String name = v.getName();
-                    String[] entries = new String[] {
-                            Integer.toString(i), name, 
+                    String[] entries = new String[]{
+                            Integer.toString(i), name,
                             Double.toString(dest.getX()), Double.toString(dest.getY())
                     };
                     writer.writeRecord(entries);
@@ -190,45 +183,6 @@ public class GraphStats {
                 }
             } catch (IOException ioe) {
                 LOG.error("Excpetion while writing CSV: {}", ioe.getMessage());
-            }
-            LOG.info("done."); 
-        }
-    }
-
-    @Parameters(commandNames = "speedstats", commandDescription = "speed stats") 
-    class CommandSpeedStats {
-
-        public void run() {
-            LOG.info("dumping hop info...");
-            try {
-                writer.writeRecord( new String[] {"route", "distance", "time", "speed"} );
-                for (Vertex v : graph.getVertices()) {
-                    for (PatternHop ph : Iterables.filter(v.getOutgoing(), PatternHop.class)) {
-                        // Vertex fromv = ph.getFromVertex();
-                        // Vertex tov = ph.getToVertex();
-                        double distance = ph.getDistance();
-                        if (distance < 3)
-                            continue;
-                        TripPattern ttp = ph.getPattern();
-                        List<Trip> trips = ttp.getTrips();
-                        int hop = ph.stopIndex;
-                        String route = ttp.route.getId().toString();
-                        for (int trip = 0; trip < trips.size(); trip++){
-                            int time = ttp.scheduledTimetable.getTripTimes(trip).getRunningTime(hop);
-                            double speed = distance / time;
-                            if (Double.isInfinite(speed) || Double.isNaN(speed))
-                                continue;
-                            String[] entries = new String[] { 
-                                    route, Double.toString(distance), Integer.toString(time), 
-                                    Double.toString(speed)
-                            };
-                            writer.writeRecord(entries);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                LOG.error("Exception writing CSV: {}", e.getMessage());
-                return;
             }
             LOG.info("done.");
         }
@@ -245,13 +199,7 @@ public class GraphStats {
                         "nTripsInPattern", "frequency", 
                         "cumulativePatterns", "empiricalDistPatterns",
                         "cumulativeTrips", "empiricalDistTrips" } );
-                Set<TripPattern> patterns = new HashSet<TripPattern>();
-                for (Vertex v : graph.getVertices()) {
-                    for (PatternHop ph : Iterables.filter(v.getOutgoing(), PatternHop.class)) {
-                        TripPattern ttp = ph.getPattern();
-                        patterns.add(ttp);
-                    }
-                }
+                Collection<TripPattern> patterns = graph.tripPatternForId.values();
                 Multiset<Integer> counts = TreeMultiset.create();
                 int nPatterns = patterns.size();
                 LOG.info("total number of patterns is: {}", nPatterns);

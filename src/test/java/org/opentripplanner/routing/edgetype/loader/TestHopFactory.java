@@ -11,9 +11,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -44,35 +41,6 @@ public class TestHopFactory extends TestCase {
         );
 
         feedId = context.getFeedId().getId();
-    }
-
-    public void testBoardAlight() throws Exception {
-
-        Vertex stop_a = graph.getVertex(feedId + ":A_depart");
-        Vertex stop_b_depart = graph.getVertex(feedId + ":B_depart");
-
-        assertEquals(1, stop_a.getDegreeOut());
-        assertEquals(3, stop_b_depart.getDegreeOut());
-
-        for (Edge e : stop_a.getOutgoing()) {
-            assertEquals(TransitBoardAlight.class, e.getClass());
-            assertTrue(((TransitBoardAlight) e).boarding);
-        }
-
-        // TODO: could this ever be a PatternAlight? I think not.
-        TransitBoardAlight pb = (TransitBoardAlight) stop_a.getOutgoing().iterator().next();
-        Vertex journey_a_1 = pb.getToVertex();
-
-        assertEquals(1, journey_a_1.getDegreeIn());
-
-        for (Edge e : journey_a_1.getOutgoing()) {
-            if (e.getToVertex() instanceof TransitStop) {
-                assertEquals(TransitBoardAlight.class, e.getClass());
-                assertTrue(((TransitBoardAlight) e).boarding);
-            } else {
-                assertEquals(PatternHop.class, e.getClass());
-            }
-        }
     }
 
     public void testDwell() throws Exception {
