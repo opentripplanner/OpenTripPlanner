@@ -1,7 +1,12 @@
 package org.opentripplanner.mmri;
 
+import org.junit.Ignore;
 import org.opentripplanner.api.model.Leg;
 
+/**
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
+ */
+@Ignore
 public class SecondUnpreferredTransferTest extends MmriTest {
 
     @Override

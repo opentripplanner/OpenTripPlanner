@@ -11,6 +11,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -46,6 +47,10 @@ import org.locationtech.jts.geom.Geometry;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
+/**
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
+ */
+@Ignore
 public class TestPatternHopFactory extends TestCase {
 
     private Graph graph;

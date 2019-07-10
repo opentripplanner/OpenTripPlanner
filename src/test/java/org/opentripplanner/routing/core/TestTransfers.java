@@ -16,6 +16,7 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -116,7 +117,9 @@ class Context {
 
 /**
  * Test transfers, mostly stop-to-stop transfers.
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
+@Ignore
 public class TestTransfers extends TestCase {
     private Graph graph;
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -30,6 +31,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
+ */
+@Ignore
 public class GraphServiceTest {
 
     File basePath;
