@@ -1,16 +1,15 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,74 +32,84 @@ import java.util.List;
  * one based on distance or other heuristics.
  */
 public class TransitToTaggedStopsModule implements GraphBuilderModule {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
-
+    
     private double searchRadiusM = 250;
     private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
-    StreetVertexIndexServiceImpl index;
     private String vertexConnector;
-
+    private StreetVertexIndexServiceImpl indexService;
+    
     public TransitToTaggedStopsModule(String vertexConnector) {
         this.vertexConnector = vertexConnector;
     }
-
-    public TransitToTaggedStopsModule() {
-        this.vertexConnector = "";
-    }
-
+    
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");
     }
-
+    
     public List<String> getPrerequisites() {
         return Arrays.asList("streets"); // why not "transit" ?
     }
-
+    
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to tagged bus stops...");
-        index = new StreetVertexIndexServiceImpl(graph);
-
-        // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        vertices.addAll(graph.getVertices());
-        VertexConnectorFactory factory = new VertexConnectorFactory();
-        VertexConnector connector = factory.getVertexConnector(this.vertexConnector);
-        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
-            // if the street is already linked there is no need to linked it again,
-            // could happened if using the prune isolated island
-            boolean alreadyLinked = false;
-            for(Edge e:ts.getOutgoing()){
-                if(e instanceof StreetTransitLink) {
-                    alreadyLinked = true;
-                    break;
-                }
-            }
-
-            if(alreadyLinked) continue;
-            // only connect transit stops that (a) are entrances, or (b) have no associated
-            // entrances
-            if (ts.isEntrance() || !ts.hasEntrances()) {
-                boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                boolean vectorConnected = false;
-                if(ts.getStopCode() != null) {
-                    Envelope envelope = new Envelope(ts.getCoordinate());
-                    double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
-                    envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
-                    Collection<Vertex> tsVertices = index.getVerticesForEnvelope(envelope);
-                    vectorConnected = connector.connectVertex(ts, wheelchairAccessible, tsVertices);
-                }
-                if (!vectorConnected) {
-                    LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());
-                    //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
-                }
-            }
+        indexService = new StreetVertexIndexServiceImpl(graph);
+        
+        // Iterate over a copy of vertex list because it will be modified
+        List<Vertex> vertices = new ArrayList<>(graph.getVertices());
+        VertexConnector connector = VertexConnectorFactory.getVertexConnector(vertexConnector);
+        
+        Iterables.filter(vertices, TransitStop.class).forEach(
+            stop -> createLinkOnCondition(stop, connector)
+        );
+    }
+    
+    private void createLinkOnCondition(TransitStop stop, VertexConnector connector) {
+        // If the street is already linked, there is no need to link it again,
+        // Could happen if using the prune isolated island
+        boolean stopAlreadyLinked = stop.getOutgoing().stream().anyMatch(link -> link instanceof StreetTransitLink);
+        
+        if (stopAlreadyLinked)
+            return;
+        
+        // Only connect transit stops that (a) are entrances, or (b) have no associated entrances
+        if (!stop.isEntrance() || stop.hasEntrances())
+            return;
+        
+        boolean linkCreated = createLinkIfStopCodeExists(stop, connector);
+        
+        if (!linkCreated) {
+            LOG.debug("Could not connect {} at {}", stop.getStopCode(), stop.getCoordinate().toString());
+            //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
         }
     }
-
+    
+    private boolean createLinkIfStopCodeExists(TransitStop stop, VertexConnector connector) {
+        if (stop.getStopCode() == null)
+            return false;
+        
+        boolean wheelchairAccessible = stop.hasWheelchairEntrance();
+        Collection<Vertex> vertices  = findTransitStopVertices(stop);
+        return connector.connectVertex(stop, wheelchairAccessible, vertices);
+    }
+    
+    private Collection<Vertex> findTransitStopVertices(TransitStop stop) {
+        Envelope searchEnvelope = createSearchEnvelope(stop.getCoordinate());
+        return indexService.getVerticesForEnvelope(searchEnvelope);
+    }
+    
+    private Envelope createSearchEnvelope(Coordinate coordinate) {
+        double xScale = Math.cos(coordinate.y * Math.PI / 180);
+        Envelope envelope = new Envelope(coordinate);
+        envelope.expandBy(searchRadiusLat / xScale, searchRadiusLat);
+        return envelope;
+    }
+    
     @Override
     public void checkInputs() {
         //no inputs
     }
+    
 }

@@ -8,37 +8,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Default way to connect vertexes.
  */
 public class DefaultVertexConnector implements VertexConnector {
-
-
-	private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
-
-	private void makeStreetTransitLink(TransitStop ts, boolean wheelchairAccessible, TransitStopStreetVertex tsv) {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultVertexConnector.class);
+	
+	@Override
+	public boolean connectVertex(TransitStop stop, boolean wheelchairAccessible, Collection<Vertex> vertices) {
+		// Search for a matching stop code in (nearby) vertices that represent transit stops in OSM.
+		Optional<TransitStopStreetVertex> optionalVertex = findFirstVertexWithMatchingStopCode(stop, vertices);
+		
+		// Create a link if a stop code in a vertex's ref= tag matches the GTFS stop code of this TransitStop.
+		return optionalVertex.isPresent() && makeStreetTransitLink(stop, wheelchairAccessible, optionalVertex.get());
+	}
+	
+	private Optional<TransitStopStreetVertex> findFirstVertexWithMatchingStopCode(TransitStop stop, Collection<Vertex> vertices) {
+		return vertices.stream()
+					.filter(TransitStopStreetVertex.class::isInstance)
+					.map(TransitStopStreetVertex.class::cast)
+					.filter(vertex -> matchStopCodes(vertex.stopCode, stop.getStopCode()))
+					.findFirst();
+	}
+	
+	private boolean matchStopCodes(String vertexStopCode, String stopCode) {
+		if (vertexStopCode == null)
+			return false;
+		
+		return stopCode.equals(vertexStopCode);
+	}
+	
+	private boolean makeStreetTransitLink(TransitStop ts, boolean wheelchairAccessible, TransitStopStreetVertex tsv) {
 		new StreetTransitLink(ts, tsv, wheelchairAccessible);
 		new StreetTransitLink(tsv, ts, wheelchairAccessible);
-		LOG.debug("Connected " + ts.toString() + " (" + ts.getStopCode() + ") to " + tsv.getLabel() + " at " + tsv.getCoordinate().toString());
+		LOG.debug("Connected {} ({}) to {} at {}", ts.toString(), ts.getStopCode(), tsv.getLabel(), tsv.getCoordinate().toString());
+		return true;
 	}
-
-	@Override
-	public boolean connectVertex(TransitStop ts, boolean wheelchairAccessible,  Collection<Vertex> vertices) {
-		// Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
-		// in their ref= tag that matches the GTFS stop code of this TransitStop.
-		for (Vertex v : vertices) {
-			if (!(v instanceof TransitStopStreetVertex)) {
-				continue;
-			}
-
-			TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
-			// Only use stop codes for linking TODO: find better method to connect stops without stop code
-			if (tsv.stopCode != null && tsv.stopCode.equals(ts.getStopCode())) {
-				makeStreetTransitLink(ts, wheelchairAccessible, tsv);
-				return true;
-			}
-		}
-		return false;
-	}
+	
 }
