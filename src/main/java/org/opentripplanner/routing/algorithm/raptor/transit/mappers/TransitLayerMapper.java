@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -21,24 +20,19 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.ws.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.ServiceCalendarMapper.mapServiceCodesByLocalDates;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.StopIndexMapper.listStopIndexesForTripPattern;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.StopIndexMapper.mapIndexByStop;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper.mapPatternsByServiceCode;
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper.mapTripPatternsByStopDate;
 
 /**
  * Maps the TransitLayer object from the OTP Graph object. The ServiceDay hierarchy is reversed,

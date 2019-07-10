@@ -61,11 +61,10 @@ class TripPatternMapper {
 
 
     /**
-     * What is a "stop date"? Judging by local variables, this means "tripPatternsByStopByDate".
-     * But I see nothing grouping them by stop.
-     * It looks like these are just TripPatterns with their times filtered by date, then grouped by date in a Map.
+     * Groups each pattern by its active dates for quick lookup when making a request at a specific date (or dates).
+     * We create a new object called TripPatternForDate that contains only the TripSchedules for that date.
      */
-    static HashMap<LocalDate, List<TripPatternForDate>> mapTripPatternsByStopDate(
+    static HashMap<LocalDate, List<TripPatternForDate>> groupTripPatternsPerDateAndFilterSchedules(
             Multimap<Integer, TripPattern> patternsByServiceCode,
             Multimap<LocalDate, Integer> serviceCodesByLocalDates
     ) {
