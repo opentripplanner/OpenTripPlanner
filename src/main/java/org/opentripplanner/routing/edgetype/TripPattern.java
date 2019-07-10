@@ -8,6 +8,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -122,6 +123,21 @@ public class TripPattern implements Cloneable, Serializable {
 
     /** Used by the MapBuilder (and should be exposed by the Index API). */
     public LineString geometry = null;
+
+
+    // TODO This should probably be precalculated in the PatternHopFactory
+    public LineString getHopGeometry(int stopIndex) {
+        if (hopGeometries != null) {
+            return hopGeometries[stopIndex];
+        } else {
+            Coordinate c1 = new Coordinate(stopPattern.stops[stopIndex].getLon(),
+                                            stopPattern.stops[stopIndex].getLat());
+            Coordinate c2 = new Coordinate(stopPattern.stops[stopIndex + 1].getLon(),
+                                            stopPattern.stops[stopIndex + 1].getLat());
+
+            return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
+        }
+    }
 
     /**
      * Geometries of each inter-stop segment of the tripPattern. This is redundant information but should just reuse
