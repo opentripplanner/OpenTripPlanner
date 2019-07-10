@@ -25,6 +25,7 @@ import javax.xml.ws.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class TransitLayerMapper {
     }
 
     /**
-     * Map trip tripPatterns and trips to Raptor classes
+     * Map pre-Raptor TripPatterns and Trips to the corresponding Raptor classes.
      */
     private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (Map<Stop, Integer> indexByStop) {
         // CalendarService has one main implementation (CalendarServiceImpl) which contains a CalendarServiceData which
@@ -157,11 +158,11 @@ public class TransitLayerMapper {
                     timetable = timetableSnapshot.resolve(oldTripPattern, serviceDate);
                 }
                 List<TripSchedule> newTripSchedules = new ArrayList<>();
-                for (TripTimes tripTimes : timetable.tripTimes) {
+                // The TripTimes are not sorted by departure time in the source timetable. Results are wrong unless trips are sorted.
+                for (TripTimes tripTimes : getSortedTripTimes(timetable)) {
                     if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
                         continue;
                     }
-                    // TODO check if trips are already sorted in the source Timetable
                     TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(tripTimes,
                             tt -> TripScheduleMapper.map(oldTripPattern, tt));
                     newTripSchedules.add(tripSchedule);
@@ -177,6 +178,13 @@ public class TransitLayerMapper {
             tripPatternsForDates.put(localDate, values);
         }
         return tripPatternsForDates;
+    }
+
+
+    private List<TripTimes> getSortedTripTimes (Timetable timetable) {
+        return timetable.tripTimes.stream()
+                .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
+                .collect(Collectors.toList());
     }
 
     private Collection<org.opentripplanner.routing.edgetype.TripPattern> originalTripPatterns() {
