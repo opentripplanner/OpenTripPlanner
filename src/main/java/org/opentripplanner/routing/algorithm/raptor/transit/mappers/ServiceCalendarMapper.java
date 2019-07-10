@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This uses the integer service codes that are already present in the pre-Raptor OTP graph.
+ */
 class ServiceCalendarMapper {
     static Multimap<LocalDate, Integer> mapServiceCodesByLocalDates(
             CalendarService calendarService,
@@ -36,7 +39,7 @@ class ServiceCalendarMapper {
         return serviceCodesByLocalDates;
     }
 
-    private static LocalDate localDateFromServiceDate(ServiceDate serviceDate) {
+    public static LocalDate localDateFromServiceDate(ServiceDate serviceDate) {
         return LocalDate.of(serviceDate.getYear(), serviceDate.getMonth(), serviceDate.getDay());
     }
 }

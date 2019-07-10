@@ -79,4 +79,5 @@ public class CalendarServiceData implements Serializable {
         dates = Collections.unmodifiableList(new ArrayList<>(dates));
         datesByLocalizedServiceId.put(serviceId, dates);
     }
+
 }

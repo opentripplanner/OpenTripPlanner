@@ -11,10 +11,20 @@ import java.util.Objects;
  * having to do any filtering by date during the search itself.
  */
 public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
+
+    /**
+     * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules.
+     * Its TripSchedules remain unchanged.
+     */
     private final TripPattern tripPattern;
 
+    /**
+     * The filtered TripSchedules for only those trips in the TripPattern that are active on the given day.
+     * Invariant: this array should contain a subset of the TripSchedules in tripPattern.tripSchedules.
+     */
     private final TripSchedule[] tripSchedules;
 
+    /** The date for which the filtering was performed. */
     private final LocalDate localDate;
 
     public TripPatternForDate(TripPattern tripPattern, List<TripSchedule> tripSchedules, LocalDate localDate) {
@@ -57,6 +67,7 @@ public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
         if (o == null || getClass() != o.getClass())
             return false;
         TripPatternForDate that = (TripPatternForDate) o;
+        // FIXME equals method seems broken, it only checks the pattern ID
         return this.getTripPattern().getId() == that.getTripPattern().getId();
     }
 
