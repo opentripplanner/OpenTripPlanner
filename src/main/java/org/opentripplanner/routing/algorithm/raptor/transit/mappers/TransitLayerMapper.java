@@ -175,6 +175,8 @@ public class TransitLayerMapper {
     }
 
 
+    // TODO About 80% of the mapping time is spent in this method. Should be consider pre-sorting these before
+    // TODO serializing the graph?
     private List<TripTimes> getSortedTripTimes (Timetable timetable) {
         return timetable.tripTimes.stream()
                 .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
