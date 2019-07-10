@@ -14,6 +14,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -776,7 +777,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /** Split this street edge and return the resulting street edges */
-    public P2<StreetEdge> split(SplitterVertex v, boolean destructive) {
+    public P2<StreetEdge> split(SplitterVertex v, boolean destructive, boolean createSemiPermanentEdges) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;
@@ -837,14 +838,29 @@ public class StreetEdge extends Edge implements Cloneable {
                 e.setBack(isBack());
             }
         } else {
-            if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-                e1.setNoThruTraffic(this.isNoThruTraffic());
-                e1.setStreetClass(this.getStreetClass());
+            if (createSemiPermanentEdges) {
+                e1 = new SemiPermanentPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
+                e2 = new SemiPermanentPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
+
+                for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
+                    e.setBicycleSafetyFactor(getBicycleSafetyFactor());
+                    e.setHasBogusName(hasBogusName());
+                    e.setStairs(isStairs());
+                    e.setWheelchairAccessible(isWheelchairAccessible());
+                    e.setBack(isBack());
+                    e.setNoThruTraffic(isNoThruTraffic());
+                    e.setStreetClass(getStreetClass());
+                }
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-                e2.setNoThruTraffic(this.isNoThruTraffic());
-                e2.setStreetClass(this.getStreetClass());
+                if (((TemporarySplitterVertex) v).isEndVertex()) {
+                    e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, 0);
+                    e1.setNoThruTraffic(this.isNoThruTraffic());
+                    e1.setStreetClass(this.getStreetClass());
+                } else {
+                    e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, 0);
+                    e2.setNoThruTraffic(this.isNoThruTraffic());
+                    e2.setStreetClass(this.getStreetClass());
+                }
             }
         }
         return new P2<>(e1, e2);
