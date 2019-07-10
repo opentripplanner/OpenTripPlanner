@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.SemiPermanentPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -41,6 +42,7 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -161,11 +163,15 @@ public class StreetSplitter {
         this(graph, null, null);
     }
 
-    /** Link all relevant vertices to the street network */
+    /**
+     * Link all relevant vertices to the street network.
+     * This is to be called only during graph building in order to destructively split edges in order to create
+     * permanent edges.
+     */
     public void linkAllStationsToGraph() {
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
-                if (!linkToClosestWalkableEdge(v, DESTRUCTIVE_SPLIT)) {
+                if (!linkToClosestWalkableEdge(v, DESTRUCTIVE_SPLIT, false)) {
                     if (v instanceof TransitStop)
                         LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStop) v)));
                     else if (v instanceof BikeRentalStationVertex)
@@ -180,21 +186,34 @@ public class StreetSplitter {
      * Link this vertex into the graph to the closest walkable edge
      * @param vertex The vertex to be linked.
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
-     *                             false Splitting is only for duration of a request. Since they are made from
-     *                             temporary vertices and edges.
-     * @return
+     *                             false the original edge is kept in the graph after creating split edges.
+     * @param createSemiPermanentEdges If true, semi-permanent edges and a semi-permanent splitter vertex is created.
+     *                                 These vertices and edges are intended to be kept in the graph and linked to
+     *                                 during subsequent requests, but might be removed at a later time. For example a
+     *                                 floating bike rental may need to be removed from the graph once the data is
+     *                                 updated to show that the floating bike rental no longer exists or if its
+     *                                 location has significantly changed.
      */
-    public boolean linkToClosestWalkableEdge(Vertex vertex, final boolean destructiveSplitting) {
-        return linkToGraph(vertex, TraverseMode.WALK, null, destructiveSplitting);
+    public boolean linkToClosestWalkableEdge(
+        Vertex vertex,
+        final boolean destructiveSplitting,
+        boolean createSemiPermanentEdges
+    ) {
+        return linkToGraph(vertex, TraverseMode.WALK, null, destructiveSplitting, createSemiPermanentEdges);
     }
 
-    public boolean linkToGraph(Vertex vertex, TraverseMode traverseMode, RoutingRequest options,
-                               final boolean destructiveSplitting) {
+    public boolean linkToGraph(
+        Vertex vertex,
+        TraverseMode traverseMode,
+        RoutingRequest options,
+        final boolean destructiveSplitting,
+        boolean createSemiPermanentEdges
+    ) {
         final TraverseModeSet traverseModeSet = new TraverseModeSet(traverseMode);
         if (traverseMode == TraverseMode.BICYCLE) {
             traverseModeSet.setWalk(true);
         }
-        return linkToGraph(vertex, traverseModeSet, options, destructiveSplitting);
+        return linkToGraph(vertex, traverseModeSet, options, destructiveSplitting, createSemiPermanentEdges);
     }
 
     /**
@@ -205,12 +224,21 @@ public class StreetSplitter {
      * @param traverseModeSet The traverse modes.
      * @param options The routing options.
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
-     *                             false Splitting is only for duration of a request. Since they are made from
-     *                             temporary vertices and edges.
-     * @return
+     *                             false the original edge is kept in the graph after creating split edges.
+     * @param createSemiPermanentEdges If true, semi-permanent edges and a semi-permanent splitter vertex is created.
+     *                                 These vertices and edges are intended to be kept in the graph and linked to
+     *                                 during subsequent requests, but might be removed at a later time. For example a
+     *                                 floating bike rental may need to be removed from the graph once the data is
+     *                                 updated to show that the floating bike rental no longer exists or if its
+     *                                 location has significantly changed.
      */
-    public boolean linkToGraph(Vertex vertex, TraverseModeSet traverseModeSet, RoutingRequest options,
-                               final boolean destructiveSplitting) {
+    public boolean linkToGraph(
+        Vertex vertex,
+        TraverseModeSet traverseModeSet,
+        RoutingRequest options,
+        final boolean destructiveSplitting,
+        boolean createSemiPermanentEdges
+    ) {
         // find nearby street edges
         // TODO: we used to use an expanding-envelope search, which is more efficient in
         // dense areas. but first let's see how inefficient this is. I suspect it's not too
@@ -232,7 +260,14 @@ public class StreetSplitter {
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
         List<StreetEdge> candidateEdges = idx.query(env).stream()
-            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
+            .filter(
+                streetEdge -> streetEdge instanceof StreetEdge &&
+                    // do not find SemiPermanentPartialStreetEdges if creating new SemiPermanentPartialStreetEdges
+                    // use only permanent StreetEdges instead
+                    (createSemiPermanentEdges
+                        ? !(streetEdge instanceof SemiPermanentPartialStreetEdge)
+                        : true)
+            )
             .map(edge -> (StreetEdge) edge)
             // note: not filtering by radius here as distance calculation is expensive
             // we do that below.
@@ -327,7 +362,7 @@ public class StreetSplitter {
                     .get(candidateEdges.get(i - 1).getId()) < DUPLICATE_WAY_EPSILON_DEGREES);
 
             for (StreetEdge edge : bestEdges) {
-                linkToEdge(vertex, edge, xscale, options, destructiveSplitting);
+                linkToEdge(vertex, edge, xscale, options, destructiveSplitting, createSemiPermanentEdges);
             }
 
             // Warn if a linkage was made, but the linkage was suspiciously long.
@@ -373,11 +408,22 @@ public class StreetSplitter {
      * @param xscale The longitude scale factor in Equirectangular projection.
      * @param options An object of RoutingRequest
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
-     *                             false Splitting is only for duration of a request. Since they are made from
-     *                             temporary vertices and edges.
+     *                             false the original edge is kept in the graph after creating split edges.
+     * @param createSemiPermanentEdges If true, semi-permanent edges and a semi-permanent splitter vertex is created.
+     *                                 These vertices and edges are intended to be kept in the graph and linked to
+     *                                 during subsequent requests, but might be removed at a later time. For example a
+     *                                 floating bike rental may need to be removed from the graph once the data is
+     *                                 updated to show that the floating bike rental no longer exists or if its
+     *                                 location has significantly changed.
      */
-    private void linkToEdge(Vertex vertex, StreetEdge edge, double xscale, RoutingRequest options,
-                            final boolean destructiveSplitting) {
+    private void linkToEdge(
+        Vertex vertex,
+        StreetEdge edge,
+        double xscale,
+        RoutingRequest options,
+        final boolean destructiveSplitting,
+        boolean createSemiPermanentEdges
+    ) {
         // TODO: we've already built this line string, we should save it
         LineString orig = edge.getGeometry();
         LineString transformed = equirectangularProject(orig, xscale);
@@ -417,7 +463,14 @@ public class StreetSplitter {
                 options.canSplitEdge(edge);
             }
             // split the edge, get the split vertex
-            SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex, destructiveSplitting);
+            SplitterVertex v0 = split(
+                edge,
+                ll,
+                temporaryVertex != null,
+                endVertex,
+                destructiveSplitting,
+                createSemiPermanentEdges
+            );
             makeLinkEdges(vertex, v0, destructiveSplitting);
 
             // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
@@ -434,15 +487,27 @@ public class StreetSplitter {
      *
      * @param edge to be split
      * @param ll fraction at which to split the edge
-     * @param temporarySplit if true this is temporary split at origin/destinations search and only temporary edges vertices are created
+     * @param temporarySplit if true this is temporary split at origin/destinations search and only temporary edges
+     *                       vertices are created
      * @param endVertex if this is temporary edge this is true if this is end vertex otherwise it doesn't matter
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
-     *                             false Splitting is only for duration of a request. Since they are made from
-     *                             temporary vertices and edges.
+     *                             false the original edge is kept in the graph after creating split edges.
+     * @param createSemiPermanentEdges If true, semi-permanent edges and a semi-permanent splitter vertex is created.
+     *                                 These vertices and edges are intended to be kept in the graph and linked to
+     *                                 during subsequent requests, but might be removed at a later time. For example a
+     *                                 floating bike rental may need to be removed from the graph once the data is
+     *                                 updated to show that the floating bike rental no longer exists or if its
+     *                                 location has significantly changed.
      * @return Splitter vertex with added new edges
      */
-    private SplitterVertex split (StreetEdge edge, LinearLocation ll, boolean temporarySplit, boolean endVertex,
-                                  final boolean destructiveSplitting) {
+    private SplitterVertex split (
+        StreetEdge edge,
+        LinearLocation ll,
+        boolean temporarySplit,
+        boolean endVertex,
+        final boolean destructiveSplitting,
+        boolean createSemiPermanentEdges
+    ) {
 
         LineString geometry = edge.getGeometry();
 
@@ -451,17 +516,20 @@ public class StreetSplitter {
 
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
-        if (temporarySplit) {
-            v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y, edge, endVertex);
+        String vertexLabel = "split from " + edge.getId();
+        if (createSemiPermanentEdges) {
+            v = new SemiPermanentSplitterVertex(vertexLabel, splitPoint.x, splitPoint.y, edge, endVertex);
+        } else if (temporarySplit) {
+            v = new TemporarySplitterVertex(vertexLabel, splitPoint.x, splitPoint.y, edge, endVertex);
         } else {
-            v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y, edge);
+            v = new SplitterVertex(graph, vertexLabel, splitPoint.x, splitPoint.y, edge);
         }
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
         // existing vertices
-        P2<StreetEdge> edges = edge.split(v, !temporarySplit);
+        P2<StreetEdge> edges = edge.split(v, !temporarySplit, createSemiPermanentEdges);
 
-        if (destructiveSplitting) {
+        if (destructiveSplitting || createSemiPermanentEdges) {
             // update indices of new edges
             synchronized (this) {
                 // Note: Write operations are not synchronized in HashGridSpatialIndex, hence the lock.
@@ -469,8 +537,10 @@ public class StreetSplitter {
                 idx.insert(edges.second.getGeometry(), edges.second);
             }
             // (no need to remove original edge, we filter it when it comes out of the index)
+        }
 
-            // remove original edge from the graph
+        if (destructiveSplitting) {
+            // remove original edge from the graph if split was destructive
             edge.getToVertex().removeIncoming(edge);
             edge.getFromVertex().removeOutgoing(edge);
         }
@@ -485,7 +555,7 @@ public class StreetSplitter {
         } else if (from instanceof TransitStop) {
             makeTransitLinkEdges((TransitStop) from, to, destructiveSplitting);
         } else if (from instanceof BikeRentalStationVertex) {
-            makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to, destructiveSplitting);
+            makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
             makeBikeParkEdges((BikeParkVertex) from, to, destructiveSplitting);
         }
@@ -541,11 +611,7 @@ public class StreetSplitter {
     }
 
     /** Make link edges for bike rental */
-    private void makeBikeRentalLinkEdges (BikeRentalStationVertex from, StreetVertex to,
-                                          final boolean destructiveSplitting) {
-        if (!destructiveSplitting) {
-            throw new RuntimeException("Bike rental edges are created with non destructive splitting!");
-        }
+    private void makeBikeRentalLinkEdges (BikeRentalStationVertex from, StreetVertex to) {
         for (StreetBikeRentalLink sbrl : Iterables.filter(from.getOutgoing(), StreetBikeRentalLink.class)) {
             if (sbrl.getToVertex() == to)
                 return;
@@ -635,7 +701,7 @@ public class StreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!linkToGraph(closest, nonTransitMode, options, NON_DESTRUCTIVE_SPLIT)) {
+        if(!linkToGraph(closest, nonTransitMode, options, NON_DESTRUCTIVE_SPLIT, false)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;

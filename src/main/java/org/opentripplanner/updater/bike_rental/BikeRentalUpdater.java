@@ -170,7 +170,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
-                    if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                    if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT, true)) {
                         // the toString includes the text "Bike rental station"
                         LOG.warn("{} not near any streets; it will not be usable.", station);
                     }
@@ -196,6 +196,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 toRemove.add(station);
                 service.removeBikeRentalStation(station);
                 // TODO: need to unsplit any streets that were split
+                // TODO: see if vertex was semi-permanent and then remove vertex, edges from graph, also remove edges
+                //    from splitter index
             }
             for (BikeRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
