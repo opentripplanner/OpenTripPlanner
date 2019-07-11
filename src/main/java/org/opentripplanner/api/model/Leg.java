@@ -263,14 +263,6 @@ public class Leg {
     @JsonSerialize
     public TransportationNetworkCompanySummary tncData;
 
-    @XmlAttribute
-    @JsonSerialize
-    public RentedCarSummary rentedCarData;
-
-    @XmlAttribute
-    @JsonSerialize
-    public RentedVehicleSummary rentedVehicleData;
-
     /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
