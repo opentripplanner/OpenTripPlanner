@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 
@@ -14,6 +14,8 @@ import org.opentripplanner.util.I18NString;
  * when they are no longer needed.
  */
 public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
+    private boolean bikeRentalOptionRequired = false;
+
     public SemiPermanentPartialStreetEdge(
         StreetEdge streetEdge,
         StreetVertex v1,
@@ -29,7 +31,8 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
      * use a bike rental. In those cases, return null to avoid exploring this edge and any connected vertices further.
      */
     @Override public State traverse(State s0) {
-        // TODO: add some conditions that would return null to avoid traversal
+        RoutingRequest options = s0.getOptions();
+        if (bikeRentalOptionRequired && !options.allowBikeRental) return null;
         return super.traverse(s0);
     }
 
@@ -38,5 +41,12 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
         return "SemiPermanentPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
             + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
             + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+    }
+
+    /**
+     * Marks the edge as only traversable if a request is made that allows bike rentals
+     */
+    public void setBikeRentalOptionRequired() {
+        bikeRentalOptionRequired = true;
     }
 }

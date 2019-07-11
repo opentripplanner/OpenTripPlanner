@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -471,6 +472,21 @@ public class StreetSplitter {
                 destructiveSplitting,
                 createSemiPermanentEdges
             );
+
+            // if SemiPermanentEdges were created, update some of their characteristics to ensure that they are not
+            // traversed if there is no reason to do so
+            if (createSemiPermanentEdges) {
+                Set<Edge> newlySplitEdges = new HashSet<>();
+                newlySplitEdges.addAll(v0.getOutgoing());
+                newlySplitEdges.addAll(v0.getIncoming());
+
+                if (vertex instanceof BikeRentalStationVertex) {
+                    for (Edge splitEdge : newlySplitEdges) {
+                        ((SemiPermanentPartialStreetEdge) splitEdge).setBikeRentalOptionRequired();
+                    }
+                }
+            }
+
             makeLinkEdges(vertex, v0, destructiveSplitting);
 
             // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
