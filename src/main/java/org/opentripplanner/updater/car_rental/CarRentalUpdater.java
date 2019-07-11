@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.NON_DESTRUCTIVE_SPLIT;
 
 public class CarRentalUpdater extends PollingGraphUpdater {
 
@@ -194,7 +194,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
         private void makeVertex(Graph graph, CarRentalStation station) {
             CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-            if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+            if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                 // the toString includes the text "Car rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
@@ -293,7 +293,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             coordToNetworksMap.forEach((coord, networks) -> {
                 CarRentalStation station = makeDropOffStation(coord, networks);
                 CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-                if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }

@@ -36,7 +36,6 @@ public class AddTripPatternTest extends TestCase {
 
         // get a graph
         Graph g = buildGraphNoTransit();
-        link(g);
         g.index(new DefaultStreetVertexIndexFactory());
 
         // materialize the trip pattern
@@ -96,7 +95,6 @@ public class AddTripPatternTest extends TestCase {
 
         // get a graph
         Graph g = buildGraphNoTransit();
-        link(g);
         g.index(new DefaultStreetVertexIndexFactory());
 
         // materialize the trip pattern
@@ -158,7 +156,6 @@ public class AddTripPatternTest extends TestCase {
         // get a graph
         Graph g = buildGraphNoTransit();
         addTransit(g);
-        link(g);
         g.index(new DefaultStreetVertexIndexFactory());
 
         // materialize the trip pattern
@@ -235,7 +232,6 @@ public class AddTripPatternTest extends TestCase {
     public void integrationTest () throws Exception {
         Graph g = buildGraphNoTransit();
         addTransit(g);
-        link(g);
 
         ProfileRequest pr1 = new ProfileRequest();
         pr1.date = new LocalDate(2015, 6, 10);

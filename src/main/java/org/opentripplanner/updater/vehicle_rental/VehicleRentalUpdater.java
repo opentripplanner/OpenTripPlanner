@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.NON_DESTRUCTIVE_SPLIT;
 
 /**
  * An updater for vehicle rentals. This runs as a PollingGraphUpdater and fetches the latest data from a datasource that
@@ -200,7 +200,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         private void makeVertex(Graph graph, VehicleRentalStation station) {
             VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
-            if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+            if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                 // the toString includes the text "Vehicle rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
@@ -304,7 +304,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             coordToNetworksMap.forEach((coord, networks) -> {
                 VehicleRentalStation station = makeDropOffStation(coord, networks);
                 VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
-                if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }

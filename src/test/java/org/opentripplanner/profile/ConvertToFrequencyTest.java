@@ -27,7 +27,6 @@ public class ConvertToFrequencyTest extends TestCase {
     public void testSimpleConversion () throws Exception {
         Graph gg = buildGraphNoTransit();
         addTransit(gg);
-        link(gg);
         gg.index(new DefaultStreetVertexIndexFactory());
 
         ProfileRequest pr1 = new ProfileRequest();
@@ -78,7 +77,6 @@ public class ConvertToFrequencyTest extends TestCase {
     public void testMultiplePatterns () throws Exception {
         Graph gg = buildGraphNoTransit();
         addMultiplePatterns(gg);
-        link(gg);
         gg.index(new DefaultStreetVertexIndexFactory());
 
         ProfileRequest pr1 = new ProfileRequest();
@@ -178,7 +176,6 @@ public class ConvertToFrequencyTest extends TestCase {
     public void testBidirectional () throws Exception {
         Graph gg = buildGraphNoTransit();
         addTransitBidirectional(gg);
-        link(gg);
         gg.index(new DefaultStreetVertexIndexFactory());
 
         ProfileRequest pr2 = new ProfileRequest();
