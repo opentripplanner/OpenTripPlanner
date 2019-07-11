@@ -1095,4 +1095,8 @@ public class Graph implements Serializable {
         }
         this.useFlexService = useFlexService;
     }
+
+    public boolean containsVertexLabel(String label) {
+        return vertices.containsKey(label);
+    }
 }

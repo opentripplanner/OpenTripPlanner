@@ -516,9 +516,19 @@ public class StreetSplitter {
 
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
-        String vertexLabel = "split from " + edge.getId();
+        StringBuilder splitLabel = new StringBuilder();
+        splitLabel.append("split from ");
+        splitLabel.append(edge.getId());
+        splitLabel.append(" #");
+        int splintNum = 1;
+        splitLabel.append(splintNum);
+        while (graph.containsVertexLabel(splitLabel.toString())) {
+            splintNum++;
+            splitLabel.replace(splitLabel.lastIndexOf("#") + 1, Integer.MAX_VALUE, String.valueOf(splintNum));
+        }
+        String vertexLabel = splitLabel.toString();
         if (createSemiPermanentEdges) {
-            v = new SemiPermanentSplitterVertex(vertexLabel, splitPoint.x, splitPoint.y, edge, endVertex);
+            v = new SemiPermanentSplitterVertex(graph, vertexLabel, splitPoint.x, splitPoint.y, edge);
         } else if (temporarySplit) {
             v = new TemporarySplitterVertex(vertexLabel, splitPoint.x, splitPoint.y, edge, endVertex);
         } else {
@@ -527,7 +537,7 @@ public class StreetSplitter {
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
         // existing vertices
-        P2<StreetEdge> edges = edge.split(v, !temporarySplit, createSemiPermanentEdges);
+        P2<StreetEdge> edges = edge.split(v, destructiveSplitting, createSemiPermanentEdges);
 
         if (destructiveSplitting || createSemiPermanentEdges) {
             // update indices of new edges
@@ -535,8 +545,12 @@ public class StreetSplitter {
                 // Note: Write operations are not synchronized in HashGridSpatialIndex, hence the lock.
                 idx.insert(edges.first.getGeometry(), edges.first);
                 idx.insert(edges.second.getGeometry(), edges.second);
+
+                // if destructively splitting, remove the edge from the index
+                if (destructiveSplitting) {
+                    idx.remove(edge.getGeometry().getEnvelopeInternal(), edge);
+                }
             }
-            // (no need to remove original edge, we filter it when it comes out of the index)
         }
 
         if (destructiveSplitting) {
@@ -569,10 +583,19 @@ public class StreetSplitter {
         if (to instanceof TemporarySplitterVertex) {
             from.setWheelchairAccessible(((TemporarySplitterVertex) to).isWheelchairAccessible());
         }
+        // there is no need to create a TemporaryFreeEdge when the to vertex
         if (from.isEndVertex()) {
+            // Don't create a TemporaryFreeEdge if the to vertex doesn't have any incoming edges, it's a dead end that
+            // was probably caused by avoiding the creation of identical TemporaryPartialStreetEdges in cases where a
+            // certain SemiPermanentPartialStreetEdge was split.
+            if (to.getDegreeIn() == 0) return;
             LOG.debug("Linking end vertex to {} -> {}", to, from);
             new TemporaryFreeEdge(to, from);
         } else {
+            // Don't create a TemporaryFreeEdge if the to vertex doesn't have any outgoing edges, it's a dead end that
+            // was probably caused by avoiding the creation of identical TemporaryPartialStreetEdges in cases where a
+            // certain SemiPermanentPartialStreetEdge was split.
+            if (to.getDegreeOut() == 0) return;
             LOG.debug("Linking start vertex to {} -> {}", from, to);
             new TemporaryFreeEdge(from, to);
         }
@@ -714,5 +737,29 @@ public class StreetSplitter {
 
     public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
         this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+    }
+
+    public void removeSemiPermanentVerticesAndEdges (SemiPermanentSplitterVertex vertex) {
+        // remove all associated SemiPermanentPartialStreetEdges from the splitter index
+        for (Edge edge : vertex.getOutgoing()) {
+            if (edge instanceof SemiPermanentPartialStreetEdge) {
+                removeEdgeFromIdx((StreetEdge) edge);
+            }
+        }
+        for (Edge edge : vertex.getIncoming()) {
+            if (edge instanceof SemiPermanentPartialStreetEdge) {
+                removeEdgeFromIdx((StreetEdge) edge);
+            }
+        }
+        if (graph.containsVertex(vertex)) {
+            // remove the SemiPermanentSplitterVertex and associated SemiPermanentPartialStreetEdges
+            graph.removeVertexAndEdges(vertex);
+        }
+    }
+
+    public void removeEdgeFromIdx (StreetEdge edge) {
+        synchronized (this) {
+            idx.remove(edge.getGeometry().getEnvelopeInternal(), edge);
+        }
     }
 }

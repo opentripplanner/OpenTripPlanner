@@ -778,6 +778,12 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** Split this street edge and return the resulting street edges */
     public P2<StreetEdge> split(SplitterVertex v, boolean destructive, boolean createSemiPermanentEdges) {
+        if (this instanceof SemiPermanentPartialStreetEdge && !(v instanceof TemporarySplitterVertex)) {
+            throw new RuntimeException(
+                "A split is being attempted on a SemiPermanentPartialStreetEdge using a vertex other than a "
+                    + "TemporarySplitterVertex. Something is wrong!"
+            );
+        }
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;
@@ -853,13 +859,23 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             } else {
                 if (((TemporarySplitterVertex) v).isEndVertex()) {
-                    e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, 0);
-                    e1.setNoThruTraffic(this.isNoThruTraffic());
-                    e1.setStreetClass(this.getStreetClass());
+                    // There is no need to split a SemiPermanentPartialStreetEdge when the to vertex is a
+                    // SemiPermanentSplitterVertex. The original edge that the SemiPermanentPartialStreetEdge was split
+                    // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
+                    if (!(this instanceof SemiPermanentPartialStreetEdge && tov instanceof SemiPermanentSplitterVertex)) {
+                        e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, 0);
+                        e1.setNoThruTraffic(this.isNoThruTraffic());
+                        e1.setStreetClass(this.getStreetClass());
+                    }
                 } else {
-                    e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, 0);
-                    e2.setNoThruTraffic(this.isNoThruTraffic());
-                    e2.setStreetClass(this.getStreetClass());
+                    // There is no need to split a SemiPermanentPartialStreetEdge when the from vertex is a
+                    // SemiPermanentSplitterVertex. The original edge that the SemiPermanentPartialStreetEdge was split
+                    // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
+                    if (!(this instanceof SemiPermanentPartialStreetEdge && fromv instanceof SemiPermanentSplitterVertex)) {
+                        e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, 0);
+                        e2.setNoThruTraffic(this.isNoThruTraffic());
+                        e2.setStreetClass(this.getStreetClass());
+                    }
                 }
             }
         }
