@@ -32,4 +32,11 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
         // TODO: add some conditions that would return null to avoid traversal
         return super.traverse(s0);
     }
+
+    @Override
+    public String toString() {
+        return "SemiPermanentPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
+            + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
+            + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+    }
 }

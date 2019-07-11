@@ -14,6 +14,7 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
 
     private boolean wheelchairAccessible;
 
+    // whether the vertex is the destination vertex (toVertex) in a RoutingContext
     final private boolean endVertex;
 
     public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge, boolean endVertex) {
