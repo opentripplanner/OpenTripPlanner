@@ -1290,12 +1290,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** Split this street edge and return the resulting street edges */
     public P2<StreetEdge> split(SplitterVertex v, boolean destructive, boolean createSemiPermanentEdges) {
-        if (this instanceof SemiPermanentPartialStreetEdge && !(v instanceof TemporarySplitterVertex)) {
-            throw new RuntimeException(
-                "A split is being attempted on a SemiPermanentPartialStreetEdge using a vertex other than a "
-                    + "TemporarySplitterVertex. Something is wrong!"
-            );
-        }
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;

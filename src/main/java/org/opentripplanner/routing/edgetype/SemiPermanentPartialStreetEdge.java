@@ -1,9 +1,12 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -48,5 +51,20 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
      */
     public void setBikeRentalOptionRequired() {
         bikeRentalOptionRequired = true;
+    }
+
+    /**
+     * Make sure that the only way to split a SemiPermanentPartialStreetEdge is with a TemporarySplitterVertex. The
+     * whole point of SemiPermanentPartialStreetEdges is that they are only split once from a regular StreetEdge in
+     * order to isolate access to a particular vertex that can be accessed from a StreetEdge such as a bike rental.
+     */
+    @Override public P2<StreetEdge> split(SplitterVertex v, boolean destructive, boolean createSemiPermanentEdges) {
+        if (!(v instanceof TemporarySplitterVertex)) {
+            throw new RuntimeException(
+                "A split is being attempted on a SemiPermanentPartialStreetEdge using a vertex other than a "
+                    + "TemporarySplitterVertex. Something is wrong!"
+            );
+        }
+        return super.split(v, destructive, createSemiPermanentEdges);
     }
 }
