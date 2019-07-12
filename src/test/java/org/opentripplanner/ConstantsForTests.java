@@ -1,19 +1,16 @@
 package org.opentripplanner;
 
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.HashMap;
 
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
@@ -82,7 +79,7 @@ public class ConstantsForTests {
         StreetLinkerModule ttsnm = new StreetLinkerModule();
         ttsnm.buildGraph(portlandGraph, new HashMap<Class<?>, Object>());
     }
-
+    
     public static Graph buildGraph(String path) {
         GtfsContext context;
         try {
