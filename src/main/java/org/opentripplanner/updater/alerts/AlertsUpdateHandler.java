@@ -40,11 +40,11 @@ public class AlertsUpdateHandler {
     /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public void update(FeedMessage message) {
+    public void update(List<GtfsRealtime.FeedEntity> entities) {
         alertPatchService.expire(patchIds);
         patchIds.clear();
 
-        for (FeedEntity entity : message.getEntityList()) {
+        for (FeedEntity entity : entities) {
             if (!entity.hasAlert()) {
                 continue;
             }

@@ -3,6 +3,7 @@ package org.opentripplanner.updater.alerts;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.util.ArrayUtils;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,8 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private AlertsUpdateHandler updateHandler = null;
 
+    private String[] blacklist = new String[0];
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -60,6 +64,9 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+        }
+        if (config.path("blacklist") != null) {
+            this.blacklist = new ObjectMapper().convertValue(config.path("blacklist"), String[].class);
         }
         LOG.info("Creating enhanced real-time alert (json) updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
@@ -91,11 +98,17 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
                 return;
             }
 
+            List<GtfsRealtime.FeedEntity> entities = feed
+                    .getEntityList()
+                    .stream()
+                    .filter(e -> e.hasId() && !ArrayUtils.contains(blacklist, e.getId()))
+                    .collect(Collectors.toList());
+
             // Handle update in graph writer runnable
             updaterManager.execute(new GraphWriterRunnable() {
                 @Override
                 public void run(Graph graph) {
-                    updateHandler.update(feed);
+                    updateHandler.update(entities);
                 }
             });
 
@@ -142,6 +155,10 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
 
         if (alertNode.get("effect") != null) {
             alert.setEffect(GtfsRealtime.Alert.Effect.valueOf(alertNode.get("effect").textValue()));
+        }
+
+        if (alertNode.get("cause") != null) {
+            alert.setCause(GtfsRealtime.Alert.Cause.valueOf(alertNode.get("cause").textValue()));
         }
 
         if (alertNode.get("url") != null) {
