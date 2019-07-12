@@ -488,6 +488,14 @@ public class StreetSplitter {
                     for (Edge splitEdge : newlySplitEdges) {
                         ((SemiPermanentPartialStreetEdge) splitEdge).setBikeRentalOptionRequired();
                     }
+                } else if (vertex instanceof CarRentalStationVertex) {
+                    for (Edge splitEdge : newlySplitEdges) {
+                        ((SemiPermanentPartialStreetEdge) splitEdge).setCarRentalOptionRequired();
+                    }
+                } else if (vertex instanceof VehicleRentalStationVertex) {
+                    for (Edge splitEdge : newlySplitEdges) {
+                        ((SemiPermanentPartialStreetEdge) splitEdge).setVehicleRentalOptionRequired();
+                    }
                 }
             }
 

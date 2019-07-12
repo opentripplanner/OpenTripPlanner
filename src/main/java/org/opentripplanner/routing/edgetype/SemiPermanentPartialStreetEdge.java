@@ -18,6 +18,8 @@ import org.opentripplanner.util.I18NString;
  */
 public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
     private boolean bikeRentalOptionRequired = false;
+    private boolean carRentalOptionRequired = false;
+    private boolean vehicleRentalOptionRequired = false;
 
     public SemiPermanentPartialStreetEdge(
         StreetEdge streetEdge,
@@ -35,7 +37,13 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
      */
     @Override public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
-        if (bikeRentalOptionRequired && !options.allowBikeRental) return null;
+        if (
+            (bikeRentalOptionRequired && !options.allowBikeRental) ||
+                (carRentalOptionRequired && !options.allowCarRental) ||
+                (vehicleRentalOptionRequired && !options.allowVehicleRental)
+        ) {
+            return null;
+        }
         return super.traverse(s0);
     }
 
@@ -52,6 +60,16 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
     public void setBikeRentalOptionRequired() {
         bikeRentalOptionRequired = true;
     }
+
+    /**
+     * Marks the edge as only traversable if a request is made that allows car rentals
+     */
+    public void setCarRentalOptionRequired() { carRentalOptionRequired = true; }
+
+    /**
+     * Marks the edge as only traversable if a request is made that allows vehicle rentals
+     */
+    public void setVehicleRentalOptionRequired() { vehicleRentalOptionRequired = true; }
 
     /**
      * Make sure that the only way to split a SemiPermanentPartialStreetEdge is with a TemporarySplitterVertex. The
