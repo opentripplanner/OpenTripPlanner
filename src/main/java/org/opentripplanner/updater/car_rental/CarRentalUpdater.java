@@ -8,16 +8,20 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import org.opentripplanner.api.resource.CarRental;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.edgetype.RentACarOffEdge;
 import org.opentripplanner.routing.edgetype.RentACarOnEdge;
+import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -178,13 +182,27 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 CarRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                CarRentalStationVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
+                CarRentalStationVertex carRentalStationVertex = entry.getValue();
+
+                // before removing the carRentalStationVertex, first find and remove all associated
+                // SemiPermanentSplitterVertices
+                for (Edge edge : carRentalStationVertex.getOutgoing()) {
+                    if (edge instanceof StreetCarRentalLink) {
+                        StreetCarRentalLink toStreetLink = (StreetCarRentalLink) edge;
+                        StreetVertex streetVertex = (StreetVertex) toStreetLink.getToVertex();
+                        if (streetVertex != null && streetVertex instanceof SemiPermanentSplitterVertex) {
+                            splitter.removeSemiPermanentVerticesAndEdges((SemiPermanentSplitterVertex) streetVertex);
+                        }
+                    }
                 }
+
+                // remove the carRentalStationVertex from the graph if it's in there (why wouldn't it be?)
+                if (graph.containsVertex(carRentalStationVertex)) {
+                    graph.removeVertexAndEdges(carRentalStationVertex);
+                }
+
                 toRemove.add(station);
                 service.removeCarRentalStation(station);
-                // TODO: need to unsplit any streets that were split
             }
             for (CarRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
