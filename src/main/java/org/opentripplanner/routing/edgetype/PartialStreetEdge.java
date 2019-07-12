@@ -34,7 +34,6 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
             LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
-        setCarSpeed(parentEdge.getCarSpeed());
 
         // If length is 0, use the provided geometry to estimate it
         if (length == 0) {
