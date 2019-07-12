@@ -1341,33 +1341,10 @@ public class StreetEdge extends Edge implements Cloneable {
                 e2.fromv.removeOutgoing(e2);
                 throw new IllegalStateException("Split street is longer than original street!");
             }
-
-            for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-                e.setBicycleSafetyFactor(getBicycleSafetyFactor());
-                e.setWalkComfortScore(getWalkComfortScore());
-                e.setHasBogusName(hasBogusName());
-                e.setStairs(isStairs());
-                e.setWheelchairAccessible(isWheelchairAccessible());
-                e.setBack(isBack());
-                e.setCarNetworks(getCarNetworks());
-                e.setFloatingCarDropoffSuitability(getFloatingCarDropoffSuitability());
-                e.setVehicleNetworks(getVehicleNetworks());
-                e.setFloatingVehicleDropoffSuitability(getFloatingVehicleDropoffSuitability());
-            }
         } else {
             if (createSemiPermanentEdges) {
                 e1 = new SemiPermanentPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e2 = new SemiPermanentPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-
-                for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-                    e.setBicycleSafetyFactor(getBicycleSafetyFactor());
-                    e.setHasBogusName(hasBogusName());
-                    e.setStairs(isStairs());
-                    e.setWheelchairAccessible(isWheelchairAccessible());
-                    e.setBack(isBack());
-                    e.setNoThruTraffic(isNoThruTraffic());
-                    e.setStreetClass(getStreetClass());
-                }
             } else {
                 if (((TemporarySplitterVertex) v).isEndVertex()) {
                     // There is no need to split a SemiPermanentPartialStreetEdge when the to vertex is a
@@ -1375,8 +1352,6 @@ public class StreetEdge extends Edge implements Cloneable {
                     // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
                     if (!(this instanceof SemiPermanentPartialStreetEdge && tov instanceof SemiPermanentSplitterVertex)) {
                         e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, 0);
-                        e1.setNoThruTraffic(this.isNoThruTraffic());
-                        e1.setStreetClass(this.getStreetClass());
                     }
                 } else {
                     // There is no need to split a SemiPermanentPartialStreetEdge when the from vertex is a
@@ -1384,18 +1359,38 @@ public class StreetEdge extends Edge implements Cloneable {
                     // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
                     if (!(this instanceof SemiPermanentPartialStreetEdge && fromv instanceof SemiPermanentSplitterVertex)) {
                         e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, 0);
-                        e2.setNoThruTraffic(this.isNoThruTraffic());
-                        e2.setStreetClass(this.getStreetClass());
                     }
                 }
             }
         }
 
-
-
-
+        for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
+            if (e == null) continue;
+            e.copyAttributes(this);
+        }
 
         return new P2<StreetEdge>(e1, e2);
+    }
+
+    /**
+     * Copies over all attirubtes related to the street (not stuff like geometry and vertices and ids) from an other
+     * StreetEdge to this StreetEdge
+     */
+    private void copyAttributes(StreetEdge other) {
+        this.setBicycleSafetyFactor(other.getBicycleSafetyFactor());
+        this.setWalkComfortScore(other.getWalkComfortScore());
+        this.setHasBogusName(other.hasBogusName());
+        this.setStairs(other.isStairs());
+        this.setWheelchairAccessible(other.isWheelchairAccessible());
+        this.setBack(other.isBack());
+        this.setCarNetworks(other.getCarNetworks());
+        this.setCarSpeed(other.getCarSpeed());
+        this.setFloatingCarDropoffSuitability(other.getFloatingCarDropoffSuitability());
+        this.setVehicleNetworks(other.getVehicleNetworks());
+        this.setFloatingVehicleDropoffSuitability(other.getFloatingVehicleDropoffSuitability());
+        this.setNoThruTraffic(other.isNoThruTraffic());
+        this.setStreetClass(other.getStreetClass());
+        this.setTNCStopSuitability(other.getTNCStopSuitability());
     }
 
     /**
