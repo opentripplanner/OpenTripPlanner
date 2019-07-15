@@ -8,22 +8,16 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
-import org.opentripplanner.api.resource.CarRental;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.edgetype.RentACarOffEdge;
 import org.opentripplanner.routing.edgetype.RentACarOnEdge;
-import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
-import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -164,8 +158,8 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 CarRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     makeVertex(graph, station);
-                } else if (Math.abs(station.x - vertex.getX()) > 0.00005 || Math.abs(station.y - vertex.getY()) > 0.00005) {
-                    LOG.info("{} has changed, re-graphing", station);
+                } else if (vertex.hasDifferentApproximatePosition(station)) {
+                    LOG.info("Rental car {} has changed position, re-graphing", station);
 
                     // First remove the old vertices and edges
                     splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
