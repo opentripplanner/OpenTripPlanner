@@ -543,13 +543,11 @@ public class StreetSplitterTest {
         //  vertices and edges
 
         // remove floating bike rental vertex and associated SemiPermanentSplitterVertex and SemiPermanentPartialStreetEdges
-        findAndRemoveAssociatedSemiPermamentVerticesAndEdges(splitter, bikeRentalStationVertexE);
-        g.removeVertexAndEdges(bikeRentalStationVertexE);
+        splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(bikeRentalStationVertexE);
 
         // remove docking bike rental station vertex and associated SemiPermanentSplitterVertex and
         // SemiPermanentPartialStreetEdges
-        findAndRemoveAssociatedSemiPermamentVerticesAndEdges(splitter, bikeRentalStationVertexJ);
-        g.removeVertexAndEdges(bikeRentalStationVertexJ);
+        splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(bikeRentalStationVertexJ);
 
         // The graph should now look like this:
         //
@@ -573,21 +571,6 @@ public class StreetSplitterTest {
         // Begin Act 12
         // Verify that the graph is in the initial state
         verifyInitialState(a, b, c);
-    }
-
-    private void findAndRemoveAssociatedSemiPermamentVerticesAndEdges(
-        StreetSplitter splitter,
-        BikeRentalStationVertex bikeRentalStationVertex
-    ) {
-        for (Edge edge : bikeRentalStationVertex.getOutgoing()) {
-            if (edge instanceof StreetBikeRentalLink) {
-                StreetBikeRentalLink toStreetLink = (StreetBikeRentalLink) edge;
-                StreetVertex streetVertex = (StreetVertex) toStreetLink.getToVertex();
-                if (streetVertex != null && streetVertex instanceof SemiPermanentSplitterVertex) {
-                    splitter.removeSemiPermanentVerticesAndEdges((SemiPermanentSplitterVertex) streetVertex);
-                }
-            }
-        }
     }
 
     /**

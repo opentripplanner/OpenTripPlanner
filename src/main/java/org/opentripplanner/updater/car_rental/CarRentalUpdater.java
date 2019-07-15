@@ -168,7 +168,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                     LOG.info("{} has changed, re-graphing", station);
 
                     // First remove the old vertices and edges
-                    removeStationVerticesAndEgesFromGraph(vertex);
+                    splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
 
                     // then make a new vertices and edges
                     makeVertex(graph, station);
@@ -184,7 +184,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 if (stationSet.contains(station))
                     continue;
 
-                removeStationVerticesAndEgesFromGraph(entry.getValue());
+                splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
 
                 toRemove.add(station);
                 service.removeCarRentalStation(station);
@@ -192,25 +192,6 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             for (CarRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
-            }
-        }
-
-        private void removeStationVerticesAndEgesFromGraph(CarRentalStationVertex carRentalStationVertex) {
-            // before removing the carRentalStationVertex, first find and remove all associated
-            // SemiPermanentSplitterVertices
-            for (Edge edge : carRentalStationVertex.getOutgoing()) {
-                if (edge instanceof StreetCarRentalLink) {
-                    StreetCarRentalLink toStreetLink = (StreetCarRentalLink) edge;
-                    StreetVertex streetVertex = (StreetVertex) toStreetLink.getToVertex();
-                    if (streetVertex != null && streetVertex instanceof SemiPermanentSplitterVertex) {
-                        splitter.removeSemiPermanentVerticesAndEdges((SemiPermanentSplitterVertex) streetVertex);
-                    }
-                }
-            }
-
-            // remove the carRentalStationVertex from the graph if it's in there (why wouldn't it be?)
-            if (graph.containsVertex(carRentalStationVertex)) {
-                graph.removeVertexAndEdges(carRentalStationVertex);
             }
         }
 

@@ -29,7 +29,7 @@ import java.util.Set;
  * @author IBI Group
  * 
  */
-public class VehicleRentalStationVertex extends Vertex {
+public class VehicleRentalStationVertex extends RentalStationVertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 

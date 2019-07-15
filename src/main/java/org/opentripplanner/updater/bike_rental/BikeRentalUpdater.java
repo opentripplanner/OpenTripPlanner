@@ -196,24 +196,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                BikeRentalStationVertex bikeRentalStationVertex = entry.getValue();
 
-                // before removing the bikeRentalStationVertex, first find and remove all associated
-                // SemiPermanentSplitterVertices
-                for (Edge edge : bikeRentalStationVertex.getOutgoing()) {
-                    if (edge instanceof StreetBikeRentalLink) {
-                        StreetBikeRentalLink toStreetLink = (StreetBikeRentalLink) edge;
-                        StreetVertex streetVertex = (StreetVertex) toStreetLink.getToVertex();
-                        if (streetVertex != null && streetVertex instanceof SemiPermanentSplitterVertex) {
-                            splitter.removeSemiPermanentVerticesAndEdges((SemiPermanentSplitterVertex) streetVertex);
-                        }
-                    }
-                }
-
-                // remove the bikeRentalStationVertex from the graph if it's in there (why wouldn't it be?)
-                if (graph.containsVertex(bikeRentalStationVertex)) {
-                    graph.removeVertexAndEdges(bikeRentalStationVertex);
-                }
+                splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
 
                 // first get the outgoing
                 toRemove.add(station);

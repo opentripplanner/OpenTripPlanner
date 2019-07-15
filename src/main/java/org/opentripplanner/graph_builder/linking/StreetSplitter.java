@@ -33,6 +33,7 @@ import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetCarRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
@@ -45,6 +46,7 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.RentalStationVertex;
 import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -808,21 +810,45 @@ public class StreetSplitter {
         this.addExtraEdgesToAreas = addExtraEdgesToAreas;
     }
 
-    public void removeSemiPermanentVerticesAndEdges (SemiPermanentSplitterVertex vertex) {
-        // remove all associated SemiPermanentPartialStreetEdges from the splitter index
-        for (Edge edge : vertex.getOutgoing()) {
-            if (edge instanceof SemiPermanentPartialStreetEdge) {
-                removeEdgeFromIdx((StreetEdge) edge);
+    /**
+     * Helper method for removing all vertices and edges associated with a SemiPermanentSplitterVertex. The purpose of
+     * a SemiPermanentSplitterVertex is to model access to another vertex (typically a bike/car/vehicle rental station
+     * vertex) from an existing set of street vertices. This method removes all edges immediately connected to the given
+     * vertex, but also searches outward for Street{Bike/Car/Vehicle}RentalLink edges and associated connected vertices
+     * and edges and removes those as well from the graph.
+     */
+    public void removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges (RentalStationVertex rentalStationVertex) {
+        // before removing the bikeRentalStationVertex, first find and remove all associated
+        // SemiPermanentSplitterVertices
+        for (Edge rentalStationVertexEdge : rentalStationVertex.getOutgoing()) {
+            if (rentalStationVertexEdge instanceof StreetRentalLink) {
+                StreetRentalLink toStreetLink = (StreetRentalLink) rentalStationVertexEdge;
+                StreetVertex streetVertex = (StreetVertex) toStreetLink.getToVertex();
+                // Sometimes a StreetRentalLink can link directly to a permanent StreetVertex, so make sure only
+                // SemiPermanentSplitterVertices are removed.
+                if (streetVertex != null && streetVertex instanceof SemiPermanentSplitterVertex) {
+                    // remove all associated SemiPermanentPartialStreetEdges from the splitter index
+                    for (Edge edge : streetVertex.getOutgoing()) {
+                        if (edge instanceof SemiPermanentPartialStreetEdge) {
+                            removeEdgeFromIdx((StreetEdge) edge);
+                        }
+                    }
+                    for (Edge edge : streetVertex.getIncoming()) {
+                        if (edge instanceof SemiPermanentPartialStreetEdge) {
+                            removeEdgeFromIdx((StreetEdge) edge);
+                        }
+                    }
+                    if (graph.containsVertex(streetVertex)) {
+                        // remove the SemiPermanentSplitterVertex and associated SemiPermanentPartialStreetEdges
+                        graph.removeVertexAndEdges(streetVertex);
+                    }
+                }
             }
         }
-        for (Edge edge : vertex.getIncoming()) {
-            if (edge instanceof SemiPermanentPartialStreetEdge) {
-                removeEdgeFromIdx((StreetEdge) edge);
-            }
-        }
-        if (graph.containsVertex(vertex)) {
-            // remove the SemiPermanentSplitterVertex and associated SemiPermanentPartialStreetEdges
-            graph.removeVertexAndEdges(vertex);
+
+        // remove the bikeRentalStationVertex from the graph if it's in there (why wouldn't it be?)
+        if (graph.containsVertex(rentalStationVertex)) {
+            graph.removeVertexAndEdges(rentalStationVertex);
         }
     }
 

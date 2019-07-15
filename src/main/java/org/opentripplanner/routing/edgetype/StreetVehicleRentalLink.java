@@ -29,41 +29,16 @@ import java.util.Locale;
  * This represents the connection between a street vertex and a vehicle rental station vertex.
  * 
  */
-public class StreetVehicleRentalLink extends Edge {
+public class StreetVehicleRentalLink extends StreetRentalLink {
 
     private static final long serialVersionUID = 1L;
 
-    private VehicleRentalStationVertex vehicleRentalStationVertex;
-
     public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalStationVertex tov) {
         super(fromv, tov);
-        vehicleRentalStationVertex = tov;
     }
 
     public StreetVehicleRentalLink(VehicleRentalStationVertex fromv, StreetVertex tov) {
         super(fromv, tov);
-        vehicleRentalStationVertex = fromv;
-    }
-
-    public String getDirection() {
-        return null;
-    }
-
-    public double getDistance() {
-        return 0;
-    }
-
-    public LineString getGeometry() {
-        return null;
-    }
-
-    public String getName() {
-        return vehicleRentalStationVertex.getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return vehicleRentalStationVertex.getName(locale);
     }
 
     public State traverse(State s0) {
@@ -86,14 +61,6 @@ public class StreetVehicleRentalLink extends Edge {
     @Override
     public double weightLowerBound(RoutingRequest options) {
         return options.modes.contains(TraverseMode.MICROMOBILITY) ? 0 : Double.POSITIVE_INFINITY;
-    }
-
-    public Vertex getFromVertex() {
-        return fromv;
-    }
-
-    public Vertex getToVertex() {
-        return tov;
     }
 
     public String toString() {
