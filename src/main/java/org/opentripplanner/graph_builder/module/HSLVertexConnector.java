@@ -41,13 +41,17 @@ public class HSLVertexConnector implements VertexConnector {
 		if (stopCode.equals(vertexStopCode))
 			return true;
 		
-		return matchPrefixedHslStopCodes(vertexStopCode, stopCode);
+		if (Math.abs(vertexStopCode.length() - stopCode.length()) != 1)
+			return false;
+		
+		return matchPrefixedHslStopCodes(vertexStopCode, stopCode)
+			|| matchPrefixedHslStopCodes(stopCode, vertexStopCode);
 	}
 	
-	private boolean matchPrefixedHslStopCodes(String vertexStopCode, String stopCode) {
+	private static boolean matchPrefixedHslStopCodes(String potentiallyPrefixedStopCode, String stopCode) {
 		// Special check for HSL stops which may have a prefixed 'H'
-		boolean hasHslPrefix = ('H' == vertexStopCode.charAt(0));
-		return hasHslPrefix && stopCode.equals(vertexStopCode.substring(1));
+		boolean hasHslPrefix = ('H' == potentiallyPrefixedStopCode.charAt(0));
+		return hasHslPrefix && stopCode.equals(potentiallyPrefixedStopCode.substring(1));
 	}
 	
 	private boolean makeStreetTransitLink(TransitStop ts, boolean wheelchairAccessible, TransitStopStreetVertex tsv) {

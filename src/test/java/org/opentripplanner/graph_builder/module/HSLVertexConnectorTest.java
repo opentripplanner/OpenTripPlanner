@@ -28,6 +28,13 @@ public class HSLVertexConnectorTest extends AbstractVertexConnectorTest {
 	}
 	
 	@Test
+	public void connectVertexSucceedsWithPrefixedTransitStop() {
+		TransitStop transitStop = createPrefixedTransitStop();
+		boolean connected = connector.connectVertex(transitStop,false, vertices);
+		assertTrue(connected);
+	}
+	
+	@Test
 	public void connectVertexCreatesCorrectLinks() {
 		TransitStop transitStop = createTransitStop();
 		connector.connectVertex(transitStop,false, vertices);
@@ -39,6 +46,13 @@ public class HSLVertexConnectorTest extends AbstractVertexConnectorTest {
 		TransitStop transitStop = createPrefixMatchedTransitStop();
 		connector.connectVertex(transitStop,false, vertices);
 		assertBidirectionalEdges(transitStop, prefixedTransitVertex);
+	}
+	
+	@Test
+	public void connectVertexCreatesCorrectLinksWithPrefixedTransitStop() {
+		TransitStop transitStop = createPrefixedTransitStop();
+		connector.connectVertex(transitStop,false, vertices);
+		assertBidirectionalEdges(transitStop, transitVertex);
 	}
 	
 	@Test

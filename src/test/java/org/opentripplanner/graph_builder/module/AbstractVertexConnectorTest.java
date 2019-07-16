@@ -21,9 +21,10 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractVertexConnectorTest {
 	
-	protected static final String DEFAULT_STOP_CODE    = "123";
-	protected static final String PREFIXLESS_STOP_CODE = "321";
-	protected static final String PREFIXED_STOP_CODE   = "H" + PREFIXLESS_STOP_CODE;
+	protected static final String DEFAULT_STOP_CODE          = "123";
+	protected static final String PREFIXLESS_STOP_CODE       = "321";
+	protected static final String PREFIXED_STOP_CODE         = "H" + PREFIXLESS_STOP_CODE;
+	protected static final String PREFIXED_DEFAULT_STOP_CODE = "H" + DEFAULT_STOP_CODE;
 	
 	protected TransitStopStreetVertex transitVertex;
 	protected TransitStopStreetVertex prefixedTransitVertex;
@@ -81,6 +82,10 @@ public abstract class AbstractVertexConnectorTest {
 	
 	protected TransitStop createTransitStop() {
 		return createTransitStop(DEFAULT_STOP_CODE);
+	}
+	
+	protected TransitStop createPrefixedTransitStop() {
+		return createTransitStop(PREFIXED_DEFAULT_STOP_CODE);
 	}
 	
 	protected TransitStop createPrefixMatchedTransitStop() {
