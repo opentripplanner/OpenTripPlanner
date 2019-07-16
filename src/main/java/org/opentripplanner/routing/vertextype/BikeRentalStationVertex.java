@@ -17,7 +17,7 @@ import java.util.Set;
  *
  * TODO if we continue using this for car rental and flex systems, change name to VehicleRentalStationVertex
  */
-public class BikeRentalStationVertex extends Vertex {
+public class BikeRentalStationVertex extends RentalStationVertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 

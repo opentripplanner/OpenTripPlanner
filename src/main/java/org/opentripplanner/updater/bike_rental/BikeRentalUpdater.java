@@ -6,8 +6,14 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SemiPermanentPartialStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -25,7 +31,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.NON_DESTRUCTIVE_SPLIT;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -170,7 +177,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
-                    if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                    if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                         // the toString includes the text "Bike rental station"
                         LOG.warn("{} not near any streets; it will not be usable.", station);
                     }
@@ -189,13 +196,12 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                BikeRentalStationVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
+
+                splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
+
+                // first get the outgoing
                 toRemove.add(station);
                 service.removeBikeRentalStation(station);
-                // TODO: need to unsplit any streets that were split
             }
             for (BikeRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification

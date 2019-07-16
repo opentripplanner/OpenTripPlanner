@@ -12,11 +12,14 @@ import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.edgetype.RentAVehicleOffEdge;
 import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -37,7 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.NON_DESTRUCTIVE_SPLIT;
 
 /**
  * An updater for vehicle rentals. This runs as a PollingGraphUpdater and fetches the latest data from a datasource that
@@ -164,14 +167,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                 VehicleRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     makeVertex(graph, station);
-                } else if (station.x != vertex.getX() || station.y != vertex.getY()) {
-                    LOG.info("{} has changed, re-graphing", station);
+                } else if (vertex.hasDifferentApproximatePosition(station)) {
+                    LOG.info("Vehicle rental {} has changed position, re-graphing", station);
 
-                    // First remove the old one.
-                    if (graph.containsVertex(vertex)) {
-                        graph.removeVertexAndEdges(vertex);
-                    }
+                    // First remove the old vertices and edges
+                    splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
 
+                    // then make a new vertices and edges
                     makeVertex(graph, station);
                 } else {
                     vertex.setVehiclesAvailable(station.vehiclesAvailable);
@@ -184,13 +186,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                 VehicleRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                VehicleRentalStationVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
+
+                splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
+
                 toRemove.add(station);
                 service.removeVehicleRentalStation(station);
-                // TODO: need to unsplit any streets that were split
             }
             for (VehicleRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
@@ -200,7 +200,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         private void makeVertex(Graph graph, VehicleRentalStation station) {
             VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
-            if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+            if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                 // the toString includes the text "Vehicle rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
@@ -304,7 +304,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             coordToNetworksMap.forEach((coord, networks) -> {
                 VehicleRentalStation station = makeDropOffStation(coord, networks);
                 VehicleRentalStationVertex vertex = new VehicleRentalStationVertex(graph, station);
-                if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }

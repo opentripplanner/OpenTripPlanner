@@ -37,20 +37,8 @@ import java.util.Set;
  * FIXME: border dropoff stations, vertices and edges are probably not needed anymore with updated StreetEdge dropoff
  *  checks.
  */
-public class VehicleRentalStation implements Serializable, Cloneable {
+public class VehicleRentalStation extends RentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;
-
-    @XmlAttribute
-    @JsonSerialize
-    public String id;
-
-    @XmlTransient
-    @JsonIgnore
-    public I18NString name;
-
-    @XmlAttribute
-    @JsonSerialize
-    public double x, y; //longitude, latitude
 
     @XmlAttribute
     @JsonSerialize
@@ -59,14 +47,6 @@ public class VehicleRentalStation implements Serializable, Cloneable {
     @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
-
-    @XmlAttribute
-    @JsonSerialize
-    public boolean allowDropoff = true;
-
-    @XmlAttribute
-    @JsonSerialize
-    public boolean allowPickup = true;
 
     /**
      * Whether or not this rental station models a floating vehicle that is parked outside of a docking station on some

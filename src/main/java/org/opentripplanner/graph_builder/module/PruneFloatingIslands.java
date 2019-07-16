@@ -1,15 +1,14 @@
 package org.opentripplanner.graph_builder.module;
 
+import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import org.opentripplanner.common.StreetUtils;
-import org.opentripplanner.graph_builder.linking.TransitToStreetNetworkModule;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
-import org.slf4j.*;
 
 /**
  * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} process. it design to remove small isolated
@@ -40,8 +39,6 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      */
     private String islandLogFile;
 
-    private StreetLinkerModule transitToStreetNetwork;
-
     public List<String> provides() {
         return Collections.emptyList();
     }
@@ -59,14 +56,12 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Pruning isolated islands in street network");
         
-        StreetUtils.pruneFloatingIslands(graph, pruningThresholdIslandWithoutStops, 
-        		pruningThresholdIslandWithStops, islandLogFile);
-        if (transitToStreetNetwork == null) {
-            LOG.debug("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
-        } else {
-            //reconnect stops on small islands (that removed)
-            transitToStreetNetwork.buildGraph(graph,extra);
-        }
+        StreetUtils.pruneFloatingIslands(
+            graph,
+            pruningThresholdIslandWithoutStops,
+            pruningThresholdIslandWithStops,
+            islandLogFile
+        );
         LOG.debug("Done pruning isolated islands");
     }
 

@@ -4,8 +4,6 @@ package org.opentripplanner.routing.impl;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -13,16 +11,19 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.SampleEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -30,7 +31,10 @@ import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
@@ -47,9 +51,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /**
      * Contains only instances of {@link StreetEdge}
      */
-    private SpatialIndex edgeTree;
-    private SpatialIndex transitStopTree;
-    private SpatialIndex verticesTree;
+    private HashGridSpatialIndex edgeTree;
+    private HashGridSpatialIndex transitStopTree;
+    private HashGridSpatialIndex verticesTree;
 
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
@@ -70,33 +74,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
-    private SimpleStreetSplitter simpleStreetSplitter;
+    private StreetSplitter streetSplitter;
 
     public StreetVertexIndexServiceImpl(Graph graph) {
-        this(graph, true);
-    }
-
-    public StreetVertexIndexServiceImpl(Graph graph, boolean hashGrid) {
         this.graph = graph;
-        if (hashGrid) {
-            edgeTree = new HashGridSpatialIndex<>();
-            transitStopTree = new HashGridSpatialIndex<>();
-            verticesTree = new HashGridSpatialIndex<>();
-        } else {
-            edgeTree = new STRtree();
-            transitStopTree = new STRtree();
-            verticesTree = new STRtree();
-        }
+        edgeTree = new HashGridSpatialIndex<>();
+        transitStopTree = new HashGridSpatialIndex<>();
+        verticesTree = new HashGridSpatialIndex<>();
         postSetup();
-        if (!hashGrid) {
-            ((STRtree) edgeTree).build();
-            ((STRtree) transitStopTree).build();
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null);
-        } else {
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
-                    (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree);
-        }
-
+        streetSplitter = new StreetSplitter(graph, edgeTree, transitStopTree);
     }
 
     /**
@@ -117,12 +103,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
         boolean wheelchairAccessible = false;
 
-        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name,
-                endVertex);
+        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name, endVertex);
+
         for (StreetEdge street : edges) {
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
-            wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
+            wheelchairAccessible |= street.isWheelchairAccessible();
+
             /* forward edges and vertices */
             Vertex edgeLocation;
             if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
@@ -175,17 +162,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
                     street, fromv, base, geometries.first, name, lengthIn);
 
-            temporaryPartialStreetEdge.setElevationProfile(ElevationUtils
-                    .getPartialElevationProfile(street.getElevationProfile(), 0, lengthIn), false);
             temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
         } else {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
                     street, base, tov, geometries.second, name, lengthOut);
 
-            temporaryPartialStreetEdge.setElevationProfile(ElevationUtils
-                    .getPartialElevationProfile(street.getElevationProfile(), lengthIn,
-                    lengthIn + lengthOut), false);
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
             temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
         }
@@ -209,18 +191,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * If one need to store transit edges in the index, we could improve the hash grid
              * rasterizing splitting long segments.
              */
-            for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternEdge || e instanceof SimpleTransfer)
-                    continue;
-                LineString geometry = e.getGeometry();
-                if (geometry == null) {
-                    continue;
+            synchronized (this) {
+                // place a lock here in order to ensure writes are thread-safe to the edgeTree
+                for (Edge e : gv.getOutgoing()) {
+                    if (e instanceof PatternEdge || e instanceof SimpleTransfer)
+                        continue;
+                    LineString geometry = e.getGeometry();
+                    if (geometry == null) {
+                        continue;
+                    }
+                    edgeTree.insert(geometry, e);
                 }
-                Envelope env = geometry.getEnvelopeInternal();
-                if (edgeTree instanceof HashGridSpatialIndex)
-                    ((HashGridSpatialIndex)edgeTree).insert(geometry, e);
-                else
-                    edgeTree.insert(env, e);
             }
             if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
@@ -321,7 +302,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                                        boolean endVertex) {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
-            return simpleStreetSplitter.linkOriginDestination(loc, options, endVertex);
+            return streetSplitter.linkOriginDestination(loc, options, endVertex);
         }
 
         // No Coordinate available.
@@ -374,6 +355,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     public StreetSplitter getStreetSplitter() {
-        return simpleStreetSplitter;
+        return streetSplitter;
     }
 }

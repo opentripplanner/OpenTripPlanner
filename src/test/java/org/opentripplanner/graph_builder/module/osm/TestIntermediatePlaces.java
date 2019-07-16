@@ -12,7 +12,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
@@ -26,7 +25,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for planning with intermediate places
@@ -46,8 +48,7 @@ public class TestIntermediatePlaces {
         try {
             Graph graph = FakeGraph.buildGraphNoTransit();
             FakeGraph.addPerpendicularRoutes(graph);
-            FakeGraph.link(graph);
-            graph.index(new DefaultStreetVertexIndexFactory());
+            FakeGraph.indexGraphAndLinkStations(graph);
 
             OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
             otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", graph));

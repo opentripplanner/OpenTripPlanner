@@ -16,41 +16,16 @@ import java.util.Locale;
  * This represents the connection between a street vertex and a bike rental station vertex.
  * 
  */
-public class StreetBikeRentalLink extends Edge {
+public class StreetBikeRentalLink extends StreetRentalLink {
 
     private static final long serialVersionUID = 1L;
 
-    private BikeRentalStationVertex bikeRentalStationVertex;
-
     public StreetBikeRentalLink(StreetVertex fromv, BikeRentalStationVertex tov) {
         super(fromv, tov);
-        bikeRentalStationVertex = tov;
     }
 
     public StreetBikeRentalLink(BikeRentalStationVertex fromv, StreetVertex tov) {
         super(fromv, tov);
-        bikeRentalStationVertex = fromv;
-    }
-
-    public String getDirection() {
-        return null;
-    }
-
-    public double getDistance() {
-        return 0;
-    }
-
-    public LineString getGeometry() {
-        return null;
-    }
-
-    public String getName() {
-        return bikeRentalStationVertex.getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return bikeRentalStationVertex.getName(locale);
     }
 
     public State traverse(State s0) {
@@ -76,14 +51,6 @@ public class StreetBikeRentalLink extends Edge {
     @Override
     public double weightLowerBound(RoutingRequest options) {
         return options.modes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
-    }
-
-    public Vertex getFromVertex() {
-        return fromv;
-    }
-
-    public Vertex getToVertex() {
-        return tov;
     }
 
     public String toString() {

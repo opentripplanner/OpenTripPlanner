@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.opentripplanner.graph_builder.linking.SimpleStreetSplitter.DESTRUCTIVE_SPLIT;
+import static org.opentripplanner.graph_builder.linking.StreetSplitter.NON_DESTRUCTIVE_SPLIT;
 
 public class CarRentalUpdater extends PollingGraphUpdater {
 
@@ -158,14 +158,13 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 CarRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     makeVertex(graph, station);
-                } else if (station.x != vertex.getX() || station.y != vertex.getY()) {
-                    LOG.info("{} has changed, re-graphing", station);
+                } else if (vertex.hasDifferentApproximatePosition(station)) {
+                    LOG.info("Rental car {} has changed position, re-graphing", station);
 
-                    // First remove the old one.
-                    if (graph.containsVertex(vertex)) {
-                        graph.removeVertexAndEdges(vertex);
-                    }
+                    // First remove the old vertices and edges
+                    splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
 
+                    // then make a new vertices and edges
                     makeVertex(graph, station);
                 } else {
                     vertex.setCarsAvailable(station.carsAvailable);
@@ -178,13 +177,11 @@ public class CarRentalUpdater extends PollingGraphUpdater {
                 CarRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                CarRentalStationVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
+
+                splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
+
                 toRemove.add(station);
                 service.removeCarRentalStation(station);
-                // TODO: need to unsplit any streets that were split
             }
             for (CarRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
@@ -194,7 +191,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
         private void makeVertex(Graph graph, CarRentalStation station) {
             CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-            if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+            if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                 // the toString includes the text "Car rental station"
                 LOG.warn("{} not near any streets; it will not be usable.", station);
             }
@@ -293,7 +290,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             coordToNetworksMap.forEach((coord, networks) -> {
                 CarRentalStation station = makeDropOffStation(coord, networks);
                 CarRentalStationVertex vertex = new CarRentalStationVertex(graph, station);
-                if (!splitter.linkToClosestWalkableEdge(vertex, DESTRUCTIVE_SPLIT)) {
+                if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
                     LOG.warn("Ignoring {} since it's not near any streets; it will not be usable.", station);
                     return;
                 }

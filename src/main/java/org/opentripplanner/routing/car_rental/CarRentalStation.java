@@ -15,6 +15,7 @@ package org.opentripplanner.routing.car_rental;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
@@ -24,24 +25,12 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
-public class CarRentalStation implements Serializable, Cloneable {
+public class CarRentalStation extends RentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;
-
-    @XmlAttribute
-    @JsonSerialize
-    public String id;
 
     @XmlTransient
     @JsonIgnore
     public String licensePlate;
-
-    @XmlTransient
-    @JsonIgnore
-    public I18NString name;
-
-    @XmlAttribute
-    @JsonSerialize
-    public double x, y; //longitude, latitude
 
     @XmlAttribute
     @JsonSerialize
@@ -53,22 +42,7 @@ public class CarRentalStation implements Serializable, Cloneable {
 
     @XmlAttribute
     @JsonSerialize
-    public boolean allowDropoff = true;
-
-    @XmlAttribute
-    @JsonSerialize
-    public boolean allowPickup = true;
-
-    @XmlAttribute
-    @JsonSerialize
     public boolean isFloatingCar = false;
-
-    /**
-     * List of compatible network names. Null (default) to be compatible with all.
-     */
-    @XmlAttribute
-    @JsonSerialize
-    public Set<String> networks = null;
 
     /**
      * Fuel type of the car.

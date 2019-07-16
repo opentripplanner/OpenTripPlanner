@@ -23,6 +23,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -1287,16 +1288,37 @@ public class StreetEdge extends Edge implements Cloneable {
         length_mm = (int) (accumulatedMeters * 1000);
     }
 
-    /** Split this street edge and return the resulting street edges */
-    public P2<StreetEdge> split(SplitterVertex v, boolean destructive) {
-        P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
+    /**
+     * Split this street edge and return the resulting street edges.  There are 3 possible types of splits:
+     * 1. A destructive split where two new StreetEdges are created from the existing edge. The edge that was split
+     *      has its reference removed from its from and to vertices in the StreetSplitter class thus permanently
+     *      removing the possibility of the original edge being traversed in subsequent searches. This split method
+     *      should only be used when building a graph. Another important note is that in destructive splits, regular
+     *      StreetEdges are created without elevation data, but typically these destructive splits occur in graph
+     *      build modules that occur before adding in elevation data.
+     * 2. A semi-permanent split is typically used in an updater to create vertices and edges that are specifically for
+     *      a single rental car/bike/vehicle station. Further splits of semi-permanent edges are only allowed for
+     *      linking the origin and destination for the graph. See {@link SemiPermanentPartialStreetEdge.split}. The
+     *      original edge is still traversable in the graph.
+     * 3. A temporary split is used to link a StreetEdge to an origin or destination. In this case there is only a need
+     *      for creating outgoing edges from the origin and incoming edges to the destination.
+     *      // TODO: there is also something about half edges which may not be needed anymore?
+     *
+     * @param splitterVertex The new vertex that the newly split edge(s) will become connected to.
+     * @param destructive Whether or not the split should be permanent and result in the old edge no longer existing
+     *                    within the graph.
+     * @param createSemiPermanentEdges Whether or not the split should result in the creation of semi-permanent edges
+     *                                 or temporary edges.
+     */
+    public P2<StreetEdge> split(SplitterVertex splitterVertex, boolean destructive, boolean createSemiPermanentEdges) {
+        P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), splitterVertex.getCoordinate());
 
         StreetEdge e1 = null;
         StreetEdge e2 = null;
 
         if (destructive) {
-            e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
-            e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
+            e1 = new StreetEdge((StreetVertex) fromv, splitterVertex, geoms.first, name, 0, permission, this.isBack());
+            e2 = new StreetEdge(splitterVertex, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
 
             // copy the wayId to the split edges, so we can trace them back to their parent if need be
             e1.wayId = this.wayId;
@@ -1325,11 +1347,11 @@ public class StreetEdge extends Edge implements Cloneable {
 
             // TODO: better handle this temporary fix to handle bad edge distance calculation
             if (e1.length_mm < 0) {
-                LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
+                LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, splitterVertex.getLat(), splitterVertex.getLon(), e1.length_mm);
                 e1.length_mm = 1;
             }
             if (e2.length_mm < 0) {
-                LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
+                LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, splitterVertex.getLat(), splitterVertex.getLon(), e2.length_mm);
                 e2.length_mm = 1;
             }
 
@@ -1340,38 +1362,98 @@ public class StreetEdge extends Edge implements Cloneable {
                 e2.fromv.removeOutgoing(e2);
                 throw new IllegalStateException("Split street is longer than original street!");
             }
-
-            for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-                e.setBicycleSafetyFactor(getBicycleSafetyFactor());
-                e.setWalkComfortScore(getWalkComfortScore());
-                e.setHasBogusName(hasBogusName());
-                e.setStairs(isStairs());
-                e.setWheelchairAccessible(isWheelchairAccessible());
-                e.setBack(isBack());
-                e.setCarNetworks(getCarNetworks());
-                e.setFloatingCarDropoffSuitability(getFloatingCarDropoffSuitability());
-                e.setVehicleNetworks(getVehicleNetworks());
-                e.setFloatingVehicleDropoffSuitability(getFloatingVehicleDropoffSuitability());
-            }
         } else {
-            if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, (TemporarySplitterVertex) v, geoms.first, name, 0);
-                e1.calculateLengthFromGeometry();
-                e1.setNoThruTraffic(this.isNoThruTraffic());
-                e1.setStreetClass(this.getStreetClass());
+            if (createSemiPermanentEdges) {
+                e1 = new SemiPermanentPartialStreetEdge(this, (StreetVertex) fromv, splitterVertex, geoms.first, name);
+                e2 = new SemiPermanentPartialStreetEdge(this, splitterVertex, (StreetVertex) tov, geoms.second, name);
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, (TemporarySplitterVertex) v, (StreetVertex) tov, geoms.second, name, 0);
-                e2.calculateLengthFromGeometry();
-                e2.setNoThruTraffic(this.isNoThruTraffic());
-                e2.setStreetClass(this.getStreetClass());
+                boolean splitAtEndVertex = ((TemporarySplitterVertex) splitterVertex).isEndVertex();
+                // The StreetVertex of the edge to be split that won't be used when creating a TemporaryPartialStreetEdge
+                StreetVertex ununsedExistingStreetVertex = (StreetVertex) (splitAtEndVertex ? tov : fromv);
+                if (
+                    this instanceof SemiPermanentPartialStreetEdge &&
+                        ununsedExistingStreetVertex instanceof SemiPermanentSplitterVertex
+                ) {
+                    // There is no need to split a SemiPermanentPartialStreetEdge when the splitter vertex is a
+                    // SemiPermanentSplitterVertex. The original edge that the SemiPermanentPartialStreetEdge was split
+                    // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
+                    //
+                    // This situation will arise in the following context:
+                    //
+                    // Given the following graph...
+                    //
+                    // B =====(1)==== A
+                    // \\           // \
+                    //   =(3)=D=(4)=   (2)
+                    //      ||||        \
+                    //       (5)         C
+                    //      ||||
+                    //        E<(6)>
+                    //
+                    // Vertices:
+                    // A = StreetVertex A
+                    // B = StreetVertex B
+                    // C = StreetVertex C
+                    // D = SemiPermanentSplitterVertices D1 and D2. There will be two of these, one for the split
+                    //      between edge A->B and another for the split between edge B->A
+                    // E = BikeRentalStationVertex E
+                    //
+                    // Edges:
+                    // 1 = StreetEdges A->B and B->A
+                    // 2 = StreetEdge A->C
+                    // 3 = SemiPermanentPartialStreetEdges (B->D1 and D2->B) (split from A->B and B->A)
+                    // 4 = SemiPermanentPartialStreetEdges (A->D2 and D1->A) (split from A->B and B->A)
+                    // 5 = StreetBikeRentalLinks (
+                    //          SemiPermanentSplitterVertex D1&2 -> BikeRentalStationVertex E
+                    //          and
+                    //          BikeRentalStationVertex E -> SemiPermanentSplitterVertex D1&2
+                    //     )
+                    // 6 = RentABikeOnEdge (E -> E)
+                    //
+                    // ... assume a request is made to split between vertices B and A at a position that is also between
+                    // vertices B and D. The splitting logic will find that the following edges could be split: B->A,
+                    // A->B, B->D1 and D2->B. Since B->D1 and D2->B are edges that were already split from B->A and A->B
+                    // respectively, the split from B->D1 would be identical to the proposed split from B->A. Therefore,
+                    // to avoid creating unneeded edges, the creation of this edge is avoided.
+                    LOG.debug("Skipping creation of duplicate TemporaryPartialStreetEdge");
+                } else {
+                    if (splitAtEndVertex) {
+                        e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, splitterVertex, geoms.first, name, 0);
+                    } else {
+                        e2 = new TemporaryPartialStreetEdge(this, splitterVertex, (StreetVertex) tov, geoms.second, name, 0);
+                    }
+                }
             }
         }
 
-
-
-
+        for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
+            if (e == null) continue;
+            e.copyAttributes(this);
+        }
 
         return new P2<StreetEdge>(e1, e2);
+    }
+
+    /**
+     * Copies over all attirubtes related to the street (not stuff like geometry and vertices and ids) from an other
+     * StreetEdge to this StreetEdge
+     */
+    private void copyAttributes(StreetEdge other) {
+        this.wayId = other.wayId;
+        this.setBicycleSafetyFactor(other.getBicycleSafetyFactor());
+        this.setWalkComfortScore(other.getWalkComfortScore());
+        this.setHasBogusName(other.hasBogusName());
+        this.setStairs(other.isStairs());
+        this.setWheelchairAccessible(other.isWheelchairAccessible());
+        this.setBack(other.isBack());
+        this.setCarNetworks(other.getCarNetworks());
+        this.setCarSpeed(other.getCarSpeed());
+        this.setFloatingCarDropoffSuitability(other.getFloatingCarDropoffSuitability());
+        this.setVehicleNetworks(other.getVehicleNetworks());
+        this.setFloatingVehicleDropoffSuitability(other.getFloatingVehicleDropoffSuitability());
+        this.setNoThruTraffic(other.isNoThruTraffic());
+        this.setStreetClass(other.getStreetClass());
+        this.setTNCStopSuitability(other.getTNCStopSuitability());
     }
 
     /**

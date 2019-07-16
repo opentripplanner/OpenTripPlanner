@@ -29,7 +29,7 @@ import java.util.Set;
  * @author Conveyal
  * 
  */
-public class CarRentalStationVertex extends Vertex {
+public class CarRentalStationVertex extends RentalStationVertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
