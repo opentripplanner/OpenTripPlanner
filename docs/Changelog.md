@@ -14,6 +14,7 @@
 - Fix XML response serialization (#2685)
 - Refactor InterleavedBidirectionalHeuristic (#2671)
 - Refactor StreetSplitter (#2758)
+- Refactor bike rental edge creation (#2787)
 
 ## 1.3 (2018-08-03)
 
