@@ -15,6 +15,9 @@ import org.opentripplanner.util.I18NString;
  * created from bike rental updaters and could be subsequently removed from the feed. These edges aid in providing
  * access only when needed to the desired bike rental stations and also allow for the isolated removal of these edges
  * when they are no longer needed.
+ *
+ * See https://github.com/opentripplanner/OpenTripPlanner/issues/2787 and associated comments for more details on what
+ * inspired the creation of this class.
  */
 public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
     private boolean bikeRentalOptionRequired = false;
@@ -76,13 +79,13 @@ public class SemiPermanentPartialStreetEdge extends PartialStreetEdge {
      * whole point of SemiPermanentPartialStreetEdges is that they are only split once from a regular StreetEdge in
      * order to isolate access to a particular vertex that can be accessed from a StreetEdge such as a bike rental.
      */
-    @Override public P2<StreetEdge> split(SplitterVertex v, boolean destructive, boolean createSemiPermanentEdges) {
-        if (!(v instanceof TemporarySplitterVertex)) {
+    @Override public P2<StreetEdge> split(SplitterVertex splitterVertex, boolean destructive, boolean createSemiPermanentEdges) {
+        if (!(splitterVertex instanceof TemporarySplitterVertex)) {
             throw new RuntimeException(
                 "A split is being attempted on a SemiPermanentPartialStreetEdge using a vertex other than a "
                     + "TemporarySplitterVertex. Something is wrong!"
             );
         }
-        return super.split(v, destructive, createSemiPermanentEdges);
+        return super.split(splitterVertex, destructive, createSemiPermanentEdges);
     }
 }

@@ -190,7 +190,8 @@ public class StreetSplitter {
     }
 
     /**
-     * Link this vertex into the graph to the closest walkable edge
+     * Link this vertex into the graph to the closest walkable edge.
+     *
      * @param vertex The vertex to be linked.
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
      *                             false the original edge is kept in the graph after creating split edges.
@@ -209,6 +210,9 @@ public class StreetSplitter {
         return linkToGraph(vertex, TraverseMode.WALK, null, destructiveSplitting, createSemiPermanentEdges);
     }
 
+    /**
+     * Link a vertex into the graph to the closest edge that allows the traversal of the specified mode.
+     */
     public boolean linkToGraph(
         Vertex vertex,
         TraverseMode traverseMode,
@@ -217,7 +221,10 @@ public class StreetSplitter {
         boolean createSemiPermanentEdges
     ) {
         final TraverseModeSet traverseModeSet = new TraverseModeSet(traverseMode);
-        if (traverseMode == TraverseMode.BICYCLE) {
+        // also set the walk mode to true for bicycling or micromobility. This is done because it is assumed that the
+        // bike or micromobility vehicle is able to be walked along certain edges that explicitly forbid bicycling or
+        // micromobility travel.
+        if (traverseMode == TraverseMode.BICYCLE || traverseMode == TraverseMode.MICROMOBILITY) {
             traverseModeSet.setWalk(true);
         }
         return linkToGraph(vertex, traverseModeSet, options, destructiveSplitting, createSemiPermanentEdges);
@@ -230,7 +237,7 @@ public class StreetSplitter {
      * @param vertex The vertex to be linked.
      * @param traverseModeSet The traverse modes.
      * @param options The routing options.
-     * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when
+     * @param destructiveSplitting If true, splitting is permanent (Used when linking transit stops etc). When
      *                             false the original edge is kept in the graph after creating split edges.
      * @param createSemiPermanentEdges If true, semi-permanent edges and a semi-permanent splitter vertex is created.
      *                                 These vertices and edges are intended to be kept in the graph and linked to
@@ -264,16 +271,14 @@ public class StreetSplitter {
 
         // We sort the list of candidate edges by distance to the stop
         // This should remove any issues with things coming out of the spatial index in different orders
-        // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
+        // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of the best distance
         // so that we capture back edges and duplicate ways.
         List<StreetEdge> candidateEdges = idx.query(env).stream()
             .filter(
                 streetEdge -> streetEdge instanceof StreetEdge &&
-                    // do not find SemiPermanentPartialStreetEdges if creating new SemiPermanentPartialStreetEdges
-                    // use only permanent StreetEdges instead
-                    (createSemiPermanentEdges
-                        ? !(streetEdge instanceof SemiPermanentPartialStreetEdge)
-                        : true)
+                    // Do not find SemiPermanentPartialStreetEdges if creating new SemiPermanentPartialStreetEdges.
+                    // Use only permanent StreetEdges instead
+                    (!createSemiPermanentEdges || !(streetEdge instanceof SemiPermanentPartialStreetEdge))
             )
             .map(edge -> (StreetEdge) edge)
             // note: not filtering by radius here as distance calculation is expensive
@@ -293,10 +298,8 @@ public class StreetSplitter {
         Collections.sort(candidateEdges, (o1, o2) -> {
             double diff = distances.get(o1.getId()) - distances.get(o2.getId());
             // A Comparator must return an integer but our distances are doubles.
-            if (diff < 0)
-                return -1;
-            if (diff > 0)
-                return 1;
+            if (diff < 0) return -1;
+            if (diff > 0) return 1;
             return 0;
         });
 
@@ -322,12 +325,8 @@ public class StreetSplitter {
 
             Collections.sort(candidateStops, (o1, o2) -> {
                     double diff = stopDistances.get(o1.getIndex()) - stopDistances.get(o2.getIndex());
-                    if (diff < 0) {
-                        return -1;
-                    }
-                    if (diff > 0) {
-                        return 1;
-                    }
+                    if (diff < 0) return -1;
+                    if (diff > 0) return 1;
                     return 0;
             });
             if (candidateStops.isEmpty() || stopDistances.get(candidateStops.get(0).getIndex()) > radiusDeg) {
@@ -386,7 +385,9 @@ public class StreetSplitter {
         }
     }
 
-    // Link to all vertices in area/platform
+    /**
+     * Link to all vertices in area/platform
+     */
     private void linkTransitToAreaVertices(Vertex splitterVertex, AreaEdgeList area) {
         List<Vertex> vertices = new ArrayList<>();
 
@@ -396,7 +397,7 @@ public class StreetSplitter {
         }
 
         for (Vertex vertex : vertices) {
-            if (vertex instanceof  StreetVertex && !vertex.equals(splitterVertex)) {
+            if (vertex instanceof StreetVertex && !vertex.equals(splitterVertex)) {
                 LineString line = geometryFactory.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
                 double length = SphericalDistanceLibrary.distance(splitterVertex.getCoordinate(),
                         vertex.getCoordinate());
@@ -609,7 +610,9 @@ public class StreetSplitter {
         }
     }
 
-    /** Make temporary edges to origin/destination vertex in origin/destination search **/
+    /**
+     * Make temporary edges to origin/destination vertex in origin/destination search
+     */
     private void makeTemporaryEdges(TemporaryStreetLocation from, Vertex to, final boolean destructiveSplitting) {
         if (destructiveSplitting) {
             throw new RuntimeException("Destructive splitting is used on temporary edges. Something is wrong!");
@@ -733,7 +736,7 @@ public class StreetSplitter {
      *
      * Split edges don't replace existing ones and only temporary edges and vertices are created.
      *
-     * Will throw ThrivialPathException if origin and destination Location are on the same edge
+     * Will throw TrivialPathException if origin and destination Location are on the same edge
      *
      * @param location
      * @param options
@@ -789,10 +792,9 @@ public class StreetSplitter {
                 } else {
                     nonTransitMode = TraverseMode.CAR;
                 }
-            else if (modes.getWalk())
-                nonTransitMode = TraverseMode.WALK;
-            else if (modes.getBicycle())
-                nonTransitMode = TraverseMode.BICYCLE;
+            else if (modes.getWalk()) nonTransitMode = TraverseMode.WALK;
+            else if (modes.getBicycle()) nonTransitMode = TraverseMode.BICYCLE;
+            else if (modes.getMicromobility()) nonTransitMode = TraverseMode.MICROMOBILITY;
         }
 
         if(linkWithSingleMode && !linkToGraph(closest, nonTransitMode, options, NON_DESTRUCTIVE_SPLIT, false)) {

@@ -270,7 +270,7 @@ public class StreetSplitterTest {
         assertEquals("Origin", subject.fromVertex.getName());
         assertEquals("Destination", subject.toVertex.getName());
 
-        // Verify that the from vertex has 3 outgoing edge
+        // Verify that the from vertex has 3 outgoing edges
         assertEquals(3, subject.fromVertex.getDegreeOut());
 
         // search from the origin and make sure the expected progression of vertices and edges occurs until vertices A,
