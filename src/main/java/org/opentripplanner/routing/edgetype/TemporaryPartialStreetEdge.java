@@ -7,7 +7,8 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * This class models a StreetEdge that was non-destructively split from another StreetEdge for the purposes of modeling
- * StreetEdges that should only be valid for a single request.
+ * StreetEdges that should only be valid for a single request. These edges typically include edges used to link the
+ * origin or destination of a routing request to the graph.
  */
 public class TemporaryPartialStreetEdge extends PartialStreetEdge implements TemporaryEdge {
     public TemporaryPartialStreetEdge(

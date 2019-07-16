@@ -7,7 +7,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- *
+ * This class models a vertex that is used to connect split StreetEdges to semi-permanent vertices such as bike rental
+ * stations.
  */
 public class SemiPermanentSplitterVertex extends SplitterVertex {
 
