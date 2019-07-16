@@ -1415,6 +1415,7 @@ public class StreetEdge extends Edge implements Cloneable {
                     // A->B, B->D1 and D2->B. Since B->D1 and D2->B are edges that were already split from B->A and A->B
                     // respectively, the split from B->D1 would be identical to the proposed split from B->A. Therefore,
                     // to avoid creating unneeded edges, the creation of this edge is avoided.
+                    LOG.debug("Skipping creation of duplicate TemporaryPartialStreetEdge");
                 } else {
                     if (splitAtEndVertex) {
                         e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, splitterVertex, geoms.first, name, 0);
