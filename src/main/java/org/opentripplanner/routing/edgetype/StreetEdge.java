@@ -1368,14 +1368,53 @@ public class StreetEdge extends Edge implements Cloneable {
                 e2 = new SemiPermanentPartialStreetEdge(this, splitterVertex, (StreetVertex) tov, geoms.second, name);
             } else {
                 boolean splitAtEndVertex = ((TemporarySplitterVertex) splitterVertex).isEndVertex();
-                StreetVertex existingStreetVertex = (StreetVertex) (splitAtEndVertex ? tov : fromv);
+                // The StreetVertex of the edge to be split that won't be used when creating a TemporaryPartialStreetEdge
+                StreetVertex ununsedExistingStreetVertex = (StreetVertex) (splitAtEndVertex ? tov : fromv);
                 if (
                     this instanceof SemiPermanentPartialStreetEdge &&
-                        existingStreetVertex instanceof SemiPermanentSplitterVertex
+                        ununsedExistingStreetVertex instanceof SemiPermanentSplitterVertex
                 ) {
                     // There is no need to split a SemiPermanentPartialStreetEdge when the splitter vertex is a
                     // SemiPermanentSplitterVertex. The original edge that the SemiPermanentPartialStreetEdge was split
                     // from will also be split and we'd end up with basically 2 identical TemporaryPartialStreetEdges.
+                    //
+                    // This situation will arise in the following context:
+                    //
+                    // Given the following graph...
+                    //
+                    // B =====(1)==== A
+                    // \\           // \
+                    //   =(3)=D=(4)=   (2)
+                    //      ||||        \
+                    //       (5)         C
+                    //      ||||
+                    //        E<(6)>
+                    //
+                    // Vertices:
+                    // A = StreetVertex A
+                    // B = StreetVertex B
+                    // C = StreetVertex C
+                    // D = SemiPermanentSplitterVertices D1 and D2. There will be two of these, one for the split
+                    //      between edge A->B and another for the split between edge B->A
+                    // E = BikeRentalStationVertex E
+                    //
+                    // Edges:
+                    // 1 = StreetEdges A->B and B->A
+                    // 2 = StreetEdge A->C
+                    // 3 = SemiPermanentPartialStreetEdges (B->D1 and D2->B) (split from A->B and B->A)
+                    // 4 = SemiPermanentPartialStreetEdges (A->D2 and D1->A) (split from A->B and B->A)
+                    // 5 = StreetBikeRentalLinks (
+                    //          SemiPermanentSplitterVertex D1&2 -> BikeRentalStationVertex E
+                    //          and
+                    //          BikeRentalStationVertex E -> SemiPermanentSplitterVertex D1&2
+                    //     )
+                    // 6 = RentABikeOnEdge (E -> E)
+                    //
+                    // ... assume a request is made to split between vertices B and A at a position that is also between
+                    // vertices B and D. The splitting logic will find that the following edges could be split: B->A,
+                    // A->B, B->D1 and D2->B. Since B->D1 and D2->B are edges that were already split from B->A and A->B
+                    // respectively, the split from B->D1 would be identical to the proposed split from B->A. Therefore,
+                    // to avoid creating unneeded edges, the creation of this edge is avoided.
                 } else {
                     if (splitAtEndVertex) {
                         e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, splitterVertex, geoms.first, name, 0);
