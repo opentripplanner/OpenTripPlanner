@@ -75,7 +75,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             return;
         
         // Only connect transit stops that (a) are entrances, or (b) have no associated entrances
-        if (!stop.isEntrance() || stop.hasEntrances())
+        if (!stop.isEntrance() && stop.hasEntrances())
             return;
         
         boolean linkCreated = createLinkIfStopCodeExists(stop, connector);
