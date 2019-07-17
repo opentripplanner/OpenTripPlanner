@@ -187,7 +187,7 @@ public class GraphBuilderParameters {
     /**
      * This will determine what logic we should use when connecting stops to OSM nodes
      */
-    public final String vertexConnector;
+    public final String vertexConnectorName;
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
@@ -224,7 +224,7 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
-        vertexConnector = config.path("vertexConnector").asText("");
+        vertexConnectorName = config.path("vertexConnector").asText("");
     }
 
 

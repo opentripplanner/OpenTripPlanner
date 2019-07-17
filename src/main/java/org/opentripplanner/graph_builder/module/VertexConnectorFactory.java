@@ -5,8 +5,8 @@ package org.opentripplanner.graph_builder.module;
  */
 public class VertexConnectorFactory {
 	
-	public static VertexConnector getVertexConnector(String agency) {
-		switch (agency) {
+	public static VertexConnector getVertexConnector(String vertexConnectorName) {
+		switch (vertexConnectorName) {
 			case "HSL":
 				return new HSLVertexConnector();
 			default:

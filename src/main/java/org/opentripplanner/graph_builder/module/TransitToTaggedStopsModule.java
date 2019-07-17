@@ -37,11 +37,11 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     
     private double searchRadiusM = 250;
     private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
-    private String vertexConnector;
+    private String vertexConnectorName;
     private StreetVertexIndexServiceImpl indexService;
     
-    public TransitToTaggedStopsModule(String vertexConnector) {
-        this.vertexConnector = vertexConnector;
+    public TransitToTaggedStopsModule(String vertexConnectorName) {
+        this.vertexConnectorName = vertexConnectorName;
     }
     
     public List<String> provides() {
@@ -59,7 +59,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         
         // Iterate over a copy of vertex list because it will be modified
         List<Vertex> vertices = new ArrayList<>(graph.getVertices());
-        VertexConnector connector = VertexConnectorFactory.getVertexConnector(vertexConnector);
+        VertexConnector connector = VertexConnectorFactory.getVertexConnector(vertexConnectorName);
         
         Iterables.filter(vertices, TransitStop.class).forEach(
             stop -> createLinkOnCondition(stop, connector)
