@@ -372,7 +372,6 @@ public class SimpleStreetSplitter {
         }
     }
 
-
     /**
      * Split the street edge at the given fraction
      *
@@ -388,15 +387,15 @@ public class SimpleStreetSplitter {
         // create the geometries
         Coordinate splitPoint = ll.getCoordinate(geometry);
 
-        // every edge can be split exactly once, so this is a valid label
         SplitterVertex v;
+        String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
         if (temporarySplit) {
-            TemporarySplitterVertex tsv = new TemporarySplitterVertex("split_" + edge.hashCode(),
-                    splitPoint.x, splitPoint.y, edge, endVertex);
+            TemporarySplitterVertex tsv = new TemporarySplitterVertex(
+                    uniqueSplitLabel, splitPoint.x, splitPoint.y, edge, endVertex);
             tsv.setWheelchairAccessible(edge.isWheelchairAccessible());
             v = tsv;
         } else {
-            v = new SplitterVertex(graph, "split_" + edge.hashCode(), splitPoint.x, splitPoint.y, edge);
+            v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y, edge);
         }
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the

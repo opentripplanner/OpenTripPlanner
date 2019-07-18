@@ -120,8 +120,8 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     private GraphBundle bundle;
 
-    /* Vertex index by name is reconstructed from edges. TODO Is this actually needed? */
-    private transient Map<String, Vertex> vertices;
+    /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
+    private Map<String, Vertex> vertices = new ConcurrentHashMap<>();
 
     private transient CalendarService calendarService;
 
@@ -225,13 +225,24 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** Data model for Raptor routing */
     public transient TransitLayer transitLayer;
 
+    /** Data model for Raptor routing, with realtime updates applied. */
+    public transient TransitLayer realtimeTransitLayer;
+
+    // Hack. I've tried three different ways of generating unique labels.
+    // Previously we were just tolerating edge label collisions.
+    // For some reason we're repeatedly generating splits on the same edge objects, despite a comment that said it was
+    // guaranteed there would only ever be one split per edge. This is going to fail as soon as we load a base OSM graph
+    // and build transit on top of it.
+    public long nextSplitNumber = 0;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
     }
 
+    // Constructor for deserialization.
     public Graph() {
-        this.vertices = new ConcurrentHashMap<>();
+
     }
 
     /**
@@ -299,11 +310,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     /**
-     * Return all the edges in the graph.
-     * @return
+     * Return all the edges in the graph. Derived from vertices on demand.
      */
     public Collection<Edge> getEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
         for (Vertex v : this.getVertices()) {
             edges.addAll(v.getOutgoing());
         }
@@ -620,37 +630,38 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
         /** Create transit layer for Raptor routing */
         LOG.info("Creating transit layer for Raptor routing.");
+        // First for the scheduled timetables.
         this.transitLayer = TransitLayerMapper.map(this);
+        // Then in a loop, recreate the transitLayer for real-time updated timetables.
+        // This could eventually be done with a PollingGraphUpdater.
+        // And it should start up conditionally only if there is realtime data.
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000 * 20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
+                // TODO this is not accounting for any new patterns created by the realtime messages.
+                // Counting on atomic write to references.
+                this.transitLayer = TransitLayerMapper.map(this);
+            }
+        }).start();
     }
     
     public static Graph load(InputStream in) {
         // TODO store version information, halt load if versions mismatch
         Input input = new Input(in);
         Kryo kryo = makeKryo();
-        Graph graph = (Graph) kryo.readClassAndObject(input);
-        LOG.debug("Basic graph info read.");
+        GraphAndEdges graphAndEdges = (GraphAndEdges) kryo.readClassAndObject(input);
+        Graph graph = graphAndEdges.graph;
+        LOG.debug("Graph read.");
         if (graph.graphVersionMismatch()) {
             throw new RuntimeException("Graph version mismatch detected.");
         }
-        // Vertex edge lists are transient to avoid excessive recursion depth during serialization.
-        // vertex list is transient because it can be reconstructed from edges.
-        LOG.debug("Loading edges...");
-        List<Edge> edges = (ArrayList<Edge>) kryo.readClassAndObject(input);
-        graph.vertices = new ConcurrentHashMap<>(); // why is this concurrent?
-
-        for (Edge e : edges) {
-            Vertex fromVertex = e.getFromVertex();
-            Vertex toVertex = e.getToVertex();
-            graph.vertices.put(fromVertex.getLabel(), fromVertex);
-            graph.vertices.put(toVertex.getLabel(), toVertex);
-            // Compensating for the fact that we're not using the standard Java de/serialization methods.
-            fromVertex.initEdgeListsIfNeeded();
-            toVertex.initEdgeListsIfNeeded();
-            fromVertex.addOutgoing(e);
-            toVertex.addIncoming(e);
-        }
-
-        LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+        graphAndEdges.reconstructEdgeLists();
+        LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
         graph.index(new DefaultStreetVertexIndexFactory());
         return graph;
     }
@@ -746,19 +757,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public void save(OutputStream outputStream) {
         Kryo kryo = makeKryo();
         LOG.debug("Consolidating edges...");
+        GraphAndEdges graphAndEdges = new GraphAndEdges(this);
         Output output = new Output(outputStream);
-        // this is not space efficient
-        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : getVertices()) {
-            // there are assumed to be no edges in an incoming list that are not
-            // in an outgoing list
-            edges.addAll(v.getOutgoing());
-            if (v.getDegreeOut() + v.getDegreeIn() == 0)
-                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
-        }
-        LOG.debug("Writing edges...");
-        kryo.writeClassAndObject(output, this);
-        kryo.writeClassAndObject(output, edges);
+        kryo.writeClassAndObject(output, graphAndEdges);
         output.close();
         LOG.info("Graph written.");
         // Summarize serialized classes and associated serializers to stdout:
