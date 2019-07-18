@@ -634,7 +634,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         this.transitLayer = TransitLayerMapper.map(this);
         // Then in a loop, recreate the transitLayer for real-time updated timetables.
         // This could eventually be done with a PollingGraphUpdater.
-        // And it should start up conditionally only if there is realtime data.
         new Thread(() -> {
             while (true) {
                 try {
@@ -642,12 +641,13 @@ public class Graph implements Serializable, AddBuilderAnnotation {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
-                // TODO this is not accounting for any new patterns created by the realtime messages.
-                // Counting on atomic write to references.
-                this.transitLayer = TransitLayerMapper.map(this);
+                if (this.timetableSnapshotSource != null) {
+                    // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
+                    // TODO this is not accounting for any new patterns created by realtime "add trip" messages.
+                    this.realtimeTransitLayer = TransitLayerMapper.map(this);
+                }
             }
-        }).start();
+        }, "Realtime Transit Layer Creator").start();
     }
     
     public static Graph load(InputStream in) {
