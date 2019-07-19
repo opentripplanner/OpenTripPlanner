@@ -6,6 +6,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleImpl;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -52,7 +53,7 @@ class TripPatternMapper {
 
             for (TripTimes tripTimes : sortedTripTimes) {
                 patternsByServiceCode.put(tripTimes.serviceCode, newTripPattern);
-                tripSchedules.add(TripScheduleMapper.map(tripPattern, tripTimes));
+                tripSchedules.add(new TripScheduleImpl(tripTimes, tripPattern));
             }
 
         }

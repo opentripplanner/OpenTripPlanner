@@ -11,18 +11,6 @@ class TripScheduleMapper {
             TripPattern tripPattern,
             TripTimes tripTimes
     ) {
-        final int numStops = tripTimes.getNumStops();
-        Trip trip = tripTimes.trip;
-        int serviceCode = tripTimes.serviceCode;
-
-        int[] arrivals = new int[numStops];
-        int[] departures = new int[numStops];
-
-        for (int i = 0; i < numStops; i++) {
-            arrivals[i] = tripTimes.getArrivalTime(i);
-            departures[i] = tripTimes.getDepartureTime(i);
-        }
-
-        return new TripScheduleImpl(arrivals, departures, trip, tripPattern, serviceCode);
+        return new TripScheduleImpl(tripTimes, tripPattern);
     }
 }

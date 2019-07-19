@@ -151,28 +151,33 @@ public class ItineraryMapper {
 
         Stop boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
-        Trip trip = pathLeg.trip().getOriginalTrip();
-        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
+        TripSchedule tripSchedule = pathLeg.trip();
+        TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
+        TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
+        Trip trip = tripTimes.trip;
         Route route = tripPattern.route;
+        int numStopsInPattern = tripTimes.getNumStops();
 
-        // Determine whether the transit vehicle is running late and include that information in the Leg.
-        TripTimes scheduledTripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
-        {
-            int boardStopIndexInPattern = tripPattern.getStops().indexOf(boardStop);
-            int alightStopIndexInPattern = tripPattern.getStops().indexOf(alightStop);
-            int fromTime = scheduledTripTimes.getDepartureTime(boardStopIndexInPattern);
-            int toTime = scheduledTripTimes.getArrivalTime (alightStopIndexInPattern);
-            // This is marking every leg as realtime. We'll need to preserve a reference to the TripTimes
-            // in the Raptor TripSchedule to know for sure which ones are using realtime data.
+        // Find stop positions in pattern where this leg boards and alights.
+        // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
+        int boardStopIndexInPattern = -1;
+        int alightStopIndexInPattern = -1;
+        for (int s = 0; s < numStopsInPattern; s++) {
+            if (pathLeg.fromTime() == tripSchedule.departure(s)) {
+                boardStopIndexInPattern = s;
+            }
+        }
+        for (int s = 0; s < numStopsInPattern; s++) {
+            if (pathLeg.toTime() == tripSchedule.arrival(s)) {
+                alightStopIndexInPattern = s;
+            }
+        }
+
+        // Include real-time information in the Leg.
+        if (!tripTimes.isScheduled()) {
             leg.realTime = true;
-            leg.departureDelay = pathLeg.fromTime() - fromTime;
-            leg.arrivalDelay = pathLeg.toTime() - toTime;
-            if (leg.departureDelay > 0) {
-                LOG.info("Departure delay = {}", leg.departureDelay);
-            }
-            if (leg.arrivalDelay > 0) {
-                LOG.info("Arrival delay = {}", leg.arrivalDelay);
-            }
+            leg.departureDelay = tripTimes.getDepartureDelay(boardStopIndexInPattern);
+            leg.arrivalDelay = tripTimes.getArrivalDelay(alightStopIndexInPattern);
         }
 
         leg.serviceDate = new ServiceDate(request.getDateTime()).getAsString(); // TODO: This has to be changed for multi-day searches
@@ -199,7 +204,7 @@ public class ItineraryMapper {
         leg.agencyId = route.getAgency().getId();
         leg.routeShortName = route.getShortName();
         leg.routeLongName = route.getLongName();
-        leg.headsign = extractTripHeadsignDirection(pathLeg);
+        leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
         return leg;
     }
@@ -309,19 +314,6 @@ public class ItineraryMapper {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
         c.setTimeInMillis(zdt.toInstant().toEpochMilli());
         return c;
-    }
-
-    private String extractTripHeadsignDirection(TransitPathLeg<TripSchedule> pathLeg) {
-        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
-        TripSchedule tripSchedule = pathLeg.trip();
-        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
-            if (tripSchedule.departure(j) == pathLeg.fromTime()) {
-                return tripPattern.scheduledTimetable.getTripTimes(tripSchedule.getOriginalTrip())
-                        .getHeadsign(j);
-            }
-        }
-
-        throw new IllegalStateException("Missing stop for departure at " + pathLeg.fromTime() + " for " + tripSchedule);
     }
 
     private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
