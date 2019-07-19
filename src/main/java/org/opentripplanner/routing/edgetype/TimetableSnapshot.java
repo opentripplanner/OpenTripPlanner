@@ -130,7 +130,6 @@ public class TimetableSnapshot {
         if(sortedTimetables != null && serviceDate != null) {
             for(Timetable timetable : sortedTimetables) {
                 if (timetable != null && timetable.isValidFor(serviceDate)) {
-                    LOG.trace("returning modified timetable");
                     return timetable;
                 }
             }

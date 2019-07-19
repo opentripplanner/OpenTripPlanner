@@ -85,7 +85,8 @@ public class PlannerResource extends RoutingResource {
             }
 
             if (request.modes.isTransit()) {
-                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.transitLayer);
+                // Route on realtime data, and compare with scheduled data while converting to an Itinerary.
+                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.realtimeTransitLayer);
                 itineraries.addAll(raptorRouter.route());
             }
 

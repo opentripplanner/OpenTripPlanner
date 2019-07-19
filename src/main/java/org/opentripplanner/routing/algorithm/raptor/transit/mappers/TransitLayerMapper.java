@@ -177,7 +177,6 @@ public class TransitLayerMapper {
         return tripPatternsForDates;
     }
 
-
     // TODO About 80% of the mapping time is spent in this method. Should be consider pre-sorting these before
     // TODO serializing the graph?
     private List<TripTimes> getSortedTripTimes (Timetable timetable) {

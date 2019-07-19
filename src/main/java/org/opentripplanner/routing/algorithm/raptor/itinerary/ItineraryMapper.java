@@ -30,6 +30,7 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ import java.util.TimeZone;
  * planner.
  */
 public class ItineraryMapper {
+
     private final TransitLayer transitLayer;
 
     private final RoutingRequest request;
@@ -66,7 +68,7 @@ public class ItineraryMapper {
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
-     * @param transitLayer the currently active transit layer
+     * @param transitLayer the currently active transit layer (may have real-time data applied)
      * @param startOfTime the point in time all times in seconds are counted from
      * @param request the current routing request
      * @param accessTransfers the access paths calculated for this request by access stop
@@ -78,6 +80,7 @@ public class ItineraryMapper {
             RoutingRequest request,
             Map<Stop, Transfer> accessTransfers,
             Map<Stop, Transfer> egressTransfers) {
+
         this.transitLayer = transitLayer;
         this.startOfTime = startOfTime;
         this.request = request;
@@ -151,6 +154,26 @@ public class ItineraryMapper {
         Trip trip = pathLeg.trip().getOriginalTrip();
         TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
         Route route = tripPattern.route;
+
+        // Determine whether the transit vehicle is running late and include that information in the Leg.
+        TripTimes scheduledTripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
+        {
+            int boardStopIndexInPattern = tripPattern.getStops().indexOf(boardStop);
+            int alightStopIndexInPattern = tripPattern.getStops().indexOf(alightStop);
+            int fromTime = scheduledTripTimes.getDepartureTime(boardStopIndexInPattern);
+            int toTime = scheduledTripTimes.getArrivalTime (alightStopIndexInPattern);
+            // This is marking every leg as realtime. We'll need to preserve a reference to the TripTimes
+            // in the Raptor TripSchedule to know for sure which ones are using realtime data.
+            leg.realTime = true;
+            leg.departureDelay = pathLeg.fromTime() - fromTime;
+            leg.arrivalDelay = pathLeg.toTime() - toTime;
+            if (leg.departureDelay > 0) {
+                LOG.info("Departure delay = {}", leg.departureDelay);
+            }
+            if (leg.arrivalDelay > 0) {
+                LOG.info("Arrival delay = {}", leg.arrivalDelay);
+            }
+        }
 
         leg.serviceDate = new ServiceDate(request.getDateTime()).getAsString(); // TODO: This has to be changed for multi-day searches
         leg.stop = new ArrayList<>();

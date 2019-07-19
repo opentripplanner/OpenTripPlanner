@@ -222,10 +222,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
 
-    /** Data model for Raptor routing */
+    /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer transitLayer;
 
-    /** Data model for Raptor routing, with realtime updates applied. */
+    /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer realtimeTransitLayer;
 
     // Hack. I've tried three different ways of generating unique labels.
@@ -632,6 +632,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         LOG.info("Creating transit layer for Raptor routing.");
         // First for the scheduled timetables.
         this.transitLayer = TransitLayerMapper.map(this);
+        this.realtimeTransitLayer = transitLayer;
         // Then in a loop, recreate the transitLayer for real-time updated timetables.
         // This could eventually be done with a PollingGraphUpdater.
         new Thread(() -> {
