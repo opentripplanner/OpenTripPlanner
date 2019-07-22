@@ -89,7 +89,7 @@ public abstract class GtfsTest extends TestCase {
                 updates.add(feedEntity.getTripUpdate());
             }
             timetableSnapshotSource.applyTripUpdates(graph, fullDataset, updates, feedId.getId());
-            alertsUpdateHandler.update(feedMessage);
+            alertsUpdateHandler.update(feedMessage.getEntityList());
         } catch (Exception exception) {}
     }
 

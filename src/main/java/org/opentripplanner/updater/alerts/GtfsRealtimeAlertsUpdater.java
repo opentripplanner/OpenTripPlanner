@@ -102,7 +102,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             updaterManager.execute(new GraphWriterRunnable() {
                 @Override
                 public void run(Graph graph) {
-                    updateHandler.update(feed);
+                    updateHandler.update(feed.getEntityList());
                 }
             });
 
