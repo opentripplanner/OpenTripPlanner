@@ -171,6 +171,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         case "seattle":
             retval = new SeattleFareServiceFactory();
             break;
+        case "brisbane":
+            retval = new BrisbaneFareService.Factory();
+            break;
         default:
             throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
         }
