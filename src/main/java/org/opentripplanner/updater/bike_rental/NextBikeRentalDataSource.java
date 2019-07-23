@@ -44,7 +44,11 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
         brstation.x = Double.parseDouble(attributes.get("lng"));
         brstation.y = Double.parseDouble(attributes.get("lat"));
         brstation.name = new NonLocalizedString(attributes.get("name"));
-        brstation.spacesAvailable = Integer.parseInt(attributes.get("bike_racks"));
+        if (attributes.get("free_racks") != null) {
+            brstation.spacesAvailable = Integer.parseInt(attributes.get("free_racks"));
+        } else {
+            brstation.spacesAvailable = Integer.parseInt(attributes.get("bike_racks"));
+        }
 
         // number of bikes available is reported as "5+" if >= 5
         String numBikes = attributes.get("bikes");
@@ -53,6 +57,7 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
         } else {
             brstation.bikesAvailable = Integer.parseInt(numBikes);
         }
+        brstation.state = "Station on";
         
         return brstation;
     }
