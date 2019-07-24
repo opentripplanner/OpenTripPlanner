@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -134,6 +135,7 @@ public class TransitLayerMapper {
             LOG.info("Got timetable snapshot. This TransitLayer will reflect realtime updates.");
         }
         Set<ServiceDate> allServiceDates = serviceIdsForServiceDate.keySet();
+        Map<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new HashMap<>();
         for (ServiceDate serviceDate : allServiceDates) {
             // Create LocalDate equivalent to the OTP/GTFS ServiceDate object, serving as the key of the return Map.
             LocalDate localDate = ServiceCalendarMapper.localDateFromServiceDate(serviceDate);
@@ -155,13 +157,24 @@ public class TransitLayerMapper {
                     timetable = timetableSnapshot.resolve(oldTripPattern, serviceDate);
                 }
                 List<TripSchedule> newTripSchedules = new ArrayList<>();
-                // The TripTimes are not sorted by departure time in the source timetable. Results are wrong unless trips are sorted.
-                for (TripTimes tripTimes : getSortedTripTimes(timetable)) {
+                // The TripTimes are not sorted by departure time in the source timetable because OTP1 performs a simple
+                // linear search. Raptor results depend on trips being sorted. We reuse the same timetables many times
+                // on different days, so cache the sorted versions to avoid repeated compute-intensive sorting.
+                // Anecdotally this reduces mapping time by more than half, but it is still rather slow.
+                // NL Mapping takes 32 seconds sorting every timetable, 9 seconds with cached sorting,
+                // and 6 seconds with no timetable sorting at all.
+                List<TripTimes> sortedTripTimes = sortedTripTimesForTimetable.computeIfAbsent(
+                    timetable,
+                    TransitLayerMapper::getSortedTripTimes
+                );
+                for (TripTimes tripTimes : sortedTripTimes) {
                     if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
                         continue;
                     }
-                    TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(tripTimes,
-                            tt -> TripScheduleMapper.map(oldTripPattern, tt));
+                    TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(
+                        tripTimes,
+                        tt -> TripScheduleMapper.map(oldTripPattern, tt)
+                    );
                     newTripSchedules.add(tripSchedule);
                 }
                 TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
@@ -179,7 +192,7 @@ public class TransitLayerMapper {
 
     // TODO About 80% of the mapping time is spent in this method. Should be consider pre-sorting these before
     // TODO serializing the graph?
-    private List<TripTimes> getSortedTripTimes (Timetable timetable) {
+    private static List<TripTimes> getSortedTripTimes (Timetable timetable) {
         return timetable.tripTimes.stream()
                 .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
                 .collect(Collectors.toList());
