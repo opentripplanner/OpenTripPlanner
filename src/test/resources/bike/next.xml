@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<markers>
+    <country>
+        <city>
+            <place uid="3456" lat="52.261" lng="20.971" name="full station" number="1" bikes="2" free_racks="0" bike_racks="2">
+            </place>
+            <place uid="1234" lat="52.262" lng="20.972" name="free station" number="2" bikes="1" free_racks="1" bike_racks="3">
+            </place>
+            <place uid="2345" lat="52.263" lng="20.973" name="no free racks station" number="3" bikes="0" bike_racks="2">
+            </place>
+        </city>
+    </country>
+</markers>

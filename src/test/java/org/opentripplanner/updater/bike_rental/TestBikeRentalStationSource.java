@@ -1,13 +1,17 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 
 public class TestBikeRentalStationSource extends TestCase {
-
+    
+    private static final String NEXT_BIKE_TEST_DATA_URL = "file:src/test/resources/bike/next.xml";
+    
     public void testKeolisRennes() {
 
         KeolisRennesBikeRentalDataSource rennesSource = new KeolisRennesBikeRentalDataSource();
@@ -181,4 +185,51 @@ public class TestBikeRentalStationSource extends TestCase {
         BikeRentalStation tempClosedStationWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
         assertEquals("[vantaa]", tempClosedStationWithCustomNetwork.networks.toString());
     }
+
+    public void testNext() {
+        NextBikeRentalDataSource source = createAndUpdateNextBikeRentalDataSource(NEXT_BIKE_TEST_DATA_URL, null);
+        List<BikeRentalStation> rentalStations = source.getStations();
+        assertEquals(3, rentalStations.size());
+        
+        Map<String,BikeRentalStation> stationByName = rentalStations.stream()
+                .peek(System.out::println)
+                .collect(Collectors.toMap(BikeRentalStation::getName, station -> station));
+        
+        BikeRentalStation fullStation = stationByName.get("full station");
+        assertEquals("1", fullStation.id);
+        assertEquals(20.971, fullStation.x);
+        assertEquals(52.261, fullStation.y);
+        assertEquals(0, fullStation.spacesAvailable);
+        assertEquals(2, fullStation.bikesAvailable);
+        assertEquals("Station on", fullStation.state);
+        assertEquals("[NextBike]", fullStation.networks.toString());
+        
+        BikeRentalStation freeStation = stationByName.get("free station");
+        assertEquals("2", freeStation.id);
+        assertEquals(20.972, freeStation.x);
+        assertEquals(52.262, freeStation.y);
+        assertEquals(1, freeStation.spacesAvailable);
+        assertEquals(1, freeStation.bikesAvailable);
+        
+        BikeRentalStation noFreeRacksInfoStation = stationByName.get("no free racks station");
+        assertEquals("3", noFreeRacksInfoStation.id);
+        assertEquals(20.973, noFreeRacksInfoStation.x);
+        assertEquals(52.263, noFreeRacksInfoStation.y);
+        assertEquals(2, noFreeRacksInfoStation.spacesAvailable);
+        assertEquals(0, noFreeRacksInfoStation.bikesAvailable);
+        
+        // Test giving network name to data source
+        NextBikeRentalDataSource sourceWithCustomNetwork = createAndUpdateNextBikeRentalDataSource(NEXT_BIKE_TEST_DATA_URL, "oulu");
+        List<BikeRentalStation> rentalStationsWithCustomNetwork = sourceWithCustomNetwork.getStations();
+        BikeRentalStation tempClosedStationWithCustomNetwork  = rentalStationsWithCustomNetwork.get(0);
+        assertEquals("[oulu]", tempClosedStationWithCustomNetwork.networks.toString());
+    }
+    
+    private NextBikeRentalDataSource createAndUpdateNextBikeRentalDataSource(String url, String networkName) {
+        NextBikeRentalDataSource source = new NextBikeRentalDataSource(networkName);
+        source.setUrl(url);
+        assertTrue(source.update());
+        return source;
+    }
+    
 }
