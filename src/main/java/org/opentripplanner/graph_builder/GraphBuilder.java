@@ -262,7 +262,7 @@ public class GraphBuilder implements Runnable {
                 if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addModule(new BusRouteStreetMatcher());
                 }
-                graphBuilder.addModule(new TransitToTaggedStopsModule());
+                graphBuilder.addModule(new TransitToTaggedStopsModule(builderParams.vertexConnectorName));
             }
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental

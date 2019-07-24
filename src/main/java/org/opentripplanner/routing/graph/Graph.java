@@ -938,13 +938,15 @@ public class Graph implements Serializable {
         List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
         Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
         LOG.info("Summary (number of each type of annotation):");
+        
         for (GraphBuilderAnnotation gba : gbas)
             classes.add(gba.getClass());
-        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
-            String name = e.getElement().getSimpleName();
-            int count = e.getCount();
-            LOG.info("    {} - {}", name, count);
-        }
+    
+        classes.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getElement().getSimpleName()))
+                .forEach(e ->
+                    LOG.info(String.format("\t%-32s - %8d", e.getElement().getSimpleName(), e.getCount()))
+                );
     }
 
     /**

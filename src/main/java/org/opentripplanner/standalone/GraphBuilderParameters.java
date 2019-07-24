@@ -185,6 +185,10 @@ public class GraphBuilderParameters {
     public final Boolean extraEdgesStopPlatformLink;
 
     /**
+     * This will determine what logic we should use when connecting stops to OSM nodes
+     */
+    public final String vertexConnectorName;
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -220,6 +224,7 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
+        vertexConnectorName = config.path("vertexConnector").asText("");
     }
 
 
