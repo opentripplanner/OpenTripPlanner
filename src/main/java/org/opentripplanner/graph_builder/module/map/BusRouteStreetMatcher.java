@@ -62,10 +62,10 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     //If there are no shapes in GTFS pattern geometry is generated
                     //generated geometry is useless for street matching
                     //that is why pattern.geometry is null in that case
-                    if (pattern.geometry == null) {
+                    if (pattern.getGeometry() == null) {
                         continue;
                     }
-                    List<Edge> edges = matcher.match(pattern.geometry);
+                    List<Edge> edges = matcher.match(pattern.getGeometry());
                     if (edges == null || edges.isEmpty()) {
                         log.warn("Could not match to street network: {}", pattern);
                         continue;
@@ -78,7 +78,9 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
                     LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
                     // Replace the pattern's geometry from GTFS with that of the equivalent OSM edges.
-                    pattern.geometry = ls;
+                    // TODO: It is not possible to replace the geometry of a TripPattern anymore,
+                    // TODO: as it is constructed from the hopGeometries
+                    //pattern.getGeometry() = ls;
                 }
             }
         }

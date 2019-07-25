@@ -191,8 +191,7 @@ public class PatternHopFactory {
             LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
             if (hopGeometries != null) {
                 // Make a single unified geometry, and also store the per-hop split geometries.
-                tripPattern.makeGeometry(hopGeometries);
-                tripPattern.hopGeometries = hopGeometries;
+                tripPattern.setHopGeometries(hopGeometries);
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
 
