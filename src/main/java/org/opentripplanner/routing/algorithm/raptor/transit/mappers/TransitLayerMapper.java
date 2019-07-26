@@ -13,6 +13,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperImpl;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
@@ -173,10 +174,12 @@ public class TransitLayerMapper {
                     }
                     TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(
                         tripTimes,
-                        tt -> TripScheduleMapper.map(oldTripPattern, tt)
+                        // Two different implementations of TripSchedule
+                        tt -> new TripScheduleWrapperImpl(tt, oldTripPattern)
+                        // t -> t.toTripSchedulImpl(oldTripPattern)
                     );
                     newTripSchedules.add(tripSchedule);
-                }
+                } 
                 TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
                 TripPatternForDate tripPatternForDate = new TripPatternForDate(
                         newTripPattern,

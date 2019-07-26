@@ -87,8 +87,7 @@ public class TimetableSnapshot {
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
     // FIXME: this could be made into a flat hashtable with compound keys.
-    private HashMap<TripPattern, SortedSet<Timetable>> timetables =
-            new HashMap<TripPattern, SortedSet<Timetable>>();
+    private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
     /**
      * <p>

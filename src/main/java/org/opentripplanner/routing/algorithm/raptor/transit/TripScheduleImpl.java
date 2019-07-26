@@ -3,11 +3,20 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This represents a single trip within a TripPattern
+ * This represents a single trip within a TripPattern.
+ * It is the OTP2 Raptor equivalent of an OTP1 TripTimes.
  */
 public class TripScheduleImpl implements TripSchedule {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TripScheduleImpl.class);
+
+    private final TripTimes originalTripTimes;
+
+    private final TripPattern originalTripPattern;
 
     /**
      * Arrival times in seconds from midnight by stop index
@@ -19,44 +28,53 @@ public class TripScheduleImpl implements TripSchedule {
      */
     private final int[] departures;
 
-    private final TripTimes originalTripTimes;
+    /** How many seconds to shift the arrivals and departures (enabling reuse of arrival/departure arrays). */
+    private final int timeShift;
 
-    private final TripPattern originalTripPattern;
-
-    private final int serviceCode;
-
-    public TripScheduleImpl(TripTimes originalTripTimes, TripPattern originalTripPattern) {
+    public TripScheduleImpl (
+            TripTimes originalTripTimes,
+            TripPattern originalTripPattern,
+            int[] arrivals,
+            int[] departures,
+            int timeShift
+    ) {
+        // Sanity check array and stop pattern dimensions.
         final int numStops = originalTripTimes.getNumStops();
-        // Copy over realtime or scheduled times
-        // We could just read through to the underlying tripTimes but that may be less efficient (measure this).
-        arrivals = new int[numStops];
-        departures = new int[numStops];
-        for (int i = 0; i < numStops; i++) {
-            arrivals[i] = originalTripTimes.getArrivalTime(i);
-            departures[i] = originalTripTimes.getDepartureTime(i);
+        if (originalTripPattern.getStops().size() != numStops) {
+            LOG.error("TripPattern is not the same size as the TripTimes. This indicates a bug.");
         }
-        this.serviceCode = originalTripTimes.serviceCode;
+        if (arrivals.length != numStops) {
+            LOG.error("Arrivals arrays is not the same size as the TripTimes. This indicates a bug.");
+        }
+        if (departures.length != numStops) {
+            LOG.error("Departures arrays is not the same size as the TripTimes. This indicates a bug.");
+        }
         this.originalTripTimes = originalTripTimes;
         this.originalTripPattern = originalTripPattern;
+        this.arrivals = arrivals;
+        this.departures = departures;
+        this.timeShift = timeShift;
     }
 
     /**
      * For tests.
      */
     public TripScheduleImpl() {
-        arrivals = null;
-        departures = null;
         originalTripTimes = null;
         originalTripPattern = null;
-        serviceCode = 0;
+        arrivals = null;
+        departures = null;
+        timeShift = 0;
     }
 
     @Override
-    public int arrival(int stopPosInPattern) { return arrivals[stopPosInPattern]; }
+    public int arrival(int stopPosInPattern) {
+        return arrivals[stopPosInPattern] + timeShift;
+    }
 
     @Override
     public int departure(int stopPosInPattern) {
-        return departures[stopPosInPattern];
+        return departures[stopPosInPattern] + timeShift;
     }
 
     @Override
@@ -76,6 +94,6 @@ public class TripScheduleImpl implements TripSchedule {
 
     @Override
     public int getServiceCode() {
-        return serviceCode;
+        return originalTripTimes.serviceCode;
     }
 }
