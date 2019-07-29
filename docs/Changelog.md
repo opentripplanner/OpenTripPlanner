@@ -12,6 +12,9 @@
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - increase GTFS-realtime feeds size limit from 64MB to 2G (#2738)
+- Fix XML response serialization (#2685)
+- Refactor InterleavedBidirectionalHeuristic (#2671)
+- Fix minor test failure against BANO geocoder (#2798)
 
 ## 1.3 (2018-08-03)
 
