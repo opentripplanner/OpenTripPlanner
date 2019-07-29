@@ -13,6 +13,7 @@
 - Remove CarFreeAtoZ from list of deployments
 - Fix XML response serialization (#2685)
 - Refactor InterleavedBidirectionalHeuristic (#2671)
+- Add "Accept" headers to GTFS-RT HTTP requests (#2796)
 
 ## 1.3 (2018-08-03)
 
