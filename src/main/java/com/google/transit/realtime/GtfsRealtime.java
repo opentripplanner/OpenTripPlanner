@@ -23,7 +23,6 @@ package com.google.transit.realtime;
  * Version 2.5.0 of protoc.exe has been used to generate this file.
  * </p>
  */
-
 public final class GtfsRealtime {
   private GtfsRealtime() {}
   public static void registerAllExtensions(
