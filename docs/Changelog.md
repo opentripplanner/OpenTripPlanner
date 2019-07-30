@@ -14,6 +14,7 @@
 - Fix XML response serialization (#2685)
 - Refactor InterleavedBidirectionalHeuristic (#2671)
 - Add "Accept" headers to GTFS-RT HTTP requests (#2796)
+- Fix minor test failure against BANO geocoder (#2798)
 
 ## 1.3 (2018-08-03)
 
