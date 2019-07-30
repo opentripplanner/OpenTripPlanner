@@ -17,6 +17,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 * [**Valencia, Spain**](http://www.emtvalencia.es/geoportal/?lang=en_otp) from the Municipal Transport Company of Valencia S.A.U.
 * [**Grenoble, France**](http://www.metromobilite.fr/) from SMTC, Grenoble Alpes métropole, l'État Français, the Rhône-alpes region, the Isère council and the City of Grenoble.
 * **Rennes, France** where the STAR network provides an OTP client for [iOS](https://itunes.apple.com/us/app/starbusmetro/id899970416?mt=8), [Android](https://play.google.com/store/apps/details?id=com.bookbeo.starbusmetro), Windows Phone et Web.
+* **Alençon, France** integrated urban and school bus network [planner from Réunir Alençon](https://altobus.com/mon-itineraire/).
 * [**Poznań, Poland**](http://ztm.poznan.pl/#planner) from Urban Transport Authority of Poznań (ZTM Poznan).
 * **Trento Province, Italy** - [ViaggiaTrento](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiatrento) and [ViaggiaRovereto](https://play.google.com/store/apps/details?id=eu.trentorise.smartcampus.viaggiarovereto)
   were implemented as part of the [SmartCampus Project](http://www.smartcampuslab.it), a research project founded by [TrentoRise](http://trentorise.eu), [UNITN](http://www.unitn.it), and [FBK](http://www.fbk.eu).
