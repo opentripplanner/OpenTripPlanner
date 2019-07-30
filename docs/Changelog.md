@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4 (2018-07-30)
+## 1.4 (2019-07-30)
 
 - Remove Open Traffic prototype code (#2698)
 - Improved configuration documentation
