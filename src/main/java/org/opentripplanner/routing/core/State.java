@@ -48,6 +48,8 @@ public class State implements Cloneable {
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
+
+    int callAndRideTime = 0;
     
     private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
@@ -294,6 +296,10 @@ public class State implements Cloneable {
 
     public int getPreTransitTime() {
         return preTransitTime;
+    }
+
+    public int getCallAndRideTime() {
+        return callAndRideTime;
     }
 
     public Vertex getVertex() {
@@ -617,6 +623,10 @@ public class State implements Cloneable {
     /** @return the last TripPattern used in this path (which is set when leaving the vehicle). */
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
+    }
+
+    public boolean isLastBoardAlightDeviated() {
+        return stateData.isLastBoardAlightDeviated;
     }
 
     public ServiceDay getServiceDay() {

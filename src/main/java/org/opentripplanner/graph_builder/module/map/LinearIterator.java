@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.module.map;
 
 import java.util.Iterator;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.linearref.LinearLocation;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.linearref.LinearLocation;
 
 /**
  * I copied this class from JTS but made a few changes.

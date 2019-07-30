@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;

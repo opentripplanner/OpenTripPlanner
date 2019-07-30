@@ -5,10 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
@@ -102,10 +98,8 @@ public class WalkStep {
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
      * distance.
      */
-    @XmlTransient
     public List<P2<Double>> elevation;
 
-    @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
@@ -208,7 +202,6 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    @XmlJavaTypeAdapter(ElevationAdapter.class)
     @JsonSerialize
     public List<P2<Double>> getElevation() {
         return elevation;

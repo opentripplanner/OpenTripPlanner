@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OpenSphere, see the LICENSE file for further information. */
 package org.opensphere.geometry.triangulation.model;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Vertex.

@@ -6,8 +6,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,7 +14,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 @Path("/")
-@XmlRootElement 
 public class ServerInfo {
 
     /** Quality value prioritizes MIME types */
@@ -29,16 +27,12 @@ public class ServerInfo {
         return SERVER_INFO;
     }    
     
-    // Fields must be public or have a public getter to be auto-serialized to JSON;
-    // they are annotated with @XmlElement to be serialized to XML elements (as opposed to attributes).
+    // Fields must be public or have a public getter to be auto-serialized to JSON
 
-    @XmlElement 
-    public MavenVersion serverVersion = MavenVersion.VERSION; 
+    public MavenVersion serverVersion = MavenVersion.VERSION;
     
-    @XmlElement 
     public String cpuName = "unknown";
     
-    @XmlElement 
     public int nCores = 0;
 
     /* It would make sense to have one object containing maven, git, and hardware subobjects. */
