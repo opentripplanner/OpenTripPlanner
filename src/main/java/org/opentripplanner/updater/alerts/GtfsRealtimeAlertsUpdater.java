@@ -85,7 +85,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         try {
-            InputStream data = HttpUtils.getData(url);
+            InputStream data = HttpUtils.getData(url, "Accept", "application/x-google-protobuf; application/octet-stream; */*");
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
