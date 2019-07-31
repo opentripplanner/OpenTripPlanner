@@ -10,7 +10,6 @@
 - Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
 - Allow itineraries in response to be sorted by duration (#2593)
 - Fix reverse optimization bug (#2653, #2411)
-- Remove CarFreeAtoZ from list of deployments
 - increase GTFS-realtime feeds size limit from 64MB to 2G (#2738)
 - Fix XML response serialization (#2685)
 - Refactor InterleavedBidirectionalHeuristic (#2671)
