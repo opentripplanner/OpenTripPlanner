@@ -10,8 +10,9 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.routing.algorithm.strategies.MultiTargetTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.MultiTargetTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;

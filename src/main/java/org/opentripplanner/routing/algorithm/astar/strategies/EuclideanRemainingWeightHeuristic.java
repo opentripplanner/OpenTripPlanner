@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.strategies;
+package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;

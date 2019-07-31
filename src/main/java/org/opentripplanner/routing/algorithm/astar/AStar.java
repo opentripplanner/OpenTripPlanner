@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.astar;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;

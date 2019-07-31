@@ -1,8 +1,7 @@
-package org.opentripplanner.routing.algorithm.strategies;
+package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. For use in testing, troubleshooting, and

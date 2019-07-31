@@ -3,10 +3,10 @@ package org.opentripplanner.routing.impl;
 import com.google.common.collect.Lists;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
@@ -112,7 +112,7 @@ public class GraphPathFinder {
          *
          * After the limited areas of the street network around the origin and destination are explored, the
          * options.maxWalkDistance will be set to unlimited for similar reasons to maxTransfers above. That happens
-         * in method org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic.initialize
+         * in method org.opentripplanner.routing.algorithm.astar.strategies.InterleavedBidirectionalHeuristic.initialize
          */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
