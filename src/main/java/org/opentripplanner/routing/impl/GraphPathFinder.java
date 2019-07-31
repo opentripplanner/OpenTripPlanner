@@ -1,12 +1,10 @@
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -65,12 +63,12 @@ public class GraphPathFinder {
      * work with (in the case of the more sophisticated bidirectional heuristic, which improves over time).
      */
     public List<GraphPath> getPaths(RoutingRequest options) {
-
-        RoutingRequest originalReq = options.clone();
-
         if (options == null) {
             LOG.error("PathService was passed a null routing request.");
             return null;
+        }
+        if (options.modes.isTransit()) {
+            throw new UnsupportedOperationException("Transit search not supported");
         }
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
@@ -85,28 +83,15 @@ public class GraphPathFinder {
             // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
-        // Without transit, we'd just just return multiple copies of the same on-street itinerary.
-        if (!options.modes.isTransit()) {
-            options.numItineraries = 1;
-        }
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
         // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
-        RemainingWeightHeuristic reversedSearchHeuristic;
         if (options.disableRemainingWeightHeuristic || options.oneToMany) {
             heuristic = new TrivialRemainingWeightHeuristic();
-            reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
-        } else if (options.modes.isTransit()) {
-            // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
-            // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
-            // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
-            heuristic = new InterleavedBidirectionalHeuristic();
-            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
-            reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
@@ -158,19 +143,6 @@ public class GraphPathFinder {
             List<GraphPath> newPaths = aStar.getPathsToTarget();
             if (newPaths.isEmpty()) {
                 break;
-            }
-
-            // Find all trips used in this path and ban them for the remaining searches
-            for (GraphPath path : newPaths) {
-                // path.dump();
-                List<FeedScopedId> tripIds = path.getTrips();
-                for (FeedScopedId tripId : tripIds) {
-                    options.banTrip(tripId);
-                }
-                if (tripIds.isEmpty()) {
-                    // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
-                    options.onlyTransitTrips = true;
-                }
             }
 
             paths.addAll(newPaths.stream()
@@ -326,44 +298,4 @@ public class GraphPathFinder {
         }
         return newPath;
     }
-
-/*
-    TODO reimplement
-    This should probably be done with a special value in the departure/arrival time.
-
-    public static TripPlan generateFirstTrip(RoutingRequest request) {
-        request.setArriveBy(false);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-        return generate(request);
-    }
-
-    public static TripPlan generateLastTrip(RoutingRequest request) {
-        request.setArriveBy(true);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-
-        return generate(request);
-    }
-*/
-
 }

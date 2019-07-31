@@ -11,7 +11,8 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -46,7 +47,7 @@ public class NearbyStopFinder {
     private double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
-    private EarliestArrivalSearch earliestArrivalSearch;
+    private AStar astar;
 
     /* Fields used when finding stops without a street network. */
     private StreetVertexIndexService streetIndex;
@@ -68,11 +69,10 @@ public class NearbyStopFinder {
         this.useStreets = useStreets;
         this.radiusMeters = radiusMeters;
         if (useStreets) {
-            earliestArrivalSearch = new EarliestArrivalSearch();
+            astar = new AStar();
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
             // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
             // but we don't have much of a choice here. Use the default walking speed to convert.
-            earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
             // FIXME use the vertex index already in the graph if it exists.
             streetIndex = new StreetVertexIndexServiceImpl(graph);
@@ -135,7 +135,11 @@ public class NearbyStopFinder {
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
         routingRequest.arriveBy = reverseDirection;
-        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
+        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
+        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
+        routingRequest.disableRemainingWeightHeuristic = true;
+        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {

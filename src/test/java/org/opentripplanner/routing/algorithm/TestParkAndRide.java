@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -116,7 +116,7 @@ public class TestParkAndRide extends TestCase {
         options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
         options.setArriveBy(true);
         options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic();
+        options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(A, false);
         assertNotNull(path);
@@ -125,7 +125,7 @@ public class TestParkAndRide extends TestCase {
         options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
         //options.arriveBy
         options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new InterleavedBidirectionalHeuristic();
+        options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
         assertNotNull(path);

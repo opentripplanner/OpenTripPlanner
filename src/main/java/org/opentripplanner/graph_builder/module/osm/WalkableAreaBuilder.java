@@ -15,8 +15,9 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -309,14 +310,15 @@ public class WalkableAreaBuilder {
             mode = TraverseMode.CAR;
         }
         RoutingRequest options = new RoutingRequest(mode);
-        options.setDummyRoutingContext(graph);
         options.dominanceFunction = new DominanceFunction.EarliestArrival();
-        GenericDijkstra search = new GenericDijkstra(options);
+        options.setDummyRoutingContext(graph);
+        AStar search = new AStar();
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<Edge>();
         for (Vertex vertex : startingVertices) {
-            State state = new State(vertex, options);
-            ShortestPathTree spt = search.getShortestPathTree(state);
+            options.setRoutingContext(graph, vertex, null);
+            options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+            ShortestPathTree spt = search.getShortestPathTree(options);
             for (Vertex endVertex : startingVertices) {
                 GraphPath path = spt.getPath(endVertex, false);
                 if (path != null) {
