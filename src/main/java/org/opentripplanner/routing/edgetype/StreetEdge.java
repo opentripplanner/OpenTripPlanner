@@ -679,8 +679,32 @@ public class StreetEdge extends Edge implements Cloneable {
 
             // Apply turn restrictions
             if (options.arriveBy && !canTurnOnto(backPSE, s0, backMode)) {
-                return null;
+                // A turn restriction exists that forbids this turn with the current traverseMode.
+                // If using a bike, or micromobility, try again while walking
+                if (traverseMode == TraverseMode.BICYCLE || traverseMode == TraverseMode.MICROMOBILITY) {
+                    return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
+                }
+                // After trying again with switching to walking, the backMode will not have changed. Therefore, this
+                // conditional makes an assumption that a transition from non-walking to walking occurs at the very end
+                // of the last state. In this case it might be possible to make said turn if an immediate transition to
+                // walking is assumed at the very end of the previous state.
+                else if (
+                    traverseMode == TraverseMode.WALK &&
+                        backMode != TraverseMode.WALK &&
+                        canTurnOnto(backPSE, s0, TraverseMode.WALK)
+                ) {
+                    // the turn is now possible with the assumption that a transition to walking occurred at the very
+                    // end of the last StreetEdge of the back state.
+                    // Do nothing here in order to continue the traversal and avoid returning null.
+                } else {
+                    return null;
+                }
             } else if (!options.arriveBy && !backPSE.canTurnOnto(this, s0, traverseMode)) {
+                // A turn restriction exists that forbids this turn with the current traverseMode.
+                // If using a bike, or micromobility, try again while walking
+                if (traverseMode == TraverseMode.BICYCLE || traverseMode == TraverseMode.MICROMOBILITY) {
+                    return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
+                }
                 return null;
             }
 
