@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5 (in progress)
+
+- Fix edge case of generating walk steps from SimpleTransfer that encountered a turn restriction while not walking (#2802)
+
 ## 1.4 (2019-07-30)
 
 - Remove Open Traffic prototype code (#2698)
