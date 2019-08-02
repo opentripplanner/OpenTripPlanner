@@ -222,9 +222,10 @@ public final class Stop extends IdentityBean<FeedScopedId> {
     }
 
     /**
-     * This method changes the <code>locationType</code> from station to stop/platform.
+     * This method convert a station to a stop(default location type in GTFS).
+     * This can be done to account for missing platforms in the input data.
      */
-    public void changeLocationTypeToDefaultStopForStation() {
+    public void convertStationToStop() {
         if(!isStation()) {
             throw new IllegalStateException("This method is only defined for Stations");
         }

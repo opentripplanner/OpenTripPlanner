@@ -22,12 +22,12 @@ public class StopTest {
         assertFalse(subject.isStation());
     }
 
-    @Test public void changeLocationTypeToDefaultStopForStation() {
+    @Test public void convertStationToStop() {
         // Given a Station
         subject.setLocationType(Stop.PARENT_STATION_LOCATION_TYPE);
 
         // When changed it to a stop
-        subject.changeLocationTypeToDefaultStopForStation();
+        subject.convertStationToStop();
 
         // Then
         assertTrue(subject.isPlatform());

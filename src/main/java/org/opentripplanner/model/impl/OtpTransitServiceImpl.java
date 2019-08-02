@@ -193,7 +193,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
                 .filter(this::isStationWithoutPlatforms)
                 .forEach(it -> {
                     LOG.warn("The Station is missing Platforms: {}", it);
-                    it.changeLocationTypeToDefaultStopForStation();
+                    it.convertStationToStop();
 
                 });
     }
