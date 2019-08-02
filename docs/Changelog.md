@@ -2,6 +2,7 @@
 
 ## 2.0 (in progress)
 - Sandbox for experimental features (#2745)
+- Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 
 ## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)
