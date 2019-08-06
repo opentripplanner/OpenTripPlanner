@@ -39,7 +39,7 @@ class ServiceCalendarMapper {
         return serviceCodesByLocalDates;
     }
 
-    public static LocalDate localDateFromServiceDate(ServiceDate serviceDate) {
+    static LocalDate localDateFromServiceDate(ServiceDate serviceDate) {
         return LocalDate.of(serviceDate.getYear(), serviceDate.getMonth(), serviceDate.getDay());
     }
 }

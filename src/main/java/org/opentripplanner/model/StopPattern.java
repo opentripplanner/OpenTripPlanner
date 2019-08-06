@@ -1,15 +1,13 @@
 package org.opentripplanner.model;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hasher;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at
@@ -32,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * 
- * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key for a TripPattern.
- * Should the route be included in the StopPattern?
+ * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
+ * key for a TripPattern. Should the route be included in the StopPattern?
  */
 public class StopPattern implements Serializable {
 
@@ -124,21 +122,23 @@ public class StopPattern implements Serializable {
     }
 
     /**
-     * In most cases we want to use identity equality for StopPatterns. There is a single StopPattern instance for each
-     * semantic StopPattern, and we don't want to calculate complicated hashes or equality values during normal
-     * execution. However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
-     * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
+     * In most cases we want to use identity equality for StopPatterns. There is a single
+     * StopPattern instance for each semantic StopPattern, and we don't want to calculate
+     * complicated hashes or equality values during normal execution. However, in some cases we
+     * want a way to consistently identify trips across versions of a GTFS feed, when the feed
+     * publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
      */
     public HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
         for (int s = 0; s < size; s++) {
             Stop stop = stops[s];
-            // Truncate the lat and lon to 6 decimal places in case they move slightly between feed versions
+            // Truncate the lat and lon to 6 decimal places in case they move slightly between
+            // feed versions
             hasher.putLong((long) (stop.getLat() * 1000000));
             hasher.putLong((long) (stop.getLon() * 1000000));
         }
-        // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are not important
-        // and have changed between OTP versions.
+        // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
+        // not important and have changed between OTP versions.
         for (int hop = 0; hop < size - 1; hop++) {
             hasher.putInt(pickups[hop]);
             hasher.putInt(dropoffs[hop + 1]);

@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opentripplanner.util.DateUtils.secToHHMM;
 
 /**
  * This represents a single trip within a TripPattern.
@@ -79,7 +80,17 @@ public class TripScheduleImpl implements TripSchedule {
 
     @Override
     public String debugInfo() {
-        throw new UnsupportedOperationException();
+        // Create a short description of a trip, which can be used to for logging
+        // and debugging. Does not need to be 100% uniq, but nice if it is human
+        // readable. The format used here is <Mode>-<Route name(short)>-<departure-time>
+        // Example: Bus-32-12:56   (The depature time is )
+
+        String mode = originalTripPattern.mode.name();
+        String r = originalTripPattern.route.getShortName();
+        if(r == null || r.isEmpty()) {
+            r = originalTripPattern.route.getLongName();
+        }
+        return mode + "-" + r + "-" + secToHHMM(departure(0));
     }
 
     @Override
@@ -92,8 +103,4 @@ public class TripScheduleImpl implements TripSchedule {
         return originalTripPattern;
     }
 
-    @Override
-    public int getServiceCode() {
-        return originalTripTimes.serviceCode;
-    }
 }

@@ -29,11 +29,6 @@ public class TripScheduleWrapperImpl implements TripSchedule {
     }
 
     @Override
-    public int getServiceCode() {
-        return originalTripTimes.serviceCode;
-    }
-
-    @Override
     public int arrival(int stopPosInPattern) {
         return originalTripTimes.getArrivalTime(stopPosInPattern);
     }

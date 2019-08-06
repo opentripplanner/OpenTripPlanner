@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -44,11 +43,6 @@ public class TripScheduleWithOffset implements TripSchedule {
     @Override
     public TripPattern getOriginalTripPattern() {
         return this.tripSchedule.getOriginalTripPattern();
-    }
-
-    @Override
-    public int getServiceCode() {
-        return this.tripSchedule.getServiceCode();
     }
 
     public int getSecondsOffset() {

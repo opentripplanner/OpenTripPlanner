@@ -1,14 +1,14 @@
 package org.opentripplanner.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -185,53 +185,27 @@ public class DateUtils implements DateConstants {
     }
 
     /**
-     * Converts time in seconds to a <code>String</code> in the format h:mm.
+     * Converts the given time in seconds to a <code>String</code> in the format h:mm.
      * 
-     * @param time
-     *            the time in seconds.
+     * @param seconds the time in seconds.
      * @return a <code>String</code> representing the time in the format h:mm
      */
-    public static String secondsToString(int time) {
-        return secondsToString(time, false);
-    }
+    public static String secToHHMM(int seconds) {
+        int min;
+        String sign = "";
 
-    public static String secondsToString(int time, boolean withAmPm) {
-        if (time < 0)
-            return null;
+        if(seconds >= 0) {
+            min = seconds/60;
+            sign = "";
+        } else {
+            min = -seconds/60;
+            sign = "-";
+        }
 
-        String minutesStr = secondsToMinutes(time);
-        String hoursStr = secondsToHour(time);
-        String amPmStr = withAmPm ? getAmPm(time) : "";
+        int mm = min % 60;
+        int hh = min / 60;
 
-        return hoursStr + ":" + minutesStr + amPmStr;
-    }
-
-    public static String secondsToHour(int time) {
-        if (time < 0)
-            return null;
-        int hours = (time / 3600) % 12;
-        String hoursStr = hours == 0 ? "12" : hours + "";
-        return hoursStr;
-    }
-
-    public static String secondsToMinutes(int time) {
-        if (time < 0)
-            return null;
-
-        int minutes = (time / 60) % 60;
-        String minutesStr = (minutes < 10 ? "0" : "") + minutes;
-        return minutesStr;
-    }
-
-    public static String getAmPm(int time) {
-        return getAmPm(time, AM, PM);
-    }
-
-    public static String getAmPm(int time, String am, String pm) {
-        if (time % 86400 >= 43200)
-            return pm;
-        else
-            return am;
+        return String.format("%s%d:%02d", sign, hh, mm);
     }
 
     public static String trim(String str) {
