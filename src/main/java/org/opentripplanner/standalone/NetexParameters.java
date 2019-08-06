@@ -8,7 +8,7 @@ public class NetexParameters {
 
     private static final String EMPTY_STRING_PATTERN = "$^";
 
-    private static final String MODULE_FILE_PATTERN = ".*-netex-no\\.zip";
+    private static final String MODULE_FILE_PATTERN = ".*-netex.*\\.zip";
 
     private static final String IGNORE_FILE_PATTERN = EMPTY_STRING_PATTERN;
 
@@ -30,11 +30,11 @@ public class NetexParameters {
     /**
      * This field is used to identify Netex module (zip) files. The format is
      * a regular expression. The regular expression should match the name
-     * of the file including file extension, but not the file path.
+     * of the file including file extension, but not the directory path.
      * <p>
-     * The pattern <code>'.*-netex-no\.zip'</code> matches <code>'norway-aggregated-netex-no.zip'</code>
+     * The pattern <code>'.*-netex.*\.zip'</code> matches <code>'norway-netex-no.zip'</code>
      * <p>
-     * Default value is <code>'.*-netex-no\.zip'</code>
+     * Default value is <code>'.*-netex.*\.zip'</code>
      */
     public final Pattern moduleFilePattern;
 
