@@ -5,18 +5,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
-// TODO OTP2 - JavaDoc
+/**
+ * A named collection of NeTEx files grouped together with
+ * a set of shared group entries/files and a set of _individual_
+ * entries/files.
+ */
 class GroupEntries {
-    private String group;
-    private List<ZipEntry> sharedEntries = new ArrayList<>();
-    private List<ZipEntry> entries = new ArrayList<>();
+    private final String name;
+    private final List<ZipEntry> sharedEntries = new ArrayList<>();
+    private final List<ZipEntry> entries = new ArrayList<>();
 
-    GroupEntries(String group) {
-        this.group = group;
+    GroupEntries(String name) {
+        this.name = name;
     }
 
-    public String getGroup() {
-        return group;
+    public String name() {
+        return name;
     }
 
     void addSharedEntry(ZipEntry entry) {

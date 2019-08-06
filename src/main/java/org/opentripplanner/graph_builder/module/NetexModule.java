@@ -9,24 +9,20 @@ import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 
-// TODO OTP2 - logging?
 
 /**
- * This module is used for importing the NeTEx CEN Technical Standard for exchanging Public Transport schedules and
- * related data (<a href="http://netex-cen.eu/">http://netex-cen.eu/</a>). Currently it only supports the Norwegian
- * profile (<a href="https://enturas.atlassian.net/wiki/spaces/PUBLIC/">
- * https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>), but it is intended to be updated later to support other
- * profiles.
+ * This module is used for importing the NeTEx CEN Technical Standard for exchanging
+ * Public Transport schedules and related data
+ * (<a href="http://netex-cen.eu/">http://netex-cen.eu/</a>). Currently it only supports the
+ * Norwegian profile
+ * (<a href="https://enturas.atlassian.net/wiki/spaces/PUBLIC/">https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>),
+ * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     private List<NetexBundle> netexBundles;
 

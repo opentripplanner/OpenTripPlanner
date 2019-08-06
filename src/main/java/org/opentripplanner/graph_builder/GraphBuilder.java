@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder;
 import com.google.common.collect.Lists;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -20,6 +19,7 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
+import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
@@ -121,7 +121,7 @@ public class GraphBuilder implements Runnable {
      * Factory method to create and configure a GraphBuilder with all the appropriate modules
      * to build a graph from the files in the given configuration.
      *
-     * TODO OTP2 - Remove comment when we remove support for multiple routers
+     * TODO #2760 - Remove comment when we remove support for multiple routers
      * TODO parameterize with the router ID and call repeatedly to make multiple builders
      * note of all command line options this is only using  params.inMemory params.preFlight
      * and params.build directory

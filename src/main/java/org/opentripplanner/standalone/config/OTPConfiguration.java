@@ -25,7 +25,9 @@ import java.io.File;
  * loading fails. It delegates most of this responsibility to the {@link ConfigFile}.
  * <p/>
  * It support multiple graph configurations to be loaded from respective directories; Hence
- * support for multiple Routers. (TODO OTP2 - Remove support for multiple routers)
+ * support for multiple Routers.
+ *
+ * TODO #2760 - Remove support for multiple routers
  */
 public class OTPConfiguration {
     private static final String OTP_CONFIG_FILENAME = "otp-config.json";
@@ -44,7 +46,9 @@ public class OTPConfiguration {
     /**
      * Create a new OTP configuration instance for a given directory. OTP can load
      * multiple graphs with its own configuration.
-     * TODO OTP2 - This feature will be removed i OTP2.
+     *
+     * TODO #2760 - This feature will be removed i OTP2 when removing the support for
+     * TODO #2760 - multiple routers.
      */
     public OTPConfiguration(File otpRootPath) {
         this.otpConfig = new ConfigFile(otpRootPath, OTP_CONFIG_FILENAME);
