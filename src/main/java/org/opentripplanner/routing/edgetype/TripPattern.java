@@ -10,25 +10,23 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +35,13 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -48,6 +52,9 @@ import java.util.*;
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
+ *
+ *  TODO OTP2 - Move this to package: org.opentripplanner.model
+ *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern implements Cloneable, Serializable {
 
@@ -55,13 +62,13 @@ public class TripPattern implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
-    public static final int MASK_PICKUP = 2|4;
-    public static final int SHIFT_PICKUP = 1;
-    public static final int MASK_DROPOFF = 8|16;
-    public static final int SHIFT_DROPOFF = 3;
-    public static final int NO_PICKUP = 1;
-    public static final int FLAG_BIKES_ALLOWED = 32;
+    private static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
+    private static final int MASK_PICKUP = 2|4;
+    private static final int SHIFT_PICKUP = 1;
+    private static final int MASK_DROPOFF = 8|16;
+    private static final int SHIFT_DROPOFF = 3;
+    private static final int NO_PICKUP = 1;
+    //private static final int FLAG_BIKES_ALLOWED = 32;
 
     /**
      * The GTFS Route of all trips in this pattern.
@@ -105,6 +112,8 @@ public class TripPattern implements Cloneable, Serializable {
      * The vertices in the Graph that correspond to each Stop in this pattern.
      * Note: these are not unique to this pattern, and could be shared in the stop.
      * FIXME they appear to be all null. are they even used?
+     * TODO OTP2 - This is not used and can be removed. It is initialized in the
+     * TODO OTP2 - PatternHopFactory, but never accessed after that.
      */
     public final TransitStop[] stopVertices;
 
@@ -123,21 +132,6 @@ public class TripPattern implements Cloneable, Serializable {
 
     /** Used by the MapBuilder (and should be exposed by the Index API). */
     public LineString geometry = null;
-
-
-    // TODO This should probably be precalculated in the PatternHopFactory
-    public LineString getHopGeometry(int stopIndex) {
-        if (hopGeometries != null) {
-            return hopGeometries[stopIndex];
-        } else {
-            Coordinate c1 = new Coordinate(stopPattern.stops[stopIndex].getLon(),
-                                            stopPattern.stops[stopIndex].getLat());
-            Coordinate c2 = new Coordinate(stopPattern.stops[stopIndex + 1].getLon(),
-                                            stopPattern.stops[stopIndex + 1].getLat());
-
-            return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
-        }
-    }
 
     /**
      * Geometries of each inter-stop segment of the tripPattern. This is redundant information but should just reuse
@@ -618,4 +612,17 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
+    // TODO OTP2 - This should probably be precalculated in the PatternHopFactory
+    public LineString getHopGeometry(int stopIndex) {
+        if (hopGeometries != null) {
+            return hopGeometries[stopIndex];
+        } else {
+            Stop s1 = stopPattern.stops[stopIndex];
+            Stop s2 = stopPattern.stops[stopIndex + 1];
+            Coordinate c1 = new Coordinate(s1.getLon(), s1.getLat());
+            Coordinate c2 = new Coordinate(s2.getLon(), s2.getLat());
+
+            return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
+        }
+    }
 }

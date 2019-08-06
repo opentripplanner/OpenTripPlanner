@@ -3,8 +3,6 @@ package org.opentripplanner.routing.edgetype.factory;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.math3.util.FastMath;
@@ -51,7 +49,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
@@ -74,6 +71,9 @@ import java.util.Map;
 
 /**
  * Generates a set of edges from GTFS.
+ *
+ * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
+ * TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
 public class PatternHopFactory {
 
