@@ -23,9 +23,9 @@ import java.util.List;
 
 /**
  * This class is responsible for cleaning stop times, removing duplicates, correcting bad data
- * and so on. This was previously done in the
- * {@link PatternHopFactory}, and the code is
- * extracted out of it to make the PatternHopFactory reusable for NETEX and GTFS file import.
+ * and so on. This was previously done in the {@link PatternHopFactory}. The code is
+ * extracted out of {@link PatternHopFactory} to make the it reusable for the NeTEx and GTFS file
+ * import. This do only apply to GTFS imports.
  */
 public class RepairStopTimesForEachTripOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RepairStopTimesForEachTripOperation.class);
