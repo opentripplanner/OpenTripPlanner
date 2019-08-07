@@ -59,7 +59,7 @@ public class OtpTransitServiceBuilderTest {
 
         assertEquals(1, calendarDates.size());
         assertEquals(
-                "<CalendarDate serviceId=F_weekdays date=ServiceIdDate(2017-8-31) exception=2>",
+                "<CalendarDate serviceId=F_weekdays date=2017-08-31 exception=2>",
                 first(calendarDates).toString());
     }
 

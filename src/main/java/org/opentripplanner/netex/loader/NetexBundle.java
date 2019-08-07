@@ -1,98 +1,144 @@
 package org.opentripplanner.netex.loader;
 
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.NetexModule;
+import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
+import org.opentripplanner.netex.mapping.NetexMapper;
+import org.rutebanken.netex.model.PublicationDeliveryStructure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.NetexParameters;
-
-import java.io.File;
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.Deque;
+import java.util.LinkedList;
+
+import static java.util.Collections.singletonList;
 
 /**
- * This contains the location of the NeTEx zip-file to be imported, information about the naming of the files within,
- * and config values for how the import process should be done.
- *
+ * Loads/reads a NeTEx bundle of files(a zip file) and maps it into the OTP internal transit model.
+ * <p/>
+ * The NeTEx loader will use a file naming convention to load files in a particular order and
+ * keeping an index of entities to enable linking. The convention is documented here
+ *{@link org.opentripplanner.standalone.NetexParameters#sharedFilePattern} and here
+ * {@link NetexZipFileHierarchy}.
+ * <p/>
+ * This class is also responsible for logging progress and exception handling.
  */
 public class NetexBundle {
+    private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
-    private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
+    /** stack of NeTEx elements needed to link the input to existing data */
+    private Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
 
-    private final File file;
+    private final NetexZipFileHierarchy fileHierarchy;
 
-    public final boolean linkStopsToParentStations;
+    /** maps the NeTEx XML document to OTP transit model. */
+    private NetexMapper otpMapper;
 
-    public final boolean parentStationTransfers;
 
-    public final int subwayAccessTime;
+    private NetexXmlParser xmlParser;
 
-    public final int maxInterlineDistance;
+    private final String netexFeedId;
 
-    public final NetexParameters netexParameters;
 
-    public NetexBundle(File netexZipFile, GraphBuilderParameters builderParams) {
-        this.file = netexZipFile;
-        this.linkStopsToParentStations = builderParams.parentStopLinking;
-        this.parentStationTransfers = builderParams.stationTransfers;
-        this.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
-        this.maxInterlineDistance = builderParams.maxInterlineDistance;
-        this.netexParameters = builderParams.netex;
+    public NetexBundle(String netexFeedId, NetexZipFileHierarchy fileHierarchy) {
+        this.netexFeedId = netexFeedId;
+        this.fileHierarchy = fileHierarchy;
     }
 
-    public String getFilename() {
-        return file.getPath();
-    }
+    /** load the bundle, map it to the OTP transit model and return */
+    public OtpTransitServiceBuilder loadBundle() {
+        LOG.info("reading {}" + fileHierarchy.filename());
 
-    NetexZipFileHierarchy fileHierarchy(){
-        try {
-            return new NetexZipFileHierarchy(file, netexParameters);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        // Store result in a mutable OTP Transit Model
+        OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
-    void withZipFile(Consumer<ZipFile> zipFileConsumer) {
-        try {
-            ZipFile zipFile = null;
-            try {
-                zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-                zipFileConsumer.accept(zipFile);
-            }
-            finally {
-                if(zipFile != null) {
-                    zipFile.close();
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    @Deprecated
-    public InputStream getFileInputStream(ZipEntry entry){
-        try {
-            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-            return zipFile.getInputStream(entry);
+        // init parser and mapper
+        xmlParser = new NetexXmlParser();
+        otpMapper = new NetexMapper(transitBuilder, netexFeedId);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // Load data
+        fileHierarchy.load(this::loadZipFileEntries);
+
+        return transitBuilder;
     }
 
     public void checkInputs() {
-        if (file != null) {
-            if (!file.exists()) {
-                throw new RuntimeException("NETEX Path " + file + " does not exist.");
-            }
-            if (!file.canRead()) {
-                throw new RuntimeException("NETEX Path " + file + " cannot be read.");
-            }
+        fileHierarchy.checkFileExist();
+    }
+
+
+    /* private methods */
+
+    /** Load all files entries in the bundle */
+    private void loadZipFileEntries(NetexZipFileHierarchy entries) {
+
+        // Add a global(this zip file) shared NeTEX DAO
+        netexIndex.addFirst(new NetexImportDataIndex());
+
+        // Load global shared files
+        loadFilesThenMapToOtpTransitModel("shared file", entries.sharedEntries());
+
+        for (GroupEntries group : entries.groups()) {
+            LOG.info("reading group {}", group.name());
+
+            newNetexImportDataScope(() -> {
+                // Load shared group files
+                loadFilesThenMapToOtpTransitModel(
+                        "shared group file",
+                        group.getSharedEntries()
+                );
+
+                for (FileEntry entry : group.getIndependentEntries()) {
+                    newNetexImportDataScope(() -> {
+                        // Load each independent file in group
+                        loadFilesThenMapToOtpTransitModel("group file", singletonList(entry));
+                    });
+                }
+            });
         }
     }
 
-    public double getMaxStopToShapeSnapDistance() {
-        return MAX_STOP_TO_SHAPE_SNAP_DISTANCE;
+    /**
+     * make a new index and pushes it on the index stack, before executing the task and
+     * at the end pop of the index.
+     */
+    private void newNetexImportDataScope(Runnable task) {
+        netexIndex.addFirst(new NetexImportDataIndex(index()));
+        task.run();
+        netexIndex.removeFirst();
     }
 
+    /**
+     * Load a set of files and map the entries to OTP Transit model after the loading is
+     * complete. It is important to do this in 2 steps to be able to link references.
+     * An attempt to map each entry, when read, would lead to missing references, since
+     * the order entries are read is not enforced in any way.
+     */
+    private void loadFilesThenMapToOtpTransitModel(String fileDescription, Iterable<FileEntry> entries) {
+        for (FileEntry entry : entries) {
+            // Load entry and store it in the index
+            loadSingeFileEntry(fileDescription, entry);
+        }
+        // map current NeTEx objects into the OTP Transit Model
+        otpMapper.mapNetexToOtp(index());
+    }
+
+    private NetexImportDataIndex index() {
+        return netexIndex.peekFirst();
+    }
+
+    /** Load a single entry and store it in the index for later */
+    private void loadSingeFileEntry(String fileDescription, FileEntry entry) {
+        try {
+            LOG.info("reading entity {}: {}", fileDescription, entry.filename());
+
+            PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.toBytes());
+            NetexDocumentParser.parseAndPopulateIndex(index(), doc);
+
+        } catch (IOException | JAXBException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

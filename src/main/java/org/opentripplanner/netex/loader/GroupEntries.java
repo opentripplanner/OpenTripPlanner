@@ -3,17 +3,16 @@ package org.opentripplanner.netex.loader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.zip.ZipEntry;
 
 /**
- * A named collection of NeTEx files grouped together with
- * a set of shared group entries/files and a set of _individual_
- * entries/files.
+ * A named group of NeTEx file entries. The entries are grouped together
+ * with a set of shared group entries and a set of _individual_
+ * entries.
  */
 class GroupEntries {
     private final String name;
-    private final List<ZipEntry> sharedEntries = new ArrayList<>();
-    private final List<ZipEntry> entries = new ArrayList<>();
+    private final List<FileEntry> sharedEntries = new ArrayList<>();
+    private final List<FileEntry> independentEntries = new ArrayList<>();
 
     GroupEntries(String name) {
         this.name = name;
@@ -23,19 +22,19 @@ class GroupEntries {
         return name;
     }
 
-    void addSharedEntry(ZipEntry entry) {
+    void addSharedEntry(FileEntry entry) {
         sharedEntries.add(entry);
     }
 
-    Collection<ZipEntry> sharedEntries() {
+    Collection<FileEntry> getSharedEntries() {
         return sharedEntries;
     }
 
-    void addIndependentEntries(ZipEntry entry) {
-        entries.add(entry);
+    void addIndependentEntries(FileEntry entry) {
+        independentEntries.add(entry);
     }
 
-    Collection<ZipEntry> independentEntries() {
-        return entries;
+    Collection<FileEntry> getIndependentEntries() {
+        return independentEntries;
     }
 }

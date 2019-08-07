@@ -21,10 +21,9 @@ public class NetexParameters {
     private static final String NETEX_FEED_ID = "DefaultFeed";
 
     /**
-     * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file
-     * feed_info.txt.
+     * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id
+     * field in GTFS file feed_info.txt.
      */
-
     public final String netexFeedId;
 
     /**

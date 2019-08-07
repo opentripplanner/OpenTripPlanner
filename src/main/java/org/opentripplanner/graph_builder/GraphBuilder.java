@@ -6,7 +6,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.NetexModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
@@ -19,7 +18,6 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
@@ -39,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -164,7 +164,7 @@ public class GraphBuilder implements Runnable {
                         LOG.info("Skipping DEM file {}", file);
                     }
                     break;
-                case NETEX_NO:
+            case NETEX:
                     LOG.info("Found NETEX file {}", file);
                     netexFiles.add(file);
                     break;
@@ -175,6 +175,8 @@ public class GraphBuilder implements Runnable {
         boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
         boolean hasGTFS = builderParams.transit && !gtfsFiles.isEmpty();
         boolean hasNETEX = builderParams.transit && !netexFiles.isEmpty();
+        boolean hasTransitData = hasGTFS ||hasNETEX;
+
         if ( ! ( hasOSM || hasGTFS || hasNETEX)) {
             LOG.error("Found no input files from which to build a graph in {}", dir);
             return null;
@@ -220,26 +222,17 @@ public class GraphBuilder implements Runnable {
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
             gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
             graphBuilder.addModule(gtfsModule);
-            if ( hasOSM ) {
-                if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addModule(new BusRouteStreetMatcher());
-                }
-                graphBuilder.addModule(new TransitToTaggedStopsModule());
+        }
+
+        if( hasNETEX ) {
+            graphBuilder.addModule(netexModule(builderParams, netexFiles));
+        }
+
+        if(hasTransitData && hasOSM) {
+            if (builderParams.matchBusRoutesToStreets) {
+                graphBuilder.addModule(new BusRouteStreetMatcher());
             }
-        }else if(hasNETEX){
-            List<NetexBundle> netexBundles = Lists.newArrayList();
-            for(File netexFile : netexFiles){
-                NetexBundle netexBundle = new NetexBundle(netexFile, builderParams);
-                netexBundles.add(netexBundle);
-            }
-            NetexModule netexModule = new NetexModule(netexBundles);
-            graphBuilder.addModule(netexModule);
-            if ( hasOSM ) {
-                if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addModule(new BusRouteStreetMatcher());
-                }
-                graphBuilder.addModule(new TransitToTaggedStopsModule());
-            }
+            graphBuilder.addModule(new TransitToTaggedStopsModule());
         }
 
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
@@ -273,7 +266,7 @@ public class GraphBuilder implements Runnable {
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
             graphBuilder.addModule(elevationBuilder);
         }
-        if ( hasGTFS || hasNETEX) {
+        if ( hasTransitData ) {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
@@ -298,8 +291,9 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, NETEX_NO, OTHER;
-        public static InputFileType forFile(File file, GraphBuilderParameters buildConfig) {
+        GTFS, OSM, DEM, CONFIG, GRAPH, NETEX, OTHER;
+
+        static InputFileType forFile(File file, GraphBuilderParameters buildConfig) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
                 try {
@@ -309,7 +303,7 @@ public class GraphBuilder implements Runnable {
                     if (stopTimesEntry != null) return GTFS;
                 } catch (Exception e) { /* fall through */ }
             }
-            if (buildConfig.netex.moduleFileMatches(name)) return NETEX_NO;
+            if (buildConfig.netex.moduleFileMatches(name)) return NETEX;
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;

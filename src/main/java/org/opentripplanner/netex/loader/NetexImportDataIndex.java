@@ -44,6 +44,10 @@ import java.util.Set;
  * The hierarchy implementation is delegated to the
  * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
+ *
+ *
+ * TODO OTP2 - move this to package: org.opentripplanner.netex.index and move all the
+ * TODO OTP2 - util classes to: org.opentripplanner.netex.index.collections
  */
 public class NetexImportDataIndex {
 

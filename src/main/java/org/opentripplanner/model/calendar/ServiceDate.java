@@ -215,7 +215,7 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
     @Override
     public String toString() {
-        return "ServiceIdDate(" + year + "-" + month + "-" + day + ")";
+        return String.format("%d-%02d-%02d", year, month, day);
     }
 
     @Override

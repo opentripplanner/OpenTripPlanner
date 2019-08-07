@@ -1,10 +1,10 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.netex;
 
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.netex.loader.NetexLoader;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -23,12 +23,32 @@ import java.util.List;
  * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {
+    private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
+
+    private final boolean linkStopsToParentStations;
+    private final boolean parentStationTransfers;
+    private final int subwayAccessTime;
+    private final int maxInterlineDistance;
+    private final String netexFeedId;
+
 
     private List<NetexBundle> netexBundles;
 
     private FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
-    public NetexModule(List<NetexBundle> netexBundles) {
+    public NetexModule(
+            String netexFeedId,
+            boolean linkStopsToParentStations,
+            boolean parentStationTransfers,
+            int subwayAccessTime,
+            int maxInterlineDistance,
+            List<NetexBundle> netexBundles
+    ) {
+        this.netexFeedId = netexFeedId;
+        this.linkStopsToParentStations = linkStopsToParentStations;
+        this.parentStationTransfers = parentStationTransfers;
+        this.subwayAccessTime = subwayAccessTime;
+        this.maxInterlineDistance = maxInterlineDistance;
         this.netexBundles = netexBundles;
     }
 
@@ -46,26 +66,26 @@ public class NetexModule implements GraphBuilderModule {
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
-                OtpTransitServiceBuilder transitBuilder = new NetexLoader(netexBundle).loadBundle();
+                OtpTransitServiceBuilder transitBuilder = load(netexBundle);
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 PatternHopFactory hf = new PatternHopFactory(
                         new GtfsFeedId.Builder()
-                                .id(netexBundle.netexParameters.netexFeedId)
+                                .id(netexFeedId)
                                 .build(),
                         transitBuilder.build(),
                         fareServiceFactory,
-                        netexBundle.getMaxStopToShapeSnapDistance(),
-                        netexBundle.subwayAccessTime,
-                        netexBundle.maxInterlineDistance
+                        MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
+                        subwayAccessTime,
+                        maxInterlineDistance
                 );
                 //hf.setStopContext(stopContext);
                 hf.run(graph);
 
-                if (netexBundle.linkStopsToParentStations) {
+                if (linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
                 }
-                if (netexBundle.parentStationTransfers) {
+                if (parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
             }
@@ -83,5 +103,12 @@ public class NetexModule implements GraphBuilderModule {
     @Override
     public void checkInputs() {
         netexBundles.forEach(NetexBundle::checkInputs);
+    }
+
+
+    /* private methods */
+
+    private OtpTransitServiceBuilder load(NetexBundle netexBundle) throws Exception {
+        return netexBundle.loadBundle();
     }
 }
