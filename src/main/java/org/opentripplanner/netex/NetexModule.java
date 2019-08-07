@@ -66,7 +66,7 @@ public class NetexModule implements GraphBuilderModule {
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
-                OtpTransitServiceBuilder transitBuilder = load(netexBundle);
+                OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle();
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 PatternHopFactory hf = new PatternHopFactory(
@@ -105,10 +105,4 @@ public class NetexModule implements GraphBuilderModule {
         netexBundles.forEach(NetexBundle::checkInputs);
     }
 
-
-    /* private methods */
-
-    private OtpTransitServiceBuilder load(NetexBundle netexBundle) throws Exception {
-        return netexBundle.loadBundle();
-    }
 }
