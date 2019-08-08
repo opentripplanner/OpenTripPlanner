@@ -49,7 +49,7 @@ public class NetexBundle {
 
     /** load the bundle, map it to the OTP transit model and return */
     public OtpTransitServiceBuilder loadBundle() {
-        LOG.info("reading {}" + fileHierarchy.filename());
+        LOG.info("reading {}", fileHierarchy.filename());
 
         // Store result in a mutable OTP Transit Model
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();

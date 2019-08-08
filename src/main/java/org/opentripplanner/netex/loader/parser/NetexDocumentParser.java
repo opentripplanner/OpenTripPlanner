@@ -3,6 +3,8 @@ package org.opentripplanner.netex.loader.parser;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
+import org.rutebanken.netex.model.GeneralFrame;
+import org.rutebanken.netex.model.InfrastructureFrame;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 import org.rutebanken.netex.model.ServiceCalendarFrame;
@@ -53,23 +55,28 @@ public class NetexDocumentParser {
 
     private void parseCommonFrame(Common_VersionFrameStructure value) {
         if(value instanceof ResourceFrame) {
-            parseResourceFrames((ResourceFrame) value);
+            parse((ResourceFrame) value, new ResourceFrameParser());
         } else if(value instanceof ServiceCalendarFrame) {
-            parseServiceCalendarFrames((ServiceCalendarFrame) value);
+            parse((ServiceCalendarFrame) value, new ServiceCalendarFrameParser());
         } else if(value instanceof TimetableFrame) {
-            parseTimeTableFrames((TimetableFrame) value);
+            parse((TimetableFrame) value, new TimeTableFrameParser(netexIndex.journeyPatternsById));
         } else if(value instanceof ServiceFrame) {
-            parseServiceFrames((ServiceFrame) value);
+            parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.quayById));
         }  else if (value instanceof SiteFrame) {
-            parseSiteFrames((SiteFrame) value);
+            parse((SiteFrame) value, new SiteFrameParser());
         } else if (value instanceof CompositeFrame) {
             // We recursively parse composite frames and content until there
             // is no more nested frames - this is accepting documents witch
             // are not withing the specification, but we leave this for the
             // document schema validation - not a OTP responsibility
             parseCompositeFrame((CompositeFrame) value);
+        } else if (
+                value instanceof GeneralFrame ||
+                value instanceof InfrastructureFrame
+        ) {
+            NetexParser.logUnsupportedObject(LOG, value);
         } else {
-            LOG.warn("Unhandled frame type: " + value.getClass());
+            NetexParser.logUnknownObject(LOG, value);
         }
     }
 
@@ -102,33 +109,8 @@ public class NetexDocumentParser {
         netexIndex.timeZone.set(timeZone);
     }
 
-    private void parseSiteFrames(SiteFrame siteFrame) {
-        SiteFrameParser parser = new SiteFrameParser();
-        parser.parse(siteFrame);
-        parser.setResultOnIndex(netexIndex);
-    }
-
-    private void parseServiceFrames(ServiceFrame serviceFrame) {
-        ServiceFrameParser parser = new ServiceFrameParser(netexIndex.quayById);
-        parser.parse(serviceFrame);
-        parser.setResultOnIndex(netexIndex);
-    }
-
-    private void parseTimeTableFrames(TimetableFrame timetableFrame) {
-        TimeTableFrameParser parser = new TimeTableFrameParser(netexIndex.journeyPatternsById);
-        parser.parse(timetableFrame);
-        parser.setResultOnIndex(netexIndex);
-    }
-
-    private void parseServiceCalendarFrames(ServiceCalendarFrame serviceCalendarFrame) {
-        ServiceCalendarFrameParser parser = new ServiceCalendarFrameParser();
-        parser.parse(serviceCalendarFrame);
-        parser.setResultOnIndex(netexIndex);
-    }
-
-    private void parseResourceFrames(ResourceFrame resourceFrame) {
-        ResourceFrameParser parser = new ResourceFrameParser();
-        parser.parse(resourceFrame);
+    private <T> void parse(T node, NetexParser<T> parser) {
+        parser.parse(node);
         parser.setResultOnIndex(netexIndex);
     }
 }

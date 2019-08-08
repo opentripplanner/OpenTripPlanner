@@ -15,7 +15,7 @@ import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RoutesInFrame_RelStructure;
-import org.rutebanken.netex.model.ServiceFrame;
+import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopAssignmentsInFrame_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-class ServiceFrameParser {
+class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
 
@@ -52,15 +52,53 @@ class ServiceFrameParser {
         this.quayById = quayById;
     }
 
-    void parse(ServiceFrame sf) {
-        parseStopAssignments(sf.getStopAssignments());
-        parseRoutes(sf.getRoutes());
-        parseNetwork(sf.getNetwork());
-        parseLines(sf.getLines());
-        parseJourneyPatterns(sf.getJourneyPatterns());
-        parseDestinationDisplays(sf.getDestinationDisplays());
+    @Override
+    void parse(Service_VersionFrameStructure frame) {
+        parseStopAssignments(frame.getStopAssignments());
+        parseRoutes(frame.getRoutes());
+        parseNetwork(frame.getNetwork());
+        parseLines(frame.getLines());
+        parseJourneyPatterns(frame.getJourneyPatterns());
+        parseDestinationDisplays(frame.getDestinationDisplays());
+
+        // Keep list sorted alphabetically
+        logUnknownElement(LOG, frame.getAdditionalNetworks());
+        logUnknownElement(LOG, frame.getCommonSections());
+        logUnknownElement(LOG, frame.getConnections());
+        logUnknownElement(LOG, frame.getDirections());
+        logUnknownElement(LOG, frame.getDisplayAssignments());
+        logUnknownElement(LOG, frame.getFlexibleLinkProperties());
+        logUnknownElement(LOG, frame.getFlexiblePointProperties());
+        logUnknownElement(LOG, frame.getGeneralSections());
+        logUnknownElement(LOG, frame.getGroupsOfLines());
+        logUnknownElement(LOG, frame.getGroupsOfLinks());
+        logUnknownElement(LOG, frame.getGroupsOfPoints());
+        logUnknownElement(LOG, frame.getLineNetworks());
+        logUnknownElement(LOG, frame.getLogicalDisplays());
+        logUnknownElement(LOG, frame.getNotices());
+        logUnknownElement(LOG, frame.getNoticeAssignments());
+        logUnknownElement(LOG, frame.getPassengerInformationEquipments());
+        logUnknownElement(LOG, frame.getRouteLinks());
+        logUnknownElement(LOG, frame.getRoutePoints());
+        logUnknownElement(LOG, frame.getRoutingConstraintZones());
+        logUnknownElement(LOG, frame.getScheduledStopPoints());
+        logUnknownElement(LOG, frame.getServiceExclusions());
+        logUnknownElement(LOG, frame.getServiceLinks());
+        logUnknownElement(LOG, frame.getServicePatterns());
+        logUnknownElement(LOG, frame.getStopAreas());
+        logUnknownElement(LOG, frame.getTariffZones());
+        logUnknownElement(LOG, frame.getTimeDemandTypes());
+        logUnknownElement(LOG, frame.getTimeDemandTypeAssignments());
+        logUnknownElement(LOG, frame.getTimingPoints());
+        logUnknownElement(LOG, frame.getTimingLinks());
+        logUnknownElement(LOG, frame.getTimingLinkGroups());
+        logUnknownElement(LOG, frame.getTimingPatterns());
+        logUnknownElement(LOG, frame.getTransferRestrictions());
+
+        checkCommonProperties(LOG, frame);
     }
 
+    @Override
     void setResultOnIndex(NetexImportDataIndex index) {
         // update entities
         index.destinationDisplayById.addAll(destinationDisplays);
@@ -83,6 +121,10 @@ class ServiceFrameParser {
                 PassengerStopAssignment assignment = (PassengerStopAssignment) stopAssignment
                         .getValue();
                 String quayRef = assignment.getQuayRef().getRef();
+
+                // TODO OTP2 - This check belongs to the mapping or as a separate validation
+                // TODO OTP2 - step. The problem is that we do not want to relay on the
+                // TODO OTP2 - the order in witch elements are loaded.
                 Quay quay = quayById.lookupLastVersionById(quayRef);
                 if (quay != null) {
                     quayIdByStopPointRef
