@@ -138,8 +138,9 @@ public abstract class GraphPathToTripPlanConverter {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
-        State lastState = path.states.getLast();
         states = path.states.toArray(states);
+
+        State lastTransitState = getLastTransitState(states);
 
         Edge[] edges = new Edge[path.edges.size()];
         edges = path.edges.toArray(edges);
@@ -162,22 +163,42 @@ public abstract class GraphPathToTripPlanConverter {
 
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = lastState.getElapsedTimeSeconds();
-        itinerary.startTime = makeCalendar(states[0]);
-        itinerary.endTime = makeCalendar(lastState);
+        itinerary.duration = lastTransitState.getElapsedTimeSeconds();
+        itinerary.startTime = getStartTime(states);
+        itinerary.endTime = makeCalendar(lastTransitState);
 
         calculateTimes(itinerary, states);
 
         calculateElevations(itinerary, edges);
 
-        itinerary.walkDistance = lastState.getWalkDistance();
-
-        itinerary.transfers = lastState.getNumBoardings();
+        State finalState = path.states.getLast();
+        itinerary.walkDistance = finalState.getWalkDistance();
+        itinerary.transfers = finalState.getNumBoardings();
         if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
             itinerary.transfers--;
         }
 
         return itinerary;
+    }
+
+    private static State getLastTransitState(State[] states) {
+        State lastState = states[states.length - 1];
+
+        return Arrays
+                .stream(states)
+                .filter(s -> s.backEdge instanceof TransitBoardAlight || s.backEdge instanceof StreetEdge)
+                .reduce((first, second) -> second)
+                .orElse(lastState)
+                .getBackState();
+    }
+
+    private static Calendar getStartTime(State[] states) {
+        Optional<State> firstStep = Arrays
+                .stream(states)
+                // either boarding or walking
+                .filter(s -> s.backEdge instanceof TransitBoardAlight || s.backEdge instanceof StreetEdge)
+                .findFirst();
+        return makeCalendar(firstStep.orElse(states[0]));
     }
 
     private static Calendar makeCalendar(State state) {
