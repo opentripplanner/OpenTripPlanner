@@ -288,6 +288,8 @@ public class PatternHopFactory {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
         fareServiceFactory.processGtfs(transitService);
+
+        graph.ignoredAlerts.addAll(transitService.getAllIgnoredAlerts());
         
         // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
         loadStops(graph);

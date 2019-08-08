@@ -53,6 +53,8 @@ public interface OtpTransitService {
 
     Collection<Trip> getAllTrips();
 
+    Collection<IgnoredAlert> getAllIgnoredAlerts();
+
     List<String> getTripAgencyIdsReferencingServiceId(FeedScopedId serviceId);
 
     List<Stop> getStopsForStation(Stop station);

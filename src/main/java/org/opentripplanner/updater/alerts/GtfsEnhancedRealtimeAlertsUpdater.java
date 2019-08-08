@@ -3,12 +3,14 @@ package org.opentripplanner.updater.alerts;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.transit.realtime.GtfsRealtime;
 import org.apache.commons.io.IOUtils;
+import org.opentripplanner.model.IgnoredAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -16,7 +18,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.util.ArrayUtils;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,6 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private AlertsUpdateHandler updateHandler = null;
 
-    private String[] blacklist = new String[0];
-
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -64,9 +63,6 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
-        }
-        if (config.path("blacklist") != null) {
-            this.blacklist = new ObjectMapper().convertValue(config.path("blacklist"), String[].class);
         }
         LOG.info("Creating enhanced real-time alert (json) updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
@@ -98,16 +94,22 @@ public class GtfsEnhancedRealtimeAlertsUpdater extends PollingGraphUpdater {
                 return;
             }
 
-            List<GtfsRealtime.FeedEntity> entities = feed
-                    .getEntityList()
-                    .stream()
-                    .filter(e -> e.hasId() && !ArrayUtils.contains(blacklist, e.getId()))
-                    .collect(Collectors.toList());
-
             // Handle update in graph writer runnable
             updaterManager.execute(new GraphWriterRunnable() {
                 @Override
                 public void run(Graph graph) {
+                    Set<String> ignoredList = graph
+                            .ignoredAlerts
+                            .stream()
+                            .map(IgnoredAlert::getId)
+                            .collect(Collectors.toSet());
+
+                    List<GtfsRealtime.FeedEntity> entities = feed
+                            .getEntityList()
+                            .stream()
+                            .filter(e -> e.hasId() && !ignoredList.contains(e.getId()))
+                            .collect(Collectors.toList());
+
                     updateHandler.update(entities);
                 }
             });

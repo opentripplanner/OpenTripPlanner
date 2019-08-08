@@ -1,21 +1,6 @@
 package org.opentripplanner.model.impl;
 
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.IdentityBean;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +39,8 @@ public class OtpTransitServiceBuilder {
 
     private final List<Trip> trips = new ArrayList<>();
 
+    private final List<IgnoredAlert> ignoredAlerts = new ArrayList<>();
+
     public OtpTransitServiceBuilder() {
     }
 
@@ -76,6 +63,7 @@ public class OtpTransitServiceBuilder {
         stopTimes.addAll(other.getAllStopTimes());
         transfers.addAll(other.getAllTransfers());
         trips.addAll(other.getAllTrips());
+        ignoredAlerts.addAll(other.getAllIgnoredAlerts());
         return this;
     }
 
@@ -135,13 +123,17 @@ public class OtpTransitServiceBuilder {
         return trips;
     }
 
+    public List<IgnoredAlert> getIgnoredAlerts() {
+        return ignoredAlerts;
+    }
+
     public OtpTransitService build() {
 
         createNoneExistentIds();
 
         return new OtpTransitServiceImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
                 feedInfos, frequencies, pathways, routes, shapePoints, stops, stopTimes, transfers,
-                trips);
+                trips, ignoredAlerts);
     }
 
     private void createNoneExistentIds() {
