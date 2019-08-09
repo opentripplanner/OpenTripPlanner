@@ -76,6 +76,8 @@ public class TransitLayerMapper {
 
     /**
      * Map pre-Raptor TripPatterns and Trips to the corresponding Raptor classes.
+     *
+     * TODO OTP2 - This can be refactored and broken up into smaller. Se discussion in PR #2794
      */
     private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (
             StopIndexForRaptor stopIndex) {
@@ -131,14 +133,17 @@ public class TransitLayerMapper {
             // Create LocalDate equivalent to the OTP/GTFS ServiceDate object, serving as the key of
             // the return Map.
             LocalDate localDate = ServiceCalendarMapper.localDateFromServiceDate(serviceDate);
+
             // Create a List to hold the values for one entry in the return Map.
             List<TripPatternForDate> values = new ArrayList<>();
-            // This nested loop could be quite inefficient.
-            // Maybe determine in advance which patterns are running on each service and day.
             TIntSet serviceCodesRunning = new TIntHashSet();
+
             for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
                 serviceCodesRunning.add(graph.serviceCodes.get(serviceId));
             }
+
+            // This nested loop could be quite inefficient.
+            // Maybe determine in advance which patterns are running on each service and day.
             for (org.opentripplanner.routing.edgetype.TripPattern oldTripPattern : graph.tripPatternForId.values()) {
                 // Get an updated or scheduled timetable depending on the date. This might have the
                 // trips pre-filtered for the specified date, that needs to be investigated. But in

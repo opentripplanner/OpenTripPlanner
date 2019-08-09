@@ -67,8 +67,8 @@ public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
         if (o == null || getClass() != o.getClass())
             return false;
         TripPatternForDate that = (TripPatternForDate) o;
-        // FIXME equals method seems broken, it only checks the pattern ID
-        return this.getTripPattern().getId() == that.getTripPattern().getId();
+
+        return tripPattern.equals(that.tripPattern) && localDate.equals(that.localDate);
     }
 
     @Override

@@ -2,8 +2,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.opentripplanner.util.DateUtils.secToHHMM;
 
@@ -12,8 +10,6 @@ import static org.opentripplanner.util.DateUtils.secToHHMM;
  * It is the OTP2 Raptor equivalent of an OTP1 TripTimes.
  */
 public class TripScheduleImpl implements TripSchedule {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TripScheduleImpl.class);
 
     private final TripTimes originalTripTimes;
 
@@ -42,13 +38,19 @@ public class TripScheduleImpl implements TripSchedule {
         // Sanity check array and stop pattern dimensions.
         final int numStops = originalTripTimes.getNumStops();
         if (originalTripPattern.getStops().size() != numStops) {
-            LOG.error("TripPattern is not the same size as the TripTimes. This indicates a bug.");
+            throw new IllegalStateException(
+                    "TripPattern is not the same size as the TripTimes. This indicates a bug."
+            );
         }
         if (arrivals.length != numStops) {
-            LOG.error("Arrivals arrays is not the same size as the TripTimes. This indicates a bug.");
+            throw new IllegalStateException(
+                    "Arrivals arrays is not the same size as the TripTimes. This indicates a bug."
+            );
         }
         if (departures.length != numStops) {
-            LOG.error("Departures arrays is not the same size as the TripTimes. This indicates a bug.");
+            throw new IllegalStateException(
+                    "Departures arrays is not the same size as the TripTimes. This indicates a bug."
+            );
         }
         this.originalTripTimes = originalTripTimes;
         this.originalTripPattern = originalTripPattern;
@@ -59,6 +61,8 @@ public class TripScheduleImpl implements TripSchedule {
 
     /**
      * For tests.
+     * TODO OTP2 - Create some kind of factory together with the tests that construct valid
+     * TODO OTP2 - objects for testing.
      */
     public TripScheduleImpl() {
         originalTripTimes = null;

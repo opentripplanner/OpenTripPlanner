@@ -1,26 +1,24 @@
 package org.opentripplanner.routing.graph;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.locationtech.jts.geom.Coordinate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
@@ -32,7 +30,10 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
 
-    /* Short debugging name */
+    /**
+     * Short debugging name. This is a graph mathematical term as in
+     * https://en.wikipedia.org/wiki/Graph_labeling
+     */
     private final String label;
     
     /* Longer human-readable name for the client */

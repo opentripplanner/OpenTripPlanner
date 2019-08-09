@@ -37,7 +37,7 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     @Test
-    @Ignore
+    @Ignore // TODO OTP2 Why is this test ignored - needs to be investigated.
     public void testRoundTrip () throws Exception {
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data

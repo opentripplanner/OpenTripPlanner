@@ -5,6 +5,10 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TODO OTP2 - Performance test this and the other candidate (none wrapper) and clean up code.
+ * TODO OTP2 - This is discussed PR #2794
+ */
 public class TripScheduleWrapperImpl implements TripSchedule {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripScheduleWrapperImpl.class);

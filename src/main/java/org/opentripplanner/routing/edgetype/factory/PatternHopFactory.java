@@ -183,7 +183,7 @@ public class PatternHopFactory {
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
-            // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
+             // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
             for (int s = 0; s < tripPattern.stopVertices.length; s++) {
                 Stop stop = tripPattern.stopPattern.stops[s];
                 tripPattern.stopVertices[s] = ((TransitStop) stationStopNodes.get(stop));

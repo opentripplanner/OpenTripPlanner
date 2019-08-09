@@ -13,6 +13,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -57,7 +58,7 @@ public class GraphServiceTest {
         // Create an empty graph and it's serialized form
         emptyGraph = new Graph();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        emptyGraph.save(baos);
+        new SerializedGraphObject(emptyGraph).save(baos);
         emptyGraphData = baos.toByteArray();
 
         // Create a small graph with 2 vertices and one edge and it's serialized form
@@ -66,7 +67,7 @@ public class GraphServiceTest {
         StreetVertex v2 = new IntersectionVertex(smallGraph, "v2", 0, 0.1);
         new StreetEdge(v1, v2, null, "v1v2", 11000, StreetTraversalPermission.PEDESTRIAN, false);
         baos = new ByteArrayOutputStream();
-        smallGraph.save(baos);
+        new SerializedGraphObject(smallGraph).save(baos);
         smallGraphData = baos.toByteArray();
     }
 

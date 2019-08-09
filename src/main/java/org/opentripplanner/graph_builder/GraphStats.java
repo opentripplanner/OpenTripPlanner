@@ -1,17 +1,16 @@
 package org.opentripplanner.graph_builder;
 
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.csvreader.CsvWriter;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 import org.geotools.referencing.GeodeticCalculator;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -21,16 +20,15 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.csvreader.CsvWriter;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.linearref.LinearLocation;
-import org.locationtech.jts.linearref.LocationIndexedLine;
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class GraphStats {
 
@@ -175,8 +173,10 @@ public class GraphStats {
                     Point2D dest = gc.getDestinationGeographicPoint();
                     String name = v.getName();
                     String[] entries = new String[]{
-                            Integer.toString(i), name,
-                            Double.toString(dest.getX()), Double.toString(dest.getY())
+                            Integer.toString(i),
+                            name,
+                            Double.toString(dest.getX()),
+                            Double.toString(dest.getY())
                     };
                     writer.writeRecord(entries);
                     i += 1;
@@ -198,7 +198,8 @@ public class GraphStats {
                 writer.writeRecord( new String[] {
                         "nTripsInPattern", "frequency", 
                         "cumulativePatterns", "empiricalDistPatterns",
-                        "cumulativeTrips", "empiricalDistTrips" } );
+                        "cumulativeTrips", "empiricalDistTrips"
+                } );
                 Collection<TripPattern> patterns = graph.tripPatternForId.values();
                 Multiset<Integer> counts = TreeMultiset.create();
                 int nPatterns = patterns.size();
