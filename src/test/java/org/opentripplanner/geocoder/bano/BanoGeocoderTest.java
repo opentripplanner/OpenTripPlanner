@@ -1,11 +1,15 @@
 package org.opentripplanner.geocoder.bano;
 
+import org.junit.Assume;
 import org.junit.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
 
-import org.locationtech.jts.geom.Envelope;
+import java.io.IOException;
+import java.net.URL;
+import java.net.UnknownHostException;
 
 public class BanoGeocoderTest {
 
@@ -14,7 +18,8 @@ public class BanoGeocoderTest {
      * if a network connection is not active or the server is down.
      */
     @Test
-    public void testOnLine() throws Exception {
+    public void testOnLine() throws IOException {
+        assumeConnectedToInternet();
 
         BanoGeocoder banoGeocoder = new BanoGeocoder();
         // The Presidential palace of the French Republic is not supposed to move often
@@ -27,7 +32,7 @@ public class BanoGeocoderTest {
 
         boolean found = false;
         for (GeocoderResult result : results.getResults()) {
-            if ("55 Rue du Faubourg Saint-Honoré 75008 Paris".equals(result.getDescription())) {
+            if (result.getDescription().startsWith("55 Rue du Faubourg")) {
                 double dist = SphericalDistanceLibrary.distance(result.getLat(),
                         result.getLng(), 48.870637, 2.316939);
                 assert (dist < 100);
@@ -38,4 +43,11 @@ public class BanoGeocoderTest {
 
     }
 
+    private static void assumeConnectedToInternet() throws IOException {
+        try {
+            new URL("http://www.google.com").openConnection().connect();
+        } catch (UnknownHostException e) {
+            Assume.assumeTrue("Skips tests if not on internet.", false);
+        }
+    }
 }
