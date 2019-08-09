@@ -29,15 +29,6 @@ public class TransitStop extends TransitStationStop {
      */
     private int streetToStopTime = 0;
 
-    /*
-      We sometimes want a reference to a TransitStop's corresponding arrive or depart vertex.
-      Rather than making a Map in the GraphIndex, we just store them here.
-      This should also help make the GTFS-loading context object unnecessary, and eventually help
-      eliminate explicit transit edges.
-    */
-    public TransitStopArrive arriveVertex;
-    public TransitStopDepart departVertex;
-
     public TransitStop(Graph graph, Stop stop) {
         super(graph, stop);
         this.wheelchairEntrance = stop.getWheelchairBoarding() != 2;

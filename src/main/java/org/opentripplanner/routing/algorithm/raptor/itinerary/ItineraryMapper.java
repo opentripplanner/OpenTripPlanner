@@ -30,6 +30,7 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ import java.util.TimeZone;
  * planner.
  */
 public class ItineraryMapper {
+
     private final TransitLayer transitLayer;
 
     private final RoutingRequest request;
@@ -66,7 +68,7 @@ public class ItineraryMapper {
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
-     * @param transitLayer the currently active transit layer
+     * @param transitLayer the currently active transit layer (may have real-time data applied)
      * @param startOfTime the point in time all times in seconds are counted from
      * @param request the current routing request
      * @param accessTransfers the access paths calculated for this request by access stop
@@ -78,6 +80,7 @@ public class ItineraryMapper {
             RoutingRequest request,
             Map<Stop, Transfer> accessTransfers,
             Map<Stop, Transfer> egressTransfers) {
+
         this.transitLayer = transitLayer;
         this.startOfTime = startOfTime;
         this.request = request;
@@ -148,9 +151,34 @@ public class ItineraryMapper {
 
         Stop boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
-        Trip trip = pathLeg.trip().getOriginalTrip();
-        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
+        TripSchedule tripSchedule = pathLeg.trip();
+        TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
+        TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
+        Trip trip = tripTimes.trip;
         Route route = tripPattern.route;
+        int numStopsInPattern = tripTimes.getNumStops();
+
+        // Find stop positions in pattern where this leg boards and alights.
+        // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
+        int boardStopIndexInPattern = -1;
+        int alightStopIndexInPattern = -1;
+        for (int s = 0; s < numStopsInPattern; s++) {
+            if (pathLeg.fromTime() == tripSchedule.departure(s)) {
+                boardStopIndexInPattern = s;
+            }
+        }
+        for (int s = 0; s < numStopsInPattern; s++) {
+            if (pathLeg.toTime() == tripSchedule.arrival(s)) {
+                alightStopIndexInPattern = s;
+            }
+        }
+
+        // Include real-time information in the Leg.
+        if (!tripTimes.isScheduled()) {
+            leg.realTime = true;
+            leg.departureDelay = tripTimes.getDepartureDelay(boardStopIndexInPattern);
+            leg.arrivalDelay = tripTimes.getArrivalDelay(alightStopIndexInPattern);
+        }
 
         leg.serviceDate = new ServiceDate(request.getDateTime()).getAsString(); // TODO: This has to be changed for multi-day searches
         leg.stop = new ArrayList<>();
@@ -176,7 +204,7 @@ public class ItineraryMapper {
         leg.agencyId = route.getAgency().getId();
         leg.routeShortName = route.getShortName();
         leg.routeLongName = route.getLongName();
-        leg.headsign = extractTripHeadsignDirection(pathLeg);
+        leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
         return leg;
     }
@@ -288,19 +316,6 @@ public class ItineraryMapper {
         return c;
     }
 
-    private String extractTripHeadsignDirection(TransitPathLeg<TripSchedule> pathLeg) {
-        TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
-        TripSchedule tripSchedule = pathLeg.trip();
-        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
-            if (tripSchedule.departure(j) == pathLeg.fromTime()) {
-                return tripPattern.scheduledTimetable.getTripTimes(tripSchedule.getOriginalTrip())
-                        .getHeadsign(j);
-            }
-        }
-
-        throw new IllegalStateException("Missing stop for departure at " + pathLeg.fromTime() + " for " + tripSchedule);
-    }
-
     private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
         List<Place> places = new ArrayList<>();
         TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
@@ -333,7 +348,7 @@ public class ItineraryMapper {
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
             if (boarded) {
-                transitLegCoordinates.addAll(Arrays.asList(tripPattern.hopEdges[j - 1].getGeometry().getCoordinates()));
+                transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(j - 1).getCoordinates()));
             }
             if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
                 boarded = true;

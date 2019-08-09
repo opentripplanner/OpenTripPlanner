@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.junit.Ignore;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.api.model.Leg;
 
@@ -7,6 +8,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+/**
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
+ */
+@Ignore
 public class PatternInterlineDwellTest extends GtfsTest {
 
     @Override

@@ -1,19 +1,15 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
 import com.beust.jcommander.internal.Lists;
-
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
@@ -23,16 +19,23 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 
 /**
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
  * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
+ *
+ *  TODO OTP2 - Move this to package: org.opentripplanner.model
+ *  TODO OTP2 - after as Entur NeTEx PRs are merged.
+ *  TODO OTP2 - Also consider moving its dependencies in: org.opentripplanner.routing
+ *  TODO OTP2 - The NEW Timetable should not have any dependencies to
  */
 public class Timetable implements Serializable {
 
@@ -120,6 +123,8 @@ public class Timetable implements Serializable {
      * (before) the specified time.
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
+     *
+     *  TODO OTP2 - This code is not used - remove it, and all code that is only used by this method.
      */
     public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
         /* Search at the state's time, but relative to midnight on the given service day. */
@@ -343,6 +348,10 @@ public class Timetable implements Serializable {
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      *         with the id specified in the trip descriptor of the TripUpdate; null if something
      *         went wrong
+     *
+     * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
+     * TODO OTP2 - its job without sending in GTFS specific classes. A generic update would support
+     * TODO OTP2 - other RealTime updats, not just from GTFS.
      */
     public TripTimes createUpdatedTripTimes(TripUpdate tripUpdate, TimeZone timeZone, ServiceDate updateServiceDate) {
         if (tripUpdate == null) {

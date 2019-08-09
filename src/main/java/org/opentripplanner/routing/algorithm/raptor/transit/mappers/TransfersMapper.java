@@ -18,14 +18,13 @@ class TransfersMapper {
      */
     static List<List<Transfer>> mapTransfers(
             Map<Stop, TransitStop> stopVertexForStop,
-            List<Stop> stopsByIndex,
-            Map<Stop, Integer> indexByStop
+            StopIndexForRaptor stopIndex
     ) {
 
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
-        for (int stopIndex = 0; stopIndex < stopsByIndex.size(); ++stopIndex) {
-            Stop stop = stopsByIndex.get(stopIndex);
+        for (int i = 0; i < stopIndex.stops.size(); ++i) {
+            Stop stop = stopIndex.stops.get(i);
             ArrayList<Transfer> list = new ArrayList<>();
             transferByStopIndex.add(list);
 
@@ -33,7 +32,7 @@ class TransfersMapper {
                 if (edge instanceof SimpleTransfer) {
                     double distance = edge.getDistance();
 
-                    int toStopIndex = indexByStop.get(((TransitStop) edge.getToVertex()).getStop());
+                    int toStopIndex = stopIndex.indexByStop.get(((TransitStop) edge.getToVertex()).getStop());
                     Transfer transfer = new Transfer(toStopIndex, (int) distance,
                             Arrays.asList(edge.getGeometry().getCoordinates()),
                             ((SimpleTransfer) edge).getEdges());

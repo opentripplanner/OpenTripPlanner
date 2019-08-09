@@ -358,31 +358,11 @@ public class State implements Cloneable {
     }
 
     /**
-     * Get the name of the direction used to get to this state. For transit, it is the headsign,
-     * while for other things it is what you would expect.
-     */
-    public String getBackDirection () {
-        // This can happen when stop_headsign says different things at two trips on the same 
-        // pattern and at the same stop.
-        if (backEdge instanceof TablePatternEdge) {
-            return stateData.tripTimes.getHeadsign(((TablePatternEdge)backEdge).getStopIndex());
-        }
-        else {
-            return backEdge.getDirection();
-        }
-    }
-    
-    /**
      * Get the back trip of the given state. For time dependent transit, State will find the
      * right thing to do.
      */
     public Trip getBackTrip () {
-        if (backEdge instanceof TablePatternEdge || backEdge instanceof PatternInterlineDwell) {
-            return stateData.tripTimes.trip;
-        }
-        else {
-            return backEdge.getTrip();
-        }
+        return backEdge.getTrip(); // This is probably wrong now, but we are no longer even using States to search on Transit.
     }
 
     public Edge getBackEdge() {
@@ -652,25 +632,7 @@ public class State implements Cloneable {
             edge = orig.getBackEdge();
             
             if (optimize) {
-                // first board/last alight: figure in wait time in on the fly optimization
-                if (edge instanceof TransitBoardAlight &&
-                        forward &&
-                        orig.getNumBoardings() == 1 &&
-                        (
-                                // boarding in a forward main search
-                                (((TransitBoardAlight) edge).boarding &&                         
-                                        !stateData.opt.arriveBy) ||
-                                // alighting in a reverse main search
-                                (!((TransitBoardAlight) edge).boarding &&
-                                        stateData.opt.arriveBy)
-                         )
-                    ) {
-
-                    ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTimeSeconds());
-                    newInitialWaitTime = ret.stateData.initialWaitTime;
-                } else {
-                    ret = edge.traverse(ret);
-                }
+                ret = edge.traverse(ret);
 
                 if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
                         ret.getBackMode() != orig.getBackMode()) {

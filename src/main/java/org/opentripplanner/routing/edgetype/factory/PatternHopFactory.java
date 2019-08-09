@@ -40,28 +40,19 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.impl.OnBoardDepartServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +71,9 @@ import java.util.Map;
 
 /**
  * Generates a set of edges from GTFS.
+ *
+ * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
+ * TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
 public class PatternHopFactory {
 
@@ -99,7 +93,9 @@ public class PatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    private GtfsStopContext context = new GtfsStopContext();
+    // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
+    // This is the OTP Graph Vertex representing each Stop from the input GTFS.
+    private Map<Stop, TransitStationStop> stationStopNodes = new HashMap<>();
 
     // the location types for transfers.txt
     private static final int STOP_LOCATION_TYPE = 0;
@@ -185,19 +181,18 @@ public class PatternHopFactory {
         /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns);
 
-        /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
+        /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
-            tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
-            // Add the geometries to the hop edges.
-            LineString[] geom = geometriesByTripPattern.get(tripPattern);
-            if (geom != null) {
-                for (int i = 0; i < tripPattern.hopEdges.length; i++) {
-                    tripPattern.hopEdges[i].setGeometry(geom[i]);
-                }
-                // Make a geometry for the whole TripPattern from all its constituent hops.
-                // This happens only if geometry is found in geometriesByTripPattern,
-                // because that means that geometry was created from shapes instead "as crow flies"
-                tripPattern.makeGeometry();
+             // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
+            for (int s = 0; s < tripPattern.stopVertices.length; s++) {
+                Stop stop = tripPattern.stopPattern.stops[s];
+                tripPattern.stopVertices[s] = ((TransitStop) stationStopNodes.get(stop));
+            }
+            LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
+            if (hopGeometries != null) {
+                // Make a single unified geometry, and also store the per-hop split geometries.
+                tripPattern.makeGeometry(hopGeometries);
+                tripPattern.hopGeometries = hopGeometries;
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
 
@@ -211,6 +206,8 @@ public class PatternHopFactory {
                 graph.addTransitMode(mode);
             }
 
+            // Store the tripPattern in the Graph so it will be serialized and usable in routing.
+            graph.tripPatternForId.put(tripPattern.code, tripPattern);
         }
 
         /* Identify interlined trips and create the necessary edges. */
@@ -220,7 +217,7 @@ public class PatternHopFactory {
         loadTransfers(graph);
 
         /* Store parent stops in graph, even if not linked. These are needed for clustering*/
-        for (TransitStationStop stop : context.stationStopNodes.values()) {
+        for (TransitStationStop stop : stationStopNodes.values()) {
             if (stop instanceof TransitStation) {
                 TransitStation parentStopVertex = (TransitStation) stop;
                 graph.parentStopById.put(parentStopVertex.getStopId(), parentStopVertex.getStop());
@@ -232,16 +229,16 @@ public class PatternHopFactory {
         for (TripPattern tableTripPattern : tripPatterns) {
             tableTripPattern.scheduledTimetable.finish();
         }
-        
-        clearCachedData(); // eh?
+
+        // FIXME again, what is the goal here? Why is there cached "data", and why are we clearing it?
+        clearCachedData();
+
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
-        graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
 
     /**
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
-     * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices
-     * are already created, because it creates interline dwell edges between existing pattern arrive/depart vertices.
+     * and update the TripPatterns accordingly.
      */
     private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
 
@@ -308,18 +305,14 @@ public class PatternHopFactory {
             }
         }
 
-        // Create the PatternInterlineDwell edges linking together TripPatterns.
-        // All the pattern vertices and edges must already have been created.
+        // Copy all interline relationships into the field holding them in the graph.
+        // TODO: verify whether we need to be keeping track of patterns at all here, or could just accumulate trip-trip relationships.
         for (P2<TripPattern> patterns : interlines.keySet()) {
-            TripPattern prevPattern = patterns.first;
-            TripPattern nextPattern = patterns.second;
-            // This is a single (uni-directional) edge which may be traversed forward and backward.
-            PatternInterlineDwell edge = new PatternInterlineDwell(prevPattern, nextPattern);
             for (P2<Trip> trips : interlines.get(patterns)) {
-                edge.add(trips.first, trips.second);
+                graph.interlinedTrips.put(trips.first, trips.second);
             }
         }
-        LOG.info("Done finding interlining trips and creating the corresponding edges.");
+        LOG.info("Done finding interlining trips.");
     }
 
     /**
@@ -531,8 +524,8 @@ public class PatternHopFactory {
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
-            Vertex fromVertex = context.stationStopNodes.get(pathway.getFromStop());
-            Vertex toVertex = context.stationStopNodes.get(pathway.getToStop());
+            Vertex fromVertex = stationStopNodes.get(pathway.getFromStop());
+            Vertex toVertex = stationStopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
             } else {
@@ -543,37 +536,14 @@ public class PatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : transitService.getAllStops()) {
-            if (context.stops.contains(stop.getId())) {
-                LOG.error("Skipping stop {} because we already loaded an identical ID.", stop.getId());
-                continue;
-            }
-            context.stops.add(stop.getId());
-
             int locationType = stop.getLocationType();
-
-            //add a vertex representing the stop
+            // Add a vertex representing the stop.
+            // FIXME it is now possible for these vertices to not be connected to any edges.
             if (locationType == 1) {
-                context.stationStopNodes.put(stop, new TransitStation(graph, stop));
+                stationStopNodes.put(stop, new TransitStation(graph, stop));
             } else {
                 TransitStop stopVertex = new TransitStop(graph, stop);
-                context.stationStopNodes.put(stop, stopVertex);
-                if (locationType != 2) {
-                    // Add a vertex representing arriving at the stop
-                    TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
-                    // FIXME no need for this context anymore, we just put references to these nodes in the stop vertices themselves.
-                    context.stopArriveNodes.put(stop, arrive);
-                    stopVertex.arriveVertex = arrive;
-
-                    // Add a vertex representing departing from the stop
-                    TransitStopDepart depart = new TransitStopDepart(graph, stop, stopVertex);
-                    // FIXME no need for this context anymore, we just put references to these nodes in the stop vertices themselves.
-                    context.stopDepartNodes.put(stop, depart);
-                    stopVertex.departVertex = depart;
-
-                    // Add edges from arrive to stop and stop to depart
-                    new PreAlightEdge(arrive, stopVertex);
-                    new PreBoardEdge(stopVertex, depart);
-                }
+                stationStopNodes.put(stop, stopVertex);
             }
         }
     }
@@ -600,28 +570,11 @@ public class PatternHopFactory {
                 Route toRoute = t.getToRoute();
                 Trip fromTrip = t.getFromTrip();
                 Trip toTrip = t.getToTrip();
-                Vertex fromVertex = context.stopArriveNodes.get(fromStop);
-                Vertex toVertex = context.stopDepartNodes.get(toStop);
                 switch (t.getTransferType()) {
                     case 1:
                         // timed (synchronized) transfer
                         // Handle with edges that bypass the street network.
                         // from and to vertex here are stop_arrive and stop_depart vertices
-
-                        // only add edge when it doesn't exist already
-                        boolean hasTimedTransferEdge = false;
-
-                        for (Edge outgoingEdge : fromVertex.getOutgoing()) {
-                            if (outgoingEdge instanceof TimedTransferEdge) {
-                                if (outgoingEdge.getToVertex() == toVertex) {
-                                    hasTimedTransferEdge = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!hasTimedTransferEdge) {
-                            new TimedTransferEdge(fromVertex, toVertex);
-                        }
                         // add to transfer table to handle specificity
                         transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, StopTransfer.TIMED_TRANSFER);
                         break;
@@ -865,32 +818,16 @@ public class PatternHopFactory {
         for (Stop stop : transitService.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
-                Vertex stopVertex = context.stationStopNodes.get(stop);
+                Vertex stopVertex = stationStopNodes.get(stop);
 
                 String agencyId = stop.getId().getAgencyId();
                 FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
 
                 Stop parentStop = transitService.getStopForId(parentStationId);
-                Vertex parentStopVertex = context.stationStopNodes.get(parentStop);
+                Vertex parentStopVertex = stationStopNodes.get(parentStop);
 
                 new FreeEdge(parentStopVertex, stopVertex);
                 new FreeEdge(stopVertex, parentStopVertex);
-
-                // Stops with location_type=2 (entrances as defined in the pathways.txt
-                // proposal) have no arrive/depart vertices, hence the null checks.
-                Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
-                Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
-                if (stopArriveVertex != null && parentStopArriveVertex != null) {
-                    new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                    new FreeEdge(stopArriveVertex, parentStopArriveVertex);
-                }
-
-                Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
-                Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
-                if (stopDepartVertex != null && parentStopDepartVertex != null) {
-                    new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                    new FreeEdge(stopDepartVertex, parentStopDepartVertex);
-                }
 
                 // TODO: provide a cost for these edges when stations and
                 // stops have different locations
@@ -911,13 +848,12 @@ public class PatternHopFactory {
         for (Stop stop : transitService.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
-                TransitStop stopVertex = (TransitStop) context.stationStopNodes.get(stop);
+                TransitStop stopVertex = (TransitStop) stationStopNodes.get(stop);
                 String agencyId = stop.getId().getAgencyId();
                 FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
                 Stop parentStop = transitService.getStopForId(parentStationId);
-                if(context.stationStopNodes.get(parentStop) instanceof TransitStation) {
-                    TransitStation parentStopVertex = (TransitStation)
-                            context.stationStopNodes.get(parentStop);
+                if (stationStopNodes.get(parentStop) instanceof TransitStation) {
+                    TransitStation parentStopVertex = (TransitStation) stationStopNodes.get(parentStop);
                     new StationStopEdge(parentStopVertex, stopVertex);
                     new StationStopEdge(stopVertex, parentStopVertex);
                 } else {
@@ -944,8 +880,8 @@ public class PatternHopFactory {
             if (transfer.getFromStop().equals(transfer.getToStop())) {
                 continue;
             }
-            TransitStationStop fromv = context.stationStopNodes.get(transfer.getFromStop());
-            TransitStationStop tov = context.stationStopNodes.get(transfer.getToStop());
+            TransitStationStop fromv = stationStopNodes.get(transfer.getFromStop());
+            TransitStationStop tov = stationStopNodes.get(transfer.getToStop());
 
             double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
@@ -961,18 +897,6 @@ public class PatternHopFactory {
             LineString geometry = geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
-    }
-
-    public void setStopContext(GtfsStopContext context) {
-        this.context = context;
-    }
-
-    public double getMaxStopToShapeSnapDistance() {
-        return maxStopToShapeSnapDistance;
-    }
-
-    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
-        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
     private Collection<Transfer> expandTransfer (Transfer source) {

@@ -8,6 +8,7 @@ import java.util.Objects;
 public class TripPattern {
     private final int id;
 
+    // TODO These are only used in an intermediary step during mapping and could be deleted after the mapping has been refactored
     private final List<TripSchedule> tripSchedules;
 
     private final TraverseMode transitMode;

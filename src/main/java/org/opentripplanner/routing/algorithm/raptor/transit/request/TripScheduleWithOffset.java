@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
@@ -36,18 +36,13 @@ public class TripScheduleWithOffset implements TripSchedule {
     }
 
     @Override
-    public Trip getOriginalTrip() {
-        return this.tripSchedule.getOriginalTrip();
+    public TripTimes getOriginalTripTimes() {
+        return this.tripSchedule.getOriginalTripTimes();
     }
 
     @Override
     public TripPattern getOriginalTripPattern() {
         return this.tripSchedule.getOriginalTripPattern();
-    }
-
-    @Override
-    public int getServiceCode() {
-        return this.tripSchedule.getServiceCode();
     }
 
     public int getSecondsOffset() {

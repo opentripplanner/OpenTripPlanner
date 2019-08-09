@@ -21,7 +21,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.json_serialization.EncodedPolylineJSONSerializer;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,9 +88,6 @@ public class RouteVariant implements Serializable {
     @JsonIgnore
     private ArrayList<RouteSegment> exemplarSegments;
 
-    @JsonIgnore
-    private ArrayList<PatternInterlineDwell> interlines;
-
     private Route route;
 
     private String direction;
@@ -108,7 +104,6 @@ public class RouteVariant implements Serializable {
         trips = new ArrayList<TripsModelInfo>();
         segments = new ArrayList<RouteSegment>();
         exemplarSegments = new ArrayList<RouteSegment>();
-        interlines = new ArrayList<PatternInterlineDwell>();
         this.mode = GtfsLibrary.getTraverseMode(route);
     }
 
@@ -254,15 +249,6 @@ public class RouteVariant implements Serializable {
 
     public void setGeometry(LineString geometry) {
         this.geometry = geometry;
-    }
-
-    public void addInterline(PatternInterlineDwell dwell) {
-        interlines.add(dwell);
-    }
-
-    @JsonIgnore
-    public List<PatternInterlineDwell> getInterlines() {
-        return interlines;
     }
 
     public void addTrip(Trip trip, int number) {

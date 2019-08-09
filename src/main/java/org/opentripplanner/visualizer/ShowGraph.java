@@ -16,12 +16,10 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -466,7 +464,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             for (Edge e : v.getOutgoing()) {
                 if (e.getGeometry() == null)
                     continue;
-                if (e instanceof PatternEdge || e instanceof StreetTransitLink
+                if (e instanceof StreetTransitLink
                         || e instanceof StreetEdge || e instanceof PathwayEdge
                         || e instanceof SimpleTransfer) {
                     env = e.getGeometry().getEnvelopeInternal();
@@ -485,10 +483,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         visibleLinkEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-            if (de instanceof PatternEdge) {
-                visibleTransitEdges.add(de);
-            }
-            else if (de instanceof PathwayEdge || de instanceof StreetTransitLink || de instanceof SimpleTransfer) {
+            if (de instanceof PathwayEdge || de instanceof StreetTransitLink || de instanceof SimpleTransfer) {
                 visibleLinkEdges.add(de);
             }
             else if (de instanceof StreetEdge) {
@@ -559,16 +554,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         // mark key vertices
         lastLabelY = -999;
         labelState(gp.states.getFirst(), "begin");
-        for (State s : gp.states) {
-            Edge e = s.getBackEdge();
-            if (e instanceof TransitBoardAlight) {
-                if (((TransitBoardAlight) e).boarding) {
-                    labelState(s, "board");
-                } else {
-                    labelState(s, "alight");
-                }
-            }
-        }
         labelState(gp.states.getLast(), "end");
 
         if (VIDEO) {

@@ -27,7 +27,6 @@ import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -50,14 +49,9 @@ public class TimetableSnapshotTest {
         graph.putService(CalendarServiceData.class, createCalendarServiceData(context.getTransitBuilder()));
 
         patternIndex = new HashMap<>();
-
-        for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
-            for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
-                if (!tba.boarding) continue;
-                TripPattern pattern = tba.getPattern();
-                for (Trip trip : pattern.getTrips()) {
-                    patternIndex.put(trip.getId(), pattern);
-                }
+        for (TripPattern tripPattern : graph.tripPatternForId.values()) {
+            for (Trip trip : tripPattern.getTrips()) {
+                patternIndex.put(trip.getId(), tripPattern);
             }
         }
     }
