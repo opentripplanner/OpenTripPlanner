@@ -1273,7 +1273,7 @@ public class State implements Cloneable {
                 }
             } else {
                 // make sure a vehicle hasn't already been rented before transit
-                if (stateData.hasRentedCarPreTransit()) {
+                if (stateData.hasRentedVehiclePreTransit()) {
                     // a vehicle has already been rented before transit, don't begin renting another one until we take
                     // transit
                     return false;
