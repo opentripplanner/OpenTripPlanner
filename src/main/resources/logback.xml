@@ -84,5 +84,11 @@
   <logger name="org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule" level="debug" additivity="false">
     <appender-ref ref="TaggedStopsLog"/>
   </logger>
+  <logger name="org.opentripplanner.graph_builder.module.HSLVertexConnector" level="debug" additivity="false">
+    <appender-ref ref="TaggedStopsLog"/>
+  </logger>
+  <logger name="org.opentripplanner.graph_builder.module.DefaultVertexConnector" level="debug" additivity="false">
+    <appender-ref ref="TaggedStopsLog"/>
+  </logger>
 
 </configuration>
