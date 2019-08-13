@@ -2,8 +2,8 @@ package org.opentripplanner.common.geometry;
 
 import junit.framework.TestCase;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 public class CompactElevationProfileTest extends TestCase {
 

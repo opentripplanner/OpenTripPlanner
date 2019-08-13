@@ -1,17 +1,54 @@
 package org.opentripplanner.common.geometry;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.analyst.UnsupportedGeometryException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.LineString;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GeometryUtilsTest {
+
+    private static final double tolerance = 0.000001;
+
+    @Test
+    public final void testConvertGeoJsonToJtsGeometry()
+            throws UnsupportedGeometryException {
+
+         { // Should convert Point correctly
+            double lng1 = -77.1111;
+            double lat1 = 38.1111;
+            org.geojson.Point p1 = new org.geojson.Point(lng1, lat1);
+            Point geometry = (Point) GeometryUtils.convertGeoJsonToJtsGeometry(p1);
+            assertEquals(lng1, geometry.getX(), tolerance);
+            assertEquals(lat1, geometry.getY(), tolerance);
+        }
+
+         { // Should convert LineString correctly
+            double lng1 = -77.1111;
+            double lat1 = 38.1111;
+            double lng2 = -77.2222;
+            double lat2 = 38.2222;
+            org.geojson.LngLatAlt a1 = new org.geojson.LngLatAlt(lng1, lat1);
+            org.geojson.LngLatAlt a2 = new org.geojson.LngLatAlt(lng2, lat2);
+            org.geojson.LineString lineString = new org.geojson.LineString(a1, a2);
+            LineString geometry = (LineString) GeometryUtils.convertGeoJsonToJtsGeometry(lineString);
+            assertEquals(lng1, geometry.getCoordinateN(0).x, tolerance);
+            assertEquals(lat1, geometry.getCoordinateN(0).y, tolerance);
+            assertEquals(lng2, geometry.getCoordinateN(1).x, tolerance);
+            assertEquals(lat2, geometry.getCoordinateN(1).y, tolerance);
+        }
+    }
+
     @Test
     public final void testSplitGeometryAtFraction() {
         Coordinate[] coordinates = new Coordinate[4];
@@ -204,5 +241,22 @@ public class GeometryUtilsTest {
         sequence = coordinateSequenceFactory.create(referenceCoordinates[8][1]);
         geometry = new LineString(sequence, geometryFactory);
         assertEquals(geometry, results[8][1]);
+    }
+
+    @Test
+    public void testWkt() {
+        String wkt = "POLYGON((1.0 2.0,3.0 -4.0,-1.0 2.0, 1.0 2.0))";
+        Geometry geom = GeometryUtils.parseWkt(wkt);
+        assertTrue(geom instanceof Polygon);
+        Coordinate[] coords = geom.getCoordinates();
+        assertEquals(4, coords.length);
+        assertEquals(1.0, coords[0].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[0].getOrdinate(1), tolerance);
+        assertEquals(3.0, coords[1].getOrdinate(0), tolerance);
+        assertEquals(-4.0, coords[1].getOrdinate(1), tolerance);
+        assertEquals(-1.0, coords[2].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[2].getOrdinate(1), tolerance);
+        assertEquals(1.0, coords[3].getOrdinate(0), tolerance);
+        assertEquals(2.0, coords[3].getOrdinate(1), tolerance);
     }
 }

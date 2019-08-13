@@ -2,11 +2,12 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -29,14 +30,20 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     private boolean flattened;
 
+    private double effectiveWalkFactor = 1.0;
+
+    /**
+     * Remember to call the {@link #setElevationProfile(PackedCoordinateSequence, boolean)} to initiate elevation data.
+     */
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
+
     }
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             String name, double length, StreetTraversalPermission permission, boolean back) {
-        super(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
     @Override
@@ -59,6 +66,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         slopeWorkFactor = (float)costs.slopeWorkFactor;
         maxSlope = (float)costs.maxSlope;
         flattened = costs.flattened;
+        effectiveWalkFactor = costs.effectiveWalkFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
         bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
@@ -88,6 +96,14 @@ public class StreetWithElevationEdge extends StreetEdge {
     @Override
     public double getSlopeWorkCostEffectiveLength() {
         return slopeWorkFactor * getDistance();
+    }
+
+    /**
+     * The effective walk distance is adjusted to take the elevation into account.
+     */
+    @Override
+    public double getSlopeWalkSpeedEffectiveLength() {
+        return effectiveWalkFactor * getDistance();
     }
 
     @Override

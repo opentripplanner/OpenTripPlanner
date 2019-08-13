@@ -11,9 +11,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.linearref.LinearLocation;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.linearref.LinearLocation;
 
 public abstract class MatchState {
     private static final RoutingRequest traverseOptions = new RoutingRequest(TraverseMode.CAR);

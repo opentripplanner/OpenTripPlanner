@@ -3,7 +3,7 @@ package org.opentripplanner.analyst.request;
 import java.util.Arrays;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A request for an isochrone vector.

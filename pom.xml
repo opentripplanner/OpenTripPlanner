@@ -78,11 +78,11 @@
     </scm>
 
     <properties>
-        <geotools.version>10.5</geotools.version>
+        <geotools.version>20.1</geotools.version>
+        <geotools.wfs.version>16.5</geotools.wfs.version>
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws.version>1.9.39</aws.version>
     </properties>
 
     <distributionManagement>
@@ -231,6 +231,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -416,14 +417,9 @@
             <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
-            <id>download.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-        <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
+            <url>https://download.osgeo.org/webdav/geotools/</url>
         </repository>
         <repository>
             <id>axis</id>
@@ -448,34 +444,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Amazon AWS client libraries -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ec2</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>${aws.version}</version>
-        </dependency>
-        <!-- Kryo serialization, used to save graphs to disk. -->
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-        <!-- Extra serializers for Kryo -->
-        <dependency>
-            <groupId>de.javakaffee</groupId>
-            <artifactId>kryo-serializers</artifactId>
-            <version>0.42</version>
-        </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -488,26 +456,6 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
-        <!-- AWS SDK uses Java commons logging. Redirect it to the slf4j API (we use the Logback implementation) -->
-        <!-- Why does this work? It seems like we'd need to declare JCL "provided" to avoid using the true JCL. -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <!-- Guava provides improved collections, among other things. -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <!-- Trove provides optimized map/set collections for native types (int, long...) -->
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
         <dependency>
@@ -547,8 +495,13 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs</artifactId>
+            <artifactId>gt-opengis</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-wfs</artifactId>
+            <version>${geotools.wfs.version}</version>
         </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
@@ -562,7 +515,7 @@
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
             <version>1.2</version>
-            <!-- We explicitely exclude jackson-core/databind as we use a more recent
+            <!-- We explicitly exclude jackson-core/databind as we use a more recent
                  version than the one geojson-jackson depends on, and the two seems to
                  be somehow incompatible. -->
             <exclusions>
@@ -575,12 +528,6 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>jackson2-geojson</artifactId>
-            <version>0.8</version>
         </dependency>
 
         <!-- TESTING -->
@@ -596,7 +543,13 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
-
+        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Guava, Trove, and Kryo. -->
+        <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>kryo-tools</artifactId>
+            <version>1.2.0</version>
+        </dependency>
         <!-- Jersey annontation-driven REST web services (JAX-RS implementation) -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -791,39 +744,17 @@
             <artifactId>graphql-java</artifactId>
             <version>2.2.0</version>
         </dependency>
+        <!-- Provides annotations like XmlElement indicating how classes should be serialized -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
         <!-- Support for OTP scripting -->
         <dependency>
             <groupId>bsf</groupId>
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
-        <!--
-            Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
-            Therefore we don't include them by default. You can either update the POM in your fork to include the
-            scripting dependencies, or simply download them and add them to the classpath on the command line.
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.3.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-        -->
-        <!-- OTP 2.0 will adopt routing methods based on those in R5. This also contains a serialization test framework. -->
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>r5</artifactId>
-            <version>4.4.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-simple</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
-
 </project>

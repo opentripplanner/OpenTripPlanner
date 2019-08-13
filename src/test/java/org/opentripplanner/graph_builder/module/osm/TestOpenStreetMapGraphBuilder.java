@@ -311,7 +311,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         LocalizedString localizedString = new LocalizedString("corner",
                 new String[]{"first", "second"});
 
-        assertEquals("corner of first and second", localizedString.toString());
+        assertEquals("Corner of first and second", localizedString.toString());
         assertEquals("Kreuzung first mit second",
                 localizedString.toString(new Locale("de")));
     }

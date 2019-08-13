@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  *
  */
-@XmlRootElement(name = "AlertPatch")
 public class AlertPatch implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AlertPatch.class);
 
@@ -68,7 +67,6 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
-    @XmlElement
     public Alert getAlert() {
         return alert;
     }
@@ -101,7 +99,6 @@ public class AlertPatch implements Serializable {
         return serviceAffected() && activities.contains("EXIT");
     }
 
-    @XmlElement
     public String getId() {
         return id;
     }
@@ -292,17 +289,14 @@ public class AlertPatch implements Serializable {
         return agency;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getRoute() {
         return route;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getTrip() {
         return trip;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getStop() {
         return stop;
     }
@@ -330,12 +324,10 @@ public class AlertPatch implements Serializable {
         this.directionId = direction;
     }
 
-    @XmlElement
     public String getDirection() {
         return direction;
     }
 
-    @XmlElement
     public int getDirectionId() {
         return directionId;
     }

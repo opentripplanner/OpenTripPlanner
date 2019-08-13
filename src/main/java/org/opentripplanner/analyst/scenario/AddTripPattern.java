@@ -1,12 +1,11 @@
 package org.opentripplanner.analyst.scenario;
 
-import com.conveyal.gtfs.model.Route;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
-import org.apache.commons.math3.analysis.function.Add;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.model.json_serialization.*;
@@ -43,8 +42,8 @@ public class AddTripPattern extends Modification {
     /** used to store the indices of the temporary stops in the graph */
     public transient TemporaryStop[] temporaryStops;
 
-    /** GTFS mode (route_type), see constants in com.conveyal.gtfs.model.Route */
-    public int mode = Route.BUS;
+    /** GTFS mode (route_type), see constants at https://developers.google.com/transit/gtfs/reference/#routestxt */
+    public int mode = 3;
 
     /** Create temporary stops associated with the given graph. Note that a given AddTripPattern can be associated only with a single graph. */
     public void materialize (Graph graph) {

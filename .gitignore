@@ -28,5 +28,6 @@ gen-py/
 _site/
 /otp
 /otp-batch-analyst
+*.DS_Store
 lucene/
 var/

@@ -59,6 +59,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private Collection<Trip> trips;
 
+    private Collection<FlexArea> flexAreas;
+
     private Collection<IgnoredAlert> ignoredAlerts;
 
     // Indexes
@@ -83,7 +85,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
             List<FareRule> fareRules, List<FeedInfo> feedInfos, List<Frequency> frequencies,
             List<Pathway> pathways, List<Route> routes, List<ShapePoint> shapePoints,
             List<Stop> stops, List<StopTime> stopTimes, List<Transfer> transfers,
-            List<Trip> trips, List<IgnoredAlert> ignoredAlerts) {
+            List<Trip> trips, List<FlexArea> flexAreas, List<IgnoredAlert> ignoredAlerts) {
         this.agencies = nullSafeUnmodifiableList(agencies);
         this.calendarDates = nullSafeUnmodifiableList(calendarDates);
         this.calendars = nullSafeUnmodifiableList(calendars);
@@ -98,6 +100,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.stopTimes = nullSafeUnmodifiableList(stopTimes);
         this.transfers = nullSafeUnmodifiableList(transfers);
         this.trips = nullSafeUnmodifiableList(trips);
+        this.flexAreas = nullSafeUnmodifiableList(flexAreas);
         this.ignoredAlerts = nullSafeUnmodifiableList(ignoredAlerts);
     }
 
@@ -277,6 +280,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
         throw new MultipleCalendarsForServiceIdException(serviceId);
     }
 
+    @Override
+    public Collection<FlexArea> getAllAreas() {
+        return flexAreas;
+    }
 
     /*  Private Methods */
 

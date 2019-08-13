@@ -39,6 +39,8 @@ public class OtpTransitServiceBuilder {
 
     private final List<Trip> trips = new ArrayList<>();
 
+    private final List<FlexArea> flexAreas = new ArrayList<>();
+
     private final List<IgnoredAlert> ignoredAlerts = new ArrayList<>();
 
     public OtpTransitServiceBuilder() {
@@ -63,6 +65,7 @@ public class OtpTransitServiceBuilder {
         stopTimes.addAll(other.getAllStopTimes());
         transfers.addAll(other.getAllTransfers());
         trips.addAll(other.getAllTrips());
+        flexAreas.addAll(other.getAllAreas());
         ignoredAlerts.addAll(other.getAllIgnoredAlerts());
         return this;
     }
@@ -123,6 +126,10 @@ public class OtpTransitServiceBuilder {
         return trips;
     }
 
+    public List<FlexArea> getFlexAreas() {
+        return flexAreas;
+    }
+
     public List<IgnoredAlert> getIgnoredAlerts() {
         return ignoredAlerts;
     }
@@ -133,7 +140,7 @@ public class OtpTransitServiceBuilder {
 
         return new OtpTransitServiceImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
                 feedInfos, frequencies, pathways, routes, shapePoints, stops, stopTimes, transfers,
-                trips, ignoredAlerts);
+                trips, flexAreas, ignoredAlerts);
     }
 
     private void createNoneExistentIds() {

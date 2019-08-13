@@ -36,6 +36,8 @@ public final class Route extends IdentityBean<FeedScopedId> {
 
     private String brandingUrl;
 
+    private int eligibilityRestricted = MISSING_VALUE;
+
     public FeedScopedId getId() {
         return id;
     }
@@ -151,6 +153,18 @@ public final class Route extends IdentityBean<FeedScopedId> {
 
     public void setBrandingUrl(String brandingUrl) {
         this.brandingUrl = brandingUrl;
+    }
+
+    public boolean hasEligibilityRestricted() {
+        return eligibilityRestricted != MISSING_VALUE;
+    }
+
+    public int getEligibilityRestricted() {
+        return eligibilityRestricted;
+    }
+
+    public void setEligibilityRestricted(int eligibilityRestricted) {
+        this.eligibilityRestricted = eligibilityRestricted;
     }
 
     @Override
