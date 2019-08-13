@@ -2,6 +2,7 @@
 
 ## 2.0 (in progress)
 - Sandbox for experimental features (#2745)
+- Remove extra Djikstra implementations
 
 ## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)
