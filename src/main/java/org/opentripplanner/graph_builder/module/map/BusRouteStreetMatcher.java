@@ -65,22 +65,25 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     if (pattern.getGeometry() == null) {
                         continue;
                     }
-                    List<Edge> edges = matcher.match(pattern.getGeometry());
-                    if (edges == null || edges.isEmpty()) {
-                        log.warn("Could not match to street network: {}", pattern);
-                        continue;
+
+                    for (int i = 0; i < pattern.numHopGeometries(); i++) {
+                        LineString hopGeometry = pattern.getHopGeometry(i);
+
+                        List<Edge> edges = matcher.match(hopGeometry);
+                        if (edges == null || edges.isEmpty()) {
+                            log.warn("Could not match to street network: {}", pattern);
+                            continue;
+                        }
+                        List<Coordinate> coordinates = new ArrayList<>();
+                        for (Edge e : edges) {
+                            coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
+                            edgesForRoute.edgesForRoute.put(route, e);
+                        }
+                        Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
+                        LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
+                        // Replace the hop's geometry from GTFS with that of the equivalent OSM edges.
+                        pattern.setHopGeometry(i, ls);
                     }
-                    List<Coordinate> coordinates = new ArrayList<Coordinate>();
-                    for (Edge e : edges) {
-                        coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
-                        edgesForRoute.edgesForRoute.put(route, e);
-                    }
-                    Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
-                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
-                    // Replace the pattern's geometry from GTFS with that of the equivalent OSM edges.
-                    // TODO: It is not possible to replace the geometry of a TripPattern anymore,
-                    // TODO: as it is constructed from the hopGeometries
-                    //pattern.getGeometry() = ls;
                 }
             }
         }
