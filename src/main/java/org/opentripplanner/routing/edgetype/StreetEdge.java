@@ -82,7 +82,7 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     protected float bicycleSafetyFactor;
 
-    private int[] compactGeometry;
+    private byte[] compactGeometry;
     
     private I18NString name;
 
@@ -643,11 +643,11 @@ public class StreetEdge extends Edge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
+		return CompactLineString.uncompackLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
 	}
 
 	private void setGeometry(LineString geometry) {
-		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
+		this.compactGeometry = CompactLineString.compackLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
 	}
 
 	public void shareData(StreetEdge reversedEdge) {

@@ -132,7 +132,7 @@ public class TripPattern implements Cloneable, Serializable {
     /**
      * Geometries of each inter-stop segment of the tripPattern.
      */
-    private int[][] hopGeometries = null;
+    private byte[][] hopGeometries = null;
 
 
     public LineString getHopGeometry(int stopIndex) {
@@ -140,7 +140,7 @@ public class TripPattern implements Cloneable, Serializable {
         TransitStop transitStopEnd = stopVertices[stopIndex + 1];
 
         if (hopGeometries != null) {
-            return CompactLineString.uncompactLineString(
+            return CompactLineString.uncompackLineString(
                     transitStopStart.getX(),
                     transitStopStart.getY(),
                     transitStopEnd.getX(),
@@ -158,7 +158,7 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public void setHopGeometries(LineString[] hopGeometries) {
-        this.hopGeometries = new int[hopGeometries.length][];
+        this.hopGeometries = new byte[hopGeometries.length][];
 
         for (int i = 0; i < hopGeometries.length; i++) {
             setHopGeometry(i, hopGeometries[i]);
@@ -174,7 +174,7 @@ public class TripPattern implements Cloneable, Serializable {
                 hopGeometry,
                 transitStopEnd.getCoordinate());
 
-        int[] compactCoordinates = CompactLineString.compactLineString(
+        byte[] compactCoordinates = CompactLineString.compackLineString(
                 transitStopStart.getX(),
                 transitStopStart.getY(),
                 transitStopEnd.getX(),
