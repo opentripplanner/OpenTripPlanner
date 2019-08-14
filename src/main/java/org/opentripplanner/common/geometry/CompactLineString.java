@@ -1,7 +1,5 @@
 package org.opentripplanner.common.geometry;
 
-import java.io.Serializable;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -24,9 +22,7 @@ import org.locationtech.jts.geom.LineString;
  * 
  * @author laurent
  */
-public final class CompactLineString implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public final class CompactLineString {
 
     /**
      * Multiplier for fixed-float representation. For lat/lon CRS, 1e6 leads to a precision of 0.11
@@ -44,9 +40,9 @@ public final class CompactLineString implements Serializable {
     /**
      * Singleton representation of a straight-line (where nothing has to be stored), to be re-used.
      */
-    protected static final int[] STRAIGHT_LINE = new int[0];
+    public static final int[] STRAIGHT_LINE = new int[0];
 
-    protected static final byte[] STRAIGHT_LINE_PACKED = new byte[0];
+    public static final byte[] STRAIGHT_LINE_PACKED = new byte[0];
 
     /**
      * Geometry factory. TODO - Do we need to make this parametrable?
@@ -124,6 +120,18 @@ public final class CompactLineString implements Serializable {
     }
 
     /**
+     * Wrapper for the above method in the case where there are no start/end coordinates provided.
+     * 0-coordinates are added in order for the delta encoding to work correctly.
+     */
+    public static byte[] compackLineString(LineString lineString, boolean reverse) {
+        lineString = GeometryUtils.addStartEndCoordinatesToLineString(
+                new Coordinate(0.0, 0.0),
+                lineString,
+                new Coordinate(0.0, 0.0));
+        return compackLineString(0.0, 0.0, 0.0, 0.0, lineString, reverse);
+    }
+
+    /**
      * Construct a LineString based on external end-points and compacted int version.
      * 
      * @param xa
@@ -174,5 +182,14 @@ public final class CompactLineString implements Serializable {
     public static LineString uncompackLineString(double x0, double y0, double x1, double y1,
             byte[] packedCoords, boolean reverse) {
         return uncompactLineString(x0, y0, x1, y1, DlugoszVarLenIntPacker.unpack(packedCoords), reverse);
+    }
+
+    /**
+     * Wrapper for the above method in the case where there are no start/end coordinates provided.
+     * 0-coordinates are added and then removed in order for the delta encoding to work correctly.
+     */
+    public static LineString uncompackLineString(byte[] packedCoords, boolean reverse) {
+        LineString lineString = uncompackLineString(0.0, 0.0, 0.0, 0.0, packedCoords, reverse);
+        return GeometryUtils.removeStartEndCoordinatesFromLineString(lineString);
     }
 }
