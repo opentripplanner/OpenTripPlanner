@@ -6,26 +6,32 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 
 public class CompactElevationProfileTest extends TestCase {
-/*
+
+    private final static double DISTANCE_BETWEEN_SAMPLES = 10;
+
     public final void testEncodingDecoding() {
 
-        runOneTest(null);
-        runOneTest(new Coordinate[] { new Coordinate(0.0, 0.0) });
-        runOneTest(new Coordinate[] { new Coordinate(0.0, 1.0) });
-        runOneTest(new Coordinate[] { new Coordinate(0.0, 10000.0) }); // More than Mt Everest
-                                                                       // elevation
-        runOneTest(new Coordinate[] { new Coordinate(100000.0, 0.0) }); // A long street segment
-                                                                        // length
-        runOneTest(new Coordinate[] { new Coordinate(0.0, 10.0), new Coordinate(8.0, -10.0),
-                new Coordinate(120.0, 20.0), new Coordinate(150.0, 0.0) });
-        runOneTest(new Coordinate[] { new Coordinate(0.0, 0.12345678), new Coordinate(1.1111111111, -0.987654321),
-                new Coordinate(2.222222222222, 0.0000123), new Coordinate(3.33333333333, 6789.987654321) });
+        CompactElevationProfile.setDistanceBetweenSamplesM(DISTANCE_BETWEEN_SAMPLES);
+
+        runOneTest(new Coordinate[] {
+                new Coordinate(0.0, 0.0),
+                new Coordinate(3.0, 0.0),
+        },
+        3);
+
+        runOneTest(new Coordinate[] {
+                new Coordinate(0.0, 0.0),
+                new Coordinate(10.0, 0.0),
+                new Coordinate(19.0, 0.0)
+        },
+        19);
     }
 
-    private void runOneTest(Coordinate[] c) {
+    private void runOneTest(Coordinate[] c, double length) {
         CoordinateSequence elev1 = c == null ? null : new PackedCoordinateSequence.Double(c);
-        byte[] packed = CompactElevationProfile.compactElevationProfile(elev1);
-        CoordinateSequence elev2 = CompactElevationProfile.uncompactElevationProfile(packed);
+        byte[] packed = CompactElevationProfile.compactElevationProfileWithRegularSamples(elev1);
+        CoordinateSequence elev2 = CompactElevationProfile
+                .uncompactElevationProfileWithRegularSamples(packed, length);
         if (elev1 == null) {
             // This is rather simple
             assertNull(elev2);
@@ -41,6 +47,4 @@ public class CompactElevationProfileTest extends TestCase {
             assertTrue("Too large elevation delta", dy <= 1e-2);
         }
     }
-
- */
 }
