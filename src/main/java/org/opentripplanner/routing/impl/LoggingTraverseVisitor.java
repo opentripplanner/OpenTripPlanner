@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.impl;
 
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.astar;
 
 /**
  * This exception is thrown when an edge has a negative weight. Dijkstra's

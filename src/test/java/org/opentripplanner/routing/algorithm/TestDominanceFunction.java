@@ -30,28 +30,6 @@ public class TestDominanceFunction extends TestCase {
 
         Assert.assertTrue(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateA, stateB));
         Assert.assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateB, stateA));
-
-        // Simple transfers should not dominate
-
-        SimpleTransfer simpleTransfer = mock(SimpleTransfer.class);
-        State stateC = new State(fromVertex, simpleTransfer, 0, request);
-        State stateD = new State(toVertex, null, 0, request);
-        stateC.weight = 1;
-        stateD.weight = 2;
-
-        Assert.assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateC, stateD));
-        Assert.assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateD, stateC));
-
-        // Timed transfers should not dominate
-
-        TimedTransferEdge timedTransferEdge = mock(TimedTransferEdge.class);
-        State stateE = new State(fromVertex, timedTransferEdge, 0, request);
-        State stateF = new State(toVertex, null, 0, request);
-        stateE.weight = 1;
-        stateF.weight = 2;
-
-        Assert.assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateE, stateF));
-        Assert.assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateF, stateE));
     }
 
     // TODO: Make unit tests for rest of dominance functionality
