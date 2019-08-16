@@ -53,6 +53,8 @@ public class ElevationModule implements GraphBuilderModule {
     private int nPointsEvaluated = 0;
     private int nPointsOutsideDEM = 0;
 
+    private final double distanceBetweenSamplesM;
+
     /**
      * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
      * are defined in meters in the source data. If, for example, decimetres are used in the source data,
@@ -60,11 +62,13 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private double elevationUnitMultiplier = 1;
 
-    public ElevationModule() { /* This makes me a "bean" */ };
-    
-    public ElevationModule(ElevationGridCoverageFactory factory, double elevationUnitMultiplier) {
+    public ElevationModule(ElevationGridCoverageFactory factory,
+            double elevationUnitMultiplier,
+            double distanceBetweenSamples
+    ) {
         this.setGridCoverageFactory(factory);
         this.elevationUnitMultiplier = elevationUnitMultiplier;
+        this.distanceBetweenSamplesM = distanceBetweenSamples;
     }
 
     public List<String> provides() {
@@ -81,6 +85,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
 
@@ -340,8 +345,6 @@ public class ElevationModule implements GraphBuilderModule {
 
         // initial sample (x = 0)
         coordList.add(new Coordinate(0, getElevation(coords[0])));
-
-        double distanceBetweenSamplesM = CompactElevationProfile.getDistanceBetweenSamplesM();
 
         // loop for edge-internal samples
         for (double x = distanceBetweenSamplesM; x < edgeLenM; x += distanceBetweenSamplesM) {

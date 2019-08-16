@@ -32,63 +32,7 @@ public final class CompactElevationProfile implements Serializable {
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
      * arc-second NED data.
      */
-    private static double distanceBetweenSamplesM = 10;
-
-    /**
-     * Compact an elevation profile onto a var-len int packed form (Dlugosz coding).
-     *
-     * @param profile The elevation profile to compact
-     * @return The compacted format
-     */
-    public static byte[] compactElevationProfile(CoordinateSequence elevation) {
-        if (elevation == null)
-            return null;
-        int oix = 0;
-        int oiy = 0;
-        int[] coords = new int[elevation.size() * 2];
-        for (int i = 0; i < elevation.size(); i++) {
-            /*
-             * Note: We should do the rounding *before* the delta to prevent rounding errors from
-             * accumulating on long line strings.
-             */
-            Coordinate c = elevation.getCoordinate(i);
-            int ix = (int) Math.round(c.x * FIXED_FLOAT_MULT);
-            int iy = (int) Math.round(c.y * FIXED_FLOAT_MULT);
-            int dix = ix - oix;
-            int diy = iy - oiy;
-            coords[i * 2] = dix;
-            coords[i * 2 + 1] = diy;
-            oix = ix;
-            oiy = iy;
-        }
-        return DlugoszVarLenIntPacker.pack(coords);
-    }
-
-    /**
-     * Uncompact an ElevationProfile from a var-len int packed form (Dlugosz coding).
-     *
-     * TODO relax the returned type to CoordinateSequence
-     *
-     * @param packedCoords Compacted coordinates
-     * @return The elevation profile
-     */
-    public static PackedCoordinateSequence uncompactElevationProfile(byte[] packedCoords) {
-        if (packedCoords == null)
-            return null;
-        int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
-        int size = coords.length / 2;
-        Coordinate[] c = new Coordinate[size];
-        int oix = 0;
-        int oiy = 0;
-        for (int i = 0; i < c.length; i++) {
-            int ix = oix + coords[i * 2];
-            int iy = oiy + coords[i * 2 + 1];
-            c[i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
-            oix = ix;
-            oiy = iy;
-        }
-        return new PackedCoordinateSequence.Double(c, 2);
-    }
+    private static double distanceBetweenSamplesM;
 
     /**
      * Compact an elevation profile onto a var-len int packed form (Dlugosz coding). This method
@@ -147,7 +91,8 @@ public final class CompactElevationProfile implements Serializable {
         return new PackedCoordinateSequence.Double(c, 2);
     }
 
-    public static double getDistanceBetweenSamplesM() {
-        return distanceBetweenSamplesM;
+    public static void setDistanceBetweenSamplesM(double distance) {
+        distanceBetweenSamplesM = distance;
     }
+
 }
