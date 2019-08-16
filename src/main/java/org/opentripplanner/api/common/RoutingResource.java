@@ -159,7 +159,40 @@ public abstract class RoutingResource {
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
-    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    /**
+     * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
+     * <p>The possible values of the comma-separated list are:</p>
+     *
+     * <ul>
+     *  <li>WALK</li>
+     *  <li>TRANSIT: General catch-all for all public transport modes.</li>
+     *  <li>BICYCLE: Taking a bicycle onto the public transport and cycling from the arrival station to the destination.</li>
+     *  <li>BICYCLE_RENT: Taking a rented, shared-mobility bike for part or the entirety of the route.
+     *      <br>
+     *      <em>Prerequisite:</em> Vehicle positions need to be added to OTP either as static stations or dynamic data feeds.
+     *      For static stations check the graph building documentation for the property <code>staticBikeRental</code>.
+     *  </li>
+     *  <li>BICYCLE_PARK: Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+     *      <br>
+     *      <em>Prerequisite:</em> Bicycle parking stations near the station and visible to OTP by enabling the property <code>staticBikeParkAndRide</code>
+     *      during graph build.
+     *   </li>
+     *  <li>CAR</li>
+     *  <li>CAR_PARK: Driving a car to the park-and-ride facilities near a station and taking public transport.
+     *      <br>
+     *      <em>Prerequisite:</em> Park-and-ride areas near the station and visible to OTP by enabling the property <code>staticParkAndRide</code>
+     *      during graph build.
+     *  </li>
+     *  <li>TRAM</li>
+     *  <li>SUBWAY</li>
+     *  <li>RAIL</li>
+     *  <li>BUS</li>
+     *  <li>FERRY</li>
+     *  <li>CABLE_CAR</li>
+     *  <li>GONDOLA</li>
+     *  <li>AIRPLANE</li>
+     * </ul>
+     */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
