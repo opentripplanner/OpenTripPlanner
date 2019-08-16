@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -11,6 +12,7 @@ import org.locationtech.jts.geom.LineString;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
@@ -22,13 +24,11 @@ public class SimpleTransfer extends Edge {
 
     private double distance;
     
-    private LineString geometry;
     private List<Edge> edges;
 
     public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
         super(from, to);
         this.distance = distance;
-        this.geometry = geometry;
         this.edges = edges;
     }
 
@@ -81,11 +81,14 @@ public class SimpleTransfer extends Edge {
     public double getDistance(){
     	return this.distance;
     }
-    
-    
+
     @Override
     public LineString getGeometry(){
-	   return this.geometry;
+        return GeometryUtils.concatenateLineStrings(
+                edges.stream()
+                        .filter(t -> t.getGeometry() != null)
+                        .map(Edge::getGeometry)
+                        .collect(Collectors.toList()));
    }
 
     public List<Edge> getEdges() { return this.edges; }

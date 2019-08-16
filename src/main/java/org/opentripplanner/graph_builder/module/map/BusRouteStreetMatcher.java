@@ -62,23 +62,28 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     //If there are no shapes in GTFS pattern geometry is generated
                     //generated geometry is useless for street matching
                     //that is why pattern.geometry is null in that case
-                    if (pattern.geometry == null) {
+                    if (pattern.getGeometry() == null) {
                         continue;
                     }
-                    List<Edge> edges = matcher.match(pattern.geometry);
-                    if (edges == null || edges.isEmpty()) {
-                        log.warn("Could not match to street network: {}", pattern);
-                        continue;
+
+                    for (int i = 0; i < pattern.numHopGeometries(); i++) {
+                        LineString hopGeometry = pattern.getHopGeometry(i);
+
+                        List<Edge> edges = matcher.match(hopGeometry);
+                        if (edges == null || edges.isEmpty()) {
+                            log.warn("Could not match to street network: {}", pattern);
+                            continue;
+                        }
+                        List<Coordinate> coordinates = new ArrayList<>();
+                        for (Edge e : edges) {
+                            coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
+                            edgesForRoute.edgesForRoute.put(route, e);
+                        }
+                        Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
+                        LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
+                        // Replace the hop's geometry from GTFS with that of the equivalent OSM edges.
+                        pattern.setHopGeometry(i, ls);
                     }
-                    List<Coordinate> coordinates = new ArrayList<Coordinate>();
-                    for (Edge e : edges) {
-                        coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
-                        edgesForRoute.edgesForRoute.put(route, e);
-                    }
-                    Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
-                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
-                    // Replace the pattern's geometry from GTFS with that of the equivalent OSM edges.
-                    pattern.geometry = ls;
                 }
             }
         }

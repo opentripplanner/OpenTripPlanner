@@ -82,7 +82,7 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     protected float bicycleSafetyFactor;
 
-    private int[] compactGeometry;
+    private byte[] compactGeometry;
     
     private I18NString name;
 
