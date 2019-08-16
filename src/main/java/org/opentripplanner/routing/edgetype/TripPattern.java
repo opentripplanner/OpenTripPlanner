@@ -10,16 +10,15 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -130,15 +129,53 @@ public class TripPattern implements Cloneable, Serializable {
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    /** Used by the MapBuilder (and should be exposed by the Index API). */
-    public LineString geometry = null;
-
     /**
-     * Geometries of each inter-stop segment of the tripPattern. This is redundant information but should just reuse
-     * references to the same coordinates referenced by the single geometry field. These probably could be raw coordinate
-     * arrays (or some kind of packed coordinate sequences) since we just use the coordinate arrays out of them.
+     * Geometries of each inter-stop segment of the tripPattern.
      */
-    public LineString[] hopGeometries = null;
+    private byte[][] hopGeometries = null;
+
+
+    public LineString getHopGeometry(int stopIndex) {
+        TransitStop transitStopStart = stopVertices[stopIndex];
+        TransitStop transitStopEnd = stopVertices[stopIndex + 1];
+
+        if (hopGeometries != null) {
+            return CompactLineString.uncompactLineString(
+                    hopGeometries[stopIndex],
+                    false
+            );
+        } else {
+            return GeometryUtils.getGeometryFactory()
+                    .createLineString(
+                            new Coordinate[] {
+                                    transitStopStart.getCoordinate(),
+                                    transitStopEnd.getCoordinate() });
+        }
+    }
+
+    public void setHopGeometries(LineString[] hopGeometries) {
+        this.hopGeometries = new byte[hopGeometries.length][];
+
+        for (int i = 0; i < hopGeometries.length; i++) {
+            setHopGeometry(i, hopGeometries[i]);
+        }
+    }
+
+    public void setHopGeometry(int i, LineString hopGeometry) {
+        this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry,false);
+    }
+
+    public LineString getGeometry() {
+        List<LineString> lineStrings = new ArrayList<>();
+        for (int i = 0; i < hopGeometries.length - 1; i++) {
+            lineStrings.add(getHopGeometry(i));
+        }
+        return GeometryUtils.concatenateLineStrings(lineStrings);
+    }
+
+    public int numHopGeometries() {
+        return hopGeometries.length;
+    }
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
@@ -513,33 +550,6 @@ public class TripPattern implements Cloneable, Serializable {
         return String.format("<TripPattern %s>", this.code);
     }
 
-    /**
-     * Generates a geometry for the full pattern.
-     * This is done by concatenating the shapes of all the constituent hops.
-     * It could probably just come from the full shapes.txt entry for the trips in the route, but given all the details
-     * in how the individual hop geometries are constructed we just recombine them here.
-     */
-    public void makeGeometry(LineString[] hopGeoms) {
-        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-        for (int i = 0; i < hopGeoms.length; i++) {
-            LineString geometry = hopGeoms[i];
-            if (geometry != null) {
-                if (coordinates.size() == 0) {
-                    coordinates.extend(geometry.getCoordinates());
-                } else {
-                    coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplicate coords at stops
-                }
-            }
-        }
-        // The CoordinateArrayListSequence is easy to append to, but is not serializable.
-        // It might be possible to just mark it serializable, but it is not particularly compact either.
-        // So we convert it to a packed coordinate sequence, since that is serializable and smaller.
-        // FIXME It seems like we could simply accumulate the coordinates into an array instead of using the CoordinateArrayListSequence.
-        PackedCoordinateSequence packedCoords = new PackedCoordinateSequence.Double(coordinates.toCoordinateArray(), 2);
-        this.geometry = GeometryUtils.getGeometryFactory().createLineString(packedCoords);
-    }
-
-
 	public Trip getExemplar() {
 		if(this.trips.isEmpty()){
 			return null;
@@ -612,17 +622,4 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
-    // TODO OTP2 - This should probably be precalculated in the PatternHopFactory
-    public LineString getHopGeometry(int stopIndex) {
-        if (hopGeometries != null) {
-            return hopGeometries[stopIndex];
-        } else {
-            Stop s1 = stopPattern.stops[stopIndex];
-            Stop s2 = stopPattern.stops[stopIndex + 1];
-            Coordinate c1 = new Coordinate(s1.getLon(), s1.getLat());
-            Coordinate c2 = new Coordinate(s2.getLon(), s2.getLat());
-
-            return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
-        }
-    }
 }

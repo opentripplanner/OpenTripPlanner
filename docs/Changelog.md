@@ -3,6 +3,7 @@
 ## 2.0 (in progress)
 - Sandbox for experimental features (#2745)
 - Remove extra Djikstra implementations
+- Remove redundant LineStrings in order to save memory (#2795)
 
 ## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)

@@ -22,6 +22,8 @@ public final class CompactElevationProfile implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final double DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS = 10;
+
     /**
      * Multipler for fixed-float representation. In meters, the precision is 1 cm (elevation and arc
      * length).
@@ -29,58 +31,70 @@ public final class CompactElevationProfile implements Serializable {
     private static final double FIXED_FLOAT_MULT = 1.0e2;
 
     /**
-     * Compact an elevation profile onto a var-len int packed form (Dlugosz coding).
+     * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
+     * arc-second NED data.
+     */
+    private static double distanceBetweenSamplesM = DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS;
+
+    /**
+     * Compact an elevation profile onto a var-len int packed form (Dlugosz coding). This method
+     * supposes that only the y-values are to be compacted and the x-values can be reconstructed
+     * at regular intervals according to the distanceBetweenSamplesM field. The last x-value is given
+     * by the length of the geometry.
      * 
      * @param profile The elevation profile to compact
      * @return The compacted format
      */
-    public static byte[] compactElevationProfile(CoordinateSequence elevation) {
+    public static byte[] compactElevationProfileWithRegularSamples(CoordinateSequence elevation) {
         if (elevation == null)
             return null;
-        int oix = 0;
         int oiy = 0;
-        int[] coords = new int[elevation.size() * 2];
+        int[] coords = new int[elevation.size()];
         for (int i = 0; i < elevation.size(); i++) {
             /*
              * Note: We should do the rounding *before* the delta to prevent rounding errors from
              * accumulating on long line strings.
              */
             Coordinate c = elevation.getCoordinate(i);
-            int ix = (int) Math.round(c.x * FIXED_FLOAT_MULT);
             int iy = (int) Math.round(c.y * FIXED_FLOAT_MULT);
-            int dix = ix - oix;
             int diy = iy - oiy;
-            coords[i * 2] = dix;
-            coords[i * 2 + 1] = diy;
-            oix = ix;
+            coords[i] = diy;
             oiy = iy;
         }
         return DlugoszVarLenIntPacker.pack(coords);
     }
 
     /**
-     * Uncompact an ElevationProfile from a var-len int packed form (Dlugosz coding).
-     * 
-     * TODO relax the returned type to CoordinateSequence
-     * 
+     * Uncompact an ElevationProfile from a var-len int packed form (Dlugosz coding). This method
+     * supposes that only the y-values have been compacted and x-values will be reconstructed at
+     * regular interval according to the distanceBetweenSamplesM field. The last x-value is given
+     * by the length of the geometry.
+     *
      * @param packedCoords Compacted coordinates
+     * @param lengthM The length of the edge in meters. This is used as the x-value of the final
+     *                height sample
      * @return The elevation profile
      */
-    public static PackedCoordinateSequence uncompactElevationProfile(byte[] packedCoords) {
+    public static PackedCoordinateSequence uncompactElevationProfileWithRegularSamples(byte[] packedCoords, double lengthM) {
         if (packedCoords == null)
             return null;
         int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
-        int size = coords.length / 2;
+        int size = coords.length;
         Coordinate[] c = new Coordinate[size];
-        int oix = 0;
         int oiy = 0;
         for (int i = 0; i < c.length; i++) {
-            int ix = oix + coords[i * 2];
-            int iy = oiy + coords[i * 2 + 1];
-            c[i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
-            oix = ix;
+            int iy = oiy + coords[i];
+            c[i] = new Coordinate(
+                    i == c.length - 1 ?
+                            lengthM :
+                            i * distanceBetweenSamplesM, iy / FIXED_FLOAT_MULT);
             oiy = iy;
         }
         return new PackedCoordinateSequence.Double(c, 2);
     }
+
+    public static void setDistanceBetweenSamplesM(double distance) {
+        distanceBetweenSamplesM = distance;
+    }
+
 }
