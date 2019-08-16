@@ -7,11 +7,9 @@ import org.locationtech.jts.geom.CoordinateSequence;
 
 public class CompactElevationProfileTest extends TestCase {
 
-    private final static double DISTANCE_BETWEEN_SAMPLES = 10;
-
     public final void testEncodingDecoding() {
-
-        CompactElevationProfile.setDistanceBetweenSamplesM(DISTANCE_BETWEEN_SAMPLES);
+        CompactElevationProfile.setDistanceBetweenSamplesM(
+                CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
 
         runOneTest(new Coordinate[] {
                 new Coordinate(0.0, 0.0),

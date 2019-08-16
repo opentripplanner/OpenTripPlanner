@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -174,7 +175,7 @@ public class GraphBuilderParameters {
 
     /**
      * The distance between elevation samples in meters. Defaults to 10m, the approximate resolution of 1/3
-     * arc-second NED data. This should not be smaller than the resolution of the height data used.
+     * arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
      */
     public double distanceBetweenElevationSamples;
 
@@ -213,7 +214,8 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
-        distanceBetweenElevationSamples = config.path("distanceBetweenElevationSamples").asDouble(25);
+        distanceBetweenElevationSamples = config.path("distanceBetweenElevationSamples").asDouble(
+                CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     }
 
 

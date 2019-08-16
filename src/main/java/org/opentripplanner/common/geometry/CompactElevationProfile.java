@@ -22,6 +22,8 @@ public final class CompactElevationProfile implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final double DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS = 10;
+
     /**
      * Multipler for fixed-float representation. In meters, the precision is 1 cm (elevation and arc
      * length).
@@ -32,7 +34,7 @@ public final class CompactElevationProfile implements Serializable {
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
      * arc-second NED data.
      */
-    private static double distanceBetweenSamplesM;
+    private static double distanceBetweenSamplesM = DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS;
 
     /**
      * Compact an elevation profile onto a var-len int packed form (Dlugosz coding). This method
