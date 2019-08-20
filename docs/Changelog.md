@@ -2,6 +2,7 @@
 
 ## 2.0 (in progress)
 - Sandbox for experimental features (#2745)
+- Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
 

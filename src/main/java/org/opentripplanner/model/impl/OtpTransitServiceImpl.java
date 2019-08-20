@@ -14,6 +14,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,8 @@ import static java.util.stream.Collectors.groupingBy;
  * @author bdferris
  */
 class OtpTransitServiceImpl implements OtpTransitService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitService.class);
 
     private final Collection<Agency> agencies;
 
@@ -64,9 +68,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private final Collection<Trip> trips;
 
 
-    // Lazy initialized indexes
-
-    private Map<Stop, Collection<Stop>> stopsByStation = null;
+    /**
+     * Note! This field is lazy initialized - this relay on this field NOT
+     * being used BEFORE all data is loaded.
+     */
+    private Map<Stop, List<Stop>> stopsByStation = null;
 
 
     /**
@@ -129,8 +135,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     @Override
     public List<Stop> getStopsForStation(Stop station) {
-        ensureStopForStations();
-        return immutableList(stopsByStation.get(station));
+        if(stopsByStation == null) {
+            lazyBuildStopsByStations();
+        }
+        return stopsByStation.get(station);
     }
 
     @Override
@@ -161,19 +169,33 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /*  Private Methods */
 
-    private void ensureStopForStations() {
-        if (stopsByStation == null) {
-            stopsByStation = new HashMap<>();
-            for (Stop stop : getAllStops()) {
-                if (stop.getLocationType() == 0 && stop.getParentStation() != null) {
-                    Stop parentStation = getStopForId(
-                            new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation()));
-                    Collection<Stop> subStops = stopsByStation
-                            .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
-                    subStops.add(stop);
-                }
+    private void lazyBuildStopsByStations() {
+        stopsByStation = new HashMap<>();
+        for (Stop stop : getAllStops()) {
+            if (stop.isPlatform() && stop.getParentStation() != null) {
+                Stop parentStation = getStopForId(
+                        new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation()));
+                Collection<Stop> subStops = stopsByStation
+                        .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
+                subStops.add(stop);
             }
         }
+
+        for (Map.Entry<Stop, List<Stop>> entry : stopsByStation.entrySet()) {
+            entry.setValue(Collections.unmodifiableList(entry.getValue()));
+        }
+
+        // Log warnings for Stations without Platforms - this is not allowed according to the
+        // GTFS specification. OTP will treat these Stations as a Platform - but there might be
+        // hick-ups.
+        // See: locationType = 1,t https://developers.google.com/transit/gtfs/reference/#stopstxt
+        getAllStops().stream()
+                .filter(this::isStationWithoutPlatforms)
+                .forEach(it -> {
+                    LOG.warn("The Station is missing Platforms: {}", it);
+                    it.convertStationToStop();
+
+                });
     }
 
     private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(Collection<ShapePoint> shapePoints) {
@@ -196,5 +218,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
             list = new ArrayList<>(c);
         }
         return Collections.unmodifiableList(list);
+    }
+
+    private boolean isStationWithoutPlatforms(Stop it) {
+        return it.isStation() & stopsByStation.get(it) == null;
     }
 }

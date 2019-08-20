@@ -7,6 +7,10 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     private static final int MISSING_VALUE = -999;
 
+    // the location types for transfers.txt
+    static final int PLATFORM_LOCATION_TYPE = 0;
+    static final int PARENT_STATION_LOCATION_TYPE = 1;
+
     private FeedScopedId id;
 
     private String name;
@@ -123,8 +127,33 @@ public final class Stop extends IdentityBean<FeedScopedId> {
         this.url = url;
     }
 
+    /**
+     * Consider using the {@link #isPlatform()} and {@link #isStation()} instead.
+     */
     public int getLocationType() {
         return locationType;
+    }
+
+    /**
+     * Stop (or "Platform"). A location where passengers board or disembark
+     * from a transit vehicle. Stops are called a "platform" when they're
+     * defined within a parent_station.
+     * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
+     * <p/>
+     * <code>locationType=0</code>
+     */
+    public boolean isPlatform() {
+        return locationType == PLATFORM_LOCATION_TYPE;
+    }
+
+    /**
+     * Station. A physical structure or area that contains one or more platforms.
+     * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
+     * <p/>
+     * <code>locationType=1</code>
+     */
+    public boolean isStation() {
+        return locationType == PARENT_STATION_LOCATION_TYPE;
     }
 
     public void setLocationType(int locationType) {
@@ -190,5 +219,16 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     public void setPlatformCode(String platformCode) {
         this.platformCode = platformCode;
+    }
+
+    /**
+     * This method convert a station to a stop(default location type in GTFS).
+     * This can be done to account for missing platforms in the input data.
+     */
+    public void convertStationToStop() {
+        if(!isStation()) {
+            throw new IllegalStateException("This method is only defined for Stations");
+        }
+        locationType = PLATFORM_LOCATION_TYPE;
     }
 }

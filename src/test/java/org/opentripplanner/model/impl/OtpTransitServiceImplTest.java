@@ -2,20 +2,20 @@ package org.opentripplanner.model.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.ConstantsForTests;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ import java.util.List;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class OtpTransitServiceImplTest {
@@ -104,6 +106,27 @@ public class OtpTransitServiceImplTest {
 
         assertEquals(9, transfers.size());
         assertEquals("<Transfer stop=Z_F..Z_E>", first(transfers).toString());
+    }
+
+    @Test
+    public void getTransfersWhenStationHasNoPlatfromsShouldNotFail() {
+        OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
+
+        Stop stationWithoutPlatforms = new Stop();
+        stationWithoutPlatforms.setId(new FeedScopedId("A", "123"));
+        stationWithoutPlatforms.setLocationType(1);
+        stationWithoutPlatforms.setName("Station without platforms");
+        builder.getStops().add(stationWithoutPlatforms);
+
+        OtpTransitService service = new OtpTransitServiceImpl(builder);
+
+        List<Stop> platforms = service.getStopsForStation(stationWithoutPlatforms);
+
+        assertNull("No platforms forund", platforms);
+        assertTrue(
+                "The type is changed from Station to Platform",
+                stationWithoutPlatforms.isPlatform()
+        );
     }
 
     @Test
