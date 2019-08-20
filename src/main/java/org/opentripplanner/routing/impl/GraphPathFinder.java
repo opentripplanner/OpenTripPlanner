@@ -1,18 +1,15 @@
 package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
@@ -66,12 +63,12 @@ public class GraphPathFinder {
      * work with (in the case of the more sophisticated bidirectional heuristic, which improves over time).
      */
     public List<GraphPath> getPaths(RoutingRequest options) {
-
-        RoutingRequest originalReq = options.clone();
-
         if (options == null) {
             LOG.error("PathService was passed a null routing request.");
             return null;
+        }
+        if (options.modes.isTransit()) {
+            throw new UnsupportedOperationException("Transit search not supported");
         }
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
@@ -86,28 +83,15 @@ public class GraphPathFinder {
             // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
-        // Without transit, we'd just just return multiple copies of the same on-street itinerary.
-        if (!options.modes.isTransit()) {
-            options.numItineraries = 1;
-        }
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
         // Choose an appropriate heuristic for goal direction.
         RemainingWeightHeuristic heuristic;
-        RemainingWeightHeuristic reversedSearchHeuristic;
         if (options.disableRemainingWeightHeuristic || options.oneToMany) {
             heuristic = new TrivialRemainingWeightHeuristic();
-            reversedSearchHeuristic = new TrivialRemainingWeightHeuristic();
-        } else if (options.modes.isTransit()) {
-            // Only use the BiDi heuristic for transit. It is not very useful for on-street modes.
-            // heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
-            // Use a simplistic heuristic until BiDi heuristic is improved, see #2153
-            heuristic = new InterleavedBidirectionalHeuristic();
-            reversedSearchHeuristic = new InterleavedBidirectionalHeuristic();
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
-            reversedSearchHeuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
@@ -128,7 +112,7 @@ public class GraphPathFinder {
          *
          * After the limited areas of the street network around the origin and destination are explored, the
          * options.maxWalkDistance will be set to unlimited for similar reasons to maxTransfers above. That happens
-         * in method org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic.initialize
+         * in method org.opentripplanner.routing.algorithm.astar.strategies.InterleavedBidirectionalHeuristic.initialize
          */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
@@ -161,24 +145,6 @@ public class GraphPathFinder {
                 break;
             }
 
-            // Do a full reversed search to compact the legs
-            if(options.compactLegsByReversedSearch){
-                newPaths = compactLegsByReversedSearch(aStar, originalReq, options, newPaths, timeout, reversedSearchHeuristic);
-            }
-
-            // Find all trips used in this path and ban them for the remaining searches
-            for (GraphPath path : newPaths) {
-                // path.dump();
-                List<FeedScopedId> tripIds = path.getTrips();
-                for (FeedScopedId tripId : tripIds) {
-                    options.banTrip(tripId);
-                }
-                if (tripIds.isEmpty()) {
-                    // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
-                    options.onlyTransitTrips = true;
-                }
-            }
-
             paths.addAll(newPaths.stream()
                     .filter(path -> {
                         double duration = options.useRequestedDateTimeInMaxHours
@@ -195,137 +161,6 @@ public class GraphPathFinder {
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, options.getPathComparator(options.arriveBy));
         return paths;
-    }
-
-    /**
-     * Do a full reversed search to compact the legs of the path.
-     *
-     * By doing a reversed search we are looking for later departures that will still be in time for transfer
-     * to the next trip, shortening the transfer wait time. Also considering other routes than the ones found
-     * in the original search.
-     *
-     * For arrive-by searches, we are looking to shorten transfer wait time and rather arrive earlier.
-     */
-    private List<GraphPath> compactLegsByReversedSearch(AStar aStar, RoutingRequest originalReq, RoutingRequest options,
-                                                        List<GraphPath> newPaths, double timeout,
-                                                        RemainingWeightHeuristic remainingWeightHeuristic){
-        List<GraphPath> reversedPaths = new ArrayList<>();
-        for(GraphPath newPath : newPaths){
-            State targetAcceptedState = options.arriveBy ? newPath.states.getLast().reverse() : newPath.states.getLast();
-            if(targetAcceptedState.stateData.getNumBooardings() < 2) {
-                reversedPaths.add(newPath);
-                continue;
-            }
-            final long arrDepTime = targetAcceptedState.getTimeSeconds();
-            LOG.debug("Dep time: " + new Date(newPath.getStartTime() * 1000));
-            LOG.debug("Arr time: " + new Date(newPath.getEndTime() * 1000));
-
-            // find first/last transit stop
-            Vertex transitStop = null;
-            long transitStopTime = arrDepTime;
-            while (transitStop == null) {
-                if(targetAcceptedState.backEdge instanceof TransitBoardAlight){
-                    if(options.arriveBy){
-                        transitStop = targetAcceptedState.backEdge.getFromVertex();
-                    }else{
-                        transitStop = targetAcceptedState.backEdge.getToVertex();
-                    }
-                    transitStopTime = targetAcceptedState.getTimeSeconds();
-                }
-                targetAcceptedState = targetAcceptedState.getBackState();
-            }
-
-            // find the path from transitStop to origin/destination
-            Vertex fromVertex = options.arriveBy ? options.rctx.fromVertex : transitStop;
-            Vertex toVertex = options.arriveBy ? transitStop : options.rctx.toVertex;
-            RoutingRequest reversedTransitRequest = createReversedTransitRequest(originalReq, options, fromVertex, toVertex,
-                    arrDepTime, new EuclideanRemainingWeightHeuristic());
-            aStar.getShortestPathTree(reversedTransitRequest, timeout);
-            List<GraphPath> pathsToTarget = aStar.getPathsToTarget();
-            if(pathsToTarget.isEmpty()){
-                reversedPaths.add(newPath);
-                continue;
-            }
-            GraphPath walkPath = pathsToTarget.get(0);
-
-            // do the reversed search to/from transitStop
-            Vertex fromTransVertex = options.arriveBy ? transitStop : options.rctx.fromVertex;
-            Vertex toTransVertex = options.arriveBy ? options.rctx.toVertex: transitStop;
-            RoutingRequest reversedMainRequest = createReversedMainRequest(originalReq, options, fromTransVertex,
-                    toTransVertex, transitStopTime, remainingWeightHeuristic);
-            aStar.getShortestPathTree(reversedMainRequest, timeout);
-
-            List<GraphPath> newRevPaths = aStar.getPathsToTarget();
-            if (newRevPaths.isEmpty()) {
-                reversedPaths.add(newPath);
-            }else{
-                List<GraphPath> joinedPaths = new ArrayList<>();
-                for(GraphPath newRevPath : newRevPaths){
-                    LOG.debug("REV Dep time: " + new Date(newRevPath.getStartTime() * 1000));
-                    LOG.debug("REV Arr time: " + new Date(newRevPath.getEndTime() * 1000));
-                    List<GraphPath> concatenatedPaths = Arrays.asList(newRevPath, walkPath);
-                    if(options.arriveBy){
-                        Collections.reverse(concatenatedPaths);
-                    }
-                    GraphPath joinedPath = joinPaths(concatenatedPaths);
-
-                    if((!options.arriveBy && joinedPath.states.getFirst().getTimeInMillis() > options.dateTime * 1000) ||
-                            (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
-                        joinedPaths.add(joinedPath);
-                        if(newPaths.size() > 1){
-                            for (FeedScopedId tripId : joinedPath.getTrips()) {
-                                options.banTrip(tripId);
-                            }
-                        }
-                    }
-                }
-                reversedPaths.addAll(joinedPaths);
-            }
-        }
-        return reversedPaths.isEmpty() ? newPaths : reversedPaths;
-    }
-
-
-
-    private RoutingRequest createReversedTransitRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
-                                                 Vertex toVertex, long arrDepTime, RemainingWeightHeuristic remainingWeightHeuristic){
-
-        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex, toVertex,
-                arrDepTime, new EuclideanRemainingWeightHeuristic());
-        if((originalReq.parkAndRide || originalReq.kissAndRide) && !originalReq.arriveBy){
-            request.parkAndRide = false;
-            request.kissAndRide = false;
-            request.modes.setCar(false);
-        }
-        request.maxWalkDistance = CLAMP_MAX_WALK;
-        return request;
-    }
-
-    private RoutingRequest createReversedMainRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
-                                                        Vertex toVertex, long dateTime, RemainingWeightHeuristic remainingWeightHeuristic){
-        RoutingRequest request = createReversedRequest(originalReq, options, fromVertex,
-                toVertex, dateTime, remainingWeightHeuristic);
-        if((originalReq.parkAndRide || originalReq.kissAndRide) && originalReq.arriveBy){
-            request.parkAndRide = false;
-            request.kissAndRide = false;
-            request.modes.setCar(false);
-        }
-        return request;
-
-    }
-
-    private RoutingRequest createReversedRequest(RoutingRequest originalReq, RoutingRequest options, Vertex fromVertex,
-                                                 Vertex toVertex, long dateTime, RemainingWeightHeuristic remainingWeightHeuristic){
-        RoutingRequest reversedOptions = originalReq.clone();
-        reversedOptions.dateTime = dateTime;
-        reversedOptions.setArriveBy(!originalReq.arriveBy);
-        reversedOptions.setRoutingContext(router.graph, fromVertex, toVertex);
-        reversedOptions.dominanceFunction = new DominanceFunction.MinimumWeight();
-        reversedOptions.rctx.remainingWeightHeuristic = remainingWeightHeuristic;
-        reversedOptions.maxTransfers = 4;
-        reversedOptions.longDistance = true;
-        reversedOptions.bannedTrips = options.bannedTrips;
-        return reversedOptions;
     }
 
     /* Try to find N paths through the Graph */
@@ -463,44 +298,4 @@ public class GraphPathFinder {
         }
         return newPath;
     }
-
-/*
-    TODO reimplement
-    This should probably be done with a special value in the departure/arrival time.
-
-    public static TripPlan generateFirstTrip(RoutingRequest request) {
-        request.setArriveBy(false);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-        return generate(request);
-    }
-
-    public static TripPlan generateLastTrip(RoutingRequest request) {
-        request.setArriveBy(true);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-
-        return generate(request);
-    }
-*/
-
 }

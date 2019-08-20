@@ -1,14 +1,21 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.*;
-import java.util.Map.Entry;
-
+import com.google.common.base.Preconditions;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 // this is only currently in edgetype because that's where Trippattern is.
 // move these classes elsewhere.
@@ -22,6 +29,9 @@ import com.google.common.base.Preconditions;
  * relative arrival and departure times of other trips that have not necessarily been boarded.
  *
  * At this point, only one writing thread at a time is supported.
+ *
+ *  TODO OTP2 - Move this to package: org.opentripplanner.model
+ *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
 public class TimetableSnapshot {
 
@@ -87,8 +97,7 @@ public class TimetableSnapshot {
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
     // FIXME: this could be made into a flat hashtable with compound keys.
-    private HashMap<TripPattern, SortedSet<Timetable>> timetables =
-            new HashMap<TripPattern, SortedSet<Timetable>>();
+    private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
     /**
      * <p>
@@ -130,7 +139,6 @@ public class TimetableSnapshot {
         if(sortedTimetables != null && serviceDate != null) {
             for(Timetable timetable : sortedTimetables) {
                 if (timetable != null && timetable.isValidFor(serviceDate)) {
-                    LOG.trace("returning modified timetable");
                     return timetable;
                 }
             }

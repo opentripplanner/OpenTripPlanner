@@ -45,11 +45,7 @@ public class TripPatternCache {
             // Finish scheduled time table
             tripPattern.scheduledTimetable.finish();
             
-            // Create vertices and edges for new TripPattern
-            // TODO: purge these vertices and edges once in a while?
-            tripPattern.makePatternVerticesAndEdges(graph, graph.index.stopVertexForStop);
-            
-            // TODO: Add pattern to graph index? 
+            // TODO: Add pattern to graph index?
             
             // Add pattern to cache
             cache.put(stopPattern, tripPattern);

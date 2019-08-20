@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.astar;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -44,6 +44,8 @@ public class AStar {
     enum RunStatus {
         RUNNING, STOPPED
     }
+
+    private SkipEdgeStrategy skipEdgeStrategy;
 
     /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
     class RunState {
@@ -164,8 +166,13 @@ public class AStar {
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
+            if (skipEdgeStrategy != null &&
+                    skipEdgeStrategy.shouldSkipEdge(null,null,null, edge,null,null)) {
+                continue;
+            }
+
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
-            // returning NULL), the iteration is over. TODO Use this to board multiple trips.
+            // returning NULL), the iteration is over.
             for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
                 // Could be: for (State v : traverseEdge...)
 
@@ -355,5 +362,9 @@ public class AStar {
             }
         }
         return ret;
+    }
+
+    public void setSkipEdgeStrategy(SkipEdgeStrategy skipEdgeStrategy) {
+        this.skipEdgeStrategy = skipEdgeStrategy;
     }
 }

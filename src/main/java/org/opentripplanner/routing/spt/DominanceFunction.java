@@ -2,9 +2,7 @@ package org.opentripplanner.routing.spt;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -40,25 +38,6 @@ public abstract class DominanceFunction implements Serializable {
      * applied when the two states have all these variables in common (are on the same plane).
      */
     public boolean betterOrEqualAndComparable(State a, State b) {
-
-        // States before boarding transit and after riding transit are incomparable.
-        // This allows returning transit options even when walking to the destination is the optimal strategy.
-        if (a.isEverBoarded() != b.isEverBoarded()) {
-            return false;
-        }
-
-        // The result of a SimpleTransfer must not block alighting normally from transit. States that are results of
-        // SimpleTransfers are incomparable with states that are not the result of SimpleTransfers.
-        if ((a.backEdge instanceof SimpleTransfer) != (b.backEdge instanceof SimpleTransfer)) {
-            return false;
-        }
-
-        // A TimedTransferEdge might be invalidated later, when we have boarded the next trip and have all the information
-        // we need to check the specificity. We do not want states that might be invalidated to dominate other valid
-        // states.
-        if ((a.backEdge instanceof TimedTransferEdge) || (b.backEdge instanceof TimedTransferEdge)) {
-            return false;
-        }
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
         if (a.isBikeRenting() != b.isBikeRenting()) {

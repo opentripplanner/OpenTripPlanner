@@ -24,9 +24,6 @@ public class TransferEdge extends Edge {
 
     private boolean wheelchairAccessible = true;
 
-    /**
-     * @see Transfer(Vertex, Vertex, double, int)
-     */
     public TransferEdge(TransitStationStop fromv, TransitStationStop tov, double distance) {
         this(fromv, tov, distance, (int) distance);
     }

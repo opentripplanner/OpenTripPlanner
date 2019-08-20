@@ -22,7 +22,7 @@ public class MergeTripPatternForDatesTest {
     @Test
     public void testMergeTripPatterns() {
         List<TripSchedule> tripSchedules = new ArrayList<>();
-        tripSchedules.add(new TripScheduleImpl(null, null, null, null, 0));
+        tripSchedules.add(new TripScheduleImpl());
 
         LocalDate first = LocalDate.of(2019, 3, 30);
         LocalDate second = LocalDate.of(2019, 3, 31);

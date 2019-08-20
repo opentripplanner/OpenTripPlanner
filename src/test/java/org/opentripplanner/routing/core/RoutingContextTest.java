@@ -5,7 +5,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.Collections;
 import java.util.TimeZone;
@@ -68,7 +68,7 @@ public class RoutingContextTest {
     }
 
     private void verifyServiceDays(RoutingRequest routingRequest, Graph graph, ServiceDate ... dates) {
-        RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, mock(PatternArriveVertex.class));
+        RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, mock(StreetVertex.class));
 
         for(int i = 0; i < dates.length; ++i) {
             assertEquals("date " + i, dates[i], routingContext.serviceDays.get(i).getServiceDate());

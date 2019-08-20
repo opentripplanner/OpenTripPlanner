@@ -8,26 +8,24 @@ import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,13 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -47,6 +51,9 @@ import java.util.*;
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
+ *
+ *  TODO OTP2 - Move this to package: org.opentripplanner.model
+ *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern implements Cloneable, Serializable {
 
@@ -54,13 +61,13 @@ public class TripPattern implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
-    public static final int MASK_PICKUP = 2|4;
-    public static final int SHIFT_PICKUP = 1;
-    public static final int MASK_DROPOFF = 8|16;
-    public static final int SHIFT_DROPOFF = 3;
-    public static final int NO_PICKUP = 1;
-    public static final int FLAG_BIKES_ALLOWED = 32;
+    private static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
+    private static final int MASK_PICKUP = 2|4;
+    private static final int SHIFT_PICKUP = 1;
+    private static final int MASK_DROPOFF = 8|16;
+    private static final int SHIFT_DROPOFF = 3;
+    private static final int NO_PICKUP = 1;
+    //private static final int FLAG_BIKES_ALLOWED = 32;
 
     /**
      * The GTFS Route of all trips in this pattern.
@@ -100,16 +107,14 @@ public class TripPattern implements Cloneable, Serializable {
      */
     public String code;
 
-    /* The vertices in the Graph that correspond to each Stop in this pattern. */
-    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. FIXME they appear to be all null. are they even used?
-    public final PatternDepartVertex[] departVertices;
-    public final PatternArriveVertex[] arriveVertices;
-
-    /* The Edges in the graph that correspond to each Stop in this pattern. */
-    public final TransitBoardAlight[]  boardEdges;
-    public final TransitBoardAlight[]  alightEdges;
-    public final PatternHop[]          hopEdges;
-    public final PatternDwell[]        dwellEdges;
+    /**
+     * The vertices in the Graph that correspond to each Stop in this pattern.
+     * Note: these are not unique to this pattern, and could be shared in the stop.
+     * FIXME they appear to be all null. are they even used?
+     * TODO OTP2 - This is not used and can be removed. It is initialized in the
+     * TODO OTP2 - PatternHopFactory, but never accessed after that.
+     */
+    public final TransitStop[] stopVertices;
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
@@ -124,19 +129,53 @@ public class TripPattern implements Cloneable, Serializable {
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    /** Used by the MapBuilder (and should be exposed by the Index API). */
-    public LineString geometry = null;
-
     /**
-     * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
-     * the same stops and a PatternHop apply to all those trips, so this array apply to every trip
-     * in every timetable in this pattern. Please note that the array size is the number of stops
-     * minus 1. This also allow to access the ordered list of stops.
-     *
-     * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
-     * stopPattern.
+     * Geometries of each inter-stop segment of the tripPattern.
      */
-    private PatternHop[] patternHops; // TODO rename/merge with hopEdges
+    private byte[][] hopGeometries = null;
+
+
+    public LineString getHopGeometry(int stopIndex) {
+        TransitStop transitStopStart = stopVertices[stopIndex];
+        TransitStop transitStopEnd = stopVertices[stopIndex + 1];
+
+        if (hopGeometries != null) {
+            return CompactLineString.uncompactLineString(
+                    hopGeometries[stopIndex],
+                    false
+            );
+        } else {
+            return GeometryUtils.getGeometryFactory()
+                    .createLineString(
+                            new Coordinate[] {
+                                    transitStopStart.getCoordinate(),
+                                    transitStopEnd.getCoordinate() });
+        }
+    }
+
+    public void setHopGeometries(LineString[] hopGeometries) {
+        this.hopGeometries = new byte[hopGeometries.length][];
+
+        for (int i = 0; i < hopGeometries.length; i++) {
+            setHopGeometry(i, hopGeometries[i]);
+        }
+    }
+
+    public void setHopGeometry(int i, LineString hopGeometry) {
+        this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry,false);
+    }
+
+    public LineString getGeometry() {
+        List<LineString> lineStrings = new ArrayList<>();
+        for (int i = 0; i < hopGeometries.length - 1; i++) {
+            lineStrings.add(getHopGeometry(i));
+        }
+        return GeometryUtils.concatenateLineStrings(lineStrings);
+    }
+
+    public int numHopGeometries() {
+        return hopGeometries.length;
+    }
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
@@ -153,18 +192,8 @@ public class TripPattern implements Cloneable, Serializable {
         this.route = route;
         this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
-        int size = stopPattern.size;
+        this.stopVertices = new TransitStop[stopPattern.size];
         setStopsFromStopPattern(stopPattern);
-
-        /* Create properly dimensioned arrays for all the vertices/edges associated with this pattern. */
-        stopVertices   = new TransitStop[size];
-        departVertices = new PatternDepartVertex[size];
-        arriveVertices = new PatternArriveVertex[size];
-        boardEdges     = new TransitBoardAlight[size];
-        alightEdges    = new TransitBoardAlight[size];
-        // one less hop than stops
-        hopEdges       = new PatternHop[size - 1];
-        dwellEdges     = new PatternDwell[size];
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -178,7 +207,6 @@ public class TripPattern implements Cloneable, Serializable {
     // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
     // TODO get rid of the per stop flags and just use the values in StopPattern, or an Enum
     private void setStopsFromStopPattern(StopPattern stopPattern) {
-        patternHops = new PatternHop[stopPattern.size - 1];
         perStopFlags = new int[stopPattern.size];
         int i = 0;
         for (Stop stop : stopPattern.stops) {
@@ -193,24 +221,11 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     public Stop getStop(int stopIndex) {
-        if (stopIndex == patternHops.length) {
-            return patternHops[stopIndex - 1].getEndStop();
-        } else {
-            return patternHops[stopIndex].getBeginStop();
-        }
+        return stopPattern.stops[stopIndex];
     }
 
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
-    }
-
-    public List<PatternHop> getPatternHops() {
-        return Arrays.asList(patternHops);
-    }
-
-    /* package private */
-    void setPatternHop(int stopIndex, PatternHop patternHop) {
-        patternHops[stopIndex] = patternHop;
     }
 
     public Trip getTrip(int tripIndex) {
@@ -483,70 +498,6 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     /**
-     * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
-     * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
-     * needed for shape distances (actually, stop sequence numbers?).
-     *
-     * @param graph graph to create vertices and edges in
-     * @param transitStops map of transit stops given the stop; it is assumed all stops of this trip
-     *        pattern are included in this map and refer to TransitStops
-     */
-    public void makePatternVerticesAndEdges(Graph graph, Map<Stop, ? extends TransitStationStop> transitStops) {
-
-        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */
-        PatternArriveVertex pav0, pav1 = null;
-        PatternDepartVertex pdv0;
-        int nStops = stopPattern.size;
-        for (int stop = 0; stop < nStops - 1; stop++) {
-            Stop s0 = stopPattern.stops[stop];
-            Stop s1 = stopPattern.stops[stop + 1];
-            pdv0 = new PatternDepartVertex(graph, this, stop);
-            departVertices[stop] = pdv0;
-            if (stop > 0) {
-                pav0 = pav1;
-                dwellEdges[stop] = new PatternDwell(pav0, pdv0, stop, this);
-            }
-            pav1 = new PatternArriveVertex(graph, this, stop + 1);
-            arriveVertices[stop + 1] = pav1;
-            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
-
-            /* Get the arrive and depart vertices for the current stop (not pattern stop). */
-            TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;
-            TransitStopArrive stopArrive = ((TransitStop) transitStops.get(s1)).arriveVertex;
-
-            /* Record the transit stop vertices visited on this pattern. */
-            stopVertices[stop] = stopDepart.getStopVertex();
-            stopVertices[stop + 1] = stopArrive.getStopVertex(); // this will only have an effect on the last stop
-
-            /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
-            if (this.canBoard(stop)) {
-                boardEdges[stop] = new TransitBoardAlight(stopDepart, pdv0, stop, mode);
-            }
-            if (this.canAlight(stop + 1)) {
-                alightEdges[stop + 1] = new TransitBoardAlight(pav1, stopArrive, stop + 1, mode);
-            }
-        }
-    }
-
-    public void dumpServices() {
-        Set<FeedScopedId> services = Sets.newHashSet();
-        for (Trip trip : this.trips) {
-            services.add(trip.getServiceId());
-        }
-        LOG.info("route {} : {}", route, services);
-    }
-
-    public void dumpVertices() {
-        for (int i = 0; i < this.stopPattern.size; ++i) {
-            Vertex arrive = arriveVertices[i];
-            Vertex depart = departVertices[i];
-            System.out.format("%s %02d %s %s\n", this.code, i,
-                    arrive == null ? "NULL" : arrive.getLabel(),
-                    depart == null ? "NULL" : depart.getLabel());
-        }
-    }
-
-    /**
      * A bit of a strange place to set service codes all at once when TripTimes are already added,
      * but we need a reference to the Graph or at least the codes map. This could also be
      * placed in the hop factory itself.
@@ -598,35 +549,6 @@ public class TripPattern implements Cloneable, Serializable {
     public String toString () {
         return String.format("<TripPattern %s>", this.code);
     }
-
-    /**
-     * Generates a geometry for the full pattern.
-     * This is done by concatenating the shapes of all the constituent hops.
-     * It could probably just come from the full shapes.txt entry for the trips in the route, but given all the details
-     * in how the individual hop geometries are constructed we just recombine them here.
-     */
-    public void makeGeometry() {
-        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-        if (patternHops != null && patternHops.length > 0) {
-            for (int i = 0; i < patternHops.length; i++) {
-                LineString geometry = patternHops[i].getGeometry();
-                if (geometry != null) {
-                    if (coordinates.size() == 0) {
-                        coordinates.extend(geometry.getCoordinates());
-                    } else {
-                        coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplicate coords at stops
-                    }
-                }
-            }
-            // The CoordinateArrayListSequence is easy to append to, but is not serializable.
-            // It might be possible to just mark it serializable, but it is not particularly compact either.
-            // So we convert it to a packed coordinate sequence, since that is serializable and smaller.
-            // FIXME It seems like we could simply accumulate the coordinates into an array instead of using the CoordinateArrayListSequence.
-            PackedCoordinateSequence packedCoords = new PackedCoordinateSequence.Double(coordinates.toCoordinateArray(), 2);
-            this.geometry = GeometryUtils.getGeometryFactory().createLineString(packedCoords);
-        }
-    }
-
 
 	public Trip getExemplar() {
 		if(this.trips.isEmpty()){

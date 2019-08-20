@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.strategies;
+package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.util.HashSet;
 import java.util.Set;

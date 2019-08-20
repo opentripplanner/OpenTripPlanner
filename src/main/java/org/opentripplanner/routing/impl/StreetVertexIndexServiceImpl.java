@@ -187,7 +187,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternEdge || e instanceof SimpleTransfer)
+                if (e instanceof SimpleTransfer)
                     continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {

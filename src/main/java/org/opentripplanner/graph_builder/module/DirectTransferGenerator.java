@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit network among themselves. This is necessary for
- * routing in long-distance mode.
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit
+ * network among themselves. This is necessary for routing in long-distance mode.
  *
  * It will use the street network if OSM data has already been loaded into the graph.
  * Otherwise it will use straight-line distance between stops.

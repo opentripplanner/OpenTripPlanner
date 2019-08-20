@@ -10,9 +10,6 @@ import java.util.Map;
 
 public class TransitLayer {
 
-
-
-
     /**
      * Transit data required for routing
      */

@@ -148,7 +148,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
                 .type(patternType)
-                .dataFetcher(environment -> index.patternForId
+                .dataFetcher(environment -> index.graph.tripPatternForId
                     .get(((StopTimesInPattern) environment.getSource()).pattern.id))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -537,7 +537,7 @@ public class IndexGraphQLSchema {
                 .name("geometry")
                 .type(Scalars.GraphQLString) //TODO: Should be geometry
                 .dataFetcher(environment -> index.patternForTrip
-                    .get((Trip) environment.getSource()).geometry.getCoordinateSequence())
+                    .get((Trip) environment.getSource()).getGeometry())
                 .build())
             .build();
 
@@ -603,7 +603,7 @@ public class IndexGraphQLSchema {
                 .name("geometry")
                 .type(new GraphQLList(coordinateType))
                 .dataFetcher(environment -> {
-                    LineString geometry = ((TripPattern) environment.getSource()).geometry;
+                    LineString geometry = ((TripPattern) environment.getSource()).getGeometry();
                     if (geometry == null) {
                         return null;
                     } else {
@@ -773,7 +773,7 @@ public class IndexGraphQLSchema {
                     return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
                 }
                 if (id.type.equals(patternType.getName())) {
-                    return index.patternForId.get(id.id);
+                    return index.graph.tripPatternForId.get(id.id);
                 }
                 if (id.type.equals(agencyType.getName())) {
                     return index.getAgencyWithoutFeedId(id.id);
@@ -985,7 +985,7 @@ public class IndexGraphQLSchema {
                 .name("patterns")
                 .description("Get all patterns for the specified graph")
                 .type(new GraphQLList(patternType))
-                .dataFetcher(environment -> new ArrayList<>(index.patternForId.values()))
+                .dataFetcher(environment -> new ArrayList<>(index.graph.tripPatternForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
@@ -995,7 +995,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.patternForId.get(environment.getArgument("id")))
+                .dataFetcher(environment -> index.graph.tripPatternForId.get(environment.getArgument("id")))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("viewer")

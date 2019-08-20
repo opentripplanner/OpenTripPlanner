@@ -1,17 +1,15 @@
 package org.opentripplanner.routing.core;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -242,11 +240,6 @@ public class RoutingContext implements Cloneable {
             }
         }
 
-        if (opt.startingTransitStopId != null) {
-            Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
-            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            startingStop = tstop.departVertex;
-        }
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
@@ -324,7 +317,7 @@ public class RoutingContext implements Cloneable {
         }
     }
 
-    /** check if the start and end locations are accessible */
+    /** Check if the start and end locations are accessible. */
     public boolean isAccessible() {
         if (opt.wheelchairAccessible) {
             return isWheelchairAccessible(fromVertex) && isWheelchairAccessible(toVertex);

@@ -1,13 +1,9 @@
 package org.opentripplanner.routing.graph;
 
-import com.conveyal.kryo.TIntArrayListSerializer;
-import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -15,32 +11,27 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
-import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
-import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.TDoubleList;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.linked.TDoubleLinkedList;
-import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -56,7 +47,6 @@ import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -67,14 +57,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -119,8 +105,8 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     private GraphBundle bundle;
 
-    /* Vertex index by name is reconstructed from edges. TODO Is this actually needed? */
-    private transient Map<String, Vertex> vertices;
+    /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
+    private Map<String, Vertex> vertices = new ConcurrentHashMap<>();
 
     private transient CalendarService calendarService;
 
@@ -197,38 +183,84 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** True if direct single-edge transfers were generated between transit stops in this Graph. */
     public boolean hasDirectTransfers = false;
 
-    /** True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0). */
+    /**
+     * True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0).
+     */
     public boolean hasFrequencyService = false;
 
-    /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
+    /**
+     * True if schedule-based services exist in this Graph (including GTFS frequencies with
+     * exact_times = 1).
+     */
     public boolean hasScheduledService = false;
 
-    /** Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or ferries. */
+    /**
+     * Has information how much time boarding a vehicle takes. Can be significant
+     * eg in airplanes or ferries.
+     */
     public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
 
-    /** Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or ferries. */
+    /**
+     * Has information how much time alighting a vehicle takes. Can be significant
+     * eg in airplanes or ferries.
+     */
     public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
 
-    /** The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's center */
+    /**
+     * The difference in meters between the WGS84 ellipsoid height and geoid height
+     * at the graph's center
+     */
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
-    /** Data model for Raptor routing */
+    /**
+     * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
+     * vertices/edges anymore.
+     */
+    public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+
+    /** Interlining relationships between trips. */
+    public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
+
+    /** The distance between elevation samples used in CompactElevationProfile. */
+    private double distanceBetweenElevationSamples;
+
+    /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer transitLayer;
+
+    /** Data model for Raptor routing, with realtime updates applied (if any). */
+    public transient TransitLayer realtimeTransitLayer;
+
+    /**
+     * Hack. I've tried three different ways of generating unique labels.
+     * Previously we were just tolerating edge label collisions.
+     * For some reason we're repeatedly generating splits on the same edge objects, despite a
+     * comment that said it was guaranteed there would only ever be one split per edge. This is
+     * going to fail as soon as we load a base OSM graph and build transit on top of it.
+     */
+    public long nextSplitNumber = 0;
 
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
     }
 
+    // Constructor for deserialization.
     public Graph() {
-        this.vertices = new ConcurrentHashMap<>();
+
     }
 
     /**
-     * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
+     * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph,
+     * when they are constructed or deserialized.
+     *
+     * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
+     * TODO OTP2 - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
+     * TODO OTP2 - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
+     * TODO OTP2 - a VertexCollection class, let the graph hold an instance of this collection,
+     * TODO OTP2 - and create factory methods for each type of Vertex in the VertexCollection.
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
@@ -237,21 +269,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
                 LOG.error("repeatedly added the same vertex: {}", v);
             else
                 LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v);
-        }
-    }
-
-    /**
-     * Removes a vertex from the graph.
-     *
-     * Called from streetutils, must be public for now
-     *
-     * @param v
-     */
-    public void removeVertex(Vertex v) {
-        if (vertices.remove(v.getLabel()) != v) {
-            LOG.error(
-                    "attempting to remove vertex that is not in graph (or mapping value was null): {}",
-                    v);
         }
     }
 
@@ -306,11 +323,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     /**
-     * Return all the edges in the graph.
-     * @return
+     * Return all the edges in the graph. Derived from vertices on demand.
      */
     public Collection<Edge> getEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
         for (Vertex v : this.getVertices()) {
             edges.addAll(v.getOutgoing());
         }
@@ -618,49 +634,49 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
-        Set<TripPattern> tableTripPatterns = Sets.newHashSet();
-        for (PatternArriveVertex pav : Iterables.filter(this.getVertices(), PatternArriveVertex.class)) {
-            tableTripPatterns.add(pav.getTripPattern());
-        }
-        for (TripPattern ttp : tableTripPatterns) {
-            if (ttp != null) ttp.scheduledTimetable.finish(); // skip frequency-based patterns with no table (null)
+        for (TripPattern tp : tripPatternForId.values()) {
+            // Skip frequency-based patterns which have no timetable (null)
+            if (tp != null) tp.scheduledTimetable.finish();
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
 
         /** Create transit layer for Raptor routing */
         LOG.info("Creating transit layer for Raptor routing.");
+        // First for the scheduled timetables.
         this.transitLayer = TransitLayerMapper.map(this);
+        this.realtimeTransitLayer = transitLayer;
+        // Then in a loop, recreate the transitLayer for real-time updated timetables.
+        // This could eventually be done with a PollingGraphUpdater.
+        // TODO OTP2 - Se discussion in PR #2794 (Graph.java@650)
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000 * 20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                if (this.timetableSnapshotSource != null) {
+                    // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
+                    // TODO this is not accounting for any new patterns created by realtime "add trip" messages.
+                    this.realtimeTransitLayer = TransitLayerMapper.map(this);
+                }
+            }
+        }, "Realtime Transit Layer Creator").start();
     }
     
     public static Graph load(InputStream in) {
         // TODO store version information, halt load if versions mismatch
         Input input = new Input(in);
-        Kryo kryo = makeKryo();
-        Graph graph = (Graph) kryo.readClassAndObject(input);
-        LOG.debug("Basic graph info read.");
+        Kryo kryo = SerializedGraphObject.makeKryo();
+        SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
+        Graph graph = serializedGraphObject.graph;
+        LOG.debug("Graph read.");
         if (graph.graphVersionMismatch()) {
             throw new RuntimeException("Graph version mismatch detected.");
         }
-        // Vertex edge lists are transient to avoid excessive recursion depth during serialization.
-        // vertex list is transient because it can be reconstructed from edges.
-        LOG.debug("Loading edges...");
-        List<Edge> edges = (ArrayList<Edge>) kryo.readClassAndObject(input);
-        graph.vertices = new ConcurrentHashMap<>(); // why is this concurrent?
-
-        for (Edge e : edges) {
-            Vertex fromVertex = e.getFromVertex();
-            Vertex toVertex = e.getToVertex();
-            graph.vertices.put(fromVertex.getLabel(), fromVertex);
-            graph.vertices.put(toVertex.getLabel(), toVertex);
-            // Compensating for the fact that we're not using the standard Java de/serialization methods.
-            fromVertex.initEdgeListsIfNeeded();
-            toVertex.initEdgeListsIfNeeded();
-            fromVertex.addOutgoing(e);
-            toVertex.addIncoming(e);
-        }
-
-        LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+        serializedGraphObject.reconstructEdgeLists();
+        LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
         graph.index(new DefaultStreetVertexIndexFactory());
         return graph;
     }
@@ -698,81 +714,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
     }
 
-    /**
-     * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same configuration.
-     * This allows us to use identically configured instances for serialization and deserialization.
-     *
-     * When configuring serializers, there's a difference between kryo.register() and kryo.addDefaultSerializer().
-     * The latter will set the default for a whole tree of classes. The former matches only the specified class.
-     * By default Kryo will serialize all the non-transient fields of an instance. If the class has its own overridden
-     * Java serialization methods Kryo will not automatically use those, a JavaSerializer must be registered.
-     */
-    public static Kryo makeKryo() {
-        // For generating a histogram of serialized classes with associated serializers:
-        // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
-        Kryo kryo = new Kryo();
-        // Allow serialization of unrecognized classes, for which we haven't manually set up a serializer.
-        // We might actually want to manually register a serializer for every class, to be safe.
-        kryo.setRegistrationRequired(false);
-        kryo.setReferences(true);
-        kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
-        kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
-        kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
-        // Kryo's default instantiation and deserialization of BitSets leaves them empty.
-        // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
-        // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
-        kryo.register(BitSet.class, new JavaSerializer());
-        // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
-        // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
-        // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
-        kryo.register(HashBiMap.class, new HashBiMapSerializer());
-        // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
-        // FIXME we're importing all the contributed kryo-serializers just for this one serializer
-        try {
-            Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
-            kryo.addDefaultSerializer(unmodifiableCollection , UnmodifiableCollectionsSerializer.class);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?
-        // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
-        // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
-        // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
-        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
-        return kryo;
-    }
-
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        try {
-            save(new FileOutputStream(file));
-        } catch (Exception e) {
-            file.delete(); // remove half-written file
-            throw e;
-        }
-    }
-
-    public void save(OutputStream outputStream) {
-        Kryo kryo = makeKryo();
-        LOG.debug("Consolidating edges...");
-        Output output = new Output(outputStream);
-        // this is not space efficient
-        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : getVertices()) {
-            // there are assumed to be no edges in an incoming list that are not
-            // in an outgoing list
-            edges.addAll(v.getOutgoing());
-            if (v.getDegreeOut() + v.getDegreeIn() == 0)
-                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
-        }
-        LOG.debug("Writing edges...");
-        kryo.writeClassAndObject(output, this);
-        kryo.writeClassAndObject(output, edges);
-        output.close();
-        LOG.info("Graph written.");
-        // Summarize serialized classes and associated serializers to stdout:
-        // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
+        new SerializedGraphObject(this).save(file);
     }
 
     public CalendarService getCalendarService() {
@@ -968,5 +913,14 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public double getDistanceBetweenElevationSamples() {
+        return distanceBetweenElevationSamples;
+    }
+
+    public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
+        this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
+        CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
 }
