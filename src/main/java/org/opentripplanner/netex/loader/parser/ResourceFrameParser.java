@@ -22,24 +22,24 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
         parseOrganization(frame.getOrganisations());
 
         // Keep list sorted alphabetically
-        logUnknownElement(LOG, frame.getBlacklists());
-        logUnknownElement(LOG, frame.getControlCentres());
-        logUnknownElement(LOG, frame.getDataSources());
-        logUnknownElement(LOG, frame.getEquipments());
-        logUnknownElement(LOG, frame.getGroupsOfEntities());
-        logUnknownElement(LOG, frame.getGroupsOfOperators());
-        logUnknownElement(LOG, frame.getOperationalContexts());
-        logUnknownElement(LOG, frame.getResponsibilitySets());
-        logUnknownElement(LOG, frame.getSchematicMaps());
-        logUnknownElement(LOG, frame.getTypesOfValue());
-        logUnknownElement(LOG, frame.getVehicles());
-        logUnknownElement(LOG, frame.getVehicleEquipmentProfiles());
-        logUnknownElement(LOG, frame.getVehicleModels());
-        logUnknownElement(LOG, frame.getVehicleTypes());
-        logUnknownElement(LOG, frame.getWhitelists());
-        logUnknownElement(LOG, frame.getZones());
+        warnOnMissingMapping(LOG, frame.getBlacklists());
+        warnOnMissingMapping(LOG, frame.getControlCentres());
+        warnOnMissingMapping(LOG, frame.getDataSources());
+        warnOnMissingMapping(LOG, frame.getEquipments());
+        warnOnMissingMapping(LOG, frame.getGroupsOfEntities());
+        warnOnMissingMapping(LOG, frame.getGroupsOfOperators());
+        warnOnMissingMapping(LOG, frame.getOperationalContexts());
+        warnOnMissingMapping(LOG, frame.getResponsibilitySets());
+        warnOnMissingMapping(LOG, frame.getSchematicMaps());
+        warnOnMissingMapping(LOG, frame.getTypesOfValue());
+        warnOnMissingMapping(LOG, frame.getVehicles());
+        warnOnMissingMapping(LOG, frame.getVehicleEquipmentProfiles());
+        warnOnMissingMapping(LOG, frame.getVehicleModels());
+        warnOnMissingMapping(LOG, frame.getVehicleTypes());
+        warnOnMissingMapping(LOG, frame.getWhitelists());
+        warnOnMissingMapping(LOG, frame.getZones());
 
-        checkCommonProperties(LOG, frame);
+        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
     @Override void setResultOnIndex(NetexImportDataIndex netexIndex) {
@@ -59,7 +59,7 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
         if (element instanceof Authority) {
             authorityById.add((Authority) element);
         } else {
-            logUnknownObject(LOG, element);
+            warnOnMissingMapping(LOG, element);
         }
     }
 }

@@ -28,7 +28,6 @@ class MappingSupport {
      * @param id the ref is set to point to this id.
      * @param clazz the class used to create a new instance. The class must have a default constructor.
      * @param <T> the type of the created ref structure
-     * @return
      */
     @SuppressWarnings("unchecked")
     static <T extends VersionOfObjectRefStructure> T createRef(String id, Class<T> clazz) {

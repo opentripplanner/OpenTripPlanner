@@ -23,26 +23,26 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         parseStopPlaces(frame.getStopPlaces().getStopPlace());
 
         // Keep list sorted alphabetically
-        logUnknownElement(LOG, frame.getAccesses());
-        logUnknownElement(LOG, frame.getAddresses());
-        logUnknownElement(LOG, frame.getCountries());
-        logUnknownElement(LOG, frame.getCheckConstraints());
-        logUnknownElement(LOG, frame.getCheckConstraintDelays());
-        logUnknownElement(LOG, frame.getCheckConstraintThroughputs());
-        logUnknownElement(LOG, frame.getGroupsOfStopPlaces());
-        logUnknownElement(LOG, frame.getFlexibleStopPlaces());
-        logUnknownElement(LOG, frame.getNavigationPaths());
-        logUnknownElement(LOG, frame.getParkings());
-        logUnknownElement(LOG, frame.getPathJunctions());
-        logUnknownElement(LOG, frame.getPathLinks());
-        logUnknownElement(LOG, frame.getPointsOfInterest());
-        logUnknownElement(LOG, frame.getPointOfInterestClassifications());
-        logUnknownElement(LOG, frame.getPointOfInterestClassificationHierarchies());
-        logUnknownElement(LOG, frame.getSiteFacilitySets());
-        logUnknownElement(LOG, frame.getTariffZones());
-        logUnknownElement(LOG, frame.getTopographicPlaces());
+        warnOnMissingMapping(LOG, frame.getAccesses());
+        warnOnMissingMapping(LOG, frame.getAddresses());
+        warnOnMissingMapping(LOG, frame.getCountries());
+        warnOnMissingMapping(LOG, frame.getCheckConstraints());
+        warnOnMissingMapping(LOG, frame.getCheckConstraintDelays());
+        warnOnMissingMapping(LOG, frame.getCheckConstraintThroughputs());
+        warnOnMissingMapping(LOG, frame.getGroupsOfStopPlaces());
+        warnOnMissingMapping(LOG, frame.getFlexibleStopPlaces());
+        warnOnMissingMapping(LOG, frame.getNavigationPaths());
+        warnOnMissingMapping(LOG, frame.getParkings());
+        warnOnMissingMapping(LOG, frame.getPathJunctions());
+        warnOnMissingMapping(LOG, frame.getPathLinks());
+        warnOnMissingMapping(LOG, frame.getPointsOfInterest());
+        warnOnMissingMapping(LOG, frame.getPointOfInterestClassifications());
+        warnOnMissingMapping(LOG, frame.getPointOfInterestClassificationHierarchies());
+        warnOnMissingMapping(LOG, frame.getSiteFacilitySets());
+        warnOnMissingMapping(LOG, frame.getTariffZones());
+        warnOnMissingMapping(LOG, frame.getTopographicPlaces());
 
-        checkCommonProperties(LOG, frame);
+        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
     @Override

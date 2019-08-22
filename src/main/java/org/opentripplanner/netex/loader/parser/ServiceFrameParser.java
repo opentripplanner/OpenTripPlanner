@@ -62,40 +62,40 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         parseDestinationDisplays(frame.getDestinationDisplays());
 
         // Keep list sorted alphabetically
-        logUnknownElement(LOG, frame.getAdditionalNetworks());
-        logUnknownElement(LOG, frame.getCommonSections());
-        logUnknownElement(LOG, frame.getConnections());
-        logUnknownElement(LOG, frame.getDirections());
-        logUnknownElement(LOG, frame.getDisplayAssignments());
-        logUnknownElement(LOG, frame.getFlexibleLinkProperties());
-        logUnknownElement(LOG, frame.getFlexiblePointProperties());
-        logUnknownElement(LOG, frame.getGeneralSections());
-        logUnknownElement(LOG, frame.getGroupsOfLines());
-        logUnknownElement(LOG, frame.getGroupsOfLinks());
-        logUnknownElement(LOG, frame.getGroupsOfPoints());
-        logUnknownElement(LOG, frame.getLineNetworks());
-        logUnknownElement(LOG, frame.getLogicalDisplays());
-        logUnknownElement(LOG, frame.getNotices());
-        logUnknownElement(LOG, frame.getNoticeAssignments());
-        logUnknownElement(LOG, frame.getPassengerInformationEquipments());
-        logUnknownElement(LOG, frame.getRouteLinks());
-        logUnknownElement(LOG, frame.getRoutePoints());
-        logUnknownElement(LOG, frame.getRoutingConstraintZones());
-        logUnknownElement(LOG, frame.getScheduledStopPoints());
-        logUnknownElement(LOG, frame.getServiceExclusions());
-        logUnknownElement(LOG, frame.getServiceLinks());
-        logUnknownElement(LOG, frame.getServicePatterns());
-        logUnknownElement(LOG, frame.getStopAreas());
-        logUnknownElement(LOG, frame.getTariffZones());
-        logUnknownElement(LOG, frame.getTimeDemandTypes());
-        logUnknownElement(LOG, frame.getTimeDemandTypeAssignments());
-        logUnknownElement(LOG, frame.getTimingPoints());
-        logUnknownElement(LOG, frame.getTimingLinks());
-        logUnknownElement(LOG, frame.getTimingLinkGroups());
-        logUnknownElement(LOG, frame.getTimingPatterns());
-        logUnknownElement(LOG, frame.getTransferRestrictions());
+        warnOnMissingMapping(LOG, frame.getAdditionalNetworks());
+        warnOnMissingMapping(LOG, frame.getCommonSections());
+        warnOnMissingMapping(LOG, frame.getConnections());
+        warnOnMissingMapping(LOG, frame.getDirections());
+        warnOnMissingMapping(LOG, frame.getDisplayAssignments());
+        warnOnMissingMapping(LOG, frame.getFlexibleLinkProperties());
+        warnOnMissingMapping(LOG, frame.getFlexiblePointProperties());
+        warnOnMissingMapping(LOG, frame.getGeneralSections());
+        warnOnMissingMapping(LOG, frame.getGroupsOfLines());
+        warnOnMissingMapping(LOG, frame.getGroupsOfLinks());
+        warnOnMissingMapping(LOG, frame.getGroupsOfPoints());
+        warnOnMissingMapping(LOG, frame.getLineNetworks());
+        warnOnMissingMapping(LOG, frame.getLogicalDisplays());
+        warnOnMissingMapping(LOG, frame.getNotices());
+        warnOnMissingMapping(LOG, frame.getNoticeAssignments());
+        warnOnMissingMapping(LOG, frame.getPassengerInformationEquipments());
+        warnOnMissingMapping(LOG, frame.getRouteLinks());
+        warnOnMissingMapping(LOG, frame.getRoutePoints());
+        warnOnMissingMapping(LOG, frame.getRoutingConstraintZones());
+        warnOnMissingMapping(LOG, frame.getScheduledStopPoints());
+        warnOnMissingMapping(LOG, frame.getServiceExclusions());
+        warnOnMissingMapping(LOG, frame.getServiceLinks());
+        warnOnMissingMapping(LOG, frame.getServicePatterns());
+        warnOnMissingMapping(LOG, frame.getStopAreas());
+        warnOnMissingMapping(LOG, frame.getTariffZones());
+        warnOnMissingMapping(LOG, frame.getTimeDemandTypes());
+        warnOnMissingMapping(LOG, frame.getTimeDemandTypeAssignments());
+        warnOnMissingMapping(LOG, frame.getTimingPoints());
+        warnOnMissingMapping(LOG, frame.getTimingLinks());
+        warnOnMissingMapping(LOG, frame.getTimingLinkGroups());
+        warnOnMissingMapping(LOG, frame.getTimingPatterns());
+        warnOnMissingMapping(LOG, frame.getTransferRestrictions());
 
-        checkCommonProperties(LOG, frame);
+        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
     @Override
@@ -131,8 +131,11 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                             .put(assignment.getScheduledStopPointRef().getValue()
                                     .getRef(), quay.getId());
                 } else {
-                    LOG.warn("Quay " + quayRef + " not found in stop place file.");
+                    LOG.warn("Quay {} not found in stop place file.", quayRef);
                 }
+            }
+            else {
+                warnOnMissingMapping(LOG, stopAssignment.getValue());
             }
         }
     }
@@ -173,6 +176,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
             }
+            else {
+                warnOnMissingMapping(LOG, lines.getLine_());
+            }
         }
     }
 
@@ -182,6 +188,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         for (JAXBElement pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
             if (pattern.getValue() instanceof JourneyPattern) {
                 this.journeyPatterns.add((JourneyPattern) pattern.getValue());
+            }
+            else {
+                warnOnMissingMapping(LOG, pattern.getValue());
             }
         }
     }

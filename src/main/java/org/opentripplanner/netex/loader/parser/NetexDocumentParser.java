@@ -74,9 +74,9 @@ public class NetexDocumentParser {
                 value instanceof GeneralFrame ||
                 value instanceof InfrastructureFrame
         ) {
-            NetexParser.logUnsupportedObject(LOG, value);
+            NetexParser.informOnElementIntentionallySkipped(LOG, value);
         } else {
-            NetexParser.logUnknownObject(LOG, value);
+            NetexParser.warnOnMissingMapping(LOG, value);
         }
     }
 

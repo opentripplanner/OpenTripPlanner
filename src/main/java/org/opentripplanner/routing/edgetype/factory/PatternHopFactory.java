@@ -759,11 +759,8 @@ public class PatternHopFactory {
             i++;
         }
 
-        /*
-         * If we don't have distances here, we can't calculate them ourselves because we can't
-         * assume the units will match
-         */
-
+        // If we don't have distances here, we can't calculate them ourselves because we can't
+        // assume the units will match
         if (!hasAllDistances) {
             distances = null;
         }

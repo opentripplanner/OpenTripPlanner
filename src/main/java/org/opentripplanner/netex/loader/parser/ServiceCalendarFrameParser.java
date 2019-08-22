@@ -42,11 +42,11 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
 
         // Keep list sorted alphabetically
 
-        logUnknownElement(LOG, frame.getTimebands());
-        logUnknownElement(LOG, frame.getGroupOfTimebands());
-        logUnknownElement(LOG, frame.getOperatingDays());
+        warnOnMissingMapping(LOG, frame.getTimebands());
+        warnOnMissingMapping(LOG, frame.getGroupOfTimebands());
+        warnOnMissingMapping(LOG, frame.getOperatingDays());
 
-        checkCommonProperties(LOG, frame);
+        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
     @Override

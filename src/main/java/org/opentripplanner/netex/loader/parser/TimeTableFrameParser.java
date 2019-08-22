@@ -34,43 +34,43 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     void parse(Timetable_VersionFrameStructure frame) {
         parseJourneys(frame.getVehicleJourneys());
 
-        logUnknownElement(LOG, frame.getNetworkView());
-        logUnknownElement(LOG, frame.getLineView());
-        logUnknownElement(LOG, frame.getOperatorView());
-        logUnknownElement(LOG, frame.getAccessibilityAssessment());
+        warnOnMissingMapping(LOG, frame.getNetworkView());
+        warnOnMissingMapping(LOG, frame.getLineView());
+        warnOnMissingMapping(LOG, frame.getOperatorView());
+        warnOnMissingMapping(LOG, frame.getAccessibilityAssessment());
 
         // Keep list sorted alphabetically
-        logUnknownElement(LOG, frame.getBookingTimes());
-        logUnknownElement(LOG, frame.getVehicleTypeRef());
-        logUnknownElement(LOG, frame.getCoupledJourneys());
-        logUnknownElement(LOG, frame.getDefaultInterchanges());
-        logUnknownElement(LOG, frame.getFlexibleServiceProperties());
-        logUnknownElement(LOG, frame.getFrequencyGroups());
-        logUnknownElement(LOG, frame.getGroupsOfServices());
-        logUnknownElement(LOG, frame.getInterchangeRules());
-        logUnknownElement(LOG, frame.getJourneyAccountingRef());
-        logUnknownElement(LOG, frame.getJourneyAccountings());
-        logUnknownElement(LOG, frame.getJourneyInterchanges());
-        logUnknownElement(LOG, frame.getJourneyMeetings());
-        logUnknownElement(LOG, frame.getJourneyPartCouples());
-        logUnknownElement(LOG, frame.getNotices());
-        logUnknownElement(LOG, frame.getNoticeAssignments());
-        logUnknownElement(LOG, frame.getServiceCalendarFrameRef());
-        logUnknownElement(LOG, frame.getServiceFacilitySets());
-        logUnknownElement(LOG, frame.getTimeDemandTypes());
-        logUnknownElement(LOG, frame.getTimeDemandTypeAssignments());
-        logUnknownElement(LOG, frame.getTimingLinkGroups());
-        logUnknownElement(LOG, frame.getTrainNumbers());
-        logUnknownElement(LOG, frame.getTypesOfService());
-        logUnknownElement(LOG, frame.getVehicleTypes());
+        warnOnMissingMapping(LOG, frame.getBookingTimes());
+        warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
+        warnOnMissingMapping(LOG, frame.getCoupledJourneys());
+        warnOnMissingMapping(LOG, frame.getDefaultInterchanges());
+        warnOnMissingMapping(LOG, frame.getFlexibleServiceProperties());
+        warnOnMissingMapping(LOG, frame.getFrequencyGroups());
+        warnOnMissingMapping(LOG, frame.getGroupsOfServices());
+        warnOnMissingMapping(LOG, frame.getInterchangeRules());
+        warnOnMissingMapping(LOG, frame.getJourneyAccountingRef());
+        warnOnMissingMapping(LOG, frame.getJourneyAccountings());
+        warnOnMissingMapping(LOG, frame.getJourneyInterchanges());
+        warnOnMissingMapping(LOG, frame.getJourneyMeetings());
+        warnOnMissingMapping(LOG, frame.getJourneyPartCouples());
+        warnOnMissingMapping(LOG, frame.getNotices());
+        warnOnMissingMapping(LOG, frame.getNoticeAssignments());
+        warnOnMissingMapping(LOG, frame.getServiceCalendarFrameRef());
+        warnOnMissingMapping(LOG, frame.getServiceFacilitySets());
+        warnOnMissingMapping(LOG, frame.getTimeDemandTypes());
+        warnOnMissingMapping(LOG, frame.getTimeDemandTypeAssignments());
+        warnOnMissingMapping(LOG, frame.getTimingLinkGroups());
+        warnOnMissingMapping(LOG, frame.getTrainNumbers());
+        warnOnMissingMapping(LOG, frame.getTypesOfService());
+        warnOnMissingMapping(LOG, frame.getVehicleTypes());
 
-        checkCommonProperties(LOG, frame);
+        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
     @Override
     void setResultOnIndex(NetexImportDataIndex netexIndex) {
-        netexIndex.serviceJourneyByPatternId.addAll(serviceJourneyByPatternId);
         netexIndex.dayTypeRefs.addAll(dayTypeRefs);
+        netexIndex.serviceJourneyByPatternId.addAll(serviceJourneyByPatternId);
     }
 
     private void parseJourneys(JourneysInFrame_RelStructure element) {
@@ -80,7 +80,7 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
                 parseServiceJourney((ServiceJourney)it);
             }
             else {
-                logUnknownObject(LOG, it);
+                warnOnMissingMapping(LOG, it);
             }
         }
     }
