@@ -181,7 +181,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <!-- Target Java versions -->
                     <source>1.8</source>
@@ -222,7 +222,7 @@
                 and in "reports" (for site generation), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.1.1</version>
                 <configuration>
                     <!-- Turn off Java 8 strict Javadoc checking -->
                     <additionalparam>-Xdoclint:none</additionalparam>
@@ -240,7 +240,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -302,8 +302,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.21.0</version>
                 <configuration>
-                    <argLine>-Xmx3G</argLine>
-					<argLine>-Dfile.encoding=UTF-8</argLine>
+                    <argLine>-Xmx2G</argLine>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <argLine>--illegal-access=permit</argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
@@ -351,7 +352,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.2</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -431,7 +432,7 @@
                 (for attach-javadoc during release), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.1.1</version>
                 <configuration>
                     <!-- Turn off Java 8 strict Javadoc checking -->
                     <additionalparam>-Xdoclint:none</additionalparam>
