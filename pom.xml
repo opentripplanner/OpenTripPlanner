@@ -260,10 +260,20 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <argLine>-Xmx2G</argLine>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <argLine>--illegal-access=permit</argLine>
-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                    <!-- we have to fork the JVM during tests so that the argLine is passed along -->
+                    <forkCount>3</forkCount>
+                    <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works -->
+                    <argLine>
+                        -Xmx2G
+                        -Dfile.encoding=UTF-8
+                        --illegal-access=permit
+                        --add-opens java.base/java.lang.module=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+                        --add-opens jdk.proxy1/com.sun.proxy.jdk.proxy1=ALL-UNNAMED
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                    </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
