@@ -1,7 +1,15 @@
 # Changelog
 
-## 1.4 (in progress)
+## 1.5 (in progress)
 
+- Add Way Property Set for the UK (#2818)
+- Fixes surefire test failure during build (#2816)
+- Improve documentation for `mode` routing parameter (#2809)
+
+## 1.4 (2019-07-30)
+
+- Remove Open Traffic prototype code (#2698)
+- Improved configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
 - Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
 - Allow itineraries in response to be sorted by duration (#2593)
