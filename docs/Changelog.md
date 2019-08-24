@@ -21,6 +21,7 @@
 - Add "Accept" headers to GTFS-RT HTTP requests (#2796)
 - Fixes surefire test failure during build (#2816)
 - Cannot transfer between stops at exactly the same location (#2371)
+- Improve documentation for `mode` routing parameter (#2809)
 
 ## 1.3 (2018-08-03)
 
