@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.graph;
 
 import com.conveyal.object_differ.ObjectDiffer;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Polygon;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
 import org.junit.Test;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
@@ -88,8 +89,8 @@ public class GraphSerializationTest {
         objectDiffer.ignoreFields("incoming", "outgoing");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
-        // Method instances usually are part of a proxy which is totally un-reflectable in Java 11
-        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, Method.class);
+        // Method instances usually are part of a proxy which are totally un-reflectable in Java 11
+        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, Method.class, JarFile.class);
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);

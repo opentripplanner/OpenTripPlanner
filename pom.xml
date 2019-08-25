@@ -272,6 +272,9 @@
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.util=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.module=ALL-UNNAMED
                         --add-opens java.base/java.lang=ALL-UNNAMED
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
