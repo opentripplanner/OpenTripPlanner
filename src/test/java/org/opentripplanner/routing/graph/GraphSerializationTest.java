@@ -13,6 +13,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStation;
 
 import java.io.File;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.util.BitSet;
 import java.util.List;
@@ -90,7 +91,7 @@ public class GraphSerializationTest {
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
         // Method instances usually are part of a proxy which are totally un-reflectable in Java 11
-        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, Method.class, JarFile.class);
+        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, Method.class, JarFile.class, SoftReference.class);
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
