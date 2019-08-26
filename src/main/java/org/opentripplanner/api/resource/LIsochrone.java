@@ -47,10 +47,10 @@ import org.locationtech.jts.geom.MultiPolygon;
  * 
  * Example of request:
  * 
- * <code>
+ * {@code
  * http://localhost:8080/otp-rest-servlet/ws/isochrone?routerId=bordeaux&algorithm=accSampling&fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT&cutoffSec=1800&cutoffSec=3600
- * </code>
- * 
+ * }
+ *
  * @author laurent
  */
 @Path("/routers/{routerId}/isochrone")

@@ -64,7 +64,7 @@ public class CSVPopulation extends BasicPopulation {
                 if (!destCrs.equals(sourceCrs)) {
                     transform = true;
 
-                    // find the transformation, being strict about datums &c.
+                    // find the transformation, being strict about datums etc.
                     mathTransform = CRS.findMathTransform(sourceCrs, destCrs, false);
                 }
             }

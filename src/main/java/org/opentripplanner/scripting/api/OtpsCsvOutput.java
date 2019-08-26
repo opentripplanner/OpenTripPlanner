@@ -78,7 +78,7 @@ public class OtpsCsvOutput {
 
     /**
      * @return The CSV data as a string. It can be used for example as the script return value.
-     * @see OtpsEntryPoint.setRetval()
+     * @see OtpsEntryPoint#setRetval
      * @throws IOException
      */
     public String asText() throws IOException {

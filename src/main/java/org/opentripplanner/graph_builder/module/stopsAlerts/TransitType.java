@@ -10,7 +10,7 @@ public class TransitType extends AbstractStopTester {
 
 
     /**
-     * @retrun return true if a transit type of type transitType is pass through that stop
+     * @return true if a transit type of type transitType is pass through that stop
      */
     @Override
     public boolean fulfillDemands(TransitStop ts, Graph graph) {

@@ -32,9 +32,9 @@ import ar.com.hjg.pngj.chunks.PngChunkTextVar;
  * 
  * Example of request:
  * 
- * <code>
+ * {@code
  * http://localhost:8080/otp/routers/bordeaux/timegrid?fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&maxTimeSec=3600&mode=WALK,TRANSIT
- * </code>
+ * }
  * 
  * @author laurent
  */

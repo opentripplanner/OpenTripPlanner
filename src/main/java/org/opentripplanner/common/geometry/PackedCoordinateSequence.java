@@ -338,7 +338,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         float[] coords;
 
         /**
-         * Constructs a packed coordinate sequence from an array of <code>float<code>s
+         * Constructs a packed coordinate sequence from an array of {@code float}s
          * 
          * @param coords
          * @param dimensions
@@ -356,7 +356,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         }
 
         /**
-         * Constructs a packed coordinate sequence from an array of <code>double<code>s
+         * Constructs a packed coordinate sequence from an array of ${@code double}s
          */
         public Float(double[] coordinates, int dimensions) {
             this.coords = new float[coordinates.length];

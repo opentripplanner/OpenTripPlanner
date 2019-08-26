@@ -120,7 +120,7 @@ public class Graph implements Serializable {
     public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
-     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
+     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();

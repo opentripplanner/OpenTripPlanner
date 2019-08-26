@@ -5,7 +5,7 @@ package org.opentripplanner.scripting.api;
  * 
  * Objects are returned by the eval method of the SPT.
  * 
- * @see OtpsSPT.eval()
+ * @see OtpsSPT#eval
  * 
  * @author laurent
  */

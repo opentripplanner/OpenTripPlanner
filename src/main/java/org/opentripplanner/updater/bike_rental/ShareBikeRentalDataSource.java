@@ -28,8 +28,10 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 	 * ShareBike format http://www.sharebike.com/
 	 * 
 	 * URL for configuration:
-	 * http://map.webservice.sharebike.com:8888/json/MapService/LiveStationData?
-	 * APIKey=<Your API Key>&SystemID=<Bike System ID>
+	 * {@code
+	 *   http://map.webservice.sharebike.com:8888/json/MapService/LiveStationData?
+	 *   APIKey=<Your API Key>&SystemID=<Bike System ID>
+	 * }
 	 * 
 	 * Currently used in Norway (Oslo, Trondheim, Drammen) , Barcelona, Mexico
 	 * City, Milan, Stockholm, Antwerpen among others

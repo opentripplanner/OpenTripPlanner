@@ -35,7 +35,7 @@ public class DoubleComparator implements Comparator<QuadEdge> {
 	 * @param qeB
 	 * 		quad edge to compare
 	 * @return
-	 * 		1 if double value associated to qeA  < double
+	 * 		1 if double value associated to qeA less than double
 	 * 		value associated to qeB,
 	 * 		0 if values are equals,
 	 * 		-1 otherwise

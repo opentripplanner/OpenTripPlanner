@@ -647,7 +647,7 @@ public class State implements Cloneable {
      * 
      * @param optimize Should this path be optimized or just reversed?
      * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
-     * @returns a state at the other end (or this end, in the case of a forward search) 
+     * @return a state at the other end (or this end, in the case of a forward search)
      * of a reversed, optimized path
      */
     public State optimizeOrReverse (boolean optimize, boolean forward) {

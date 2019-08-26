@@ -27,7 +27,6 @@ public class AnalysisUtils {
      * of nodes) will not overlap any other components (it will have holes); the others may overlap
      * each other.
      *
-     * @param dateTime
      */
     public static List<Geometry> getComponentPolygons(Graph graph, RoutingRequest options,
                                                       long time) {

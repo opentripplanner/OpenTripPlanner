@@ -60,7 +60,7 @@ public class OTPApplication extends Application {
     /**
      * This method registers classes with Jersey to define web resources and enable custom features.
      * These are classes (not instances) that will be instantiated by Jersey for each request (they are request-scoped).
-     * Types that have been confirmed to work are: annotated resources, ContextResolver<ObjectMapper> implementation,
+     * Types that have been confirmed to work are: annotated resources, {@code ContextResolver<ObjectMapper>} implementation,
      * ContainerResponseFilter and ContainerRequestFilter.
      * Note that the listed classes do not need to be annotated with @Provider -- that is for scanning config.
      */
@@ -113,7 +113,7 @@ public class OTPApplication extends Application {
      * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
      * However, these are single instances that will be reused for all requests (they are singleton-scoped).
      * See https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
-     * Leave <Object> out of method signature to avoid confusing the Guava type inference.
+     * Leave {@code <Object>} out of method signature to avoid confusing the Guava type inference.
      */
     @Override
     public Set<Object> getSingletons() {

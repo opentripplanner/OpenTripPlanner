@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Implementation of a BikeRentalDataSource for the generic JCDecaux Open-Data API.
  * 
- * @link https://developer.jcdecaux.com
+ * See https://developer.jcdecaux.com
  * @see BikeRentalDataSource
  */
 public class JCDecauxBikeRentalDataSource extends GenericJsonBikeRentalDataSource {

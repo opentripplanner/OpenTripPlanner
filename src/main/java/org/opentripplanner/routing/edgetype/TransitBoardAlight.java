@@ -49,7 +49,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     /** True if this edge represents boarding a vehicle, false if it represents alighting. */
     public boolean boarding;
 
-    /** Boarding constructor (TransitStopDepart --> PatternStopVertex) */
+    /** Boarding constructor (TransitStopDepart → PatternStopVertex) */
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
             int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
@@ -58,7 +58,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         this.boarding = true;
     }
     
-    /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
+    /** Alighting constructor (PatternStopVertex → TransitStopArrive) */
     public TransitBoardAlight (PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
             int stopIndex, TraverseMode mode) {
         super(fromPatternStop, toStationVertex);

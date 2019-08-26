@@ -31,7 +31,7 @@ public final class CompactElevationProfile implements Serializable {
     /**
      * Compact an elevation profile onto a var-len int packed form (Dlugosz coding).
      * 
-     * @param profile The elevation profile to compact
+     * @param elevation The elevation profile to compact
      * @return The compacted format
      */
     public static byte[] compactElevationProfile(CoordinateSequence elevation) {

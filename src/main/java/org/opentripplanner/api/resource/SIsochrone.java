@@ -97,9 +97,11 @@ public class SIsochrone extends RoutingResource {
      * and distortions towards an ellipse will appear if it is transformed/projected to the user location.
      * <p>
      * An example request may look like this:
+     * {@code
      * localhost:8080/otp-rest-servlet/ws/iso?layers=traveltime&styles=mask&batch=true&fromPlace=51.040193121307176
      * %2C-114.04471635818481&toPlace
-     * =51.09098935%2C-113.95179705&time=2012-06-06T08%3A00%3A00&mode=WALK&maxWalkDistance=10000&walkSpeed=1.38&walkTime=10.7&output=EDGES 
+     * =51.09098935%2C-113.95179705&time=2012-06-06T08%3A00%3A00&mode=WALK&maxWalkDistance=10000&walkSpeed=1.38&walkTime=10.7&output=EDGES
+     * }
      * Though the first parameters (i) layer, (ii) styles and (iii) batch could be discarded.
      * 
      * @param walkmins Maximum number of minutes to walk.

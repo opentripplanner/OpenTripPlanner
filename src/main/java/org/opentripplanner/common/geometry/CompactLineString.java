@@ -164,11 +164,6 @@ public final class CompactLineString implements Serializable {
     /**
      * Same as the other version, but in a var-len int packed form (Dlugosz coding).
      * 
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param coords
      * @return
      */
     public static LineString uncompackLineString(double x0, double y0, double x1, double y1,
