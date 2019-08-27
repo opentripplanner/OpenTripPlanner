@@ -66,6 +66,42 @@ are found in `router-config.json`.
 
 # Graph build configuration
 
+This table lists the possible settings that can be defined in a `build-config.json` file. Sections follow that describe particular settings in more depth.
+
+config key | description | value type | value default | notes
+---------- | ----------- | ---------- | ------------- | -----
+`htmlAnnotations` |  Generate nice HTML report of Graph errors/warnings (annotations) | boolean | false |
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
+`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
+`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
+`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
+`stopClusterMode` | Stop clusters can be built in one of two ways, either by geographical proximity and name, or according to a parent/child station topology, if it exists | enum | `proximity` | options: `proximity`, `parentStation`
+`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`streets` | Include street input files (OSM/PBF) | boolean | true | 
+`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
+`areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
+`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
+`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
+`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
+`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
+`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
+`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
+`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
+`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
+`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
+`maxHtmlAnnotationsPerFile` | If number of annotations is larger then specified number annotations will be split in multiple files | int | 1,000 | 
+`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
+`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
+`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
+`banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
+`banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
+`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
+
 ## Reaching a subway platform
 
 The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
