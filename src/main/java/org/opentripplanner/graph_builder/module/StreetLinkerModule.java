@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +44,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         if(graph.hasStreets) {
             LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
-            if (graph.streetIndex == null) {
-                graph.index(new DefaultStreetVertexIndexFactory());
-            }
+            graph.index(false);
             StreetSplitter linker = graph.streetIndex.getStreetSplitter();
             linker.setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
             linker.linkAllStationsToGraph();

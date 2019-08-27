@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 /**
  * Uses the shapes from GTFS to determine which streets buses drive on. This is used to improve the quality of
@@ -47,7 +46,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         //Mapbuilder needs transit index
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(false);
 
         StreetMatcher matcher = new StreetMatcher(graph);
         EdgesForRoute edgesForRoute = new EdgesForRoute();

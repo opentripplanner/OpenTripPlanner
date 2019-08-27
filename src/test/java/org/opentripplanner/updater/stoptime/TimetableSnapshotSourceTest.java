@@ -39,7 +39,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -96,7 +95,7 @@ public class TimetableSnapshotSourceTest {
 
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(false);
 
         final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

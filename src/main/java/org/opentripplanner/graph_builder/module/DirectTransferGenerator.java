@@ -47,10 +47,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        /* Initialize graph index which is needed by the nearby stop finder. */
-        if (graph.index == null) {
-            graph.index = new GraphIndex(graph);
-        }
+        /* Initialize or recalculate the graph index which is needed by the nearby stop finder. */
+        graph.index(false);
 
         /* The linker will use streets if they are available, or straight-line distance otherwise. */
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, radiusMeters);

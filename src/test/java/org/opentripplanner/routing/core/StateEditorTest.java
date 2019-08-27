@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 import org.junit.Test;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +27,7 @@ public class StateEditorTest {
         request.setMode(TraverseMode.CAR);
         request.parkAndRide = true;
         Graph graph = new Graph();
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(false);
         request.rctx = new RoutingContext(request, graph);
         State state = new State(request);
 

@@ -15,7 +15,6 @@ import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.common.Histogram;
 import org.slf4j.Logger;
@@ -260,7 +259,7 @@ public class RepeatedRaptorComparison {
         graphBuilder.run();
         Graph graph = graphBuilder.getGraph();
         graph.routerId = "GRAPH";
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(true);
         graph.index.clusterStopsAsNeeded();
         return graph;
     }

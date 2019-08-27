@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.GraphSource.Factory;
@@ -70,7 +69,7 @@ public class ClusterGraphService extends GraphService {
 			
 			g.routerId = graphId;
 			
-			g.index(new DefaultStreetVertexIndexFactory());
+			g.index(true);
 
 			g.index.clusterStopsAsNeeded();
 			

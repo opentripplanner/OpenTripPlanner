@@ -12,7 +12,6 @@ import org.opentripplanner.profile.RaptorWorkerTimetable;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 import java.util.Arrays;
 
