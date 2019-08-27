@@ -172,16 +172,16 @@ public class GraphBuilder implements Runnable {
                     LOG.warn("Skipping unrecognized file '{}'", file);
             }
         }
-        boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
-        boolean hasGTFS = builderParams.transit && !gtfsFiles.isEmpty();
-        boolean hasNETEX = builderParams.transit && !netexFiles.isEmpty();
-        boolean hasTransitData = hasGTFS ||hasNETEX;
+        boolean hasOsm  = builderParams.streets && !osmFiles.isEmpty();
+        boolean hasGtfs = builderParams.transit && !gtfsFiles.isEmpty();
+        boolean hasNetex = builderParams.transit && !netexFiles.isEmpty();
+        boolean hasTransitData = hasGtfs || hasNetex;
 
-        if ( ! ( hasOSM || hasGTFS || hasNETEX)) {
+        if ( ! ( hasOsm || hasGtfs || hasNetex)) {
             LOG.error("Found no input files from which to build a graph in {}", dir);
             return null;
         }
-        if ( hasOSM ) {
+        if ( hasOsm ) {
             List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
             for (File osmFile : osmFiles) {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
@@ -206,7 +206,7 @@ public class GraphBuilder implements Runnable {
             pruneFloatingIslands.setPruningThresholdIslandWithStops(builderParams.pruningThresholdIslandWithStops);
             graphBuilder.addModule(pruneFloatingIslands);
         }
-        if ( hasGTFS ) {
+        if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
@@ -224,11 +224,11 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(gtfsModule);
         }
 
-        if( hasNETEX ) {
+        if( hasNetex ) {
             graphBuilder.addModule(netexModule(builderParams, netexFiles));
         }
 
-        if(hasTransitData && hasOSM) {
+        if(hasTransitData && hasOsm) {
             if (builderParams.matchBusRoutesToStreets) {
                 graphBuilder.addModule(new BusRouteStreetMatcher());
             }
