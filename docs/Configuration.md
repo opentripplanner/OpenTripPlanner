@@ -79,7 +79,7 @@ config key | description | value type | value default | notes
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
-`areaVisibility` | Perform visibility calculations on OSM areas (these calculations can be time consuming) | boolean | true |
+`areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
 `fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
