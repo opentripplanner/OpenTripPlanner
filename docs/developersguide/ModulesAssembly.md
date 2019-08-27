@@ -1,3 +1,6 @@
+# WIP This is not done or thought trough
+
+
 # OTP Application Module Assembly
 OTP originally was a Spring application, but we found the Spring Application framework to be overkill for this project. Hence we need to use some guidelines instead to keep the application maintainable.
 
