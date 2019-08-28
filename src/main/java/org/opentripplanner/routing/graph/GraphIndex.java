@@ -11,6 +11,7 @@ import graphql.execution.ExecutorServiceExecutionStrategy;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.index.IndexGraphQLSchema;
@@ -24,8 +25,8 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -92,6 +93,8 @@ public class GraphIndex {
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
+
+        CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {

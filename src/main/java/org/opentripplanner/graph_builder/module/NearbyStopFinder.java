@@ -5,13 +5,13 @@ import com.beust.jcommander.internal.Sets;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -28,7 +28,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
@@ -46,7 +48,7 @@ public class NearbyStopFinder {
     private double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
-    private EarliestArrivalSearch earliestArrivalSearch;
+    private AStar astar;
 
     /* Fields used when finding stops without a street network. */
     private StreetVertexIndexService streetIndex;
@@ -68,11 +70,10 @@ public class NearbyStopFinder {
         this.useStreets = useStreets;
         this.radiusMeters = radiusMeters;
         if (useStreets) {
-            earliestArrivalSearch = new EarliestArrivalSearch();
+            astar = new AStar();
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
             // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
             // but we don't have much of a choice here. Use the default walking speed to convert.
-            earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
             // FIXME use the vertex index already in the graph if it exists.
             streetIndex = new StreetVertexIndexServiceImpl(graph);
@@ -135,7 +136,11 @@ public class NearbyStopFinder {
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
         routingRequest.arriveBy = reverseDirection;
-        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
+        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
+        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
+        routingRequest.disableRemainingWeightHeuristic = true;
+        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {

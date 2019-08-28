@@ -1,16 +1,22 @@
 package org.opentripplanner.common.geometry;
 
-import org.locationtech.jts.geom.*;
+import org.geojson.LngLatAlt;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.geojson.LngLatAlt;
-import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class GeometryUtils {
@@ -37,6 +43,37 @@ public class GeometryUtils {
             coordinates[i / 2] = new Coordinate(coords[i], coords[i+1]);
         }
         return factory.createLineString(coordinates);
+    }
+
+    public static LineString makeLineString(Coordinate[] coordinates) {
+        GeometryFactory factory = getGeometryFactory();
+        return factory.createLineString(coordinates);
+    }
+
+    public static LineString concatenateLineStrings(List<LineString> lineStrings) {
+        GeometryFactory factory = getGeometryFactory();
+        return factory.createLineString(
+                lineStrings.stream()
+                        .flatMap(t -> Arrays.stream(t.getCoordinates()))
+                        .toArray(Coordinate[]::new));
+    }
+
+    public static LineString addStartEndCoordinatesToLineString(Coordinate startCoord, LineString lineString, Coordinate endCoord) {
+        Coordinate[] coordinates = new Coordinate[lineString.getCoordinates().length + 2];
+        coordinates[0] = startCoord;
+        for (int j = 0; j < lineString.getCoordinates().length; j++) {
+            coordinates[j + 1] = lineString.getCoordinates()[j];
+        }
+        coordinates[lineString.getCoordinates().length + 1] = endCoord;
+        return makeLineString(coordinates);
+    }
+
+    public static LineString removeStartEndCoordinatesFromLineString(LineString lineString) {
+        Coordinate[] coordinates = new Coordinate[lineString.getCoordinates().length - 2];
+        for (int j = 1; j < lineString.getCoordinates().length - 1; j++) {
+            coordinates[j - 1] = lineString.getCoordinates()[j];
+        }
+        return makeLineString(coordinates);
     }
 
     public static GeometryFactory getGeometryFactory() {

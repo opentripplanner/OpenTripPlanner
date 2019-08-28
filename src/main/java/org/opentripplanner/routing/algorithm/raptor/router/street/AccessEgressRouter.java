@@ -9,7 +9,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +44,6 @@ public class AccessEgressRouter {
                     new Transfer(-1,
                             (int)stopAtDistance.edges.stream().map(Edge::getDistance)
                                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum(),
-                            Arrays.asList(stopAtDistance.geom.getCoordinates()),
                             stopAtDistance.edges));
         }
 

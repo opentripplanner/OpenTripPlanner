@@ -2,14 +2,15 @@ package org.opentripplanner.graph_builder.module.map;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 /**
  * Uses the shapes from GTFS to determine which streets buses drive on. This is used to improve the quality of
@@ -62,23 +62,28 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     //If there are no shapes in GTFS pattern geometry is generated
                     //generated geometry is useless for street matching
                     //that is why pattern.geometry is null in that case
-                    if (pattern.geometry == null) {
+                    if (pattern.getGeometry() == null) {
                         continue;
                     }
-                    List<Edge> edges = matcher.match(pattern.geometry);
-                    if (edges == null || edges.isEmpty()) {
-                        log.warn("Could not match to street network: {}", pattern);
-                        continue;
+
+                    for (int i = 0; i < pattern.numHopGeometries(); i++) {
+                        LineString hopGeometry = pattern.getHopGeometry(i);
+
+                        List<Edge> edges = matcher.match(hopGeometry);
+                        if (edges == null || edges.isEmpty()) {
+                            log.warn("Could not match to street network: {}", pattern);
+                            continue;
+                        }
+                        List<Coordinate> coordinates = new ArrayList<>();
+                        for (Edge e : edges) {
+                            coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
+                            edgesForRoute.edgesForRoute.put(route, e);
+                        }
+                        Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
+                        LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
+                        // Replace the hop's geometry from GTFS with that of the equivalent OSM edges.
+                        pattern.setHopGeometry(i, ls);
                     }
-                    List<Coordinate> coordinates = new ArrayList<Coordinate>();
-                    for (Edge e : edges) {
-                        coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
-                        edgesForRoute.edgesForRoute.put(route, e);
-                    }
-                    Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
-                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
-                    // Replace the pattern's geometry from GTFS with that of the equivalent OSM edges.
-                    pattern.geometry = ls;
                 }
             }
         }

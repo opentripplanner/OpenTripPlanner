@@ -1,16 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.util.HashMap;
-import java.net.URLDecoder;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -21,6 +15,15 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import java.io.File;
+import java.net.URLDecoder;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TriangleInequalityTest {
     

@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -61,7 +59,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
 
-        packedElevationProfile = CompactElevationProfile.compactElevationProfile(elev);
+        packedElevationProfile = CompactElevationProfile.compactElevationProfileWithRegularSamples(elev);
         slopeSpeedFactor = (float)costs.slopeSpeedFactor;
         slopeWorkFactor = (float)costs.slopeWorkFactor;
         maxSlope = (float)costs.maxSlope;
@@ -75,7 +73,10 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public PackedCoordinateSequence getElevationProfile() {
-        return CompactElevationProfile.uncompactElevationProfile(packedElevationProfile);
+        return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
+                packedElevationProfile,
+                getDistance()
+        );
     }
 
     @Override

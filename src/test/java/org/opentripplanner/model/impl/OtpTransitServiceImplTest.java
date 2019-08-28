@@ -25,6 +25,8 @@ import java.util.List;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class OtpTransitServiceImplTest {
@@ -104,6 +106,27 @@ public class OtpTransitServiceImplTest {
 
         assertEquals(9, transfers.size());
         assertEquals("<Transfer stop=Z_F..Z_E>", first(transfers).toString());
+    }
+
+    @Test
+    public void getTransfersWhenStationHasNoPlatfromsShouldNotFail() {
+        OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
+
+        Stop stationWithoutPlatforms = new Stop();
+        stationWithoutPlatforms.setId(new FeedScopedId("A", "123"));
+        stationWithoutPlatforms.setLocationType(1);
+        stationWithoutPlatforms.setName("Station without platforms");
+        builder.getStops().add(stationWithoutPlatforms);
+
+        OtpTransitService service = new OtpTransitServiceImpl(builder);
+
+        List<Stop> platforms = service.getStopsForStation(stationWithoutPlatforms);
+
+        assertNull("No platforms forund", platforms);
+        assertTrue(
+                "The type is changed from Station to Platform",
+                stationWithoutPlatforms.isPlatform()
+        );
     }
 
     @Test

@@ -1,23 +1,21 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-
 import junit.framework.TestCase;
-
 import org.junit.Test;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
-import org.locationtech.jts.geom.Coordinate;
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
 
 public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 

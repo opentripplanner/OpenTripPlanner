@@ -7,7 +7,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ class TransfersMapper {
 
                     int toStopIndex = stopIndex.indexByStop.get(((TransitStop) edge.getToVertex()).getStop());
                     Transfer transfer = new Transfer(toStopIndex, (int) distance,
-                            Arrays.asList(edge.getGeometry().getCoordinates()),
                             ((SimpleTransfer) edge).getEdges());
 
                     list.add(transfer);

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.astar;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;

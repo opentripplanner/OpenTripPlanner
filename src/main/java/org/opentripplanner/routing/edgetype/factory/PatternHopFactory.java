@@ -97,10 +97,6 @@ public class PatternHopFactory {
     // This is the OTP Graph Vertex representing each Stop from the input GTFS.
     private Map<Stop, TransitStationStop> stationStopNodes = new HashMap<>();
 
-    // the location types for transfers.txt
-    private static final int STOP_LOCATION_TYPE = 0;
-    private static final int PARENT_STATION_LOCATION_TYPE = 1;
-
     private int subwayAccessTime = 0;
 
     private double maxStopToShapeSnapDistance = 150;
@@ -191,8 +187,7 @@ public class PatternHopFactory {
             LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
             if (hopGeometries != null) {
                 // Make a single unified geometry, and also store the per-hop split geometries.
-                tripPattern.makeGeometry(hopGeometries);
-                tripPattern.hopGeometries = hopGeometries;
+                tripPattern.setHopGeometries(hopGeometries);
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
 
@@ -900,28 +895,16 @@ public class PatternHopFactory {
         Stop fromStop = source.getFromStop();
         Stop toStop = source.getToStop();
 
-        if (fromStop.getLocationType() == STOP_LOCATION_TYPE && toStop.getLocationType() == STOP_LOCATION_TYPE) {
+        if (fromStop.isPlatform() && toStop.isPlatform()) {
             // simple, no need to copy anything
-            return Arrays.asList(source);
+            return Collections.singletonList(source);
         } else {
             // at least one of the stops is a parent station
             // all the stops this transfer originates with
-            List<Stop> fromStops;
+            List<Stop> fromStops = listPlatformsForStop(fromStop);
 
             // all the stops this transfer terminates with
-            List<Stop> toStops;
-
-            if (fromStop.getLocationType() == PARENT_STATION_LOCATION_TYPE) {
-                fromStops = transitService.getStopsForStation(fromStop);
-            } else {
-                fromStops = Arrays.asList(fromStop);
-            }
-
-            if (toStop.getLocationType() == PARENT_STATION_LOCATION_TYPE) {
-                toStops = transitService.getStopsForStation(toStop);
-            } else {
-                toStops = Arrays.asList(toStop);
-            }
+            List<Stop> toStops = listPlatformsForStop(toStop);
 
             List<Transfer> expandedTransfers = new ArrayList<>(fromStops.size() * toStops.size());
 
@@ -941,5 +924,18 @@ public class PatternHopFactory {
 
             return expandedTransfers;
         }
+    }
+
+    /**
+     * Return a list of stops for the given stop:
+     * <ul>
+     *     <li>if platform - return a list with just one stop - the given stop input.</li>
+     *     <li>if station - return all platforms for the given station.</li>
+     * </ul>
+     */
+    private List<Stop> listPlatformsForStop(Stop stop) {
+        return stop.isStation()
+                ? transitService.getStopsForStation(stop)
+                : Collections.singletonList(stop);
     }
 }

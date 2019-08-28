@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.strategies;
+package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 

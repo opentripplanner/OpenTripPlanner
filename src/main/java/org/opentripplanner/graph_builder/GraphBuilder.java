@@ -252,18 +252,30 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsBucketName = bucketConfig.bucketName;
             NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             gcf.tileSource = awsTileSource;
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
+            GraphBuilderModule elevationBuilder = new ElevationModule(
+                    gcf,
+                    builderParams.elevationUnitMultiplier,
+                    builderParams.distanceBetweenElevationSamples
+            );
             graphBuilder.addModule(elevationBuilder);
         } else if (builderParams.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
+            GraphBuilderModule elevationBuilder = new ElevationModule(
+                    gcf,
+                    builderParams.elevationUnitMultiplier,
+                    builderParams.distanceBetweenElevationSamples
+            );
             graphBuilder.addModule(elevationBuilder);
         } else if (demFile != null) {
             // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf, builderParams.elevationUnitMultiplier);
+            GraphBuilderModule elevationBuilder = new ElevationModule(
+                    gcf,
+                    builderParams.elevationUnitMultiplier,
+                    builderParams.distanceBetweenElevationSamples
+            );
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasTransitData ) {

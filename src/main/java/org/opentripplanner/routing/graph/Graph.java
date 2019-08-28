@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
@@ -222,6 +223,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
+
+    /** The distance between elevation samples used in CompactElevationProfile. */
+    private double distanceBetweenElevationSamples;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer transitLayer;
@@ -909,5 +913,14 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public double getDistanceBetweenElevationSamples() {
+        return distanceBetweenElevationSamples;
+    }
+
+    public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
+        this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
+        CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
 }
