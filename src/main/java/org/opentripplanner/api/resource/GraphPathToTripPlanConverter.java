@@ -165,9 +165,9 @@ public abstract class GraphPathToTripPlanConverter {
 
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = lastTransitState.getElapsedTimeSeconds();
+        itinerary.duration = getDuration(states);
         itinerary.startTime = getStartTime(states);
-        itinerary.endTime = makeCalendar(lastTransitState);
+        itinerary.endTime = getEndTime(states);
 
         calculateTimes(itinerary, states);
 
@@ -194,13 +194,22 @@ public abstract class GraphPathToTripPlanConverter {
                 .getBackState();
     }
 
-    private static Calendar getStartTime(State[] states) {
+    public static Long getDuration(State[] states) {
+        return getLastTransitState(states).getElapsedTimeSeconds();
+    }
+
+    public static Calendar getStartTime(State[] states) {
         Optional<State> firstStep = Arrays
                 .stream(states)
                 // either boarding or walking
                 .filter(s -> s.backEdge instanceof TransitBoardAlight || s.backEdge instanceof StreetEdge)
                 .findFirst();
         return makeCalendar(firstStep.orElse(states[0]));
+    }
+
+    public static Calendar getEndTime(State[] states) {
+         State lastTransitState = getLastTransitState(states);
+         return makeCalendar(lastTransitState);
     }
 
     private static Calendar makeCalendar(State state) {

@@ -926,17 +926,17 @@ public class GraphPathToTripPlanConverterTest {
     /** Compare all simple itinerary fields to their expected values. */
     private void compareItinerary(Itinerary itinerary, Type type) {
         if (type == Type.FORWARD) {
-            assertEquals(66.0, itinerary.duration.doubleValue(), 0.0);
-            assertEquals(0L, itinerary.startTime.getTimeInMillis());
-            assertEquals(66000L, itinerary.endTime.getTimeInMillis());
+            assertEquals(61.0, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(7000L, itinerary.startTime.getTimeInMillis());
+            assertEquals(61000L, itinerary.endTime.getTimeInMillis());
         } else if (type == Type.BACKWARD) {
-            assertEquals(68.0, itinerary.duration.doubleValue(), 0.0);
-            assertEquals(2000L, itinerary.startTime.getTimeInMillis());
-            assertEquals(70000L, itinerary.endTime.getTimeInMillis());
+            assertEquals(63.0, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(9000L, itinerary.startTime.getTimeInMillis());
+            assertEquals(65000L, itinerary.endTime.getTimeInMillis());
         } else if (type == Type.ONBOARD) {
-            assertEquals(60.0, itinerary.duration.doubleValue(), 0.0);
-            assertEquals(6000L, itinerary.startTime.getTimeInMillis());
-            assertEquals(66000L, itinerary.endTime.getTimeInMillis());
+            assertEquals(55.0, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(19000L, itinerary.startTime.getTimeInMillis());
+            assertEquals(61000L, itinerary.endTime.getTimeInMillis());
         }
 
         if (type == Type.FORWARD) {

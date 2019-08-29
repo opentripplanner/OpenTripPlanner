@@ -230,6 +230,7 @@ public class VermontFlexRoutingTest {
         options.walkReluctance = walkReluctance;
         options.waitAtBeginningFactor = waitAtBeginningFactor;
         options.transferPenalty = transferPenalty;
+        options.flexUseReservationServices = true;
 
         // for testing
         options.flexIgnoreDrtAdvanceBookMin = ignoreDrtAdvanceMinBooking;

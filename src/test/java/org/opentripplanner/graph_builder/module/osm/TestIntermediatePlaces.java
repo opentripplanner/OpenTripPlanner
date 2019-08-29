@@ -11,6 +11,7 @@ import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -21,7 +22,6 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -147,9 +147,16 @@ public class TestIntermediatePlaces {
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
         assertTrue(1 <= plan.itinerary.size());
-        for (Itinerary itinerary : plan.itinerary) {
+        for (int i = 0; i < plan.itinerary.size(); i++) {
+            Itinerary itinerary = plan.itinerary.get(i);
             validateIntermediatePlacesVisited(itinerary, via);
             assertTrue(via.length < itinerary.legs.size());
+
+            State[] states = pathList.get(i).states.toArray(new State[0]);
+            assertEquals(itinerary.startTime, GraphPathToTripPlanConverter.getStartTime(states));
+            assertEquals(itinerary.endTime, GraphPathToTripPlanConverter.getEndTime(states));
+            assertEquals(itinerary.duration, GraphPathToTripPlanConverter.getDuration(states));
+
             validateLegsTemporally(request, itinerary);
             validateLegsSpatially(plan, itinerary);
             if (modes.contains("TRANSIT")) {
@@ -195,7 +202,6 @@ public class TestIntermediatePlaces {
             departTime.setTimeInMillis(request.dateTime * 1000);
             arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).to.arrival;
         }
-        long sumOfDuration = 0;
         for (Leg leg : itinerary.legs) {
             assertFalse(departTime.after(leg.startTime));
             assertEquals(leg.startTime, leg.from.departure);
@@ -203,15 +209,9 @@ public class TestIntermediatePlaces {
             assertFalse(leg.startTime.after(leg.endTime));
 
             departTime = leg.to.arrival;
-            sumOfDuration += leg.getDuration();
         }
-        sumOfDuration += itinerary.waitingTime;
 
         assertFalse(departTime.after(arriveTime));
-
-        // Check the total duration of the legs,
-        int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
-        assertEquals(sumOfDuration, itinerary.duration.doubleValue(), accuracy);
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {
