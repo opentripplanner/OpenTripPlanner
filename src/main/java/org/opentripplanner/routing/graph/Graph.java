@@ -695,11 +695,14 @@ public class Graph implements Serializable {
      *
      * However, due to the potential for problems to arise with two StreetVertexIndexServices and StreetSplitters being
      * active at once, a warning is logged just in case.
+     *
+     * @param recreateStreetIndex if true, recreate the streetIndex even if it already exists. Make sure you know what
+     *                            you're doing when setting this to true! See above method documentation.
      */
     public void index (boolean recreateStreetIndex) {
         if (streetIndex == null || recreateStreetIndex) {
             if (streetIndex != null && recreateStreetIndex) {
-                LOG.warn("Overwritting an existing streetIndex! This could lead to problems if both the old and new streetIndex are used. Make sure only the new streetIndex is used going forward.");
+                LOG.warn("Overwriting an existing streetIndex! This could lead to problems if both the old and new streetIndex are used. Make sure only the new streetIndex is used going forward.");
             }
             LOG.info("building street index");
             streetIndex = new StreetVertexIndexService(this);
@@ -750,7 +753,9 @@ public class Graph implements Serializable {
         }
 
         LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(false);
+        // Make sure the graph index has been initialized. The streetIndex should be able to be safely recreated
+        // because the streetIndexes used during build will not be visible outside of this method.
+        graph.index(true);
         return graph;
     }
 

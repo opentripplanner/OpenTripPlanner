@@ -82,6 +82,10 @@ public class StreetVertexIndexService {
      * Construct a new StreetVertexIndexService using the given graph. Upon instantiation, a number of spatial indexes
      * will be created to be used for the quick lookup of data with spatial attributes.
      *
+     * After a refactor in the year 2019, this class was refactored to be just this class instead of the previous
+     * structure of having an interface and factory implementation. The StreetVertexIndexFactory was always being used
+     * to create the same StreetVertexIndexService implementation.
+     *
      * IMPORTANT NOTE: Only one StreetVertexIndexService should be active on a graph at any given time. This is because
      * any newly-created (or removed) vertices or edges in this StreetVertexIndexService won't show up in the indices of
      * the other StreetVertexIndexServices.

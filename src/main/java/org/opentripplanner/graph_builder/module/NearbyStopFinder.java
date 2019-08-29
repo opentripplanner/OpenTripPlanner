@@ -66,7 +66,6 @@ public class NearbyStopFinder {
             // but we don't have much of a choice here. Use the default walking speed to convert.
             earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
-            graph.index(false);
             streetIndex = graph.streetIndex;
         }
     }
