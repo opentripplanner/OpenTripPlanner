@@ -17,7 +17,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 public class GtfsGraphBuilderModuleTest {
 
@@ -39,7 +38,7 @@ public class GtfsGraphBuilderModuleTest {
 
         Graph graph = new Graph();
         builder.buildGraph(graph, _extra);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(true);
 
         // Feed id is used instead of the agency id for OBA entities.
         GtfsBundle gtfsBundle = bundleList.get(0);
@@ -68,7 +67,7 @@ public class GtfsGraphBuilderModuleTest {
 
         Graph graph = new Graph();
         builder.buildGraph(graph, _extra);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(true);
 
         // Feed id is used instead of the agency id for OBA entities.
         GtfsBundle gtfsBundle = bundleList.get(0);

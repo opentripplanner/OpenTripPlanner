@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.GraphSource.Factory;
@@ -69,8 +68,11 @@ public class ClusterGraphService extends GraphService {
 			Graph g = gbt.getGraph();
 			
 			g.routerId = graphId;
-			
-			g.index(new DefaultStreetVertexIndexFactory());
+
+			// re-index the graph to ensure all data is added and recreate a new streetIndex. It's ok to recreate the
+			// streetIndex because the previous one created during graph build is not needed anymore  and isn't able to
+			// be used outside of the graphBuilder.
+			g.index(true);
 
 			g.index.clusterStopsAsNeeded();
 			

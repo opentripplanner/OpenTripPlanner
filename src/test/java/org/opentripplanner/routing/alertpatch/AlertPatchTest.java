@@ -19,7 +19,6 @@ import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
@@ -46,7 +45,7 @@ public class AlertPatchTest extends TestCase {
                 CalendarServiceData.class,
                 createCalendarServiceData(context.getOtpTransitService())
         );
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(false);
 
         feedId = context.getFeedId().getId();
     }

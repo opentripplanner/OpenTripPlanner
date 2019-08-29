@@ -5,7 +5,6 @@ import com.amazonaws.services.s3.model.S3Object;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,10 @@ public class ClusterGraphBuilder {
         graphBuilder.run();
         Graph graph = graphBuilder.getGraph();
         graph.routerId = graphId;
-        graph.index(new DefaultStreetVertexIndexFactory());
+        // re-index the graph to ensure all data is added and recreate a new streetIndex. It's ok to recreate the
+        // streetIndex because the previous one created during graph build is not needed anymore  and isn't able to be
+        // used outside of the graphBuilder.
+        graph.index(true);
         graph.index.clusterStopsAsNeeded();
         this.currGraphId = graphId;
         this.currGraph = graph;

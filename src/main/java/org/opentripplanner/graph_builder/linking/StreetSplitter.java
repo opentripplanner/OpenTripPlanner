@@ -124,8 +124,10 @@ public class StreetSplitter {
 
     /**
      * Construct a new StreetSplitter.
-     * NOTE: Only one StreetSplitter should be active on a graph at any given time and this is enforced by an error
-     * being thrown if more than an attempt is made to instantiate a 2nd instance of a StreetSplitter on the same graph.
+     *
+     * IMPORTANT NOTE: Only one StreetSplitter should be active on a graph at any given time. This is because any
+     * newly-created split edges in this street splitter won't show up in the index of the other street splitters
+     * (and potentially StreetVertexIndexServices).
      *
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
      * @param transitStopIndex Index of all transitStops which is generated in {@link org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl}
@@ -137,7 +139,7 @@ public class StreetSplitter {
     ) {
         this.graph = graph;
         if (graphsWithSplitters.contains(graph)) {
-            throw new UnsupportedOperationException("Only one street splitter should be active on a graph at any given time");
+            LOG.warn("Multiple StreetSplitters detected on the same graph! Make sure only the most recently created one is used going forward!");
         }
         LOG.info("New StreetSpiltter created successfully!");
         graphsWithSplitters.add(graph);
@@ -660,7 +662,8 @@ public class StreetSplitter {
             throw new RuntimeException("Transitedges are created with non destructive splitting!");
         }
         // ensure that the requisite edges do not already exist
-        // this can happen if we link to duplicate ways that have the same start/end vertices.
+        // this can happen if we link to duplicate ways that have the same start/end vertices or if
+        // certain transit stops were already linked to the network in the TransitToTaggedStopsModule.
         for (StreetTransitLink e : Iterables.filter(tstop.getOutgoing(), StreetTransitLink.class)) {
             if (e.getToVertex() == v)
                 return;
