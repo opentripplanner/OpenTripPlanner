@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0.9000
+
+- Add Way Property Set for the UK (#2818)
+
 ## 1.4 (2019-07-30)
 
 - Remove Open Traffic prototype code (#2698)

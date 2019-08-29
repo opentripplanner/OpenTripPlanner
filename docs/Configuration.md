@@ -137,7 +137,6 @@ yield very realistic transfer time expectations. This works particularly well in
 the layering of non-intersecting ways is less prevalent. Here's an example in the Netherlands:
 
 <iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=4.70502644777298%2C52.01675028000761%2C4.7070810198783875%2C52.01813190694357&amp;layer=mapnik" style="border: 1px solid black"></iframe><small><a href="http://www.openstreetmap.org/#map=19/52.01744/4.70605">View Larger Map</a></small>
-
 When such micro-mapping data is not available, we need to rely on information from GTFS including how stops are grouped
 into stations and a table of transfer timings where available. During the graph build, OTP can create preferential
 connections between each pair of stops in the same station to favor in-station transfers:
@@ -301,6 +300,7 @@ There are currently 2 wayPropertySets defined;
 
 - `default` which is based on California/US mapping standard
 - `norway` which is adjusted to rules and speeds in Norway
+- `uk` which is adjusted to rules and speed in the UK
 
 To add your own custom property set have a look at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet` and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones. The mechanism is that for any two identical tags, OTP will use the first one.
 
