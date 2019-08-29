@@ -44,6 +44,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         if(graph.hasStreets) {
             LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
+            // Make sure the graph index has been initialized. Don't recalculate the street index because it should
+            // already have been initialized in a previous build module and should have all needed street data for
+            // splitting StreetEdges.
             graph.index(false);
             StreetSplitter linker = graph.streetIndex.getStreetSplitter();
             linker.setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);

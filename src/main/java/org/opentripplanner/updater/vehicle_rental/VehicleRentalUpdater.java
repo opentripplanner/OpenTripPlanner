@@ -125,9 +125,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) {
-        // Creation of network linker library will not modify the graph
         splitter = graph.streetIndex.getStreetSplitter();
-
         service = graph.getService(VehicleRentalStationService.class, true);
     }
 

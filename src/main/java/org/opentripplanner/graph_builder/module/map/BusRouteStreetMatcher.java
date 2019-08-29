@@ -45,7 +45,9 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
      */
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
-        //Mapbuilder needs transit index
+        // Make sure the graph index has been initialized. As of a refactor in 2019, this is the first place in the
+        // build process that an index is created, but just in case future build modules are added later, send over
+        // false for indexing a graph just in case.
         graph.index(false);
 
         StreetMatcher matcher = new StreetMatcher(graph);

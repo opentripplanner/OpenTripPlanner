@@ -271,6 +271,9 @@ public class Routers {
         tempDir.delete();
         
         Graph graph = graphBuilder.getGraph();
+        // re-index the graph to ensure all data is added and recreate a new streetIndex. It's ok to recreate the
+        // streetIndex because the previous one created during graph build is not needed anymore  and isn't able to be
+        // used outside of the graphBuilder.
         graph.index(true);
         
         GraphService graphService = otpServer.getGraphService();

@@ -52,6 +52,9 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
+        // Make sure the graph index has been initialized. Don't recalculate the street index because it should
+        // already have been initialized in a previous build module and should have all needed vertex data for
+        // spatially querying vertices.
         graph.index(false);
         index = graph.streetIndex;
 

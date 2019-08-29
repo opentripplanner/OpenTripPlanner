@@ -98,6 +98,9 @@ public class OTPMain {
                 /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
                 if (params.inMemory || params.preFlight) {
                     Graph graph = graphBuilder.getGraph();
+                    // re-index the graph to ensure all data is added and recreate a new streetIndex. It's ok to
+                    // recreate the streetIndex because the previous one created during graph build is not needed
+                    // anymore and isn't able to be used outside of the graphBuilder.
                     graph.index(true);
                     // FIXME set true router IDs
                     graphService.registerGraph("", new MemoryGraphSource("", graph));

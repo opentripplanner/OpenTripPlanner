@@ -557,8 +557,9 @@ public class FakeGraph {
      * Index the graph and then link all stations in the graph.
      */
     public static void indexGraphAndLinkStations (Graph g) {
-        // creating a new DefaultStreetVertexIndexFactory results in setting the streetIndex on the graph.
-        g.index(false);
+        // recreate a new streetIndex even if one exists to ensure all indexes are built. It is assumed that all tests
+        // that use this method do not need any previously street indexes created during building the graph
+        g.index(true);
         StreetSplitter linker = (StreetSplitter) g.streetIndex.getStreetSplitter();
         linker.linkAllStationsToGraph();
     }
