@@ -8,7 +8,6 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
@@ -53,9 +52,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
-        if (graph.streetIndex == null) {
-            graph.index(new DefaultStreetVertexIndexFactory());
-        }
+        graph.index(false);
         index = graph.streetIndex;
 
         // iterate over a copy of vertex list because it will be modified

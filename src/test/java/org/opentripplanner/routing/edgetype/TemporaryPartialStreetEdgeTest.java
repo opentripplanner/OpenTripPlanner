@@ -17,8 +17,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -102,9 +102,9 @@ public class TemporaryPartialStreetEdgeTest {
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
-        TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
+        TemporaryStreetLocation end = StreetVertexIndexService.createTemporaryStreetLocation(
                 graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
-        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
+        TemporaryStreetLocation start = StreetVertexIndexService.createTemporaryStreetLocation(
                 graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
 
         RoutingRequest options = new RoutingRequest();

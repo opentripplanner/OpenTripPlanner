@@ -19,7 +19,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -67,9 +66,7 @@ public class NearbyStopFinder {
             // but we don't have much of a choice here. Use the default walking speed to convert.
             earliestArrivalSearch.maxDuration = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         } else {
-            if (graph.streetIndex == null) {
-                graph.index(new DefaultStreetVertexIndexFactory());
-            }
+            graph.index(false);
             streetIndex = graph.streetIndex;
         }
     }
