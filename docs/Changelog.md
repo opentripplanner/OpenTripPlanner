@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0 (in progress)
+
+- Fixes surefire test failure during build (#2816)
+
 ## 1.4 (2019-07-30)
 
 - Remove Open Traffic prototype code (#2698)
