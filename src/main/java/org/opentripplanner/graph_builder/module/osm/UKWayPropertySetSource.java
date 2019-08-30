@@ -21,47 +21,39 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  */
 public class UKWayPropertySetSource implements WayPropertySetSource {
 
-	@Override
-	public void populateProperties(WayPropertySet props) {
+    @Override
+    public void populateProperties(WayPropertySet props) {
         // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
-        props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
-                2.06);
-		props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
-		
-		props.setProperties("highway=trunk;cycleway=lane",
-                StreetTraversalPermission.ALL, 1.5, 1.5);
-        props.setProperties("highway=trunk_link;cycleway=lane",
-                StreetTraversalPermission.ALL, 1.15, 1.15);
-				
-		props.setProperties("highway=trunk;cycleway=share_busway",
-                StreetTraversalPermission.ALL, 1.75, 1.75);
+        props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06, 2.06);
+        props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
+        props.setProperties("highway=trunk;cycleway=lane", StreetTraversalPermission.ALL, 1.5,
+                1.5);
+        props.setProperties("highway=trunk_link;cycleway=lane", StreetTraversalPermission.ALL,
+                1.15, 1.15);
+        props.setProperties("highway=trunk;cycleway=share_busway", StreetTraversalPermission.ALL,
+                1.75, 1.75);
         props.setProperties("highway=trunk_link;cycleway=share_busway",
-                StreetTraversalPermission.ALL, 1.25, 1.25);
-				
-		props.setProperties("highway=trunk;cycleway=opposite_lane",
-                StreetTraversalPermission.ALL, 7.47, 1.5);
+                StreetTraversalPermission.ALL,1.25, 1.25);
+        props.setProperties("highway=trunk;cycleway=opposite_lane", StreetTraversalPermission.ALL,
+                7.47, 1.5);
         props.setProperties("highway=trunk_link;cycleway=opposite_lane",
                 StreetTraversalPermission.ALL, 2.06, 1.15);
-				
-		props.setProperties("highway=trunk;cycleway=track",
-                StreetTraversalPermission.ALL, 0.95, 0.95);
-        props.setProperties("highway=trunk_link;cycleway=track",
-                StreetTraversalPermission.ALL, 0.85, 0.85);
-				
-	    props.setProperties("highway=trunk;cycleway=opposite_track",
-                StreetTraversalPermission.ALL, 7.47, 0.95);
+        props.setProperties("highway=trunk;cycleway=track", StreetTraversalPermission.ALL, 0.95,
+                0.95);
+        props.setProperties("highway=trunk_link;cycleway=track", StreetTraversalPermission.ALL,
+                0.85, 0.85);
+        props.setProperties("highway=trunk;cycleway=opposite_track", StreetTraversalPermission.ALL,
+                7.47, 0.95);
         props.setProperties("highway=trunk_link;cycleway=opposite_track",
                 StreetTraversalPermission.ALL, 2.06, 0.85);
-				
-		props.setProperties("highway=trunk;bicycle=designated",
-                StreetTraversalPermission.ALL, 7.25, 7.25);
-        props.setProperties("highway=trunk_link;bicycle=designated",
-                StreetTraversalPermission.ALL, 2, 2);
-
+        props.setProperties("highway=trunk;bicycle=designated", StreetTraversalPermission.ALL,
+                7.25, 7.25);
+        props.setProperties("highway=trunk_link;bicycle=designated", StreetTraversalPermission.ALL,
+                2, 2);
 
         /*
          * Automobile speeds in UK. Based on recorded free flow speeds for motorways, trunk and primary and 
-		 * my (marcusyoung) personal experience in obtaining realistic routes.
+         * my (marcusyoung) personal experience in obtaining realistic routes.
          * 
          */
         props.setCarSpeed("highway=motorway", 30.4f); // ~=68mph
@@ -70,11 +62,11 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
         props.setCarSpeed("highway=trunk_link", 17.9f); // ~= 40mph
         props.setCarSpeed("highway=primary", 22.4f); // ~=50mph
         props.setCarSpeed("highway=primary_link", 17.9f); // ~= 40mph
-		props.setCarSpeed("highway=secondary", 17.9f); // ~= 40mph
+        props.setCarSpeed("highway=secondary", 17.9f); // ~= 40mph
         props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
-		props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
+        props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
 
         // Read the rest from the default set
-		new DefaultWayPropertySetSource().populateProperties(props);
-	}
+        new DefaultWayPropertySetSource().populateProperties(props);
+    }
 }
