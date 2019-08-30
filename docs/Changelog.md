@@ -1,6 +1,7 @@
 # Changelog
 
-## 1.4.0.9000
+## 1.5.0 (in progress)
+
 - Fixes surefire test failure during build (#2816)
 
 ## 1.4 (2019-07-30)
