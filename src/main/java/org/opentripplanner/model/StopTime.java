@@ -6,11 +6,13 @@ import org.opentripplanner.util.TimeToStringConverter;
 import java.io.Serializable;
 import java.util.Objects;
 
-public final class StopTime implements Serializable, Comparable<StopTime> {
+public final class StopTime implements Serializable, Comparable<StopTime>, NoticeAssignable {
 
     private static final long serialVersionUID = 1L;
 
     public static final int MISSING_VALUE = -999;
+
+    private FeedScopedId id;
 
     private Trip trip;
 
@@ -42,6 +44,7 @@ public final class StopTime implements Serializable, Comparable<StopTime> {
     }
 
     public StopTime(StopTime st) {
+        this.id = st.id;
         this.arrivalTime = st.arrivalTime;
         this.departureTime = st.departureTime;
         this.dropOffType = st.dropOffType;
@@ -53,6 +56,15 @@ public final class StopTime implements Serializable, Comparable<StopTime> {
         this.stopSequence = st.stopSequence;
         this.timepoint = st.timepoint;
         this.trip = st.trip;
+        this.farePeriodId = st.farePeriodId;
+    }
+
+    public FeedScopedId getId() {
+        return id;
+    }
+
+    public void setId(FeedScopedId id) {
+        this.id = id;
     }
 
     public Trip getTrip() {

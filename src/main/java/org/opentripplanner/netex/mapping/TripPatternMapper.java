@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
 
@@ -58,14 +59,20 @@ class TripPatternMapper {
             HierarchicalMap<String, String> quayIdByStopPointRef,
             HierarchicalMapById<DestinationDisplay> destinationDisplayById,
             HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId,
-            EntityById<FeedScopedId, Stop> stopsById
+            EntityById<FeedScopedId, Stop> stopsById,
+            Map<String, StopTime> stopTimesById
     ) {
         this.routeById = routeById;
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
         this.transitBuilder = transitBuilder;
         this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
-        this.stopTimesMapper = new StopTimesMapper(destinationDisplayById, stopsById, quayIdByStopPointRef);
+        this.stopTimesMapper = new StopTimesMapper(
+                destinationDisplayById,
+                stopsById,
+                quayIdByStopPointRef,
+                stopTimesById
+        );
     }
 
     void mapTripPattern(
@@ -105,6 +112,7 @@ class TripPatternMapper {
         TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
         tripPattern.code = journeyPattern.getId();
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
+        tripPattern.id = createFeedScopedId(journeyPattern.getId());
 
         createTripTimes(trips, tripPattern);
 

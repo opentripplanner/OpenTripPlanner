@@ -15,6 +15,7 @@ import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -55,7 +56,7 @@ import java.util.Set;
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
  *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
-public class TripPattern implements Cloneable, Serializable {
+public class TripPattern implements Cloneable, Serializable, NoticeAssignable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -68,6 +69,11 @@ public class TripPattern implements Cloneable, Serializable {
     private static final int SHIFT_DROPOFF = 3;
     private static final int NO_PICKUP = 1;
     //private static final int FLAG_BIKES_ALLOWED = 32;
+
+    /**
+     * Currently used for NeTEx id
+     */
+    public FeedScopedId id;
 
     /**
      * The GTFS Route of all trips in this pattern.

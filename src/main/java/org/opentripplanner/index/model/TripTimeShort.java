@@ -1,21 +1,23 @@
 package org.opentripplanner.index.model;
 
-import java.util.List;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
     public FeedScopedId stopId;
+    public StopTime stopTime;
     public int stopIndex;
     public int stopCount;
     public int scheduledArrival = UNDEFINED ;
@@ -36,7 +38,8 @@ public class TripTimeShort {
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
-        stopId = stop.getId();
+        stopId             = stop.getId();
+        stopTime           = tt.getStopTimeByIndex(i);
         stopIndex          = i;
         stopCount          = tt.getNumStops();
         scheduledArrival   = tt.getScheduledArrivalTime(i);
@@ -63,7 +66,7 @@ public class TripTimeShort {
      */
     public static List<TripTimeShort> fromTripTimes (Timetable table, Trip trip) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
-        List<TripTimeShort> out = Lists.newArrayList();
+        List<TripTimeShort> out = new ArrayList();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
             out.add(new TripTimeShort(times, i, table.pattern.getStop(i)));

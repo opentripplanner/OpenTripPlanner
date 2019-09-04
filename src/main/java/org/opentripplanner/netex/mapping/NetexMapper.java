@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.Multimap;
+import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -8,6 +10,7 @@ import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Collection;
@@ -43,12 +46,20 @@ public class NetexMapper {
                 netexIndex.quayIdByStopPointRef,
                 netexIndex.destinationDisplayById,
                 netexIndex.serviceJourneyByPatternId,
-                transitBuilder.getStops()
+                transitBuilder.getStops(),
+                transitBuilder.getStopTimesById()
         );
         RouteMapper routeMapper = new RouteMapper(
                 transitBuilder,
                 netexIndex,
                 netexIndex.timeZone.get()
+        );
+        NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                netexIndex.passingTimeByStopPointId,
+                netexIndex.noticeById,
+                transitBuilder.getRoutes(),
+                transitBuilder.getStopTimesById(),
+                transitBuilder.getTripsById()
         );
 
         AgencyMapper agencyMapper = new AgencyMapper(netexIndex.timeZone.get());
@@ -81,6 +92,13 @@ public class NetexMapper {
             transitBuilder.getCalendarDates().addAll(
                     mapToCalendarDates(dayTypeRefs, netexIndex)
             );
+        }
+
+        for (NoticeAssignment noticeAssignment : netexIndex.noticeAssignmentById.localValues()) {
+            Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElementId;
+
+            noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
+            transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }
     }
 }

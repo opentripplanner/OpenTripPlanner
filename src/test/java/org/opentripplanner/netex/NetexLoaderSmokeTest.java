@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test
@@ -40,13 +41,13 @@ public class NetexLoaderSmokeTest {
 
         System.out.println(otpBuilder);
 
-
         // Then - smoke testing
         Assert.assertEquals(1, otpBuilder.getAgenciesById().values().size());
-        ArrayList<Route> routesNetex = new ArrayList<>(otpBuilder.getRoutes().values());
+        List<Route> routesNetex = new ArrayList<>(otpBuilder.getRoutes().values());
         Assert.assertEquals(2, routesNetex.size());
         Assert.assertEquals(8, otpBuilder.getStopTimesSortedByTrip().valuesAsSet().size());
         Assert.assertEquals(24, otpBuilder.getCalendarDates().size());
+        Assert.assertEquals(4, otpBuilder.getNoticeAssignments().size());
     }
 
 

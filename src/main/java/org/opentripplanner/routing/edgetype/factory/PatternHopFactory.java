@@ -211,6 +211,10 @@ public class PatternHopFactory {
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
 
+        // TODO TGR - This have nothing to do with PatternHops, so maybe it should be put in
+        // TODO TGR - another place.
+        loadNotices(graph);
+
         /* Store parent stops in graph, even if not linked. These are needed for clustering*/
         for (TransitStationStop stop : stationStopNodes.values()) {
             if (stop instanceof TransitStation) {
@@ -549,6 +553,10 @@ public class PatternHopFactory {
         geometriesByShapeId.clear();
         distancesByShapeId.clear();
         geometriesByShapeSegmentKey.clear();
+    }
+
+    private void loadNotices(Graph graph) {
+        graph.setNoticesByElement(transitService.getNoticeAssignments());
     }
 
     private void loadTransfers(Graph graph) {

@@ -48,6 +48,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
+    private final NoticeParser noticeParser = new NoticeParser();
+
     ServiceFrameParser(ReadOnlyHierarchicalVersionMapById<Quay> quayById) {
         this.quayById = quayById;
     }
@@ -57,6 +59,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         parseStopAssignments(frame.getStopAssignments());
         parseRoutes(frame.getRoutes());
         parseNetwork(frame.getNetwork());
+        noticeParser.parseNotices(frame.getNotices());
+        noticeParser.parseNoticeAssignments(frame.getNoticeAssignments());
         parseLines(frame.getLines());
         parseJourneyPatterns(frame.getJourneyPatterns());
         parseDestinationDisplays(frame.getDestinationDisplays());
@@ -75,8 +79,6 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         warnOnMissingMapping(LOG, frame.getGroupsOfPoints());
         warnOnMissingMapping(LOG, frame.getLineNetworks());
         warnOnMissingMapping(LOG, frame.getLogicalDisplays());
-        warnOnMissingMapping(LOG, frame.getNotices());
-        warnOnMissingMapping(LOG, frame.getNoticeAssignments());
         warnOnMissingMapping(LOG, frame.getPassengerInformationEquipments());
         warnOnMissingMapping(LOG, frame.getRouteLinks());
         warnOnMissingMapping(LOG, frame.getRoutePoints());
@@ -106,6 +108,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         index.journeyPatternsById.addAll(journeyPatterns);
         index.lineById.addAll(lines);
         index.networkById.addAll(networks);
+        noticeParser.setResultOnIndex(index);
         index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
         index.routeById.addAll(routes);
 
@@ -127,9 +130,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                 // TODO OTP2 - the order in witch elements are loaded.
                 Quay quay = quayById.lookupLastVersionById(quayRef);
                 if (quay != null) {
-                    quayIdByStopPointRef
-                            .put(assignment.getScheduledStopPointRef().getValue()
-                                    .getRef(), quay.getId());
+                    String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+                    quayIdByStopPointRef.put(stopPointRef, quay.getId());
                 } else {
                     LOG.warn("Quay {} not found in stop place file.", quayRef);
                 }

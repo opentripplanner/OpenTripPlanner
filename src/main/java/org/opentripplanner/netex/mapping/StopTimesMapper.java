@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
@@ -41,14 +42,18 @@ class StopTimesMapper {
 
     private final HierarchicalMap<String, String> quayIdByStopPointRef;
 
+    private final Map<String, StopTime> stopTimesById;
+
     StopTimesMapper(
             HierarchicalMapById<DestinationDisplay> destinationDisplayById,
             EntityById<FeedScopedId, Stop> stopsById,
-            HierarchicalMap<String, String> quayIdByStopPointRef
+            HierarchicalMap<String, String> quayIdByStopPointRef,
+            Map<String, StopTime> stopTimesById
     ) {
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
+        this.stopTimesById = stopTimesById;
     }
 
     List<StopTime> mapToStopTimes(
@@ -60,8 +65,10 @@ class StopTimesMapper {
 
         for (int i = 0; i < timetabledPassingTimes.size(); i++) {
 
+            TimetabledPassingTime currentTimeTabledPassingTime = timetabledPassingTimes.get(i);
+
             String pointInJourneyPattern =
-                    timetabledPassingTimes.get(i).getPointInJourneyPatternRef().getValue().getRef();
+                    currentTimeTabledPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
             Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
@@ -70,11 +77,12 @@ class StopTimesMapper {
                     trip,
                     stopPoint,
                     stop,
-                    timetabledPassingTimes.get(i),
+                    currentTimeTabledPassingTime,
                     i,
                     destinationDisplayById);
 
             stopTimes.add(stopTime);
+            stopTimesById.put(currentTimeTabledPassingTime.getId(), stopTime);
         }
         return stopTimes;
     }
@@ -88,6 +96,7 @@ class StopTimesMapper {
             HierarchicalMapById<DestinationDisplay> destinationDisplayById
     ) {
         StopTime stopTime = new StopTime();
+        stopTime.setId(FeedScopedIdFactory.createFeedScopedId(passingTime.getId()));
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
         stopTime.setStop(stop);

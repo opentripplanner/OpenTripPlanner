@@ -1,11 +1,14 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
@@ -36,8 +39,6 @@ import static java.util.stream.Collectors.groupingBy;
  * If you need to modify a {@link OtpTransitService}, you can create a new
  * {@link OtpTransitServiceBuilder} based on your old data, do your modification and
  * create a new unmodifiable instance.
- *
- * @author bdferris
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
@@ -50,6 +51,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private final Collection<FareRule> fareRules;
 
     private final Collection<FeedInfo> feedInfos;
+
+    private final Multimap<NoticeAssignable, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -83,6 +86,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
+        this.noticeAssignments = builder.getNoticeAssignments();
         this.pathways = immutableList(builder.getPathways());
         this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
@@ -111,6 +115,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<FeedInfo> getAllFeedInfos() {
         return feedInfos;
+    }
+
+    @Override
+    public Multimap<NoticeAssignable, Notice> getNoticeAssignments() {
+        return noticeAssignments;
     }
 
     @Override

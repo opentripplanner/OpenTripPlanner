@@ -48,7 +48,8 @@ public class TripPatternMapperTest {
                 tripPatternStructure.getQuayIdByStopPointRef(),
                 new HierarchicalMapById<>(),
                 tripPatternStructure.getServiceJourneyByPatternId(),
-                tripPatternStructure.getStopsById()
+                tripPatternStructure.getStopsById(),
+                tripPatternStructure.getStopTimesById()
         );
 
         tripPatternMapper.mapTripPattern(tripPatternStructure.getJourneyPattern());

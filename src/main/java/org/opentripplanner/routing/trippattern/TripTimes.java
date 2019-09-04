@@ -87,6 +87,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     int[] departureTimes;
 
     /**
+     * Keep track of stop time objects to enable notices to point to a specific stop time.
+     */
+    StopTime[] stopTimes;
+
+    /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
      * the stops. Despite the face that the StopPattern or TripPattern enclosing this TripTimes
      * provides an ordered list of Stops, the original stop sequence numbers may still be needed for
@@ -115,6 +120,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
         final int[] sequences  = new int[nStops];
+        this.stopTimes = new StopTime[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.iterator().next().getArrivalTime();
@@ -122,6 +128,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
             arrivals[s] = st.getArrivalTime() - timeShift;
+            this.stopTimes[s] = st;
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
             s++;
@@ -148,6 +155,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = object.headsigns;
         this.scheduledDepartureTimes = object.scheduledDepartureTimes;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
+        this.stopTimes = object.stopTimes;
         this.stopSequences = object.stopSequences;
         this.timepoints = object.timepoints;
     }
@@ -221,6 +229,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public int getDepartureTime(final int stop) {
         if (departureTimes == null) return getScheduledDepartureTime(stop);
         else return departureTimes[stop]; // updated times are not time shifted.
+    }
+
+    public StopTime getStopTimeByIndex(int i) {
+        return stopTimes[i];
     }
 
     /** @return the amount of time in seconds that the vehicle waits at the stop. */

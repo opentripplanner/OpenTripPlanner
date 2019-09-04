@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
@@ -10,9 +11,7 @@ import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.opentripplanner.netex.mapping.MappingSupport.*;
 
@@ -30,7 +29,11 @@ class TripPatternStructure {
 
     private HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId = new HierarchicalMultimap<>();
 
-    private HierarchicalMapById<Route> routeById = new HierarchicalMapById<>();
+    private HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
+
+    private Map<String, StopTime> stopTimesById = new HashMap<>();
+
+    private HierarchicalMapById<Route> tripsById = new HierarchicalMapById<>();
 
     private HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
 
@@ -78,7 +81,7 @@ class TripPatternStructure {
 
         route.setLineRef(lineRef);
 
-        routeById.add(route);
+        routesById.add(route);
 
         RouteRefStructure routeRefStructure = new RouteRefStructure().withRef("RUT:Route:1");
         journeyPattern.setRouteRef(routeRefStructure);
@@ -209,6 +212,10 @@ class TripPatternStructure {
         return stopsById;
     }
 
+    EntityById<FeedScopedId, Stop> getTripsById() {
+        return stopsById;
+    }
+
     HierarchicalMap<String, String> getQuayIdByStopPointRef() {
         return quayIdByStopPointRef;
     }
@@ -225,7 +232,9 @@ class TripPatternStructure {
         return serviceJourneyByPatternId;
     }
 
-    HierarchicalMapById<Route> getRouteById() { return routeById; }
+    HierarchicalMapById<Route> getRouteById() { return routesById; }
+
+    Map<String, StopTime> getStopTimesById() { return stopTimesById; }
 
     HierarchicalMapById<JourneyPattern> getJourneyPatternById() { return journeyPatternById; }
 

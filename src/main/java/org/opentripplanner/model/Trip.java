@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Trip extends IdentityBean<FeedScopedId> {
+public final class Trip extends IdentityBean<FeedScopedId> implements NoticeAssignable {
 
     private static final long serialVersionUID = 1L;
 

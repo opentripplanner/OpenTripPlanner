@@ -19,7 +19,7 @@ public class FeedScopedIdFactory {
     }
 
 
-    static FeedScopedId createFeedScopedId(String netexId) {
+    public static FeedScopedId createFeedScopedId(String netexId) {
         return new FeedScopedId(feedId, netexId);
     }
 }

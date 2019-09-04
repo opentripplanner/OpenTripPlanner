@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -16,7 +17,8 @@ public class StopTimesMapperTest {
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
                 tripPatternStructure.getDestinationDisplayById(),
                 tripPatternStructure.getStopsById(),
-                tripPatternStructure.getQuayIdByStopPointRef());
+                tripPatternStructure.getQuayIdByStopPointRef(),
+                new HashMap<>());
 
         List<StopTime> stopTimes = stopTimesMapper.mapToStopTimes(
                 tripPatternStructure.getJourneyPattern(),

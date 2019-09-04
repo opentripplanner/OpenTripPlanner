@@ -7,7 +7,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Responsible for mapping GTFS StopTime into the OTP model. */
+import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
+
+/**
+ * Responsible for mapping GTFS StopTime into the OTP Transit model.
+ */
 class StopTimeMapper {
     private final StopMapper stopMapper;
 
@@ -32,6 +36,7 @@ class StopTimeMapper {
     private StopTime doMap(org.onebusaway.gtfs.model.StopTime rhs) {
         StopTime lhs = new StopTime();
 
+        lhs.setId(createFeedScopedId(rhs.getId().toString()));
         lhs.setTrip(tripMapper.map(rhs.getTrip()));
         lhs.setStop(stopMapper.map(rhs.getStop()));
         lhs.setArrivalTime(rhs.getArrivalTime());
@@ -53,5 +58,4 @@ class StopTimeMapper {
 
         return lhs;
     }
-
 }

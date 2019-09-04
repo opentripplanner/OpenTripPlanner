@@ -14,11 +14,14 @@ import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.Notice;
+import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TimetabledPassingTime;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,7 +68,10 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
     public final HierarchicalMapById<Line> lineById;
     public final HierarchicalMapById<Network> networkById;
+    public final HierarchicalMapById<Notice> noticeById;
+    public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
@@ -79,8 +85,10 @@ public class NetexImportDataIndex {
 
     public final HierarchicalMap<String, String> networkIdByGroupOfLineId;
 
+
     // Shared data
     public final HierarchicalElement<String> timeZone;
+
 
     /**
      * Create a root node.
@@ -96,7 +104,10 @@ public class NetexImportDataIndex {
         this.lineById = new HierarchicalMapById<>();
         this.networkById = new HierarchicalMapById<>();
         this.networkIdByGroupOfLineId = new HierarchicalMap<>();
+        this.noticeById = new HierarchicalMapById<>();
+        this.noticeAssignmentById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
+        this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
@@ -120,7 +131,10 @@ public class NetexImportDataIndex {
         this.lineById = new HierarchicalMapById<>(parent.lineById);
         this.networkById = new HierarchicalMapById<>(parent.networkById);
         this.networkIdByGroupOfLineId = new HierarchicalMap<>(parent.networkIdByGroupOfLineId);
+        this.noticeById = new HierarchicalMapById<>(parent.noticeById);
+        this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
+        this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);

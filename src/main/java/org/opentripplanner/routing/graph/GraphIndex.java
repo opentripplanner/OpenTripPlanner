@@ -21,6 +21,8 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +81,10 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<>();
+
+    // TODO TGR - Needed for GRaphQL API?
+    public final Map<FeedScopedId, Notice> noticeForId = Maps.newHashMap();
+    private final Map<NoticeAssignable, List<Notice>> noticeAssignmentForElement = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -135,6 +142,14 @@ public class GraphIndex {
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
+        }
+
+        for (NoticeAssignable noticeAssignable : graph.getNoticesByElement().keySet()) {
+            Collection<Notice> notices = graph.getNoticesByElement().get(noticeAssignable);
+            for (Notice notice : notices) {
+                noticeForId.put(notice.getId(), notice);
+                noticeAssignmentForElement.computeIfAbsent(noticeAssignable, i -> new ArrayList<>()).add(notice);
+            }
         }
 
         // Copy these two service indexes from the graph until we have better ones.
@@ -425,5 +440,10 @@ public class GraphIndex {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
+    }
+
+    public Collection<Notice> getNoticesForElement(NoticeAssignable noticeAssignableElement) {
+        return this.noticeAssignmentForElement
+                .getOrDefault(noticeAssignableElement, Collections.emptyList());
     }
 }

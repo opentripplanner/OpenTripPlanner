@@ -8,6 +8,8 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -16,6 +18,7 @@ import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -24,8 +27,10 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExistentIds;
@@ -50,6 +55,8 @@ public class OtpTransitServiceBuilder {
 
     private final List<Frequency> frequencies = new ArrayList<>();
 
+    private final Multimap<NoticeAssignable, Notice> noticeAssignments = HashMultimap.create();
+
     private final List<Pathway> pathways = new ArrayList<>();
 
     private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
@@ -59,6 +66,8 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
+
+    private final Map<String, StopTime> stopTimesById = new HashMap<>();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
@@ -103,6 +112,10 @@ public class OtpTransitServiceBuilder {
         return frequencies;
     }
 
+    public Multimap<NoticeAssignable, Notice> getNoticeAssignments() {
+        return noticeAssignments;
+    }
+
     public List<Pathway> getPathways() {
         return pathways;
     }
@@ -122,6 +135,8 @@ public class OtpTransitServiceBuilder {
     public TripStopTimes getStopTimesSortedByTrip() {
         return stopTimesByTrip;
     }
+
+    public Map<String, StopTime> getStopTimesById() { return stopTimesById; }
 
     public List<Transfer> getTransfers() {
         return transfers;
