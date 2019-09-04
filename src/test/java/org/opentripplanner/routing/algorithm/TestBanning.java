@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.junit.Ignore;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -15,7 +15,11 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.

@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
 import junit.framework.TestCase;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 

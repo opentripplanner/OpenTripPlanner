@@ -1,12 +1,11 @@
 package org.opentripplanner.standalone;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +24,8 @@ import java.util.List;
  */
 public class GraphBuilderParameters {
 
-    private static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
+
+    private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
     /**
      * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
@@ -180,6 +180,11 @@ public class GraphBuilderParameters {
     public double distanceBetweenElevationSamples;
 
     /**
+     * Netex spesific build parameters.
+     */
+    public final NetexParameters netex;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -191,7 +196,7 @@ public class GraphBuilderParameters {
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
         stationTransfers = config.path("stationTransfers").asBoolean(false);
-        subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
+        subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
@@ -216,6 +221,7 @@ public class GraphBuilderParameters {
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
         distanceBetweenElevationSamples = config.path("distanceBetweenElevationSamples").asDouble(
                 CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
+        netex = new NetexParameters(config.path("netex"));
     }
 
 

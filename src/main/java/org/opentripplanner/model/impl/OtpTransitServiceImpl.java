@@ -79,7 +79,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
      * Create a read only version of the {@link OtpTransitService}.
      */
     OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
-        this.agencies = immutableList(builder.getAgencies());
+        this.agencies = immutableList(builder.getAgenciesById().values());
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
@@ -90,7 +90,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
-        this.trips = immutableList(builder.getTrips().values());
+        this.trips = immutableList(builder.getTripsById().values());
     }
 
     @Override
@@ -135,9 +135,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     @Override
     public List<Stop> getStopsForStation(Stop station) {
-        if(stopsByStation == null) {
-            lazyBuildStopsByStations();
-        }
+        ensureStopByStationsIsInitialized();
         return stopsByStation.get(station);
     }
 
@@ -169,7 +167,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /*  Private Methods */
 
-    private void lazyBuildStopsByStations() {
+    private void ensureStopByStationsIsInitialized() {
+        if(stopsByStation != null) {
+            return;
+        }
+
         stopsByStation = new HashMap<>();
         for (Stop stop : getAllStops()) {
             if (stop.isPlatform() && stop.getParentStation() != null) {

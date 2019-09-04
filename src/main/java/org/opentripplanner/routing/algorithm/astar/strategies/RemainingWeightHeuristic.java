@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import java.io.Serializable;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+
+import java.io.Serializable;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) 

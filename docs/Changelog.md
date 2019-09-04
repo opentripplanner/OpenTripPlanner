@@ -5,6 +5,7 @@
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
+- NeTEx import support (#2769).
 
 ## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)

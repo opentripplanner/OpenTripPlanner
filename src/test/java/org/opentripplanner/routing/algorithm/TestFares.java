@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.junit.Ignore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -23,7 +23,6 @@ import org.opentripplanner.util.TestUtils;
 
 import java.util.List;
 
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
@@ -41,8 +40,7 @@ public class TestFares extends TestCase {
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(gg);
         gg.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -120,8 +118,7 @@ public class TestFares extends TestCase {
         
         factory.run(gg);
         gg.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
@@ -158,8 +155,7 @@ public class TestFares extends TestCase {
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(gg);
         gg.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();

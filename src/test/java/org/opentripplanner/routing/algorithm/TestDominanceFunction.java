@@ -3,11 +3,9 @@ package org.opentripplanner.routing.algorithm;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import static org.mockito.Mockito.mock;

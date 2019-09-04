@@ -1,36 +1,32 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsContextBuilder;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.google.common.collect.Iterables;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TimetableSnapshotTest {
     private static Map<FeedScopedId, TripPattern> patternIndex;
@@ -46,7 +42,8 @@ public class TimetableSnapshotTest {
 
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.putService(CalendarServiceData.class, createCalendarServiceData(context.getTransitBuilder()));
+        graph.putService(CalendarServiceData.class,
+                context.getCalendarServiceData());
 
         patternIndex = new HashMap<>();
         for (TripPattern tripPattern : graph.tripPatternForId.values()) {

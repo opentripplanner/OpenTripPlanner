@@ -44,7 +44,7 @@ public class OtpTransitServiceImplTest {
         GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
         OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
 
-        agency = first(builder.getAgencies());
+        agency = first(builder.getAgenciesById().values());
 
         // Supplement test data with at least one entity in all collections
         FareRule rule = createFareRule();

@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
  * It is modular: GraphBuilderModules are placed in a list and run in sequence.
@@ -119,7 +121,7 @@ public class GraphBuilder implements Runnable {
      * Factory method to create and configure a GraphBuilder with all the appropriate modules
      * to build a graph from the files in the given configuration.
      *
-     * TODO OTP2 - Remove comment when we remove support for multiple routers
+     * TODO #2760 - Remove comment when we remove support for multiple routers
      * TODO parameterize with the router ID and call repeatedly to make multiple builders
      * note of all command line options this is only using  params.inMemory params.preFlight
      * and params.build directory
@@ -127,6 +129,7 @@ public class GraphBuilder implements Runnable {
     public static GraphBuilder create(CommandLineParameters params, GraphConfig config) {
         LOG.info("Wiring up and configuring graph builder task.");
         List<File> gtfsFiles = Lists.newArrayList();
+        List<File> netexFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File demFile = null;
         File dir = params.build;
@@ -144,7 +147,7 @@ public class GraphBuilder implements Runnable {
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
 
         for (File file : dir.listFiles()) {
-            switch (InputFileType.forFile(file)) {
+            switch (InputFileType.forFile(file, builderParams)) {
                 case GTFS:
                     LOG.info("Found GTFS file {}", file);
                     gtfsFiles.add(file);
@@ -161,17 +164,24 @@ public class GraphBuilder implements Runnable {
                         LOG.info("Skipping DEM file {}", file);
                     }
                     break;
+            case NETEX:
+                    LOG.info("Found NETEX file {}", file);
+                    netexFiles.add(file);
+                    break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
             }
         }
-        boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
-        boolean hasGTFS = builderParams.transit && !gtfsFiles.isEmpty();
-        if ( ! ( hasOSM || hasGTFS )) {
+        boolean hasOsm  = builderParams.streets && !osmFiles.isEmpty();
+        boolean hasGtfs = builderParams.transit && !gtfsFiles.isEmpty();
+        boolean hasNetex = builderParams.transit && !netexFiles.isEmpty();
+        boolean hasTransitData = hasGtfs || hasNetex;
+
+        if ( ! ( hasOsm || hasGtfs || hasNetex)) {
             LOG.error("Found no input files from which to build a graph in {}", dir);
             return null;
         }
-        if ( hasOSM ) {
+        if ( hasOsm ) {
             List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
             for (File osmFile : osmFiles) {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
@@ -196,7 +206,7 @@ public class GraphBuilder implements Runnable {
             pruneFloatingIslands.setPruningThresholdIslandWithStops(builderParams.pruningThresholdIslandWithStops);
             graphBuilder.addModule(pruneFloatingIslands);
         }
-        if ( hasGTFS ) {
+        if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
@@ -212,13 +222,19 @@ public class GraphBuilder implements Runnable {
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
             gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
             graphBuilder.addModule(gtfsModule);
-            if ( hasOSM ) {
-                if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addModule(new BusRouteStreetMatcher());
-                }
-                graphBuilder.addModule(new TransitToTaggedStopsModule());
-            }
         }
+
+        if( hasNetex ) {
+            graphBuilder.addModule(netexModule(builderParams, netexFiles));
+        }
+
+        if(hasTransitData && hasOsm) {
+            if (builderParams.matchBusRoutesToStreets) {
+                graphBuilder.addModule(new BusRouteStreetMatcher());
+            }
+            graphBuilder.addModule(new TransitToTaggedStopsModule());
+        }
+
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
         // which need to be handled even when there's no transit.
         StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
@@ -262,7 +278,7 @@ public class GraphBuilder implements Runnable {
             );
             graphBuilder.addModule(elevationBuilder);
         }
-        if ( hasGTFS ) {
+        if ( hasTransitData ) {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
@@ -287,8 +303,9 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
-        public static InputFileType forFile(File file) {
+        GTFS, OSM, DEM, CONFIG, GRAPH, NETEX, OTHER;
+
+        static InputFileType forFile(File file, GraphBuilderParameters buildConfig) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
                 try {
@@ -298,6 +315,7 @@ public class GraphBuilder implements Runnable {
                     if (stopTimesEntry != null) return GTFS;
                 } catch (Exception e) { /* fall through */ }
             }
+            if (buildConfig.netex.moduleFileMatches(name)) return NETEX;
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
