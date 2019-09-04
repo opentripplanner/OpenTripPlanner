@@ -19,6 +19,7 @@
 - Refactor InterleavedBidirectionalHeuristic (#2671)
 - Fix minor test failure against BANO geocoder (#2798)
 - Add "Accept" headers to GTFS-RT HTTP requests (#2796)
+- Fixes surefire test failure during build (#2816)
 
 ## 1.3 (2018-08-03)
 
