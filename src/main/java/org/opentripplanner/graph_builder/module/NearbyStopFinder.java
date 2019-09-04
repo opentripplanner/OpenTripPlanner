@@ -5,7 +5,6 @@ import com.beust.jcommander.internal.Sets;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -29,7 +28,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.

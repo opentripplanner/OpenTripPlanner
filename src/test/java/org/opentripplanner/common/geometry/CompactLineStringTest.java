@@ -1,16 +1,14 @@
 package org.opentripplanner.common.geometry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.junit.Test;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class CompactLineStringTest extends TestCase {
 

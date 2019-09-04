@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.annotation.RepeatedStops;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
  * This class is responsible for cleaning stop times, removing duplicates, correcting bad data
- * and so on. This was previously done in the
- * {@link org.opentripplanner.routing.edgetype.factory.PatternHopFactory}, and the code is
- * extracted out of it to make the PatternHopFactory reusable for NETEX and GTFS file import.
+ * and so on. This was previously done in the {@link PatternHopFactory}. The code is
+ * extracted out of {@link PatternHopFactory} to make the it reusable for the NeTEx and GTFS file
+ * import. This do only apply to GTFS imports.
  */
 public class RepairStopTimesForEachTripOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RepairStopTimesForEachTripOperation.class);

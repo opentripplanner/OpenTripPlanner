@@ -1,29 +1,19 @@
 package org.opentripplanner.routing.core;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import junit.framework.TestCase;
-
 import org.junit.Ignore;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
@@ -41,11 +31,18 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.TestUtils;
 
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * This is a singleton class to hold graph data between test runs, since loading it is slow.
@@ -77,8 +74,7 @@ class Context {
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
         graph.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
 
         feedId = context.getFeedId().getId();

@@ -105,9 +105,9 @@ public class PatternHopFactory {
 
     public PatternHopFactory(GtfsContext context) {
         this.feedId = context.getFeedId();
-        this.transitService = context.getTransitBuilder().build();
+        this.transitService = context.getTransitService();
     }
-    
+
     public PatternHopFactory(
             GtfsFeedId feedId, OtpTransitService transitService, FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance, int subwayAccessTime, int maxInterlineDistance
@@ -321,7 +321,7 @@ public class PatternHopFactory {
      */
     private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
         FeedScopedId shapeId = trip.getShapeId();
-        
+
         // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
         LineString[] geoms = new LineString[stopTimes.size() - 1];
 
@@ -591,7 +591,7 @@ public class PatternHopFactory {
         }
     }
 
-    
+
     private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
 
         double startDistance = st0.getShapeDistTraveled();
@@ -754,11 +754,8 @@ public class PatternHopFactory {
             i++;
         }
 
-        /*
-         * If we don't have distances here, we can't calculate them ourselves because we can't
-         * assume the units will match
-         */
-
+        // If we don't have distances here, we can't calculate them ourselves because we can't
+        // assume the units will match
         if (!hasAllDistances) {
             distances = null;
         }

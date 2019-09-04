@@ -78,10 +78,12 @@
     </scm>
 
     <properties>
+        <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>20.1</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
+        <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -570,6 +572,17 @@
             </exclusions>
         </dependency>
 
+        <!--
+            Netex XML document - JAXB generated Java model.
+            This is generated using the official Netex schema(v1.0) and support the entire model,
+            not just the Nordic/Norwegian profile witch is currently supported by OTP.
+         -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-java-model</artifactId>
+            <version>1.0.8</version>
+        </dependency>
+
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -784,7 +797,7 @@
             <artifactId>graphql-java</artifactId>
             <version>2.2.0</version>
         </dependency>
-        <!-- Provides annotations like XmlElement indicating how classes should be serialized -->
+        <!-- Provides annotations like XmlElement indicating how classes should be serialized  -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>

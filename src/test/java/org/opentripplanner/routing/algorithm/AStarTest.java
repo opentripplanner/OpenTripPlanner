@@ -1,20 +1,13 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
@@ -23,9 +16,15 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AStarTest {
 

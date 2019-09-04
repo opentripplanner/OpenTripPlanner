@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A termination strategy that terminates after multiple targets have been reached.

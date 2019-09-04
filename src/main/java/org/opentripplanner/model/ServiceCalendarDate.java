@@ -10,12 +10,11 @@ import java.util.Objects;
  * @author bdferris
  *
  */
-public final class ServiceCalendarDate implements Serializable {
+public final class ServiceCalendarDate implements Serializable, Comparable<ServiceCalendarDate> {
 
     private static final long serialVersionUID = 1L;
 
     public static final int EXCEPTION_TYPE_ADD = 1;
-
     public static final int EXCEPTION_TYPE_REMOVE = 2;
 
     private FeedScopedId serviceId;
@@ -67,5 +66,17 @@ public final class ServiceCalendarDate implements Serializable {
     public String toString() {
         return "<CalendarDate serviceId=" + this.serviceId + " date=" + this.date + " exception="
                 + this.exceptionType + ">";
+    }
+
+    /**
+     * Default sort order is to sort on {@code serviceId} first and then on {@code date}.
+     */
+    @Override
+    public int compareTo(ServiceCalendarDate other) {
+        int c = serviceId.compareTo(other.serviceId);
+        if(c == 0) {
+            c = date.compareTo(other.date);
+        }
+        return c;
     }
 }

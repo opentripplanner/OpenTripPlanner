@@ -10,15 +10,15 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -505,7 +505,13 @@ public class TripPattern implements Cloneable, Serializable {
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         services = new BitSet();
         for (Trip trip : trips) {
-            services.set(serviceCodes.get(trip.getServiceId()));
+            FeedScopedId serviceId = trip.getServiceId();
+            if (serviceCodes.containsKey(serviceId)) {
+                services.set(serviceCodes.get(trip.getServiceId()));
+            }
+            else {
+                LOG.warn("ServiceCode " + serviceCodes.toString() + " not found.");
+            }
         }
         scheduledTimetable.setServiceCodes (serviceCodes);
     }

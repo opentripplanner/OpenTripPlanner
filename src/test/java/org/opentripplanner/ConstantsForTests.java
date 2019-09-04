@@ -1,16 +1,15 @@
 package org.opentripplanner;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
 
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
+import java.io.IOException;
+import java.util.HashMap;
+
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class ConstantsForTests {
@@ -70,7 +69,7 @@ public class ConstantsForTests {
             // this is now making a duplicate calendarservicedata but it's oh so practical
             portlandGraph.putService(
                     CalendarServiceData.class,
-                    createCalendarServiceData(portlandContext.getTransitBuilder())
+                    portlandContext.getCalendarServiceData()
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,8 +92,7 @@ public class ConstantsForTests {
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
         graph.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         return graph;
     }

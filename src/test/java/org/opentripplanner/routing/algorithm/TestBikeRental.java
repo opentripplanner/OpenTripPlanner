@@ -1,19 +1,17 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -22,6 +20,10 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestBikeRental extends TestCase {
     public void testBasic() throws Exception {

@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleImpl;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;

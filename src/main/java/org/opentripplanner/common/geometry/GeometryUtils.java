@@ -1,11 +1,16 @@
 package org.opentripplanner.common.geometry;
 
-import org.locationtech.jts.geom.*;
+import org.geojson.LngLatAlt;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.geojson.LngLatAlt;
-import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;

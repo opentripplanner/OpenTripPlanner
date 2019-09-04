@@ -56,7 +56,7 @@ public class GTFSToOtpTransitServiceMapper {
     private OtpTransitServiceBuilder map(GtfsRelationalDao data) {
         OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
-        builder.getAgencies().addAll(agencyMapper.map(data.getAllAgencies()));
+        builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
         builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
         builder.getFareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
@@ -69,7 +69,7 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getStops().addAll(stopMapper.map(data.getAllStops()));
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
-        builder.getTrips().addAll(tripMapper.map(data.getAllTrips()));
+        builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
         return builder;
     }

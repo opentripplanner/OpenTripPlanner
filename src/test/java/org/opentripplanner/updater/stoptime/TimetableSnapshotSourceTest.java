@@ -1,46 +1,41 @@
 package org.opentripplanner.updater.stoptime;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Calendar;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -59,17 +54,12 @@ public class TimetableSnapshotSourceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        GtfsContextBuilder contextBuilder = contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withGraphBuilderAnnotationsAndDeduplicator(graph);
-
-        context = contextBuilder
+        context = contextBuilder(ConstantsForTests.FAKE_GTFS)
+                .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .turnOnSetAgencyToFeedIdForAllElements()
-                .turnOffRepairStopTimesAndTripPatternsGeneration()
                 .build();
 
         feedId = context.getFeedId().getId();
-
-        contextBuilder.repairStopTimesAndGenerateTripPatterns();
 
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
@@ -90,8 +80,7 @@ public class TimetableSnapshotSourceTest {
     @Before
     public void setUp() {
         graph.putService(
-                CalendarServiceData.class,
-                createCalendarServiceData(context.getTransitBuilder())
+                CalendarServiceData.class, context.getCalendarServiceData()
         );
         updater = new TimetableSnapshotSource(graph);
     }
