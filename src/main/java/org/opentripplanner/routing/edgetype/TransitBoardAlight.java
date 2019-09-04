@@ -331,7 +331,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                         options.nonpreferredTransferPenalty);
             }
 
-            s1.incrementWeight(preferences_penalty + transferPenalty);
+            int shuttlePenalty = getPattern().route.isShuttle() ? options.shuttlePenalty : 0;
+
+            s1.incrementWeight(preferences_penalty + transferPenalty + shuttlePenalty);
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights

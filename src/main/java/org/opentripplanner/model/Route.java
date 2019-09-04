@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.Optional;
+
 public final class Route extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
@@ -165,6 +167,10 @@ public final class Route extends IdentityBean<FeedScopedId> {
 
     public void setEligibilityRestricted(int eligibilityRestricted) {
         this.eligibilityRestricted = eligibilityRestricted;
+    }
+
+    public boolean isShuttle() {
+        return Optional.ofNullable(desc).orElse("").equals("Rail Replacement Bus");
     }
 
     @Override

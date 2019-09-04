@@ -12,8 +12,8 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.AvoidShuttlesComparator;
 import org.opentripplanner.routing.impl.DurationComparator;
-import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -312,6 +312,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Penalty for using a non-preferred transfer */
     public int nonpreferredTransferPenalty = 180;
+
+    /** Penalty for using MBTA shuttles **/
+    public int shuttlePenalty = 600;
 
     /**
      * For the bike triangle, how important time is. 
@@ -1495,7 +1498,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if ("duration".equals(pathComparator)) {
             return new DurationComparator();
         }
-        return new PathComparator(compareStartTimes);
+        return new AvoidShuttlesComparator(compareStartTimes);
     }
 
 }
