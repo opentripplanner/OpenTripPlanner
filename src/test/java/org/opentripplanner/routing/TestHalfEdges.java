@@ -31,7 +31,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
 
@@ -56,9 +56,9 @@ public class TestHalfEdges {
 
     private IntersectionVertex br, tr, bl, tl;
 
-    private TransitStop station1;
+    private StopVertex station1;
 
-    private TransitStop station2;
+    private StopVertex station2;
 
     public LineString createGeometry(Vertex a, Vertex b) {
         GeometryFactory factory = new GeometryFactory();
@@ -116,8 +116,8 @@ public class TestHalfEdges {
         s2.setLat(40.0099999);
         s2.setId(new FeedScopedId("A", "morx station"));
 
-        station1 = new TransitStop(graph, s1);
-        station2 = new TransitStop(graph, s2);
+        station1 = new StopVertex(graph, s1);
+        station2 = new StopVertex(graph, s2);
         station1.addMode(TraverseMode.RAIL);
         station2.addMode(TraverseMode.RAIL);
         

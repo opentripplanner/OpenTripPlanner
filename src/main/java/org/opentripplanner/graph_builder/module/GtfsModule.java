@@ -120,12 +120,6 @@ public class GtfsModule implements GraphBuilderModule {
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
                     hf.createTransfersTxtTransfers();
                 }
-                if (gtfsBundle.linkStopsToParentStations) {
-                    hf.linkStopsToParentStations(graph);
-                }
-                if (gtfsBundle.parentStationTransfers) {
-                    hf.createParentStationTransfers();
-                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

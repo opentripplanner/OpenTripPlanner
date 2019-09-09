@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import java.util.List;
 import java.util.Locale;
@@ -25,13 +25,13 @@ public class SimpleTransfer extends Edge {
     
     private List<Edge> edges;
 
-    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
+    public SimpleTransfer(StopVertex from, StopVertex to, double distance, LineString geometry, List<Edge> edges) {
         super(from, to);
         this.distance = distance;
         this.edges = edges;
     }
 
-    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
+    public SimpleTransfer(StopVertex from, StopVertex to, double distance, LineString geometry) {
         this(from, to, distance, geometry, null);
     }
 

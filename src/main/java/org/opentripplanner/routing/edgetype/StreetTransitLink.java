@@ -8,8 +8,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -27,17 +27,17 @@ public class StreetTransitLink extends Edge {
 
     private boolean wheelchairAccessible;
 
-    private TransitStop transitStop;
+    private StopVertex stopVertex;
 
-    public StreetTransitLink(StreetVertex fromv, TransitStop tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(StreetVertex fromv, StopVertex tov, boolean wheelchairAccessible) {
     	super(fromv, tov);
-    	transitStop = tov;
+    	stopVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public StreetTransitLink(TransitStop fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(StopVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
-        transitStop = fromv;
+        stopVertex = fromv;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -77,7 +77,7 @@ public class StreetTransitLink extends Edge {
         // if they are for the same stop.
         if (
             s0.backEdge instanceof StreetTransitLink &&
-                ((StreetTransitLink) s0.backEdge).transitStop == this.transitStop
+                ((StreetTransitLink) s0.backEdge).stopVertex == this.stopVertex
         ) {
             return null;
         }
@@ -115,8 +115,8 @@ public class StreetTransitLink extends Edge {
                 return null;
             }
         }
-        s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
-        s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
+        s1.incrementTimeInSeconds(stopVertex.getStreetToStopTime() + STL_TRAVERSE_COST);
+        s1.incrementWeight(STL_TRAVERSE_COST + stopVertex.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }

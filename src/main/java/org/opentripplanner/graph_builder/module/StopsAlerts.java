@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.module.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public class StopsAlerts implements GraphBuilderModule {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
             pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");
-            for (TransitStop ts : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+            for (StopVertex ts : Iterables.filter(graph.getVertices(), StopVertex.class)) {
                 StringBuilder types = new StringBuilder();
                 for(IStopTester stopTester:stopTesters){
                     if(stopTester.fulfillDemands(ts,graph)){
@@ -41,7 +41,7 @@ public class StopsAlerts implements GraphBuilderModule {
                     }
                 }
                 if(types.length() > 0) {
-                    pw.printf("%s,%f,%f,%s\n",ts.getStopId(), ts.getCoordinate().x,
+                    pw.printf("%s,%f,%f,%s\n",ts.getStop().getId(), ts.getCoordinate().x,
                             ts.getCoordinate().y, types.toString());
                 }
             }

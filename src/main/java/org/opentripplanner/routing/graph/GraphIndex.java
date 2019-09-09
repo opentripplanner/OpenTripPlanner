@@ -40,7 +40,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,13 +77,13 @@ public class GraphIndex {
     public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
     public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
-    public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
+    public final Map<Stop, StopVertex> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
-    final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<>();
+    final HashGridSpatialIndex<StopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -120,15 +120,14 @@ public class GraphIndex {
         /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         for (Vertex vertex : graph.getVertices()) {
-            if (vertex instanceof TransitStop) {
-                TransitStop transitStop = (TransitStop) vertex;
-                Stop stop = transitStop.getStop();
+            if (vertex instanceof StopVertex) {
+                StopVertex stopVertex = (StopVertex) vertex;
+                Stop stop = stopVertex.getStop();
                 stopForId.put(stop.getId(), stop);
-                stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                stopVertexForStop.put(stop, stopVertex);
             }
         }
-        for (TransitStop stopVertex : stopVertexForStop.values()) {
+        for (StopVertex stopVertex : stopVertexForStop.values()) {
             Envelope envelope = new Envelope(stopVertex.getCoordinate());
             stopSpatialIndex.insert(envelope, stopVertex);
         }
@@ -202,8 +201,8 @@ public class GraphIndex {
         // Accumulate stops into ret as the search runs.
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
-            if (vertex instanceof TransitStop) {
-                stopsFound.add(new StopAndDistance(((TransitStop) vertex).getStop(),
+            if (vertex instanceof StopVertex) {
+                stopsFound.add(new StopAndDistance(((StopVertex) vertex).getStop(),
                     (int) state.getElapsedTimeSeconds()));
             }
         }

@@ -203,7 +203,7 @@ public abstract class GraphPathToTripPlanConverter {
         itinerary.walkDistance = lastState.getWalkDistance();
 
         itinerary.transfers = lastState.getNumBoardings();
-        if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
+        if (itinerary.transfers > 0) {
             itinerary.transfers--;
         }
 
@@ -626,10 +626,10 @@ public abstract class GraphPathToTripPlanConverter {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof TransitVertex ?
-                ((TransitVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof TransitVertex ?
-                ((TransitVertex) lastVertex).getStop(): null;
+        Stop firstStop = firstVertex instanceof StopVertex ?
+                ((StopVertex) firstVertex).getStop(): null;
+        Stop lastStop = lastVertex instanceof StopVertex ?
+                ((StopVertex) lastVertex).getStop(): null;
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
@@ -646,9 +646,9 @@ public abstract class GraphPathToTripPlanConverter {
             for (int i = 1; i < edges.length; i++) {
                 Vertex vertex = states[i].getVertex();
 
-                if (!(vertex instanceof TransitVertex)) continue;
+                if (!(vertex instanceof StopVertex)) continue;
 
-                currentStop = ((TransitVertex) vertex).getStop();
+                currentStop = ((StopVertex) vertex).getStop();
                 if (currentStop == firstStop) continue;
 
                 if (currentStop == previousStop) {                  // Avoid duplication of stops
@@ -688,14 +688,11 @@ public abstract class GraphPathToTripPlanConverter {
         Place place = new Place(vertex.getX(), vertex.getY(), name,
                 makeCalendar(state), makeCalendar(state));
 
-        if (endOfLeg) edge = state.getBackEdge();
-
-        if (vertex instanceof TransitVertex && edge instanceof OnboardEdge) {
+        if (vertex instanceof StopVertex) {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
-            place.platformCode = stop.getPlatformCode();
-            place.zoneId = stop.getZoneId();
-            place.stopIndex = ((OnboardEdge) edge).getStopIndex();
+            place.platformCode = stop.getCode();
+            place.zoneId = stop.getZone();
             if (endOfLeg) place.stopIndex++;
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);

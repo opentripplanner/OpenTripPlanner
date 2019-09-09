@@ -14,7 +14,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.util.TestUtils;
 
 import java.util.List;
@@ -63,7 +63,7 @@ public class TestGraphPath extends TestCase {
         // Check that the resulting path visits the stops in the right order.
         List<Vertex> stopvs = Lists.newArrayList();
         for (State state : path.states) {
-            if (state.getVertex() instanceof TransitStop) {
+            if (state.getVertex() instanceof StopVertex) {
                 stopvs.add(state.getVertex());
             }
         }

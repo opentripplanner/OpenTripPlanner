@@ -12,6 +12,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
@@ -25,8 +26,6 @@ import java.util.List;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class OtpTransitServiceImplTest {
@@ -109,31 +108,18 @@ public class OtpTransitServiceImplTest {
     }
 
     @Test
-    public void getTransfersWhenStationHasNoPlatfromsShouldNotFail() {
-        OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
+    public void testGetAllStations() {
+        Collection<Station> stations = subject.getAllStations();
 
-        Stop stationWithoutPlatforms = new Stop();
-        stationWithoutPlatforms.setId(new FeedScopedId("A", "123"));
-        stationWithoutPlatforms.setLocationType(1);
-        stationWithoutPlatforms.setName("Station without platforms");
-        builder.getStops().add(stationWithoutPlatforms);
-
-        OtpTransitService service = new OtpTransitServiceImpl(builder);
-
-        List<Stop> platforms = service.getStopsForStation(stationWithoutPlatforms);
-
-        assertNull("No platforms forund", platforms);
-        assertTrue(
-                "The type is changed from Station to Platform",
-                stationWithoutPlatforms.isPlatform()
-        );
+        assertEquals(1, stations.size());
+        assertEquals("<Station Z_station>", first(stations).toString());
     }
 
     @Test
     public void testGetAllStops() {
         Collection<Stop> stops = subject.getAllStops();
 
-        assertEquals(25, stops.size());
+        assertEquals(22, stops.size());
         assertEquals("<Stop Z_A>", first(stops).toString());
     }
 
@@ -165,7 +151,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopsForStation() {
-        List<Stop> stops = subject.getStopsForStation(subject.getStopForId(STATION_ID));
+        List<Stop> stops = subject.getStopsForStation(subject.getStationForId(STATION_ID));
         assertEquals("[<Stop Z_A>]", stops.toString());
     }
 

@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
-
+import java.util.stream.Collectors;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -12,6 +12,10 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
  */
 public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
+
+    private final StationMapper stationMapper = new StationMapper();
+
+    private final StationStopLinker stationStopLinker = new StationStopLinker();
 
     private final StopMapper stopMapper = new StopMapper();
 
@@ -36,7 +40,7 @@ public class GTFSToOtpTransitServiceMapper {
     private final FrequencyMapper frequencyMapper = new FrequencyMapper(tripMapper);
 
     private final TransferMapper transferMapper = new TransferMapper(
-            routeMapper, stopMapper, tripMapper
+            routeMapper, stationMapper, stopMapper, tripMapper
     );
 
     private final FareRuleMapper fareRuleMapper = new FareRuleMapper(
@@ -66,7 +70,13 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
-        builder.getStops().addAll(stopMapper.map(data.getAllStops()));
+        builder.getStops().addAll(stopMapper.map(
+                data.getAllStops().stream().filter(s -> s.getLocationType() == 0)
+                        .collect(Collectors.toList())));
+        builder.getStations().addAll(stationMapper.map(
+                data.getAllStops().stream().filter(s -> s.getLocationType() == 1)
+                        .collect(Collectors.toList())));
+        stationStopLinker.link(data.getAllStops(), builder.getStations(), builder.getStops());
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));

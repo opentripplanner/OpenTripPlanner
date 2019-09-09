@@ -4,6 +4,10 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.opentripplanner.model.Stop;
 
+import static org.opentripplanner.api.adapters.WheelChairCodeMapper.mapFromWheelChairCode;
+
+// TODO What is this used for? This needs to map either Stop or Station depending on location type
+
 public class StopAdapter extends XmlAdapter<StopType, Stop> {
 
     @Override
@@ -15,15 +19,13 @@ public class StopAdapter extends XmlAdapter<StopType, Stop> {
         a.setId(arg.id);
         a.setName(arg.stopName);
         a.setCode(arg.stopCode);
-        a.setDesc(arg.stopDesc);
+        a.setDescription(arg.stopDesc);
         a.setLat(arg.stopLat);
         a.setLon(arg.stopLon);
-        a.setZoneId(arg.zoneId);
+        a.setZone(arg.zoneId);
         a.setUrl(arg.stopUrl);
-        a.setLocationType(arg.locationType);
-        a.setParentStation(arg.parentStation);
-        a.setWheelchairBoarding(arg.wheelchairBoarding);
-        a.setDirection(arg.direction);
+        //a.setParentStation(arg.parentStation);
+        a.setWheelchairBoarding(mapFromWheelChairCode(arg.wheelchairBoarding));
         return new Stop(a);
     }
 

@@ -9,7 +9,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         ArrayList<Vertex> vertices = new ArrayList<>();
         vertices.addAll(graph.getVertices());
 
-        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
+        for (StopVertex ts : Iterables.filter(vertices, StopVertex.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
@@ -74,15 +74,15 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!connectVertexToStop(ts, wheelchairAccessible)) {
-                    LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());
+                    LOG.debug("Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString());
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
         }
     }
 
-    private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
-        String stopCode = ts.getStopCode();
+    private boolean connectVertexToStop(StopVertex ts, boolean wheelchairAccessible) {
+        String stopCode = ts.getStop().getCode();
         if (stopCode == null){
             return false;
         }
@@ -91,7 +91,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
         // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
-        // in their ref= tag that matches the GTFS stop code of this TransitStop.
+        // in their ref= tag that matches the GTFS stop code of this StopVertex.
         for (Vertex v : vertices){
             if (!(v instanceof TransitStopStreetVertex)){
                 continue;

@@ -5,7 +5,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import static org.mockito.Mockito.mock;
@@ -33,8 +33,8 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Stop stop2 = new Stop();
         stop2.setId(new FeedScopedId("agency", "stop2"));
         
-        Vertex from = new TransitStop(graph, stop1);
-        Vertex to = new TransitStop(graph, stop2);
+        Vertex from = new StopVertex(graph, stop1);
+        Vertex to = new StopVertex(graph, stop2);
         
         // Create dummy TimetableSnapshot
         TimetableSnapshot snapshot = new TimetableSnapshot();

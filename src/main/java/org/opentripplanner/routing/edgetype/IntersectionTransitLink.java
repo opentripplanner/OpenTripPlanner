@@ -10,7 +10,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import java.util.Locale;
 
@@ -23,13 +23,13 @@ public class IntersectionTransitLink extends Edge {
 
     private int length_mm;
 
-    public IntersectionTransitLink(TransitStop tstop, OsmVertex intersection, int lengthMeters) {
+    public IntersectionTransitLink(StopVertex tstop, OsmVertex intersection, int lengthMeters) {
         super(tstop, intersection);
 
         length_mm = lengthMeters * 1000;
     }
 
-    public IntersectionTransitLink(OsmVertex intersection, TransitStop tstop, int lengthMeters) {
+    public IntersectionTransitLink(OsmVertex intersection, StopVertex tstop, int lengthMeters) {
         super(intersection, tstop);
 
         length_mm = lengthMeters * 1000;

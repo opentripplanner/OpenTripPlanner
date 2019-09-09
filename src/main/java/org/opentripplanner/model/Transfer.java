@@ -2,31 +2,29 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public final class Transfer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final int MISSING_VALUE = -999;
+    private final Stop fromStop;
 
-    private Stop fromStop;
+    private final Route fromRoute;
 
-    private Route fromRoute;
+    private final Trip fromTrip;
 
-    private Trip fromTrip;
+    private final Stop toStop;
 
-    private Stop toStop;
+    private final Route toRoute;
 
-    private Route toRoute;
+    private final Trip toTrip;
 
-    private Trip toTrip;
+    private final TransferType transferType;
 
-    private int transferType;
-
-    private int minTransferTime = MISSING_VALUE;
-
-    public Transfer() {
-    }
+    private final int minTransferTimeSeconds;
 
     public Transfer(Transfer obj) {
         this.fromStop = obj.fromStop;
@@ -36,79 +34,155 @@ public final class Transfer implements Serializable {
         this.toRoute = obj.toRoute;
         this.toTrip = obj.toTrip;
         this.transferType = obj.transferType;
-        this.minTransferTime = obj.minTransferTime;
+        this.minTransferTimeSeconds = obj.minTransferTimeSeconds;
+    }
+
+    public Transfer(
+            Stop fromStop,
+            Stop toStop,
+            Route fromRoute,
+            Route toRoute,
+            Trip fromTrip,
+            Trip toTrip,
+            TransferType transferType,
+            int minTransferTimeSeconds
+    ) {
+        this.fromStop = fromStop;
+        this.toStop = toStop;
+        this.fromRoute = fromRoute;
+        this.toRoute = toRoute;
+        this.fromTrip = fromTrip;
+        this.toTrip = toTrip;
+        this.transferType = transferType;
+        this.minTransferTimeSeconds = minTransferTimeSeconds;
+    }
+
+    /**
+     * Gets a single transfer between the stops specified
+     */
+    public static Collection<Transfer> getExpandedTransfers(
+            Stop fromStop,
+            Stop toStop,
+            Route fromRoute,
+            Route toRoute,
+            Trip fromTrip,
+            Trip toTrip,
+            TransferType transferType,
+            int minTransferTimeSeconds
+    ) {
+        Transfer transfer = new Transfer(
+                fromStop,
+                toStop,
+                fromRoute,
+                toRoute,
+                fromTrip,
+                toTrip,
+                transferType,
+                minTransferTimeSeconds
+        );
+        return Collections.singletonList(transfer);
+    }
+
+    /**
+     * The transfer is expanded to include transfers from all child stops
+     */
+    public static Collection<Transfer> getExpandedTransfers(
+            Station fromStation,
+            Stop toStop,
+            Route fromRoute,
+            Route toRoute,
+            Trip fromTrip,
+            Trip toTrip,
+            TransferType transferType,
+            int minTransferTimeSeconds
+    ) {
+        Collection<Transfer> expandedTransfers = new ArrayList<>();
+
+        for (Stop fromStop : fromStation.getChildStops()) {
+            expandedTransfers.add(new Transfer(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip,
+                    transferType, minTransferTimeSeconds));
+        }
+
+        return expandedTransfers;
+    }
+
+    /**
+     * The transfer is expanded to include transfers to all child stops
+     */
+    public static Collection<Transfer> getExpandedTransfers(
+            Stop fromStop,
+            Station toStation,
+            Route fromRoute,
+            Route toRoute,
+            Trip fromTrip,
+            Trip toTrip,
+            TransferType transferType,
+            int minTransferTimeSeconds
+    ) {
+        Collection<Transfer> expandedTransfers = new ArrayList<>();
+
+        for (Stop toStop : toStation.getChildStops()) {
+            expandedTransfers.add(new Transfer(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip,
+                    transferType, minTransferTimeSeconds));
+        }
+
+        return expandedTransfers;
+    }
+
+    /**
+     * The transfer is expanded to include transfers from all child stops to all child stops
+     */
+    public static Collection<Transfer> getExpandedTransfers(
+            Station fromStation,
+            Station toStation,
+            Route fromRoute,
+            Route toRoute,
+            Trip fromTrip,
+            Trip toTrip,
+            TransferType transferType,
+            int minTransferTimeSeconds
+    ) {
+        Collection<Transfer> expandedTransfers = new ArrayList<>();
+
+        for (Stop fromStop : fromStation.getChildStops()) {
+            for (Stop toStop : toStation.getChildStops())
+            expandedTransfers.add(new Transfer(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip,
+                    transferType, minTransferTimeSeconds));
+        }
+
+        return expandedTransfers;
     }
 
     public Stop getFromStop() {
         return fromStop;
     }
 
-    public void setFromStop(Stop fromStop) {
-        this.fromStop = fromStop;
-    }
-
     public Route getFromRoute() {
         return fromRoute;
-    }
-
-    public void setFromRoute(Route fromRoute) {
-        this.fromRoute = fromRoute;
     }
 
     public Trip getFromTrip() {
         return fromTrip;
     }
 
-    public void setFromTrip(Trip fromTrip) {
-        this.fromTrip = fromTrip;
-    }
-
     public Stop getToStop() {
         return toStop;
-    }
-
-    public void setToStop(Stop toStop) {
-        this.toStop = toStop;
     }
 
     public Route getToRoute() {
         return toRoute;
     }
 
-    public void setToRoute(Route toRoute) {
-        this.toRoute = toRoute;
-    }
-
     public Trip getToTrip() {
         return toTrip;
     }
 
-    public void setToTrip(Trip toTrip) {
-        this.toTrip = toTrip;
-    }
-
-    public int getTransferType() {
+    public TransferType getTransferType() {
         return transferType;
     }
 
-    public void setTransferType(int transferType) {
-        this.transferType = transferType;
-    }
-
-    public boolean isMinTransferTimeSet() {
-        return minTransferTime != MISSING_VALUE;
-    }
-
-    public int getMinTransferTime() {
-        return minTransferTime;
-    }
-
-    public void setMinTransferTime(int minTransferTime) {
-        this.minTransferTime = minTransferTime;
-    }
-
-    public void clearMinTransferTime() {
-        this.minTransferTime = MISSING_VALUE;
+    public int getMinTransferTimeSeconds() {
+        return minTransferTimeSeconds;
     }
 
     public String toString() {

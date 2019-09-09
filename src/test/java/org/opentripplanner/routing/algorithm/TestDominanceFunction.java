@@ -6,7 +6,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import static org.mockito.Mockito.mock;
 
@@ -15,8 +15,8 @@ public class TestDominanceFunction extends TestCase {
 
     public void testGeneralDominanceFunction() {
         DominanceFunction minimumWeightDominanceFunction = new DominanceFunction.MinimumWeight();
-        Vertex fromVertex = mock(TransitStop.class);
-        Vertex toVertex = mock(TransitStop.class);
+        Vertex fromVertex = mock(StopVertex.class);
+        Vertex toVertex = mock(StopVertex.class);
         RoutingRequest request = new RoutingRequest();
 
         // Test if domination works in the general case

@@ -35,6 +35,7 @@ import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -52,7 +53,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -227,7 +228,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Station> stationById = new HashMap<>();
 
     /**
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
@@ -905,7 +906,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
             Median median = new Median();
 
             getVertices().stream()
-                .filter(v -> v instanceof TransitStop)
+                .filter(v -> v instanceof StopVertex)
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());

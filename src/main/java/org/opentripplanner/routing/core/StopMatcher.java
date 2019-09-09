@@ -87,10 +87,9 @@ public class StopMatcher implements Cloneable, Serializable {
                 return true;    
             }
             // Check whether parent stop is matched
-            else if (stop.getParentStation() != null 
-                    && !stop.getParentStation().isEmpty()) {
+            else if (stop.getParentStation() != null) {
                 // This stop has a parent
-                FeedScopedId parentId = new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
+                FeedScopedId parentId = stop.getParentStation().getId();
                 if (matches(parentId)) {
                     return true;    
                 }

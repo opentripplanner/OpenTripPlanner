@@ -138,7 +138,7 @@ public class AlertPatch implements Serializable {
             }
         } else if (stop != null) {
             throw new UnsupportedOperationException(
-                    "Cannot add alert to TransitStop - "
+                    "Cannot add alert to StopVertex - "
                     + "PreBoard and PreAlight edges no longer exist."
             );
         }
@@ -190,7 +190,7 @@ public class AlertPatch implements Serializable {
             }
         } else if (stop != null) {
             throw new UnsupportedOperationException(
-                    "Cannot remove alert from TransitStop - "
+                    "Cannot remove alert from StopVertex - "
                     + "PreBoard and PreAlight edges no longer exist."
             );
         }

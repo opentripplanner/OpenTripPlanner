@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
@@ -23,24 +24,30 @@ class StopMapper {
     }
 
     private Stop doMap(org.onebusaway.gtfs.model.Stop rhs) {
-        Stop lhs = new Stop();
+        Stop otpStop = new Stop();
 
-        lhs.setId(mapAgencyAndId(rhs.getId()));
-        lhs.setName(rhs.getName());
-        lhs.setLat(rhs.getLat());
-        lhs.setLon(rhs.getLon());
-        lhs.setCode(rhs.getCode());
-        lhs.setDesc(rhs.getDesc());
-        lhs.setZoneId(rhs.getZoneId());
-        lhs.setUrl(rhs.getUrl());
-        lhs.setLocationType(rhs.getLocationType());
-        lhs.setParentStation(rhs.getParentStation());
-        lhs.setWheelchairBoarding(rhs.getWheelchairBoarding());
-        lhs.setDirection(rhs.getDirection());
-        lhs.setTimezone(rhs.getTimezone());
-        lhs.setVehicleType(rhs.getVehicleType());
-        lhs.setPlatformCode(rhs.getPlatformCode());
+        otpStop.setId(mapAgencyAndId(rhs.getId()));
+        otpStop.setName(rhs.getName());
+        otpStop.setLat(rhs.getLat());
+        otpStop.setLon(rhs.getLon());
+        otpStop.setCode(rhs.getCode());
+        otpStop.setDescription(rhs.getDesc());
+        otpStop.setZone(rhs.getZoneId());
+        otpStop.setUrl(rhs.getUrl());
+        otpStop.setWheelchairBoarding(mapGtfsWheelChairCode(rhs.getWheelchairBoarding()));
 
-        return lhs;
+        return otpStop;
+    }
+
+    private WheelChairBoarding mapGtfsWheelChairCode(int wheelChairCode) {
+        switch (wheelChairCode) {
+            case 2:
+                return WheelChairBoarding.NOT_POSSIBLE;
+            case 1:
+                return WheelChairBoarding.POSSIBLE;
+            case 0:
+            default:
+                return WheelChairBoarding.NO_INFORMATION;
+        }
     }
 }

@@ -7,7 +7,7 @@ import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,34 +53,34 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
         int stopsAnalyzed = 0;
 
-        for (TransitStop originStop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+        for (StopVertex originStop : Iterables.filter(graph.getVertices(), StopVertex.class)) {
             if (++stopsAnalyzed % 1000 == 0) {
                 LOG.info("{} stops analyzed", stopsAnalyzed);
             }
 
             /* Find nearby stops by euclidean distance */
-            Map<TransitStop, NearbyStopFinder.StopAtDistance> stopsEuclidean =
+            Map<StopVertex, NearbyStopFinder.StopAtDistance> stopsEuclidean =
                     nearbyStopFinderEuclidian.findNearbyStopsEuclidean(originStop).stream()
                             .collect(Collectors.toMap(t -> t.tstop, t -> t));
 
             /* Find nearby stops by street distance */
-            Map<TransitStop, NearbyStopFinder.StopAtDistance> stopsStreets =
+            Map<StopVertex, NearbyStopFinder.StopAtDistance> stopsStreets =
                     nearbyStopFinderStreets.findNearbyStopsViaStreets(originStop).stream()
                             .collect(Collectors.toMap(t -> t.tstop, t -> t));
 
             /* Get stops found by both street and euclidean search */
-            List<TransitStop> stopsConnected =
+            List<StopVertex> stopsConnected =
                     stopsEuclidean.keySet().stream().filter(t -> stopsStreets.keySet().contains(t)
                             && t != originStop)
                             .collect(Collectors.toList());
 
             /* Get stops found by euclidean search but not street search */
-            List<TransitStop> stopsUnconnected =
+            List<StopVertex> stopsUnconnected =
                     stopsEuclidean.keySet().stream().filter(t -> !stopsStreets.keySet().contains(t)
                             && t != originStop)
                             .collect(Collectors.toList());
 
-            for (TransitStop destStop : stopsConnected) {
+            for (StopVertex destStop : stopsConnected) {
                 NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
                 NearbyStopFinder.StopAtDistance streetStop = stopsStreets.get(destStop);
 
@@ -96,7 +96,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                 }
             }
 
-            for (TransitStop destStop : stopsUnconnected) {
+            for (StopVertex destStop : stopsUnconnected) {
                 NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
 
                 /* Log transfers that are found by euclidean search but not by street search */
@@ -144,15 +144,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     }
 
     private static class TransferInfo {
-        final TransitStop origin;
-        final TransitStop destination;
+        final StopVertex origin;
+        final StopVertex destination;
         final double directDistance;
         final double streetDistance;
         final double ratio;
 
         TransferInfo(
-                TransitStop origin,
-                TransitStop destination,
+                StopVertex origin,
+                StopVertex destination,
                 double directDistance,
                 double streetDistance) {
             this.origin = origin;

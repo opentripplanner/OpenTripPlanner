@@ -15,8 +15,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +138,7 @@ public class GraphStats {
                     n, radius, useStops ? "stops" : "streets"));
             List<Vertex> vertices = new ArrayList<Vertex>();
             GeodeticCalculator gc = new GeodeticCalculator();
-            Class<?> klasse = useStops ? TransitStop.class : StreetVertex.class;
+            Class<?> klasse = useStops ? StopVertex.class : StreetVertex.class;
             for (Vertex v : graph.getVertices())
                 if (klasse.isInstance(v))
                     vertices.add(v);

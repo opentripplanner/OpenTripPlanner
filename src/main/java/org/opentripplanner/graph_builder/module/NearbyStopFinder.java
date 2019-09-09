@@ -24,7 +24,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public class NearbyStopFinder {
 
     /**
      * Find all unique nearby stops that are the closest stop on some trip pattern.
-     * Note that the result will include the origin vertex if it is an instance of TransitStop.
+     * Note that the result will include the origin vertex if it is an instance of StopVertex.
      * This is intentional: we don't want to return the next stop down the line for trip patterns that pass through the
      * origin vertex.
      */
@@ -95,7 +95,7 @@ public class NearbyStopFinder {
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
             /* Filter out destination stops that are already reachable via pathways or transfers. */
             // FIXME why is the above comment relevant here? how does the next line achieve this?
-            TransitStop ts1 = stopAtDistance.tstop;
+            StopVertex ts1 = stopAtDistance.tstop;
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
@@ -114,7 +114,7 @@ public class NearbyStopFinder {
     /**
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * Use the correct method depending on whether the graph has street data or not.
-     * If the origin vertex is a TransitStop, the result will include it; this characteristic is essential for
+     * If the origin vertex is a StopVertex, the result will include it; this characteristic is essential for
      * associating the correct stop with each trip pattern in the vicinity.
      */
     public List<StopAtDistance> findNearbyStops (Vertex vertex) {
@@ -124,7 +124,7 @@ public class NearbyStopFinder {
 
     /**
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
-     * If the origin vertex is a TransitStop, the result will include it.
+     * If the origin vertex is a StopVertex, the result will include it.
      *
      * @param originVertex the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
@@ -148,14 +148,14 @@ public class NearbyStopFinder {
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (targetVertex == originVertex) continue;
-                if (targetVertex instanceof TransitStop) {
+                if (targetVertex instanceof StopVertex) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
         }
         /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        if (originVertex instanceof TransitStop) {
-            stopsFound.add(new StopAtDistance((TransitStop)originVertex, 0));
+        if (originVertex instanceof StopVertex) {
+            stopsFound.add(new StopAtDistance((StopVertex)originVertex, 0));
         }
         routingRequest.cleanup();
         return stopsFound;
@@ -168,12 +168,12 @@ public class NearbyStopFinder {
 
     /**
      * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
-     * If the origin vertex is a TransitStop, the result will include it.
+     * If the origin vertex is a StopVertex, the result will include it.
      */
     public List<StopAtDistance> findNearbyStopsEuclidean (Vertex originVertex) {
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         Coordinate c0 = originVertex.getCoordinate();
-        for (TransitStop ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
+        for (StopVertex ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
             double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
             if (distance < radiusMeters) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
@@ -190,12 +190,12 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public TransitStop tstop;
+        public StopVertex tstop;
         public double      dist;
         public LineString  geom;
         public List<Edge>  edges;
 
-        public StopAtDistance(TransitStop tstop, double dist) {
+        public StopAtDistance(StopVertex tstop, double dist) {
             this.tstop = tstop;
             this.dist = dist;
         }
@@ -212,7 +212,7 @@ public class NearbyStopFinder {
     }
 
     /**
-     * Given a State at a TransitStop, bundle the TransitStop together with information about how far away it is
+     * Given a State at a StopVertex, bundle the StopVertex together with information about how far away it is
      * and the geometry of the path leading up to the given State.
      *
      * TODO this should probably be merged with similar classes in Profile routing.
@@ -243,7 +243,7 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((TransitStop) state.getVertex(), distance);
+        StopAtDistance sd = new StopAtDistance((StopVertex) state.getVertex(), distance);
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;

@@ -8,7 +8,7 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         int nTransfersTotal = 0;
         int nLinkableStops = 0;
 
-        for (TransitStop ts0 : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+        for (StopVertex ts0 : Iterables.filter(graph.getVertices(), StopVertex.class)) {
 
             /* Skip stops that are entrances to stations or whose entrances are coded separately */
             if (!ts0.isStreetLinkable()) continue;
@@ -73,11 +73,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
             /* Determine the set of stops that are already reachable via other pathways or transfers */
-            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();
+            Set<StopVertex> pathwayDestinations = new HashSet<StopVertex>();
             for (Edge e : ts0.getOutgoing()) {
                 if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
-                    if (e.getToVertex() instanceof TransitStop) {
-                        TransitStop to = (TransitStop) e.getToVertex();
+                    if (e.getToVertex() instanceof StopVertex) {
+                        StopVertex to = (StopVertex) e.getToVertex();
                         pathwayDestinations.add(to);
                     }
                 }

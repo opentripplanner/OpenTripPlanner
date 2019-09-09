@@ -6,13 +6,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPoint;
-
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 public class Subgraph {
 
@@ -29,7 +28,7 @@ public class Subgraph {
     }
 
     public void addVertex(Vertex vertex){
-        if(vertex instanceof TransitVertex){
+        if(vertex instanceof StopVertex){
             stopsVertexSet.add(vertex);
         }else{
             streetVertexSet.add(vertex);

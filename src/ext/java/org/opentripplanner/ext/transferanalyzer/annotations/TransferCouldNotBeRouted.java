@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transferanalyzer.annotations;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 /**
  * Represents two stops that are close to each other where no route is found between them using OSM data
@@ -20,11 +20,11 @@ public class TransferCouldNotBeRouted extends GraphBuilderAnnotation {
             "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> could not be routed. " +
             "Euclidean distance is %.0f.";
 
-    private final TransitStop origin;
-    private final TransitStop destination;
+    private final StopVertex origin;
+    private final StopVertex destination;
     private final double directDistance;
 
-    public TransferCouldNotBeRouted(TransitStop origin, TransitStop destination, double directDistance) {
+    public TransferCouldNotBeRouted(StopVertex origin, StopVertex destination, double directDistance) {
         this.origin = origin;
         this.destination = destination;
         this.directDistance = directDistance;

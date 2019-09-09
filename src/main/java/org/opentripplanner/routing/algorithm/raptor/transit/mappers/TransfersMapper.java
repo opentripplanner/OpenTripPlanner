@@ -4,7 +4,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ class TransfersMapper {
      * Copy pre-calculated transfers from the original graph
      */
     static List<List<Transfer>> mapTransfers(
-            Map<Stop, TransitStop> stopVertexForStop,
+            Map<Stop, StopVertex> stopVertexForStop,
             StopIndexForRaptor stopIndex
     ) {
 
@@ -31,7 +31,7 @@ class TransfersMapper {
                 if (edge instanceof SimpleTransfer) {
                     double distance = edge.getDistance();
 
-                    int toStopIndex = stopIndex.indexByStop.get(((TransitStop) edge.getToVertex()).getStop());
+                    int toStopIndex = stopIndex.indexByStop.get(((StopVertex) edge.getToVertex()).getStop());
                     Transfer transfer = new Transfer(toStopIndex, (int) distance,
                             ((SimpleTransfer) edge).getEdges());
 

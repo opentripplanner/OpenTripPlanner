@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transferanalyzer.annotations;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 /**
  * Represents two stops where the routing distance between them (using OSM data) is much longer than the euclidean
@@ -21,13 +21,13 @@ public class TransferRoutingDistanceTooLong extends GraphBuilderAnnotation {
             "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> is %.0f times longer than " +
             "the euclidean distance. Street distance: %.2f, direct distance: %.2f.";
 
-    private final TransitStop origin;
-    private final TransitStop destination;
+    private final StopVertex origin;
+    private final StopVertex destination;
     private final double directDistance;
     private final double streetDistance;
     private final double ratio;
 
-    public TransferRoutingDistanceTooLong(TransitStop origin, TransitStop destination, double directDistance, double streetDistance, double ratio) {
+    public TransferRoutingDistanceTooLong(StopVertex origin, StopVertex destination, double directDistance, double streetDistance, double ratio) {
         this.origin = origin;
         this.destination = destination;
         this.directDistance = directDistance;

@@ -89,13 +89,6 @@ public class NetexModule implements GraphBuilderModule {
                 );
                 //hf.setStopContext(stopContext);
                 hf.run(graph);
-
-                if (linkStopsToParentStations) {
-                    hf.linkStopsToParentStations(graph);
-                }
-                if (parentStationTransfers) {
-                    hf.createParentStationTransfers();
-                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

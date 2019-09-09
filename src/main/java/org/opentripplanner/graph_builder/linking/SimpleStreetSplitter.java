@@ -41,10 +41,10 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
@@ -142,10 +142,10 @@ public class SimpleStreetSplitter {
     /** Link all relevant vertices to the street network */
     public void link () {	
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
+            if (v instanceof StopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
                 if (!link(v)) {
-                    if (v instanceof TransitStop)
-                        LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStop) v)));
+                    if (v instanceof StopVertex)
+                        LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((StopVertex) v)));
                     else if (v instanceof BikeRentalStationVertex)
                         LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v)));
                     else if (v instanceof BikeParkVertex)
@@ -223,12 +223,12 @@ public class SimpleStreetSplitter {
             LOG.debug("No street edge was found for {}", vertex);
             // We search for closest stops (since this is only used in origin/destination linking if no edges were found)
             // in the same way the closest edges are found.
-            List<TransitStop> candidateStops = new ArrayList<>();
-            transitStopIndex.query(env).forEach(candidateStop -> candidateStops.add((TransitStop) candidateStop));
+            List<StopVertex> candidateStops = new ArrayList<>();
+            transitStopIndex.query(env).forEach(candidateStop -> candidateStops.add((StopVertex) candidateStop));
 
             final TObjectDoubleMap<Vertex> stopDistances = new TObjectDoubleHashMap<>();
 
-            for (TransitStop t : candidateStops) {
+            for (StopVertex t : candidateStops) {
                 stopDistances.put(t, distance(vertex, t, xscale));
             }
 
@@ -246,7 +246,7 @@ public class SimpleStreetSplitter {
                 LOG.debug("Stops aren't close either!");
                 return false;
             } else {
-                List<TransitStop> bestStops = Lists.newArrayList();
+                List<StopVertex> bestStops = Lists.newArrayList();
                 // Add stops until there is a break of epsilon meters.
                 // we do this to enforce determinism. if there are a lot of stops that are all extremely close to each other,
                 // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
@@ -258,7 +258,7 @@ public class SimpleStreetSplitter {
                     stopDistances.get(candidateStops.get(i)) - stopDistances
                         .get(candidateStops.get(i - 1)) < DUPLICATE_WAY_EPSILON_DEGREES);
 
-                for (TransitStop stop: bestStops) {
+                for (StopVertex stop: bestStops) {
                     LOG.debug("Linking vertex to stop: {}", stop.getName());
                     makeTemporaryEdges((TemporaryStreetLocation)vertex, stop);
                 }
@@ -285,12 +285,12 @@ public class SimpleStreetSplitter {
             }
 
             // Warn if a linkage was made, but the linkage was suspiciously long.
-            if (vertex instanceof TransitStop) {
+            if (vertex instanceof StopVertex) {
                 double distanceDegreesLatitude = distances.get(candidateEdges.get(0));
                 int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
                 if (distanceMeters > WARNING_DISTANCE_METERS) {
                     // Registering an annotation but not logging because tests produce thousands of these warnings.
-                    graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStop)vertex, distanceMeters));
+                    graph.addBuilderAnnotation(new StopLinkedTooFar((StopVertex)vertex, distanceMeters));
                 }
             }
 
@@ -366,7 +366,7 @@ public class SimpleStreetSplitter {
 
             // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
             // edges that were missed by WalkableAreaBuilder
-            if (edge instanceof AreaEdge && tstop instanceof TransitStop && this.addExtraEdgesToAreas) {
+            if (edge instanceof AreaEdge && tstop instanceof StopVertex && this.addExtraEdgesToAreas) {
                 linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
             }
         }
@@ -421,8 +421,8 @@ public class SimpleStreetSplitter {
     private void makeLinkEdges(Vertex from, StreetVertex to) {
         if (from instanceof TemporaryStreetLocation) {
             makeTemporaryEdges((TemporaryStreetLocation) from, to);
-        } else if (from instanceof TransitStop) {
-            makeTransitLinkEdges((TransitStop) from, to);
+        } else if (from instanceof StopVertex) {
+            makeTransitLinkEdges((StopVertex) from, to);
         } else if (from instanceof BikeRentalStationVertex) {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
@@ -464,7 +464,7 @@ public class SimpleStreetSplitter {
     /** 
      * Make street transit link edges, unless they already exist.
      */
-    private void makeTransitLinkEdges (TransitStop tstop, StreetVertex v) {
+    private void makeTransitLinkEdges (StopVertex tstop, StreetVertex v) {
         if (!destructiveSplitting) {
             throw new RuntimeException("Transitedges are created with non destructive splitting!");
         }

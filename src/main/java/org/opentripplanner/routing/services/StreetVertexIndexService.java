@@ -6,7 +6,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,13 +35,13 @@ public interface StreetVertexIndexService {
      * @param radiusMeters
      * @return The transit stops within a certain radius of the given location.
      */
-    List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radiusMeters);
+    List<StopVertex> getNearbyTransitStops(Coordinate coordinate, double radiusMeters);
 
     /**
      * @param envelope
      * @return The transit stops within an envelope.
      */
-    List<TransitStop> getTransitStopForEnvelope(Envelope envelope);
+    List<StopVertex> getTransitStopForEnvelope(Envelope envelope);
 
     /**
      * Finds the appropriate vertex for this location.

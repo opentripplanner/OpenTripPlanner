@@ -6,7 +6,7 @@ import java.util.List;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.openstreetmap.services.RegionsSource;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.StopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
     	List<Envelope> regions = new ArrayList<Envelope>();
 
         for (Vertex gv : task.getGraph().getVertices()) {
-            if (gv instanceof TransitStop) {
+            if (gv instanceof StopVertex) {
                 Coordinate c = gv.getCoordinate();
                 Envelope env = new Envelope(c);
                 double meters_per_degree_lon_here =  

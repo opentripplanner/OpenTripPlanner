@@ -11,7 +11,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStation;
+import org.opentripplanner.routing.vertextype.StopVertex;
 
 import java.io.File;
 import java.util.BitSet;
@@ -107,7 +107,7 @@ public class GraphSerializationTest {
         // Remove the transit stations, which have no edges and won't survive serialization.
         // These are buffered into a list to prevent concurrent modification (removal while iterating).
         List<Vertex> transitVertices = originalGraph.getVertices().stream()
-                .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
+                .filter(v -> v instanceof StopVertex).collect(Collectors.toList());
         transitVertices.forEach(originalGraph::remove);
         originalGraph.index(new DefaultStreetVertexIndexFactory());
         // The cached timezone in the graph is transient and lazy-initialized.
