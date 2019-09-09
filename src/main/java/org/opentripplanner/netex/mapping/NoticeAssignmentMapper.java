@@ -57,14 +57,14 @@ class NoticeAssignmentMapper {
     }
 
     Multimap<NoticeAssignable, Notice> map(NoticeAssignment noticeAssignment){
-        Multimap<NoticeAssignable, Notice> noticesByElementId = HashMultimap.create();
+        Multimap<NoticeAssignable, Notice> noticeByElement = HashMultimap.create();
 
         String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
         Notice otpNotice = getOrMapNotice(noticeAssignment);
 
         if(otpNotice == null) {
             LOG.warn("Notice in notice assignment is missing for assignment {}", noticeAssignment);
-            return noticesByElementId;
+            return noticeByElement;
         }
 
         Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.lookup(noticedObjectId);
@@ -72,22 +72,22 @@ class NoticeAssignmentMapper {
         // Special case for StopPointInJourneyPattern
         if (!times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
-                noticesByElementId.put(
+                noticeByElement.put(
                         stopTimesById.get(time.getId()),
                         otpNotice
                 );
             }
         } else if (stopTimesById.containsKey(noticedObjectId)) {
-            noticesByElementId.put(stopTimesById.get(noticedObjectId), otpNotice);
+            noticeByElement.put(stopTimesById.get(noticedObjectId), otpNotice);
         } else if (routesById.containsKey(createFeedScopedId(noticedObjectId))) {
-            noticesByElementId.put(routesById.get(createFeedScopedId(noticedObjectId)), otpNotice);
+            noticeByElement.put(routesById.get(createFeedScopedId(noticedObjectId)), otpNotice);
         } else if (tripsById.containsKey(createFeedScopedId(noticedObjectId))) {
-            noticesByElementId.put(tripsById.get(createFeedScopedId(noticedObjectId)), otpNotice);
+            noticeByElement.put(tripsById.get(createFeedScopedId(noticedObjectId)), otpNotice);
         } else {
             LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
         }
 
-        return noticesByElementId;
+        return noticeByElement;
     }
 
     private Notice getOrMapNotice(NoticeAssignment assignment) {

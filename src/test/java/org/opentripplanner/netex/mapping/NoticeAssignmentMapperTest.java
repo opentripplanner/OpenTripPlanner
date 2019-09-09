@@ -81,12 +81,10 @@ public class NoticeAssignmentMapperTest {
 
         StopTime stopTime1 = new StopTime();
         StopTime stopTime2 = new StopTime();
-        stopTime1.setId(FeedScopedIdFactory.createFeedScopedId(TIMETABLED_PASSING_TIME1));
-        stopTime2.setId(FeedScopedIdFactory.createFeedScopedId(TIMETABLED_PASSING_TIME2));
 
         Map<String, StopTime> stopTimesById = new HashMap<>();
-        stopTimesById.put(stopTime1.getId().getId(), stopTime1);
-        stopTimesById.put(stopTime2.getId().getId(), stopTime2);
+        stopTimesById.put(TIMETABLED_PASSING_TIME1, stopTime1);
+        stopTimesById.put(TIMETABLED_PASSING_TIME2, stopTime2);
 
         noticesById.add(NOTICE);
 
@@ -102,13 +100,13 @@ public class NoticeAssignmentMapperTest {
                 new EntityById<>()
         );
 
-        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElementId
+        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElement
                 = noticeAssignmentMapper.map(noticeAssignment);
 
-        org.opentripplanner.model.Notice notice2a = noticesByElementId.get(stopTime1)
+        org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1)
                 .stream().findFirst().orElseThrow(IllegalStateException::new);
 
-        org.opentripplanner.model.Notice notice2b = noticesByElementId.get(stopTime2)
+        org.opentripplanner.model.Notice notice2b = noticesByElement.get(stopTime2)
                 .stream().findFirst().orElseThrow(IllegalStateException::new);
 
         assertEquals(NOTICE_ID, notice2a.getId().getId());
