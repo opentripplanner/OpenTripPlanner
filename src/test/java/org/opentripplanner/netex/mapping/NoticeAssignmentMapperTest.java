@@ -56,7 +56,8 @@ public class NoticeAssignmentMapperTest {
                 new EntityById<>()
         );
 
-        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElement = noticeAssignmentMapper.map(noticeAssignment);
+        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElement =
+                noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2 = noticesByElement.get(route)
                 .stream().findFirst().get();
@@ -66,7 +67,8 @@ public class NoticeAssignmentMapperTest {
 
     @Test
     public void mapNoticeAssignmentOnStopPoint() {
-        HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId = new HierarchicalMultimap<>();
+        HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId =
+                new HierarchicalMultimap<>();
         HierarchicalMapById<Notice> noticesById = new HierarchicalMapById<>();
 
 
