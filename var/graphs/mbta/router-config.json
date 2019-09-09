@@ -1,0 +1,19 @@
+{
+  "stopClusterMode": "parentStation",
+  "useFlexService": "true",
+  "updaters": [
+    {
+      "type": "real-time-alerts-enhanced",
+      "frequencySec": 100,
+      "url": "https://cdn.mbta.com/realtime/Alerts_enhanced.json",
+      "feedId": "1"
+    },
+    {
+      "type": "stop-time-updater",
+      "frequencySec": 10,
+      "sourceType": "gtfs-http",
+      "url": "https://cdn.mbta.com/realtime/TripUpdates.pb",
+      "feedId": "1"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "useTransfersTxt": true,
+  "useBothGtfsAndDistance": true,
+  "parentStopLinking": true,
+  "fetchElevationUS": false,
+  "embedRouterConfig": false,
+  "maxTransferDistance": 750,
+  "staticParkAndRide": true
+}

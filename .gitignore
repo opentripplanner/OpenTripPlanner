@@ -30,4 +30,9 @@ _site/
 /otp-batch-analyst
 *.DS_Store
 lucene/
-var/
+var/graphs/mbta/*.zip
+var/graphs/mbta/*.pbf
+var/graphs/mbta/Graph.obj
+mbta/mbta_otp.zip
+mbta/http/
+mbta/var/

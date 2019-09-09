@@ -14,7 +14,7 @@ public class AvoidShuttlesComparator extends PathComparator {
         boolean o2HasShuttles = hasShuttles(o2);
 
         if (o1HasShuttles == o2HasShuttles) return super.compare(o1, o2);
-        // means that if o1 has shuttles then it's "greater" then o2 and hence it goes to the end of the list
+        // means that if o1 has shuttles then it's "greater" than o2 and hence it goes to the end of the list
         else return o1HasShuttles ? 1 : -1;
     }
 
