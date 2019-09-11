@@ -40,7 +40,7 @@ public class LocalizedString implements I18NString, Serializable {
 
     /**
      * Creates String which can be localized
-     * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
+     * @param key key of translation for this way set in {@link org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource} and translations read from from properties Files
      * @param params Values with which tagNames are replaced in translations.
      */
     public LocalizedString(String key, String[] params) {
@@ -58,7 +58,7 @@ public class LocalizedString implements I18NString, Serializable {
      * For example. If key platform has key {ref} current value of tag ref in way is saved to be used in localizations.
      * It currently assumes that tag exists in way. (otherwise this namer wouldn't be used)
      * </p>
-     * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
+     * @param key key of translation for this way set in {@link org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource} and translations read from from properties Files
      * @param way OSM way from which tag values are read
      */
     public LocalizedString(String key, OSMWithTags way) {

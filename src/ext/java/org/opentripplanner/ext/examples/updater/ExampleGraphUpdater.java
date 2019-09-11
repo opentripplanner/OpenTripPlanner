@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.examples.updater;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  * @see ExamplePollingGraphUpdater
+ * @see org.opentripplanner.updater.GraphUpdaterConfigurator
  */
 public class ExampleGraphUpdater implements GraphUpdater {
 

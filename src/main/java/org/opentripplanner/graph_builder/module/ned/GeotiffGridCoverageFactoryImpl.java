@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.factory.Hints;
+import org.geotools.util.factory.Hints;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;

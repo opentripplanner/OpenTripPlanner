@@ -61,7 +61,7 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
  * For example:
  * 
  * GET http://localhost/otp-rest-servlet/ws/routers
- * will retrieve a list of all registered routerId -> Graph mappings and their geographic bounds.
+ * will retrieve a list of all registered routerId → Graph mappings and their geographic bounds.
  * 
  * GET http://localhost/otp-rest-servlet/ws/routers/london
  * will return status code 200 and a brief description of the 'london' graph including geographic 
@@ -117,7 +117,7 @@ public class Routers {
 
     /** 
      * Returns the bounds for a specific routerId, or verifies whether it is registered. 
-     * @returns status code 200 if the routerId is registered, otherwise a 404.
+     * @return status code 200 if the routerId is registered, otherwise a 404.
      */
     @GET @Path("{routerId}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })

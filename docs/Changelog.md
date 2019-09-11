@@ -8,6 +8,15 @@
 - NeTEx import support (#2769).
 
 ## Ported over from the 1.x
+- Make OTP run on Java 11 (#2812)
+- Fixes surefire test failure during build (#2816)
+
+## 1.5.0 (in progress)
+- Add Way Property Set for the UK (#2818)
+
+## 1.4 (2019-07-30)
+
+>>>>>>> cc975ebbc... Java 11 build.
 - Remove Open Traffic prototype code (#2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)

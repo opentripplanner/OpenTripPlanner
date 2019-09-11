@@ -19,7 +19,8 @@ import org.opentripplanner.common.model.P2;
  * See https://developers.google.com/transit/gtfs/reference#transfers_fields
  * and https://support.google.com/transitpartners/answer/2450962 (heading Route-to-route
  * and trip-to-trip transfers) for more details about the specifications.
- * @see StopTransfer, SpecificTransfer
+ * @see StopTransfer
+ * @see SpecificTransfer
  */
 public class TransferTable implements Serializable {
 
@@ -200,7 +201,7 @@ public class TransferTable implements Serializable {
     
     /**
      * Internal class for testing purposes only.
-     * @see TransferGraphLinker
+     * @see org.opentripplanner.routing.edgetype.factory.TransferGraphLinker
      */
     @Deprecated
     public static class Transfer {
@@ -216,7 +217,7 @@ public class TransferTable implements Serializable {
     /**
      * Public function for testing purposes only.
      * Returns only the first specific transfers.
-     * @see TransferGraphLinker
+     * @see org.opentripplanner.routing.edgetype.factory.TransferGraphLinker
      */
     @Deprecated
     public Iterable<Transfer> getAllFirstSpecificTransfers() {
