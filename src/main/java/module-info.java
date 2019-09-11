@@ -1,6 +1,10 @@
 module otp {
     opens java.lang.module;
 
+    requires netex.java.model;
+    requires r5;
+    requires validation.api;
+
     requires org.geotools.referencing;
     requires org.geotools.metadata;
     requires org.geotools.opengis;
