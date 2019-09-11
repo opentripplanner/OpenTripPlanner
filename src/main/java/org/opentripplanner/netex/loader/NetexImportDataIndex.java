@@ -29,7 +29,7 @@ import java.util.Set;
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
  * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
  * in memory and to be able to override values in a more specific(lower) level.
- * <p/>
+ * <p>
  * There is one instance of this class for <em>shard data</em> - the ROOT.
  * For each <em>group of shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a
  * parent. When such <em>group of shared data</em> is not needed any more it is discard and become
@@ -37,10 +37,10 @@ import java.util.Set;
  * For each <em>single files</em> a new {@code NetexImportDataIndex} is created with the corresponding
  * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
  * the file is loaded.
- * <p/>
+ * <p>
  * This hierarchy make it possible to override values in child instances of the {@code NetexImportDataIndex}
  * and save memory during the load operation, because data not needed any more can be thrown away.
- * <p/>
+ * <p>
  * The hierarchy implementation is delegated to the
  * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
@@ -134,7 +134,7 @@ public class NetexImportDataIndex {
      * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
      * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
      * can lookup the Network directly.
-     * <p/>
+     * <p>
      * If no Network is found {@code null} is returned.
      */
     public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {

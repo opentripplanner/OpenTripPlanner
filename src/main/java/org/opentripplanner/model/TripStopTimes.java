@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * A multimap from Trip to a sorted list of StopTimes.
- * <p/>
+ * <p>
  * The list of stop times  for a given trip is guarantied to be sorted.
  */
 public class TripStopTimes {
@@ -53,7 +53,7 @@ public class TripStopTimes {
     /**
      * Return a copy of the internal map. Changes in the source are not reflected
      * in the destination (returned Map), and visa versa.
-     * <p/>
+     * <p>
      * The returned map is immutable.
      */
     public Map<Trip, List<StopTime>> asImmutableMap() {

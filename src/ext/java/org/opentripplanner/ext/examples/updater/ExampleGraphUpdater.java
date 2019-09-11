@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
  * This class shows an example of how to implement a graph updater. Besides implementing the methods
  * of the interface {@link GraphUpdater}, the updater also needs to be registered in
  * 'router-config.json'.
- * <p/>
+ * <p>
  * See the configuration documentation.
- * <p/>
+ * <p>
  * This example is suited for streaming updaters. For polling updaters it is better to use the
  * abstract base class PollingGraphUpdater. The class ExamplePollingGraphUpdater shows an example of
  * this.
- * <p/>
+ * <p>
  * Usage example in the file 'router-config.json':
  * <pre>
  * {

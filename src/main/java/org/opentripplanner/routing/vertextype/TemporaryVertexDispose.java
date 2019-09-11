@@ -12,9 +12,9 @@ import java.util.Set;
  * This is a utility class used to remove a temporary subgraph from the manin graph.
  * It traverse the subgraph of temporary vertices, and cuts that subgraph off from the
  * main graph at each point it encounters a non-temporary vertexes.
- * <p/>
+ * <p>
  * OTP then holds no references to the temporary subgraph and it is garbage collected.
- * <p/>
+ * <p>
  * The static {@link #dispose(Vertex)} utility method is the only way to access the logic,
  * hence preventing this class from reuse. This make the class thread safe, and simplify
  * the implementation.

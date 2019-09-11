@@ -20,7 +20,7 @@ class DayOfWeekMapper {
     /**
      * Return a set Java DayOfWeek representing a union of all input values given. Each value is
      * mapped to a set of Java DayOfWeek, which is merged into one set.
-     * <p/>
+     * <p>
      * [MONDAY, SATURDAY, WEEKEND] => [MONDAY, SATURDAY, SUNDAY]
      */
     static Set<DayOfWeek> mapDayOfWeek(Collection<DayOfWeekEnumeration> values) {

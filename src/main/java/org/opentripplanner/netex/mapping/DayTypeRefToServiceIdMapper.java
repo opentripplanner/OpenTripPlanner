@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * The concept ServiceId does not exist in NeTEx. To generate a Service Id a simple
  * strategy of concatenating the dayTypes together is used.
- * <p/>
+ * <p>
  * Dont parse the service date to get dayTypeRefs, the reason way we keep the refs is
  * to allow the ServiceId to be human readable.
  */

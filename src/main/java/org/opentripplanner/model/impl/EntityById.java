@@ -45,7 +45,7 @@ public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
     /**
      * Return a copy of the internal map. Changes in the source are not reflected
      * in the destination (returned Map), and visa versa.
-     * <p/>
+     * <p>
      * The returned map is immutable.
      */
     Map<I, E> asImmutableMap() {

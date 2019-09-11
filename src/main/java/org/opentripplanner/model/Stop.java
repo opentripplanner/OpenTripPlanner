@@ -139,7 +139,7 @@ public final class Stop extends IdentityBean<FeedScopedId> {
      * from a transit vehicle. Stops are called a "platform" when they're
      * defined within a parent_station.
      * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
-     * <p/>
+     * <p>
      * <code>locationType=0</code>
      */
     public boolean isPlatform() {
@@ -149,7 +149,7 @@ public final class Stop extends IdentityBean<FeedScopedId> {
     /**
      * Station. A physical structure or area that contains one or more platforms.
      * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
-     * <p/>
+     * <p>
      * <code>locationType=1</code>
      */
     public boolean isStation() {

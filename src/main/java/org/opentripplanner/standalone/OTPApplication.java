@@ -84,7 +84,7 @@ public class OTPApplication extends Application {
      * Like getClasses, this method declares web resources, providers, and features to the JAX-RS
      * implementation. However, these are single instances that will be reused for all requests
      * (they are singleton-scoped).
-     * <p/>
+     * <p>
      * See https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
      * Leave {@code <Object>} out of method signature to avoid confusing the Guava type inference.
      */

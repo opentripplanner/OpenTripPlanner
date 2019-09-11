@@ -5,9 +5,9 @@ import org.opentripplanner.model.FeedScopedId;
 /**
  * GTFS uses the term agency_id, which is used to scope the ids of all other elements in OTP. Since NeTEx does not
  * contain this id and also assumes ids are already unique, it is necessary to specify an id to use in the OTP model.
- * <p/>
+ * <p>
  * This factory is used to set the feed id once and then apply it to elements as they are created.
- * <p/>
+ * <p>
  * This class should only be used by the Netex import/mapping process. It is NOT THREAD SAFE and each import
  * must be done in sequence for it to work properly.
  */
