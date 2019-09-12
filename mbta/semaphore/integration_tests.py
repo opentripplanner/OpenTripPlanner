@@ -25,7 +25,10 @@ PREDEFINED_PLANS = [
     {"Back Bay::42.34735,-71.075727", "Logan International Airport, Boston, MA, USA::42.3658907,-71.017547"},
 
     # Continuous drop-off
-    {"Wellington::42.40237,-71.077082", "49 Cushing Street, Medford, MA, USA::42.4142089,-71.0968295"}
+    {"Wellington::42.40237,-71.077082", "49 Cushing Street, Medford, MA, USA::42.4142089,-71.0968295"},
+
+    # Transfer to a stop with pathways
+    {"Walnut St @ Page Rd::42.353395,-71.208103", "Dana-Farber Cancer Institute, Brookline Avenue, Boston, MA, USA::42.3374515,-71.1081799"},
 ]
 
 
@@ -101,22 +104,26 @@ def process_plan(plan):
         return json
 
     # temporary stops have random IDs
-    def remove_random_stop_ids(json):
+    def remove_random_stop_ids_and_new_fields(json):
         if isinstance(json, list):
-            return [remove_random_stop_ids(j) for j in json]
+            return [remove_random_stop_ids_and_new_fields(j) for j in json]
         elif isinstance(json, dict):
             result = {}
             for key, value in json.items():
-                if key == "stopId":
-                    result[key] = re.sub(r"(\w+:temp_0)\.\d+", r"\1-random", value)
+                if key in ["fare", "zoneId"]:
+                    pass
+                elif key in ["stopId", "routeId", "tripId"]:
+                    value = re.sub(r"(\w+:temp_0)\.\d+", r"\1-random", value)
+                    value = re.sub(r"909983", r"loganexpress-ma-us", value)
+                    result[key] = value
                 else:
-                    result[key] = remove_random_stop_ids(value)
+                    result[key] = remove_random_stop_ids_and_new_fields(value)
             return result
         else:
             return json
 
     plan = sort_alerts(plan)
-    plan = remove_random_stop_ids(plan)
+    plan = remove_random_stop_ids_and_new_fields(plan)
     return plan
 
 
@@ -145,7 +152,10 @@ def compare_plans(plan1, plan2, **kwargs):
 
     except AssertionError:
         print("[FAIL] Plans are different:")
-        print(json.dumps(diff, indent=2))
+        try:
+            print(json.dumps(diff, indent=2))
+        except TypeError:
+            print(diff)
 
         if kwargs.get("local_run", False):
             dt = datetime.now().strftime("%Y%m%d-%H%M%S%f")

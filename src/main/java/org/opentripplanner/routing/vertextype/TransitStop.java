@@ -76,12 +76,7 @@ public class TransitStop extends TransitStationStop {
     }
 
     public boolean hasGtfsTransfers() {
-        for (Edge e : this.getOutgoing()) {
-            if (e instanceof TransferEdge || e instanceof PathwayEdge) {
-                return true;
-            }
-        }
-        return false;
+        return this.getOutgoing().stream().anyMatch(e -> e instanceof TransferEdge);
      }
 
     public int getStreetToStopTime() {
