@@ -1,27 +1,9 @@
-/* This program is free software: you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public License
-   as published by the Free Software Foundation, either version 3 of
-   the License, or (at your option) any later version.
-   
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
- */
-
 package org.opentripplanner.api.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
@@ -116,10 +98,8 @@ public class WalkStep {
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
      * distance.
      */
-    @XmlTransient
     public List<P2<Double>> elevation;
 
-    @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
@@ -222,7 +202,6 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    @XmlJavaTypeAdapter(ElevationAdapter.class)
     @JsonSerialize
     public List<P2<Double>> getElevation() {
         return elevation;

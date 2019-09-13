@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner;
 
 import java.io.File;
@@ -22,7 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
@@ -116,8 +103,15 @@ public abstract class GtfsTest extends TestCase {
     public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
                boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
                String excludedRoute, String excludedStop, int legCount) {
+        return plan(dateTime, fromVertex, toVertex, onTripId, wheelchairAccessible, preferLeastTransfers,
+                preferredMode, excludedRoute, excludedStop, legCount, null);
+    }
+
+    public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
+                      boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
+                      String excludedRoute, String excludedStop, int legCount, RoutingRequest opt) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
-        RoutingRequest routingRequest = new RoutingRequest();
+        RoutingRequest routingRequest = opt == null ? new RoutingRequest() : opt;
         routingRequest.setNumItineraries(1);
         
         routingRequest.setArriveBy(dateTime < 0);
@@ -129,7 +123,7 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.to = new GenericLocation(null, feedId.getId() + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.startingTransitTripId = (new AgencyAndId(feedId.getId(), onTripId));
+            routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
@@ -151,6 +145,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
+        if (paths.isEmpty())
+            return new Leg[] { null };
         TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);

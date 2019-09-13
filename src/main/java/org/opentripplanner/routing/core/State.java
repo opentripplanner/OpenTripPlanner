@@ -1,30 +1,17 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.core;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +48,8 @@ public class State implements Cloneable {
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
+
+    int callAndRideTime = 0;
     
     private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
@@ -129,7 +118,7 @@ public class State implements Cloneable {
         this.walkDistance = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
-        stateData.routeSequence = new AgencyAndId[0];
+        stateData.routeSequence = new FeedScopedId[0];
     }
 
     /**
@@ -230,7 +219,7 @@ public class State implements Cloneable {
         return activeTime;            
     }
 
-    public AgencyAndId getTripId() {
+    public FeedScopedId getTripId() {
         return stateData.tripId;
     }
 
@@ -242,7 +231,7 @@ public class State implements Cloneable {
         return stateData.zone;
     }
 
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return stateData.route;
     }
 
@@ -307,6 +296,10 @@ public class State implements Cloneable {
 
     public int getPreTransitTime() {
         return preTransitTime;
+    }
+
+    public int getCallAndRideTime() {
+        return callAndRideTime;
     }
 
     public Vertex getVertex() {
@@ -501,8 +494,8 @@ public class State implements Cloneable {
 
     // symmetric prefix check
     public boolean routeSequencePrefix (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedScopedId[] rs0 = this.stateData.routeSequence;
+        FeedScopedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1)
             return true;
         int n = rs0.length < rs1.length ? rs0.length : rs1.length;
@@ -514,11 +507,11 @@ public class State implements Cloneable {
 
     // symmetric subset check
     public boolean routeSequenceSubsetSymmetric (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedScopedId[] rs0 = this.stateData.routeSequence;
+        FeedScopedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1)
             return true;
-        AgencyAndId[] shorter, longer;
+        FeedScopedId[] shorter, longer;
         if (rs0.length < rs1.length) {
             shorter = rs0;
             longer  = rs1;
@@ -527,9 +520,9 @@ public class State implements Cloneable {
             longer  = rs0;
         }
         /* bad complexity, but these are tiny arrays */
-        for (AgencyAndId ais : shorter) {
+        for (FeedScopedId ais : shorter) {
             boolean match = false;
-            for (AgencyAndId ail : longer) {
+            for (FeedScopedId ail : longer) {
                 if (ais == ail) {
                     match = true;
                     break;
@@ -542,14 +535,14 @@ public class State implements Cloneable {
 
     // subset check: is this a subset of that?
     public boolean routeSequenceSubset (State that) {
-        AgencyAndId[] rs0 = this.stateData.routeSequence;
-        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        FeedScopedId[] rs0 = this.stateData.routeSequence;
+        FeedScopedId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1) return true;
         if (rs0.length > rs1.length) return false;
         /* bad complexity, but these are tiny arrays */
-        for (AgencyAndId r0 : rs0) {
+        for (FeedScopedId r0 : rs0) {
             boolean match = false;
-            for (AgencyAndId r1 : rs1) {
+            for (FeedScopedId r1 : rs1) {
                 if (r0 == r1) {
                     match = true;
                     break;
@@ -632,6 +625,10 @@ public class State implements Cloneable {
         return stateData.lastPattern;
     }
 
+    public boolean isLastBoardAlightDeviated() {
+        return stateData.isLastBoardAlightDeviated;
+    }
+
     public ServiceDay getServiceDay() {
         return stateData.serviceDay;
     }
@@ -703,6 +700,9 @@ public class State implements Cloneable {
                         return unoptimized.reverse();
                 }
             }
+            // Not reverse-optimizing, so we don't re-traverse the edges backward.
+            // Instead we just replicate all the states, and replicate the deltas between the state's incremental fields.
+            // TODO determine whether this is really necessary, and whether there's a more maintainable way to do this.
             else {
                 StateEditor editor = ret.edit(edge);
                 // note the distinction between setFromState and setBackState
@@ -716,8 +716,11 @@ public class State implements Cloneable {
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
 
-                if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
-                    editor.setBikeRenting(!orig.isBikeRenting());
+                if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+                    editor.doneVehicleRenting();
+                } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                    editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                }
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
                 if (orig.isBikeParked() != orig.getBackState().isBikeParked())

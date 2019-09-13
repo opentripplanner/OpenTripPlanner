@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.alerts;
 
 import java.io.InputStream;
@@ -81,11 +68,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
-        LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
+        LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
 
     @Override
-    public void setup() {
+    public void setup(Graph graph) {
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }
@@ -98,7 +85,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         try {
-            InputStream data = HttpUtils.getData(url);
+            InputStream data = HttpUtils.getData(url, "Accept", "application/x-google-protobuf; application/octet-stream; */*");
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }

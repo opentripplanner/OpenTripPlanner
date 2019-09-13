@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,7 +40,7 @@ public class GraphServiceTest extends TestCase {
         // Create an empty graph and it's serialized form
         emptyGraph = new Graph();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        emptyGraph.save(new ObjectOutputStream(baos));
+        emptyGraph.save(baos);
         emptyGraphData = baos.toByteArray();
 
         // Create a small graph with 2 vertices and one edge and it's serialized form
@@ -62,7 +49,7 @@ public class GraphServiceTest extends TestCase {
         StreetVertex v2 = new IntersectionVertex(smallGraph, "v2", 0, 0.1);
         new StreetEdge(v1, v2, null, "v1v2", 11000, StreetTraversalPermission.PEDESTRIAN, false);
         baos = new ByteArrayOutputStream();
-        smallGraph.save(new ObjectOutputStream(baos));
+        smallGraph.save(baos);
         smallGraphData = baos.toByteArray();
     }
 

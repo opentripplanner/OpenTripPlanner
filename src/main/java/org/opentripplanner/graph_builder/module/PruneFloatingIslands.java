@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module;
 
 import java.util.Arrays;
@@ -38,13 +25,13 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      * this field indicate the maximum size for island without stops
      * island under this size will be pruned.
      */
-    private int islandWithoutStopsMaxSize = 40;
+    private int pruningThresholdIslandWithoutStops;
 
     /**
      * this field indicate the maximum size for island with stops
      * island under this size will be pruned.
      */
-    private int islandWithStopsMaxSize = 5;
+    private int pruningThresholdIslandWithStops;
 
     /**
      * The name for output file for this process. The file will store information about the islands 
@@ -72,8 +59,8 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Pruning isolated islands in street network");
         
-        StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, 
-                islandWithStopsMaxSize, islandLogFile);
+        StreetUtils.pruneFloatingIslands(graph, pruningThresholdIslandWithoutStops, 
+        		pruningThresholdIslandWithStops, islandLogFile);
         if (transitToStreetNetwork == null) {
             LOG.debug("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
         } else {
@@ -86,6 +73,12 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     @Override
     public void checkInputs() {
         //no inputs
+    }
+    public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
+    	this.pruningThresholdIslandWithoutStops = pruningThresholdIslandWithoutStops;
+    }
+    public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
+    	this.pruningThresholdIslandWithStops = pruningThresholdIslandWithStops;
     }
 
 }

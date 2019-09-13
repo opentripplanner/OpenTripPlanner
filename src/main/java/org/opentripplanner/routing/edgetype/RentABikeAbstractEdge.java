@@ -1,20 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Set;
 
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -24,7 +12,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
@@ -63,11 +51,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         }
 
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost
-                : options.bikeRentalPickupCost);
-        s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime
-                : options.bikeRentalPickupTime);
-        s1.setBikeRenting(true);
+        s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
+        s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
+        s1.beginVehicleRenting(((BikeRentalStationVertex)fromv).getVehicleMode());
         s1.setBikeRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
@@ -87,11 +73,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         }
 
         StateEditor s1e = s0.edit(this);
-        s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost
-                : options.bikeRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime
-                : options.bikeRentalDropoffTime);
-        s1e.setBikeRenting(false);
+        s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
+        s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
+        s1e.doneVehicleRenting();
         s1e.setBackMode(TraverseMode.WALK);
         State s1 = s1e.makeState();
         return s1;

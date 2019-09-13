@@ -1,0 +1,40 @@
+# This file configures the generation of static documentation by MkDocs
+# based on Markdown source files in the 'docs' directory of the OTP repo.
+# This static documentation is built and served by Readthedocs
+# at opentripplanner.readthedocs.org
+
+site_name: OpenTripPlanner
+site_url: http://docs.opentripplanner.org
+repo_url: http://github.com/opentripplanner/OpenTripPlanner
+docs_dir: docs
+site_dir: target/mkdocs
+
+# MkDocs will automatically discover pages if you don't list them here.
+# In that case subdirectories can be used to organize pages.
+# The list below organizes them into categories and controls the order.
+
+pages:
+- Home: 'index.md'
+- About:
+    - Governance: 'Governance.md'
+    - History: 'History.md'
+    - Deployments: 'Deployments.md'
+    - Changelog: 'Changelog.md'
+    - Visual Identity: 'Visual-Identity.md'
+- Tutorials: 
+    - Basic Tutorial: 'Basic-Tutorial.md'
+    - Intermediate Tutorial: 'Intermediate-Tutorial.md'
+    - External Tutorials: 'External-Tutorials.md'
+- 'Usage Guide':
+    - 'Getting OTP': 'Getting-OTP.md'
+    - Configuration: 'Configuration.md'
+    - Analyst: 'Analyst.md'
+    - Scripting: 'Scripting.md'
+    - Security: 'Security.md'
+    - Troubleshooting: 'Troubleshooting-Routing.md'
+    - GTFS-Flex Routing: 'Flex.md'
+- Development:
+    - "Developers' Guide": 'Developers-Guide.md'
+    - Architecture: 'Architecture.md'
+    - Localization: 'Localization.md'
+    - Bibliography: 'Bibliography.md'

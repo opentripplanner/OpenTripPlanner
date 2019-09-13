@@ -1,33 +1,24 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.api.resource;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
+import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -81,11 +72,27 @@ public abstract class GraphPathToTripPlanConverter {
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
+        // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
+        long bestNonTransitTime = Long.MAX_VALUE;
+        List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
+            if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
+                bestNonTransitTime = itinerary.walkTime;
+            }
+            itineraries.add(itinerary);
+        }
+
+        // Filter and add itineraries to plan
+        for (Itinerary itinerary : itineraries) {
+            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
+            // do not include in plan
+            if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
+
             plan.addItinerary(itinerary);
         }
+
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 /* Communicate the fact that the only way we were able to get a response was by removing a slope limit. */
@@ -177,9 +184,13 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone(); 
+        TimeZone timeZone = rctx.graph.getTimeZone();
+        return makeCalendar(timeZone, state.getTimeInMillis());
+    }
+
+    private static Calendar makeCalendar(TimeZone timeZone, long timeMillis) {
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(state.getTimeInMillis());
+        calendar.setTimeInMillis(timeMillis);
         return calendar;
     }
 
@@ -189,11 +200,11 @@ public abstract class GraphPathToTripPlanConverter {
      * @param edges The array of input edges
      * @return The coordinates of the points on the edges
      */
-    private static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
+    public static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {
-            LineString geometry = edge.getGeometry();
+            LineString geometry = edge.getDisplayGeometry();
 
             if (geometry != null) {
                 if (coordinates.size() == 0) {
@@ -567,6 +578,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.agencyId = agency.getId();
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
+            leg.agencyBrandingUrl = agency.getBrandingUrl();
             leg.headsign = states[1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
@@ -575,9 +587,15 @@ public abstract class GraphPathToTripPlanConverter {
             leg.routeShortName = route.getShortName();
             leg.routeTextColor = route.getTextColor();
             leg.routeType = route.getType();
+            leg.routeBrandingUrl = route.getBrandingUrl();
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
+            leg.flexDrtAdvanceBookMin = trip.getDrtAdvanceBookMin();
+            leg.flexDrtPickupMessage = trip.getDrtPickupMessage();
+            leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
+            leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
+            leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -586,6 +604,30 @@ public abstract class GraphPathToTripPlanConverter {
             if (leg.headsign == null) {
                 leg.headsign = trip.getTripHeadsign();
             }
+
+            Edge edge = states[states.length - 1].backEdge;
+            if (edge instanceof TemporaryDirectPatternHop) {
+                leg.callAndRide = true;
+            }
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                int directTime = hop.getDirectVehicleTime();
+                TripTimes tt = states[states.length - 1].getTripTimes();
+                int maxTime = tt.getDemandResponseMaxTime(directTime);
+                int avgTime = tt.getDemandResponseAvgTime(directTime);
+                int delta = maxTime - avgTime;
+                if (directTime != 0 && delta > 0) {
+                    if (hop.isDeviatedRouteBoard()) {
+                        long maxStartTime = leg.startTime.getTimeInMillis() + (delta * 1000);
+                        leg.flexCallAndRideMaxStartTime = makeCalendar(leg.startTime.getTimeZone(), maxStartTime);
+                    }
+                    if (hop.isDeviatedRouteAlight()) {
+                        long minEndTime = leg.endTime.getTimeInMillis() - (delta * 1000);
+                        leg.flexCallAndRideMinEndTime = makeCalendar(leg.endTime.getTimeZone(), minEndTime);
+                    }
+                }
+            }
+
         }
     }
 
@@ -679,6 +721,22 @@ public abstract class GraphPathToTripPlanConverter {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
             place.vertexType = VertexType.TRANSIT;
+            place.boardAlightType = BoardAlightType.DEFAULT;
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                if (hop.hasBoardArea() && !endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getBoardArea());
+                }
+                if (hop.hasAlightArea() && endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getAlightArea());
+                }
+                if ((endOfLeg && hop.isFlagStopAlight()) || (!endOfLeg && hop.isFlagStopBoard())) {
+                    place.boardAlightType = BoardAlightType.FLAG_STOP;
+                }
+                if ((endOfLeg && hop.isDeviatedRouteAlight()) || (!endOfLeg && hop.isDeviatedRouteBoard())) {
+                    place.boardAlightType = BoardAlightType.DEVIATED;
+                }
+            }
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
@@ -731,7 +789,10 @@ public abstract class GraphPathToTripPlanConverter {
             SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
             List<Edge> transferEdges = transferEdge.getEdges();
             if (transferEdges != null) {
-                State s = new State(transferEdges.get(0).getFromVertex(), states[0].getOptions());
+                // Create a new initial state. Some parameters may have change along the way, copy them from the first state
+                StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
+                se.setNonTransitOptionsFromState(states[0]);
+                State s = se.makeState();
                 ArrayList<State> transferStates = new ArrayList<>();
                 transferStates.add(s);
                 for (Edge e : transferEdges) {
@@ -993,7 +1054,8 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             } else {
                 if (!createdNewStep && step.elevation != null) {
-                    List<P2<Double>> s = encodeElevationProfile(edge, distance);
+                    List<P2<Double>> s = encodeElevationProfile(edge, distance,
+                            backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
                     if (step.elevation != null && step.elevation.size() > 0) {
                         step.elevation.addAll(s);
                     } else {
@@ -1048,7 +1110,8 @@ public abstract class GraphPathToTripPlanConverter {
         step.streetName = en.getName(wantedLocale);
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
-        step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
+        step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
+                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
         step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
@@ -1058,7 +1121,7 @@ public abstract class GraphPathToTripPlanConverter {
         return step;
     }
 
-    private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
+    private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
         if (!(edge instanceof StreetEdge)) {
             return new ArrayList<P2<Double>>();
         }
@@ -1069,7 +1132,7 @@ public abstract class GraphPathToTripPlanConverter {
         ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
         for (int i = 0; i < coordArr.length; i++) {
-            out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
+            out.add(new P2<Double>(coordArr[i].x + distanceOffset, coordArr[i].y + heightOffset));
         }
         return out;
     }

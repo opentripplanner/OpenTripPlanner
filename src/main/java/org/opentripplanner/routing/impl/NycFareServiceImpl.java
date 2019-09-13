@@ -1,21 +1,8 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.State;
@@ -59,9 +46,9 @@ public class NycFareServiceImpl implements FareService, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final float ORDINARY_FARE = 2.25f;
+	private static final float ORDINARY_FARE = 2.75f;
 
-	private static final float EXPRESS_FARE = 5.50f;
+	private static final float EXPRESS_FARE = 6.50f;
 
 	private static final float EXPENSIVE_EXPRESS_FARE = 7.50f; // BxM4C only
 
@@ -71,18 +58,18 @@ public class NycFareServiceImpl implements FareService, Serializable {
 	@Override
 	public Fare getCost(GraphPath path) {
 
-		final List<AgencyAndId> SIR_PAID_STOPS = makeMtaStopList("S31", "S30");
+		final List<FeedScopedId> SIR_PAID_STOPS = makeMtaStopList("S31", "S30");
 
-		final List<AgencyAndId> SUBWAY_FREE_TRANSFER_STOPS = makeMtaStopList(
+		final List<FeedScopedId> SUBWAY_FREE_TRANSFER_STOPS = makeMtaStopList(
 				"R11", "B08", "629");
 
-		final List<AgencyAndId> SIR_BONUS_STOPS = makeMtaStopList("140", "420",
+		final List<FeedScopedId> SIR_BONUS_STOPS = makeMtaStopList("140", "420",
 				"419", "418", "M22", "M23", "R27", "R26");
 
-		final List<AgencyAndId> SIR_BONUS_ROUTES = makeMtaStopList("M5", "M20",
+		final List<FeedScopedId> SIR_BONUS_ROUTES = makeMtaStopList("M5", "M20",
 				"M15-SBS");
 
-		final List<AgencyAndId> CANARSIE = makeMtaStopList("L29", "303345");
+		final List<FeedScopedId> CANARSIE = makeMtaStopList("L29", "303345");
 
 		// List of NYC agencies to set fares for
 		final List<String> AGENCIES = new ArrayList<>();
@@ -123,7 +110,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				newRide = null;
 				continue;
 			}
-			AgencyAndId routeId = state.getRoute();
+			FeedScopedId routeId = state.getRoute();
 			String agencyId = state.getBackTrip().getRoute().getAgency().getId();
 			if (!AGENCIES.contains(agencyId)) {
 				continue;
@@ -172,8 +159,8 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		boolean sirBonusTransfer = false;
 		float totalFare = 0;
 		for (Ride ride : rides) {
-			AgencyAndId firstStopId = null;
-			AgencyAndId lastStopId = null; 
+			FeedScopedId firstStopId = null;
+			FeedScopedId lastStopId = null;
 			if (ride.firstStop != null) {
 				firstStopId = ride.firstStop.getId();
 				lastStopId = ride.lastStop.getId();
@@ -379,13 +366,13 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		return fare;
 	}
 
-	private List<AgencyAndId> makeMtaStopList(String... stops) {
+	private List<FeedScopedId> makeMtaStopList(String... stops) {
 
-		ArrayList<AgencyAndId> out = new ArrayList<AgencyAndId>();
+		ArrayList<FeedScopedId> out = new ArrayList<FeedScopedId>();
 		for (String stop : stops) {
-			out.add(new AgencyAndId("MTA NYCT", stop));
-			out.add(new AgencyAndId("MTA NYCT", stop + "N"));
-			out.add(new AgencyAndId("MTA NYCT", stop + "S"));
+			out.add(new FeedScopedId("MTA NYCT", stop));
+			out.add(new FeedScopedId("MTA NYCT", stop + "N"));
+			out.add(new FeedScopedId("MTA NYCT", stop + "S"));
 		}
 		return out;
 	}

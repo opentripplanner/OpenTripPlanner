@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.impl;
 
 import java.io.Serializable;
@@ -25,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -45,12 +31,14 @@ import org.slf4j.LoggerFactory;
 
 /** A set of edges on a single route, with associated information for calculating fares */
 class Ride {
-    
+
+    String feedId;
+
     String agency; // route agency
 
-    AgencyAndId route;
+    FeedScopedId route;
 
-    AgencyAndId trip;
+    FeedScopedId trip;
     
     Set<String> zones;
 
@@ -121,7 +109,7 @@ class FareSearch {
 
     // Cell [i,j] holds the id of the fare that corresponds to the relevant cost
     // we can't just use FareAndId for resultTable because you need to sum them
-    AgencyAndId[][] fareIds;
+    FeedScopedId[][] fareIds;
 
     // Cell [i] holds the index of the last ride that ride[i] has a fare to
     // If it's -1, the ride does not have fares to anywhere
@@ -130,7 +118,7 @@ class FareSearch {
     FareSearch(int size) {
         resultTable = new float[size][size];
         next = new int[size][size];
-        fareIds = new AgencyAndId[size][size];
+        fareIds = new FeedScopedId[size][size];
         endOfComponent = new int[size];
         Arrays.fill(endOfComponent, -1);
     }
@@ -139,9 +127,9 @@ class FareSearch {
 /** Holds fare and corresponding fareId */
 class FareAndId {
     float fare;
-    AgencyAndId fareId;
+    FeedScopedId fareId;
 
-    FareAndId(float fare, AgencyAndId fareId) {
+    FareAndId(float fare, FeedScopedId fareId) {
         this.fare = fare;
         this.fareId = fareId;
     }
@@ -191,6 +179,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
                 ride.trip = state.getTripId();
+                ride.feedId = hEdge.getFeedId();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();
@@ -216,15 +205,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
             FareType fareType = kv.getKey();
             Collection<FareRuleSet> fareRules = kv.getValue();
-
-            // pick up a random currency from fareAttributes,
-            // we assume that all tickets use the same currency
+            // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
             Currency currency = null;
-            WrappedCurrency wrappedCurrency = null;
             if (fareRules.size() > 0) {
-                currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute()
-                        .getCurrencyType());
-                wrappedCurrency = new WrappedCurrency(currency);
+                currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute().getCurrencyType());
             }
             hasFare = populateFare(fare, currency, fareType, rides, fareRules);
         }
@@ -263,7 +247,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 r.resultTable[j][j + i] = cost;
                 r.fareIds[j][j + i] = best.fareId;
                 for (int k = 0; k < i; k++) {
-                    float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+                    float via = addFares(rides.subList(j, j + k + 1), rides.subList(j + k + 1, j + i + 1),
+                            r.resultTable[j][j + k], r.resultTable[j + k + 1][j + i]);
                     if (r.resultTable[j][j + i] > via) {
                         r.resultTable[j][j + i] = via;
                         r.endOfComponent[j] = j + i;
@@ -273,6 +258,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             }
         }
         return r;
+    }
+
+    protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
+        return cost0 + cost1;
     }
 
     protected float getLowestCost(FareType fareType, List<Ride> rides,
@@ -320,7 +309,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
             int via = r.next[start][r.endOfComponent[start]];
             float cost = r.resultTable[start][via];
-            AgencyAndId fareId = r.fareIds[start][via];
+            FeedScopedId fareId = r.fareIds[start][via];
             FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
             for(int i = start; i <= via; ++i) {
                 detail.addRoute(rides.get(i).route);
@@ -343,21 +332,20 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
-        Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
+        Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
         Set<String> agencies = new HashSet<String>();
-        Set<AgencyAndId> trips = new HashSet<AgencyAndId>();
+        Set<FeedScopedId> trips = new HashSet<FeedScopedId>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
         long   startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
-        // stops don't really have an agency id, they have the per-feed default id
-        String feedId = firstRide.firstStop.getId().getAgencyId();  
+        String feedId = firstRide.feedId;
         long lastRideStartTime = firstRide.startTime;
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
-            if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
+            if ( ! ride.feedId.equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
                 return new FareAndId(Float.POSITIVE_INFINITY, null);
             }

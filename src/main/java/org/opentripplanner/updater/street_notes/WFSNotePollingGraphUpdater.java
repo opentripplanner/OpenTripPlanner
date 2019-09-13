@@ -3,7 +3,7 @@ package org.opentripplanner.updater.street_notes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.WFSDataStore;
@@ -87,7 +87,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         featureType = config.path("featureType").asText();
         this.graph = graph;
         LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
-                frequencySec, url.toString(), featureType);
+                pollingPeriodSeconds, url.toString(), featureType);
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Setup the WFS data source and add the DynamicStreetNotesSource to the graph
      */
     @Override
-    public void setup() throws IOException, FactoryException {
+    public void setup(Graph graph) throws IOException, FactoryException {
         LOG.info("Setup WFS polling updater");
         HashMap<String, Object> connectionParameters = new HashMap<>();
         connectionParameters.put(WFSDataStoreFactory.URL.key, url);
@@ -110,7 +110,6 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         query = new Query(featureType); // Read only single feature type from the source
         query.setCoordinateSystem(CRS.decode("EPSG:4326", true)); // Get coordinates in WGS-84
         featureSource = data.getFeatureSource(featureType);
-
         graph.streetNotesService.addNotesSource(notesSource);
     }
 

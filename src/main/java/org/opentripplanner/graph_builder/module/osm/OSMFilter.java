@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
@@ -39,23 +26,30 @@ public class OSMFilter {
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
      */
-    public static boolean isWayRoutable(OSMWithTags way) {
-        if (!isOsmEntityRoutable(way))
+    static boolean isWayRoutable(OSMWithTags way) {
+        if (!isOsmEntityRoutable(way)) {
             return false;
+        }
 
         String highway = way.getTag("highway");
-        if (highway != null
-                && (highway.equals("conveyer") || highway.equals("proposed")
-                        || highway.equals("construction") || highway.equals("raceway") || highway
-                            .equals("unbuilt")))
-            return false;
+        if (highway != null) {
+            if(
+                    highway.equals("conveyer") ||
+                    highway.equals("proposed") ||
+                    highway.equals("construction") ||
+                    highway.equals("razed") ||
+                    highway.equals("raceway") ||
+                    highway.equals("unbuilt")
+            ) {
+                return false;
+            }
+        }
 
         if (way.isGeneralAccessDenied()) {
             // There are exceptions.
             return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
                     .isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed());
         }
-
         return true;
     }
 
@@ -141,7 +135,7 @@ public class OSMFilter {
      * @return
      */
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
-            StreetTraversalPermission def, Graph graph) {
+            StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
 
         /*
@@ -169,6 +163,11 @@ public class OSMFilter {
             permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
         }
 
+        // Check for foot=discouraged, if applicable
+        if(banDiscouragedWalking && way.hasTag("foot") && way.getTag("foot").equals("discouraged")) {
+            permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
+        }
+
         // Compute bike permissions, check consistency.
         boolean forceBikes = false;
         if (way.isBicycleExplicitlyAllowed()) {
@@ -176,7 +175,8 @@ public class OSMFilter {
             forceBikes = true;
         }
 
-        if (way.isBicycleDismountForced()) {
+        if (way.isBicycleDismountForced() ||
+                (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))) {
             permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
             if (forceBikes) {
                 LOG.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
@@ -184,6 +184,11 @@ public class OSMFilter {
         }
 
         return permissions;
+    }
+
+    public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
+            StreetTraversalPermission def, Graph graph) {
+        return getPermissionsForWay(way, def, graph, false, false);
     }
 
     /**

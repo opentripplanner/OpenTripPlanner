@@ -95,6 +95,6 @@ In order to use this demo in the "library" mode, insert the 3 python lines given
 
 ## API
 
-For a complete documentation, please see the [online JavaDoc](http://docs.opentripplanner.org/javadoc/master/) of all classes within the `org.opentripplanner.scripting.api` package.
+For a complete documentation, please see the [online JavaDoc](http://dev.opentripplanner.org/javadoc/) of all classes within the `org.opentripplanner.scripting.api` package.
 
 Classes in this package are meant to be kept stable in time, at least regarding backward compatibility. Be careful as scripting is still in development phase; so there is no strong guarantee about the stability of the API, which is only a stated long-term goal. The aim is to achieve a stable API for the 1.0 OTP release.

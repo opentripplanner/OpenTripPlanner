@@ -1,19 +1,11 @@
 package org.opentripplanner.profile;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Lists;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.model.Stop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Groups stops by geographic proximity and name similarity.
@@ -36,6 +28,11 @@ public class StopCluster {
     public StopCluster(String id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public void setCoordinates(double lat, double lon){
+        this.lat = lat;
+        this.lon = lon;
     }
 
     public void computeCenter() {

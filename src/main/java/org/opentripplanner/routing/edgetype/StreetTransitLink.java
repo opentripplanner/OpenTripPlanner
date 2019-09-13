@@ -1,19 +1,6 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -24,8 +11,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+
 import java.util.Locale;
 
 /** 
@@ -89,8 +77,12 @@ public class StreetTransitLink extends Edge {
         }
 
         // Do not re-enter the street network following a transfer.
-        // FIXME this is a serious problem: transfer result state can dominate arrivals at a stop on a vehicle and prune the tree!
         if (s0.backEdge instanceof SimpleTransfer) {
+            return null;
+        }
+
+        // Do not get off at a real stop when on call-n-ride (force a transfer instead).
+        if (s0.isLastBoardAlightDeviated() && !(transitStop.checkCallAndRideStreetLinkOk(s0))) {
             return null;
         }
 
@@ -115,7 +107,7 @@ public class StreetTransitLink extends Edge {
 
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
+        if (s0.getNonTransitMode() == TraverseMode.CAR && !req.enterStationsWithCar) {
             if (req.kissAndRide && !s0.isCarParked()) {
                 s1.setCarParked(true);
             } else {
@@ -161,6 +153,5 @@ public class StreetTransitLink extends Edge {
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
-
 
 }

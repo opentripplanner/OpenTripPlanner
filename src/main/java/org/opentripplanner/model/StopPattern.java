@@ -3,13 +3,14 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * 
  * Any two trips with the same stops in the same order, and that operate on the same days, can be
  * combined using a TripPattern to simplify the graph. This saves memory and reduces search
- * complexity since we only consider the trip that departs soonest for each pattern. AgencyAndId
+ * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * 
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key for a TripPattern.
@@ -53,12 +54,17 @@ public class StopPattern implements Serializable {
     public final int[]  pickups;
     public final int[]  dropoffs;
 
+    /** GTFS-Flex specific fields; will be null unless GTFS-Flex dataset is in use. */
+    private StopPatternFlexFields flexFields;
+
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
             StopPattern that = (StopPattern) other;
-            return Arrays.equals(this.stops,    that.stops) && 
-                   Arrays.equals(this.pickups,  that.pickups) && 
-                   Arrays.equals(this.dropoffs, that.dropoffs);
+            return Arrays.equals(this.stops, that.stops) &&
+                    Arrays.equals(this.pickups, that.pickups) &&
+                    Arrays.equals(this.dropoffs, that.dropoffs) &&
+                    ((flexFields == null && that.flexFields == null) ||
+                    (flexFields != null && flexFields.equals(((StopPattern) other).flexFields)));
         } else {
             return false;
         }
@@ -71,6 +77,7 @@ public class StopPattern implements Serializable {
         hash += Arrays.hashCode(this.pickups);
         hash *= 31;
         hash += Arrays.hashCode(this.dropoffs);
+        hash *= 31;
         return hash;
     }
 
@@ -83,17 +90,22 @@ public class StopPattern implements Serializable {
         return sb.toString();
     }
 
-    private StopPattern (int size) {
-        this.size = size;
-        stops     = new Stop[size];
-        pickups   = new int[size];
-        dropoffs  = new int[size];
-    }
-
-    /** Assumes that stopTimes are already sorted by time. */
-    public StopPattern (List<StopTime> stopTimes) {
-        this (stopTimes.size());
-        if (size == 0) return;
+    /**
+     * Default constructor
+     * @param stopTimes List of StopTimes; assumes that stopTimes are already sorted by time.
+     * @param deduplicator Deduplicator. If null, do not deduplicate arrays.
+     */
+    public StopPattern (List<StopTime> stopTimes, Deduplicator deduplicator) {
+        this.size = stopTimes.size();
+        if (size == 0) {
+            this.stops = new Stop[size];
+            this.pickups = new int[0];
+            this.dropoffs = new int[0];
+            return;
+        }
+        stops = new Stop[size];
+        int[] pickups = new int[size];
+        int[] dropoffs = new int[size];
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
@@ -112,6 +124,22 @@ public class StopPattern implements Serializable {
          */
         dropoffs[0] = 0;
         pickups[size - 1] = 0;
+
+        if (deduplicator != null) {
+            this.pickups = deduplicator.deduplicateIntArray(pickups);
+            this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
+        } else {
+            this.pickups = pickups;
+            this.dropoffs = dropoffs;
+        }
+    }
+
+    /**
+     * Create StopPattern without deduplicating arrays
+     * @param stopTimes List of StopTimes; assumes that stopTimes are already sorted by time.
+     */
+    public StopPattern (List<StopTime> stopTimes) {
+        this(stopTimes, null);
     }
 
     /**
@@ -122,8 +150,6 @@ public class StopPattern implements Serializable {
         for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) return true;
         return false;
     }
-
-    private static final Logger LOG = LoggerFactory.getLogger(StopPattern.class);
 
     /**
      * In most cases we want to use identity equality for StopPatterns. There is a single StopPattern instance for each
@@ -145,7 +171,26 @@ public class StopPattern implements Serializable {
             hasher.putInt(pickups[hop]);
             hasher.putInt(dropoffs[hop + 1]);
         }
+        if (flexFields != null) {
+            for (int hop = 0; hop < size - 1; hop++) {
+                hasher.putInt(flexFields.continuousPickup[hop]);
+                hasher.putInt(flexFields.continuousDropOff[hop]);
+                hasher.putDouble(flexFields.serviceAreaRadius[hop]);
+                hasher.putInt(flexFields.serviceAreas[hop].hashCode());
+            }
+        }
         return hasher.hash();
     }
 
+    public StopPatternFlexFields getFlexFields() {
+        return flexFields;
+    }
+
+    public void setFlexFields(StopPatternFlexFields flexFields) {
+        this.flexFields = flexFields;
+    }
+
+    public boolean hasFlexFields() {
+        return flexFields != null;
+    }
 }

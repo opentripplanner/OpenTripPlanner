@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.alertpatch;
 
 import java.io.IOException;
@@ -18,16 +5,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.google.common.collect.Multimap;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -45,7 +27,6 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  *
  */
-@XmlRootElement(name = "AlertPatch")
 public class AlertPatch implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AlertPatch.class);
 
@@ -59,11 +40,11 @@ public class AlertPatch implements Serializable {
 
     private String agency;
 
-    private AgencyAndId route;
+    private FeedScopedId route;
 
-    private AgencyAndId trip;
+    private FeedScopedId trip;
 
-    private AgencyAndId stop;
+    private FeedScopedId stop;
 
     /**
      * The headsign of the alert
@@ -80,7 +61,6 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
-    @XmlElement
     public Alert getAlert() {
         return alert;
     }
@@ -96,7 +76,6 @@ public class AlertPatch implements Serializable {
         return false;
     }
 
-    @XmlElement
     public String getId() {
         return id;
     }
@@ -246,18 +225,15 @@ public class AlertPatch implements Serializable {
         return agency;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public AgencyAndId getRoute() {
+    public FeedScopedId getRoute() {
         return route;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public AgencyAndId getTrip() {
+    public FeedScopedId getTrip() {
         return trip;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    public AgencyAndId getStop() {
+    public FeedScopedId getStop() {
         return stop;
     }
 
@@ -265,11 +241,11 @@ public class AlertPatch implements Serializable {
         this.agency = agency;
     }
 
-    public void setRoute(AgencyAndId route) {
+    public void setRoute(FeedScopedId route) {
         this.route = route;
     }
 
-    public void setTrip(AgencyAndId trip) {
+    public void setTrip(FeedScopedId trip) {
         this.trip = trip;
     }
 
@@ -284,17 +260,15 @@ public class AlertPatch implements Serializable {
         this.directionId = direction;
     }
 
-    @XmlElement
     public String getDirection() {
         return direction;
     }
 
-    @XmlElement
     public int getDirectionId() {
         return directionId;
     }
 
-    public void setStop(AgencyAndId stop) {
+    public void setStop(FeedScopedId stop) {
         this.stop = stop;
     }
 

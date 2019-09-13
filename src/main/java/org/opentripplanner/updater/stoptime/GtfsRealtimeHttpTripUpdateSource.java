@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.updater.stoptime;
 
 import java.io.InputStream;
@@ -64,7 +51,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
         List<TripUpdate> updates = null;
         fullDataset = true;
         try {
-            InputStream is = HttpUtils.getData(url);
+            InputStream is = HttpUtils.getData(url, "Accept", "application/x-google-protobuf; application/octet-stream; */*");
             if (is != null) {
                 // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);
@@ -79,7 +66,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
                 }
                 
                 // Create List of TripUpdates
-                updates = new ArrayList<TripUpdate>(feedEntityList.size());
+                updates = new ArrayList<>(feedEntityList.size());
                 for (FeedEntity feedEntity : feedEntityList) {
                     if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
                 }
