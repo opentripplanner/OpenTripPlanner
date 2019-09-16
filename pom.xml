@@ -208,6 +208,21 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
+                                 our dependencies specify a module name. -->
+                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+
+            </plugin>
+            <plugin>
                 <!-- This plugin must be configured both here (for attach-javadoc during release)
                 and in "reports" (for site generation), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
@@ -216,6 +231,11 @@
                 <configuration>
                     <!-- Turn off strict Javadoc checking -->
                     <doclint>none</doclint>
+                    <!--
+                      Exclude this package as it inherits from a JAI (https://www.oracle.com/technetwork/java/iio-141084.html) type
+                      whose sources are hard to discover by the JavaDoc tool.
+                    -->
+                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
                 </configuration>
                 <executions>
                     <!-- Compress Javadoc into JAR and include that JAR when deploying. -->
@@ -258,6 +278,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!--
+                  Intentionally an old version as the combination of Junit 5, Java 11 and Surefire was causing issues.
+                  https://github.com/opentripplanner/OpenTripPlanner/pull/2812/commits/c811224f8467699ee70684e9f6b00d3ad803dbeb
+                -->
                 <version>2.19.1</version>
                 <configuration>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
@@ -407,7 +431,7 @@
                 <version>3.1.1</version>
                 <configuration>
                     <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <doclint>false</doclint>
                 </configuration>
                 <reportSets>
                     <reportSet>
