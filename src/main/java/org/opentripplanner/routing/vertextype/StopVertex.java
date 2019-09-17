@@ -12,6 +12,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+// TODO Name TransitStopVertex
 public class StopVertex extends Vertex {
 
     private static final Logger LOG = LoggerFactory.getLogger(StopVertex.class);

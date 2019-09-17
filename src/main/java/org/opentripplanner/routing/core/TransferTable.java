@@ -9,6 +9,10 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.P2;
 
+
+// TODO Ask Andrew about this code and look at the GTFS spec - it might be wast to look at the original
+
+
 /**
  * This class represents all transfer information in the graph. Transfers are grouped by
  * stop-to-stop pairs.

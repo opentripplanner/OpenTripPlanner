@@ -2,6 +2,9 @@ package org.opentripplanner.api.adapters;
 
 import org.opentripplanner.model.WheelChairBoarding;
 
+
+// TODO Check if there is another better packege to plac this
+
 public class WheelChairCodeMapper {
         static int mapToWheelChairCode(WheelChairBoarding wheelChairBoarding) {
                 switch (wheelChairBoarding) {

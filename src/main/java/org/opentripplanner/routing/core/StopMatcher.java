@@ -76,6 +76,7 @@ public class StopMatcher implements Cloneable, Serializable {
      * @param stop is the stop to match using its ID
      * @return true when the stop is matched
      */
+    // TODO Check what this is used for and that it still works
     public boolean matches(Stop stop) {
         // Don't bother with an empty matcher 
         if (this.isEmpty()) {

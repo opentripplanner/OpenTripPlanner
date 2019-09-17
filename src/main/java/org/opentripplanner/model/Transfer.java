@@ -57,6 +57,9 @@ public final class Transfer implements Serializable {
         this.minTransferTimeSeconds = minTransferTimeSeconds;
     }
 
+
+    // TODO Move this to mapping
+
     /**
      * Gets a single transfer between the stops specified
      */

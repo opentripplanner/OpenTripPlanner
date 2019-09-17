@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+// TODO Delete
+
 /**
  * A level above a monomodal StopPlace (station) in NeTEx. It has no equivalent in GTFS.
  */

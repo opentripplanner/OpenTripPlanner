@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+
+// TODO Look at this class
+
 /** Responsible for mapping GTFS Transfer into the OTP model. */
 class TransferMapper {
     private final RouteMapper routeMapper;

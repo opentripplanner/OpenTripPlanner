@@ -62,6 +62,9 @@ import java.util.Map;
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
 
+
+// TODO Look at this class
+
 /**
  * Generates a set of edges from GTFS.
  *

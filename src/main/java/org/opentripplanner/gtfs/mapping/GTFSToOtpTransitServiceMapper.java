@@ -70,6 +70,9 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
+
+
+        // TODO Ta en titt på dette
         builder.getStops().addAll(stopMapper.map(
                 data.getAllStops().stream().filter(s -> s.getLocationType() == 0)
                         .collect(Collectors.toList())));

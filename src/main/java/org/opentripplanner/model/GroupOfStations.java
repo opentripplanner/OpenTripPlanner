@@ -2,6 +2,9 @@ package org.opentripplanner.model;
 
 import java.util.Set;
 
+
+// TODO Delete
+
 /**
  * A group consisting of Stations and MultiModalStations. This is used in NeTEx to link several
  * major StopPlaces into a hub. It has no equivalent in GTFS.

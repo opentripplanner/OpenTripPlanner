@@ -76,12 +76,15 @@ public class GraphIndex {
     public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
     public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+    // TODO Remove?
     public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
+    // TODO Remove ?
     public final Map<Stop, StopVertex> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    // TODO Remove
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<StopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
 
