@@ -461,11 +461,6 @@
             <url>https://download.osgeo.org/webdav/geotools/</url>
         </repository>
         <repository>
-            <id>geosolutions</id>
-            <name>GeoSolutions Repository</name>
-            <url>http://maven.geo-solutions.it</url>
-        </repository>
-        <repository>
             <id>axis</id>
             <name>axis</name>
             <url>https://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
