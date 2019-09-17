@@ -30,12 +30,14 @@ import org.slf4j.LoggerFactory;
  * Result is stored in image pixel as a signed byte.
  * 
  * So:
+ * <pre>
  * {@code
  *  -119 to +119 are interpreted literally,
  *  +120 means >= +120,
  *  -120 means <= -120,
  *  -128 means "unreachable".
  * }
+ * </pre>
  */
 public abstract class Tile {
 

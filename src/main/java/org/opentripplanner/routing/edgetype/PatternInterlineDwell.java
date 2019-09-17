@@ -36,7 +36,7 @@ import java.util.Locale;
  *
  * Another option is to store the Trip→Trip mapping at the Graph level, and use the source and target vertices of the
  * interline dwell edges to know which pattern should be used for resolving TripTimes. However, this will get in the
- * way of eventually eliminating transit edges. This could be a Guava {@code BiMap<Trip, Trip>}.
+ * way of eventually eliminating transit edges. This could be a Guava {@link BiMap<Trip, Trip>}.
  *
  * Links to previous and next trips could be stored directly as fields in TripTimes, or in a map.
  * Previous/next TripTimes in fields will not work because real-time updates to any one TripTimes will

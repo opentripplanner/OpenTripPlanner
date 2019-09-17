@@ -57,7 +57,6 @@ public class GtfsFeedId {
          *
          * @param source the input source
          * @return A GtfsFeedId
-         * @throws RuntimeException
          * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
          */
         public Builder fromGtfsFeed(CsvInputSource source) {

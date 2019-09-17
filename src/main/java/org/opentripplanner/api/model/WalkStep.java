@@ -17,28 +17,34 @@ import com.google.common.collect.Lists;
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
  * <p>
- * Turn onto Broadway from W 57th St (coming from 7th Ave): <br>
- * distance = 100 (say) <br>
- * walkDirection = RIGHT <br>
- * streetName = Broadway <br>
- * everything else null/false <br>
+ * Turn onto Broadway from W 57th St (coming from 7th Ave):
+ * <pre>
+ *  distance = 100 (say) 
+ *  walkDirection = RIGHT 
+ *  streetName = Broadway 
+ *  everything else null/false 
+ * </pre>
  * </p>
  * <p>
- * Now, turn from Broadway onto Central Park S via Columbus Circle <br>
- * distance = 200 (say) <br>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
- * streetName = Central Park S <br>
- * exit = 1 (first exit) <br>
- * immediately everything else false <br>
+ * Now, turn from Broadway onto Central Park S via Columbus Circle
+ * <pre>
+ *  distance = 200 (say) 
+ *  walkDirection = CIRCLE_COUNTERCLOCKWISE 
+ *  streetName = Central Park S 
+ *  exit = 1 (first exit) 
+ *  immediately everything else false 
+ * </pre>
  * </p>
  * <p>
- * Instead, go through the circle to continue on Broadway <br>
- * distance = 100 (say) <br>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
- * streetName = Broadway <br>
- * exit = 3 <br>
- * stayOn = true <br>
- * everything else false <br>
+ * Instead, go through the circle to continue on Broadway
+ * <pre>
+ *  distance = 100 (say)
+ *  walkDirection = CIRCLE_COUNTERCLOCKWISE
+ *  streetName = Broadway
+ *  exit = 3
+ *  stayOn = true
+ *  everything else false
+ * </pre>
  * </p>
  * */
 public class WalkStep {
