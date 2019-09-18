@@ -6,6 +6,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class TimetableSnapshot {
     
     /**
      * Class to use as key in HashMap containing feed id, trip id and service date
+     * TODO shouldn't this be a static class?
      */
     protected class TripIdAndServiceDate {
         private final String feedId;
@@ -93,10 +95,14 @@ public class TimetableSnapshot {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
     
-    // Use HashMap not Map so we can clone.
-    // if this turns out to be slow/spacious we can use an array with integer pattern indexes
-    // The SortedSet members are copy-on-write
-    // FIXME: this could be made into a flat hashtable with compound keys.
+    /**
+     * The timetables for different days, for each TripPattern (each sequence of stops on a particular Route).
+     * The keys include both TripPatterns from the scheduled GTFS, and TripPatterns added by realtime messages and
+     * tracked by the TripPatternCache.
+     * We use a HashMap rather than a Map so we can clone it. If this turns out to be slow/spacious we can use an array
+     * with integer pattern indexes. The SortedSet members are copy-on-write.
+     * FIXME: this could be made into a flat hashtable with compound keys.
+     */
     private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
     /**
@@ -351,4 +357,13 @@ public class TimetableSnapshot {
         String d = readOnly ? "committed" : String.format("%d dirty", dirtyTimetables.size());
         return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
     }
+
+    /**
+     * @return all TripPatterns available in this snapshot, including both those from scheduled (static) transit data
+     *         and those added by realtime messages (rerouted or added trips).
+     */
+    public Collection<TripPattern> getAllScheduledAndRealtimeTripPatterns() {
+        return timetables.keySet();
+    }
+
 }

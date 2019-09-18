@@ -647,12 +647,15 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         this.transitLayer = TransitLayerMapper.map(this);
         this.realtimeTransitLayer = transitLayer;
         // Then in a loop, recreate the transitLayer for real-time updated timetables.
+        // Doing this here in the index() method is definitely a hack.
         // This could eventually be done with a PollingGraphUpdater.
-        // TODO OTP2 - Se discussion in PR #2794 (Graph.java@650)
+        // TODO OTP2 - See discussion in PR #2794 (Graph.java@650)
+        final int BUILD_REALTIME_TRANSIT_LAYER_INTERVAL_SECONDS = 40;
         new Thread(() -> {
             while (true) {
+                // Sleep before mapping, waiting for the timetableSnapshotSource to be created by a graph updater.
                 try {
-                    Thread.sleep(1000 * 20);
+                    Thread.sleep(1000 * BUILD_REALTIME_TRANSIT_LAYER_INTERVAL_SECONDS);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

@@ -11,11 +11,16 @@ import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
+ * This tracks only patterns added by realtime messages, not ones that already existed from the scheduled GTFS.
  */
 public class TripPatternCache {
     
     private int counter = 0;
 
+    /**
+     * This tracks only patterns added by realtime messages, it is not primed with TripPatterns that already existed
+     * from the scheduled GTFS.
+     */
     private final Map<StopPattern, TripPattern> cache = new HashMap<>();
     
     /**
