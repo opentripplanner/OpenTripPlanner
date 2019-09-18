@@ -99,6 +99,7 @@ public class TimetableSnapshot {
      * <p>
      * This is a HashMap and not a Map so the clone function is available.
      * </p>
+     * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
     
@@ -143,6 +144,7 @@ public class TimetableSnapshot {
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
      * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of
      * a trip that didn't exist yet in the trip pattern.
+     * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      *
      * @param feedId feed id the trip id belongs to
      * @param tripId trip id (without agency)
