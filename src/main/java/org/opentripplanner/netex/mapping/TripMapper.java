@@ -16,7 +16,7 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
  * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP Route) in two ways.
  * Either directly from the ServiceJourney or through JourneyPattern->Route. The former has precedent over the latter.
  */
-public class TripMapper {
+class TripMapper {
 
     private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
     private ReadOnlyHierarchicalMap<String, Route> routeById;

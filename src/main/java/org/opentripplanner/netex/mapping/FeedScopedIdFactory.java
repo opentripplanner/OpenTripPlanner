@@ -11,7 +11,7 @@ import org.opentripplanner.model.FeedScopedId;
  * This class should only be used by the Netex import/mapping process. It is NOT THREAD SAFE and each import
  * must be done in sequence for it to work properly.
  */
-public class FeedScopedIdFactory {
+class FeedScopedIdFactory {
     private static String feedId = "NETEX_AGENCY_ID_NOT_SET";
 
     public static void setFeedId(String feedId) {

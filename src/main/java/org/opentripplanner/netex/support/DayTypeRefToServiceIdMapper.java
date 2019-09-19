@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.mapping;
+package org.opentripplanner.netex.support;
 
 import java.util.Collection;
 
@@ -9,7 +9,7 @@ import java.util.Collection;
  * Dont parse the service date to get dayTypeRefs, the reason way we keep the refs is
  * to allow the ServiceId to be human readable.
  */
-public class DayTypeRefToServiceIdMapper {
+class DayTypeRefToServiceIdMapper {
     private static final char SEP = '+';
 
     /** private constructor to prevent instantiation of utility class */
@@ -22,7 +22,7 @@ public class DayTypeRefToServiceIdMapper {
      * two different set should always generate diffrent ServiceIds. The order of the elements
      * in the input set should not matter and duplicate elements in the set ignored.
      */
-    public static String generateServiceId(Collection<String> dayTypeRefs) {
+    static String generateServiceId(Collection<String> dayTypeRefs) {
         return dayTypeRefs.stream().distinct().sorted().reduce((s,t) -> s + SEP + t).orElse(
                 null
         );

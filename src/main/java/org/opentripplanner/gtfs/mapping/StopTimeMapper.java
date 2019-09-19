@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedScopedId;
-
 /**
  * Responsible for mapping GTFS StopTime into the OTP Transit model.
  */
