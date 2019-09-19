@@ -49,21 +49,25 @@ class TripPatternStructure {
         otpRoute.setId(FeedScopedIdFactory.createFeedScopedId("RUT:Line:1"));
         otpRouteByid.add(otpRoute);
 
-        TimetabledPassingTime timetabledPassingTime1= new TimetabledPassingTime();
-        timetabledPassingTime1.setDepartureTime(LocalTime.of(5, 0));
-        timetabledPassingTimes.add(timetabledPassingTime1);
-        TimetabledPassingTime timetabledPassingTime2 = new TimetabledPassingTime();
-        timetabledPassingTime2.setDepartureTime(LocalTime.of(5, 4));
-        timetabledPassingTimes.add(timetabledPassingTime2);
-        TimetabledPassingTime timetabledPassingTime3 = new TimetabledPassingTime();
-        timetabledPassingTime3.setDepartureTime(LocalTime.of(5, 10));
-        timetabledPassingTimes.add(timetabledPassingTime3);
-        TimetabledPassingTime timetabledPassingTime4 = new TimetabledPassingTime();
-        timetabledPassingTime4.setDepartureTime(LocalTime.of(5, 15));
-        timetabledPassingTimes.add(timetabledPassingTime4);
-        TimetabledPassingTime timetabledPassingTime5 = new TimetabledPassingTime();
-        timetabledPassingTime5.setDepartureTime(LocalTime.of(5, 22));
-        timetabledPassingTimes.add(timetabledPassingTime5);
+        TimetabledPassingTime passingTime1 = new TimetabledPassingTime()
+                .withId("TTPT-1")
+                .withDepartureTime(LocalTime.of(5, 0));
+        TimetabledPassingTime passingTime2 = new TimetabledPassingTime()
+                .withId("TTPT-2")
+                .withDepartureTime(LocalTime.of(5, 4));
+        TimetabledPassingTime passingTime3 = new TimetabledPassingTime()
+                .withId("TTPT-3")
+                .withDepartureTime(LocalTime.of(5, 10));
+        TimetabledPassingTime passingTime4 = new TimetabledPassingTime()
+                .withId("TTPT-4")
+                .withDepartureTime(LocalTime.of(5, 15));
+        TimetabledPassingTime passingTime5 = new TimetabledPassingTime()
+                .withId("TTPT-5")
+                .withDepartureTime(LocalTime.of(5, 22));
+
+        timetabledPassingTimes.addAll(
+                Arrays.asList(passingTime1, passingTime2, passingTime3, passingTime4, passingTime5)
+        );
 
         Route route = new Route().withId("RUT:Route:1");
 
@@ -124,7 +128,7 @@ class TripPatternStructure {
         stopPointInJourneyPattern1.setId("RUT:StopPointInJourneyPattern:1");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef1 =
                 createStopPointInJourneyPatternRef(stopPointInJourneyPattern1.getId());
-        timetabledPassingTime1.setPointInJourneyPatternRef(stopPointInJourneyPatternRef1);
+        passingTime1.setPointInJourneyPatternRef(stopPointInJourneyPatternRef1);
 
         stopPointInJourneyPattern1.setDestinationDisplayRef(createDestinationDisplayRef(destinationDisplay1.getId()).getValue());
 
@@ -132,19 +136,19 @@ class TripPatternStructure {
         stopPointInJourneyPattern2.setId("RUT:StopPointInJourneyPattern:2");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef2 =
                 createStopPointInJourneyPatternRef(stopPointInJourneyPattern2.getId());
-        timetabledPassingTime2.setPointInJourneyPatternRef(stopPointInJourneyPatternRef2);
+        passingTime2.setPointInJourneyPatternRef(stopPointInJourneyPatternRef2);
 
         StopPointInJourneyPattern stopPointInJourneyPattern3 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern3.setId("RUT:StopPointInJourneyPattern:3");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef3 =
                 createStopPointInJourneyPatternRef(stopPointInJourneyPattern3.getId());
-        timetabledPassingTime3.setPointInJourneyPatternRef(stopPointInJourneyPatternRef3);
+        passingTime3.setPointInJourneyPatternRef(stopPointInJourneyPatternRef3);
 
         StopPointInJourneyPattern stopPointInJourneyPattern4 = new StopPointInJourneyPattern();
         stopPointInJourneyPattern4.setId("RUT:StopPointInJourneyPattern:4");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef4 =
                 createStopPointInJourneyPatternRef(stopPointInJourneyPattern4.getId());
-        timetabledPassingTime4.setPointInJourneyPatternRef(stopPointInJourneyPatternRef4);
+        passingTime4.setPointInJourneyPatternRef(stopPointInJourneyPatternRef4);
 
         stopPointInJourneyPattern4.setDestinationDisplayRef(createDestinationDisplayRef(destinationDisplay2.getId()).getValue());
 
@@ -152,7 +156,7 @@ class TripPatternStructure {
         stopPointInJourneyPattern5.setId("RUT:StopPointInJourneyPattern:5");
         JAXBElement<StopPointInJourneyPatternRefStructure> stopPointInJourneyPatternRef5 =
                 createStopPointInJourneyPatternRef(stopPointInJourneyPattern5.getId());
-        timetabledPassingTime5.setPointInJourneyPatternRef(stopPointInJourneyPatternRef5);
+        passingTime5.setPointInJourneyPatternRef(stopPointInJourneyPatternRef5);
 
         JAXBElement<ScheduledStopPointRefStructure> scheduledStopPointRef1 =
                 createScheduledStopPointRef(stopPointInJourneyPattern1.getId());

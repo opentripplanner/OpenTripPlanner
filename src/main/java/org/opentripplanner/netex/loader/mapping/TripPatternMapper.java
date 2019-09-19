@@ -65,7 +65,7 @@ class TripPatternMapper {
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
-        this.stopTimesMapper = new StopTimesMapper(destinationDisplayById, stopsById, quayIdByStopPointRef);
+        this.stopTimesMapper = new StopTimesMapper(stopsById, destinationDisplayById, quayIdByStopPointRef);
     }
 
     Result mapTripPattern(JourneyPattern journeyPattern) {
@@ -87,17 +87,15 @@ class TripPatternMapper {
                     serviceJourney
             );
 
-            List<StopTime> stopTimes = stopTimesMapper.mapToStopTimes(
+            StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime()
             );
-            // Make sure the stop times are sorted by stop sequence number
-            Collections.sort(stopTimes);
+            result.tripStopTimes.put(trip, stopTimes.stopTimes);
+            result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
-            result.tripStopTimes.put(trip, stopTimes);
-
-            trip.setTripHeadsign(getHeadsign(stopTimes));
+            trip.setTripHeadsign(getHeadsign(stopTimes.stopTimes));
             trips.add(trip);
         }
 
@@ -160,5 +158,6 @@ class TripPatternMapper {
     static class Result {
         final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
         final List<TripPattern> tripPatterns = new ArrayList<>();
+        final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
     }
 }

@@ -127,6 +127,7 @@ public class NetexMapper {
             for (TripPattern it : result.tripPatterns) {
                 transitBuilder.getTripPatterns().put(it.stopPattern, it);
             }
+            transitBuilder.getStopTimesByNetexId().putAll(result.stopTimeByNetexId);
         }
     }
 
@@ -148,7 +149,7 @@ public class NetexMapper {
                 netexIndex.getPassingTimeByStopPointId(),
                 netexIndex.getNoticeById(),
                 transitBuilder.getRoutes(),
-                transitBuilder.getStopTimesById(),
+                transitBuilder.getStopTimesByNetexId(),
                 transitBuilder.getTripsById()
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {

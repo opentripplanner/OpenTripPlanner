@@ -68,7 +68,7 @@ public class OtpTransitServiceBuilder {
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
     /** This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService. */
-    private final Map<String, StopTime> stopTimesById = new HashMap<>();
+    private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
@@ -135,7 +135,7 @@ public class OtpTransitServiceBuilder {
         return stopTimesByTrip;
     }
 
-    public Map<String, StopTime> getStopTimesById() { return stopTimesById; }
+    public Map<String, StopTime> getStopTimesByNetexId() { return stopTimesByNetexId; }
 
     public List<Transfer> getTransfers() {
         return transfers;

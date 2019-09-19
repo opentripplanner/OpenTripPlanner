@@ -7,6 +7,7 @@ import org.opentripplanner.model.Trip;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,34 +32,39 @@ public class StopTimesMapperTest {
         TripPatternStructure tripPatternStructure = new TripPatternStructure();
 
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
-                tripPatternStructure.getDestinationDisplayById(),
                 tripPatternStructure.getStopsById(),
+                tripPatternStructure.getDestinationDisplayById(),
                 tripPatternStructure.getQuayIdByStopPointRef()
         );
 
-        List<StopTime> stopTimes = stopTimesMapper.mapToStopTimes(
+        StopTimesMapper.MappedStopTimes result = stopTimesMapper.mapToStopTimes(
                 tripPatternStructure.getJourneyPattern(),
                 new Trip(),
-                tripPatternStructure.getTimetabledPassingTimes());
+                tripPatternStructure.getTimetabledPassingTimes()
+        );
+
+        List<StopTime> stopTimes = result.stopTimes;
 
         assertEquals(5, stopTimes.size());
 
-        assertEquals("NSR:Quay:1", stopTimes.get(0).getStop().getId().getId());
-        assertEquals("NSR:Quay:2", stopTimes.get(1).getStop().getId().getId());
-        assertEquals("NSR:Quay:3", stopTimes.get(2).getStop().getId().getId());
-        assertEquals("NSR:Quay:4", stopTimes.get(3).getStop().getId().getId());
-        assertEquals("NSR:Quay:5", stopTimes.get(4).getStop().getId().getId());
+        assertStop(stopTimes.get(0),"NSR:Quay:1", 18000, "Bergen");
+        assertStop(stopTimes.get(1),"NSR:Quay:2", 18240, "Bergen");
+        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Bergen");
+        assertStop(stopTimes.get(3),"NSR:Quay:4", 18900, "Stavanger");
+        assertStop(stopTimes.get(4),"NSR:Quay:5", 19320, "Stavanger");
 
-        assertEquals(18000, stopTimes.get(0).getDepartureTime());
-        assertEquals(18240, stopTimes.get(1).getDepartureTime());
-        assertEquals(18600, stopTimes.get(2).getDepartureTime());
-        assertEquals(18900, stopTimes.get(3).getDepartureTime());
-        assertEquals(19320, stopTimes.get(4).getDepartureTime());
+        Map<String, StopTime> map = result.stopTimeByNetexId;
 
-        assertEquals("Bergen", stopTimes.get(0).getStopHeadsign());
-        assertEquals("Bergen", stopTimes.get(1).getStopHeadsign());
-        assertEquals("Bergen", stopTimes.get(2).getStopHeadsign());
-        assertEquals("Stavanger", stopTimes.get(3).getStopHeadsign());
-        assertEquals("Stavanger", stopTimes.get(4).getStopHeadsign());
+        assertEquals(stopTimes.get(0), map.get("TTPT-1"));
+        assertEquals(stopTimes.get(1), map.get("TTPT-2"));
+        assertEquals(stopTimes.get(2), map.get("TTPT-3"));
+        assertEquals(stopTimes.get(3), map.get("TTPT-4"));
+        assertEquals(stopTimes.get(4), map.get("TTPT-5"));
+    }
+
+    private void assertStop(StopTime stopTime, String stopId, long departureTime, String headsign) {
+        assertEquals(stopId, stopTime.getStop().getId().getId());
+        assertEquals(departureTime, stopTime.getDepartureTime());
+        assertEquals(headsign, stopTime.getStopHeadsign());
     }
 }

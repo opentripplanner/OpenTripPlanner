@@ -6,7 +6,12 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +19,13 @@ import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
@@ -41,8 +48,8 @@ class StopTimesMapper {
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
     StopTimesMapper(
-            ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             EntityById<FeedScopedId, Stop> stopsById,
+            ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
     ) {
         this.destinationDisplayById = destinationDisplayById;
@@ -50,34 +57,40 @@ class StopTimesMapper {
         this.quayIdByStopPointRef = quayIdByStopPointRef;
     }
 
-    List<StopTime> mapToStopTimes(
+    /**
+     * @return a map of stop-times indexed by the TimetabledPassingTime id.
+     */
+    MappedStopTimes mapToStopTimes(
             JourneyPattern journeyPattern,
             Trip trip,
-            List<TimetabledPassingTime> timetabledPassingTimes
+            List<TimetabledPassingTime> passingTimes
     ) {
-        List<StopTime> stopTimes = new ArrayList<>();
+        MappedStopTimes result = new MappedStopTimes();
 
-        for (int i = 0; i < timetabledPassingTimes.size(); i++) {
+        for (int i = 0; i < passingTimes.size(); i++) {
 
-            TimetabledPassingTime currentTimeTabledPassingTime = timetabledPassingTimes.get(i);
+            TimetabledPassingTime currentPassingTime = passingTimes.get(i);
 
-            String pointInJourneyPattern =
-                    currentTimeTabledPassingTime.getPointInJourneyPatternRef().getValue().getRef();
+            String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
             Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
 
-            StopTime stopTime = mapToStopTime(
-                    trip,
-                    stopPoint,
-                    stop,
-                    currentTimeTabledPassingTime,
-                    i
-            );
+            StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
 
+            result.add(currentPassingTime.getId(), stopTime);
+        }
+        return result;
+    }
+
+    static class MappedStopTimes {
+        Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
+        List<StopTime> stopTimes = new ArrayList<>();
+
+        void add(String netexId, StopTime stopTime) {
+            stopTimeByNetexId.put(netexId, stopTime);
             stopTimes.add(stopTime);
         }
-        return stopTimes;
     }
 
     private StopTime mapToStopTime(

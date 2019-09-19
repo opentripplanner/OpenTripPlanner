@@ -23,8 +23,6 @@ public class TripPatternMapperTest {
 
         TripPatternStructure tripPatternStructure = new TripPatternStructure();
 
-        OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 tripPatternStructure.getStopsById(),
                 tripPatternStructure.getOtpRouteByid(),
@@ -35,11 +33,11 @@ public class TripPatternMapperTest {
                 tripPatternStructure.getServiceJourneyByPatternId()
         );
 
-        tripPatternMapper.mapTripPattern(tripPatternStructure.getJourneyPattern());
+        TripPatternMapper.Result r = tripPatternMapper.mapTripPattern(tripPatternStructure.getJourneyPattern());
 
-        assertEquals(1, transitBuilder.getTripPatterns().size());
+        assertEquals(1, r.tripPatterns.size());
 
-        TripPattern tripPattern = transitBuilder.getTripPatterns().values().stream().findFirst().get();
+        TripPattern tripPattern = r.tripPatterns.get(0);
 
         assertEquals(5, tripPattern.getStops().size());
         assertEquals(1, tripPattern.getTrips().size());
