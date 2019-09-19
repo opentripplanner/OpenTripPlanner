@@ -6,10 +6,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -22,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,60 +33,55 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
  * <p>
  * Headsigns in NeTEx are only specified once and then valid for each subsequent TimeTabledPassingTime until a new
  * headsign is specified. This is accounted for in the mapper.
+ * <p>
+ * THIS CLASS IS NOT THREADSAFE! This mapper store its intermediate results as part of its state.
  */
 class TripPatternMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
 
-    private final OtpTransitServiceBuilder transitBuilder;
-
-    private final HierarchicalMapById<Route> routeById;
-
     private final EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
 
-    private final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
+    private final ReadOnlyHierarchicalMap<String, Route> routeById;
+
+    private final ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId;
 
     private final TripMapper tripMapper;
 
     private final StopTimesMapper stopTimesMapper;
 
+    private Result result;
+
     TripPatternMapper(
-            OtpTransitServiceBuilder transitBuilder,
-            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
-            HierarchicalMapById<Route> routeById,
-            HierarchicalMapById<JourneyPattern> journeyPatternById,
-            HierarchicalMap<String, String> quayIdByStopPointRef,
-            HierarchicalMapById<DestinationDisplay> destinationDisplayById,
-            HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId,
             EntityById<FeedScopedId, Stop> stopsById,
-            Map<String, StopTime> stopTimesById
+            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            ReadOnlyHierarchicalMap<String, Route> routeById,
+            ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
+            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
+            ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
+            ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId
     ) {
         this.routeById = routeById;
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
-        this.transitBuilder = transitBuilder;
         this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
-        this.stopTimesMapper = new StopTimesMapper(
-                destinationDisplayById,
-                stopsById,
-                quayIdByStopPointRef,
-                stopTimesById
-        );
+        this.stopTimesMapper = new StopTimesMapper(destinationDisplayById, stopsById, quayIdByStopPointRef);
     }
 
-    void mapTripPattern(
-            JourneyPattern journeyPattern
-    ) {
+    Result mapTripPattern(JourneyPattern journeyPattern) {
+        // Make sure the result is clean, by creating a new object.
+        result = new Result();
         Collection<ServiceJourney> serviceJourneys = serviceJourneyByPatternId
                 .lookup(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
             LOG.warn("ServiceJourneyPattern " + journeyPattern.getId()
                     + " does not contain any serviceJourneys.");
-            return;
+            return null;
         }
 
         List<Trip> trips = new ArrayList<>();
+
         for (ServiceJourney serviceJourney : serviceJourneys) {
             Trip trip = tripMapper.mapServiceJourney(
                     serviceJourney
@@ -98,16 +92,17 @@ class TripPatternMapper {
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime()
             );
+            // Make sure the stop times are sorted by stop sequence number
+            Collections.sort(stopTimes);
 
-            transitBuilder.getStopTimesSortedByTrip().put(trip, stopTimes);
+            result.tripStopTimes.put(trip, stopTimes);
+
             trip.setTripHeadsign(getHeadsign(stopTimes));
             trips.add(trip);
         }
 
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
-        StopPattern stopPattern = new StopPattern(
-                transitBuilder.getStopTimesSortedByTrip().get(trips.get(0))
-        );
+        StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
 
         TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
         tripPattern.code = journeyPattern.getId();
@@ -116,7 +111,9 @@ class TripPatternMapper {
 
         createTripTimes(trips, tripPattern);
 
-        transitBuilder.getTripPatterns().put(tripPattern.stopPattern, tripPattern);
+        result.tripPatterns.add(tripPattern);
+
+        return result;
     }
 
     private org.opentripplanner.model.Route lookupRoute(
@@ -130,15 +127,19 @@ class TripPatternMapper {
             List<Trip> trips,
             TripPattern tripPattern
     ) {
+        // TODO OTP2 Make this global or use the Graph version
         Deduplicator deduplicator = new Deduplicator();
+
         for (Trip trip : trips) {
-            if (transitBuilder.getStopTimesSortedByTrip().get(trip).size() == 0) {
+            if (result.tripStopTimes.get(trip).size() == 0) {
                 LOG.warn("Trip" + trip.getId() + " does not contain any trip times.");
             } else {
-                TripTimes tripTimes = new TripTimes(trip,
-                        transitBuilder.getStopTimesSortedByTrip().get(trip), deduplicator);
+                TripTimes tripTimes = new TripTimes(
+                        trip,
+                        result.tripStopTimes.get(trip),
+                        deduplicator
+                );
                 tripPattern.add(tripTimes);
-                transitBuilder.getTripsById().add(trip);
             }
         }
     }
@@ -149,5 +150,15 @@ class TripPatternMapper {
         } else {
             return "";
         }
+    }
+
+
+    /**
+     * This mapper returnes two collections, so we need to use a simple wraper to be able to return the result
+     * from the mapping method.
+     */
+    static class Result {
+        final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+        final List<TripPattern> tripPatterns = new ArrayList<>();
     }
 }

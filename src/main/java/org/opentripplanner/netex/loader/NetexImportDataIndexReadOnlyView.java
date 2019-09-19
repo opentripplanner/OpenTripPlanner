@@ -1,0 +1,48 @@
+package org.opentripplanner.netex.loader;
+
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
+import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.DayType;
+import org.rutebanken.netex.model.DayTypeAssignment;
+import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.GroupOfLines;
+import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.Notice;
+import org.rutebanken.netex.model.NoticeAssignment;
+import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TimetabledPassingTime;
+
+import java.util.Collection;
+
+public interface NetexImportDataIndexReadOnlyView {
+    Network lookupNetworkForLine(String groupOfLineOrNetworkId);
+    ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
+    ReadOnlyHierarchicalMapById<DayType> getDayTypeById();
+    ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId();
+    Iterable<DayTypeRefsToServiceIdAdapter> getDayTypeRefs();
+    ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById();
+    ReadOnlyHierarchicalMapById<GroupOfLines> getGroupOfLinesById();
+    ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById();
+    ReadOnlyHierarchicalMapById<Line> getLineById();
+    ReadOnlyHierarchicalMapById<Network> getNetworkById();
+    ReadOnlyHierarchicalMapById<Notice> getNoticeById();
+    ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById();
+    ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById();
+    ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId();
+    ReadOnlyHierarchicalVersionMapById<Quay> getQuayById();
+    ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef();
+    ReadOnlyHierarchicalMapById<Route> getRouteById();
+    ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId();
+    ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
+    ReadOnlyHierarchicalMap<String, String> getNetworkIdByGroupOfLineId();
+    String getTimeZone();
+}

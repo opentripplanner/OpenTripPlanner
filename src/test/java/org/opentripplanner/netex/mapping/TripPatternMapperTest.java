@@ -41,15 +41,13 @@ public class TripPatternMapperTest {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
-                transitBuilder,
+                tripPatternStructure.getStopsById(),
                 tripPatternStructure.getOtpRouteByid(),
                 tripPatternStructure.getRouteById(),
                 tripPatternStructure.getJourneyPatternById(),
                 tripPatternStructure.getQuayIdByStopPointRef(),
                 new HierarchicalMapById<>(),
-                tripPatternStructure.getServiceJourneyByPatternId(),
-                tripPatternStructure.getStopsById(),
-                tripPatternStructure.getStopTimesById()
+                tripPatternStructure.getServiceJourneyByPatternId()
         );
 
         tripPatternMapper.mapTripPattern(tripPatternStructure.getJourneyPattern());

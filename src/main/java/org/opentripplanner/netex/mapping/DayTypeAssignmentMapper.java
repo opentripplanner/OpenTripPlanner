@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
@@ -21,19 +21,11 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.logUnmapped
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDateTime}.
  * <p/>
- * The mapper is stateful so it is important to follow the following sequence
- * of operations:
+ * The mapper is stateful and uses a 2 step approtch:
  * <p/>
- * At least for each thread:
- * - Create: {@code m = new DayTypeAssignmentMapper(..)} - Setup and inject dependencies
- * - Then for each set of dayTypes in a ServiceJourney (equivalent to a GTFS Calendar Service):
- * <ol>
- *     <li>Init: {@code m.clear() } - Prepare mapper by removing all earlier calculations. The
- *     mapper is not ready to be reused.
- *     <li>Map all: {@code m.map(...) or m.mapAll(...)} - Map all day type assignments using the map methods.
- *     <li>Read result: {@code m.mergeDates()}
- * </ol>
- *
+ * - Create a new mapper
+ * - Add each dayTypeId and list of assignments (multiple calls)
+ * - Merge dates. Take the list of all available days and remove all none available dates.
  * <p/>
  * THIS CLASS IS NOT THREAD-SAFE, USE SEPARATE INSTANCES FOR EACH THREAD.
  */
@@ -43,36 +35,30 @@ class DayTypeAssignmentMapper {
     private final Set<LocalDateTime> dates = new HashSet<>();
     private final Set<LocalDateTime> datesToRemove = new HashSet<>();
 
-    private final HierarchicalMapById<DayType> dayTypeById;
-    private final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    private final ReadOnlyHierarchicalMapById<DayType> dayTypeById;
+    private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
 
     private String dayTypeId;
 
+    /** This flag is used to prevent the merge operation to be performed more than one time. */
+    private Boolean merged = false;
+
     DayTypeAssignmentMapper(
-            HierarchicalMapById<DayType> dayTypeById,
-            HierarchicalMapById<OperatingPeriod> operatingPeriodById
+            ReadOnlyHierarchicalMapById<DayType> dayTypeById,
+            ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById
     ) {
         this.dayTypeById = dayTypeById;
         this.operatingPeriodById = operatingPeriodById;
     }
 
     /**
-     * The mapper store the result of each call to any of the mapping methods
-     * in an internal data structure. Hence, before starting the mapping process
-     * this method needs to be called.
-     */
-    void clear() {
-        dates.clear();
-        datesToRemove.clear();
-    }
-
-    /**
-     * Map all given {@code dayTypeAssignments} for {@code dayTypeId}. The result is kept until
+     * Map all given {@code dayTypeAssignments} for {@code dayTypeId}. The result is kept
      * internally in the mapper until all mapping are performed.
      * <p/>
      * Retrieve the results using {@link #mergeDates()}.
      */
     void mapAll(String dayTypeId, Collection<DayTypeAssignment> dayTypeAssignments) {
+        assertNotMerged();
         this.dayTypeId = dayTypeId;
         for (DayTypeAssignment it : dayTypeAssignments) {
             map(it);
@@ -86,16 +72,22 @@ class DayTypeAssignmentMapper {
      * Do not call this method before you want to retrieve the result. Calling this method more
      * than once, may have unexpected effects.
      * <p/>
-     * @return the list of service dates for all dayTypes mapped since the {@link #clear()} was
-     * called.
+     * @return the list of service dates for all dayTypes mapped.
      */
     Set<LocalDateTime> mergeDates() {
         dates.removeAll(datesToRemove);
+        merged = true;
         return dates;
     }
 
 
     /* private methods */
+
+    private void assertNotMerged() {
+        if(merged) throw new IllegalStateException(
+                "This mapper can only be used once, when the result is merged this method is not alloed any more."
+        );
+    }
 
     private void map(DayTypeAssignment dayTypeAssignment) {
         // Add or remove single days
@@ -146,14 +138,14 @@ class DayTypeAssignmentMapper {
         }
     }
 
-    private boolean isDayTypeAvailableForAssigment(DayTypeAssignment dta) {
+    private static boolean isDayTypeAvailableForAssigment(DayTypeAssignment dta) {
         if(dta.isIsAvailable() == null) {
             return true;
         }
         return dta.isIsAvailable();
     }
 
-    private Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
+    private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
         Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
 
         if (dayType.getProperties() != null) {

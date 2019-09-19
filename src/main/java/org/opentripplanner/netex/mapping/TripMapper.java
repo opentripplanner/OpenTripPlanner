@@ -4,6 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.*;
 
@@ -18,13 +19,13 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
 public class TripMapper {
 
     private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
-    private HierarchicalMapById<Route> routeById;
-    private HierarchicalMapById<JourneyPattern> journeyPatternsById;
+    private ReadOnlyHierarchicalMap<String, Route> routeById;
+    private ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
 
     TripMapper(
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
-            HierarchicalMapById<Route> routeById,
-            HierarchicalMapById<JourneyPattern> journeyPatternsById
+            ReadOnlyHierarchicalMap<String, Route> routeById,
+            ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById
     ) {
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;

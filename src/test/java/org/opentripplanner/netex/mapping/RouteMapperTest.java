@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.*;
@@ -28,8 +29,8 @@ public class RouteMapperTest {
         network.setId(NETWORK_ID);
 
         RouteMapper routeMapper = new RouteMapper(
-                new OtpTransitServiceBuilder(),
-                netexImportDataIndex,
+                new OtpTransitServiceBuilder().getAgenciesById(),
+                netexImportDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );
 
@@ -54,7 +55,11 @@ public class RouteMapperTest {
 
         Line line = createExampleLine();
 
-        RouteMapper routeMapper = new RouteMapper(transitBuilder, netexIndex, TIME_ZONE);
+        RouteMapper routeMapper = new RouteMapper(
+                transitBuilder.getAgenciesById(),
+                netexIndex.readOnlyView(),
+                TIME_ZONE
+        );
 
         Route route = routeMapper.mapRoute(line);
 
@@ -73,8 +78,8 @@ public class RouteMapperTest {
                         .withTextColour(textColor));
 
         RouteMapper routeMapper = new RouteMapper(
-                new OtpTransitServiceBuilder(),
-                netexImportDataIndex,
+                new OtpTransitServiceBuilder().getAgenciesById(),
+                netexImportDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );
 

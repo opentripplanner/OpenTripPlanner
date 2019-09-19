@@ -2,9 +2,8 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -28,35 +27,26 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
 class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
-    private final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
-    private final DayTypeAssignmentMapper dayTypeAssignmentMapper;
+    private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
+    private ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    private ReadOnlyHierarchicalMapById<DayType> dayTypeById;
 
 
     CalendarMapper(
-            HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId,
-            HierarchicalMapById<OperatingPeriod> operatingPeriodById,
-            HierarchicalMapById<DayType> dayTypeById
+            ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
+            ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
+            ReadOnlyHierarchicalMapById<DayType> dayTypeById
     ) {
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
-        this.dayTypeAssignmentMapper = new DayTypeAssignmentMapper(dayTypeById, operatingPeriodById);
-    }
-
-    static Collection<ServiceCalendarDate> mapToCalendarDates(
-            DayTypeRefsToServiceIdAdapter dayTypeRef,
-            NetexImportDataIndex netexIndex
-    ) {
-        return new CalendarMapper(
-                netexIndex.dayTypeAssignmentByDayTypeId,
-                netexIndex.operatingPeriodById,
-                netexIndex.dayTypeById
-        ).mapToCalendarDates(dayTypeRef);
+        this.operatingPeriodById = operatingPeriodById;
+        this.dayTypeById = dayTypeById;
     }
 
     Collection<ServiceCalendarDate> mapToCalendarDates(DayTypeRefsToServiceIdAdapter dayTypeRefs) {
         String serviceId = dayTypeRefs.getServiceId();
 
-        // The mapper store intermediate results and need to be initialized before use
-        dayTypeAssignmentMapper.clear();
+        // The mapper store intermediate results and need to be initialized every time
+        DayTypeAssignmentMapper dayTypeAssignmentMapper = new DayTypeAssignmentMapper(dayTypeById, operatingPeriodById);
 
         for (String dayTypeId : dayTypeRefs.getDayTypeRefs()) {
             dayTypeAssignmentMapper.mapAll(dayTypeId, dayTypeAssignments(dayTypeId));

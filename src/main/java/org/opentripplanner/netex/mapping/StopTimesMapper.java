@@ -7,6 +7,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,24 +37,20 @@ class StopTimesMapper {
 
     private String currentHeadSign;
 
-    private final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
+    private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
     private final EntityById<FeedScopedId, Stop> stopsById;
 
-    private final HierarchicalMap<String, String> quayIdByStopPointRef;
-
-    private final Map<String, StopTime> stopTimesById;
+    private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
     StopTimesMapper(
-            HierarchicalMapById<DestinationDisplay> destinationDisplayById,
+            ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             EntityById<FeedScopedId, Stop> stopsById,
-            HierarchicalMap<String, String> quayIdByStopPointRef,
-            Map<String, StopTime> stopTimesById
+            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
     ) {
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
-        this.stopTimesById = stopTimesById;
     }
 
     List<StopTime> mapToStopTimes(
@@ -78,11 +75,10 @@ class StopTimesMapper {
                     stopPoint,
                     stop,
                     currentTimeTabledPassingTime,
-                    i,
-                    destinationDisplayById);
+                    i
+            );
 
             stopTimes.add(stopTime);
-            stopTimesById.put(currentTimeTabledPassingTime.getId(), stopTime);
         }
         return stopTimes;
     }
@@ -92,8 +88,7 @@ class StopTimesMapper {
             StopPointInJourneyPattern stopPoint,
             Stop stop,
             TimetabledPassingTime passingTime,
-            int stopSequence,
-            HierarchicalMapById<DestinationDisplay> destinationDisplayById
+            int stopSequence
     ) {
         StopTime stopTime = new StopTime();
         stopTime.setTrip(trip);
@@ -143,9 +138,9 @@ class StopTimesMapper {
         return stopTime;
     }
 
-    private Stop lookupStop(
+    private static Stop lookupStop(
             StopPointInJourneyPattern stopPointInJourneyPattern,
-            HierarchicalMap<String, String> quayIdByStopPointRef,
+            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             EntityById<FeedScopedId, Stop> stopsById
     ) {
         if (stopPointInJourneyPattern != null) {
@@ -167,7 +162,7 @@ class StopTimesMapper {
         return null;
     }
 
-    private StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
+    private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
                                                     JourneyPattern journeyPattern) {
         List<PointInLinkSequence_VersionedChildStructure> points = journeyPattern
                 .getPointsInSequence()

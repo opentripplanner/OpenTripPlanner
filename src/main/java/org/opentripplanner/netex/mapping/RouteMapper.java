@@ -4,6 +4,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.PresentationStructure;
@@ -22,25 +23,21 @@ class RouteMapper {
     private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
-    private final OtpTransitServiceBuilder transitBuilder;
-
-    private final NetexImportDataIndex netexIndex;
-
+    private final EntityById<String, Agency> agenciesById;
+    private final NetexImportDataIndexReadOnlyView netexIndex;
     private final AgencyMapper agencyMapper;
 
     RouteMapper(
-            OtpTransitServiceBuilder transitBuilder,
-            NetexImportDataIndex netexIndex,
+            EntityById<String, Agency> agenciesById,
+            NetexImportDataIndexReadOnlyView netexIndex,
             String timeZone
     ) {
-        this.transitBuilder = transitBuilder;
+        this.agenciesById = agenciesById;
         this.netexIndex = netexIndex;
         this.agencyMapper = new AgencyMapper(timeZone);
     }
 
-    org.opentripplanner.model.Route mapRoute(
-            Line line
-    ){
+    org.opentripplanner.model.Route mapRoute(Line line){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
 
         otpRoute.setAgency(findOrCreateAgency(line));
@@ -74,7 +71,7 @@ class RouteMapper {
 
         if(network != null) {
             String orgRef = network.getTransportOrganisationRef().getValue().getRef();
-            Agency agency = transitBuilder.getAgenciesById().get(orgRef);
+            Agency agency = agenciesById.get(orgRef);
             if(agency != null) return agency;
         }
 
@@ -82,7 +79,6 @@ class RouteMapper {
         // Use the default agency, create if necessary
         LOG.warn("No authority found for " + line.getId());
         Agency agency = agencyMapper.createDefaultAgency();
-        EntityById<String, Agency> agenciesById = transitBuilder.getAgenciesById();
         if (!agenciesById.containsKey(agency.getId())) {
             agenciesById.add(agency);
         }

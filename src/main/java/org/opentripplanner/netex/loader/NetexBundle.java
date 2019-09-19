@@ -122,7 +122,7 @@ public class NetexBundle {
             loadSingeFileEntry(fileDescription, entry);
         }
         // map current NeTEx objects into the OTP Transit Model
-        otpMapper.mapNetexToOtp(index());
+        otpMapper.mapNetexToOtp(index().readOnlyView());
     }
 
     private NetexImportDataIndex index() {

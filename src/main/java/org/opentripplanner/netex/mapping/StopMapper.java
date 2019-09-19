@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
@@ -43,10 +44,10 @@ class StopMapper {
 
     private final ArrayList<Stop> resultStops = new ArrayList<>();
 
-    private final HierarchicalVersionMapById<Quay> quayIndex;
+    private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
 
 
-    StopMapper(HierarchicalVersionMapById<Quay> quayIndex) {
+    StopMapper(ReadOnlyHierarchicalVersionMapById<Quay> quayIndex) {
         this.quayIndex = quayIndex;
     }
 
@@ -56,6 +57,8 @@ class StopMapper {
     Collection<Stop> mapParentAndChildStops(final Collection<StopPlace> stopPlaces) {
 
         // Prioritize StopPlace versions. Highest priority first.
+        // TODO OTP2 - This should pushed up into the ReadOnlyHierarchicalVersionMapById as part of
+        // TODO OTP2 - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
         // Map the highest priority StopPlace version to station

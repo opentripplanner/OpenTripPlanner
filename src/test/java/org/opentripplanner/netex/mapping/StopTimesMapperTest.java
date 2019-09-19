@@ -17,8 +17,8 @@ public class StopTimesMapperTest {
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
                 tripPatternStructure.getDestinationDisplayById(),
                 tripPatternStructure.getStopsById(),
-                tripPatternStructure.getQuayIdByStopPointRef(),
-                new HashMap<>());
+                tripPatternStructure.getQuayIdByStopPointRef()
+        );
 
         List<StopTime> stopTimes = stopTimesMapper.mapToStopTimes(
                 tripPatternStructure.getJourneyPattern(),

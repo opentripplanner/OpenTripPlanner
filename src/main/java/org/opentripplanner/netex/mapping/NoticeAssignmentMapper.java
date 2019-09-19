@@ -6,6 +6,7 @@ import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
@@ -27,9 +28,9 @@ import static org.opentripplanner.netex.mapping.FeedScopedIdFactory.createFeedSc
  */
 class NoticeAssignmentMapper {
 
-    private final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
+    private final ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId;
 
-    private final HierarchicalMapById<org.rutebanken.netex.model.Notice> noticesById;
+    private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 
     private final EntityById<FeedScopedId, Route> routesById;
 
@@ -43,8 +44,8 @@ class NoticeAssignmentMapper {
     private static final Logger LOG = LoggerFactory.getLogger(NoticeAssignmentMapper.class);
 
     NoticeAssignmentMapper(
-            HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId,
-            HierarchicalMapById<org.rutebanken.netex.model.Notice> noticesById,
+            ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
+            ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
             EntityById<FeedScopedId, Route> routesById,
             Map<String, StopTime> stopTimesById,
             EntityById<FeedScopedId, Trip> tripsById

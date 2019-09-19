@@ -67,6 +67,7 @@ public class OtpTransitServiceBuilder {
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
+    /** This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService. */
     private final Map<String, StopTime> stopTimesById = new HashMap<>();
 
     private final List<Transfer> transfers = new ArrayList<>();
@@ -80,9 +81,7 @@ public class OtpTransitServiceBuilder {
     }
 
 
-
     /* Accessors */
-
 
     public EntityById<String, Agency> getAgenciesById() {
         return agenciesById;
