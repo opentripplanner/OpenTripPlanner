@@ -189,20 +189,12 @@ public class NetexImportDataIndex {
                 return destinationDisplayById;
             }
 
-            public ReadOnlyHierarchicalMapById<GroupOfLines> getGroupOfLinesById() {
-                return groupOfLinesById;
-            }
-
             public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
                 return journeyPatternsById;
             }
 
             public ReadOnlyHierarchicalMapById<Line> getLineById() {
                 return lineById;
-            }
-
-            public ReadOnlyHierarchicalMapById<Network> getNetworkById() {
-                return networkById;
             }
 
             public ReadOnlyHierarchicalMapById<Notice> getNoticeById() {
@@ -239,10 +231,6 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
                 return stopPlaceById;
-            }
-
-            public ReadOnlyHierarchicalMap<String, String> getNetworkIdByGroupOfLineId() {
-                return networkIdByGroupOfLineId;
             }
 
             public String getTimeZone() {

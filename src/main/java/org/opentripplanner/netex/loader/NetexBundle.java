@@ -3,7 +3,7 @@ package org.opentripplanner.netex.loader;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
-import org.opentripplanner.netex.mapping.NetexMapper;
+import org.opentripplanner.netex.loader.mapping.NetexMapper;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -30,10 +30,8 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId();
     Iterable<DayTypeRefsToServiceIdAdapter> getDayTypeRefs();
     ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById();
-    ReadOnlyHierarchicalMapById<GroupOfLines> getGroupOfLinesById();
     ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById();
     ReadOnlyHierarchicalMapById<Line> getLineById();
-    ReadOnlyHierarchicalMapById<Network> getNetworkById();
     ReadOnlyHierarchicalMapById<Notice> getNoticeById();
     ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById();
     ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById();
@@ -43,6 +41,5 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<Route> getRouteById();
     ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId();
     ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
-    ReadOnlyHierarchicalMap<String, String> getNetworkIdByGroupOfLineId();
     String getTimeZone();
 }
