@@ -21,6 +21,7 @@ import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,13 @@ public class NetexMapper {
 
     private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
+
+    /**
+     * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
+     * so we need to temporally cash this here.
+     */
+    private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
+
 
     public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
         this.transitBuilder = transitBuilder;
@@ -127,7 +135,7 @@ public class NetexMapper {
             for (TripPattern it : result.tripPatterns) {
                 transitBuilder.getTripPatterns().put(it.stopPattern, it);
             }
-            transitBuilder.getStopTimesByNetexId().putAll(result.stopTimeByNetexId);
+            stopTimesByNetexId.putAll(result.stopTimeByNetexId);
         }
     }
 
@@ -149,7 +157,7 @@ public class NetexMapper {
                 netexIndex.getPassingTimeByStopPointId(),
                 netexIndex.getNoticeById(),
                 transitBuilder.getRoutes(),
-                transitBuilder.getStopTimesByNetexId(),
+                stopTimesByNetexId,
                 transitBuilder.getTripsById()
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
