@@ -25,7 +25,6 @@ import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
@@ -116,7 +115,15 @@ public class StreetSplitterTest {
         createStreetEdge(a, b, "a -> b");
         createStreetEdge(b, a, "b -> a");
         createStreetEdge(a, c, "a -> c");
-        g.index(new DefaultStreetVertexIndexFactory());
+        g.index(false);
+        
+        // When - a bike rental station between A and B that has been inserted into the graph
+        BikeRentalStation brstation = new BikeRentalStation();
+        brstation.id = "bike_1";
+        brstation.x = 0.5;
+        brstation.y = 1.001;
+        brstation.name =  new NonLocalizedString("bike_1");
+        BikeRentalStationVertex bikeRentalStationVertex = new BikeRentalStationVertex(g, brstation);
         StreetSplitter splitter = g.streetIndex.getStreetSplitter();
 
         // the initial graph should look like this:

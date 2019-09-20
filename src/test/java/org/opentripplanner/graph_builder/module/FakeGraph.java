@@ -8,7 +8,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.File;
@@ -135,8 +134,9 @@ public class FakeGraph {
      * Index the graph and then link all stations in the graph.
      */
     public static void indexGraphAndLinkStations (Graph g) {
-        // creating a new DefaultStreetVertexIndexFactory results in setting the streetIndex on the graph.
-        g.index(new DefaultStreetVertexIndexFactory());
+        // recreate a new streetIndex even if one exists to ensure all indexes are built. It is assumed that all tests
+        // that use this method do not need any previously street indexes created during building the graph
+        g.index(true);
         StreetSplitter linker = (StreetSplitter) g.streetIndex.getStreetSplitter();
         linker.linkAllStationsToGraph();
     }

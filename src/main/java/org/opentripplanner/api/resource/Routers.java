@@ -32,7 +32,6 @@ import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
@@ -270,7 +269,10 @@ public class Routers {
         tempDir.delete();
         
         Graph graph = graphBuilder.getGraph();
-        graph.index(new DefaultStreetVertexIndexFactory());
+        // re-index the graph to ensure all data is added and recreate a new streetIndex. It's ok to recreate the
+        // streetIndex because the previous one created during graph build is not needed anymore  and isn't able to be
+        // used outside of the graphBuilder.
+        graph.index(true);
         
         GraphService graphService = otpServer.getGraphService();
         graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));

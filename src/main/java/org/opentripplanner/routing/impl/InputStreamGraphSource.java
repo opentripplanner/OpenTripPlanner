@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +43,6 @@ public class InputStreamGraphSource implements GraphSource {
      * The current used input stream implementation for getting graph data source.
      */
     private Streams streams;
-
-    // TODO Why do we need a factory? There is a single one implementation.
-    private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
     /**
      * @return A GraphSource loading graph from the file system under a base path.

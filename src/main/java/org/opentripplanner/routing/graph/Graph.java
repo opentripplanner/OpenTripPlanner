@@ -48,8 +48,6 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.flex.FlexIndex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -673,23 +671,44 @@ public class Graph implements Serializable {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         return load(new FileInputStream(file));
     }
-
-    /**
-     * Perform indexing on vertices, edges, and timetables, and create transient data structures.
-     * This used to be done in readObject methods upon deserialization, but stand-alone mode now
-     * allows passing graphs from graphbuilder to server in memory, without a round trip through
-     * serialization. 
-     * TODO: do we really need a factory for different street vertex indexes?
+    
+    /** 
+     * Perform indexing on vertices, edges, and timetables, and create transient data structures. This used to be done
+     * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from graphbuilder to
+     * server in memory, without a round trip through serialization.
+     *
+     * After a refactor in the year 2019, the method signature was changed to no longer take in an argument of a
+     * StreetVertexIndexFactory as a single factory was always being used to create the same StreetVertexIndexService.
+     * Instead the management of instances of StreetVertexIndexServices is encapsulated within this method only. Also,
+     * the parameter of `recreateStreetIndex` was added.
+     *
+     * In a lot of cases, especially when this method is called from certain build phases, the streetIndex does not need
+     * to be recreated. However, in other use cases such as the "build graph over wire" and in-memory graph builds where
+     * a newly created graph is used immediately instead of it being saved and the program exiting, a reindex is needed
+     * in order to make sure that every non-transit edge with geographic data is available in the respective indexes.
+     * In those use cases, the streetIndex was created during the graph building phase for the purposes of splitting
+     * various edges to insert certain items like transit stops. However, the graph does need to be reindexed after all
+     * items are inserted in order to have full knowledge of all items with geography such as SimpleTransfers and
+     * StreetTransitLinks. From looking at the code paths of where a new index is requested, it seems that the indexing
+     * takes place in a manner that would not result in two different StreetSplitters being used at once as the old one
+     * is typically used only during graph building.
+     *
+     * However, due to the potential for problems to arise with two StreetVertexIndexServices and StreetSplitters being
+     * active at once, a warning is logged just in case.
+     *
+     * @param recreateStreetIndex if true, recreate the streetIndex even if it already exists. Make sure you know what
+     *                            you're doing when setting this to true! See above method documentation.
      */
-    public void index (StreetVertexIndexFactory indexFactory) {
-        if (streetIndex != null) {
-            throw new UnsupportedOperationException(
-                "A streetIndex has already been defined. Can't you just reuse the existing one?"
-            );
+    public void index (boolean recreateStreetIndex) {
+        if (streetIndex == null || recreateStreetIndex) {
+            if (streetIndex != null && recreateStreetIndex) {
+                LOG.warn("Overwriting an existing streetIndex! This could lead to problems if both the old and new streetIndex are used. Make sure only the new streetIndex is used going forward.");
+            }
+            LOG.info("building street index");
+            streetIndex = new StreetVertexIndexService(this);
+            LOG.info("street index built");
         }
-        streetIndex = indexFactory.newIndex(this);
-        LOG.debug("street index built.");
-        LOG.debug("Rebuilding edge and vertex indices.");
+        LOG.info("Rebuilding edge and vertex indices");
         rebuildVertexAndEdgeIndices();
         Set<TripPattern> tableTripPatterns = Sets.newHashSet();
         for (PatternArriveVertex pav : Iterables.filter(this.getVertices(), PatternArriveVertex.class)) {
@@ -734,7 +753,9 @@ public class Graph implements Serializable {
         }
 
         LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(new DefaultStreetVertexIndexFactory());
+        // Make sure the graph index has been initialized. The streetIndex should be able to be safely recreated
+        // because the streetIndexes used during build will not be visible outside of this method.
+        graph.index(true);
         return graph;
     }
 

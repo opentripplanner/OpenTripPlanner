@@ -34,7 +34,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -76,7 +75,7 @@ class Context {
         graph = spy(new Graph());
         PatternHopFactory factory = new PatternHopFactory(context);
         factory.run(graph);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index(false);
         graph.putService(
                 CalendarServiceData.class,
                 createCalendarServiceData(context.getOtpTransitService())
