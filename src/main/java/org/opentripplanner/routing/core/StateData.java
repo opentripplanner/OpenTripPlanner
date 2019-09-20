@@ -134,7 +134,11 @@ public class StateData implements Cloneable {
 
     protected StateData clone() {
         try {
-            return (StateData) super.clone();
+            StateData clonedStateData = (StateData) super.clone();
+            // hashsets do not get cloned, so they must be created with the existing data
+            clonedStateData.rentedCars = new HashSet<>(this.rentedCars);
+            clonedStateData.rentedVehicles = new HashSet<>(this.rentedVehicles);
+            return clonedStateData;
         } catch (CloneNotSupportedException e1) {
             throw new IllegalStateException("This is not happening");
         }
