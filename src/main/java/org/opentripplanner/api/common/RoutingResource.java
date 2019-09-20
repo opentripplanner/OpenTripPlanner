@@ -151,7 +151,33 @@ public abstract class RoutingResource {
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
-    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    /**
+     * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
+     * <p>The possible values of the comma-separated list are:</p>
+     *
+     * <ul>
+     *  <li>WALK</li>
+     *  <li>TRANSIT</li>
+     *  <li>BICYCLE</li>
+     *  <li>BICYCLE_RENT</li>
+     *  <li>BICYCLE_PARK</li>
+     *  <li>CAR</li>
+     *  <li>CAR_PARK</li>
+     *  <li>TRAM</li>
+     *  <li>SUBWAY</li>
+     *  <li>RAIL</li>
+     *  <li>BUS</li>
+     *  <li>CABLE_CAR</li>
+     *  <li>FERRY</li>
+     *  <li>GONDOLA</li>
+     *  <li>FUNICULAR</li>
+     *  <li>AIRPLANE</li>
+     * </ul>
+     *
+     * <p>
+     *   For a more complete discussion of this parameter see <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
+     * </p>
+     */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
