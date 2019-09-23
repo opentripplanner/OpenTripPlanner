@@ -67,7 +67,7 @@ public final class FareRule implements Serializable {
     }
 
 
-    private static String toStrOpt(String lbl, IdentityBean arg) {
+    private static String toStrOpt(String lbl, TransitEntity arg) {
         return (arg == null ? "" : lbl + arg.getId());
     }
 

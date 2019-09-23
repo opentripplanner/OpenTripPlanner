@@ -1,8 +1,12 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.NoticeAssignment;
@@ -10,6 +14,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -32,7 +37,7 @@ class NoticeAssignmentMapper {
 
     private final EntityById<FeedScopedId, Route> routesById;
 
-    private final Map<String, StopTime> stopTimesById;
+    private final Map<String, StopTime> stopTimesByNetexId;
 
     private final EntityById<FeedScopedId, Trip> tripsById;
 
@@ -45,18 +50,18 @@ class NoticeAssignmentMapper {
             ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
             EntityById<FeedScopedId, Route> routesById,
-            Map<String, StopTime> stopTimesById,
+            Map<String, StopTime> stopTimesByNetexId,
             EntityById<FeedScopedId, Trip> tripsById
     ) {
         this.passingTimeByStopPointId = passingTimeByStopPointId;
         this.noticesById = noticesById;
         this.routesById = routesById;
-        this.stopTimesById = stopTimesById;
+        this.stopTimesByNetexId = stopTimesByNetexId;
         this.tripsById = tripsById;
     }
 
-    Multimap<NoticeAssignable, Notice> map(NoticeAssignment noticeAssignment){
-        Multimap<NoticeAssignable, Notice> noticeByElement = HashMultimap.create();
+    Multimap<Serializable, Notice> map(NoticeAssignment noticeAssignment){
+        Multimap<Serializable, Notice> noticeByElement = ArrayListMultimap.create();
 
         String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
         Notice otpNotice = getOrMapNotice(noticeAssignment);
@@ -72,20 +77,23 @@ class NoticeAssignmentMapper {
         if (!times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
                 noticeByElement.put(
-                        stopTimesById.get(time.getId()),
+                        stopTimesByNetexId.get(time.getId()).getId(),
                         otpNotice
                 );
             }
-        } else if (stopTimesById.containsKey(noticedObjectId)) {
-            noticeByElement.put(stopTimesById.get(noticedObjectId), otpNotice);
-        } else if (routesById.containsKey(createFeedScopedId(noticedObjectId))) {
-            noticeByElement.put(routesById.get(createFeedScopedId(noticedObjectId)), otpNotice);
-        } else if (tripsById.containsKey(createFeedScopedId(noticedObjectId))) {
-            noticeByElement.put(tripsById.get(createFeedScopedId(noticedObjectId)), otpNotice);
         } else {
-            LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
-        }
+            FeedScopedId otpId = createFeedScopedId(noticedObjectId);
 
+            if (stopTimesByNetexId.containsKey(noticedObjectId)) {
+                noticeByElement.put(otpId, otpNotice);
+            } else if (routesById.containsKey(otpId)) {
+                noticeByElement.put(otpId, otpNotice);
+            } else if (tripsById.containsKey(otpId)) {
+                noticeByElement.put(otpId, otpNotice);
+            } else {
+                LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
+            }
+        }
         return noticeByElement;
     }
 

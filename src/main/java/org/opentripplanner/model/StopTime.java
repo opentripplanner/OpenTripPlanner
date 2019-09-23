@@ -6,7 +6,7 @@ import org.opentripplanner.util.TimeToStringConverter;
 import java.io.Serializable;
 import java.util.Objects;
 
-public final class StopTime implements Serializable, Comparable<StopTime>, NoticeAssignable {
+public final class StopTime extends TransitEntity<StopTimeId> implements Serializable, Comparable<StopTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,9 +37,7 @@ public final class StopTime implements Serializable, Comparable<StopTime>, Notic
     /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
     private String farePeriodId;
 
-    public StopTime() {
-
-    }
+    public StopTime() { }
 
     public StopTime(StopTime st) {
         this.arrivalTime = st.arrivalTime;
@@ -54,6 +52,20 @@ public final class StopTime implements Serializable, Comparable<StopTime>, Notic
         this.timepoint = st.timepoint;
         this.trip = st.trip;
         this.farePeriodId = st.farePeriodId;
+    }
+
+    /**
+     * The id is used only to link other entities to StopTime (using maps), so we can save memory by
+     * creating new ids every time we need them, instead of holding a reference to id in this class.
+     * New ids should only be created when a travel search result is mapped to an itinerary, so even
+     * if creating new objects are expensive, the few extra objects created during the mapping process
+     * is ok.
+     * <p/>
+     * THE *ID* SHOULD NOT BE USED DURING THE ROUTING SEARCH.
+     */
+    @Override
+    public StopTimeId getId() {
+        return new StopTimeId(trip.getId(), stopSequence);
     }
 
     public Trip getTrip() {
@@ -199,19 +211,16 @@ public final class StopTime implements Serializable, Comparable<StopTime>, Notic
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
         StopTime stopTime = (StopTime) o;
-        return stopSequence == stopTime.stopSequence
-                && Objects.equals(trip, stopTime.trip)
-                && Objects.equals(stop, stopTime.stop);
+        return stopSequence == stopTime.stopSequence && trip.equals(stopTime.trip);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(trip, stop, stopSequence);
+        return Objects.hash(trip, stopSequence);
     }
 
     @Override

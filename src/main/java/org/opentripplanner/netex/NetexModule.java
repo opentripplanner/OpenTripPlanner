@@ -2,6 +2,7 @@ package org.opentripplanner.netex;
 
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
@@ -69,11 +70,15 @@ public class NetexModule implements GraphBuilderModule {
                 OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle();
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
+                OtpTransitService otpService = transitBuilder.build();
+
+                graph.addNoticAssignments(otpService.getNoticeAssignments());
+
                 PatternHopFactory hf = new PatternHopFactory(
                         new GtfsFeedId.Builder()
                                 .id(netexFeedId)
                                 .build(),
-                        transitBuilder.build(),
+                        otpService,
                         fareServiceFactory,
                         MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
                         subwayAccessTime,

@@ -8,7 +8,6 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
@@ -20,6 +19,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +52,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
-    private final Multimap<NoticeAssignable, Notice> noticeAssignments;
+    private final Multimap<Serializable, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -117,8 +117,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
         return feedInfos;
     }
 
+    /**
+     * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type
+     * for ids, since some entities have String, while other have FeedScopeId ids.
+     */
     @Override
-    public Multimap<NoticeAssignable, Notice> getNoticeAssignments() {
+    public Multimap<Serializable, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 

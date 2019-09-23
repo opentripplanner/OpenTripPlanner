@@ -3,7 +3,6 @@ package org.opentripplanner.netex.loader.mapping;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.Stop;
@@ -20,6 +19,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +55,6 @@ public class NetexMapper {
     public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;
-
     }
 
     /**
@@ -161,8 +160,7 @@ public class NetexMapper {
                 transitBuilder.getTripsById()
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
-            Multimap<NoticeAssignable, Notice> noticesByElementId;
-
+            Multimap<Serializable, Notice> noticesByElementId;
             noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
             transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }

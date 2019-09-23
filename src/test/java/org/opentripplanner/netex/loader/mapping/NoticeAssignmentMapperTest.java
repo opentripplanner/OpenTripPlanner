@@ -3,9 +3,9 @@ package org.opentripplanner.netex.loader.mapping;
 import com.google.common.collect.Multimap;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
@@ -16,6 +16,7 @@ import org.rutebanken.netex.model.NoticeRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class NoticeAssignmentMapperTest {
     private static final String STOP_POINT_ID = "RUT:StopPointInJourneyPattern:1";
     private static final String NOTICE_ID = "RUT:Notice:1";
     private static final String TIMETABLED_PASSING_TIME1 = "RUT:TimetabledPassingTime:1";
-    private static final String TIMETABLED_PASSING_TIME2 = "RUT:TimetabledPassingTime:1";
+    private static final String TIMETABLED_PASSING_TIME2 = "RUT:TimetabledPassingTime:2";
 
 
     private static final Notice NOTICE = new org.rutebanken.netex.model.Notice()
@@ -56,11 +57,10 @@ public class NoticeAssignmentMapperTest {
                 new EntityById<>()
         );
 
-        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElement =
+        Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement =
                 noticeAssignmentMapper.map(noticeAssignment);
 
-        org.opentripplanner.model.Notice notice2 = noticesByElement.get(route)
-                .stream().findFirst().get();
+        org.opentripplanner.model.Notice notice2 = noticesByElement.get(route.getId()).iterator().next();
 
         assertEquals(NOTICE_ID, notice2.getId().getId());
     }
@@ -81,8 +81,10 @@ public class NoticeAssignmentMapperTest {
                 new TimetabledPassingTime().withId(TIMETABLED_PASSING_TIME2)
         );
 
-        StopTime stopTime1 = new StopTime();
-        StopTime stopTime2 = new StopTime();
+        Trip trip = new Trip();
+        trip.setId(new FeedScopedId("T", "1"));
+        StopTime stopTime1 = createStopTime(1, trip);
+        StopTime stopTime2 = createStopTime(2, trip);
 
         Map<String, StopTime> stopTimesById = new HashMap<>();
         stopTimesById.put(TIMETABLED_PASSING_TIME1, stopTime1);
@@ -102,16 +104,23 @@ public class NoticeAssignmentMapperTest {
                 new EntityById<>()
         );
 
-        Multimap<NoticeAssignable, org.opentripplanner.model.Notice> noticesByElement
+        Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement
                 = noticeAssignmentMapper.map(noticeAssignment);
 
-        org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1)
+        org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1.getId())
                 .stream().findFirst().orElseThrow(IllegalStateException::new);
 
-        org.opentripplanner.model.Notice notice2b = noticesByElement.get(stopTime2)
+        org.opentripplanner.model.Notice notice2b = noticesByElement.get(stopTime2.getId())
                 .stream().findFirst().orElseThrow(IllegalStateException::new);
 
         assertEquals(NOTICE_ID, notice2a.getId().getId());
         assertEquals(NOTICE_ID, notice2b.getId().getId());
+    }
+
+    private StopTime createStopTime(int stopSequence, Trip trip) {
+        StopTime stopTime1 = new StopTime();
+        stopTime1.setStopSequence(stopSequence);
+        stopTime1.setTrip(trip);
+        return stopTime1;
     }
 }

@@ -22,9 +22,9 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
@@ -82,10 +82,6 @@ public class GraphIndex {
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<>();
 
-    // TODO TGR - Needed for GRaphQL API?
-    public final Map<FeedScopedId, Notice> noticeForId = Maps.newHashMap();
-    private final Map<NoticeAssignable, List<Notice>> noticeAssignmentForElement = Maps.newHashMap();
-
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
     private final Map<FeedScopedId,Integer> serviceCodes;
@@ -142,14 +138,6 @@ public class GraphIndex {
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
-        }
-
-        for (NoticeAssignable noticeAssignable : graph.getNoticesByElement().keySet()) {
-            Collection<Notice> notices = graph.getNoticesByElement().get(noticeAssignable);
-            for (Notice notice : notices) {
-                noticeForId.put(notice.getId(), notice);
-                noticeAssignmentForElement.computeIfAbsent(noticeAssignable, i -> new ArrayList<>()).add(notice);
-            }
         }
 
         // Copy these two service indexes from the graph until we have better ones.
@@ -442,8 +430,9 @@ public class GraphIndex {
         return allAgencies;
     }
 
-    public Collection<Notice> getNoticesForElement(NoticeAssignable noticeAssignableElement) {
-        return this.noticeAssignmentForElement
-                .getOrDefault(noticeAssignableElement, Collections.emptyList());
+    public Collection<Notice> getNoticesForElement(TransitEntity<?> entity) {
+        // Delegate to graph
+        Collection<Notice> res = graph.getNoticesByElement().get(entity.getId());
+        return res == null ? Collections.emptyList() : res;
     }
 }

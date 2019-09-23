@@ -32,8 +32,8 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -99,11 +99,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
     /**
-     * Allows a notice element to be attached to an object in the OTP model and then retrieved
-     * by the API when navigating from that object. This requires equals and hashCode to be
-     * implemented properly.
+     * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
+     * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
      */
-    private final Multimap<NoticeAssignable, Notice> noticesByElement = HashMultimap.create();
+    private final Multimap<Serializable, Notice> noticesByElement = HashMultimap.create();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
@@ -926,12 +925,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         return transitServiceEnds;
     }
 
-    public Multimap<NoticeAssignable, Notice> getNoticesByElement() {
+    public Multimap<Serializable, Notice> getNoticesByElement() {
         return noticesByElement;
     }
 
-    public void setNoticesByElement(Multimap<NoticeAssignable, Notice> noticesByElement) {
-        this.noticesByElement.clear();
+    public void addNoticAssignments(Multimap<Serializable, Notice> noticesByElement) {
         this.noticesByElement.putAll(noticesByElement);
     }
 

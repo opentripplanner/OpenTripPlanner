@@ -36,7 +36,6 @@ public class NetexBundle {
     /** maps the NeTEx XML document to OTP transit model. */
     private NetexMapper otpMapper;
 
-
     private NetexXmlParser xmlParser;
 
     private final String netexFeedId;

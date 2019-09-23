@@ -1,5 +1,6 @@
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
@@ -9,7 +10,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.NoticeAssignable;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -18,7 +18,6 @@ import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -26,11 +25,10 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExistentIds;
@@ -55,7 +53,7 @@ public class OtpTransitServiceBuilder {
 
     private final List<Frequency> frequencies = new ArrayList<>();
 
-    private final Multimap<NoticeAssignable, Notice> noticeAssignments = HashMultimap.create();
+    private final Multimap<Serializable, Notice> noticeAssignments = ArrayListMultimap.create();
 
     private final List<Pathway> pathways = new ArrayList<>();
 
@@ -71,7 +69,7 @@ public class OtpTransitServiceBuilder {
 
     private final EntityById<FeedScopedId, Trip> tripsById = new EntityById<>();
 
-    private final Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
+    private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
 
     public OtpTransitServiceBuilder() {
@@ -108,7 +106,11 @@ public class OtpTransitServiceBuilder {
         return frequencies;
     }
 
-    public Multimap<NoticeAssignable, Notice> getNoticeAssignments() {
+    /**
+     * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable). Entities
+     * that might have Notices are Routes, Trips, Stops and StopTimes.
+     */
+    public Multimap<Serializable, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 

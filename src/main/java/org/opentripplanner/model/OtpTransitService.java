@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,10 +21,10 @@ public interface OtpTransitService {
     Collection<FeedInfo> getAllFeedInfos();
 
     /**
-     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entities of
-     * any type (having a {@link FeedScopedId} id).
+     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entities ids of
+     * any type (Serializable).
      */
-    Multimap<NoticeAssignable, Notice> getNoticeAssignments();
+    Multimap<Serializable, Notice> getNoticeAssignments();
 
     Collection<Pathway> getAllPathways();
 

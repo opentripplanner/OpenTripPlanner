@@ -5,7 +5,7 @@ package org.opentripplanner.model;
  * describing circumstances which cannot be modelled as structured data." Any NeTEx element can have a notice attached,
  * although not all are supported in OTP.
  */
-public class Notice extends IdentityBean<FeedScopedId> {
+public class Notice extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 

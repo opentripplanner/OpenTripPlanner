@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +104,7 @@ class TripPatternMapper {
         TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
         tripPattern.code = journeyPattern.getId();
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
-        tripPattern.id = createFeedScopedId(journeyPattern.getId());
+        tripPattern.setId(createFeedScopedId(journeyPattern.getId()));
 
         createTripTimes(trips, tripPattern);
 
@@ -149,7 +148,6 @@ class TripPatternMapper {
             return "";
         }
     }
-
 
     /**
      * This mapper returnes two collections, so we need to use a simple wraper to be able to return the result

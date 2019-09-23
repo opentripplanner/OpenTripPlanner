@@ -851,7 +851,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
                     .type(new GraphQLList(noticeType))
-                    .dataFetcher(environment -> index.noticeForId.values())
+                    .dataFetcher(environment -> index.graph.getNoticesByElement().values())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agencies")

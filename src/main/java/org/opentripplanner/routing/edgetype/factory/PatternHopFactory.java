@@ -156,6 +156,18 @@ public class PatternHopFactory {
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
+        /* Generate unique short IDs for all the TableTripPatterns. */
+        TripPattern.generateUniqueIds(tripPatterns);
+
+        for (TripPattern it : tripPatterns) {
+            if(it.getId() == null) {
+                System.out.println("TP id == null: " + it);
+            }
+        }
+
+        /* Generate unique human-readable names for all the TableTripPatterns. */
+        TripPattern.generateUniqueNames(tripPatterns);
+
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
             for (Trip trip : tripPattern.getTrips()) {
@@ -170,12 +182,6 @@ public class PatternHopFactory {
                 }
             }
         }
-
-        /* Generate unique human-readable names for all the TableTripPatterns. */
-        TripPattern.generateUniqueNames(tripPatterns);
-
-        /* Generate unique short IDs for all the TableTripPatterns. */
-        TripPattern.generateUniqueIds(tripPatterns);
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
@@ -210,10 +216,6 @@ public class PatternHopFactory {
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
-
-        // TODO TGR - This have nothing to do with PatternHops, so maybe it should be put in
-        // TODO TGR - another place.
-        loadNotices(graph);
 
         /* Store parent stops in graph, even if not linked. These are needed for clustering*/
         for (TransitStationStop stop : stationStopNodes.values()) {
@@ -553,10 +555,6 @@ public class PatternHopFactory {
         geometriesByShapeId.clear();
         distancesByShapeId.clear();
         geometriesByShapeSegmentKey.clear();
-    }
-
-    private void loadNotices(Graph graph) {
-        graph.setNoticesByElement(transitService.getNoticeAssignments());
     }
 
     private void loadTransfers(Graph graph) {
