@@ -21,7 +21,7 @@ public interface OtpTransitService {
     Collection<FeedInfo> getAllFeedInfos();
 
     /**
-     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entities ids of
+     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
      * any type (Serializable).
      */
     Multimap<Serializable, Notice> getNoticeAssignments();

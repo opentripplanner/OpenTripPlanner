@@ -13,6 +13,7 @@ import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
@@ -44,6 +45,7 @@ public class NetexMapper {
 
     private final OtpTransitServiceBuilder transitBuilder;
     private final String agencyId;
+    private final Deduplicator deduplicator;
 
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
@@ -52,9 +54,10 @@ public class NetexMapper {
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
 
-    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId) {
+    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId, Deduplicator deduplicator) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;
+        this.deduplicator = deduplicator;
     }
 
     /**
@@ -121,7 +124,8 @@ public class NetexMapper {
                 netexIndex.getJourneyPatternsById(),
                 netexIndex.getQuayIdByStopPointRef(),
                 netexIndex.getDestinationDisplayById(),
-                netexIndex.getServiceJourneyByPatternId()
+                netexIndex.getServiceJourneyByPatternId(),
+                deduplicator
         );
 
         for (JourneyPattern journeyPattern : netexIndex.getJourneyPatternsById().localValues()) {

@@ -1,4 +1,3 @@
-/* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
 import java.io.Serializable;
@@ -15,6 +14,10 @@ public abstract class TransitEntity<T extends Serializable> implements Serializa
 
     public abstract T getId();
 
+    /**
+     * Override this method to allow the id to be set. The default implementation throw a
+     * {@link UnsupportedOperationException}.
+     */
     public void setId(T id) {
         throw new UnsupportedOperationException(
                 "It is not allowed to change the id for this type: " + getClass().getSimpleName()

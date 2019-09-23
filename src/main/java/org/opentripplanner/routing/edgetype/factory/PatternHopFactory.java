@@ -159,12 +159,6 @@ public class PatternHopFactory {
         /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns);
 
-        for (TripPattern it : tripPatterns) {
-            if(it.getId() == null) {
-                System.out.println("TP id == null: " + it);
-            }
-        }
-
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns);
 

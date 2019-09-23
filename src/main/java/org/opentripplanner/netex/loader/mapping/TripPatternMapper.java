@@ -49,6 +49,8 @@ class TripPatternMapper {
 
     private final StopTimesMapper stopTimesMapper;
 
+    private final Deduplicator deduplicator;
+
     private Result result;
 
     TripPatternMapper(
@@ -58,13 +60,15 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
-            ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId
+            ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId,
+            Deduplicator deduplicator
     ) {
         this.routeById = routeById;
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
         this.stopTimesMapper = new StopTimesMapper(stopsById, destinationDisplayById, quayIdByStopPointRef);
+        this.deduplicator = deduplicator;
     }
 
     Result mapTripPattern(JourneyPattern journeyPattern) {
@@ -124,9 +128,6 @@ class TripPatternMapper {
             List<Trip> trips,
             TripPattern tripPattern
     ) {
-        // TODO OTP2 Make this global or use the Graph version
-        Deduplicator deduplicator = new Deduplicator();
-
         for (Trip trip : trips) {
             if (result.tripStopTimes.get(trip).size() == 0) {
                 LOG.warn("Trip" + trip.getId() + " does not contain any trip times.");

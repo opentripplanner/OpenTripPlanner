@@ -40,23 +40,26 @@ public final class StopTime extends TransitEntity<StopTimeId> implements Seriali
     public StopTime() { }
 
     public StopTime(StopTime st) {
+        this.trip = st.trip;
+        this.stop = st.stop;
         this.arrivalTime = st.arrivalTime;
         this.departureTime = st.departureTime;
-        this.dropOffType = st.dropOffType;
-        this.pickupType = st.pickupType;
-        this.routeShortName = st.routeShortName;
-        this.shapeDistTraveled = st.shapeDistTraveled;
-        this.stop = st.stop;
-        this.stopHeadsign = st.stopHeadsign;
-        this.stopSequence = st.stopSequence;
         this.timepoint = st.timepoint;
-        this.trip = st.trip;
+        this.stopSequence = st.stopSequence;
+        this.stopHeadsign = st.stopHeadsign;
+        this.routeShortName = st.routeShortName;
+        this.pickupType = st.pickupType;
+        this.dropOffType = st.dropOffType;
+        this.shapeDistTraveled = st.shapeDistTraveled;
         this.farePeriodId = st.farePeriodId;
     }
 
     /**
-     * The id is used only to link other entities to StopTime (using maps), so we can save memory by
-     * creating new ids every time we need them, instead of holding a reference to id in this class.
+     * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
+     * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
+     * StopTime field. This save memory, since there is a lot of StopTimes - and very few references
+     * to StopTimes.
+     * <p/>
      * New ids should only be created when a travel search result is mapped to an itinerary, so even
      * if creating new objects are expensive, the few extra objects created during the mapping process
      * is ok.

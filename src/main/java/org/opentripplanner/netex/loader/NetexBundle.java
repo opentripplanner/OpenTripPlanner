@@ -4,6 +4,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.loader.mapping.NetexMapper;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class NetexBundle {
     }
 
     /** load the bundle, map it to the OTP transit model and return */
-    public OtpTransitServiceBuilder loadBundle() {
+    public OtpTransitServiceBuilder loadBundle(Deduplicator deduplicator) {
         LOG.info("reading {}", fileHierarchy.filename());
 
         // Store result in a mutable OTP Transit Model
@@ -55,7 +56,7 @@ public class NetexBundle {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        otpMapper = new NetexMapper(transitBuilder, netexFeedId);
+        otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator);
 
         // Load data
         fileHierarchy.load(this::loadZipFileEntries);

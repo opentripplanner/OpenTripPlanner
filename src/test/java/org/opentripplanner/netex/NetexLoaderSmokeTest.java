@@ -7,6 +7,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 
@@ -37,7 +38,7 @@ public class NetexLoaderSmokeTest {
         netexBundle.checkInputs();
 
         // When
-        OtpTransitServiceBuilder otpBuilder = netexBundle.loadBundle();
+        OtpTransitServiceBuilder otpBuilder = netexBundle.loadBundle(new Deduplicator());
 
         System.out.println(otpBuilder);
 

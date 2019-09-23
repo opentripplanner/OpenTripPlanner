@@ -28,8 +28,8 @@ class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
-    private ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
-    private ReadOnlyHierarchicalMapById<DayType> dayTypeById;
+    private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    private final ReadOnlyHierarchicalMapById<DayType> dayTypeById;
 
 
     CalendarMapper(
