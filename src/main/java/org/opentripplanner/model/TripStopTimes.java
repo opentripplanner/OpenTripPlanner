@@ -87,11 +87,4 @@ public class TripStopTimes {
         Collections.sort(values);
         return values;
     }
-
-    /**
-     * Return a all values for all trips merged into a set.
-     */
-    public Set<StopTime> valuesAsSet() {
-        return map.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
-    }
 }

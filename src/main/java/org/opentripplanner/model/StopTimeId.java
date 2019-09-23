@@ -22,5 +22,5 @@ public class StopTimeId implements Serializable {
         StopTimeId other = (StopTimeId) obj;
         return stopSequensNo == other.stopSequensNo && tripId.equals(other.tripId);
     }
-    @Override public String toString() { return tripId.toString() + ":" + stopSequensNo; }
+    @Override public String toString() { return tripId.toString() + "_" + stopSequensNo; }
 }

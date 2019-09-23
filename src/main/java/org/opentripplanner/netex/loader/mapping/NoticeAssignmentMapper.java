@@ -6,6 +6,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.StopTimeId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
@@ -37,9 +38,9 @@ class NoticeAssignmentMapper {
 
     private final EntityById<FeedScopedId, Route> routesById;
 
-    private final Map<String, StopTime> stopTimesByNetexId;
-
     private final EntityById<FeedScopedId, Trip> tripsById;
+
+    private final Map<String, StopTime> stopTimesByNetexId;
 
     /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
     private final NoticeMapper noticeMapper = new NoticeMapper();
@@ -50,14 +51,14 @@ class NoticeAssignmentMapper {
             ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
             EntityById<FeedScopedId, Route> routesById,
-            Map<String, StopTime> stopTimesByNetexId,
-            EntityById<FeedScopedId, Trip> tripsById
+            EntityById<FeedScopedId, Trip> tripsById,
+            Map<String, StopTime> stopTimesByNetexId
     ) {
         this.passingTimeByStopPointId = passingTimeByStopPointId;
         this.noticesById = noticesById;
         this.routesById = routesById;
-        this.stopTimesByNetexId = stopTimesByNetexId;
         this.tripsById = tripsById;
+        this.stopTimesByNetexId = stopTimesByNetexId;
     }
 
     Multimap<Serializable, Notice> map(NoticeAssignment noticeAssignment){
@@ -71,22 +72,19 @@ class NoticeAssignmentMapper {
             return noticeByElement;
         }
 
+        // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so we
+        // attach the notice to all StopTimes for the pattern at the given stop.
         Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.lookup(noticedObjectId);
-
-        // Special case for StopPointInJourneyPattern
         if (!times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
-                noticeByElement.put(
-                        stopTimesByNetexId.get(time.getId()).getId(),
-                        otpNotice
-                );
+                noticeByElement.put(stopTimeId(time.getId()), otpNotice);
             }
+        } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
+            noticeByElement.put(stopTimeId(noticedObjectId), otpNotice);
         } else {
             FeedScopedId otpId = createFeedScopedId(noticedObjectId);
 
-            if (stopTimesByNetexId.containsKey(noticedObjectId)) {
-                noticeByElement.put(otpId, otpNotice);
-            } else if (routesById.containsKey(otpId)) {
+            if (routesById.containsKey(otpId)) {
                 noticeByElement.put(otpId, otpNotice);
             } else if (tripsById.containsKey(otpId)) {
                 noticeByElement.put(otpId, otpNotice);
@@ -95,6 +93,10 @@ class NoticeAssignmentMapper {
             }
         }
         return noticeByElement;
+    }
+
+    private StopTimeId stopTimeId(String timeTablePassingTimeId) {
+        return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
     }
 
     private Notice getOrMapNotice(NoticeAssignment assignment) {

@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
@@ -52,7 +53,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
-    private final Multimap<Serializable, Notice> noticeAssignments;
+    private final ImmutableListMultimap<Serializable, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -86,7 +87,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
-        this.noticeAssignments = builder.getNoticeAssignments();
+        this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
         this.pathways = immutableList(builder.getPathways());
         this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());

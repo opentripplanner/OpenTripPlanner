@@ -160,8 +160,8 @@ public class NetexMapper {
                 netexIndex.getPassingTimeByStopPointId(),
                 netexIndex.getNoticeById(),
                 transitBuilder.getRoutes(),
-                stopTimesByNetexId,
-                transitBuilder.getTripsById()
+                transitBuilder.getTripsById(),
+                stopTimesByNetexId
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
             Multimap<Serializable, Notice> noticesByElementId;

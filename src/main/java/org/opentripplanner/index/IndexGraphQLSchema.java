@@ -444,6 +444,8 @@ public class IndexGraphQLSchema {
                             .build())
                     .dataFetcher(environment -> {
                         TripTimeShort tripTimeShort = (TripTimeShort) environment.getSource();
+
+
                         return index.getNoticesForElement(tripTimeShort.stopTime);
                     })
                     .build())

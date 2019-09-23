@@ -53,8 +53,8 @@ public class NoticeAssignmentMapperTest {
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
                 routesById,
-                new HashMap<>(),
-                new EntityById<>()
+                new EntityById<>(),
+                new HashMap<>()
         );
 
         Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement =
@@ -100,8 +100,8 @@ public class NoticeAssignmentMapperTest {
                 passingTimeByStopPointId,
                 noticesById,
                 new EntityById<>(),
-                stopTimesById,
-                new EntityById<>()
+                new EntityById<>(),
+                stopTimesById
         );
 
         Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement
