@@ -26,6 +26,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTimeId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -443,10 +444,9 @@ public class IndexGraphQLSchema {
                             .type(Scalars.GraphQLString)
                             .build())
                     .dataFetcher(environment -> {
-                        TripTimeShort tripTimeShort = (TripTimeShort) environment.getSource();
-
-
-                        return index.getNoticesForElement(tripTimeShort.stopTime);
+                        TripTimeShort tts = (TripTimeShort) environment.getSource();
+                        StopTimeId id = new StopTimeId(tts.tripId, tts.stopIndex);
+                        return index.getNoticesByEntityId(id);
                     })
                     .build())
             .build();
@@ -587,8 +587,7 @@ public class IndexGraphQLSchema {
                             .type(Scalars.GraphQLString)
                             .build())
                     .dataFetcher(environment -> {
-                        Trip trip = (Trip) environment.getSource();
-                        return index.getNoticesForElement(trip);
+                        return index.getNoticesByEntity((Trip) environment.getSource());
                     })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -684,8 +683,7 @@ public class IndexGraphQLSchema {
                             .type(Scalars.GraphQLString)
                             .build())
                     .dataFetcher(environment -> {
-                        TripPattern tripPattern = (TripPattern) environment.getSource();
-                        return index.getNoticesForElement(tripPattern);
+                        return index.getNoticesByEntity((TripPattern) environment.getSource());
                     })
                     .build())
             .build();

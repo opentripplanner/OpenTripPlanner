@@ -17,7 +17,6 @@ public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
     public FeedScopedId stopId;
-    public StopTime stopTime;
     public int stopIndex;
     public int stopCount;
     public int scheduledArrival = UNDEFINED ;
@@ -39,7 +38,6 @@ public class TripTimeShort {
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId             = stop.getId();
-        stopTime           = tt.getStopTimeByIndex(i);
         stopIndex          = i;
         stopCount          = tt.getNumStops();
         scheduledArrival   = tt.getScheduledArrivalTime(i);
@@ -66,7 +64,7 @@ public class TripTimeShort {
      */
     public static List<TripTimeShort> fromTripTimes (Timetable table, Trip trip) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
-        List<TripTimeShort> out = new ArrayList();
+        List<TripTimeShort> out = new ArrayList<>();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
             out.add(new TripTimeShort(times, i, table.pattern.getStop(i)));

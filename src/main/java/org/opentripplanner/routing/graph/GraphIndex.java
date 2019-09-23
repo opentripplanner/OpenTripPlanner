@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -430,9 +431,13 @@ public class GraphIndex {
         return allAgencies;
     }
 
-    public Collection<Notice> getNoticesForElement(TransitEntity<?> entity) {
+    public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
+        return getNoticesByEntityId(entity.getId());
+    }
+
+    public Collection<Notice> getNoticesByEntityId(Serializable id) {
         // Delegate to graph
-        Collection<Notice> res = graph.getNoticesByElement().get(entity.getId());
+        Collection<Notice> res = graph.getNoticesByElement().get(id);
         return res == null ? Collections.emptyList() : res;
     }
 }
