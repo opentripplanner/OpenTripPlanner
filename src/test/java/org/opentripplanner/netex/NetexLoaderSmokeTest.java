@@ -44,6 +44,14 @@ public class NetexLoaderSmokeTest {
     private static final String NETEX_DIR = "src/test/resources/netex";
     private static final String NETEX_FILENAME = "netex_minimal.zip";
 
+
+    /**
+     * This test load a very simple Netex data set and do assertions on it.
+     * For each type we assert some of the most important fields for one element
+     * and then check the expected number of that type. This is not a replacement
+     * for unit tests on mappers. Try to focus on relation between entities and Netex
+     * import integration.
+     */
     @Test
     public void smokeTestOfNetexLoadData() {
         // Given
