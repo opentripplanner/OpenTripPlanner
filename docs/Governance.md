@@ -7,6 +7,7 @@ OpenTripPlanner is a member project of the [Software Freedom Conservancy](https:
 | Sean Barbeau      | University of South Florida |
 | Sheldon Brown     | Cambridge Systematics       |
 | Andrew Byrd       | Conveyal                    |
+| Thomas Craig      | Trillium                    |
 | Drew Dara-Abrams  | Interline                   |
 | David Emory       | MARTA (Atlanta, Georgia)    |
 | Thomas Gran       | Ruter & Entur (Norway)      |
