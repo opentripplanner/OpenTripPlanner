@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.*;
+import org.locationtech.jts.geom.*;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;

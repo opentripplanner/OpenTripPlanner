@@ -11,8 +11,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+
 import java.util.Locale;
 
 /** 
@@ -69,12 +70,30 @@ public class StreetTransitLink extends Edge {
     }
 
     public State traverse(State s0) {
+
+        // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
+        // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
+        // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a
+        // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
+        // if they are for the same stop.
+        if (
+            s0.backEdge instanceof StreetTransitLink &&
+                ((StreetTransitLink) s0.backEdge).transitStop == this.transitStop
+        ) {
+            return null;
+        }
+
         // Do not re-enter the street network following a transfer.
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;
         }
         // Do not detour through a TransitStop when traversing the street network
         if (s0.getVertex() instanceof TransitStop && s0.backEdge instanceof StreetTransitLink) {
+            return null;
+        }
+
+        // Do not get off at a real stop when on call-n-ride (force a transfer instead).
+        if (s0.isLastBoardAlightDeviated() && !(transitStop.checkCallAndRideStreetLinkOk(s0))) {
             return null;
         }
 
@@ -99,7 +118,8 @@ public class StreetTransitLink extends Edge {
 
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
+
+        if (s0.getNonTransitMode() == TraverseMode.CAR && !req.enterStationsWithCar) {
             if ((req.kissAndRide && !s0.isCarParked()) || (req.rideAndKiss && s0.isCarParked())) {
                 s1.setCarParked(true);
             } else {
@@ -145,6 +165,5 @@ public class StreetTransitLink extends Edge {
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
-
 
 }

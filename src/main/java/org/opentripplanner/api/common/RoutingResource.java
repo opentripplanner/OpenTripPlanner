@@ -156,8 +156,34 @@ public abstract class RoutingResource {
     /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
     @QueryParam("optimize")
     protected OptimizeType optimize;
-
-    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    
+    /**
+     * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
+     * <p>The possible values of the comma-separated list are:</p>
+     *
+     * <ul>
+     *  <li>WALK</li>
+     *  <li>TRANSIT</li>
+     *  <li>BICYCLE</li>
+     *  <li>BICYCLE_RENT</li>
+     *  <li>BICYCLE_PARK</li>
+     *  <li>CAR</li>
+     *  <li>CAR_PARK</li>
+     *  <li>TRAM</li>
+     *  <li>SUBWAY</li>
+     *  <li>RAIL</li>
+     *  <li>BUS</li>
+     *  <li>CABLE_CAR</li>
+     *  <li>FERRY</li>
+     *  <li>GONDOLA</li>
+     *  <li>FUNICULAR</li>
+     *  <li>AIRPLANE</li>
+     * </ul>
+     *
+     * <p>
+     *   For a more complete discussion of this parameter see <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
+     * </p>
+     */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
@@ -398,6 +424,36 @@ public abstract class RoutingResource {
      */
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
+
+    /*
+     * Control the size of flag-stop buffer returned in API response. This parameter only applies
+     * to GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     */
+    @QueryParam("flexFlagStopBufferSize")
+    protected Double flexFlagStopBufferSize;
+
+    /**
+     * Whether to use reservation-based services
+     */
+    @QueryParam("flexUseReservationServices")
+    protected Boolean flexUseReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services
+     */
+    @QueryParam("flexUseEligibilityServices")
+    protected Boolean flexUseEligibilityServices = true;
+
+    /**
+     * Whether to ignore DRT time limits.
+     *
+     * According to the GTFS-flex spec, demand-response transit (DRT) service must be reserved
+     * at least `drt_advance_book_min` minutes in advance. OTP not allow DRT service to be used
+     * inside that time window, unless this parameter is set to true.
+     */
+    @QueryParam("flexIgnoreDrtAdvanceBookMin")
+    protected Boolean flexIgnoreDrtAdvanceBookMin;
 
     @QueryParam("maxHours")
     private Double maxHours;
@@ -682,6 +738,18 @@ public abstract class RoutingResource {
 
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
+
+        if (flexFlagStopBufferSize != null)
+            request.flexFlagStopBufferSize = flexFlagStopBufferSize;
+
+        if (flexUseReservationServices != null)
+            request.flexUseReservationServices = flexUseReservationServices;
+
+        if (flexUseEligibilityServices != null)
+            request.flexUseEligibilityServices = flexUseEligibilityServices;
+
+        if (flexIgnoreDrtAdvanceBookMin != null)
+            request.flexIgnoreDrtAdvanceBookMin = flexIgnoreDrtAdvanceBookMin;
 
         if (maxHours != null)
             request.maxHours = maxHours;

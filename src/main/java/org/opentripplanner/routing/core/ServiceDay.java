@@ -48,7 +48,6 @@ public class ServiceDay implements Serializable {
 
     public ServiceDay(Graph graph, ServiceDate serviceDate, CalendarService cs, TimeZone timeZone) {
         this.serviceDate = new ServiceDate(serviceDate);
-
         init(graph, cs, timeZone);
     }
 
