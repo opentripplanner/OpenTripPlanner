@@ -446,12 +446,10 @@ public class GraphPathFinder {
             List <GraphPath> completePaths = new ArrayList<>();
             DebugOutput debugOutput = null;
 
-            Vertex[] fromVertices = new Vertex[places.size()];
-            Vertex[] toVertices = new Vertex[places.size()];
-
             OUTER: for (int i = 0; i < request.numItineraries; i++) {
                 List<GraphPath> paths = new ArrayList<>();
                 int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
+                Collection<Vertex> temporaryVertices = new ArrayList<>();
 
                 while (0 < placeIndex && placeIndex < places.size()) {
                     GenericLocation currentPlace = places.get(placeIndex - 1);
@@ -461,25 +459,7 @@ public class GraphPathFinder {
                     intermediateRequest.from = currentPlace;
                     intermediateRequest.to = places.get(placeIndex);
                     intermediateRequest.rctx = null;
-
-                    if ( fromVertices[placeIndex - 1] != null && toVertices[placeIndex] != null ) {
-                        intermediateRequest.setRoutingContext(
-                            router.graph,
-                            fromVertices[placeIndex - 1],
-                            toVertices[placeIndex]
-                        );
-                    } else {
-                        intermediateRequest.setRoutingContext(router.graph);
-                    }
-
-                    // Need to save used vertices, so we won't get a TrivialPathException later.
-                    if (fromVertices[placeIndex - 1] == null) {
-                        fromVertices[placeIndex -1] = intermediateRequest.rctx.fromVertex;
-                    }
-
-                    if (toVertices[placeIndex] == null) {
-                        toVertices[placeIndex] = intermediateRequest.rctx.toVertex;
-                    }
+                    intermediateRequest.setRoutingContext(router.graph, temporaryVertices);
 
                     if (debugOutput != null) {// Restore the previous debug info accumulator
                         intermediateRequest.rctx.debugOutput = debugOutput;
