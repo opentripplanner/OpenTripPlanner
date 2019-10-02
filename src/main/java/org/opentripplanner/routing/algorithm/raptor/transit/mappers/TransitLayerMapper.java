@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,11 +113,15 @@ public class TransitLayerMapper {
         // If we are using realtime updates, we want to include both the TripPatterns in the scheduled (static) data
         // and any new patterns that were created by realtime data (added or rerouted trips).
         // So far, realtime messages cannot add new stops or service IDs, so we can use those straight from the Graph.
-        final Collection<org.opentripplanner.routing.edgetype.TripPattern> allTripPatterns;
-        if (timetableSnapshot == null) {
-            allTripPatterns = graph.tripPatternForId.values();
-        } else {
-            allTripPatterns = timetableSnapshot.getAllScheduledAndRealtimeTripPatterns();
+        Collection<org.opentripplanner.routing.edgetype.TripPattern> allTripPatterns;
+        allTripPatterns = graph.tripPatternForId.values();
+        if (timetableSnapshot != null && !timetableSnapshot.getAllRealtimeTripPatterns().isEmpty()) {
+            // Make a protective copy, also removing duplicates between the scheduled and updated patterns.
+            // This may be somewhat inefficient since we copy all patterns into a Set even when none have been added.
+            // However references to the TripPatternCache are private, and none is held by the timetableSnapshot so
+            // this is simpler.
+            allTripPatterns = new HashSet(allTripPatterns);
+            allTripPatterns.addAll(timetableSnapshot.getAllRealtimeTripPatterns());
         }
 
         final Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> newTripPatternForOld;

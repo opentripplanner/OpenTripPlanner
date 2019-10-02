@@ -96,9 +96,10 @@ public class TimetableSnapshot {
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
     
     /**
-     * The timetables for different days, for each TripPattern (each sequence of stops on a particular Route).
-     * The keys include both TripPatterns from the scheduled GTFS, and TripPatterns added by realtime messages and
-     * tracked by the TripPatternCache.
+     * The timetables for different days, for each TripPattern (each sequence of stops on a particular Route) for which
+     * we have an updated Timetable. The keys include both TripPatterns from the scheduled GTFS, and TripPatterns added
+     * by realtime messages and tracked by the TripPatternCache. Note that the keys will not include all scheduled
+     * TripPatterns, only those for which we've got an update.
      * We use a HashMap rather than a Map so we can clone it. If this turns out to be slow/spacious we can use an array
      * with integer pattern indexes. The SortedSet members are copy-on-write.
      * FIXME: this could be made into a flat hashtable with compound keys.
@@ -359,10 +360,11 @@ public class TimetableSnapshot {
     }
 
     /**
-     * @return all TripPatterns available in this snapshot, including both those from scheduled (static) transit data
-     *         and those added by realtime messages (rerouted or added trips).
+     * @return all TripPatterns for which we have any updated timetables created by realtime messages, including both
+     *         patterns that were in the scheduled (static) transit data and those that were added to this snapshot by
+     *         rerouted or added trips.
      */
-    public Collection<TripPattern> getAllScheduledAndRealtimeTripPatterns() {
+    public Collection<TripPattern> getAllRealtimeTripPatterns () {
         return timetables.keySet();
     }
 
