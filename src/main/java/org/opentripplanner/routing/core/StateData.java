@@ -138,6 +138,7 @@ public class StateData implements Cloneable {
             // HashSets do not get cloned quite right, so if any HashSets exists with data that gets added to them
             // throughout a shortest path search, they must be recreated with the previous state's data in order to make
             // sure they don't contain data from other paths.
+            // See https://github.com/ibi-group/OpenTripPlanner/pull/15 for more discussion.
             clonedStateData.rentedCars = new HashSet<>(this.rentedCars);
             clonedStateData.rentedVehicles = new HashSet<>(this.rentedVehicles);
             return clonedStateData;
