@@ -135,9 +135,13 @@ public class StateData implements Cloneable {
     protected StateData clone() {
         try {
             StateData clonedStateData = (StateData) super.clone();
-            // HashSets do not get cloned quite right, so if any HashSets exists with data that gets added to them
-            // throughout a shortest path search, they must be recreated with the previous state's data in order to make
-            // sure they don't contain data from other paths.
+            // When HashSets (and other collections) are cloned, they contain references to the original HashSet (see
+            // https://stackoverflow.com/a/7537385/269834). Therefore, any Collection in a StateData instance must be
+            // recreated using a copy constructor if data is added to the Collection throughout a shortest path search.
+            // This will then ensure the Collections don't contain data that is specific to a certain path.
+            // For example, the rentedCars and rentedVehicles HashSets are populated with IDs of vehicles that were
+            // rented at some point during a shortest path search. However, other fields like vehicleRentalNetworks are
+            // only set once using data from a StreetEdge and are not added to throughout a shortest path search.
             // See https://github.com/ibi-group/OpenTripPlanner/pull/15 for more discussion.
             clonedStateData.rentedCars = new HashSet<>(this.rentedCars);
             clonedStateData.rentedVehicles = new HashSet<>(this.rentedVehicles);
