@@ -3,14 +3,9 @@ package org.opentripplanner.geocoder;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-@XmlRootElement
 public class GeocoderResults {
 
     private String error;
@@ -26,7 +21,6 @@ public class GeocoderResults {
         this.results = results;
     }
 
-    @XmlElement(required=false)
     public String getError() {
         return error;
     }
@@ -36,9 +30,6 @@ public class GeocoderResults {
         this.error = error;
     }
 
-    
-    @XmlElementWrapper(name="results")
-    @XmlElement(name="result")
     @JsonProperty(value="results")
     public Collection<GeocoderResult> getResults() {
         return results;
@@ -55,7 +46,6 @@ public class GeocoderResults {
         results.add(result);
     }
 
-    @XmlElement(name="count")
     public int getCount() {
         return results != null ? results.size() : 0;
     }
