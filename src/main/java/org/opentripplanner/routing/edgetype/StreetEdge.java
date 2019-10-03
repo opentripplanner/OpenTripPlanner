@@ -1472,7 +1472,6 @@ public class StreetEdge extends Edge implements Cloneable {
         this.setHasBogusName(other.hasBogusName());
         this.setStairs(other.isStairs());
         this.setWheelchairAccessible(other.isWheelchairAccessible());
-        this.setBack(other.isBack());
         this.setCarNetworks(other.getCarNetworks());
         this.setCarSpeed(other.getCarSpeed());
         this.setFloatingCarDropoffSuitability(other.getFloatingCarDropoffSuitability());
