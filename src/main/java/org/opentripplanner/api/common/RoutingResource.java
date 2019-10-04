@@ -171,6 +171,10 @@ public abstract class RoutingResource {
      *  <li>BICYCLE_PARK</li>
      *  <li>CAR</li>
      *  <li>CAR_PARK</li>
+     *  <li>CAR_HAIL</li>
+     *  <li>CAR_RENT</li>
+     *  <li>MICROMOBILITY</li>
+     *  <li>MICROMOBILITY_RENT</li>
      *  <li>TRAM</li>
      *  <li>SUBWAY</li>
      *  <li>RAIL</li>
@@ -424,13 +428,23 @@ public abstract class RoutingResource {
     private Boolean onlyTransitTrips;
 
     /**
-     * The amount of watts a Micromobility vehicle can sustainably output
+     * The amount of watts a Micromobility vehicle can sustainably output. A micromobility is a vehicle that has a motor
+     * and weighs less than a car. Theoretically, this could also model human power. The default is set to 250 watts.
+     *
+     * Here are some examples of power output assumptions from various micromobility vehicles:
+     *
+     * 125 watts: Swagtron Turbo 5 hoverboard: (https://swagtron.com/product/recertified-swagtron-turbo-five-hoverboard-classic/)
+     * 250 watts: Xiaomi M365 (https://www.gearbest.com/skateboard/pp_596618.html)
+     * 500 watts: Razor EcoSmart Metro (https://www.amazon.com/Razor-EcoSmart-Metro-Electric-Scooter/dp/B002ZDAEIS?SubscriptionId=AKIAJMXJ2YFJTEDLQMUQ&tag=digitren08-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B002ZDAEIS&ascsubtag=15599460143449ocb)
+     * 1000 watts: Boosted Rev (https://boostedboards.com/vehicles/scooters/boosted-rev)
      */
     @QueryParam("watts")
     private Double watts;
 
     /**
-     * The weight of the Micromobility vehicle and all things transported by the vehicle including the rider
+     * The weight of the Micromobility vehicle and all things transported by the vehicle including the rider. The
+     * default is set to 105 kilograms. This assumes a North-American average weight of 80kgs and then 25kgs for vehicle
+     * weight. See https://en.wikipedia.org/wiki/Human_body_weight#Average_weight_around_the_world
      */
     @QueryParam("weight")
     private Double weight;
@@ -439,7 +453,7 @@ public abstract class RoutingResource {
      * The minimum speed of a personal micromobility vehicle. This should only be used to avoid unreasonably slow times
      * on hills. If it is desired to model effectively impossible travel uphill (ie the vehicle can't reasonably be
      * transported up a steep enough grade) enter 0. Value in m/s. If this parameter is not provided, a default of
-     * 0.8 m/s is set in the RoutingRequest class.
+     * 0.8 m/s (~1.8mph) is set in the RoutingRequest class.
      * TODO: A future refactor of the code will update StateData data with this value if using a personal micromobility
      *   vehicle or with data describing the rental vehicle characteristics.
      */
@@ -450,7 +464,7 @@ public abstract class RoutingResource {
      * The maximum speed of a personal micromobility vehicle. This will cap all speeds on declines to this value even if
      * the physics of the downslope would naturally result in the vehicle traveling faster than this value (ie, the user
      * or the vehicle itself is assumed to be braking). Value in m/s. If this parameter is not provided, a default of
-     * 5 m/s is set in the RoutingRequest class.
+     * 5 m/s (~11mph) is set in the RoutingRequest class.
      * TODO: A future refactor of the code will update StateData data with this value if using a personal micromobility
      *   vehicle or with data describing the rental vehicle characteristics.
      */

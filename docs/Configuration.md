@@ -99,6 +99,8 @@ config key | description | value type | value default | notes
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`micromobilityTravelRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to traverse a StreetEdge with the `MICROMOBILITY` mode. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)
+`micromobilityDropoffRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to dropoff a rented micromobility vehicle. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)  
 
 This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
 
@@ -314,10 +316,11 @@ There is currently only one custom naming module called `portland` (which has no
 
 ### Micromobility Restrictions
 
-It is possible to load in restricted micromobility travel and rental parking areas that will be applied throughout the graph.
-There are two separate keys that can be added to describe either areas where travel is forbidden or where parking floating 
-rental vehicles is forbidden. Each file must contain GeoJson with a Feature or FeatureCollection that contains only Polygons 
-or MultiPolygons. The values of these keys can be either a url or a file path. For example: 
+By default, OTP allows the traversal of any StreetEdge by a micromobility vehicle where a bicycle is also allowed to traverse the StreetEdge. Also by default, OTP allows rented micromobility vehicles to be dropped off on any StreetEdge in the graph.
+
+It is possible to load in restricted micromobility travel and rental parking areas that will be applied throughout the graph. There are two separate keys that can be added to describe either areas where travel is forbidden or where parking floating
+rental vehicles is forbidden. Each file must contain GeoJson with a Feature or FeatureCollection that contains only Polygons
+or MultiPolygons. If any part of the geometry of a StreetEdge intersects any part of the given GeoJSON, then the entire StreetEdge will be marked as either not allowing traversal or not allowing the dropoff of a rented micromobility vehicle depending on the restriction being analyzed. The values of these keys can be either a url or a file path. For example:
 
 ```JSON
 // build-config.json
@@ -362,7 +365,7 @@ Any public field or setter method in this class can be given a default value usi
 The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
 of routes.
 
-Some modes (mostly bicycle and car) also have optional qualifiers `RENT` and `PARK` to specify if vehicles are to be parked at a station or rented. In theory
+Some modes (mostly bicycle and car) also have optional qualifiers `RENT`, `HAIL` or `PARK` to specify if vehicles are to be parked at a station or rented. In theory
 this can also apply to other modes but makes sense only in select cases which are listed below.
 
 Whether a transport mode is available highly depends on the input feeds (GTFS, OSM, bike sharing feeds) and the graph building options supplied to OTP.
@@ -402,6 +405,23 @@ The complete list of modes are:
 
     _Prerequisite:_ Park-and-ride areas near the station need to be present in the OSM input file.
 
+- `CAR_RENT`: Taking a rented, shared-mobility car for part or the entirety of the route.
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP  as dynamic data feeds.
+
+    For dynamic car positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
+
+- `CAR_HAIL`: Hailing a car from a transportation network company such as Lyft or Uber and then riding in the vehicle for part or the entirety of the route. OTP will still use the underlying graph to calculate driving directions, so results will be different travel time estiamtes quoted from the TNC providers. If service is not available at a particular pickup location, this can cause a TNC availability error which can result in an itinerary not being able to be calculated.
+
+    _Prerequisite:_ API keys for the respective TNC providers must be added in `router-config.json`.
+
+- `MICROMOBILITY`: Riding on a lightweight motorized vehicle for the entirety of the route or taking said vehicle onto public transport and riding again from the arrival station to the destination. This mode could theoretically also be used to model human power while pedaling a bicycle.
+
+- `MICROMOBILITY_RENT`: Taking a rented, shared-mobility motorized vehicle for part or the entirety of the route.  
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP  as dynamic data feeds.
+
+    For dynamic vehicle positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
 
 The following modes are 1-to-1 mappings from the [GTFS `route_type`](https://developers.google.com/transit/gtfs/reference/#routestxt):
 
