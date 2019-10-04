@@ -90,7 +90,8 @@ public class InitialStopsTest extends TestCase {
      *
      * There was once a bug where bike speed was not correctly applied because we used the distance not the speed.
      */
-    @Test @Ignore
+    @Ignore
+    @Test
     public void testInitialStopWalkSpeedIncrease () throws Exception {
         Graph g = buildGraphNoTransit();
         addRegularStopGrid(g);
