@@ -261,9 +261,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <!-- Fixes issue with tests failing in some environments. Replace this when proper version of 3.0 is released. -->
-                <version>3.0.0-M1</version>
+                <version>3.0.0-M3</version>
                 <configuration>
-                    <argLine>-Xmx4G</argLine>
+                    <argLine>-XX:+UseParNewGC</argLine>
+                    <argLine>-Xms5G</argLine>
+                    <argLine>-Xmx5G</argLine>
+                    <argLine>-XX:NewRatio=5</argLine>
+                    <argLine>-XX:+UseStringDeduplication</argLine>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
