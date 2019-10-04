@@ -1,7 +1,7 @@
 package org.opentripplanner.visualizer;
 
 import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import javassist.Modifier;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;

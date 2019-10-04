@@ -1,11 +1,12 @@
 package org.opentripplanner.common.model;
 
 import com.google.common.base.Joiner;
-import com.vividsolutions.jts.geom.Coordinate;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Class describing a location provided by clients of routing. Used to describe end points

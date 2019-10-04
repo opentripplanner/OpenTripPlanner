@@ -8,7 +8,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 import java.util.List;
 import java.util.Locale;
@@ -61,8 +61,11 @@ public class SimpleTransfer extends Edge {
         if(distance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
-
         if (s0.getOptions().wheelchairAccessible && !this.isWheelchairAccessible) {
+            return null;
+        }
+        // Don't allow SimpleTransfer right after a call-and-ride or deviated-route dropoff - in that case we need to transfer at the same stop
+        if (s0.isLastBoardAlightDeviated()) {
             return null;
         }
         // Only transfer right after riding a vehicle.

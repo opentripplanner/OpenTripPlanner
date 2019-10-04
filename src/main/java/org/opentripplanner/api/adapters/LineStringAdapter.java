@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 public class LineStringAdapter extends XmlAdapter<EncodedPolylineBean, LineString>{
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.*;
@@ -10,14 +10,12 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -565,18 +563,6 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            if (options.useTraffic) {
-                // the expected speed based on traffic
-                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
-
-                if (source != null) {
-                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
-
-                    if (!Double.isNaN(congestedSpeed))
-                        return congestedSpeed;
-                }
-            }
-
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
@@ -879,13 +865,11 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         } else {
             if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, (TemporarySplitterVertex) v, geoms.first, name, 0);
-                e1.calculateLengthFromGeometry();
+                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, (TemporarySplitterVertex) v, (StreetVertex) tov, geoms.second, name, 0);
-                e2.calculateLengthFromGeometry();
+                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());
             }

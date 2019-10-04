@@ -4,12 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.util.elevation.ToblersHickingFunction;
+import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 public class ElevationUtils {
     private static Logger log = LoggerFactory.getLogger(ElevationUtils.class);
@@ -24,7 +24,7 @@ public class ElevationUtils {
 
     /**
      * If the calculated factor is more than this constant, we ignore the calculated factor and use this
-     * constant in stead. See ths table in {@link ToblersHickingFunction} for a mapping between the
+     * constant in stead. See ths table in {@link ToblersHikingFunction} for a mapping between the
      * factor and angels(degree and percentage). A factor of 3 with take effect for slopes with a
      * incline above 31.4% and a decline below 41.4%. The worlds steepest road ia about 35%, and the
      * steepest climes in Tour De France is usually in the range 8-12%. Some walking paths may be quite
@@ -32,7 +32,7 @@ public class ElevationUtils {
      */
     private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
 
-    private static final ToblersHickingFunction toblerWalkingFunction = new ToblersHickingFunction(MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
+    private static final ToblersHikingFunction toblerWalkingFunction = new ToblersHikingFunction(MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
 
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
@@ -253,7 +253,7 @@ public class ElevationUtils {
 
     /**
      * <p>
-     *     We use the Tobler function {@link ToblersHickingFunction} to calculate this.
+     *     We use the Tobler function {@link ToblersHikingFunction} to calculate this.
      * </p>
      * <p>
      *     When testing this we get good results in general, but for some edges

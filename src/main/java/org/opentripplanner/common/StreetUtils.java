@@ -1,7 +1,7 @@
 package org.opentripplanner.common;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;

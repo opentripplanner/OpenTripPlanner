@@ -34,6 +34,8 @@ public class RoutingContextTest {
         routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
 
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Europe/Budapest"));
+        when(graph.getAllTimeZones()).thenReturn(Collections.singletonList(
+                TimeZone.getTimeZone("Europe/Budapest")));
         when(graph.getCalendarService()).thenReturn(calendarService);
         when(graph.getFeedIds()).thenReturn(Collections.singletonList("FEED"));
         when(graph.getAgencies(feedId)).thenReturn(Collections.singletonList(agency));

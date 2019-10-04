@@ -19,6 +19,7 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
     public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge, boolean endVertex) {
         super(null, label, x, y, streetEdge);
         this.endVertex = endVertex;
+        this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
     }
 
     @Override

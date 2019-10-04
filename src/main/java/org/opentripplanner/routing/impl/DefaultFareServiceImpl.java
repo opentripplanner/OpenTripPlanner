@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 
 /** A set of edges on a single route, with associated information for calculating fares */
 class Ride {
-    
+
+    String feedId;
+
     String agency; // route agency
 
     FeedScopedId route;
@@ -182,6 +184,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
                 ride.trip = state.getTripId();
+                ride.feedId = hEdge.getFeedId();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();
@@ -389,12 +392,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long   startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
-        // stops don't really have an agency id, they have the per-feed default id
-        String feedId = firstRide.firstStop.getId().getAgencyId();  
+        String feedId = firstRide.feedId;
         long lastRideStartTime = firstRide.startTime;
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
-            if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
+            if ( ! ride.feedId.equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
                 return new FareAndId(Float.POSITIVE_INFINITY, null);
             }

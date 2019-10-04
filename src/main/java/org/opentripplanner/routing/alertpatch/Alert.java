@@ -4,41 +4,30 @@ import com.google.transit.realtime.GtfsRealtime;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 
-@XmlType
 public class Alert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;
 
-    @XmlElement
     public I18NString alertHeaderText;
 
-    @XmlElement
     public I18NString alertDescriptionText;
 
-    @XmlElement
     public I18NString alertUrl;
 
     //null means unknown
-    @XmlElement
     public Date effectiveStartDate;
 
     //null means unknown
-    @XmlElement
     public Date effectiveEndDate;
 
-    @XmlElement
     public GtfsRealtime.Alert.Effect effect;
 
-    @XmlElement
     public GtfsRealtime.Alert.Cause cause;
 
-    @XmlElement
     public GtfsRealtime.Alert.SeverityLevel severityLevel;
 
     public static HashSet<Alert> newSimpleAlertSet(String text) {

@@ -3,17 +3,14 @@ package org.opentripplanner.analyst;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 import org.joda.time.LocalDate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
-import org.opentripplanner.profile.TimeWindow;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -23,6 +20,7 @@ import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 /**
  * Test the code that finds initial transit stops.
  */
+@Ignore
 public class InitialStopsTest extends TestCase {
     /** Time (in seconds) that a decrease must be greater than in order to be considered a decrease (make sure tests don't inadvertently pass due to rounding errors) */
     public static final int EPSILON = 10;

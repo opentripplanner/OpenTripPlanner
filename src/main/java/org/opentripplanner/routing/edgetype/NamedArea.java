@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.util.I18NString;
 
 /**

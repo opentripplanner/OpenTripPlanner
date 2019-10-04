@@ -201,6 +201,10 @@ public final class GtfsRealtime {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
+        // Increase input stream size limit to 2G (instead of the 64M default).
+        // Mimics a change that was supposed to be released in protobuf 2.7.0,
+        // see https://git.io/fjfg5.
+        input.setSizeLimit(Integer.MAX_VALUE);
         return new FeedMessage(input, extensionRegistry);
       }
     };

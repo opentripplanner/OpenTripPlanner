@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -16,11 +17,14 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
+
+import static org.mockito.Mockito.*;
 
 public class TripTimesTest {
     private static final FeedScopedId tripId = new FeedScopedId("agency", "testtrip");
@@ -228,5 +232,81 @@ public class TripTimesTest {
         for (int i = 0; i < stops.length; i++) {
             assertEquals(i, updatedTripTimes.getDwellTime(i));
         }
+    }
+
+    @Test
+    public void testCallAndRideBoardTime() {
+        // times: 0, 60, 120
+
+        ServiceDay sd = mock(ServiceDay.class);
+        when(sd.secondsSinceMidnight(Matchers.anyLong())).thenCallRealMethod();
+        int time;
+
+        // time before interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, false, 0);
+        assertEquals(60, time);
+
+        // time in interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 70, 20, sd, false, 0);
+        assertEquals(70, time);
+
+        // time would overlap end of interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 105, 20, sd, false, 0);
+        assertTrue(time < 105);
+
+        // time after end of interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 125, 20, sd, false, 0);
+        assertTrue(time < 105);
+
+        // clock time before
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 30);
+        assertEquals(60, time);
+
+        // clock time in interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 70);
+        assertEquals(70, time);
+
+        // clock time after interval
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 130);
+        assertTrue(time < 50);
+
+        // clock time would cause overlap
+        time = originalTripTimes.getCallAndRideBoardTime(1, 50, 20, sd, true, 105);
+        assertTrue(time < 50);
+    }
+
+    @Test
+    public void testCallAndRideAlightTime() {
+        ServiceDay sd = mock(ServiceDay.class);
+        when(sd.secondsSinceMidnight(Matchers.anyLong())).thenCallRealMethod();
+        int time;
+
+        // time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 130, 20, sd, false, 0);
+        assertEquals(120, time);
+
+        // time in interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, false, 0);
+        assertEquals(110, time);
+
+        // time in interval, would cause overlap
+        time = originalTripTimes.getCallAndRideAlightTime(2, 65, 20, sd, false, 0);
+        assertTrue(time == -1 || time > 65);
+
+        // time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 55, 20, sd, false, 0);
+        assertTrue(time == -1 || time > 65);
+
+        // clock time after interval
+        time = originalTripTimes.getCallAndRideAlightTime(2, 130, 20, sd, true, 130);
+        assertEquals(-1, time);
+
+        // clock time before board
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, true, 85);
+        assertEquals(110, time);
+
+        // clock time after board
+        time = originalTripTimes.getCallAndRideAlightTime(2, 110, 20, sd, true, 100);
+        assertEquals(-1, time);
     }
 }
