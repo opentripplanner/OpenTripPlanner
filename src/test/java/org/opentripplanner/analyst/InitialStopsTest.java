@@ -4,6 +4,7 @@ import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import junit.framework.TestCase;
 import org.joda.time.LocalDate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -89,7 +90,7 @@ public class InitialStopsTest extends TestCase {
      *
      * There was once a bug where bike speed was not correctly applied because we used the distance not the speed.
      */
-    @Test
+    @Test @Ignore
     public void testInitialStopWalkSpeedIncrease () throws Exception {
         Graph g = buildGraphNoTransit();
         addRegularStopGrid(g);
