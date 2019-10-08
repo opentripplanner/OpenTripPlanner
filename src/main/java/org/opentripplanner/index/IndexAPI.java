@@ -462,7 +462,8 @@ public class IndexAPI {
         Trip trip = index.tripForId.get(tripId);
         if (trip != null) {
             TripPattern tripPattern = index.patternForTrip.get(trip);
-            return getGeometryForPattern(tripPattern.code);
+            // TODO OTP2 - Refactor to use the pattern ID
+            return getGeometryForPattern(tripPattern.getCode());
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }

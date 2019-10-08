@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
@@ -106,6 +107,7 @@ public class SerializedGraphObject implements Serializable {
         kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
         kryo.register(HashMultimap.class, new JavaSerializer());
+        kryo.register(ArrayListMultimap.class, new JavaSerializer());
         // Kryo's default instantiation and deserialization of BitSets leaves them empty.
         // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
         // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.

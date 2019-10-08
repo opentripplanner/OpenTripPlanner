@@ -67,12 +67,14 @@ public class NetexModule implements GraphBuilderModule {
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
+                netexBundle.checkInputs();
+
                 OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(graph.deduplicator);
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 OtpTransitService otpService = transitBuilder.build();
 
-                graph.addNoticAssignments(otpService.getNoticeAssignments());
+                graph.addNoticeAssignments(otpService.getNoticeAssignments());
 
                 PatternHopFactory hf = new PatternHopFactory(
                         new GtfsFeedId.Builder()

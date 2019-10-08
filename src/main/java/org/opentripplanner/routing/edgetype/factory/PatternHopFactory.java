@@ -202,7 +202,7 @@ public class PatternHopFactory {
             }
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-            graph.tripPatternForId.put(tripPattern.code, tripPattern);
+            graph.tripPatternForId.put(tripPattern.getCode(), tripPattern);
         }
 
         /* Identify interlined trips and create the necessary edges. */

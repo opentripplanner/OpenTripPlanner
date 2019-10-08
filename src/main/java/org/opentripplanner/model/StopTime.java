@@ -4,9 +4,16 @@ package org.opentripplanner.model;
 import org.opentripplanner.util.TimeToStringConverter;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-public final class StopTime extends TransitEntity<StopTimeId> implements Serializable, Comparable<StopTime> {
+
+/**
+ * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model,
+ * it is not kept as part of the Graph.
+ * <p/>
+ * TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the target
+ * TODO OTP2 - object structure.
+ */
+public final class StopTime implements Comparable<StopTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,18 +64,14 @@ public final class StopTime extends TransitEntity<StopTimeId> implements Seriali
     /**
      * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
      * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
-     * StopTime field. This save memory, since there is a lot of StopTimes - and very few references
-     * to StopTimes.
+     * StopTime field.
      * <p/>
      * New ids should only be created when a travel search result is mapped to an itinerary, so even
      * if creating new objects are expensive, the few extra objects created during the mapping process
      * is ok.
-     * <p/>
-     * THE *ID* SHOULD NOT BE USED DURING THE ROUTING SEARCH.
      */
-    @Override
-    public StopTimeId getId() {
-        return new StopTimeId(trip.getId(), stopSequence);
+    public StopTimeKey getId() {
+        return new StopTimeKey(trip.getId(), stopSequence);
     }
 
     public Trip getTrip() {
@@ -210,20 +213,6 @@ public final class StopTime extends TransitEntity<StopTimeId> implements Seriali
 
     public int compareTo(StopTime o) {
         return this.getStopSequence() - o.getStopSequence();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StopTime stopTime = (StopTime) o;
-        return stopSequence == stopTime.stopSequence && trip.equals(stopTime.trip);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(trip, stopSequence);
     }
 
     @Override

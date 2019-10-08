@@ -1,7 +1,6 @@
 package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
@@ -19,13 +18,13 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +52,7 @@ public class OtpTransitServiceBuilder {
 
     private final List<Frequency> frequencies = new ArrayList<>();
 
-    private final Multimap<Serializable, Notice> noticeAssignments = ArrayListMultimap.create();
+    private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
 
     private final List<Pathway> pathways = new ArrayList<>();
 
@@ -110,7 +109,7 @@ public class OtpTransitServiceBuilder {
      * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable). Entities
      * that might have Notices are Routes, Trips, Stops and StopTimes.
      */
-    public Multimap<Serializable, Notice> getNoticeAssignments() {
+    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 

@@ -7,6 +7,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
@@ -164,7 +165,7 @@ public class NetexMapper {
                 stopTimesByNetexId
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
-            Multimap<Serializable, Notice> noticesByElementId;
+            Multimap<TransitEntity<?>, Notice> noticesByElementId;
             noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
             transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }

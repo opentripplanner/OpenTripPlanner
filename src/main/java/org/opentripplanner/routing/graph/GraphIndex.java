@@ -432,12 +432,8 @@ public class GraphIndex {
     }
 
     public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
-        return getNoticesByEntityId(entity.getId());
-    }
-
-    public Collection<Notice> getNoticesByEntityId(Serializable id) {
         // Delegate to graph
-        Collection<Notice> res = graph.getNoticesByElement().get(id);
+        Collection<Notice> res = graph.getNoticesByElement().get(entity);
         return res == null ? Collections.emptyList() : res;
     }
 }

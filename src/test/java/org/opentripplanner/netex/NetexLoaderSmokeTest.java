@@ -1,32 +1,28 @@
 package org.opentripplanner.netex;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Multimap;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTimeId;
+import org.opentripplanner.model.StopTimeKey;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.config.OTPConfiguration;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -40,11 +36,6 @@ import static org.junit.Assert.fail;
  * to test that the different parts of the NeTEx works together.
  */
 public class NetexLoaderSmokeTest {
-
-    private static final String NETEX_DIR = "src/test/resources/netex";
-    private static final String NETEX_FILENAME = "netex_minimal.zip";
-
-
     /**
      * This test load a very simple Netex data set and do assertions on it.
      * For each type we assert some of the most important fields for one element
@@ -55,8 +46,7 @@ public class NetexLoaderSmokeTest {
     @Test
     public void smokeTestOfNetexLoadData() {
         // Given
-        GraphBuilderParameters builderParameters = createBuilderParameters();
-        NetexBundle netexBundle = createNetexBundle(builderParameters);
+        NetexBundle netexBundle = ConstantsForTests.createMinimalNetexBundle();
 
         // Run the check to make sure it does not throw an exception
         netexBundle.checkInputs();
@@ -138,7 +128,7 @@ public class NetexLoaderSmokeTest {
         assertEquals(4, trips.size());
     }
 
-    private void assertNoticeAssignments(Multimap<Serializable, Notice> map) {
+    private void assertNoticeAssignments(Multimap<TransitEntity<?>, Notice> map) {
         assertNote(map, fId("RUT:ServiceJourney:4-101468-583"),"045", "Notice on ServiceJourney");
         assertNote(map, stId("RUT:ServiceJourney:4-101468-583", 0), "035", "Notice on TimetabledPassingTime");
         assertNote(map, fId("RUT:Line:4"), "075", "Notice on Line");
@@ -146,7 +136,12 @@ public class NetexLoaderSmokeTest {
         assertEquals(4, map.size());
     }
 
-    private void assertNote(Multimap<Serializable, Notice> map, Serializable key, String code, String text) {
+    private void assertNote(Multimap<TransitEntity<?>, Notice> map, Serializable entityKey, String code, String text) {
+        TransitEntity<?> key = map.keySet().stream()
+                .filter(it -> entityKey.equals(it.getId()))
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
+
         List<Notice> list = list(map.get(key));
         if(list.size() == 0) fail("Notice not found: " + key + " -> <Notice " + code + ", " + text + ">\n\t" + map);
         Notice n = list.get(0);
@@ -186,26 +181,11 @@ public class NetexLoaderSmokeTest {
 
     private static <T> List<T> list(Collection<T> collection) { return new ArrayList<>(collection);}
 
-    private static StopTimeId stId(String id, int stopSequenceNr) {
-        return new StopTimeId(fId(id), stopSequenceNr);
+    private static StopTimeKey stId(String id, int stopSequenceNr) {
+        return new StopTimeKey(fId(id), stopSequenceNr);
     }
 
     private static FeedScopedId fId(String id) {
         return new FeedScopedId("RB", id);
-    }
-
-    private static GraphBuilderParameters createBuilderParameters() {
-        JsonNode buildConfig = new OTPConfiguration(null)
-                .getGraphConfig(new File(NETEX_DIR))
-                .builderConfig();
-
-        return new GraphBuilderParameters(buildConfig);
-    }
-
-    private static NetexBundle createNetexBundle(GraphBuilderParameters builderParameters) {
-        return NetexConfig.netexBundleForTest(
-                builderParameters,
-                new File(NETEX_DIR, NETEX_FILENAME)
-        );
     }
 }

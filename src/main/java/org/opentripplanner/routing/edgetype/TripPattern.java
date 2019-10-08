@@ -71,17 +71,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     private static final int NO_PICKUP = 1;
     //private static final int FLAG_BIKES_ALLOWED = 32;
 
-    /**
-     * Currently used for NeTEx id
-     * TODO OTP2 - Merge with code or document why it should not be merged with code.
-     */
-    public FeedScopedId id;
-
-    /**
-     * The short unique identifier for this trip pattern,
-     * generally in the format Agency:RouteId:DirectionId:PatternNumber.
-     */
-    public String code;
+    private FeedScopedId id;
 
     /** The human-readable, unique name for this trip pattern. */
     public String name;
@@ -147,6 +137,15 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     @Override
     public void setId(FeedScopedId id) { this.id = id; }
+
+    /**
+     * The short unique identifier for this trip pattern,
+     * generally in the format Agency:RouteId:DirectionId:PatternNumber (GTFS)
+     * or if the id is set, then {@code id.getId()} (Netex).
+     */
+    public String getCode() {
+        return id.getId();
+    }
 
     public LineString getHopGeometry(int stopIndex) {
         TransitStop transitStopStart = stopVertices[stopIndex];
@@ -562,12 +561,12 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
             String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
-            pattern.code = (id);
+            pattern.setId(new FeedScopedId(routeId.getAgencyId(), id));
         }
     }
 
     public String toString () {
-        return String.format("<TripPattern %s>", this.code);
+        return String.format("<TripPattern %s>", this.getCode());
     }
 
 	public Trip getExemplar() {
@@ -640,24 +639,5 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
         return route.getId().getAgencyId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TripPattern other = (TripPattern) o;
-
-        if(id != null) return id.equals(other.id);
-        else return code.equals(other.code);
-    }
-
-    @Override
-    public int hashCode() {
-        // If both code and id is _null_ this will cause a NPE - this is intended.
-        // A TripPattern should not be used as a key in a set/map before it is
-        // properly initiated.
-        if(id != null) return id.hashCode();
-        else return code.hashCode();
     }
 }

@@ -15,6 +15,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
-    private final ImmutableListMultimap<Serializable, Notice> noticeAssignments;
+    private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -123,7 +124,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
      * for ids, since some entities have String, while other have FeedScopeId ids.
      */
     @Override
-    public Multimap<Serializable, Notice> getNoticeAssignments() {
+    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 

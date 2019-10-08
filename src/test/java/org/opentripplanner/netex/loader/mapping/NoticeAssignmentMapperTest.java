@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
@@ -57,10 +58,10 @@ public class NoticeAssignmentMapperTest {
                 new HashMap<>()
         );
 
-        Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement =
+        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement =
                 noticeAssignmentMapper.map(noticeAssignment);
 
-        org.opentripplanner.model.Notice notice2 = noticesByElement.get(route.getId()).iterator().next();
+        org.opentripplanner.model.Notice notice2 = noticesByElement.get(route).iterator().next();
 
         assertEquals(NOTICE_ID, notice2.getId().getId());
     }
@@ -104,7 +105,7 @@ public class NoticeAssignmentMapperTest {
                 stopTimesById
         );
 
-        Multimap<Serializable, org.opentripplanner.model.Notice> noticesByElement
+        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement
                 = noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1.getId())

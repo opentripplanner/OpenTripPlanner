@@ -15,10 +15,12 @@ public class Notice extends TransitEntity<FeedScopedId> {
 
     private String publicCode;
 
+    @Override
     public FeedScopedId getId() {
         return id;
     }
 
+    @Override
     public void setId(FeedScopedId id) {
         this.id = id;
     }

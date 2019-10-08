@@ -26,7 +26,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTimeId;
+import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -445,8 +445,7 @@ public class IndexGraphQLSchema {
                             .build())
                     .dataFetcher(environment -> {
                         TripTimeShort tts = (TripTimeShort) environment.getSource();
-                        StopTimeId id = new StopTimeId(tts.tripId, tts.stopIndex);
-                        return index.getNoticesByEntityId(id);
+                        return index.getNoticesByEntity(new StopTimeKey(tts.tripId, tts.stopIndex));
                     })
                     .build())
             .build();
@@ -621,7 +620,7 @@ public class IndexGraphQLSchema {
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .dataFetcher(environment -> relay.toGlobalId(
-                    patternType.getName(), ((TripPattern) environment.getSource()).code))
+                    patternType.getName(), ((TripPattern) environment.getSource()).getCode()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
@@ -641,7 +640,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("code")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
-                .dataFetcher(environment -> ((TripPattern) environment.getSource()).code)
+                .dataFetcher(environment -> ((TripPattern) environment.getSource()).getCode())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("headsign")

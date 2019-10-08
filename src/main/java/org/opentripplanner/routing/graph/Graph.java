@@ -102,7 +102,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
      * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
      */
-    private final Multimap<Serializable, Notice> noticesByElement = HashMultimap.create();
+    private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
@@ -925,11 +925,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         return transitServiceEnds;
     }
 
-    public Multimap<Serializable, Notice> getNoticesByElement() {
+    public Multimap<TransitEntity<?>, Notice> getNoticesByElement() {
         return noticesByElement;
     }
 
-    public void addNoticAssignments(Multimap<Serializable, Notice> noticesByElement) {
+    public void addNoticeAssignments(Multimap<TransitEntity<?>, Notice> noticesByElement) {
         this.noticesByElement.putAll(noticesByElement);
     }
 

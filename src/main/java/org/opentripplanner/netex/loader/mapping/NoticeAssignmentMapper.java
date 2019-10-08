@@ -6,7 +6,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.StopTimeId;
+import org.opentripplanner.model.StopTimeKey;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
@@ -15,7 +16,6 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -26,9 +26,6 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
  * to. In the case of a notice referring to a StopPointInJourneyPattern, which has no OTP equivalent,
  * it will be assigned to its corresponding TimeTabledPassingTimes for each ServiceJourney in the
  * same JourneyPattern.
- *
- * In order to maintain this connection to TimeTabledPassingTime (StopTime in OTP), it is necessary
- * to assign the TimeTabledPassingTime id to its corresponding StopTime.
  */
 class NoticeAssignmentMapper {
 
@@ -61,8 +58,9 @@ class NoticeAssignmentMapper {
         this.stopTimesByNetexId = stopTimesByNetexId;
     }
 
-    Multimap<Serializable, Notice> map(NoticeAssignment noticeAssignment){
-        Multimap<Serializable, Notice> noticeByElement = ArrayListMultimap.create();
+    @SuppressWarnings("StatementWithEmptyBody")
+    Multimap<TransitEntity<?>, Notice> map(NoticeAssignment noticeAssignment){
+        Multimap<TransitEntity<?>, Notice> noticeByElement = ArrayListMultimap.create();
 
         String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
         Notice otpNotice = getOrMapNotice(noticeAssignment);
@@ -77,25 +75,23 @@ class NoticeAssignmentMapper {
         Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.lookup(noticedObjectId);
         if (!times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
-                noticeByElement.put(stopTimeId(time.getId()), otpNotice);
+                noticeByElement.put(lookupStopTimeKey(time.getId()), otpNotice);
             }
         } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
-            noticeByElement.put(stopTimeId(noticedObjectId), otpNotice);
+            noticeByElement.put(lookupStopTimeKey(noticedObjectId), otpNotice);
         } else {
             FeedScopedId otpId = createFeedScopedId(noticedObjectId);
 
-            if (routesById.containsKey(otpId)) {
-                noticeByElement.put(otpId, otpNotice);
-            } else if (tripsById.containsKey(otpId)) {
-                noticeByElement.put(otpId, otpNotice);
-            } else {
+            if(addNotice(routesById.get(otpId), otpNotice, noticeByElement)) { /* intentionally empty */ }
+            else if(addNotice(tripsById.get(otpId), otpNotice, noticeByElement)) { /* intentionally empty */ }
+            else {
                 LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
             }
         }
         return noticeByElement;
     }
 
-    private StopTimeId stopTimeId(String timeTablePassingTimeId) {
+    private StopTimeKey lookupStopTimeKey(String timeTablePassingTimeId) {
         return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
     }
 
@@ -105,5 +101,15 @@ class NoticeAssignmentMapper {
                 : noticesById.lookup(assignment.getNoticeRef().getRef());
 
         return notice == null ? null : noticeMapper.map(notice);
+    }
+
+    private static boolean addNotice(
+            TransitEntity entity,
+            Notice otpNotice,
+            Multimap<TransitEntity<?>, Notice> noticeByEntity
+    ) {
+        if(entity == null) return false;
+        noticeByEntity.put(entity, otpNotice);
+        return true;
     }
 }
