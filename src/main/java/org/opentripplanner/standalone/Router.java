@@ -9,6 +9,7 @@ import ch.qos.logback.core.FileAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -132,6 +133,13 @@ public class Router {
                 }
             }
         }
+
+
+        /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
+        /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
+        LOG.info("Creating transit layer for Raptor routing.");
+        graph.transitLayer = TransitLayerMapper.map(graph);
+        graph.realtimeTransitLayer = graph.transitLayer;
 
         /* Create Graph updater modules from JSON config. */
         GraphUpdaterConfigurator.setupGraph(this.graph, config);

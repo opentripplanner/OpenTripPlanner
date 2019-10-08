@@ -126,19 +126,13 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            throw new UnsupportedOperationException(
-                                    "Cannot add Alert patch to Board/Alight edges - "
-                                    + "transit edges do not exist anymore under Raptor."
-                            );
+                            LOG.warn("Cannot add Alert patch to Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }
             }
         } else if (stop != null) {
-            throw new UnsupportedOperationException(
-                    "Cannot add alert to TransitStop - "
-                    + "PreBoard and PreAlight edges no longer exist."
-            );
+            LOG.warn("Cannot add alert to TransitStop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 
@@ -178,19 +172,13 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            throw new UnsupportedOperationException(
-                                    "Cannot remove Alert patch from Board/Alight edges - "
-                                    + "transit edges do not exist anymore under Raptor."
-                            );
+                            LOG.warn("Cannot remove Alert patch from Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }
             }
         } else if (stop != null) {
-            throw new UnsupportedOperationException(
-                    "Cannot remove alert from TransitStop - "
-                    + "PreBoard and PreAlight edges no longer exist."
-            );
+            LOG.warn("Cannot remove alert from TransitStop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 

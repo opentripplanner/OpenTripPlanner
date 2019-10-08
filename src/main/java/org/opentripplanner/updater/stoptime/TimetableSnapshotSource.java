@@ -90,6 +90,7 @@ public class TimetableSnapshotSource {
 
     protected ServiceDate lastPurgeDate = null;
 
+    /** Epoch time in milliseconds at which the last snapshot was generated. */
     protected long lastSnapshotTime = -1;
 
     private final TimeZone timeZone;

@@ -640,32 +640,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
-
-        /** Create transit layer for Raptor routing */
-        LOG.info("Creating transit layer for Raptor routing.");
-        // First for the scheduled timetables.
-        this.transitLayer = TransitLayerMapper.map(this);
-        this.realtimeTransitLayer = transitLayer;
-        // Then in a loop, recreate the transitLayer for real-time updated timetables.
-        // Doing this here in the index() method is definitely a hack.
-        // This could eventually be done with a PollingGraphUpdater.
-        // TODO OTP2 - See discussion in PR #2794 (Graph.java@650)
-        final int BUILD_REALTIME_TRANSIT_LAYER_INTERVAL_SECONDS = 40;
-        new Thread(() -> {
-            while (true) {
-                // Sleep before mapping, waiting for the timetableSnapshotSource to be created by a graph updater.
-                try {
-                    Thread.sleep(1000 * BUILD_REALTIME_TRANSIT_LAYER_INTERVAL_SECONDS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (this.timetableSnapshotSource != null) {
-                    // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
-                    // TODO this is not accounting for any new patterns created by realtime "add trip" messages.
-                    this.realtimeTransitLayer = TransitLayerMapper.map(this);
-                }
-            }
-        }, "Realtime Transit Layer Creator").start();
     }
     
     public static Graph load(InputStream in) {
