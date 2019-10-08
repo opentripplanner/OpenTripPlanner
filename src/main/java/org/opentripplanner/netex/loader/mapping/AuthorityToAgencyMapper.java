@@ -7,11 +7,16 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptiona
 
 /**
  * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation which is responsible
- * for the establishment of a public transport service." In NeTEx this is not the same as an operator. A default
- * authority can be created if none is present.
+ * for the establishment of a public transport service." In NeTEx this is not the same as an operator. A dummy
+ * authority can be created if input data is missing an authority.
  */
 class AuthorityToAgencyMapper {
     private final String timeZone;
+
+    /**
+     * This id is used to generate a "dummy" authority when the input data is not associated with an
+     * authority. The OTP Model requires an agency to exist, while Netex do not.
+     */
     private final String dummyAgencyId;
 
 

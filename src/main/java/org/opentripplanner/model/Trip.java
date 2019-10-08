@@ -73,6 +73,11 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         return operator != null ? operator : route.getOperator();
     }
 
+    /**
+     * This method return the operator associated with the trip. If the Trip have no Operator set {@code null} is
+     * returned. Note! this method do not consider the {@link Route#getOperator()} that the trip is part of.
+     * @see #getOperator()
+     */
     public Operator getTripOperator() {
         return operator;
     }

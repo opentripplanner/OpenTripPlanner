@@ -13,12 +13,12 @@ import java.util.List;
 public interface OtpTransitService {
 
     /**
-     * Return a list of Agencies (NeTEx Authorities)
+     * @return  a list of all Agencies.
      */
     Collection<Agency> getAllAgencies();
 
     /**
-     * NeTEx Operator. Not applicable for GTFS.
+     * @return a list of all Operators, the list may be empty if there are no Operators in the imported data.
      */
     Collection<Operator> getAllOperators();
 

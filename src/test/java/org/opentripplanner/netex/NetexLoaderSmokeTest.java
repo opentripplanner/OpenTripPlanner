@@ -74,6 +74,7 @@ public class NetexLoaderSmokeTest {
     /* private methods */
 
     private void assertAgencies(Collection<Agency> agencies) {
+        assertEquals(1, agencies.size());
         Agency a = list(agencies).get(0);
         assertEquals("RUT:Authority:RUT", a.getId());
         assertEquals("RUT", a.getName());
@@ -83,16 +84,15 @@ public class NetexLoaderSmokeTest {
         assertNull(a.getPhone());
         assertNull( a.getFareUrl());
         assertNull( a.getBrandingUrl());
-        assertEquals(1, agencies.size());
     }
 
     private void assertOperators(Collection<Operator> operators) {
+        assertEquals(1, operators.size());
         Operator o = list(operators).get(0);
         assertEquals("RUT:Operator:130c", o.getId().getId());
         assertEquals("Ruter", o.getName());
         assertNull( o.getUrl());
         assertNull(o.getPhone());
-        assertEquals(1, operators.size());
     }
 
     private void assertStops(Collection<Stop> stops) {

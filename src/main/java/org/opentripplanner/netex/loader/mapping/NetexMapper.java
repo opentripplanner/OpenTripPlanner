@@ -79,7 +79,8 @@ public class NetexMapper {
         FeedScopedIdFactory.setFeedId(agencyId);
         // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
         // before Route - if both entities are defined in the same file.
-        mapOrganizations(netexIndex);
+        mapAuthorities(netexIndex);
+        mapOperators(netexIndex);
         mapStopPlaceAndQuays(netexIndex);
         mapRoute(netexIndex);
         mapTripPatterns(netexIndex);
@@ -87,12 +88,13 @@ public class NetexMapper {
         mapNoticeAssignments(netexIndex);
     }
 
-    private void mapOrganizations(NetexImportDataIndexReadOnlyView netexIndex) {
-
+    private void mapOperators(NetexImportDataIndexReadOnlyView netexIndex) {
         for (org.rutebanken.netex.model.Operator operator : netexIndex.getOperatorsById().localValues()) {
             transitBuilder.getOperatorsById().add(OperatorToAgencyMapper.mapOperator(operator));
         }
+    }
 
+    private void mapAuthorities(NetexImportDataIndexReadOnlyView netexIndex) {
         AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(netexIndex.getTimeZone());
         for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);

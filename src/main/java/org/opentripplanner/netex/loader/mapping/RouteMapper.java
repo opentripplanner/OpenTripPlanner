@@ -66,7 +66,7 @@ class RouteMapper {
 
     /**
      * Find an agency by mapping the GroupOfLines/Network Authority. If no authority is found
-     * a default agency is created and returned.
+     * a dummy agency is created and returned.
      */
     private Agency findOrCreateAuthority(Line line) {
         String groupRef = line.getRepresentedByGroupRef().getRef();
@@ -79,12 +79,16 @@ class RouteMapper {
             Agency agency = agenciesById.get(orgRef);
             if(agency != null) return agency;
         }
-
         // No authority found in Network or GroupOfLines.
-        // Use the default agency, create if necessary
+        // Use the dummy agency, create if necessary
+        return createOrGetDummyAgency(line);
+    }
+
+    private Agency createOrGetDummyAgency(Line line) {
         LOG.warn("No authority found for " + line.getId());
 
         Agency agency = agenciesById.get(authorityMapper.dummyAgencyId());
+
         if (agency == null) {
             agency = authorityMapper.createDummyAgency();
             agenciesById.add(agency);
