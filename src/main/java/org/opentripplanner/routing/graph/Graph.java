@@ -5,11 +5,13 @@ import com.esotericsoftware.kryo.io.Input;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
@@ -29,7 +31,9 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -93,6 +97,12 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
+
+    /**
+     * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
+     * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
+     */
+    private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
@@ -913,6 +923,14 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     public long getTransitServiceEnds() {
         return transitServiceEnds;
+    }
+
+    public Multimap<TransitEntity<?>, Notice> getNoticesByElement() {
+        return noticesByElement;
+    }
+
+    public void addNoticeAssignments(Multimap<TransitEntity<?>, Notice> noticesByElement) {
+        this.noticesByElement.putAll(noticesByElement);
     }
 
     public double getDistanceBetweenElevationSamples() {

@@ -6,6 +6,7 @@
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
 - NeTEx import support (#2769).
+- Added NeTEx notices (#2824)
 
 ## Ported over from the 1.x
 - Remove Open Traffic prototype code (#2698)

@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.model.calendar.ServiceDate;
 
-public final class FeedInfo extends IdentityBean<String> {
+public final class FeedInfo extends TransitEntity<String> {
 
     private static final long serialVersionUID = 1L;
 

@@ -1,22 +1,27 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +41,6 @@ import static java.util.stream.Collectors.groupingBy;
  * If you need to modify a {@link OtpTransitService}, you can create a new
  * {@link OtpTransitServiceBuilder} based on your old data, do your modification and
  * create a new unmodifiable instance.
- *
- * @author bdferris
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
@@ -50,6 +53,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private final Collection<FareRule> fareRules;
 
     private final Collection<FeedInfo> feedInfos;
+
+    private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -83,6 +88,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
+        this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
         this.pathways = immutableList(builder.getPathways());
         this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
@@ -111,6 +117,15 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<FeedInfo> getAllFeedInfos() {
         return feedInfos;
+    }
+
+    /**
+     * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type
+     * for ids, since some entities have String, while other have FeedScopeId ids.
+     */
+    @Override
+    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
+        return noticeAssignments;
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.edgetype;
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
@@ -18,6 +17,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -38,9 +38,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -55,7 +57,7 @@ import java.util.Set;
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
  *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
  */
-public class TripPattern implements Cloneable, Serializable {
+public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -68,6 +70,11 @@ public class TripPattern implements Cloneable, Serializable {
     private static final int SHIFT_DROPOFF = 3;
     private static final int NO_PICKUP = 1;
     //private static final int FLAG_BIKES_ALLOWED = 32;
+
+    private FeedScopedId id;
+
+    /** The human-readable, unique name for this trip pattern. */
+    public String name;
 
     /**
      * The GTFS Route of all trips in this pattern.
@@ -98,15 +105,6 @@ public class TripPattern implements Cloneable, Serializable {
      */
     public final Timetable scheduledTimetable = new Timetable(this);
 
-    /** The human-readable, unique name for this trip pattern. */
-    public String name;
-
-    /**
-     * The short unique identifier for this trip pattern,
-     * generally in the format Agency:RouteId:DirectionId:PatternNumber.
-     */
-    public String code;
-
     /**
      * The vertices in the Graph that correspond to each Stop in this pattern.
      * Note: these are not unique to this pattern, and could be shared in the stop.
@@ -134,6 +132,20 @@ public class TripPattern implements Cloneable, Serializable {
      */
     private byte[][] hopGeometries = null;
 
+    @Override
+    public FeedScopedId getId() { return id; }
+
+    @Override
+    public void setId(FeedScopedId id) { this.id = id; }
+
+    /**
+     * The short unique identifier for this trip pattern,
+     * generally in the format Agency:RouteId:DirectionId:PatternNumber (GTFS)
+     * or if the id is set, then {@code id.getId()} (Netex).
+     */
+    public String getCode() {
+        return id.getId();
+    }
 
     public LineString getHopGeometry(int stopIndex) {
         TransitStop transitStopStart = stopVertices[stopIndex];
@@ -420,6 +432,7 @@ public class TripPattern implements Cloneable, Serializable {
             Multimap<Stop, TripPattern> starts  = ArrayListMultimap.create();
             Multimap<Stop, TripPattern> ends    = ArrayListMultimap.create();
             Multimap<Stop, TripPattern> vias    = ArrayListMultimap.create();
+
             for (TripPattern pattern : routeTripPatterns) {
                 List<Stop> stops = pattern.getStops();
                 Stop start = stops.get(0);
@@ -449,8 +462,8 @@ public class TripPattern implements Cloneable, Serializable {
                 }
 
                 /* Check whether (end, start) is unique. */
-                Set<TripPattern> remainingPatterns = Sets.newHashSet();
-                remainingPatterns.addAll(starts.get(start));
+                Collection<TripPattern> tripPatterns = starts.get(start);
+                Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
                 remainingPatterns.retainAll(ends.get(end)); // set intersection
                 if (remainingPatterns.size() == 1) {
                     pattern.name = (sb.toString());
@@ -460,7 +473,7 @@ public class TripPattern implements Cloneable, Serializable {
                 /* Still not unique; try (end, start, via) for each via. */
                 for (Stop via : stops) {
                     if (via.equals(start) || via.equals(end)) continue;
-                    Set<TripPattern> intersection = Sets.newHashSet();
+                    Set<TripPattern> intersection = new HashSet<>();
                     intersection.addAll(remainingPatterns);
                     intersection.retainAll(vias.get(via));
                     if (intersection.size() == 1) {
@@ -540,7 +553,7 @@ public class TripPattern implements Cloneable, Serializable {
      * This only works if the Collection of TripPattern includes every TripPattern for the agency.
      */
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
-        Multimap<String, TripPattern> patternsForRoute = HashMultimap.create();
+        Multimap<String, TripPattern> patternsForRoute = ArrayListMultimap.create();
         for (TripPattern pattern : tripPatterns) {
             FeedScopedId routeId = pattern.route.getId();
             String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
@@ -548,12 +561,12 @@ public class TripPattern implements Cloneable, Serializable {
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
             String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
-            pattern.code = (id);
+            pattern.setId(new FeedScopedId(routeId.getAgencyId(), id));
         }
     }
 
     public String toString () {
-        return String.format("<TripPattern %s>", this.code);
+        return String.format("<TripPattern %s>", this.getCode());
     }
 
 	public Trip getExemplar() {
@@ -627,5 +640,4 @@ public class TripPattern implements Cloneable, Serializable {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
         return route.getId().getAgencyId();
     }
-
 }

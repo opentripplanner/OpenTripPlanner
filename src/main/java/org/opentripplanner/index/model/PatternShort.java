@@ -13,7 +13,8 @@ public class PatternShort {
     public String desc;
     
     public PatternShort (TripPattern pattern) {
-        id = pattern.code;
+        // TODO OTP2 - Refactor to use the pattern ID
+        id = pattern.getCode();
         desc = pattern.name;
     }
     

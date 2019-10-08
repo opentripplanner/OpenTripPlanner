@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBElement;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.opentripplanner.netex.mapping.DayTypeRefToServiceIdMapper.generateServiceId;
+import static org.opentripplanner.netex.support.DayTypeRefToServiceIdMapper.generateServiceId;
 
 /**
  * NeTEx do not have the GTFS concept of a ServiceId. In NeTEx a ServiceJourney is connected to a

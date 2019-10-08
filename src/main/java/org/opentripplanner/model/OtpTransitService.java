@@ -1,7 +1,9 @@
 package org.opentripplanner.model;
 
+import com.google.common.collect.Multimap;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,9 +20,17 @@ public interface OtpTransitService {
 
     Collection<FeedInfo> getAllFeedInfos();
 
+    /**
+     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
+     * any type (Serializable).
+     */
+    Multimap<TransitEntity<?>, Notice> getNoticeAssignments();
+
     Collection<Pathway> getAllPathways();
 
-    /** @return all ids for both Calendars and CalendarDates merged into on list without duplicates */
+    /**
+     * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
+     */
     Collection<FeedScopedId> getAllServiceIds();
 
     List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);

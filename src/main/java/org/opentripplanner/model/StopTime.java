@@ -4,9 +4,16 @@ package org.opentripplanner.model;
 import org.opentripplanner.util.TimeToStringConverter;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-public final class StopTime implements Serializable, Comparable<StopTime> {
+
+/**
+ * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model,
+ * it is not kept as part of the Graph.
+ * <p/>
+ * TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the target
+ * TODO OTP2 - object structure.
+ */
+public final class StopTime implements Comparable<StopTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,22 +44,34 @@ public final class StopTime implements Serializable, Comparable<StopTime> {
     /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
     private String farePeriodId;
 
-    public StopTime() {
-
-    }
+    public StopTime() { }
 
     public StopTime(StopTime st) {
+        this.trip = st.trip;
+        this.stop = st.stop;
         this.arrivalTime = st.arrivalTime;
         this.departureTime = st.departureTime;
-        this.dropOffType = st.dropOffType;
-        this.pickupType = st.pickupType;
-        this.routeShortName = st.routeShortName;
-        this.shapeDistTraveled = st.shapeDistTraveled;
-        this.stop = st.stop;
-        this.stopHeadsign = st.stopHeadsign;
-        this.stopSequence = st.stopSequence;
         this.timepoint = st.timepoint;
-        this.trip = st.trip;
+        this.stopSequence = st.stopSequence;
+        this.stopHeadsign = st.stopHeadsign;
+        this.routeShortName = st.routeShortName;
+        this.pickupType = st.pickupType;
+        this.dropOffType = st.dropOffType;
+        this.shapeDistTraveled = st.shapeDistTraveled;
+        this.farePeriodId = st.farePeriodId;
+    }
+
+    /**
+     * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
+     * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
+     * StopTime field.
+     * <p/>
+     * New ids should only be created when a travel search result is mapped to an itinerary, so even
+     * if creating new objects are expensive, the few extra objects created during the mapping process
+     * is ok.
+     */
+    public StopTimeKey getId() {
+        return new StopTimeKey(trip.getId(), stopSequence);
     }
 
     public Trip getTrip() {
@@ -194,23 +213,6 @@ public final class StopTime implements Serializable, Comparable<StopTime> {
 
     public int compareTo(StopTime o) {
         return this.getStopSequence() - o.getStopSequence();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        StopTime stopTime = (StopTime) o;
-        return stopSequence == stopTime.stopSequence
-                && Objects.equals(trip, stopTime.trip)
-                && Objects.equals(stop, stopTime.stop);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(trip, stop, stopSequence);
     }
 
     @Override

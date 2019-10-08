@@ -2,7 +2,7 @@ package org.opentripplanner.model.impl;
 
 import org.junit.Test;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class GenerateMissingIdsTest {
     private static final String ID_6 = "6";
 
     @Test public void testGenerateNoneExistentIds() {
-        List<? extends IdentityBean<String>> list;
+        List<? extends TransitEntity<String>> list;
 
         // An empty list should not cause any trouble (Exception)
         generateNoneExistentIds(Collections.<FeedInfo>emptyList());
@@ -47,17 +47,17 @@ public class GenerateMissingIdsTest {
     }
 
 
-    private static IdentityBean<String> newEntity() {
+    private static TransitEntity<String> newEntity() {
         return newEntity(null);
     }
 
-    private static IdentityBean<String> newEntity(String id) {
+    private static TransitEntity<String> newEntity(String id) {
         FeedInfo e = new FeedInfo();
         e.setId(id);
         return e;
     }
 
-    private static String id(List<? extends IdentityBean<String>> list, int index) {
+    private static String id(List<? extends TransitEntity<String>> list, int index) {
         return list.get(index).getId();
     }
 }

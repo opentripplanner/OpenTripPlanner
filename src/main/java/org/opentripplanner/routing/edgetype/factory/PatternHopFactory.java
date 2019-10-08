@@ -156,6 +156,12 @@ public class PatternHopFactory {
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
+        /* Generate unique short IDs for all the TableTripPatterns. */
+        TripPattern.generateUniqueIds(tripPatterns);
+
+        /* Generate unique human-readable names for all the TableTripPatterns. */
+        TripPattern.generateUniqueNames(tripPatterns);
+
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
             for (Trip trip : tripPattern.getTrips()) {
@@ -170,12 +176,6 @@ public class PatternHopFactory {
                 }
             }
         }
-
-        /* Generate unique human-readable names for all the TableTripPatterns. */
-        TripPattern.generateUniqueNames(tripPatterns);
-
-        /* Generate unique short IDs for all the TableTripPatterns. */
-        TripPattern.generateUniqueIds(tripPatterns);
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
@@ -202,7 +202,7 @@ public class PatternHopFactory {
             }
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-            graph.tripPatternForId.put(tripPattern.code, tripPattern);
+            graph.tripPatternForId.put(tripPattern.getCode(), tripPattern);
         }
 
         /* Identify interlined trips and create the necessary edges. */
