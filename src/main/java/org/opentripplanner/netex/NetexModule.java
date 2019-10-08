@@ -74,6 +74,7 @@ public class NetexModule implements GraphBuilderModule {
 
                 OtpTransitService otpService = transitBuilder.build();
 
+                graph.getOperators().addAll(otpService.getAllOperators());
                 graph.addNoticeAssignments(otpService.getNoticeAssignments());
 
                 PatternHopFactory hf = new PatternHopFactory(

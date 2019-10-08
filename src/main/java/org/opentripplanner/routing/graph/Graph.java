@@ -32,6 +32,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -65,6 +66,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -137,6 +139,8 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
+
+    private Collection<Operator> operators = new ArrayList<>();
 
     private Collection<String> feedIds = new HashSet<>();
 
@@ -808,7 +812,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         return timeZone;
     }
-    
+
+    public Collection<Operator> getOperators() {
+        return operators;
+    }
+
     /**
      * The timezone is cached by the graph. If you've done something to the graph that has the
      * potential to change the time zone, you should call this to ensure it is reset. 

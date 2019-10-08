@@ -9,6 +9,7 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
@@ -47,6 +48,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private static final Logger LOG = LoggerFactory.getLogger(OtpTransitService.class);
 
     private final Collection<Agency> agencies;
+
+    private final Collection<Operator> operators;
 
     private final Collection<FareAttribute> fareAttributes;
 
@@ -89,6 +92,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
         this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
+        this.operators = immutableList(builder.getOperatorsById().values());
         this.pathways = immutableList(builder.getPathways());
         this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
@@ -131,6 +135,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<Pathway> getAllPathways() {
         return pathways;
+    }
+
+    @Override
+    public Collection<Operator> getAllOperators() {
+        return operators;
     }
 
     @Override

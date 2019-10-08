@@ -12,7 +12,15 @@ import java.util.List;
  */
 public interface OtpTransitService {
 
+    /**
+     * @return  a list of all Agencies.
+     */
     Collection<Agency> getAllAgencies();
+
+    /**
+     * @return a list of all Operators, the list may be empty if there are no Operators in the imported data.
+     */
+    Collection<Operator> getAllOperators();
 
     Collection<FareAttribute> getAllFareAttributes();
 

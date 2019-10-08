@@ -2,6 +2,7 @@ package org.opentripplanner.netex.loader.parser;
 
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Organisation_VersionStructure;
 import org.rutebanken.netex.model.OrganisationsInFrame_RelStructure;
 import org.rutebanken.netex.model.ResourceFrame_VersionFrameStructure;
@@ -15,7 +16,8 @@ import java.util.Collection;
 class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructure> {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceFrameParser.class);
 
-    private final Collection<Authority> authorityById = new ArrayList<>();
+    private final Collection<Authority> authorities = new ArrayList<>();
+    private final Collection<Operator> operators = new ArrayList<>();
 
     @Override
     void parse(ResourceFrame_VersionFrameStructure frame) {
@@ -43,7 +45,8 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
     }
 
     @Override void setResultOnIndex(NetexImportDataIndex netexIndex) {
-        netexIndex.authoritiesById.addAll(authorityById);
+        netexIndex.authoritiesById.addAll(authorities);
+        netexIndex.operatorsById.addAll(operators);
     }
 
 
@@ -57,7 +60,9 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
 
     private void parseOrganization(Organisation_VersionStructure element) {
         if (element instanceof Authority) {
-            authorityById.add((Authority) element);
+            authorities.add((Authority) element);
+        } else if (element instanceof Operator) {
+                operators.add((Operator) element);
         } else {
             warnOnMissingMapping(LOG, element);
         }

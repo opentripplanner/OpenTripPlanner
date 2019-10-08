@@ -20,6 +20,7 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -76,6 +77,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<Notice> noticeById;
     public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    public final HierarchicalMapById<Operator> operatorsById;
     public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
@@ -112,6 +114,7 @@ public class NetexImportDataIndex {
         this.noticeById = new HierarchicalMapById<>();
         this.noticeAssignmentById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
+        this.operatorsById = new HierarchicalMapById<>();
         this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
@@ -139,6 +142,7 @@ public class NetexImportDataIndex {
         this.noticeById = new HierarchicalMapById<>(parent.noticeById);
         this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
+        this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
         this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
@@ -207,6 +211,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
                 return operatingPeriodById;
+            }
+
+            public ReadOnlyHierarchicalMapById<Operator> getOperatorsById() {
+                return operatorsById;
             }
 
             public ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId() {

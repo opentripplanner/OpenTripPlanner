@@ -9,6 +9,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
@@ -53,6 +54,8 @@ public class OtpTransitServiceBuilder {
     private final List<Frequency> frequencies = new ArrayList<>();
 
     private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
+
+    private final EntityById<FeedScopedId, Operator> operatorsById = new EntityById<>();
 
     private final List<Pathway> pathways = new ArrayList<>();
 
@@ -111,6 +114,10 @@ public class OtpTransitServiceBuilder {
      */
     public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
         return noticeAssignments;
+    }
+
+    public EntityById<FeedScopedId, Operator> getOperatorsById() {
+        return operatorsById;
     }
 
     public List<Pathway> getPathways() {
