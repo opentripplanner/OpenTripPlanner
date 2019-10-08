@@ -58,16 +58,18 @@ class NoticeAssignmentMapper {
         this.stopTimesByNetexId = stopTimesByNetexId;
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    Multimap<TransitEntity<?>, Notice> map(NoticeAssignment noticeAssignment){
-        Multimap<TransitEntity<?>, Notice> noticeByElement = ArrayListMultimap.create();
+    Multimap<TransitEntity<?>, Notice> map(NoticeAssignment noticeAssignment) {
+        // TODO OTP2 - Idealy this should en up as one key,value pair.
+        //             The `StopPointInJourneyPattern` witch result in more than one key/valye pair,
+        //             can be replaced with a new compound key type.
+        Multimap<TransitEntity<?>, Notice> noticiesByEntity = ArrayListMultimap.create();
 
         String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
         Notice otpNotice = getOrMapNotice(noticeAssignment);
 
         if(otpNotice == null) {
             LOG.warn("Notice in notice assignment is missing for assignment {}", noticeAssignment);
-            return noticeByElement;
+            return noticiesByEntity;
         }
 
         // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so we
@@ -75,20 +77,24 @@ class NoticeAssignmentMapper {
         Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.lookup(noticedObjectId);
         if (!times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
-                noticeByElement.put(lookupStopTimeKey(time.getId()), otpNotice);
+                noticiesByEntity.put(lookupStopTimeKey(time.getId()), otpNotice);
             }
         } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
-            noticeByElement.put(lookupStopTimeKey(noticedObjectId), otpNotice);
+            noticiesByEntity.put(lookupStopTimeKey(noticedObjectId), otpNotice);
         } else {
             FeedScopedId otpId = createFeedScopedId(noticedObjectId);
 
-            if(addNotice(routesById.get(otpId), otpNotice, noticeByElement)) { /* intentionally empty */ }
-            else if(addNotice(tripsById.get(otpId), otpNotice, noticeByElement)) { /* intentionally empty */ }
+            if(routesById.containsKey(otpId)) {
+                noticiesByEntity.put(routesById.get(otpId), otpNotice);
+            }
+            else if(tripsById.containsKey(otpId)) {
+                noticiesByEntity.put(tripsById.get(otpId), otpNotice);
+            }
             else {
                 LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
             }
         }
-        return noticeByElement;
+        return noticiesByEntity;
     }
 
     private StopTimeKey lookupStopTimeKey(String timeTablePassingTimeId) {
@@ -101,15 +107,5 @@ class NoticeAssignmentMapper {
                 : noticesById.lookup(assignment.getNoticeRef().getRef());
 
         return notice == null ? null : noticeMapper.map(notice);
-    }
-
-    private static boolean addNotice(
-            TransitEntity entity,
-            Notice otpNotice,
-            Multimap<TransitEntity<?>, Notice> noticeByEntity
-    ) {
-        if(entity == null) return false;
-        noticeByEntity.put(entity, otpNotice);
-        return true;
     }
 }
