@@ -9,6 +9,7 @@
 - Added NeTEx notices (#2824)
 
 ## Ported over from the 1.x
+- Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Make OTP run on Java 11 (#2812)
 - Fixes surefire test failure during build (#2816)
 - Disable linking from already linked stops (#2372)
