@@ -58,7 +58,7 @@ class TransferMapper {
         Trip toTrip = tripMapper.map(rhs.getToTrip());
         Route fromRoute = routeMapper.map(rhs.getFromRoute());
         Route toRoute = routeMapper.map(rhs.getToRoute());
-        TransferType transferType = mapTransferType(rhs.getTransferType());
+        TransferType transferType = TransferType.valueOfGtfsCode(rhs.getTransferType());
         int transferTime = rhs.getMinTransferTime();
 
         // Transfers may be specified using parent stations
@@ -119,19 +119,5 @@ class TransferMapper {
             lhs = Collections.emptyList();
         }
         return lhs;
-    }
-
-    private TransferType mapTransferType(int transferType) {
-        switch (transferType) {
-        case 3:
-            return TransferType.FORBIDDEN;
-        case 2:
-            return TransferType.GUARANTEED_WITH_MIN_TIME;
-        case 1:
-            return TransferType.GUARANTEED;
-        default:
-        case 0:
-            return TransferType.POSSIBLE;
-        }
     }
 }
