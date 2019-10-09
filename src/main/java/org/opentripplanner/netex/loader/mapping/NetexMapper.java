@@ -5,6 +5,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
@@ -21,6 +22,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -105,12 +107,11 @@ public class NetexMapper {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
             StopMapper stopMapper = new StopMapper(netexIndex.getQuayById());
-
-            // TODO OTP2 STOP - This code was lost in the rebase process, because the original was in a file witch is
-            //      deleted.
-
-            //Collection<Stop> stops = stopMapper.mapParentAndChildStops(null, null, null);
-            //transitBuilder.getStops().addAll(stops);
+            Collection<Stop> stops = new ArrayList<>();
+            Collection<Station> stations = new ArrayList<>();
+            stopMapper.mapParentAndChildStops(stopPlaceAllVersions, stops, stations);
+            transitBuilder.getStops().addAll(stops);
+            transitBuilder.getStations().addAll(stations);
         }
     }
 
