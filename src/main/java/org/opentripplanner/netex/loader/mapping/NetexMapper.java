@@ -21,7 +21,6 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -106,8 +105,12 @@ public class NetexMapper {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
             StopMapper stopMapper = new StopMapper(netexIndex.getQuayById());
-            Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
-            transitBuilder.getStops().addAll(stops);
+
+            // TODO OTP2 STOP - This code was lost in the rebase process, because the original was in a file witch is
+            //      deleted.
+
+            //Collection<Stop> stops = stopMapper.mapParentAndChildStops(null, null, null);
+            //transitBuilder.getStops().addAll(stops);
         }
     }
 
