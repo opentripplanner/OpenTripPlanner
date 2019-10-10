@@ -40,7 +40,7 @@ class TransferMapper {
     /** Map from GTFS to OTP model, {@code null} safe.  */
 
     Collection<Transfer> map(org.onebusaway.gtfs.model.Transfer orginal) {
-        return orginal == null ? null : doMap(orginal));
+        return orginal == null ? null : doMap(orginal);
     }
 
     private Collection<Transfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
