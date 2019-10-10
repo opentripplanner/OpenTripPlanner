@@ -27,7 +27,7 @@ public class StopAdapter extends XmlAdapter<StopType, Stop> {
         a.setZone(arg.zoneId);
         a.setUrl(arg.stopUrl);
         a.setWheelchairBoarding(mapFromWheelChairCode(arg.wheelchairBoarding));
-        return new Stop(a);
+        return a;
     }
 
     @Override

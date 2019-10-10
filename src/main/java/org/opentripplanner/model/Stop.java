@@ -46,19 +46,6 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     public Stop() {}
 
-    public Stop(Stop obj) {
-        this.id = obj.id;
-        this.name = obj.name;
-        this.lat = obj.lat;
-        this.lon = obj.lon;
-        this.code = obj.code;
-        this.description = obj.description;
-        this.zone = obj.zone;
-        this.url = obj.url;
-        this.parentStation = obj.parentStation;
-        this.wheelchairBoarding = obj.wheelchairBoarding;
-    }
-
     @Override public FeedScopedId getId() {
         return id;
     }
