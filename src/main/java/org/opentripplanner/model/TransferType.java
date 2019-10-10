@@ -2,9 +2,27 @@ package org.opentripplanner.model;
 
 // TODO add codes
 public enum TransferType {
-    POSSIBLE(0),
+        /**
+         * This transfer is recommended over other transfers. The routing algorithm should prefer
+         * this transfer compared to other transfers, for example by assigning a lower weight to it.
+         */
+    RECOMMENDED(0),
+        /**
+         * This means the departing vehicle will wait for the arriving one and leave sufficient time
+         * for a rider to transfer between routers.
+         */
     GUARANTEED(1),
-    GUARANTEED_WITH_MIN_TIME(2),
+        /**
+         * This is a regular transfer that is defined in the transit data (as opposed to
+         * OpenStreetMap data). In the case that both are present, this should take precedence.
+         * Because the the duration of the transfer is given and not the distance, walk speed will
+         * have no effect on this.
+         */
+    TRANSFER_WITH_MIN_TIME(2),
+        /**
+         * Transfers between these stops (and route/trip) is not possible, even if a transfer is
+         * already defined via OpenStreetMap data or in transit data.
+         */
     FORBIDDEN(3);
 
     TransferType(int gtfsCode) {
