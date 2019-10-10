@@ -20,6 +20,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
+// TODO OTP2 - This should probably be split into a StationMapper and a StopMapper.
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
  * GroupsOfStopPlaces and these are also mapped to parent stops, because searching from a StopPlace and searching from
