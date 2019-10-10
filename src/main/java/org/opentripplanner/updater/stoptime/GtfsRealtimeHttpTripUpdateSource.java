@@ -54,7 +54,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
             InputStream is = HttpUtils.getData(
                     url,
                     "Accept",
-                    "application/x-google-protobuf; application/x-protobuf; application/protobuf; application/octet-stream; */*");
+                    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*");
             if (is != null) {
                 // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);
