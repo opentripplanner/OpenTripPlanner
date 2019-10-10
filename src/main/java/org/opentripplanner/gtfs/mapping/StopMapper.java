@@ -23,31 +23,19 @@ class StopMapper {
         return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
     }
 
-    private Stop doMap(org.onebusaway.gtfs.model.Stop rhs) {
+    private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
         Stop otpStop = new Stop();
 
-        otpStop.setId(mapAgencyAndId(rhs.getId()));
-        otpStop.setName(rhs.getName());
-        otpStop.setLat(rhs.getLat());
-        otpStop.setLon(rhs.getLon());
-        otpStop.setCode(rhs.getCode());
-        otpStop.setDescription(rhs.getDesc());
-        otpStop.setZone(rhs.getZoneId());
-        otpStop.setUrl(rhs.getUrl());
-        otpStop.setWheelchairBoarding(mapGtfsWheelChairCode(rhs.getWheelchairBoarding()));
+        otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
+        otpStop.setName(gtfsStop.getName());
+        otpStop.setLat(gtfsStop.getLat());
+        otpStop.setLon(gtfsStop.getLon());
+        otpStop.setCode(gtfsStop.getCode());
+        otpStop.setDescription(gtfsStop.getDesc());
+        otpStop.setZone(gtfsStop.getZoneId());
+        otpStop.setUrl(gtfsStop.getUrl());
+        otpStop.setWheelchairBoarding(WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding()));
 
         return otpStop;
-    }
-
-    private WheelChairBoarding mapGtfsWheelChairCode(int wheelChairCode) {
-        switch (wheelChairCode) {
-            case 2:
-                return WheelChairBoarding.NOT_POSSIBLE;
-            case 1:
-                return WheelChairBoarding.POSSIBLE;
-            case 0:
-            default:
-                return WheelChairBoarding.NO_INFORMATION;
-        }
     }
 }
