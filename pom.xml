@@ -583,6 +583,27 @@
             <version>1.0.8</version>
         </dependency>
 
+        <!-- SIRI -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-java-model</artifactId>
+            <version>0.13-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Necessary for JAXB -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>

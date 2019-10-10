@@ -37,6 +37,18 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** The type name in the preferences JSON. FIXME String type codes seem like a red flag, should probably be removed. */
     private String type;
 
+
+    protected boolean blockReadinessUntilInitialized;
+
+    protected boolean isInitialized;
+
+    protected boolean isReady() {
+        if (blockReadinessUntilInitialized) {
+            return isInitialized;
+        }
+        return true;
+    }
+
     @Override
     final public void run() {
         try {
@@ -56,6 +68,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                 } catch (Exception e) {
                     LOG.error("Error while running polling updater of type {}", type, e);
                     // TODO Should we cancel the task? Or after n consecutive failures? cancel();
+                } finally {
+                    isInitialized = true;
                 }
                 Thread.sleep(pollingPeriodSeconds * 1000);
             }

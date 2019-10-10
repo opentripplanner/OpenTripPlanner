@@ -3,6 +3,9 @@ package org.opentripplanner.updater;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -10,6 +13,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +94,17 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
+                } else if (OTPFeature.SIRIUpdaterFuzzyMatching.isOn()) {
+
+                    if (type.equals("siri-et-updater")) {
+                        updater = new SiriETUpdater();
+                    } else if (type.equals("siri-vm-updater")) {
+                        updater = new SiriVMUpdater();
+                    } else if (type.equals("siri-sx-updater")) {
+                        updater = new SiriSXUpdater();
+                    }
+
+
                 }
             }
 

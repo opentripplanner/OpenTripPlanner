@@ -1,22 +1,15 @@
 package org.opentripplanner.updater;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * This class is attached to the graph:
@@ -144,6 +137,36 @@ public class GraphUpdaterManager {
                 LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
         });
+    }
+
+    /**
+     * This is another method to use to modify the graph from the updaters. It behaves like execute,
+     * but blocks until the runnable has been executed. This might be particularly useful in the
+     * setup method of an updater.
+     *
+     * @param runnable is a graph writer runnable
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @see GraphUpdaterManager.execute
+     */
+    public void executeBlocking(GraphWriterRunnable runnable) throws InterruptedException,
+            ExecutionException {
+        Future<?> future = executeReturningFuture(runnable);
+        // Ask for result of future. Will block and return null when runnable is successfully
+        // finished, throws otherwise
+        future.get();
+    }
+
+    private Future<?> executeReturningFuture(final GraphWriterRunnable runnable) {
+        Future<?> future = scheduler.submit(() -> {
+            try {
+                runnable.run(graph);
+            } catch (Exception e) {
+                LOG.error("Error while running graph writer {}:", runnable.getClass().getName(),
+                        e);
+            }
+        });
+        return future;
     }
 
     public int size() {

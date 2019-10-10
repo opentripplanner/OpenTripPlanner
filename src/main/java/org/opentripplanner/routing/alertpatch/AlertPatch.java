@@ -1,11 +1,7 @@
 package org.opentripplanner.routing.alertpatch;
 
 import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,11 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)
@@ -65,15 +57,29 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
+    /**
+     * Used to limit when Alert is applicable
+     */
+    private Set<StopCondition> stopConditions = new HashSet<>();
+
+    /**
+     * The provider's internal ID for this alert
+     */
+    private String situationNumber;
+
     @XmlElement
     public Alert getAlert() {
         return alert;
     }
 
     public boolean displayDuring(State state) {
+        return displayDuring(state.getStartTimeSeconds(), state.getTimeSeconds());
+    }
+
+    public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
         for (TimePeriod timePeriod : timePeriods) {
-            if (state.getTimeSeconds() >= timePeriod.startTime) {
-                if (state.getStartTimeSeconds() < timePeriod.endTime) {
+            if (endTimeSeconds >= timePeriod.startTime) {
+                if (startTimeSeconds < timePeriod.endTime) {
                     return true;
                 }
             }
@@ -275,6 +281,18 @@ public class AlertPatch implements Serializable {
 
     public boolean hasTrip() {
         return trip != null;
+    }
+
+    public Set<StopCondition> getStopConditions() {
+        return stopConditions;
+    }
+
+    public void setSituationNumber(String situationNumber) {
+        this.situationNumber = situationNumber;
+    }
+
+    public String getSituationNumber() {
+        return situationNumber;
     }
 
     public boolean equals(Object o) {
