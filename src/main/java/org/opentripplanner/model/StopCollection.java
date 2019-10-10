@@ -10,6 +10,10 @@ public interface StopCollection {
 
         FeedScopedId getId();
 
+        /**
+         * Implementations should go down the hierarchy and return all the underlying stops
+         * recursively.
+         */
         Collection<Stop> getChildStops();
 
         double getLat();
