@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.opentripplanner.model.FeedScopedId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 
 import static org.opentripplanner.api.adapters.WheelChairCodeMapper.mapToWheelChairCode;
@@ -32,8 +33,18 @@ public class StopType {
         this.stopUrl = stop.getUrl();
         this.locationType = 0;
         this.parentStation = stop.getParentStation().getId().getId();
-        // this.stopTimezone = stop.getTimezone();s
         this.wheelchairBoarding = mapToWheelChairCode(stop.getWheelchairBoarding());
+    }
+
+    public StopType(Station station) {
+        this.id = station.getId();
+        this.stopLat = station.getLat();
+        this.stopLon = station.getLon();
+        this.stopCode = station.getCode();
+        this.stopName = station.getName();
+        this.stopDesc = station.getDescription();
+        this.stopUrl = station.getUrl();
+        this.locationType = 0;
     }
 
     public StopType(Stop stop, Boolean extended) {
@@ -48,7 +59,6 @@ public class StopType {
             this.stopUrl = stop.getUrl();
             this.locationType = 0;
             this.parentStation = stop.getParentStation().getId().getId();
-            // this.stopTimezone = stop.getTimezone();
             this.wheelchairBoarding = mapToWheelChairCode(stop.getWheelchairBoarding());
         }
     }
