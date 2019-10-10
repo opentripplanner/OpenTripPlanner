@@ -13,10 +13,10 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 /**
  * Responsible for mapping GTFS Stop into the OTP model.
  *
- * <p>NOTE! This class have state. This class also holds a index of all mapped stops to avoid mapping the
- * same stop twice. We do this because the library (onebusaway) return transfers with Stop objects, not
- * references and instead of looking up the Stops by id in the {@link TransferMapper} we just use the
- * this class to cache stops. This way, the order of witch stops and transfers are mapped so not matter.
+ * <p>NOTE! This class has state. This class also holds a index of all mapped stops to avoid mapping the
+ * same stop twice. We do this because the library (onebusaway) return transfers with Stop object references,
+ * not stop ids. Instead of looking up the Stops by id in the {@link TransferMapper} we just use the
+ * this class to cache stops. This way, the order of witch stops and transfers are mapped does not matter.
  */
 class StationMapper {
 
