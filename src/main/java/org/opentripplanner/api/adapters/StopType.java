@@ -44,7 +44,7 @@ public class StopType {
         this.stopName = station.getName();
         this.stopDesc = station.getDescription();
         this.stopUrl = station.getUrl();
-        this.locationType = 0;
+        this.locationType = 1;
     }
 
     public StopType(Stop stop, Boolean extended) {
