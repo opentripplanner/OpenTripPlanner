@@ -272,10 +272,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      * when they are constructed or deserialized.
      *
      * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
-     * TODO OTP2 - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
-     * TODO OTP2 - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
-     * TODO OTP2 - a VertexCollection class, let the graph hold an instance of this collection,
-     * TODO OTP2 - and create factory methods for each type of Vertex in the VertexCollection.
+     *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
+     *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
+     *           - a VertexCollection class, let the graph hold an instance of this collection,
+     *           - and create factory methods for each type of Vertex in the VertexCollection.
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);

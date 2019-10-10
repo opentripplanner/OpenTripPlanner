@@ -64,7 +64,7 @@ class StopMapper {
 
         // Prioritize StopPlace versions. Highest priority first.
         // TODO OTP2 - This should pushed up into the ReadOnlyHierarchicalVersionMapById as part of
-        // TODO OTP2 - Issue: Netex import resolve version for all entities , not just stops #2781
+        //           - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
         // Map the highest priority StopPlace version to station
@@ -122,8 +122,8 @@ class StopMapper {
 
     private void addNewStopToParentIfNotPresent(Quay quay, Station station) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
-        // TODO OTP2 - national stop register, we should add all stops/quays
-        // TODO OTP2 - for version resolution.
+        //           - national stop register, we should add all stops/quays
+        //           - for version resolution.
         // Continue if this is not newest version of quay
         if (!quayIndex.isNewerOrSameVersionComparedWithExistingValues(quay))
             return;

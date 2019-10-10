@@ -69,7 +69,7 @@ import java.util.Map;
  * Generates a set of edges from GTFS.
  *
  * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
- * TODO OTP2 - after ass Entur NeTEx PRs are merged.
+ *           - after ass Entur NeTEx PRs are merged.
  */
 public class PatternHopFactory {
 
@@ -123,9 +123,9 @@ public class PatternHopFactory {
         }
         fareServiceFactory.processGtfs(transitService);
 
-        // TODO OTP2: Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
-        // TODO OTP2 - It should not be the PHFs responsibility to insert anything into the graph, it should build
-        // TODO OTP2 - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
+        // TODO OTP2 - Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
+        //           - It should not be the PHFs responsibility to insert anything into the graph, it should build
+        //           - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
         loadStops(graph);
         //loadPathways(graph);
         loadFeedInfo(graph);

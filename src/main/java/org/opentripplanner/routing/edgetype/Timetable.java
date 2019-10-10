@@ -32,9 +32,9 @@ import java.util.TimeZone;
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
  *
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *  TODO OTP2 - after as Entur NeTEx PRs are merged.
- *  TODO OTP2 - Also consider moving its dependencies in: org.opentripplanner.routing
- *  TODO OTP2 - The NEW Timetable should not have any dependencies to
+ *            - after as Entur NeTEx PRs are merged.
+ *            - Also consider moving its dependencies in: org.opentripplanner.routing
+ *            - The NEW Timetable should not have any dependencies to
  */
 public class Timetable implements Serializable {
 
@@ -221,8 +221,8 @@ public class Timetable implements Serializable {
      *         went wrong
      *
      * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
-     * TODO OTP2 - its job without sending in GTFS specific classes. A generic update would support
-     * TODO OTP2 - other RealTime updats, not just from GTFS.
+     *           - its job without sending in GTFS specific classes. A generic update would support
+     *           - other RealTime updats, not just from GTFS.
      */
     public TripTimes createUpdatedTripTimes(TripUpdate tripUpdate, TimeZone timeZone, ServiceDate updateServiceDate) {
         if (tripUpdate == null) {

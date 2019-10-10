@@ -59,7 +59,7 @@ import java.util.Set;
  * thus TripPattern.
  *
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
+ *            - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
 
@@ -114,7 +114,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      * Note: these are not unique to this pattern, and could be shared in the stop.
      * FIXME they appear to be all null. are they even used?
      * TODO OTP2 - This is not used and can be removed. It is initialized in the
-     * TODO OTP2 - PatternHopFactory, but never accessed after that.
+     *           - PatternHopFactory, but never accessed after that.
      */
     public final StopVertex[] stopVertices;
 

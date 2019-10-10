@@ -60,9 +60,9 @@ public class NetexModule implements GraphBuilderModule {
         CalendarServiceData calendarServiceData = new CalendarServiceData();
 
         // TODO OTP2 - Stops set inside the hf.run. The next line appered after merging
-        // TODO OTP2 - dev-2.x and netex_inport, It does not compile due to the deletion of the
-        // TODO OTP2 - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
-        // TODO OTP2 - this and the "//hf.setStopContext(stopContext);" below (line 67).
+        //           - dev-2.x and netex_inport, It does not compile due to the deletion of the
+        //           - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
+        //           - this and the "//hf.setStopContext(stopContext);" below (line 67).
         //GtfsStopContext stopContext = new GtfsStopContext();
 
         try {
