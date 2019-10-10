@@ -118,20 +118,4 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
         public String toString() {
                 return "<Station " + this.id + ">";
         }
-
-        public Stop convertStationToSTop() {
-                Stop stop =new Stop();
-                stop.setId(this.getId());
-                stop.setName(this.getName());
-                stop.setLat(this.getLat());
-                stop.setLon(this.getLon());
-                stop.setCode(this.getCode());
-                stop.setDescription(this.getDescription());
-                stop.setZone(null);
-                stop.setUrl(this.getUrl());
-                stop.setParentStation(null);
-                stop.setWheelchairBoarding(WheelChairBoarding.NO_INFORMATION);
-
-                return stop;
-        }
 }
