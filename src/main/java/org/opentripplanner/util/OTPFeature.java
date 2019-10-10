@@ -24,10 +24,6 @@ public enum OTPFeature {
     APIUpdaterStatus(true),
 
     // OTP Features
-    /**
-     * Enable the SIRI updator to use fuzzy matching to find entities like trip. TODO More and better?
-     */
-    SIRIUpdaterFuzzyMatching(true),
 
     // Sandbox extension features - Must be turned OFF by default
     SandboxExampleAPIGraphStatistics(false),
