@@ -47,8 +47,6 @@ public interface OtpTransitService {
 
     Stop getStopForId(FeedScopedId id);
 
-    List<Stop> getStopsForStation(Station station);
-
     Collection<Station> getAllStations();
 
     Collection<Stop> getAllStops();

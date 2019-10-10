@@ -151,7 +151,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopsForStation() {
-        List<Stop> stops = subject.getStopsForStation(subject.getStationForId(STATION_ID));
+        List<Stop> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
         assertEquals("[<Stop Z_A>]", stops.toString());
     }
 

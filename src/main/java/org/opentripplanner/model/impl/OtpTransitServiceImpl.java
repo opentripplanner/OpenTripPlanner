@@ -23,11 +23,9 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,14 +75,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     private final Collection<TripPattern> tripPatterns;
 
     private final Collection<Trip> trips;
-
-
-    /**
-     * Note! This field is lazy initialized - this relay on this field NOT
-     * being used BEFORE all data is loaded.
-     */
-    private Map<Station, List<Stop>> stopsByStation = null;
-
 
     /**
      * Create a read only version of the {@link OtpTransitService}.
@@ -167,12 +157,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public List<Stop> getStopsForStation(Station station) {
-        ensureStopByStationsIsInitialized();
-        return stopsByStation.get(station);
-    }
-
-    @Override
     public Collection<Station> getAllStations() {
         return immutableList(stationsById.values());
     }
@@ -205,37 +189,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /*  Private Methods */
 
-    private void ensureStopByStationsIsInitialized() {
-        if(stopsByStation != null) {
-            return;
-        }
-
-        stopsByStation = new HashMap<>();
-        for (Stop stop : getAllStops()) {
-            Station parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                Collection<Stop> subStops = stopsByStation
-                        .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
-                subStops.add(stop);
-            }
-        }
-
-        for (Map.Entry<Station, List<Stop>> entry : stopsByStation.entrySet()) {
-            entry.setValue(Collections.unmodifiableList(entry.getValue()));
-        }
-
-        // Log warnings for Stations without Platforms - this is not allowed according to the
-        // GTFS specification. OTP will treat these Stations as a Platform - but there might be
-        // hick-ups.
-        // See: locationType = 1,t https://developers.google.com/transit/gtfs/reference/#stopstxt
-        getAllStations().stream()
-                .filter(this::isStationWithoutPlatforms)
-                .forEach(it -> {
-                    LOG.warn("The Station is missing Platforms: {}", it);
-                    getAllStops().add(it.convertStationToSTop());
-                });
-    }
-
     private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(Collection<ShapePoint> shapePoints) {
         Map<FeedScopedId, List<ShapePoint>> map = shapePoints.stream()
                 .collect(groupingBy(ShapePoint::getShapeId));
@@ -258,7 +211,4 @@ class OtpTransitServiceImpl implements OtpTransitService {
         return Collections.unmodifiableList(list);
     }
 
-    private boolean isStationWithoutPlatforms(Station it) {
-        return stopsByStation.get(it) == null;
-    }
 }
