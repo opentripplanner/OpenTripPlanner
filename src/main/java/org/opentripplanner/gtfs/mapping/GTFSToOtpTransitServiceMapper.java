@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
@@ -71,19 +72,24 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
 
+        mapStopsToStopsAndStations(data, builder);
 
-        // TODO Ta en titt på dette
-        builder.getStops().addAll(stopMapper.map(
-                data.getAllStops().stream().filter(s -> s.getLocationType() == 0)
-                        .collect(Collectors.toList())));
-        builder.getStations().addAll(stationMapper.map(
-                data.getAllStops().stream().filter(s -> s.getLocationType() == 1)
-                        .collect(Collectors.toList())));
         stationStopLinker.link(data.getAllStops(), builder.getStations(), builder.getStops());
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
         return builder;
+    }
+
+    private void mapStopsToStopsAndStations(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
+        for (Stop it : data.getAllStops()) {
+            if(it.getLocationType() == 0) {
+                builder.getStops().add(stopMapper.map(it));
+            }
+            else if(it.getLocationType() == 1) {
+                builder.getStations().add(stationMapper.map(it));
+            }
+        }
     }
 }
