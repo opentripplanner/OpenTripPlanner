@@ -1,19 +1,17 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransferType;
 import org.opentripplanner.model.Trip;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-
-
-// TODO Look at this class
 
 /** Responsible for mapping GTFS Transfer into the OTP model. */
 class TransferMapper {
@@ -50,9 +48,7 @@ class TransferMapper {
         return orginal == null ? null : mappedTransfers.computeIfAbsent(orginal, this::doMap);
     }
 
-    // TODO This now returns a collection, which means the above methods need to be changed
     private Collection<Transfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
-        Collection<Transfer> lhs;
 
         Trip fromTrip = tripMapper.map(rhs.getFromTrip());
         Trip toTrip = tripMapper.map(rhs.getToTrip());
@@ -67,57 +63,35 @@ class TransferMapper {
         // applies to all stops in that station." we thus expand transfers that use parent stations
         // to all the member stops.
 
-        if (rhs.getFromStop().getLocationType() == 0
-                && rhs.getToStop().getLocationType() == 0) {
-            lhs = Transfer.getExpandedTransfers(
-                    stopMapper.map(rhs.getFromStop()),
-                    stopMapper.map(rhs.getToStop()),
-                    fromRoute,
-                    toRoute,
-                    fromTrip,
-                    toTrip,
-                    transferType,
-                    transferTime
-            );
-        } else if (rhs.getFromStop().getLocationType() == 1
-                && rhs.getToStop().getLocationType() == 0) {
-            lhs = Transfer.getExpandedTransfers(
-                    stationMapper.map(rhs.getFromStop()),
-                    stopMapper.map(rhs.getToStop()),
-                    fromRoute,
-                    toRoute,
-                    fromTrip,
-                    toTrip,
-                    transferType,
-                    transferTime
-            );
-        } else if (rhs.getFromStop().getLocationType() == 0
-                && rhs.getToStop().getLocationType() == 1) {
-            lhs = Transfer.getExpandedTransfers(
-                    stopMapper.map(rhs.getFromStop()),
-                    stationMapper.map(rhs.getToStop()),
-                    fromRoute,
-                    toRoute,
-                    fromTrip,
-                    toTrip,
-                    transferType,
-                    transferTime
-            );
-        } else if (rhs.getFromStop().getLocationType() == 1
-                && rhs.getToStop().getLocationType() == 1) {
-            lhs = Transfer.getExpandedTransfers(
-                    stationMapper.map(rhs.getFromStop()),
-                    stationMapper.map(rhs.getToStop()),
-                    fromRoute,
-                    toRoute,
-                    fromTrip,
-                    toTrip,
-                    transferType,
-                    transferTime
-            );
-        } else {
-            lhs = Collections.emptyList();
+        Collection<Stop> fromStops = getStopOrChildStops(rhs.getFromStop());
+        Collection<Stop> toStops = getStopOrChildStops(rhs.getToStop());
+
+        Collection<Transfer> lhs = new ArrayList<>();
+
+        for (Stop fromStop : fromStops) {
+            for (Stop toStop : toStops ) {
+                lhs.add(
+                        new Transfer(
+                                fromStop,
+                                toStop,
+                                fromRoute,
+                                toRoute,
+                                fromTrip,
+                                toTrip,
+                                transferType,
+                                transferTime
+                        ));
+            }
         }
+
         return lhs;
+    }
+
+    private Collection<Stop> getStopOrChildStops(org.onebusaway.gtfs.model.Stop gtfsStop) {
+        if (gtfsStop.getLocationType() == 0) {
+            return Collections.singletonList(stopMapper.map(gtfsStop));
+        } else {
+            return stationMapper.map(gtfsStop).getChildStops();
+        }
     }
 }
