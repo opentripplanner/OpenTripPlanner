@@ -132,7 +132,7 @@ public class PatternHopFactory {
         loadAgencies(graph);
 
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
-        // Perhaps it is to allow name collisions with previously loaded feeds.
+        //       Perhaps it is to allow name collisions with previously loaded feeds?
         clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
@@ -757,48 +757,5 @@ public class PatternHopFactory {
 
     public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
         this.fareServiceFactory = fareServiceFactory;
-    }
-
-    /**
-     * Create transfer edges between stops which are listed in transfers.txt.
-     * 
-     * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
-     * True for a given GTFS feed.
-     *
-     * TODO May need to be reimplemented after transfer and stop/station refactoring
-     * TODO I suppose that this is a case where you may want to define regular transfers explicitly
-     * TODO instead of routing them via OSM data
-     */
-
-    public void createTransfersTxtTransfers() {
-
-        /* Create transfer edges based on transfers.txt. */
-        for (Transfer transfer : transitService.getAllTransfers()) {
-/*
-            TransferType type = transfer.getTransferType();
-            if (type == TransferType.FORBIDDEN) // type 3 = transfer not possible
-                continue;
-            if (transfer.getFromStop().equals(transfer.getToStop())) {
-                continue;
-            }
-            TransitStationStop fromv = stopNodes.get(transfer.getFromStop());
-            TransitStationStop tov = stopNodes.get(transfer.getToStop());
-
-            double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
-            int time;
-            if (transfer.getTransferType() == TransferType.GUARANTEED_WITH_MIN_TIME) {
-                time = transfer.getMinTransferTimeSeconds();
-            } else {
-                time = (int) distance; // fixme: handle timed transfers
-            }
-
-            TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
-            CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
-                    fromv.getCoordinate(), tov.getCoordinate() }, 2);
-            LineString geometry = geometryFactory.createLineString(sequence);
-            transferEdge.setGeometry(geometry);
-
- */
-        }
     }
 }
