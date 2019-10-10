@@ -96,6 +96,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
+    // TODO StreetEdge key extractor for object differ
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();

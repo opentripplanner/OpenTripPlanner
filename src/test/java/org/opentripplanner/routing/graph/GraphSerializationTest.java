@@ -3,7 +3,6 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
@@ -128,8 +127,19 @@ public class GraphSerializationTest {
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
         // Some tests re-build the graph which will result in build times different by as little as a few milliseconds.
-        // Some transient field is not relevant to the routing; hence not restored after reloading the graph.
-        objectDiffer.ignoreFields("incoming", "outgoing", "buildTime", "transitLayer", "realtimeTransitLayer", "graphBuilderAnnotations");
+        // Some transient fields are not relevant to routing, so are not restored after reloading the graph.
+        // Other structures contain Maps with keys that have identity equality - these also cannot be compared yet.
+        // We would need to apply a key extractor function to such maps, copying them into new maps.
+        objectDiffer.ignoreFields(
+                "incoming",
+                "outgoing",
+                "buildTime",
+                "transitLayer",
+                "realtimeTransitLayer",
+                "graphBuilderAnnotations"
+        );
+        // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
+        objectDiffer.setKeyExtractor("turnRestrictions", edge -> edge.toString());
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
