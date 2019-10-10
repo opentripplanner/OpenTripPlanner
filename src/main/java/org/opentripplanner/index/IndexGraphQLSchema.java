@@ -569,7 +569,8 @@ public class IndexGraphQLSchema {
                     try {
                         Trip trip = (Trip) environment.getSource();
                         return TripTimeShort.fromTripTimes(
-                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
+                            // TODO OTP2 - This may throw a NPE: getTimetableSnapshot() can be null
+                            index.graph.getTimetableSnapshot()
                                 .resolve(index.patternForTrip.get(trip),
                                     ServiceDate.parseString(environment.getArgument("serviceDay")))
                                 , trip);

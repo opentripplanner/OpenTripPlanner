@@ -1,17 +1,15 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.util.List;
-
+import com.google.common.base.Preconditions;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.util.List;
 
-public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
+class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     private static Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
 
     /**
@@ -27,7 +25,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
     private final String feedId;
 
-    public TripUpdateGraphWriterRunnable(final boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
+    TripUpdateGraphWriterRunnable(final boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
         // Preconditions
         Preconditions.checkNotNull(updates);
         Preconditions.checkNotNull(feedId);
@@ -40,8 +38,10 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
     @Override
     public void run(Graph graph) {
-        // Apply updates to graph using realtime snapshot source
-        TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
+        // Apply updates to graph using realtime snapshot source. The source is retrieved from the graph using the
+        // setup method witch return the instance, we do not need to provide any creator because the
+        // TimetableSnapshotSource should already be set up
+        TimetableSnapshotSource snapshotSource = graph.setupTimetableSnapshotProvider(null);
         if (snapshotSource != null) {
             snapshotSource.applyTripUpdates(graph, fullDataset, updates, feedId);
         } else {

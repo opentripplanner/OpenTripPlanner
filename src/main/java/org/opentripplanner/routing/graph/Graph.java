@@ -33,6 +33,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -45,6 +46,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
@@ -54,7 +56,6 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -132,7 +134,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
-    public transient TimetableSnapshotSource timetableSnapshotSource = null;
+    private transient TimetableSnapshotProvider timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -260,6 +262,21 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     // Constructor for deserialization.
     public Graph() {
 
+    }
+
+    public TimetableSnapshot getTimetableSnapshot() {
+        return timetableSnapshotSource == null ? null : timetableSnapshotSource.getTimetableSnapshot();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends TimetableSnapshotProvider> T setupTimetableSnapshotProvider(Function<Graph, T> creator) {
+        if(timetableSnapshotSource == null) {
+            timetableSnapshotSource = creator.apply(this);
+        }
+        // TODO OTP2 - We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one
+        //           - for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters
+        //           - try setup both.
+        return (T) timetableSnapshotSource;
     }
 
     /**
@@ -666,7 +683,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                if (this.timetableSnapshotSource != null) {
+                if (this.getTimetableSnapshot() != null) {
                     // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
                     // TODO this is not accounting for any new patterns created by realtime "add trip" messages.
                     this.realtimeTransitLayer = TransitLayerMapper.map(this);

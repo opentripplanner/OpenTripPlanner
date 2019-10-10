@@ -1,7 +1,14 @@
 package org.opentripplanner.ext.siri;
 
 import com.google.common.base.Preconditions;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -12,13 +19,33 @@ import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.*;
+import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
+import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
+import uk.org.siri.siri20.EstimatedCall;
+import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri20.EstimatedVersionFrameStructure;
+import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.RecordedCall;
+import uk.org.siri.siri20.VehicleActivityCancellationStructure;
+import uk.org.siri.siri20.VehicleActivityStructure;
+import uk.org.siri.siri20.VehicleModesEnumeration;
+import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.opentripplanner.ext.siri.TimetableHelper.*;
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
+import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 
@@ -27,7 +54,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class SiriTimetableSnapshotSource {
+public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
     /**

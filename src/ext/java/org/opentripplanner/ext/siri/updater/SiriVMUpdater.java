@@ -2,12 +2,12 @@ package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -112,22 +112,19 @@ public class SiriVMUpdater extends PollingGraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
-                if (snapshotSource == null) {
-                    snapshotSource = new TimetableSnapshotSource(graph);
-                    // Add snapshot source to graph
-                    graph.timetableSnapshotSource = (snapshotSource);
-                }
+                SiriTimetableSnapshotSource snapshotSource = graph.setupTimetableSnapshotProvider(
+                        SiriTimetableSnapshotSource::new
+                );
 
                 // Set properties of realtime data snapshot source
                 if (logFrequency != null) {
-                    snapshotSource.logFrequency = (logFrequency);
+                    snapshotSource.logFrequency = logFrequency;
                 }
                 if (maxSnapshotFrequency != null) {
-                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+                    snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
                 }
                 if (purgeExpiredData != null) {
-                    snapshotSource.purgeExpiredData = (purgeExpiredData);
+                    snapshotSource.purgeExpiredData = purgeExpiredData;
                 }
                 if (siriFuzzyTripMatcher != null) {
                     siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);

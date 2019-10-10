@@ -23,8 +23,6 @@ public enum OTPFeature {
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
 
-    // OTP Features
-
     // Sandbox extension features - Must be turned OFF by default
     SandboxExampleAPIGraphStatistics(false),
     TransferAnalyzer(false);

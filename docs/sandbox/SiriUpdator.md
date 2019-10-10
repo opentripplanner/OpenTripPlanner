@@ -25,5 +25,3 @@ To enable the SIRI updator you need to add it to the updators section of the `ro
     "url": "https://api.updater.com/example-updater"
 }
 ```
-
-To turn on fuzzy matching enable the `SIRIUpdaterFuzzyMatching` feature. 

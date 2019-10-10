@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import junit.framework.TestCase;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -10,8 +11,6 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import junit.framework.TestCase;
 
 /**
  * Test ignoring realtime updates.
@@ -42,7 +41,7 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
         when(source.getTimetableSnapshot()).thenReturn(snapshot);
-        graph.timetableSnapshotSource = (source);
+        graph.setupTimetableSnapshotProvider(g -> source);
         
         // Create routing context
         RoutingContext rctx = new RoutingContext(options, graph, from, to);
