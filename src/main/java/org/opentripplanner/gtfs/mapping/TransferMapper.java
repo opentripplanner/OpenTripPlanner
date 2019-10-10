@@ -9,8 +9,6 @@ import org.opentripplanner.model.Trip;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /** Responsible for mapping GTFS Transfer into the OTP model. */
@@ -22,9 +20,6 @@ class TransferMapper {
     private final StopMapper stopMapper;
 
     private final TripMapper tripMapper;
-
-    private Map<org.onebusaway.gtfs.model.Transfer, Collection<Transfer>> mappedTransfers
-            = new HashMap<>();
 
     TransferMapper(
             RouteMapper routeMapper,
@@ -45,7 +40,7 @@ class TransferMapper {
     /** Map from GTFS to OTP model, {@code null} safe.  */
 
     Collection<Transfer> map(org.onebusaway.gtfs.model.Transfer orginal) {
-        return orginal == null ? null : mappedTransfers.computeIfAbsent(orginal, this::doMap);
+        return orginal == null ? null : doMap(orginal));
     }
 
     private Collection<Transfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
