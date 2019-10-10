@@ -4,8 +4,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
-import java.util.stream.Collectors;
-
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
  * General mapping code or reusable bussiness logic should be moved into the Builder; hence
@@ -15,8 +13,6 @@ public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
 
     private final StationMapper stationMapper = new StationMapper();
-
-    private final StationStopLinker stationStopLinker = new StationStopLinker();
 
     private final StopMapper stopMapper = new StopMapper();
 
@@ -72,9 +68,9 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
 
-        mapStopsToStopsAndStations(data, builder);
+        mapGtfsStopsToOtpStopsAndStations(data, builder);
 
-        stationStopLinker.link(data.getAllStops(), builder.getStations(), builder.getStops());
+
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
@@ -82,7 +78,7 @@ public class GTFSToOtpTransitServiceMapper {
         return builder;
     }
 
-    private void mapStopsToStopsAndStations(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
+    private void mapGtfsStopsToOtpStopsAndStations(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
         for (Stop it : data.getAllStops()) {
             if(it.getLocationType() == 0) {
                 builder.getStops().add(stopMapper.map(it));
@@ -91,5 +87,6 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getStations().add(stationMapper.map(it));
             }
         }
+        new LinkStopsAndParentStationsTogether(builder.getStations(), builder.getStops()).link(data.getAllStops());
     }
 }
