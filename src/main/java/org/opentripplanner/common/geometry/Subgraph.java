@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPoint;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class Subgraph {
 
@@ -28,7 +28,7 @@ public class Subgraph {
     }
 
     public void addVertex(Vertex vertex){
-        if(vertex instanceof StopVertex){
+        if(vertex instanceof TransitStopVertex){
             stopsVertexSet.add(vertex);
         }else{
             streetVertexSet.add(vertex);

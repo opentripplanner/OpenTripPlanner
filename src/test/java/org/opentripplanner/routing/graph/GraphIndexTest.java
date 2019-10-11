@@ -9,7 +9,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -34,8 +34,8 @@ public class GraphIndexTest extends GtfsTest {
 
         /* Graph vertices */
         for (Vertex vertex : graph.getVertices()) {
-            if (vertex instanceof StopVertex) {
-                Stop stop = ((StopVertex)vertex).getStop();
+            if (vertex instanceof TransitStopVertex) {
+                Stop stop = ((TransitStopVertex)vertex).getStop();
                 Vertex index_vertex = graph.index.stopVertexForStop.get(stop);
                 assertEquals(index_vertex, vertex);
             }
@@ -84,14 +84,14 @@ public class GraphIndexTest extends GtfsTest {
         Stop stopJ = graph.index.stopForId.get(new FeedScopedId(feedId, "J"));
         Stop stopL = graph.index.stopForId.get(new FeedScopedId(feedId, "L"));
         Stop stopM = graph.index.stopForId.get(new FeedScopedId(feedId, "M"));
-        StopVertex stopvJ = graph.index.stopVertexForStop.get(stopJ);
-        StopVertex stopvL = graph.index.stopVertexForStop.get(stopL);
-        StopVertex stopvM = graph.index.stopVertexForStop.get(stopM);
+        TransitStopVertex stopvJ = graph.index.stopVertexForStop.get(stopJ);
+        TransitStopVertex stopvL = graph.index.stopVertexForStop.get(stopL);
+        TransitStopVertex stopvM = graph.index.stopVertexForStop.get(stopM);
         // There are a two other stops within 100 meters of stop J.
         Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
         env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
                 SphericalDistanceLibrary.metersToDegrees(100));
-        List<StopVertex> stops = graph.index.stopSpatialIndex.query(env);
+        List<TransitStopVertex> stops = graph.index.stopSpatialIndex.query(env);
         assertTrue(stops.contains(stopvJ));
         assertTrue(stops.contains(stopvL));
         assertTrue(stops.contains(stopvM));

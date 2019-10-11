@@ -27,7 +27,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -717,7 +717,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 5);
 		/* Draw selected visible vertices */
 		for (Vertex v : visibleVertices) {
-            if (drawTransitStopVertices && closeEnough && v instanceof StopVertex) {
+            if (drawTransitStopVertices && closeEnough && v instanceof TransitStopVertex) {
                 fill(60, 60, 200); // Make transit stops blue dots
 		        drawVertex(v, 7);
 			}

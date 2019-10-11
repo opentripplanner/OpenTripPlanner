@@ -46,7 +46,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -624,10 +624,10 @@ public abstract class GraphPathToTripPlanConverter {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof StopVertex ?
-                ((StopVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof StopVertex ?
-                ((StopVertex) lastVertex).getStop(): null;
+        Stop firstStop = firstVertex instanceof TransitStopVertex ?
+                ((TransitStopVertex) firstVertex).getStop(): null;
+        Stop lastStop = lastVertex instanceof TransitStopVertex ?
+                ((TransitStopVertex) lastVertex).getStop(): null;
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
@@ -644,9 +644,9 @@ public abstract class GraphPathToTripPlanConverter {
             for (int i = 1; i < edges.length; i++) {
                 Vertex vertex = states[i].getVertex();
 
-                if (!(vertex instanceof StopVertex)) continue;
+                if (!(vertex instanceof TransitStopVertex)) continue;
 
-                currentStop = ((StopVertex) vertex).getStop();
+                currentStop = ((TransitStopVertex) vertex).getStop();
                 if (currentStop == firstStop) continue;
 
                 if (currentStop == previousStop) {                  // Avoid duplication of stops
@@ -686,7 +686,7 @@ public abstract class GraphPathToTripPlanConverter {
         Place place = new Place(vertex.getX(), vertex.getY(), name,
                 makeCalendar(state), makeCalendar(state));
 
-        if (vertex instanceof StopVertex) {
+        if (vertex instanceof TransitStopVertex) {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
             place.platformCode = stop.getCode();

@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.stopsAlerts;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class TransitType extends AbstractStopTester {
 
@@ -13,7 +13,7 @@ public class TransitType extends AbstractStopTester {
      * @retrun return true if a transit type of type transitType is pass through that stop
      */
     @Override
-    public boolean fulfillDemands(StopVertex ts, Graph graph) {
+    public boolean fulfillDemands(TransitStopVertex ts, Graph graph) {
         if (ts.getModes().contains(transitType))
             return true;
         return false;

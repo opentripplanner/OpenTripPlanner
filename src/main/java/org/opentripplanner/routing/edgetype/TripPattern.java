@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-
-//  TODO Is this the correct package?
-
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -116,7 +112,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      * TODO OTP2 - This is not used and can be removed. It is initialized in the
      *           - PatternHopFactory, but never accessed after that.
      */
-    public final StopVertex[] stopVertices;
+    public final TransitStopVertex[] stopVertices;
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
@@ -152,8 +148,8 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     public LineString getHopGeometry(int stopIndex) {
-        StopVertex stopVertexStart = stopVertices[stopIndex];
-        StopVertex stopVertexEnd = stopVertices[stopIndex + 1];
+        TransitStopVertex stopVertexStart = stopVertices[stopIndex];
+        TransitStopVertex stopVertexEnd = stopVertices[stopIndex + 1];
 
         if (hopGeometries != null) {
             return CompactLineString.uncompactLineString(
@@ -208,7 +204,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         this.route = route;
         this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
-        this.stopVertices = new StopVertex[stopPattern.size];
+        this.stopVertices = new TransitStopVertex[stopPattern.size];
         setStopsFromStopPattern(stopPattern);
     }
 

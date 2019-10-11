@@ -45,7 +45,7 @@ import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,9 +61,6 @@ import java.util.Map;
 
 // Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
 // or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
-
-
-// TODO Look at this class
 
 /**
  * Generates a set of edges from GTFS.
@@ -90,7 +87,7 @@ public class PatternHopFactory {
     private FareServiceFactory fareServiceFactory;
 
     // Map of stops and their vertices in the graph
-    private Map<Stop, StopVertex> stopNodes = new HashMap<>();
+    private Map<Stop, TransitStopVertex> stopNodes = new HashMap<>();
 
     private int subwayAccessTime = 0;
 
@@ -180,7 +177,7 @@ public class PatternHopFactory {
              // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
             for (int s = 0; s < tripPattern.stopVertices.length; s++) {
                 Stop stop = tripPattern.stopPattern.stops[s];
-                tripPattern.stopVertices[s] = ((StopVertex) stopNodes.get(stop));
+                tripPattern.stopVertices[s] = ((TransitStopVertex) stopNodes.get(stop));
             }
             LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
             if (hopGeometries != null) {
@@ -191,7 +188,7 @@ public class PatternHopFactory {
 
             /* Iterate over all stops in this pattern recording mode information. */
             TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
-            for (StopVertex tstop : tripPattern.stopVertices) {
+            for (TransitStopVertex tstop : tripPattern.stopVertices) {
                 tstop.addMode(mode);
                 if (mode == TraverseMode.SUBWAY) {
                     tstop.setStreetToStopTime(subwayAccessTime);
@@ -528,7 +525,7 @@ public class PatternHopFactory {
         for (Stop stop : transitService.getAllStops()) {
             // Add a vertex representing the stop.
             // FIXME it is now possible for these vertices to not be connected to any edges.
-            StopVertex stopVertex = new StopVertex(graph, stop);
+            TransitStopVertex stopVertex = new TransitStopVertex(graph, stop);
             stopNodes.put(stop, stopVertex);
         }
         for (Station station : transitService.getAllStations()) {

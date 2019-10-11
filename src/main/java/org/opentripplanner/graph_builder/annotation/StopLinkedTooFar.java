@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class StopLinkedTooFar extends GraphBuilderAnnotation {
 
@@ -10,10 +10,10 @@ public class StopLinkedTooFar extends GraphBuilderAnnotation {
     public static final String FMT = "Stop %s is far away from nearest street. Snap distance is %s.";
     public static final String HTMLFMT = "Stop <a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s&layers=T\">\"%s\" (%s)</a> is far away from nearest street. Snap distance is %s.";
 
-    final StopVertex stop;
+    final TransitStopVertex stop;
     final int distance;
 
-    public StopLinkedTooFar(StopVertex stop, int distance) {
+    public StopLinkedTooFar(TransitStopVertex stop, int distance) {
         this.stop = stop;
         this.distance = distance;
     }

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class NonStationParentStation extends GraphBuilderAnnotation {
 
@@ -9,9 +9,9 @@ public class NonStationParentStation extends GraphBuilderAnnotation {
 
     public static final String FMT = "Stop %s contains a parentStation (%s) with a location_type != 1.";
     
-    final StopVertex stop;
+    final TransitStopVertex stop;
     
-    public NonStationParentStation(StopVertex stop){
+    public NonStationParentStation(TransitStopVertex stop){
     	this.stop = stop;
     }
     

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.stopsAlerts;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public abstract class AbstractStopTester implements IStopTester{
 
@@ -12,6 +12,6 @@ public abstract class AbstractStopTester implements IStopTester{
     }
 
     @Override
-    abstract public boolean fulfillDemands(StopVertex ts, Graph graph);
+    abstract public boolean fulfillDemands(TransitStopVertex ts, Graph graph);
 
 }

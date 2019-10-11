@@ -24,7 +24,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class NearbyStopFinder {
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
             /* Filter out destination stops that are already reachable via pathways or transfers. */
             // FIXME why is the above comment relevant here? how does the next line achieve this?
-            StopVertex ts1 = stopAtDistance.tstop;
+            TransitStopVertex ts1 = stopAtDistance.tstop;
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
@@ -148,14 +148,14 @@ public class NearbyStopFinder {
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (targetVertex == originVertex) continue;
-                if (targetVertex instanceof StopVertex) {
+                if (targetVertex instanceof TransitStopVertex) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
         }
         /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        if (originVertex instanceof StopVertex) {
-            stopsFound.add(new StopAtDistance((StopVertex)originVertex, 0));
+        if (originVertex instanceof TransitStopVertex) {
+            stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
         }
         routingRequest.cleanup();
         return stopsFound;
@@ -173,7 +173,7 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsEuclidean (Vertex originVertex) {
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         Coordinate c0 = originVertex.getCoordinate();
-        for (StopVertex ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
+        for (TransitStopVertex ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
             double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
             if (distance < radiusMeters) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
@@ -190,12 +190,12 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public StopVertex tstop;
+        public TransitStopVertex tstop;
         public double      dist;
         public LineString  geom;
         public List<Edge>  edges;
 
-        public StopAtDistance(StopVertex tstop, double dist) {
+        public StopAtDistance(TransitStopVertex tstop, double dist) {
             this.tstop = tstop;
             this.dist = dist;
         }
@@ -243,7 +243,7 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((StopVertex) state.getVertex(), distance);
+        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), distance);
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;

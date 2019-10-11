@@ -13,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-// TODO Name TransitStopVertex
-public class StopVertex extends Vertex {
+public class TransitStopVertex extends Vertex {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StopVertex.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitStopVertex.class);
 
     // Do we actually need a set of modes for each stop?
     // It's nice to have for the index web API but can be generated on demand.
@@ -36,7 +35,7 @@ public class StopVertex extends Vertex {
      */
     private int streetToStopTime = 0;
 
-    public StopVertex(Graph graph, Stop stop) {
+    public TransitStopVertex (Graph graph, Stop stop) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop.getLon(), stop.getLat());
         this.stop = stop;
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

@@ -70,7 +70,6 @@ public class GTFSToOtpTransitServiceMapper {
 
         mapGtfsStopsToOtpStopsAndStations(data, builder);
 
-
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));

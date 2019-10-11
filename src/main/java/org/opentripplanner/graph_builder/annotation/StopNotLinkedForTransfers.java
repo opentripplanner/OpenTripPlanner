@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class StopNotLinkedForTransfers extends GraphBuilderAnnotation {
     private static final long serialVersionUID = 1L;
@@ -10,9 +10,9 @@ public class StopNotLinkedForTransfers extends GraphBuilderAnnotation {
 
     public static final String HTMLFMT = "Stop <a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s&layers=T\">\"%s (%s)\"</a> not near any other stops; no transfers are possible.";
 
-    final StopVertex stop;
+    final TransitStopVertex stop;
     
-    public StopNotLinkedForTransfers(StopVertex stop){
+    public StopNotLinkedForTransfers(TransitStopVertex stop){
     	this.stop = stop;
     }
 

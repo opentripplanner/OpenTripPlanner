@@ -31,7 +31,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,8 +282,8 @@ public class ItineraryMapper {
     }
 
     private Place mapOriginTargetToPlace(Vertex vertex, GenericLocation location) {
-        return vertex instanceof StopVertex ?
-                mapTransitVertexToPlace((StopVertex) vertex) :
+        return vertex instanceof TransitStopVertex ?
+                mapTransitVertexToPlace((TransitStopVertex) vertex) :
                 mapLocationToPlace(location);
     }
 
@@ -295,7 +295,7 @@ public class ItineraryMapper {
         }
     }
 
-    private Place mapTransitVertexToPlace(StopVertex vertex) {
+    private Place mapTransitVertexToPlace(TransitStopVertex vertex) {
         return mapStopToPlace(vertex.getStop());
     }
 

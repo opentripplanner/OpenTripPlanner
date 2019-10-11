@@ -68,7 +68,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             if (v instanceof BarrierVertex) {
                 attrs.color = BARRIER_COLOR_VERTEX;
             }
-        } else if (v instanceof StopVertex) {
+        } else if (v instanceof TransitStopVertex) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
             attrs.label = v.getName();
         } else if (v instanceof BikeRentalStationVertex) {

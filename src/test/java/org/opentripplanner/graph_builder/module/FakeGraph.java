@@ -8,7 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.io.File;
 import java.net.URL;
@@ -71,7 +71,7 @@ public class FakeGraph {
                 stop.setCode(id);
                 stop.setId(aid);
 
-                new StopVertex(g, stop);
+                new TransitStopVertex(g, stop);
                 count++;
             }
         }
@@ -91,7 +91,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new StopVertex(g, stop);
+            new TransitStopVertex(g, stop);
             count++;
         }
 
@@ -108,7 +108,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new StopVertex(g, stop);
+            new TransitStopVertex(g, stop);
             count++;
         }
 
@@ -125,7 +125,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new StopVertex(g, stop);
+            new TransitStopVertex(g, stop);
             count++;
         }
     }

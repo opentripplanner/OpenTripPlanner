@@ -10,27 +10,22 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
 
 import java.util.Calendar;
@@ -76,7 +71,7 @@ public class TestPatternHopFactory extends TestCase {
                 feedId + ":entrance_b"
         };
         for (int i = 0; i < stops.length; ++i) {
-            StopVertex stop = (StopVertex) (graph.getVertex(stops[i]));
+            TransitStopVertex stop = (TransitStopVertex) (graph.getVertex(stops[i]));
             
             IntersectionVertex front = new IntersectionVertex(graph, "near_1_" + stop.getStop().getId(), stop.getX() + 0.0001, stop.getY() + 0.0001);
             IntersectionVertex back =  new IntersectionVertex(graph, "near_2_" + stop.getStop().getId(), stop.getX() - 0.0001, stop.getY() - 0.0001);
@@ -104,11 +99,11 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue(found);
     }
 
-    private List<StopVertex> extractStopVertices(GraphPath path) {
-        List<StopVertex> ret = Lists.newArrayList();
+    private List<TransitStopVertex> extractStopVertices(GraphPath path) {
+        List<TransitStopVertex> ret = Lists.newArrayList();
         for (State state : path.states) {
-            if (state.getVertex() instanceof StopVertex) {
-                ret.add(((StopVertex)state.getVertex()));
+            if (state.getVertex() instanceof TransitStopVertex) {
+                ret.add(((TransitStopVertex)state.getVertex()));
             }
         }
         return ret;
@@ -156,7 +151,7 @@ public class TestPatternHopFactory extends TestCase {
         assertNotNull(path);
         // there are two paths of different lengths 
         // both arrive at 40 minutes after midnight
-        List<StopVertex> stops = extractStopVertices(path);
+        List<TransitStopVertex> stops = extractStopVertices(path);
         assertEquals(stops.size(), 3);
         assertEquals(stops.get(1), stop_c);
         long endTime = startTime + 40 * 60;

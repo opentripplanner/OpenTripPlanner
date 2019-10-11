@@ -8,7 +8,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -27,15 +27,15 @@ public class StreetTransitLink extends Edge {
 
     private boolean wheelchairAccessible;
 
-    private StopVertex stopVertex;
+    private TransitStopVertex stopVertex;
 
-    public StreetTransitLink(StreetVertex fromv, StopVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(StreetVertex fromv, TransitStopVertex tov, boolean wheelchairAccessible) {
     	super(fromv, tov);
     	stopVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public StreetTransitLink(StopVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(TransitStopVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
         stopVertex = fromv;
         this.wheelchairAccessible = wheelchairAccessible;

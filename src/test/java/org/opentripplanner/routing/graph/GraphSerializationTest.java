@@ -3,7 +3,6 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
@@ -11,7 +10,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.io.File;
 import java.util.BitSet;
@@ -107,7 +106,7 @@ public class GraphSerializationTest {
         // Remove the transit stations, which have no edges and won't survive serialization.
         // These are buffered into a list to prevent concurrent modification (removal while iterating).
         List<Vertex> transitVertices = originalGraph.getVertices().stream()
-                .filter(v -> v instanceof StopVertex).collect(Collectors.toList());
+                .filter(v -> v instanceof TransitStopVertex).collect(Collectors.toList());
         transitVertices.forEach(originalGraph::remove);
         originalGraph.index(new DefaultStreetVertexIndexFactory());
         // The cached timezone in the graph is transient and lazy-initialized.

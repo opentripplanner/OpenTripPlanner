@@ -9,7 +9,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         ArrayList<Vertex> vertices = new ArrayList<>();
         vertices.addAll(graph.getVertices());
 
-        for (StopVertex ts : Iterables.filter(vertices, StopVertex.class)) {
+        for (TransitStopVertex ts : Iterables.filter(vertices, TransitStopVertex.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
@@ -81,7 +81,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         }
     }
 
-    private boolean connectVertexToStop(StopVertex ts, boolean wheelchairAccessible) {
+    private boolean connectVertexToStop(TransitStopVertex ts, boolean wheelchairAccessible) {
         String stopCode = ts.getStop().getCode();
         if (stopCode == null){
             return false;

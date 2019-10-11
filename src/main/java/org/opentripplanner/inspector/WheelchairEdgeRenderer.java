@@ -5,7 +5,7 @@ import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.awt.Color;
 
@@ -47,14 +47,14 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
     @Override
     public boolean renderVertex(Vertex v, EdgeVertexTileRenderer.VertexVisualAttributes attrs) {
-        if (v instanceof StopVertex) {
-            if(((StopVertex) v).getStop().getWheelchairBoarding()
+        if (v instanceof TransitStopVertex) {
+            if(((TransitStopVertex) v).getStop().getWheelchairBoarding()
                     == WheelChairBoarding.NO_INFORMATION)
                 attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
-            if(((StopVertex) v).getStop().getWheelchairBoarding()
+            if(((TransitStopVertex) v).getStop().getWheelchairBoarding()
                     == WheelChairBoarding.POSSIBLE)
                 attrs.color = YES_WHEELCHAIR_COLOR;
-            if(((StopVertex) v).getStop().getWheelchairBoarding()
+            if(((TransitStopVertex) v).getStop().getWheelchairBoarding()
                     == WheelChairBoarding.NOT_POSSIBLE)
                 attrs.color = NO_WHEELCHAIR_COLOR;
             attrs.label = v.getName();

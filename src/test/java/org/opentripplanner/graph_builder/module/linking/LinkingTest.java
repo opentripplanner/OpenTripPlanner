@@ -17,7 +17,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.io.UnsupportedEncodingException;
@@ -87,13 +87,13 @@ public class LinkingTest {
         link(g2);
 
         // compare the linkages
-        for (StopVertex ts : Iterables.filter(g1.getVertices(), StopVertex.class)) {
+        for (TransitStopVertex ts : Iterables.filter(g1.getVertices(), TransitStopVertex.class)) {
             Collection<Edge> stls = stls(ts.getOutgoing());			
             assertTrue(stls.size() >= 1);
 
             StreetTransitLink exemplar = (StreetTransitLink) stls.iterator().next();
 
-            StopVertex other = (StopVertex) g2.getVertex(ts.getLabel());
+            TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
 
             Collection<Edge> ostls = stls(other.getOutgoing());
 

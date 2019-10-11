@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.StopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class StopUnlinked extends GraphBuilderAnnotation {
 
@@ -10,9 +10,9 @@ public class StopUnlinked extends GraphBuilderAnnotation {
     public static final String FMT = "Stop %s not near any streets; it will not be usable.";
     public static final String HTMLFMT = "Stop <a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s&layers=T\">\"%s\" (%s)</a> not near any streets; it will not be usable.";
     
-    final StopVertex stop;
+    final TransitStopVertex stop;
     
-    public StopUnlinked(StopVertex stop){
+    public StopUnlinked(TransitStopVertex stop){
     	this.stop = stop;
     }
     
